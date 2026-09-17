@@ -30,8 +30,16 @@ function genereerCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-/** Genereert een code, slaat 'm op (15 min geldig) en "verstuurt" 'm. Geeft de code terug t.b.v. de dev-weergave. */
-export function stuurVerificatiecode(respondentId: string, email: string): string {
+/**
+ * Genereert een code, slaat 'm op (15 min geldig) en verstuurt 'm via Gmail.
+ * Geeft terug of de mail echt is verstuurd (`verstuurd`) en de code zelf
+ * (`code`) — die laatste alleen bedoeld om te tonen als dev-fallback
+ * wanneer `verstuurd` false is.
+ */
+export async function stuurVerificatiecode(
+  respondentId: string,
+  email: string
+): Promise<{ code: string; verstuurd: boolean }> {
   const alles = laadAlles();
   const code = genereerCode();
   alles[respondentId] = {
@@ -41,8 +49,8 @@ export function stuurVerificatiecode(respondentId: string, email: string): strin
     geverifieerd: false,
   };
   slaAlles(alles);
-  verstuurVerificatiecode(email, code);
-  return code;
+  const verstuurd = await verstuurVerificatiecode(email, code);
+  return { code, verstuurd };
 }
 
 export type CodeControleResultaat = "ok" | "onjuist" | "verlopen" | "niet-aangevraagd";

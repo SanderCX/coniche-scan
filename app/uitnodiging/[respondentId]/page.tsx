@@ -31,6 +31,7 @@ export default function UitnodigingPage({
   const [code, setCode] = useState("");
   const [fout, setFout] = useState<string | null>(null);
   const [devCode, setDevCode] = useState<string | null>(null);
+  const [versturen, setVersturen] = useState(false);
 
   useEffect(() => {
     if (gegevens && isGeverifieerd(respondentId)) {
@@ -52,15 +53,20 @@ export default function UitnodigingPage({
 
   const { organisatie, respondent } = gegevens;
 
-  function handleEmailSubmit(e: React.FormEvent) {
+  async function handleEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
     setFout(null);
     if (email.trim().toLowerCase() !== respondent.email.trim().toLowerCase()) {
       setFout("Dit e-mailadres komt niet overeen met de uitnodiging.");
       return;
     }
-    const gegenereerdeCode = stuurVerificatiecode(respondentId, email.trim());
-    setDevCode(gegenereerdeCode);
+    setVersturen(true);
+    const { code: gegenereerdeCode, verstuurd } = await stuurVerificatiecode(
+      respondentId,
+      email.trim()
+    );
+    setVersturen(false);
+    setDevCode(verstuurd ? null : gegenereerdeCode);
     setStap("code");
   }
 
@@ -79,9 +85,14 @@ export default function UitnodigingPage({
     setFout("Onjuiste code. Controleer je e-mail en probeer opnieuw.");
   }
 
-  function handleOpnieuwVersturen() {
-    const gegenereerdeCode = stuurVerificatiecode(respondentId, email.trim());
-    setDevCode(gegenereerdeCode);
+  async function handleOpnieuwVersturen() {
+    setVersturen(true);
+    const { code: gegenereerdeCode, verstuurd } = await stuurVerificatiecode(
+      respondentId,
+      email.trim()
+    );
+    setVersturen(false);
+    setDevCode(verstuurd ? null : gegenereerdeCode);
     setFout(null);
     setCode("");
   }
@@ -116,21 +127,26 @@ export default function UitnodigingPage({
           {fout && <p className="text-sm text-red-600">{fout}</p>}
           <button
             type="submit"
-            className="w-full rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            disabled={versturen}
+            className="w-full rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50"
           >
-            Verstuur verificatiecode
+            {versturen ? "Versturen..." : "Verstuur verificatiecode"}
           </button>
         </form>
       )}
 
       {stap === "code" && (
         <form onSubmit={handleCodeSubmit} className="mt-8 space-y-4">
-          {devCode && (
+          {devCode ? (
             <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               <p className="font-medium">Ontwikkelmodus — nog geen mailservice gekoppeld</p>
               <p className="mt-1">
                 Je verificatiecode is: <span className="font-mono font-bold">{devCode}</span>
               </p>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800">
+              We hebben een verificatiecode gestuurd naar {email}.
             </div>
           )}
           <div>

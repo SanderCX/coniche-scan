@@ -25,19 +25,24 @@ export default function ScanDetailPage({
 
   const [email, setEmail] = useState("");
   const [laatsteLink, setLaatsteLink] = useState<string | null>(null);
+  const [laatsteLinkVerstuurd, setLaatsteLinkVerstuurd] = useState(false);
   const [gekopieerd, setGekopieerd] = useState(false);
+  const [versturen, setVersturen] = useState(false);
 
   if (!organisatie || !assessment) {
     return <p className="text-sm text-slate-500">Scan niet gevonden.</p>;
   }
 
-  function handleUitnodigen(e: React.FormEvent) {
+  async function handleUitnodigen(e: React.FormEvent) {
     e.preventDefault();
     const respondent = nodigRespondentUit(organisatieId, email.trim());
     if (!respondent) return;
     const url = `${window.location.origin}/uitnodiging/${respondent.id}`;
-    verstuurUitnodiging(email.trim(), url);
+    setVersturen(true);
+    const verstuurd = await verstuurUitnodiging(email.trim(), url);
+    setVersturen(false);
     setLaatsteLink(url);
+    setLaatsteLinkVerstuurd(verstuurd);
     setEmail("");
     setGekopieerd(false);
   }
@@ -70,12 +75,13 @@ export default function ScanDetailPage({
           />
           <button
             type="submit"
-            className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+            disabled={versturen}
+            className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
           >
-            Uitnodigen
+            {versturen ? "Versturen..." : "Uitnodigen"}
           </button>
         </form>
-        {laatsteLink && (
+        {laatsteLink && !laatsteLinkVerstuurd && (
           <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
             <p className="font-medium">
               Ontwikkelmodus — nog geen mailservice gekoppeld. Deel deze link handmatig:
@@ -92,6 +98,12 @@ export default function ScanDetailPage({
                 {gekopieerd ? "Gekopieerd!" : "Kopieer"}
               </button>
             </div>
+          </div>
+        )}
+        {laatsteLink && laatsteLinkVerstuurd && (
+          <div className="mt-4 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800">
+            Uitnodiging verstuurd. Je kunt de link ook nog handmatig kopiëren via de lijst
+            hieronder.
           </div>
         )}
       </section>
