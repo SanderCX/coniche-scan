@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAssessments } from "@/lib/assessment-store";
+import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
 
 export default function ContentOverzichtPage() {
   const assessments = useAssessments();
@@ -25,8 +26,10 @@ export default function ContentOverzichtPage() {
                 {a.icoon} {a.naam}
               </p>
               <p className="text-sm text-slate-500">
-                {a.categorieen.length} categorieën ·{" "}
-                {a.categorieen.reduce((s, c) => s + c.bouwblokken.length, 0)} bouwblokken
+                {a.categorieen
+                  ? `${a.categorieen.length} categorieën · `
+                  : "Geen categorie-laag · "}
+                {alleBouwblokkenMetGroep(a).length} {a.bouwblokEenheidMeervoud}
               </p>
             </div>
           </Link>

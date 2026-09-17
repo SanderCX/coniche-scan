@@ -5,6 +5,7 @@ import { ScaleRadio } from "./ScaleRadio";
 export function BouwblokForm({
   bouwblok,
   categorieKleur,
+  eenheid,
   schaal,
   respondent,
   isLaatsteBouwblok,
@@ -13,7 +14,9 @@ export function BouwblokForm({
   onVolgende,
 }: {
   bouwblok: Bouwblok;
-  categorieKleur: string;
+  categorieKleur: string | null;
+  /** UI-woord voor dit bouwblok, bijv. "Bouwblok" of "Domein". */
+  eenheid: string;
   schaal: SchaalLabel[];
   respondent: Respondent;
   isLaatsteBouwblok: boolean;
@@ -21,7 +24,7 @@ export function BouwblokForm({
   onOpmerking: (tekst: string) => void;
   onVolgende: () => void;
 }) {
-  const kleur = CATEGORIE_COLORS[categorieKleur];
+  const kleur = categorieKleur ? CATEGORIE_COLORS[categorieKleur] : undefined;
   const alleBeantwoord = bouwblok.vragen.every(
     (v) => typeof respondent.antwoorden[v.id] === "number"
   );
@@ -30,7 +33,7 @@ export function BouwblokForm({
     <div className="mx-auto max-w-3xl">
       <div className={`rounded-t-2xl px-6 py-5 text-white ${kleur?.bg ?? "bg-slate-700"}`}>
         <p className="text-xs font-medium uppercase tracking-wide opacity-80">
-          Bouwblok {bouwblok.volgnummer}
+          {eenheid} {bouwblok.volgnummer}
         </p>
         <h1 className="mt-1 text-2xl font-bold">{bouwblok.naam}</h1>
         <p className="mt-2 text-sm opacity-90">{bouwblok.omschrijving}</p>

@@ -333,6 +333,25 @@ export const klantcontactVolwassenheid: Assessment = {
   doelgroep: "MT, operations en CX-verantwoordelijken binnen klantcontactorganisaties",
   icoon: "🎯",
   geschatteDuur: "±30 minuten",
+  bouwblokken: null,
+  scoresPerGroepGesorteerd: false,
+  bouwblokEenheidEnkelvoud: "Bouwblok",
+  bouwblokEenheidMeervoud: "bouwblokken",
+  featureCards: [
+    {
+      titel: "Volledig beeld",
+      tekst: "15 bouwblokken, verdeeld over 5 pijlers — van strategie tot cultuur.",
+    },
+    {
+      titel: "Direct inzicht",
+      tekst: "Score per bouwblok, categorie en totaal, met sterktes en verbeterkansen.",
+    },
+    {
+      titel: "Concreet en toepasbaar",
+      tekst:
+        "Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken.",
+    },
+  ],
   schaal: [
     { waarde: 1, label: "Niet aanwezig" },
     { waarde: 2, label: "Deels / incidenteel" },

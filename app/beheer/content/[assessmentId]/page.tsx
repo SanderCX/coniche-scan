@@ -3,168 +3,294 @@
 import { use } from "react";
 import Link from "next/link";
 import { useAssessment, updateAssessment } from "@/lib/assessment-store";
-import { Assessment, VeldDefinitie } from "@/lib/types";
+import { Assessment, Bouwblok, FeatureCard, VeldDefinitie } from "@/lib/types";
 import { nieuwId } from "@/lib/id";
 import { CATEGORIE_COLORS } from "@/lib/colors";
 import { VeldDefinitieEditor } from "@/components/beheer/VeldDefinitieEditor";
 
+/** Leest/schrijft de bouwblokken op hun plek: genest in een categorie, of
+ * plat op de assessment zelf als `categorieId` null is (geen categorie-laag). */
+function metBouwblokken(
+  assessment: Assessment,
+  categorieId: string | null,
+  updater: (bouwblokken: Bouwblok[]) => Bouwblok[]
+): Assessment {
+  if (categorieId === null) {
+    return { ...assessment, bouwblokken: updater(assessment.bouwblokken ?? []) };
+  }
+  return {
+    ...assessment,
+    categorieen: (assessment.categorieen ?? []).map((c) =>
+      c.id === categorieId ? { ...c, bouwblokken: updater(c.bouwblokken) } : c
+    ),
+  };
+}
+
+function alleVolgnummers(assessment: Assessment): number[] {
+  const bouwblokken = assessment.categorieen
+    ? assessment.categorieen.flatMap((c) => c.bouwblokken)
+    : (assessment.bouwblokken ?? []);
+  return bouwblokken.map((b) => b.volgnummer);
+}
+
 function addCategorie(assessmentId: string) {
   updateAssessment(assessmentId, (a) => {
-    a.categorieen.push({
+    const categorieen = a.categorieen ?? [];
+    categorieen.push({
       id: nieuwId(),
       naam: "Nieuwe categorie",
       kleur: "blauw",
-      volgorde: a.categorieen.length + 1,
+      volgorde: categorieen.length + 1,
       bouwblokken: [],
     });
-    return a;
+    return { ...a, categorieen };
   });
 }
 
 function patchCategorie(
   assessmentId: string,
   categorieId: string,
-  patch: Partial<Assessment["categorieen"][number]>
+  patch: Partial<{ naam: string; kleur: string }>
 ) {
-  updateAssessment(assessmentId, (a) => {
-    a.categorieen = a.categorieen.map((c) => (c.id === categorieId ? { ...c, ...patch } : c));
-    return a;
-  });
+  updateAssessment(assessmentId, (a) => ({
+    ...a,
+    categorieen: (a.categorieen ?? []).map((c) => (c.id === categorieId ? { ...c, ...patch } : c)),
+  }));
 }
 
 function removeCategorie(assessmentId: string, categorieId: string) {
-  updateAssessment(assessmentId, (a) => {
-    a.categorieen = a.categorieen.filter((c) => c.id !== categorieId);
-    return a;
-  });
+  updateAssessment(assessmentId, (a) => ({
+    ...a,
+    categorieen: (a.categorieen ?? []).filter((c) => c.id !== categorieId),
+  }));
 }
 
-function addBouwblok(assessmentId: string, categorieId: string) {
+function addBouwblok(assessmentId: string, categorieId: string | null) {
   updateAssessment(assessmentId, (a) => {
-    const maxVolgnummer = Math.max(
-      0,
-      ...a.categorieen.flatMap((c) => c.bouwblokken.map((b) => b.volgnummer))
-    );
-    a.categorieen = a.categorieen.map((c) =>
-      c.id === categorieId
-        ? {
-            ...c,
-            bouwblokken: [
-              ...c.bouwblokken,
-              {
-                id: nieuwId(),
-                volgnummer: maxVolgnummer + 1,
-                naam: "Nieuw bouwblok",
-                omschrijving: "",
-                tags: [],
-                vragen: [],
-              },
-            ],
-          }
-        : c
-    );
-    return a;
+    const maxVolgnummer = Math.max(0, ...alleVolgnummers(a));
+    return metBouwblokken(a, categorieId, (bouwblokken) => [
+      ...bouwblokken,
+      {
+        id: nieuwId(),
+        volgnummer: maxVolgnummer + 1,
+        naam: "Nieuw bouwblok",
+        omschrijving: "",
+        tags: [],
+        vragen: [],
+      },
+    ]);
   });
 }
 
 function patchBouwblok(
   assessmentId: string,
-  categorieId: string,
+  categorieId: string | null,
   bouwblokId: string,
-  patch: Partial<Assessment["categorieen"][number]["bouwblokken"][number]>
+  patch: Partial<Bouwblok>
 ) {
-  updateAssessment(assessmentId, (a) => {
-    a.categorieen = a.categorieen.map((c) =>
-      c.id !== categorieId
-        ? c
-        : {
-            ...c,
-            bouwblokken: c.bouwblokken.map((b) =>
-              b.id === bouwblokId ? { ...b, ...patch } : b
-            ),
-          }
-    );
-    return a;
-  });
+  updateAssessment(assessmentId, (a) =>
+    metBouwblokken(a, categorieId, (bouwblokken) =>
+      bouwblokken.map((b) => (b.id === bouwblokId ? { ...b, ...patch } : b))
+    )
+  );
 }
 
-function removeBouwblok(assessmentId: string, categorieId: string, bouwblokId: string) {
-  updateAssessment(assessmentId, (a) => {
-    a.categorieen = a.categorieen.map((c) =>
-      c.id !== categorieId
-        ? c
-        : { ...c, bouwblokken: c.bouwblokken.filter((b) => b.id !== bouwblokId) }
-    );
-    return a;
-  });
+function removeBouwblok(assessmentId: string, categorieId: string | null, bouwblokId: string) {
+  updateAssessment(assessmentId, (a) =>
+    metBouwblokken(a, categorieId, (bouwblokken) => bouwblokken.filter((b) => b.id !== bouwblokId))
+  );
 }
 
-function addVraag(assessmentId: string, categorieId: string, bouwblokId: string) {
-  updateAssessment(assessmentId, (a) => {
-    a.categorieen = a.categorieen.map((c) =>
-      c.id !== categorieId
-        ? c
-        : {
-            ...c,
-            bouwblokken: c.bouwblokken.map((b) =>
-              b.id !== bouwblokId
-                ? b
-                : {
-                    ...b,
-                    vragen: [...b.vragen, { id: nieuwId(), volgnummer: b.vragen.length + 1, tekst: "" }],
-                  }
-            ),
-          }
-    );
-    return a;
-  });
+function addVraag(assessmentId: string, categorieId: string | null, bouwblokId: string) {
+  updateAssessment(assessmentId, (a) =>
+    metBouwblokken(a, categorieId, (bouwblokken) =>
+      bouwblokken.map((b) =>
+        b.id !== bouwblokId
+          ? b
+          : { ...b, vragen: [...b.vragen, { id: nieuwId(), volgnummer: b.vragen.length + 1, tekst: "" }] }
+      )
+    )
+  );
 }
 
 function patchVraag(
   assessmentId: string,
-  categorieId: string,
+  categorieId: string | null,
   bouwblokId: string,
   vraagId: string,
   tekst: string
 ) {
-  updateAssessment(assessmentId, (a) => {
-    a.categorieen = a.categorieen.map((c) =>
-      c.id !== categorieId
-        ? c
-        : {
-            ...c,
-            bouwblokken: c.bouwblokken.map((b) =>
-              b.id !== bouwblokId
-                ? b
-                : { ...b, vragen: b.vragen.map((v) => (v.id === vraagId ? { ...v, tekst } : v)) }
-            ),
-          }
-    );
-    return a;
-  });
+  updateAssessment(assessmentId, (a) =>
+    metBouwblokken(a, categorieId, (bouwblokken) =>
+      bouwblokken.map((b) =>
+        b.id !== bouwblokId
+          ? b
+          : { ...b, vragen: b.vragen.map((v) => (v.id === vraagId ? { ...v, tekst } : v)) }
+      )
+    )
+  );
 }
 
 function removeVraag(
   assessmentId: string,
-  categorieId: string,
+  categorieId: string | null,
   bouwblokId: string,
   vraagId: string
 ) {
+  updateAssessment(assessmentId, (a) =>
+    metBouwblokken(a, categorieId, (bouwblokken) =>
+      bouwblokken.map((b) =>
+        b.id !== bouwblokId ? b : { ...b, vragen: b.vragen.filter((v) => v.id !== vraagId) }
+      )
+    )
+  );
+}
+
+function schakelCategorieLaag(assessmentId: string, aanzetten: boolean) {
   updateAssessment(assessmentId, (a) => {
-    a.categorieen = a.categorieen.map((c) =>
-      c.id !== categorieId
-        ? c
-        : {
-            ...c,
-            bouwblokken: c.bouwblokken.map((b) =>
-              b.id !== bouwblokId
-                ? b
-                : { ...b, vragen: b.vragen.filter((v) => v.id !== vraagId) }
-            ),
-          }
-    );
-    return a;
+    if (aanzetten) {
+      return {
+        ...a,
+        categorieen: [
+          {
+            id: nieuwId(),
+            naam: "Nieuwe categorie",
+            kleur: "blauw",
+            volgorde: 1,
+            bouwblokken: a.bouwblokken ?? [],
+          },
+        ],
+        bouwblokken: null,
+      };
+    }
+    return {
+      ...a,
+      bouwblokken: (a.categorieen ?? []).flatMap((c) => c.bouwblokken),
+      categorieen: null,
+    };
   });
+}
+
+function BouwblokEditor({
+  assessmentId,
+  categorieId,
+  bouwblok,
+}: {
+  assessmentId: string;
+  categorieId: string | null;
+  bouwblok: Bouwblok;
+}) {
+  return (
+    <details className="rounded-lg border border-slate-100 p-3">
+      <summary className="flex cursor-pointer flex-wrap items-center gap-2">
+        <span className="text-xs font-semibold text-slate-400">#{bouwblok.volgnummer}</span>
+        <input
+          value={bouwblok.naam}
+          onChange={(e) =>
+            patchBouwblok(assessmentId, categorieId, bouwblok.id, { naam: e.target.value })
+          }
+          onClick={(e) => e.stopPropagation()}
+          className="flex-1 rounded-lg border border-slate-200 p-1.5 text-sm font-medium"
+        />
+        <span className="text-xs text-slate-400">{bouwblok.vragen.length} vragen</span>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            removeBouwblok(assessmentId, categorieId, bouwblok.id);
+          }}
+          className="text-sm text-red-600 hover:underline"
+        >
+          Verwijderen
+        </button>
+      </summary>
+
+      <div className="mt-3 space-y-3">
+        <label className="block text-sm">
+          <span className="mb-1 block text-slate-700">Omschrijving</span>
+          <textarea
+            value={bouwblok.omschrijving}
+            onChange={(e) =>
+              patchBouwblok(assessmentId, categorieId, bouwblok.id, {
+                omschrijving: e.target.value,
+              })
+            }
+            rows={2}
+            className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+          />
+        </label>
+        <label className="block text-sm">
+          <span className="mb-1 block text-slate-700">Tags (komma-gescheiden)</span>
+          <input
+            value={bouwblok.tags.join(", ")}
+            onChange={(e) =>
+              patchBouwblok(assessmentId, categorieId, bouwblok.id, {
+                tags: e.target.value
+                  .split(",")
+                  .map((t) => t.trim())
+                  .filter(Boolean),
+              })
+            }
+            className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+          />
+        </label>
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-slate-800">Vragen</p>
+          <div className="space-y-2">
+            {bouwblok.vragen.map((vraag) => (
+              <div key={vraag.id} className="flex items-start gap-2">
+                <span className="mt-2 w-4 text-xs text-slate-400">{vraag.volgnummer}.</span>
+                <textarea
+                  value={vraag.tekst}
+                  onChange={(e) =>
+                    patchVraag(assessmentId, categorieId, bouwblok.id, vraag.id, e.target.value)
+                  }
+                  rows={2}
+                  className="flex-1 rounded-lg border border-slate-200 p-2 text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeVraag(assessmentId, categorieId, bouwblok.id, vraag.id)}
+                  className="mt-2 text-xs text-red-600 hover:underline"
+                >
+                  Verwijder
+                </button>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => addVraag(assessmentId, categorieId, bouwblok.id)}
+            className="mt-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+          >
+            + Vraag toevoegen
+          </button>
+        </div>
+      </div>
+    </details>
+  );
+}
+
+function patchFeatureCard(assessmentId: string, index: number, patch: Partial<FeatureCard>) {
+  updateAssessment(assessmentId, (a) => ({
+    ...a,
+    featureCards: a.featureCards.map((c, i) => (i === index ? { ...c, ...patch } : c)),
+  }));
+}
+
+function addFeatureCard(assessmentId: string) {
+  updateAssessment(assessmentId, (a) => ({
+    ...a,
+    featureCards: [...a.featureCards, { titel: "Nieuwe feature", tekst: "" }],
+  }));
+}
+
+function removeFeatureCard(assessmentId: string, index: number) {
+  updateAssessment(assessmentId, (a) => ({
+    ...a,
+    featureCards: a.featureCards.filter((_, i) => i !== index),
+  }));
 }
 
 export default function ContentEditorPage({
@@ -178,6 +304,8 @@ export default function ContentEditorPage({
   if (!assessment) {
     return <p className="text-sm text-slate-500">Assessment niet gevonden.</p>;
   }
+
+  const heeftCategorieen = assessment.categorieen !== null;
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 pb-20">
@@ -252,7 +380,58 @@ export default function ContentEditorPage({
               className="w-full rounded-lg border border-slate-200 p-2 text-sm"
             />
           </label>
+          <label className="block text-sm">
+            <span className="mb-1 block text-slate-700">Eenheid enkelvoud</span>
+            <input
+              value={assessment.bouwblokEenheidEnkelvoud}
+              onChange={(e) =>
+                updateAssessment(assessmentId, (a) => ({
+                  ...a,
+                  bouwblokEenheidEnkelvoud: e.target.value,
+                }))
+              }
+              placeholder="Bouwblok / Domein"
+              className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="mb-1 block text-slate-700">Eenheid meervoud</span>
+            <input
+              value={assessment.bouwblokEenheidMeervoud}
+              onChange={(e) =>
+                updateAssessment(assessmentId, (a) => ({
+                  ...a,
+                  bouwblokEenheidMeervoud: e.target.value,
+                }))
+              }
+              placeholder="bouwblokken / AI-domeinen"
+              className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+            />
+          </label>
         </div>
+
+        <label className="mt-4 flex items-center gap-2 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            checked={assessment.scoresPerGroepGesorteerd}
+            onChange={(e) =>
+              updateAssessment(assessmentId, (a) => ({
+                ...a,
+                scoresPerGroepGesorteerd: e.target.checked,
+              }))
+            }
+          />
+          Scores op het resultatenscherm sorteren van hoog naar laag
+        </label>
+
+        <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            checked={heeftCategorieen}
+            onChange={(e) => schakelCategorieLaag(assessmentId, e.target.checked)}
+          />
+          Bouwblokken groeperen in categorieën
+        </label>
 
         <p className="mb-2 mt-6 text-sm font-medium text-slate-800">Schaal-labels (1–5)</p>
         <div className="space-y-2">
@@ -275,6 +454,47 @@ export default function ContentEditorPage({
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-slate-900">Feature-cards (landingspagina)</h2>
+          <button
+            type="button"
+            onClick={() => addFeatureCard(assessmentId)}
+            className="rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-slate-400"
+          >
+            + Kaart
+          </button>
+        </div>
+        <div className="space-y-3">
+          {assessment.featureCards.map((card, i) => (
+            <div key={i} className="flex gap-2 rounded-lg border border-slate-100 p-3">
+              <div className="flex-1 space-y-2">
+                <input
+                  value={card.titel}
+                  onChange={(e) => patchFeatureCard(assessmentId, i, { titel: e.target.value })}
+                  className="w-full rounded-lg border border-slate-200 p-2 text-sm font-medium"
+                  placeholder="Titel"
+                />
+                <textarea
+                  value={card.tekst}
+                  onChange={(e) => patchFeatureCard(assessmentId, i, { tekst: e.target.value })}
+                  rows={2}
+                  className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+                  placeholder="Tekst"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => removeFeatureCard(assessmentId, i)}
+                className="text-sm text-red-600 hover:underline"
+              >
+                Verwijderen
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="mb-4 text-lg font-semibold text-slate-900">Organisatievelden</h2>
         <VeldDefinitieEditor
           velden={assessment.organisatieVelden}
@@ -286,183 +506,106 @@ export default function ContentEditorPage({
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">Categorieën & bouwblokken</h2>
-          <button
-            type="button"
-            onClick={() => addCategorie(assessmentId)}
-            className="rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-slate-400"
-          >
-            + Categorie
-          </button>
+          <h2 className="text-lg font-semibold text-slate-900">
+            {heeftCategorieen
+              ? "Categorieën & bouwblokken"
+              : `${assessment.bouwblokEenheidMeervoud} (geen categorie-laag)`}
+          </h2>
+          {heeftCategorieen ? (
+            <button
+              type="button"
+              onClick={() => addCategorie(assessmentId)}
+              className="rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-slate-400"
+            >
+              + Categorie
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => addBouwblok(assessmentId, null)}
+              className="rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-slate-400"
+            >
+              + {assessment.bouwblokEenheidEnkelvoud}
+            </button>
+          )}
         </div>
 
-        <div className="space-y-4">
-          {[...assessment.categorieen]
-            .sort((a, b) => a.volgorde - b.volgorde)
-            .map((categorie) => (
-              <details
-                key={categorie.id}
-                className="rounded-xl border border-slate-200 p-4"
-                open
-              >
-                <summary className="flex cursor-pointer flex-wrap items-center gap-3">
-                  <span
-                    className={`h-3 w-3 rounded-full ${CATEGORIE_COLORS[categorie.kleur]?.bg ?? "bg-slate-400"}`}
-                  />
-                  <input
-                    value={categorie.naam}
-                    onChange={(e) =>
-                      patchCategorie(assessmentId, categorie.id, { naam: e.target.value })
-                    }
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex-1 rounded-lg border border-slate-200 p-1.5 text-sm font-semibold"
-                  />
-                  <select
-                    value={categorie.kleur}
-                    onChange={(e) =>
-                      patchCategorie(assessmentId, categorie.id, { kleur: e.target.value })
-                    }
-                    onClick={(e) => e.stopPropagation()}
-                    className="rounded-lg border border-slate-200 p-1.5 text-sm"
-                  >
-                    {Object.keys(CATEGORIE_COLORS).map((k) => (
-                      <option key={k} value={k}>
-                        {k}
-                      </option>
+        {heeftCategorieen ? (
+          <div className="space-y-4">
+            {[...(assessment.categorieen ?? [])]
+              .sort((a, b) => a.volgorde - b.volgorde)
+              .map((categorie) => (
+                <details key={categorie.id} className="rounded-xl border border-slate-200 p-4" open>
+                  <summary className="flex cursor-pointer flex-wrap items-center gap-3">
+                    <span
+                      className={`h-3 w-3 rounded-full ${CATEGORIE_COLORS[categorie.kleur]?.bg ?? "bg-slate-400"}`}
+                    />
+                    <input
+                      value={categorie.naam}
+                      onChange={(e) =>
+                        patchCategorie(assessmentId, categorie.id, { naam: e.target.value })
+                      }
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex-1 rounded-lg border border-slate-200 p-1.5 text-sm font-semibold"
+                    />
+                    <select
+                      value={categorie.kleur}
+                      onChange={(e) =>
+                        patchCategorie(assessmentId, categorie.id, { kleur: e.target.value })
+                      }
+                      onClick={(e) => e.stopPropagation()}
+                      className="rounded-lg border border-slate-200 p-1.5 text-sm"
+                    >
+                      {Object.keys(CATEGORIE_COLORS).map((k) => (
+                        <option key={k} value={k}>
+                          {k}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        removeCategorie(assessmentId, categorie.id);
+                      }}
+                      className="text-sm text-red-600 hover:underline"
+                    >
+                      Verwijderen
+                    </button>
+                  </summary>
+
+                  <div className="mt-4 space-y-3 border-l-2 border-slate-100 pl-4">
+                    {categorie.bouwblokken.map((bouwblok) => (
+                      <BouwblokEditor
+                        key={bouwblok.id}
+                        assessmentId={assessmentId}
+                        categorieId={categorie.id}
+                        bouwblok={bouwblok}
+                      />
                     ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      removeCategorie(assessmentId, categorie.id);
-                    }}
-                    className="text-sm text-red-600 hover:underline"
-                  >
-                    Verwijderen
-                  </button>
-                </summary>
-
-                <div className="mt-4 space-y-3 border-l-2 border-slate-100 pl-4">
-                  {categorie.bouwblokken.map((bouwblok) => (
-                    <details key={bouwblok.id} className="rounded-lg border border-slate-100 p-3">
-                      <summary className="flex cursor-pointer flex-wrap items-center gap-2">
-                        <span className="text-xs font-semibold text-slate-400">
-                          #{bouwblok.volgnummer}
-                        </span>
-                        <input
-                          value={bouwblok.naam}
-                          onChange={(e) =>
-                            patchBouwblok(assessmentId, categorie.id, bouwblok.id, {
-                              naam: e.target.value,
-                            })
-                          }
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex-1 rounded-lg border border-slate-200 p-1.5 text-sm font-medium"
-                        />
-                        <span className="text-xs text-slate-400">
-                          {bouwblok.vragen.length} vragen
-                        </span>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            removeBouwblok(assessmentId, categorie.id, bouwblok.id);
-                          }}
-                          className="text-sm text-red-600 hover:underline"
-                        >
-                          Verwijderen
-                        </button>
-                      </summary>
-
-                      <div className="mt-3 space-y-3">
-                        <label className="block text-sm">
-                          <span className="mb-1 block text-slate-700">Omschrijving</span>
-                          <textarea
-                            value={bouwblok.omschrijving}
-                            onChange={(e) =>
-                              patchBouwblok(assessmentId, categorie.id, bouwblok.id, {
-                                omschrijving: e.target.value,
-                              })
-                            }
-                            rows={2}
-                            className="w-full rounded-lg border border-slate-200 p-2 text-sm"
-                          />
-                        </label>
-                        <label className="block text-sm">
-                          <span className="mb-1 block text-slate-700">
-                            Tags (komma-gescheiden)
-                          </span>
-                          <input
-                            value={bouwblok.tags.join(", ")}
-                            onChange={(e) =>
-                              patchBouwblok(assessmentId, categorie.id, bouwblok.id, {
-                                tags: e.target.value
-                                  .split(",")
-                                  .map((t) => t.trim())
-                                  .filter(Boolean),
-                              })
-                            }
-                            className="w-full rounded-lg border border-slate-200 p-2 text-sm"
-                          />
-                        </label>
-
-                        <div>
-                          <p className="mb-2 text-sm font-medium text-slate-800">Vragen</p>
-                          <div className="space-y-2">
-                            {bouwblok.vragen.map((vraag) => (
-                              <div key={vraag.id} className="flex items-start gap-2">
-                                <span className="mt-2 w-4 text-xs text-slate-400">
-                                  {vraag.volgnummer}.
-                                </span>
-                                <textarea
-                                  value={vraag.tekst}
-                                  onChange={(e) =>
-                                    patchVraag(
-                                      assessmentId,
-                                      categorie.id,
-                                      bouwblok.id,
-                                      vraag.id,
-                                      e.target.value
-                                    )
-                                  }
-                                  rows={2}
-                                  className="flex-1 rounded-lg border border-slate-200 p-2 text-sm"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    removeVraag(assessmentId, categorie.id, bouwblok.id, vraag.id)
-                                  }
-                                  className="mt-2 text-xs text-red-600 hover:underline"
-                                >
-                                  Verwijder
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => addVraag(assessmentId, categorie.id, bouwblok.id)}
-                            className="mt-2 text-sm font-medium text-slate-600 hover:text-slate-900"
-                          >
-                            + Vraag toevoegen
-                          </button>
-                        </div>
-                      </div>
-                    </details>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => addBouwblok(assessmentId, categorie.id)}
-                    className="rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-slate-400"
-                  >
-                    + Bouwblok
-                  </button>
-                </div>
-              </details>
+                    <button
+                      type="button"
+                      onClick={() => addBouwblok(assessmentId, categorie.id)}
+                      className="rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-slate-400"
+                    >
+                      + {assessment.bouwblokEenheidEnkelvoud}
+                    </button>
+                  </div>
+                </details>
+              ))}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {(assessment.bouwblokken ?? []).map((bouwblok) => (
+              <BouwblokEditor
+                key={bouwblok.id}
+                assessmentId={assessmentId}
+                categorieId={null}
+                bouwblok={bouwblok}
+              />
             ))}
-        </div>
+          </div>
+        )}
       </section>
     </div>
   );

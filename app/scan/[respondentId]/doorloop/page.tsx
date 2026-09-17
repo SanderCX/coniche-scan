@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useRespondent, updateRespondent } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
+import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
 import { isGeverifieerd } from "@/lib/verificatie";
 import { Sidebar } from "@/components/Sidebar";
 import { BouwblokForm } from "@/components/BouwblokForm";
@@ -21,11 +22,7 @@ export default function DoorloopPage({
   const assessment = useAssessment(gegevens?.organisatie.assessmentId ?? "");
   const router = useRouter();
 
-  const alleBouwblokken = assessment
-    ? [...assessment.categorieen]
-        .sort((a, b) => a.volgorde - b.volgorde)
-        .flatMap((c) => c.bouwblokken.map((b) => ({ bouwblok: b, categorieKleur: c.kleur })))
-    : [];
+  const alleBouwblokken = assessment ? alleBouwblokkenMetGroep(assessment) : [];
 
   // Geen lazy-initializer: alleBouwblokken is pas na hydration (async localStorage-
   // lezing) gevuld, dus het actieve bouwblok wordt bij elke render opnieuw afgeleid
@@ -101,7 +98,8 @@ export default function DoorloopPage({
       <main className="flex-1 overflow-y-auto bg-slate-50 px-6 py-10">
         <BouwblokForm
           bouwblok={huidig.bouwblok}
-          categorieKleur={huidig.categorieKleur}
+          categorieKleur={huidig.groepKleur}
+          eenheid={assessment.bouwblokEenheidEnkelvoud}
           schaal={assessment.schaal}
           respondent={respondent}
           isLaatsteBouwblok={isLaatsteBouwblok}

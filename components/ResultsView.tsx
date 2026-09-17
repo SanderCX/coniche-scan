@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Assessment } from "@/lib/types";
+import { isVlakkeAssessment } from "@/lib/assessment-structuur";
 import {
   alleBouwblokResultaten,
-  alleCategorieResultaten,
+  alleGroepResultaten,
   classificatie,
   overallScore,
   topSterktesEnVerbeterkansen,
@@ -28,10 +29,14 @@ export function ResultsView({
   bouwblokHref?: (bouwblokId: string) => string;
 }) {
   const bouwblokResultaten = alleBouwblokResultaten(assessment, antwoorden);
-  const categorieResultaten = alleCategorieResultaten(assessment, bouwblokResultaten);
+  const groepResultaten = alleGroepResultaten(assessment, bouwblokResultaten);
   const overall = overallScore(bouwblokResultaten.map((r) => r.score));
   const { beantwoord, totaal } = voortgang(assessment, antwoorden);
   const { sterktes, verbeterkansen } = topSterktesEnVerbeterkansen(bouwblokResultaten);
+  const vlak = isVlakkeAssessment(assessment);
+  const groepHeading = vlak
+    ? `Scores per ${assessment.bouwblokEenheidEnkelvoud}`
+    : "Per categorie";
 
   return (
     <div className="space-y-10">
@@ -60,13 +65,13 @@ export function ResultsView({
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <h3 className="mb-2 text-lg font-semibold text-slate-900">
-            Alle bouwblokken
+            Alle {assessment.bouwblokEenheidMeervoud}
           </h3>
           <RadarChartView resultaten={bouwblokResultaten} />
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h3 className="mb-2 text-lg font-semibold text-slate-900">Per categorie</h3>
-          <CategoryBarChart resultaten={categorieResultaten} />
+          <h3 className="mb-2 text-lg font-semibold text-slate-900">{groepHeading}</h3>
+          <CategoryBarChart resultaten={groepResultaten} />
         </div>
       </section>
 

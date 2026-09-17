@@ -1,4 +1,5 @@
 import { Assessment, Bouwblok, Classificatie, Respondent } from "./types";
+import { alleBouwblokkenMetGroep, alleVragen } from "./assessment-structuur";
 
 function round1(n: number): number {
   return Number(n.toFixed(1));
@@ -20,20 +21,21 @@ export function bouwblokScore(
   return gemiddelde(scores);
 }
 
-/** Categoriescore = gemiddelde van de bouwblokscores binnen die categorie. */
+/** Groepscore = gemiddelde van de bouwblokscores binnen die groep (categorie of, bij een platte assessment, het bouwblok zelf). */
 export function categorieScore(bouwblokScores: (number | null)[]): number | null {
   return gemiddelde(bouwblokScores.filter((s): s is number => s !== null));
 }
 
 /**
  * Overall score = gemiddelde van ALLE bouwblokscores samen, niet het
- * gemiddelde van de categoriescores (categorieën hebben ongelijk veel
- * bouwblokken, dus zouden anders niet evenredig meewegen).
+ * gemiddelde van de groepscores (groepen hebben ongelijk veel bouwblokken,
+ * dus zouden anders niet evenredig meewegen).
  */
 export function overallScore(alleBouwblokScores: (number | null)[]): number | null {
   return gemiddelde(alleBouwblokScores.filter((s): s is number => s !== null));
 }
 
+/** Bevestigd (zie CLAUDE.md sectie 3, geverifieerd met twee losse datasets). */
 export function classificatie(score: number): Classificatie {
   if (score < 2.5) return "rood";
   if (score < 3.5) return "oranje";
@@ -45,11 +47,9 @@ export function voortgang(assessment: Assessment, antwoorden: Record<string, num
   totaal: number;
   percentage: number;
 } {
-  const alleVragen = assessment.categorieen.flatMap((c) =>
-    c.bouwblokken.flatMap((b) => b.vragen)
-  );
-  const beantwoord = alleVragen.filter((v) => typeof antwoorden[v.id] === "number").length;
-  const totaal = alleVragen.length;
+  const vragen = alleVragen(assessment);
+  const beantwoord = vragen.filter((v) => typeof antwoorden[v.id] === "number").length;
+  const totaal = vragen.length;
   return {
     beantwoord,
     totaal,
@@ -59,8 +59,8 @@ export function voortgang(assessment: Assessment, antwoorden: Record<string, num
 
 export interface BouwblokResultaat {
   bouwblok: Bouwblok;
-  categorieId: string;
-  categorieNaam: string;
+  groepId: string;
+  groepNaam: string | null;
   score: number | null;
 }
 
@@ -68,38 +68,60 @@ export function alleBouwblokResultaten(
   assessment: Assessment,
   antwoorden: Record<string, number>
 ): BouwblokResultaat[] {
-  return assessment.categorieen.flatMap((categorie) =>
-    categorie.bouwblokken.map((bouwblok) => ({
-      bouwblok,
-      categorieId: categorie.id,
-      categorieNaam: categorie.naam,
-      score: bouwblokScore(bouwblok, antwoorden),
-    }))
-  );
+  return alleBouwblokkenMetGroep(assessment).map(({ bouwblok, groepId, groepNaam }) => ({
+    bouwblok,
+    groepId,
+    groepNaam,
+    score: bouwblokScore(bouwblok, antwoorden),
+  }));
 }
 
-export interface CategorieResultaat {
-  categorieId: string;
-  categorieNaam: string;
-  kleur: string;
+export interface GroepResultaat {
+  groepId: string;
+  groepNaam: string;
+  kleur: string | null;
   score: number | null;
 }
 
-export function alleCategorieResultaten(
+/**
+ * Voor een assessment met categorieën: één resultaat per categorie
+ * (gemiddelde van de bouwblokscores erbinnen). Voor een platte assessment
+ * (geen categorieën, zoals de AI-Volwassenheidsscan): elk bouwblok is zijn
+ * eigen "groep", dus dit levert dezelfde granulariteit als de bouwblok-
+ * resultaten. Sortering op waarde volgt `scoresPerGroepGesorteerd`.
+ */
+export function alleGroepResultaten(
   assessment: Assessment,
   bouwblokResultaten: BouwblokResultaat[]
-): CategorieResultaat[] {
-  return assessment.categorieen.map((categorie) => {
-    const scores = bouwblokResultaten
-      .filter((r) => r.categorieId === categorie.id)
-      .map((r) => r.score);
-    return {
-      categorieId: categorie.id,
-      categorieNaam: categorie.naam,
-      kleur: categorie.kleur,
-      score: categorieScore(scores),
-    };
-  });
+): GroepResultaat[] {
+  const isVlak = assessment.categorieen === null || assessment.categorieen.length === 0;
+
+  let resultaten: GroepResultaat[];
+  if (isVlak) {
+    resultaten = bouwblokResultaten.map((r) => ({
+      groepId: r.bouwblok.id,
+      groepNaam: r.bouwblok.naam,
+      kleur: null,
+      score: r.score,
+    }));
+  } else {
+    resultaten = assessment.categorieen!.map((categorie) => {
+      const scores = bouwblokResultaten
+        .filter((r) => r.groepId === categorie.id)
+        .map((r) => r.score);
+      return {
+        groepId: categorie.id,
+        groepNaam: categorie.naam,
+        kleur: categorie.kleur,
+        score: categorieScore(scores),
+      };
+    });
+  }
+
+  if (assessment.scoresPerGroepGesorteerd) {
+    resultaten = [...resultaten].sort((a, b) => (b.score ?? -Infinity) - (a.score ?? -Infinity));
+  }
+  return resultaten;
 }
 
 export function bouwblokStatus(
@@ -126,5 +148,6 @@ export function topSterktesEnVerbeterkansen(bouwblokResultaten: BouwblokResultaa
 }
 
 export function isVolledigIngevuld(respondent: Respondent, assessment: Assessment): boolean {
-  return voortgang(assessment, respondent.antwoorden).beantwoord === voortgang(assessment, respondent.antwoorden).totaal;
+  const v = voortgang(assessment, respondent.antwoorden);
+  return v.beantwoord === v.totaal;
 }

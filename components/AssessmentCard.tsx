@@ -1,15 +1,10 @@
 import Link from "next/link";
 import { Assessment } from "@/lib/types";
+import { alleBouwblokkenMetGroep, alleVragen } from "@/lib/assessment-structuur";
 
 export function AssessmentCard({ assessment }: { assessment: Assessment }) {
-  const totaalVragen = assessment.categorieen.reduce(
-    (som, c) => som + c.bouwblokken.reduce((s, b) => s + b.vragen.length, 0),
-    0
-  );
-  const totaalBouwblokken = assessment.categorieen.reduce(
-    (som, c) => som + c.bouwblokken.length,
-    0
-  );
+  const totaalVragen = alleVragen(assessment).length;
+  const totaalBouwblokken = alleBouwblokkenMetGroep(assessment).length;
 
   return (
     <Link
@@ -21,7 +16,9 @@ export function AssessmentCard({ assessment }: { assessment: Assessment }) {
       <p className="mt-1 text-sm text-slate-500">{assessment.subtitel}</p>
       <p className="mt-3 text-sm text-slate-600">{assessment.beschrijving}</p>
       <div className="mt-4 flex gap-4 text-xs text-slate-500">
-        <span>{totaalBouwblokken} bouwblokken</span>
+        <span>
+          {totaalBouwblokken} {assessment.bouwblokEenheidMeervoud}
+        </span>
         <span>{totaalVragen} vragen</span>
         <span>{assessment.geschatteDuur}</span>
       </div>

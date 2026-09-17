@@ -48,6 +48,11 @@ export interface TechstackItem {
   ondersteuning: "zelf" | "extern";
 }
 
+export interface FeatureCard {
+  titel: string;
+  tekst: string;
+}
+
 export interface Assessment {
   id: string;
   naam: string;
@@ -56,7 +61,17 @@ export interface Assessment {
   doelgroep: string;
   icoon: string;
   geschatteDuur: string;
-  categorieen: Categorie[];
+  /** Niet elk Assessment-type heeft een categorie-laag (zie AI-Volwassenheidsscan). */
+  categorieen: Categorie[] | null;
+  /** Gebruikt i.p.v. categorieen wanneer die ontbreekt: platte lijst bouwblokken. */
+  bouwblokken: Bouwblok[] | null;
+  /** AI-scan sorteert groepsscores op waarde, Klantcontact-scan houdt vaste volgorde aan. */
+  scoresPerGroepGesorteerd: boolean;
+  /** UI-woord voor één bouwblok, bijv. "Bouwblok" of "Domein". */
+  bouwblokEenheidEnkelvoud: string;
+  /** UI-woord voor meerdere bouwblokken na een aantal, bijv. "bouwblokken" of "AI-domeinen". */
+  bouwblokEenheidMeervoud: string;
+  featureCards: FeatureCard[];
   schaal: SchaalLabel[];
   organisatieVelden: VeldDefinitie[];
 }

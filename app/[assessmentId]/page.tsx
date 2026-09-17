@@ -3,22 +3,7 @@
 import { use } from "react";
 import Link from "next/link";
 import { useAssessment } from "@/lib/assessment-store";
-
-const featureCards = [
-  {
-    titel: "Volledig beeld",
-    tekst: "15 bouwblokken, verdeeld over 5 pijlers — van strategie tot cultuur.",
-  },
-  {
-    titel: "Direct inzicht",
-    tekst: "Score per bouwblok, categorie en totaal, met sterktes en verbeterkansen.",
-  },
-  {
-    titel: "Concreet en toepasbaar",
-    tekst:
-      "Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken.",
-  },
-];
+import { alleVragen } from "@/lib/assessment-structuur";
 
 export default function AssessmentLandingPage({
   params,
@@ -36,10 +21,7 @@ export default function AssessmentLandingPage({
     );
   }
 
-  const totaalVragen = assessment.categorieen.reduce(
-    (som, c) => som + c.bouwblokken.reduce((s, b) => s + b.vragen.length, 0),
-    0
-  );
+  const totaalVragen = alleVragen(assessment).length;
 
   return (
     <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-16">
@@ -68,7 +50,7 @@ export default function AssessmentLandingPage({
       </div>
 
       <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
-        {featureCards.map((card) => (
+        {assessment.featureCards.map((card) => (
           <div key={card.titel} className="rounded-2xl border border-slate-200 bg-white p-6">
             <h3 className="font-semibold text-slate-900">{card.titel}</h3>
             <p className="mt-2 text-sm text-slate-600">{card.tekst}</p>

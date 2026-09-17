@@ -19,10 +19,11 @@ volgt na de eerste doorloop van versie 1.
   gebouwd kan worden, maar het scherm zelf bestaat nog niet.
 - **PDF- en CSV-export van resultaten** — knoppen stonden al in de oude
   versie, functionaliteit nog te bouwen.
-- **Extra assessment-types**: Klantcontact Volwassenheid — Zorg-variant,
-  AI-Volwassenheid in Klantcontact, en naar verwachting een Adoptiescan.
-  De architectuur is generiek opgezet zodat dit nieuwe `Assessment`-objecten
-  worden, geen nieuwe flow-logica.
+- **Extra assessment-types**: Zorg-variant, en naar verwachting een
+  Adoptiescan. De AI-Volwassenheidsscan is inmiddels gereconstrueerd (zie
+  `content-ai-scan.md`), dus dat punt is hiermee afgerond. De architectuur
+  is generiek opgezet zodat dit nieuwe `Assessment`-objecten worden, geen
+  nieuwe flow-logica.
 - **Terugkomen bij eerdere scans via hetzelfde verificatiemechanisme** —
   een respondent moet later (buiten de actieve invulperiode) opnieuw via
   e-mail + verificatiecode bij een eerder ingevulde of nog lopende scan

@@ -1,5 +1,6 @@
 import { Assessment, Respondent } from "@/lib/types";
 import { bouwblokStatus, voortgang } from "@/lib/scoring";
+import { getGroepen } from "@/lib/assessment-structuur";
 import { CATEGORIE_COLORS } from "@/lib/colors";
 
 export function Sidebar({
@@ -39,19 +40,19 @@ export function Sidebar({
       </div>
 
       <nav className="flex flex-col gap-4 overflow-y-auto">
-        {[...assessment.categorieen]
-          .sort((a, b) => a.volgorde - b.volgorde)
-          .map((categorie) => {
-            const kleur = CATEGORIE_COLORS[categorie.kleur];
+        {getGroepen(assessment).map((groep) => {
+            const kleur = groep.kleur ? CATEGORIE_COLORS[groep.kleur] : undefined;
             return (
-              <div key={categorie.id}>
-                <p
-                  className={`mb-2 text-xs font-semibold uppercase tracking-wide ${kleur?.text ?? "text-slate-500"}`}
-                >
-                  {categorie.naam}
-                </p>
+              <div key={groep.id}>
+                {groep.naam && (
+                  <p
+                    className={`mb-2 text-xs font-semibold uppercase tracking-wide ${kleur?.text ?? "text-slate-500"}`}
+                  >
+                    {groep.naam}
+                  </p>
+                )}
                 <ul className="space-y-1">
-                  {categorie.bouwblokken.map((bouwblok) => {
+                  {groep.bouwblokken.map((bouwblok) => {
                     const { status, beantwoord: bbBeantwoord, totaal: bbTotaal } =
                       bouwblokStatus(bouwblok, respondent.antwoorden);
                     const actief = bouwblok.id === actieveBouwblokId;

@@ -1,13 +1,13 @@
 "use client";
 
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { CategorieResultaat } from "@/lib/scoring";
+import { GroepResultaat } from "@/lib/scoring";
 import { classificatie } from "@/lib/scoring";
 import { CLASSIFICATIE_HEX } from "@/lib/colors";
 
-export function CategoryBarChart({ resultaten }: { resultaten: CategorieResultaat[] }) {
+export function CategoryBarChart({ resultaten }: { resultaten: GroepResultaat[] }) {
   const data = resultaten.map((r) => ({
-    naam: r.categorieNaam,
+    naam: r.groepNaam,
     score: r.score ?? 0,
     kleur: r.score !== null ? CLASSIFICATIE_HEX[classificatie(r.score)] : "#cbd5e1",
   }));

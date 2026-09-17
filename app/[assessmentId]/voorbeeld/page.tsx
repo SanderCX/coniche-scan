@@ -3,7 +3,7 @@
 import { use } from "react";
 import Link from "next/link";
 import { useAssessment } from "@/lib/assessment-store";
-import { demoAntwoorden, demoRespondentNaam } from "@/data/demo-antwoorden";
+import { getDemoAntwoorden, demoRespondentNaam } from "@/data/demo-antwoorden-per-assessment";
 import { ResultsView } from "@/components/ResultsView";
 
 export default function VoorbeeldPage({
@@ -41,7 +41,7 @@ export default function VoorbeeldPage({
 
       <ResultsView
         assessment={assessment}
-        antwoorden={demoAntwoorden}
+        antwoorden={getDemoAntwoorden(assessment.id)}
         respondentNaam={demoRespondentNaam}
         isPreview
       />
