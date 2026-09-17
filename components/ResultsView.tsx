@@ -41,7 +41,7 @@ export function ResultsView({
   return (
     <div className="space-y-10">
       {isPreview && (
-        <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-muted">
+        <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-ink-m">
           Dit is een voorbeeld met demo-data — zo ziet jouw resultatenscherm eruit
           na afronding van de scan.
         </div>
@@ -50,13 +50,13 @@ export function ResultsView({
       <section className="flex flex-col items-center gap-6 rounded-2xl border border-gray-200 bg-white p-8 text-center sm:flex-row sm:justify-center sm:gap-12 sm:text-left">
         {overall !== null && <ScoreCircle score={overall} classificatie={classificatie(overall)} />}
         <div>
-          <p className="text-sm font-medium text-muted">
+          <p className="text-sm font-medium text-ink-m">
             {respondentNaam ? `Resultaat voor ${respondentNaam}` : "Overall score"}
           </p>
           <h2 className="mt-1 text-2xl font-bold text-ink">
             {assessment.naam}
           </h2>
-          <p className="mt-2 text-sm text-muted">
+          <p className="mt-2 text-sm text-ink-m">
             {beantwoord} van {totaal} vragen beantwoord
           </p>
         </div>
@@ -138,7 +138,7 @@ export function ResultsView({
                 <span className={`mt-1 h-3 w-3 flex-shrink-0 rounded-full ${info.bg}`} />
                 <div>
                   <p className={`text-sm font-semibold ${info.text}`}>{info.label}</p>
-                  <p className="text-xs text-muted">{info.omschrijving}</p>
+                  <p className="text-xs text-ink-m">{info.omschrijving}</p>
                 </div>
               </div>
             );
@@ -151,7 +151,7 @@ export function ResultsView({
           type="button"
           disabled
           title="Binnenkort beschikbaar"
-          className="cursor-not-allowed rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-muted"
+          className="cursor-not-allowed rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-ink-m"
         >
           Exporteer als PDF
         </button>
@@ -159,7 +159,7 @@ export function ResultsView({
           type="button"
           disabled
           title="Binnenkort beschikbaar"
-          className="cursor-not-allowed rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-muted"
+          className="cursor-not-allowed rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-ink-m"
         >
           Exporteer als CSV
         </button>

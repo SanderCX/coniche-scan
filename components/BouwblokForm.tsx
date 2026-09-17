@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Bouwblok, Respondent, SchaalLabel } from "@/lib/types";
 import { CATEGORIE_COLORS } from "@/lib/colors";
 import { ScaleRadio } from "./ScaleRadio";
+import { Modal } from "./Modal";
 
 export function BouwblokForm({
   bouwblok,
@@ -28,22 +30,34 @@ export function BouwblokForm({
   const alleBeantwoord = bouwblok.vragen.every(
     (v) => typeof respondent.antwoorden[v.id] === "number"
   );
+  const [toelichtingOpen, setToelichtingOpen] = useState(false);
 
   return (
     <div className="mx-auto max-w-3xl">
       <div className="flex gap-4 rounded-t-2xl border border-b-0 border-gray-200 bg-white p-6">
         <div className={`w-1.5 flex-shrink-0 rounded-full ${kleur?.bg ?? "bg-gray-300"}`} />
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted">
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-m">
             {eenheid} {bouwblok.volgnummer}
           </p>
-          <h1 className="mt-1 text-2xl font-bold text-ink">{bouwblok.naam}</h1>
-          <p className="mt-2 text-sm text-muted">{bouwblok.omschrijving}</p>
+          <div className="mt-1 flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-ink">{bouwblok.naam}</h1>
+            <button
+              type="button"
+              onClick={() => setToelichtingOpen(true)}
+              aria-label={`Meer uitleg over ${bouwblok.naam}`}
+              title="Meer uitleg"
+              className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-gray-300 text-xs font-semibold text-ink-m hover:border-or hover:text-or"
+            >
+              i
+            </button>
+          </div>
+          <p className="mt-2 text-sm text-ink-m">{bouwblok.omschrijving}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {bouwblok.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-ink"
+                className="rounded-full border border-or-mid bg-or-faint px-2.5 py-1 text-xs font-medium text-or"
               >
                 {tag}
               </span>
@@ -52,8 +66,16 @@ export function BouwblokForm({
         </div>
       </div>
 
+      <Modal
+        open={toelichtingOpen}
+        onClose={() => setToelichtingOpen(false)}
+        title={bouwblok.naam}
+      >
+        {bouwblok.toelichting}
+      </Modal>
+
       <div className="space-y-8 rounded-b-2xl border border-t-0 border-gray-200 bg-white px-6 py-6">
-        <p className="rounded-lg bg-gray-100 px-4 py-3 text-sm text-muted">
+        <p className="rounded-lg bg-gray-100 px-4 py-3 text-sm text-ink-m">
           Beantwoord op basis van wat aantoonbaar geregeld is (documenten, ritmes, tooling,
           afspraken).
         </p>
@@ -80,7 +102,7 @@ export function BouwblokForm({
             value={respondent.opmerkingenPerBouwblok[bouwblok.id] ?? ""}
             onChange={(e) => onOpmerking(e.target.value)}
             rows={3}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
             placeholder="Toelichting, context of voorbeelden..."
           />
         </div>
@@ -90,7 +112,7 @@ export function BouwblokForm({
             type="button"
             disabled={!alleBeantwoord}
             onClick={onVolgende}
-            className="rounded-lg bg-brand px-6 py-2.5 text-sm font-semibold text-white transition hover:brightness-90 disabled:cursor-not-allowed disabled:bg-brand-disabled disabled:hover:brightness-100"
+            className="rounded-lg bg-or px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-or-l hover:-translate-y-px disabled:cursor-not-allowed disabled:bg-or-disabled disabled:hover:bg-or-disabled disabled:hover:translate-y-0"
           >
             {isLaatsteBouwblok ? "Bekijk resultaten" : "Volgende"}
           </button>

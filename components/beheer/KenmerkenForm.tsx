@@ -53,7 +53,7 @@ function VeldInput({
     <label className="block text-sm">
       <span className="mb-1 block text-ink">
         {veld.label}
-        {veld.type === "percentage" && <span className="text-muted"> (%)</span>}
+        {veld.type === "percentage" && <span className="text-ink-m"> (%)</span>}
       </span>
       <input
         type={isNumeriek ? "number" : "text"}

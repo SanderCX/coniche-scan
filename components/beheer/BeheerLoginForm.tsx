@@ -18,7 +18,7 @@ export function BeheerLoginForm() {
   return (
     <div className="mx-auto w-full max-w-sm flex-1 px-6 py-24">
       <h1 className="text-xl font-bold text-ink">Coniche Scan — Beheer</h1>
-      <p className="mt-2 text-sm text-muted">
+      <p className="mt-2 text-sm text-ink-m">
         Prototype-inlog voor Joost en Sander. Nog geen 2FA — zie admin-beheerpagina.md
         voor de vervolgstap.
       </p>
@@ -30,7 +30,7 @@ export function BeheerLoginForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
           />
         </div>
         <div>
@@ -40,13 +40,13 @@ export function BeheerLoginForm() {
             required
             value={wachtwoord}
             onChange={(e) => setWachtwoord(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
           />
         </div>
         {fout && <p className="text-sm text-red-600">{fout}</p>}
         <button
           type="submit"
-          className="w-full rounded-lg bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:brightness-90"
+          className="w-full rounded-lg bg-or px-6 py-3 text-sm font-semibold text-white transition hover:bg-or-l hover:-translate-y-px"
         >
           Inloggen
         </button>

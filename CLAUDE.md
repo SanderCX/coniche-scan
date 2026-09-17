@@ -93,6 +93,7 @@ Bouwblok {
   volgnummer: number               // 1 t/m 15, doorlopend over alle categorieën
   naam: string
   omschrijving: string             // de vraagzin onder de titel
+  toelichting: string              // langere uitleg, zie overlay in sectie 5 — apart van omschrijving, bewerkbaar in beheer
   tags: string[]                   // variabel aantal! Financial control heeft er maar 1, andere 5-6
   vragen: Vraag[]                  // steeds 4 in de huidige scan, maar niet hardcoded aannemen
 }
@@ -308,12 +309,15 @@ twee documenten uit elkaar gaan lopen zodra er een kleur wijzigt.
 5. **Doorloopflow** — vaste sidebar (Coniche-logo, naam respondent,
    voortgangspercentage, 5 categorieën met genummerde bouwblokken, actieve
    bouwblok gemarkeerd, 3 statussen per bouwblok). Hoofdscherm per bouwblok:
-   gekleurde kop met titel + omschrijving, tags, grijze instructieregel
-   ("Beantwoord op basis van wat aantoonbaar geregeld is (documenten,
-   ritmes, tooling, afspraken)."), 4 vragen met 5-punts radiobuttons, één
-   opmerkingenveld onderaan (per bouwblok, niet per vraag). Knoptekst
-   wisselt op het allerlaatste bouwblok van "Volgende" naar "Bekijk
-   resultaten".
+   gekleurde kop met titel + omschrijving, een link/icoon naast de titel
+   die een overlay (modal) opent met de `toelichting`-tekst van dat
+   bouwblok (langere uitleg dan de omschrijving, bron: eerste versie komt
+   uit `coniche_bouwstenen.md`, later bewerkbaar via beheer — zie
+   `admin-beheerpagina.md`), tags, grijze instructieregel ("Beantwoord op
+   basis van wat aantoonbaar geregeld is (documenten, ritmes, tooling,
+   afspraken)."), 4 vragen met 5-punts radiobuttons, één opmerkingenveld
+   onderaan (per bouwblok, niet per vraag). Knoptekst wisselt op het
+   allerlaatste bouwblok van "Volgende" naar "Bekijk resultaten".
 6. **Resultatenscherm** — overall score (groot getal + classificatie-cirkel
    + voortgang "60 van 60 vragen"), radar chart (alle 15 bouwblokken),
    staafdiagram per categorie (5 balken, kleur = classificatie niet
@@ -349,6 +353,7 @@ globale schaal die bij dat Assessment-type hoort (sectie 3).
   nog niet uitgewerkt
 - Of "Rol / Functie" bij de respondent een vrij tekstveld blijft of een
   vaste lijst wordt
-- Font-family, exacte border-radius/spacing-schaal en interactiestaten
-  (hover/focus/error) — niet met zekerheid uit screenshots te meten, zie
-  `stylesheet.md`
+- Focus- en error-states (formuliervalidatie) — komen niet voor in het
+  aangeleverde referentiemateriaal, zie `stylesheet.md`. Font-family,
+  kleurtokens, border-radius en knop-hover-states zijn inmiddels wél
+  bekend (uit `coniche-v4.html`).

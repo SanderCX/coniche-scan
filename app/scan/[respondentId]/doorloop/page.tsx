@@ -46,7 +46,7 @@ export default function DoorloopPage({
   }, [gegevens, respondentId, router]);
 
   if (!gegevens || !assessment || !actieveBouwblokId) {
-    return <div className="flex-1 px-6 py-16 text-center text-muted">Laden...</div>;
+    return <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>;
   }
 
   if (gegevens.respondent.status === "uitgenodigd") {

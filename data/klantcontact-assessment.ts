@@ -6,6 +6,7 @@ function bb(
   volgnummer: number,
   naam: string,
   omschrijving: string,
+  toelichting: string,
   tags: string[],
   vragen: string[]
 ): Bouwblok {
@@ -14,6 +15,7 @@ function bb(
     volgnummer,
     naam,
     omschrijving,
+    toelichting,
     tags,
     vragen: vragen.map((tekst, i) => ({
       id: `${id}-v${i + 1}`,
@@ -28,6 +30,7 @@ const bb1 = bb(
   1,
   "Organisatiestrategie",
   "Wat zijn de belangrijkste korte en langere termijn strategische organisatiedoelen en -plannen",
+  "Kernwoorden: missie en visie, kernwaarden en merkwaarden, groei- en ontwikkelplannen voor de korte en lange termijn, visie op werkgeverschap.",
   [
     "Missie en visie",
     "Kernwaarden / brand values",
@@ -47,6 +50,7 @@ const bb2 = bb(
   2,
   "Klantcontact visie & strategie",
   "In hoeverre is de klantcontactstrategie ondersteunend aan de organisatiestrategie? Welke servicewaarden zijn daarbij leidend?",
+  "Kernwoorden: visie op klantcontact, servicewaarden, groei- en ontwikkelplannen voor de korte en lange termijn, strategische roadmap, visie op werkgeverschap binnen klantcontact.",
   [
     "Visie op klantcontact",
     "Servicewaarden",
@@ -67,6 +71,7 @@ const bb3 = bb(
   3,
   "Structuur & Sturing",
   "Zijn het huidige organisatiestructuur en besturingsmodel ondersteunend aan de klantcontact-strategie en servicewaarden?",
+  "Geeft aan hoe het klantcontact is ingericht — strategische keuzes bepalen dat. Kernwoorden: structuur en hiërarchie, inrichting eerste en tweede lijn, skills en routering, sourcing, besturingsmodel, KPI-huis, rapportages en dashboards. De inrichting vloeit voort uit de strategie van de organisatie; daarnaast is de (be)sturing van het klantcontact een belangrijke factor die beïnvloed wordt door leiderschap en cultuur.",
   [
     "Structuur/hiërarchie van klantcontact organisatie",
     "Rollen en verantwoordelijkheden",
@@ -88,6 +93,7 @@ const bb11 = bb(
   11,
   "Leren uit klantcontact",
   "In hoeverre leert de organisatie structureel van klantcontact (contactredenen, feedback, fouten) en vertaalt dit naar verbeteringen?",
+  "Kernwoorden: klantsignalen, klantcontactredenen, conversational intelligence, data naar informatie/inzicht/verbetering, rol van klantcontact in het organisatiebrede verbeterproces. Klanten vertellen je elke dag wat ze van je product of dienst vinden — deze signalen zijn essentieel om de organisatie continu te verbeteren en tegelijkertijd de klanttevredenheid te verhogen. Klantsignaalmanagement is de kern van deze bouwsteen.",
   [
     "Contact drivers",
     "VOC (Voice of Customer)",
@@ -109,6 +115,7 @@ const bb13 = bb(
   13,
   "Financial control",
   "In hoeverre is de financiële huishouding van de klantcontactorganisatie inzichtelijk en op orde?",
+  "Kernwoorden: inzicht in kosten en bijdragen van klantcontact, financiële kengetallen en KPI's, budgetmodel. Hoe zorg je dat je 'in control' bent en blijft en niet verrast wordt? Dit wordt vaak gezien als een van de belangrijkste bouwstenen binnen klantcontact.",
   ["Inzicht in CC kosten en bijdragen"],
   [
     "Is er een gespecificeerd klantcontactbudget (mensen, tooling, leveranciers) en wordt realisatie minimaal per maand bijgehouden?",
@@ -123,6 +130,7 @@ const bb14 = bb(
   14,
   "Positionering klantcontact",
   "Welke rol speelt klantcontact in de organisatie en wat is de slagkracht?",
+  "Kernwoorden: plaats in het organigram, interne zichtbaarheid, stakeholdermanagement, interne slagkracht, positie aan de besluitvormingstafel. Is klantbeleving een serieus gespreksonderwerp aan de directietafel, of wordt klantcontact gezien als 'noodzakelijk kwaad'?",
   [
     "Plaats van klantcontact in organigram",
     "Interne zichtbaarheid klantcontact (afdeling) / PR",
@@ -143,6 +151,7 @@ const bb4 = bb(
   4,
   "Systemen & Tools",
   "In hoeverre is de klantcontactorganisatie goed gefaciliteerd met de juiste systemen en tooling?",
+  "Kernwoorden: omnichannel klantcontactplatform, CRM-integratie, integraal klantbeeld. AI, AQM, routering, spraakherkenning... techniek en digitalisering gaan razendsnel. Dit alles vooral bekeken vanuit de functionaliteit voor klanten en medewerkers.",
   [
     "CRM/klantbeeld",
     "Ticketing/Case management",
@@ -166,6 +175,7 @@ const bb6 = bb(
   6,
   "Workforce Management",
   "In hoeverre is de planning/capaciteit goed ingericht om servicelevels te halen tegen acceptabele kosten?",
+  "Kernwoorden: WFM-volwassenheid, WFM-cyclus, nauwkeurigheid van het forecastingmodel, skills en routering. Aan de hand van de schijf van 6 wordt het proces geanalyseerd en per stap het verbeterpotentieel in kaart gebracht.",
   [
     "Forecasting",
     "Capaciteitsplanning",
@@ -188,6 +198,7 @@ const bb10 = bb(
   10,
   "Kennismanagement",
   "In hoeverre is kennis vastgelegd, onderhouden en vindbaar zodat medewerkers en klanten snel het juiste antwoord krijgen?",
+  "Kernwoorden: kennisbank, kennisbeheer, verantwoordelijkheid en eigenaarschap. Alle informatie is beschikbaar — 'je hoeft mensen alleen nog maar te leren zoeken'.",
   [
     "Kennisstructuur/taxonomie",
     "Ownership (knowledge owners)",
@@ -209,6 +220,7 @@ const bb12 = bb(
   12,
   "Kanaalmanagement",
   "In hoeverre is de kanaalstrategie (voice, mail, chat, messaging, selfservice) bewust ingericht en optimaal gemanaged?",
+  "Kernwoorden: kanaalstrategie, kanaalsturing en kanaalverleiding, omnichannel, selfservice, technologie zoals chatbots en speech analytics. Elke klant heeft een voorkeurskanaal — hoe manage je dat het beste, en kun je klanten misschien 'verleiden' naar het voorkeurskanaal van de organisatie?",
   [
     "Kanaalstrategie",
     "Kanaalshift",
@@ -230,6 +242,7 @@ const bb5 = bb(
   5,
   "Performance Management",
   "In hoeverre wordt performance van medewerkers en teams structureel gemeten, besproken en verbeterd?",
+  "Kernwoorden: succesfactoren, KPI's, impact van het KPI-huis op medewerkers, kwaliteitsmanagement en monitoring, coaching.",
   [
     "Doelen en KPI's op team/individu",
     "Ritme van performance gesprekken",
@@ -251,6 +264,7 @@ const bb7 = bb(
   7,
   "Learning & Development",
   "In hoeverre zijn onboarding, training en ontwikkeling structureel ingericht en passend bij de klantcontactstrategie?",
+  "Kernwoorden: vinden, binden en boeien, training van nieuwe medewerkers, onboarding, terugdringen van vroege uitstroom, coaching, leerpaden en perspectief, learningmanagementsysteem.",
   [
     "Onboarding",
     "Opleidingsplan",
@@ -273,6 +287,7 @@ const bb8 = bb(
   8,
   "Employee Engagement",
   "In hoeverre is er aandacht voor betrokkenheid, welzijn en duurzame inzetbaarheid binnen klantcontact?",
+  "Kernwoorden: visie op werkgeverschap, autonomie, verbinding, purpose, gezondheid en welzijn, verzuim en verloop, employee journey. Belangrijk thema voor elke organisatie in een steeds krapper wordende arbeidsmarkt.",
   [
     "Medewerkerstevredenheid",
     "Bevlogenheid",
@@ -294,6 +309,7 @@ const bb9 = bb(
   9,
   "Leiderschap",
   "In hoeverre is het leiderschap binnen klantcontact effectief en in lijn met de gewenste cultuur en prestaties?",
+  "Kernwoorden: nieuw leiderschap, faciliteren, ontwikkelen, winnen, zelfsturen en zelfroosteren. Leiderschap is allesbepalend voor de cultuur en daarmee voor het succes van de organisatie — het gaat over autonomie en high performing teams.",
   [
     "Leiderschapsstijl",
     "Voorbeeldgedrag",
@@ -315,6 +331,7 @@ const bb15 = bb(
   15,
   "Cultuur",
   "Hoe kan de heersende afdelingscultuur beschreven worden en in hoeverre is deze passend bij visie en strategie van de organisatie?",
+  "Kernwoorden: cultuurbewustzijn, klantgerichtheid, growth mindset en fixed mindset.",
   ["Cultuurbewustzijn", "Klantcentriciteit", "Growth / fixed mindset"],
   [
     "Is er een expliciete set gedragsprincipes (bijv. klantgericht, eigenaarschap, samenwerken) die in onboarding en coaching terugkomt?",

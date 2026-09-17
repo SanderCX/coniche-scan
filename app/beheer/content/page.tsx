@@ -10,7 +10,7 @@ export default function ContentOverzichtPage() {
   return (
     <div className="mx-auto max-w-4xl">
       <h1 className="text-2xl font-bold text-ink">Content</h1>
-      <p className="mt-1 text-sm text-muted">
+      <p className="mt-1 text-sm text-ink-m">
         Assessment-instellingen, organisatievelden en de vragencontent.
       </p>
 
@@ -25,7 +25,7 @@ export default function ContentOverzichtPage() {
               <p className="font-semibold text-ink">
                 {a.icoon} {a.naam}
               </p>
-              <p className="text-sm text-muted">
+              <p className="text-sm text-ink-m">
                 {a.categorieen
                   ? `${a.categorieen.length} categorieën · `
                   : "Geen categorie-laag · "}

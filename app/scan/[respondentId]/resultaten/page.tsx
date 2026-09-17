@@ -32,7 +32,7 @@ export default function ResultatenPage({
   }, [gegevens, respondentId, router]);
 
   if (!gegevens || !assessment) {
-    return <div className="flex-1 px-6 py-16 text-center text-muted">Laden...</div>;
+    return <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>;
   }
 
   if (gegevens.respondent.status !== "afgerond") {
@@ -45,7 +45,7 @@ export default function ResultatenPage({
     <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-muted">
+          <p className="text-sm font-semibold uppercase tracking-wide text-ink-m">
             Resultaten
           </p>
           <h1 className="mt-1 text-2xl font-bold text-ink">{assessment.naam}</h1>

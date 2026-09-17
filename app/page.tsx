@@ -10,13 +10,13 @@ export default function Home() {
   return (
     <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
       <div className="mb-12 text-center">
-        <p className="text-sm font-semibold uppercase tracking-wide text-muted">
+        <p className="text-sm font-semibold uppercase tracking-wide text-ink-m">
           Coniche Scan
         </p>
         <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">
           Kies jouw assessment
         </h1>
-        <p className="mx-auto mt-3 max-w-xl text-muted">
+        <p className="mx-auto mt-3 max-w-xl text-ink-m">
           Elke scan geeft direct inzicht in waar jouw organisatie staat en welke
           verbeterkansen er liggen.
         </p>
@@ -29,7 +29,7 @@ export default function Home() {
       </div>
 
       <div className="mt-12 text-center">
-        <Link href="/beheer" className="text-sm text-muted hover:text-muted">
+        <Link href="/beheer" className="text-sm text-ink-m hover:text-ink">
           Coniche-medewerker? Ga naar Beheer →
         </Link>
       </div>

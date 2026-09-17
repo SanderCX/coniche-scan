@@ -23,7 +23,7 @@ export default function BeheerDashboard() {
   return (
     <div className="mx-auto max-w-4xl">
       <h1 className="text-2xl font-bold text-ink">Dashboard</h1>
-      <p className="mt-1 text-sm text-muted">Overzicht van scans en content.</p>
+      <p className="mt-1 text-sm text-ink-m">Overzicht van scans en content.</p>
 
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map((s) => (
@@ -33,7 +33,7 @@ export default function BeheerDashboard() {
             className="rounded-2xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow"
           >
             <p className="text-3xl font-bold text-ink">{s.waarde}</p>
-            <p className="mt-1 text-sm text-muted">{s.label}</p>
+            <p className="mt-1 text-sm text-ink-m">{s.label}</p>
           </Link>
         ))}
       </div>
@@ -41,7 +41,7 @@ export default function BeheerDashboard() {
       <div className="mt-10 flex gap-3">
         <Link
           href="/beheer/scans"
-          className="rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:brightness-90"
+          className="rounded-lg bg-or px-5 py-2.5 text-sm font-semibold text-white hover:bg-or-l hover:-translate-y-px"
         >
           Nieuwe scan aanmaken
         </Link>

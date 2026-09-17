@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/lib/admin-auth";
@@ -16,8 +17,15 @@ export function BeheerNav() {
   return (
     <aside className="flex w-56 flex-shrink-0 flex-col gap-6 border-r border-gray-200 bg-white p-6">
       <div>
-        <p className="text-lg font-bold text-ink">Coniche</p>
-        <p className="text-sm text-muted">Beheer</p>
+        <Image
+          src="/LOGO/Coniche_MMW_standard.svg"
+          alt="Coniche"
+          width={120}
+          height={34}
+          className="h-[34px] w-auto"
+          priority
+        />
+        <p className="mt-2 text-sm text-ink-m">Beheer</p>
       </div>
       <nav className="flex flex-col gap-1">
         {links.map((link) => {
@@ -28,7 +36,7 @@ export function BeheerNav() {
               key={link.href}
               href={link.href}
               className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                actief ? "bg-brand text-white" : "text-ink hover:bg-gray-100"
+                actief ? "bg-or text-white" : "text-ink hover:bg-gray-100"
               }`}
             >
               {link.label}
@@ -39,7 +47,7 @@ export function BeheerNav() {
       <button
         type="button"
         onClick={logout}
-        className="mt-auto text-left text-sm text-muted hover:text-muted"
+        className="mt-auto text-left text-sm text-ink-m hover:text-ink"
       >
         Uitloggen
       </button>

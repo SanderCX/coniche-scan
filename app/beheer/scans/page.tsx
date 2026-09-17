@@ -36,7 +36,7 @@ export default function ScansPage() {
         <button
           type="button"
           onClick={() => setFormOpen((v) => !v)}
-          className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:brightness-90"
+          className="rounded-lg bg-or px-4 py-2 text-sm font-semibold text-white hover:bg-or-l hover:-translate-y-px"
         >
           {formOpen ? "Annuleren" : "+ Nieuwe scan"}
         </button>
@@ -88,7 +88,7 @@ export default function ScansPage() {
 
           <button
             type="submit"
-            className="rounded-lg bg-brand px-6 py-2.5 text-sm font-semibold text-white hover:brightness-90"
+            className="rounded-lg bg-or px-6 py-2.5 text-sm font-semibold text-white hover:bg-or-l hover:-translate-y-px"
           >
             Scan aanmaken
           </button>
@@ -97,7 +97,7 @@ export default function ScansPage() {
 
       <div className="mt-6 space-y-3">
         {organisaties.length === 0 && (
-          <p className="text-sm text-muted">Nog geen scans aangemaakt.</p>
+          <p className="text-sm text-ink-m">Nog geen scans aangemaakt.</p>
         )}
         {organisaties.map((org) => {
           const assessment = assessments.find((a) => a.id === org.assessmentId);
@@ -110,9 +110,9 @@ export default function ScansPage() {
             >
               <div>
                 <p className="font-semibold text-ink">{org.naam}</p>
-                <p className="text-sm text-muted">{assessment?.naam ?? "Onbekend type"}</p>
+                <p className="text-sm text-ink-m">{assessment?.naam ?? "Onbekend type"}</p>
               </div>
-              <p className="text-sm text-muted">
+              <p className="text-sm text-ink-m">
                 {afgerond}/{org.respondenten.length} afgerond
               </p>
             </Link>

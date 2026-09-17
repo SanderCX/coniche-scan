@@ -13,6 +13,10 @@ function domein(
     volgnummer,
     naam,
     omschrijving,
+    // Geen aparte bouwstenen-bron voor de AI-scan (coniche_bouwstenen.md dekt
+    // alleen de Klantcontact Volwassenheidsscan) — toelichting valt terug op
+    // de omschrijving totdat hier eigen content voor is.
+    toelichting: omschrijving,
     tags: [],
     vragen: vragen.map((tekst, i) => ({
       id: `${id}-v${i + 1}`,

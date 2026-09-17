@@ -49,14 +49,121 @@ hover-state):
 Alle 5 categorieën hebben nu een officiële Coniche-kleur. Geen open
 besluit meer op dit punt.
 
+**Bevestiging uit een derde bron**: het bestand `coniche-v4.html`
+(eerder samen gebouwd voor de Coniche-homepage) gebruikt in zijn
+CSS-variabelen exact dezelfde hex-waarden als het officiële kleurenschema
+(`--or:#FF671F`, `--bl:#225BA0`, `--gr:#197F4E`, `--ye:#FFC043`) — dat
+bestand is dus een betrouwbare, al geïmplementeerde referentie voor hoe
+deze kleuren in code toegepast worden, niet alleen als losse hex-waarden.
+Vandaar dat de secties hieronder rechtstreeks uit dat bestand komen.
+
 De classificatiekleuren (rood/oranje/groen voor "Basis op Orde"/
 "Uitbouwen"/"Sterk punt", zie verderop) hebben hetzelfde probleem voor
-rood: geen officiële Coniche-kleur. Daar is het waarschijnlijk minder
-problematisch, want dat is een universele status-kleur (rood = probleem),
-geen merkidentiteit — maar wel iets om bewust te beslissen, niet zomaar
-Tailwind-rood aan te houden.
+rood: geen officiële Coniche-kleur, en ook `coniche-v4.html` definieert
+er geen. Daar is het waarschijnlijk minder problematisch, want dat is een
+universele status-kleur (rood = probleem), geen merkidentiteit — maar wel
+iets om bewust te beslissen, niet zomaar Tailwind-rood aan te houden.
 
 ---
+
+## Kleurtokens als CSS custom properties (uit coniche-v4.html)
+
+Sander kan dit blok vrijwel letterlijk overnemen als startpunt voor
+`:root` in de nieuwe scan-app, met Proces & Tech (paars) ernaast
+toegevoegd, want dat kwam in de homepage niet voor:
+
+```css
+:root {
+  --or: #FF671F; --or-l: #FF7F41; --or-faint: #FFF2EC; --or-mid: #FFD5C0;
+  --bl: #225BA0; --bl-faint: #EBF1FB;
+  --gr: #197F4E; --gr-faint: #E8F5EE;
+  --ye: #FFC043;
+  --pu: #392944; /* Proces & Tech — niet in coniche-v4.html, toegevoegd
+                     vanuit het officiële kleurenschema */
+  --ink: #1C1C1A; --ink-m: #4D4D49; --ink-s: #888884;
+  --bg: #FFFFFF; --bg-warm: #FAF9F7; --bg-mid: #F2F0EB;
+  --border: #E8E6E1; --border-d: #D4D1CA;
+  --r: 6px; /* standaard border-radius, zie Layout hieronder */
+}
+```
+
+`--ink`/`--ink-m`/`--ink-s` zijn de drie tekstkleuren (primair, middel,
+secundair) — vervangen de losse `#2e3138`/`#6a7181` die ik eerder uit de
+screenshots van de oude scan-app mat. Gebruik voortaan deze tokens, niet
+de losse hex-waarden verderop in dit document (die blijven staan als
+historische referentie, zie de sectie "Gemeten kleuren").
+
+## Typografie
+
+- **Lettertype**: Epilogue (gewichten 400/500/600/700/800), via Google
+  Fonts. Dit is de hoofdfont voor zowel body-tekst als koppen.
+- **Accentfont**: Source Serif 4 (italic 400/600) — alleen voor citaten/
+  quotes (`.pull-quote blockquote`, `.q-txt`), niet voor gewone UI-tekst.
+- **Koppen** (`h1`/`h2`/`h3`): font-weight 800 (h1/h2) of 700 (h3),
+  line-height 1.1, letter-spacing licht negatief (-.025em/-.015em),
+  kleur `var(--ink)`.
+  - h1: `clamp(2.5rem, 5vw, 4rem)`
+  - h2: `clamp(1.85rem, 3.5vw, 2.65rem)`
+  - h3: `1.12rem`
+- **Body-tekst** (`p`): line-height 1.78, kleur `var(--ink-m)`.
+- **Label/eyebrow-tekst** (`.label`, zie ook `.hero-tag`): font-size
+  `.69rem`, font-weight 700, letter-spacing `.14em`, hoofdletters,
+  kleur `var(--or)` — dit is het patroon voor kleine kop-labels zoals
+  "AI Assessment" of "Klantcontact Assessment" boven een scanpagina.
+
+## Layout en spacing
+
+- **Border-radius**: `--r: 6px` als standaardwaarde voor knoppen; cards
+  gebruiken losstaand `10px` (iets ronder dan knoppen, bewust verschil).
+- **Container**: `max-width: 1160px`, `padding: 0 2rem`.
+- **Sectie-padding**: `6rem 0` verticaal tussen grote pagina-secties.
+- **Nav-balk**: vaste hoogte `64px`, `position: fixed`, start transparant
+  over een hero-foto/-kleur, wordt wit met blur zodra er gescrold wordt
+  (`.scrolled` class: `background: rgba(255,255,255,.95)`,
+  `backdrop-filter: blur(16px)`, dunne onderrand in `var(--border)`).
+
+## Logo-gebruik
+
+- **In de navigatiebalk**: `<img>`, hoogte `34px`, breedte automatisch.
+- **In de footer**: `<img>`, hoogte `30px`. Het logo staat op een zwarte
+  achtergrond; geen kleurfilter nodig omdat het logobestand zelf al
+  transparant is en de oranje kleur er vanzelf doorheen zichtbaar is.
+- Gebruik in beide gevallen het logo als los beeldbestand (PNG/SVG), niet
+  als CSS-achtergrond, zodat de hoogte simpel te sturen is.
+
+## Componenten (knoppen, badges, kaarten — uit coniche-v4.html)
+
+**Knoppen**, drie varianten, alle met `border-radius: var(--r)`,
+`padding: .82rem 1.7rem`, `font-weight: 700`, `font-size: .9rem`:
+- `.btn-or` — primaire actie: gevuld `var(--or)`, witte tekst, hover
+  wordt `var(--or-l)` (Light Orange) plus een lichte `translateY(-1px)`.
+  Dit is de knop voor "Start assessment"/"Volgende".
+- `.btn-outline-w` — secundair op een donkere/foto-achtergrond: witte
+  rand (`2px solid rgba(255,255,255,.5)`), transparante vulling, hover
+  vult licht op (`rgba(255,255,255,.1)`).
+- `.btn-w` — knop bovenop een oranje sectie-achtergrond: witte vulling,
+  oranje tekst, hover krijgt een schaduw plus lichte lift.
+
+**Badges/pills**:
+- `.hero-tag` / `.label`-stijl — kleine kop-label: gevuld `var(--or)`,
+  witte tekst, hoofdletters, sterk afgerond (`border-radius: 3px`, dus
+  minder rond dan de andere pills).
+- `.g-badge` — content-tag onder een sectiekop: lichte `var(--or-faint)`
+  achtergrond, oranje tekst, volledig rond (`border-radius: 100px`), dunne
+  `var(--or-mid)` rand. Dit is vermoedelijk het patroon voor de
+  bouwblok-tags in de scan zelf.
+- `.logo-p` — klantlogo-pill (los van de scan-app, maar zelfde
+  pill-stijl): witte achtergrond, `var(--border-d)` rand, volledig rond.
+
+**Kaarten** (`.p-card`, `.case`, `.q-card`, `.g-stat`): witte of
+`var(--bg-warm)` achtergrond, `1px solid var(--border)`, `border-radius:
+10px`, `padding: 1.8rem`. Herhaald patroon: een gekleurde accentrand aan
+één zijde geeft de categorie of het type content aan —
+`.p-card`/`.g-stat` gebruiken een `border-top: 4px solid var(--or)` (met
+`.bl`/`.gr` class-varianten voor blauw/groen), `.q-card` gebruikt
+`border-left: 4px solid var(--bl)`. Dat is exact hetzelfde idee als de
+verticale accentbalk bij de bouwblok-koppen in de scan-app, nu bevestigd
+als een terugkerend Coniche-patroon, niet iets unieks voor de scan.
 
 ## Gemeten kleuren uit de oude app (referentiemateriaal, niet leidend)
 
@@ -146,14 +253,19 @@ categoriekleur — dat stond al in CLAUDE.md sectie 4), en de Top
   nummerbadge-achtergrond) met de vaste tekst "Beantwoord op basis van wat
   aantoonbaar geregeld is (documenten, ritmes, tooling, afspraken)."
 
-## Wat NIET met zekerheid uit de screenshots te halen is
+## Wat nog steeds niet met zekerheid uit dit materiaal te halen is
 
-- **Font-family**: visueel een systeem-sans-serif, consistent met Inter of
-  vergelijkbaar, maar dit is niet met zekerheid uit pixels te herleiden.
-  Vraag dit na bij Sander (waarschijnlijk staat het al vast in zijn
-  Tailwind-config van de oude app) of lever een Figma/huisstijlbron aan.
-- **Exacte border-radius- en spacing-schaal** (px-waarden voor
-  afgeronde hoeken, padding, marges) — visueel te schatten maar niet
-  pixel-exact te meten zonder de originele CSS of een designbestand.
-- **Hover-, focus- en error-states** — geen van de screenshots toont deze
-  interactiestaten (behalve de disabled-knop hierboven).
+- **Of de scan-app exact dezelfde tokens hergebruikt als coniche-v4.html**,
+  of een eigen (verwante) variant. De kleuren zijn identiek bevestigd,
+  maar de scan-app is nooit in deze codebasis gebouwd — Sander bouwt 'm
+  nu opnieuw, dus dit is een aanname dat hetzelfde systeem herbruikbaar
+  is, geen bevestigd feit over de scan-app zelf.
+- **Focus- en error-states** (formuliervalidatie, toetsenbord-focus) —
+  komen in coniche-v4.html niet voor, dat is een marketingpagina zonder
+  formulieren. Hover-states zijn nu wel bekend voor knoppen (zie
+  Componenten hierboven).
+- **Exacte spacing-schaal buiten wat hierboven staat** (bijv. kleine
+  paddings binnen componenten, gap-waarden) — deels uit de CSS te
+  destilleren, maar niet volledig gedocumenteerd hier; Sander kan de
+  ruwe CSS in coniche-v4.html raadplegen voor specifieke waarden die
+  hier niet genoemd staan.

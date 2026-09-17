@@ -35,6 +35,25 @@ Legenda:
    van de doorloopflow uit CLAUDE.md sectie 2 (respondent-uitnodiging per
    e-mail), dus niet pas bij de beheerpagina oppakken.
 
+## Toelichting per bouwblok
+
+3. **[Aanpassing]** Elke bouwblok-kop in de doorloopflow krijgt een link/
+   icoon naast de titel die een overlay (modal) opent met een langere
+   uitleg van dat bouwblok — apart van de korte `omschrijving`-zin die er
+   al onder de titel stond. Nieuw veld `toelichting` op `Bouwblok`, zie
+   CLAUDE.md sectie 1.
+
+   Aanname, nog te bevestigen: overlay/modal, geen aparte pagina — dat
+   houdt de respondent in de flow zonder de voortgang te verlaten. Zeg
+   het als dit een eigen pagina met URL moet worden in plaats van een
+   modal.
+
+   Content voor v1: de beschrijving + kernwoorden per bouwblok uit
+   `coniche_bouwstenen.md` (het officiële Bouwstenenmodel), niet zelf
+   herschrijven. Moet uiteindelijk bewerkbaar zijn via de beheerpagina
+   (zie `admin-beheerpagina.md`), voor v1 mag het een vaste tekst per
+   bouwblok in de content-data zijn.
+
 ## Reeds bekend, geen nieuwe actie (ter info, stonden al in BACKLOG.md)
 
 - CSV- en PDF-export werken nog niet — stond al expliciet als "vandaag niet

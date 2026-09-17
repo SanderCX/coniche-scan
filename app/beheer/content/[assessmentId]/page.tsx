@@ -75,6 +75,7 @@ function addBouwblok(assessmentId: string, categorieId: string | null) {
         volgnummer: maxVolgnummer + 1,
         naam: "Nieuw bouwblok",
         omschrijving: "",
+        toelichting: "",
         tags: [],
         vragen: [],
       },
@@ -183,7 +184,7 @@ function BouwblokEditor({
   return (
     <details className="rounded-lg border border-gray-100 p-3">
       <summary className="flex cursor-pointer flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold text-muted">#{bouwblok.volgnummer}</span>
+        <span className="text-xs font-semibold text-ink-m">#{bouwblok.volgnummer}</span>
         <input
           value={bouwblok.naam}
           onChange={(e) =>
@@ -192,7 +193,7 @@ function BouwblokEditor({
           onClick={(e) => e.stopPropagation()}
           className="flex-1 rounded-lg border border-gray-200 p-1.5 text-sm font-medium"
         />
-        <span className="text-xs text-muted">{bouwblok.vragen.length} vragen</span>
+        <span className="text-xs text-ink-m">{bouwblok.vragen.length} vragen</span>
         <button
           type="button"
           onClick={(e) => {
@@ -220,6 +221,21 @@ function BouwblokEditor({
           />
         </label>
         <label className="block text-sm">
+          <span className="mb-1 block text-ink">
+            Toelichting <span className="font-normal text-ink-m">(overlay-tekst)</span>
+          </span>
+          <textarea
+            value={bouwblok.toelichting}
+            onChange={(e) =>
+              patchBouwblok(assessmentId, categorieId, bouwblok.id, {
+                toelichting: e.target.value,
+              })
+            }
+            rows={4}
+            className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+          />
+        </label>
+        <label className="block text-sm">
           <span className="mb-1 block text-ink">Tags (komma-gescheiden)</span>
           <input
             value={bouwblok.tags.join(", ")}
@@ -240,7 +256,7 @@ function BouwblokEditor({
           <div className="space-y-2">
             {bouwblok.vragen.map((vraag) => (
               <div key={vraag.id} className="flex items-start gap-2">
-                <span className="mt-2 w-4 text-xs text-muted">{vraag.volgnummer}.</span>
+                <span className="mt-2 w-4 text-xs text-ink-m">{vraag.volgnummer}.</span>
                 <textarea
                   value={vraag.tekst}
                   onChange={(e) =>
@@ -262,7 +278,7 @@ function BouwblokEditor({
           <button
             type="button"
             onClick={() => addVraag(assessmentId, categorieId, bouwblok.id)}
-            className="mt-2 text-sm font-medium text-muted hover:text-ink"
+            className="mt-2 text-sm font-medium text-ink-m hover:text-ink"
           >
             + Vraag toevoegen
           </button>
@@ -302,7 +318,7 @@ export default function ContentEditorPage({
   const assessment = useAssessment(assessmentId);
 
   if (!assessment) {
-    return <p className="text-sm text-muted">Assessment niet gevonden.</p>;
+    return <p className="text-sm text-ink-m">Assessment niet gevonden.</p>;
   }
 
   const heeftCategorieen = assessment.categorieen !== null;
@@ -310,7 +326,7 @@ export default function ContentEditorPage({
   return (
     <div className="mx-auto max-w-4xl space-y-8 pb-20">
       <div>
-        <Link href="/beheer/content" className="text-sm text-muted hover:text-muted">
+        <Link href="/beheer/content" className="text-sm text-ink-m hover:text-ink">
           ← Alle assessment-types
         </Link>
         <h1 className="mt-2 text-2xl font-bold text-ink">{assessment.naam}</h1>
@@ -437,7 +453,7 @@ export default function ContentEditorPage({
         <div className="space-y-2">
           {assessment.schaal.map((s, i) => (
             <div key={s.waarde} className="flex items-center gap-3">
-              <span className="w-4 text-sm font-semibold text-muted">{s.waarde}</span>
+              <span className="w-4 text-sm font-semibold text-ink-m">{s.waarde}</span>
               <input
                 value={s.label}
                 onChange={(e) =>
@@ -459,7 +475,7 @@ export default function ContentEditorPage({
           <button
             type="button"
             onClick={() => addFeatureCard(assessmentId)}
-            className="rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-muted hover:border-gray-400"
+            className="rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-ink-m hover:border-gray-400"
           >
             + Kaart
           </button>
@@ -515,7 +531,7 @@ export default function ContentEditorPage({
             <button
               type="button"
               onClick={() => addCategorie(assessmentId)}
-              className="rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-muted hover:border-gray-400"
+              className="rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-ink-m hover:border-gray-400"
             >
               + Categorie
             </button>
@@ -523,7 +539,7 @@ export default function ContentEditorPage({
             <button
               type="button"
               onClick={() => addBouwblok(assessmentId, null)}
-              className="rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-muted hover:border-gray-400"
+              className="rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-ink-m hover:border-gray-400"
             >
               + {assessment.bouwblokEenheidEnkelvoud}
             </button>
@@ -586,7 +602,7 @@ export default function ContentEditorPage({
                     <button
                       type="button"
                       onClick={() => addBouwblok(assessmentId, categorie.id)}
-                      className="rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-muted hover:border-gray-400"
+                      className="rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-ink-m hover:border-gray-400"
                     >
                       + {assessment.bouwblokEenheidEnkelvoud}
                     </button>

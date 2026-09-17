@@ -103,7 +103,7 @@ function VeldRow({
                 ],
               })
             }
-            className="text-sm font-medium text-muted hover:text-ink"
+            className="text-sm font-medium text-ink-m hover:text-ink"
           >
             + Subveld toevoegen
           </button>
@@ -139,7 +139,7 @@ export function VeldDefinitieEditor({
         onClick={() =>
           onChange([...velden, { id: nieuwId(), label: "Nieuw veld", type: "tekst" }])
         }
-        className="rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-muted hover:border-gray-400"
+        className="rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-ink-m hover:border-gray-400"
       >
         + Veld toevoegen
       </button>

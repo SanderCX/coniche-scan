@@ -27,10 +27,12 @@ Volwassenheid anders dan straks voor een AI-scan).
 
 ### 2. Content: categorieën, bouwblokken, vragen
 Per Assessment: categorieën met kleur en volgorde, bouwblokken daarbinnen
-(naam, omschrijving, tags — variabel aantal tags), en de vragen per
-bouwblok (tekst). Dit is de contentset die nu in CLAUDE.md sectie 6
-hardcoded staat voor de Klantcontact Volwassenheidsscan — dat wordt hiermee
-bewerkbaar in plaats van vast in code.
+(naam, omschrijving, **toelichting** — de langere uitlegtekst achter de
+overlay-link, zie v1-aanpassingen.md punt 3 — tags, variabel aantal tags),
+en de vragen per bouwblok (tekst). Dit is de contentset die nu in
+CLAUDE.md sectie 6 hardcoded staat voor de Klantcontact
+Volwassenheidsscan — dat wordt hiermee bewerkbaar in plaats van vast in
+code.
 
 ### 3. Organisatievelden (VeldDefinitie's)
 De veldenlijst uit CLAUDE.md sectie 2 (volume/klantbasis, digitalisering,

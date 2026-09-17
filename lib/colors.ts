@@ -1,37 +1,17 @@
 import { Classificatie } from "./types";
 
 /**
- * Officiële Coniche-huisstijlkleuren per categorie, zie stylesheet.md.
- * De keys (oranje/blauw/paars/groen/goud) blijven ongewijzigd t.o.v. eerdere
- * versies zodat bestaande content (categorie.kleur-waarden) blijft werken —
- * alleen de kleuren zelf zijn vervangen door de officiële huisstijl.
+ * Officiële Coniche-huisstijlkleuren per categorie, zie stylesheet.md
+ * (bevestigd via coniche-v4.html). De keys (oranje/blauw/paars/groen/goud)
+ * blijven ongewijzigd t.o.v. eerdere versies zodat bestaande content
+ * (categorie.kleur-waarden) blijft werken.
  */
 export const CATEGORIE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  oranje: {
-    bg: "bg-cat-overkoepelend",
-    text: "text-cat-overkoepelend",
-    border: "border-cat-overkoepelend",
-  },
-  blauw: {
-    bg: "bg-cat-organisatie",
-    text: "text-cat-organisatie",
-    border: "border-cat-organisatie",
-  },
-  paars: {
-    bg: "bg-cat-procestech",
-    text: "text-cat-procestech",
-    border: "border-cat-procestech",
-  },
-  groen: {
-    bg: "bg-cat-mens",
-    text: "text-cat-mens",
-    border: "border-cat-mens",
-  },
-  goud: {
-    bg: "bg-cat-fundament",
-    text: "text-cat-fundament",
-    border: "border-cat-fundament",
-  },
+  oranje: { bg: "bg-or", text: "text-or", border: "border-or" },
+  blauw: { bg: "bg-bl", text: "text-bl", border: "border-bl" },
+  paars: { bg: "bg-pu", text: "text-pu", border: "border-pu" },
+  groen: { bg: "bg-gr", text: "text-gr", border: "border-gr" },
+  goud: { bg: "bg-ye", text: "text-ye", border: "border-ye" },
 };
 
 /** Universele statuskleuren, geen merkidentiteit — exacte Tailwind-tinten (zie stylesheet.md). */

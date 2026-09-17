@@ -13,9 +13,9 @@ export function AssessmentCard({ assessment }: { assessment: Assessment }) {
     >
       <span className="text-3xl">{assessment.icoon}</span>
       <h2 className="mt-4 text-xl font-bold text-ink">{assessment.naam}</h2>
-      <p className="mt-1 text-sm text-muted">{assessment.subtitel}</p>
-      <p className="mt-3 text-sm text-muted">{assessment.beschrijving}</p>
-      <div className="mt-4 flex gap-4 text-xs text-muted">
+      <p className="mt-1 text-sm text-ink-m">{assessment.subtitel}</p>
+      <p className="mt-3 text-sm text-ink-m">{assessment.beschrijving}</p>
+      <div className="mt-4 flex gap-4 text-xs text-ink-m">
         <span>
           {totaalBouwblokken} {assessment.bouwblokEenheidMeervoud}
         </span>

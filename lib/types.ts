@@ -9,6 +9,8 @@ export interface Bouwblok {
   volgnummer: number;
   naam: string;
   omschrijving: string;
+  /** Langere uitleg, getoond in een overlay naast de titel (zie v1-aanpassingen.md punt 3). */
+  toelichting: string;
   tags: string[];
   vragen: Vraag[];
 }

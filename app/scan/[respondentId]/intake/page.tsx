@@ -35,7 +35,7 @@ export default function IntakePage({
   }, [gegevens, respondentId, router]);
 
   if (!gegevens || !assessment) {
-    return <div className="flex-1 px-6 py-16 text-center text-muted">Laden...</div>;
+    return <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>;
   }
 
   if (gegevens.respondent.status !== "uitgenodigd") {
@@ -57,11 +57,11 @@ export default function IntakePage({
 
   return (
     <div className="mx-auto w-full max-w-xl flex-1 px-6 py-16">
-      <span className="inline-block rounded-full bg-brand-badge px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand">
+      <span className="inline-block rounded-full bg-or-faint px-3 py-1 text-xs font-semibold uppercase tracking-wide text-or">
         {assessment.naam}
       </span>
       <h1 className="mt-3 text-2xl font-bold text-ink">Voordat je begint</h1>
-      <p className="mt-2 text-sm text-muted">
+      <p className="mt-2 text-sm text-ink-m">
         De organisatiegegevens staan al vast — we hebben alleen een paar gegevens
         van jou nodig.
       </p>
@@ -73,7 +73,7 @@ export default function IntakePage({
             required
             value={naam}
             onChange={(e) => setNaam(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
           />
         </div>
         <div>
@@ -84,34 +84,34 @@ export default function IntakePage({
             required
             value={rol}
             onChange={(e) => setRol(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
           />
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-ink">
-            Team <span className="font-normal text-muted">(optioneel)</span>
+            Team <span className="font-normal text-ink-m">(optioneel)</span>
           </label>
           <input
             value={team}
             onChange={(e) => setTeam(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
           />
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-ink">
-            Notities <span className="font-normal text-muted">(optioneel)</span>
+            Notities <span className="font-normal text-ink-m">(optioneel)</span>
           </label>
           <textarea
             value={notities}
             onChange={(e) => setNotities(e.target.value)}
             rows={3}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
           />
         </div>
 
         <button
           type="submit"
-          className="w-full rounded-lg bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:brightness-90"
+          className="w-full rounded-lg bg-or px-6 py-3 text-sm font-semibold text-white transition hover:bg-or-l hover:-translate-y-px"
         >
           Start de scan
         </button>

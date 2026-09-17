@@ -8,27 +8,40 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-epilogue);
   --font-mono: var(--font-geist-mono);
 }
 
-/* Coniche Scan-huisstijl, zie stylesheet.md — enige bron voor deze waarden. */
+/*
+ * Coniche Scan-huisstijl, zie stylesheet.md — enige bron voor deze waarden.
+ * Overgenomen uit coniche-v4.html (bevestigde, al geïmplementeerde referentie
+ * voor dezelfde officiële huisstijlkleuren), met --pu toegevoegd voor
+ * Proces & Tech (kwam niet voor op de marketingpagina).
+ */
 @theme {
-  /* Tekstkleuren (gemeten, referentiemateriaal voor niet-merkgebonden elementen) */
-  --color-ink: #2e3138;
-  --color-muted: #6a7181;
+  --color-ink: #1c1c1a;
+  --color-ink-m: #4d4d49;
+  --color-ink-s: #888884;
 
-  /* Primaire merkkleur zoals gerenderd (knoppen/CTA's, geen categoriekleur) */
-  --color-brand: #f25d26;
-  --color-brand-disabled: #f8ae92;
-  --color-brand-badge: #fdeee9;
+  --color-bg-warm: #faf9f7;
+  --color-bg-mid: #f2f0eb;
+  --color-border: #e8e6e1;
+  --color-border-d: #d4d1ca;
 
-  /* Officiële Coniche-huisstijlkleuren per categorie (leidend, CON_Kleurenschema2022.pdf) */
-  --color-cat-overkoepelend: #ff671f;
-  --color-cat-organisatie: #225ba0;
-  --color-cat-procestech: #392944;
-  --color-cat-mens: #197f4e;
-  --color-cat-fundament: #ffc043;
+  /* Primaire merkkleur (knoppen/CTA's) = officiële Overkoepelend-kleur */
+  --color-or: #ff671f;
+  --color-or-l: #ff7f41;
+  --color-or-faint: #fff2ec;
+  --color-or-mid: #ffd5c0;
+  --color-or-disabled: #f8ae92;
+
+  /* Officiële Coniche-huisstijlkleuren, gedeeld tussen categorieën en overige merktoepassingen */
+  --color-bl: #225ba0;
+  --color-bl-faint: #ebf1fb;
+  --color-gr: #197f4e;
+  --color-gr-faint: #e8f5ee;
+  --color-ye: #ffc043;
+  --color-pu: #392944;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -41,5 +54,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-epilogue), Arial, Helvetica, sans-serif;
 }
