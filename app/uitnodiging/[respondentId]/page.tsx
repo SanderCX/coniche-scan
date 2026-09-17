@@ -9,6 +9,7 @@ import {
   isGeverifieerd,
   stuurVerificatiecode,
 } from "@/lib/verificatie";
+import { PageWithChrome } from "@/components/PageWithChrome";
 
 function volgendeUrl(respondentId: string, status: string): string {
   if (status === "afgerond") return `/scan/${respondentId}/resultaten`;
@@ -41,13 +42,15 @@ export default function UitnodigingPage({
 
   if (!gegevens) {
     return (
-      <div className="mx-auto w-full max-w-md flex-1 px-6 py-16 text-center">
-        <h1 className="text-xl font-bold text-ink">Ongeldige link</h1>
-        <p className="mt-2 text-sm text-ink-m">
-          Deze uitnodiging bestaat niet (meer). Neem contact op met Coniche
-          voor een nieuwe link.
-        </p>
-      </div>
+      <PageWithChrome>
+        <div className="mx-auto w-full max-w-md flex-1 px-6 py-16 text-center">
+          <h1 className="text-xl font-bold text-ink">Ongeldige link</h1>
+          <p className="mt-2 text-sm text-ink-m">
+            Deze uitnodiging bestaat niet (meer). Neem contact op met Coniche
+            voor een nieuwe link.
+          </p>
+        </div>
+      </PageWithChrome>
     );
   }
 
@@ -98,6 +101,7 @@ export default function UitnodigingPage({
   }
 
   return (
+    <PageWithChrome>
     <div className="mx-auto w-full max-w-md flex-1 px-6 py-16">
       <p className="text-sm font-semibold uppercase tracking-wide text-ink-m">
         {organisatie.naam}
@@ -180,5 +184,6 @@ export default function UitnodigingPage({
         </form>
       )}
     </div>
+    </PageWithChrome>
   );
 }

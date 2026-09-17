@@ -31,7 +31,11 @@ Assessment-metadata (voor sectie 1 / het kaartenscherm):
   scan in de oude app). Voor de nieuwe content: **±20 minuten** aanhouden,
   consistent overal, dit is geen bewuste keuze om over te nemen.
 - Feature-cards op de landingspagina: "8 AI-domeinen" (i.p.v. "15
-  Bouwblokken"), "Visueel Rapport", "AI-Samenvatting"
+  Bouwblokken"), "Visueel Rapport", en een derde kaart die NIET
+  "AI-Samenvatting" is — die is voor v1 bewust geschrapt (zie CLAUDE.md
+  sectie 5 en 7). Kies een vervangende derde kaart in lijn met de andere
+  twee (bijv. iets over de 8 domeinen zelf of de duur), Sander/Joost mag
+  hier een keuze in maken.
 
 Resultatenscherm-verschil: "Scores per Domein" is hier expliciet
 gesorteerd van hoog naar laag (zo genoemd in de UI: "Gedetailleerde

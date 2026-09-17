@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useAssessments } from "@/lib/assessment-store";
 import { AssessmentCard } from "@/components/AssessmentCard";
+import { PageWithChrome } from "@/components/PageWithChrome";
 
 export default function Home() {
   const assessments = useAssessments();
 
   return (
+    <PageWithChrome>
     <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
       <div className="mb-12 text-center">
         <p className="text-sm font-semibold uppercase tracking-wide text-ink-m">
@@ -34,5 +36,6 @@ export default function Home() {
         </Link>
       </div>
     </div>
+    </PageWithChrome>
   );
 }

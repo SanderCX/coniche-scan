@@ -7,6 +7,7 @@ import { useRespondent } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { isGeverifieerd } from "@/lib/verificatie";
 import { ResultsView } from "@/components/ResultsView";
+import { PageWithChrome } from "@/components/PageWithChrome";
 
 export default function ResultatenPage({
   params,
@@ -32,7 +33,11 @@ export default function ResultatenPage({
   }, [gegevens, respondentId, router]);
 
   if (!gegevens || !assessment) {
-    return <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>;
+    return (
+      <PageWithChrome>
+        <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>
+      </PageWithChrome>
+    );
   }
 
   if (gegevens.respondent.status !== "afgerond") {
@@ -42,6 +47,7 @@ export default function ResultatenPage({
   const { respondent } = gegevens;
 
   return (
+    <PageWithChrome>
     <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
       <div className="mb-8 flex items-center justify-between">
         <div>
@@ -65,5 +71,6 @@ export default function ResultatenPage({
         bouwblokHref={(bouwblokId) => `/scan/${respondentId}/doorloop?bouwblok=${bouwblokId}`}
       />
     </div>
+    </PageWithChrome>
   );
 }

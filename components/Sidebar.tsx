@@ -25,7 +25,7 @@ export function Sidebar({
           alt="Coniche"
           width={120}
           height={34}
-          className="h-[34px] w-auto"
+          style={{ height: "34px", width: "auto" }}
           priority
         />
         <p className="mt-2 text-sm text-ink-m">{respondent.naam || "Respondent"}</p>

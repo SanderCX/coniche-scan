@@ -293,12 +293,28 @@ twee documenten uit elkaar gaan lopen zodra er een kleur wijzigt.
 
 ## 5. Schermflow
 
+**Globale layout, over alle schermen heen**: een gedeelde navigatiebalk
+en footer, exact zoals beschreven in `stylesheet.md` (logo op 34px in de
+nav / 30px in de footer, nav transparant-wordt-wit-bij-scroll, dezelfde
+kleuren en fonts). Dit is één component dat op ELK scherm hieronder
+hergebruikt wordt, niet per pagina opnieuw gebouwd — anders lopen ze
+vanzelf uit elkaar. Idem voor alle kleuren/fonts: elk scherm gebruikt de
+tokens uit `stylesheet.md`, dat geldt voor alle 6 schermen hieronder,
+niet alleen waar het expliciet herhaald wordt.
+
 1. **Kies jouw assessment** — landingspagina met kaarten per Assessment-type
    (voor vandaag: alleen Klantcontact Volwassenheid ingevuld, de kaarten-
    component moet wel generiek over `Assessment[]` heen werken)
 2. **Assessment-landingspagina** — titel, hero, 3 feature-cards, "Praktische
-   informatie"-blok met 4 punten (invultijd, direct resultaat, AI-samenvatting
-   [placeholder], privacy)
+   informatie"-blok met 3 punten (invultijd, direct resultaat, privacy —
+   AI-samenvatting is hier bewust verwijderd, zie sectie 7). Twee aparte
+   CTA's, niet één: een primaire "Start assessment"-knop direct onder de
+   hero (gaat rechtstreeks naar scherm 4, Respondent-intake) én, verderop
+   op de pagina, een aparte "Bekijk wat je krijgt"-knop die naar scherm 3
+   (Voorbeeld-output preview) gaat. Dit stond al zo in de oorspronkelijke
+   screenshots maar was in een eerdere versie van dit document niet
+   expliciet als twee losse knoppen vastgelegd — dat is hier gecorrigeerd,
+   geen nieuwe eis.
 3. **Voorbeeld-output preview** — dezelfde resultaatcomponenten als scherm 6,
    gevuld met vaste demo-data (`isPreview: true` of een aparte mock-dataset,
    zodat de resultaatcomponent maar één keer gebouwd hoeft te worden)
@@ -357,3 +373,8 @@ globale schaal die bij dat Assessment-type hoort (sectie 3).
   aangeleverde referentiemateriaal, zie `stylesheet.md`. Font-family,
   kleurtokens, border-radius en knop-hover-states zijn inmiddels wél
   bekend (uit `coniche-v4.html`).
+- AI-gegenereerde managementsamenvatting: was eerder een placeholder op
+  de assessment-landingspagina (scherm 2), is nu bewust volledig van dat
+  scherm verwijderd voor v1 (geen feature-card, geen bullet in
+  "Praktische informatie"). Staat nog wel in BACKLOG.md als iets om
+  later, anders opgezet, terug te brengen.

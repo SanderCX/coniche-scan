@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAssessment } from "@/lib/assessment-store";
 import { getDemoAntwoorden, demoRespondentNaam } from "@/data/demo-antwoorden-per-assessment";
 import { ResultsView } from "@/components/ResultsView";
+import { PageWithChrome } from "@/components/PageWithChrome";
 
 export default function VoorbeeldPage({
   params,
@@ -16,13 +17,16 @@ export default function VoorbeeldPage({
 
   if (!assessment) {
     return (
-      <div className="mx-auto w-full max-w-xl flex-1 px-6 py-16 text-center text-ink-m">
-        Assessment niet gevonden.
-      </div>
+      <PageWithChrome>
+        <div className="mx-auto w-full max-w-xl flex-1 px-6 py-16 text-center text-ink-m">
+          Assessment niet gevonden.
+        </div>
+      </PageWithChrome>
     );
   }
 
   return (
+    <PageWithChrome>
     <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
       <div className="mb-8 flex items-center justify-between">
         <div>
@@ -46,5 +50,6 @@ export default function VoorbeeldPage({
         isPreview
       />
     </div>
+    </PageWithChrome>
   );
 }

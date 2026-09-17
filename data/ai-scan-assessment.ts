@@ -159,9 +159,9 @@ export const aiVolwassenheid: Assessment = {
       tekst: "Scores per domein direct inzichtelijk, gesorteerd van hoog naar laag.",
     },
     {
-      titel: "AI-Samenvatting",
+      titel: "Concrete vervolgstappen",
       tekst:
-        "Binnenkort: een AI-gegenereerde samenvatting van je resultaten en vervolgstappen.",
+        "Elk domein levert direct een concreet handelingsperspectief op, niet alleen een score.",
     },
   ],
   schaal: [

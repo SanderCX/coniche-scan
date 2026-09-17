@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useRespondent, updateRespondent } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { isGeverifieerd } from "@/lib/verificatie";
+import { PageWithChrome } from "@/components/PageWithChrome";
 
 export default function IntakePage({
   params,
@@ -35,7 +36,11 @@ export default function IntakePage({
   }, [gegevens, respondentId, router]);
 
   if (!gegevens || !assessment) {
-    return <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>;
+    return (
+      <PageWithChrome>
+        <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>
+      </PageWithChrome>
+    );
   }
 
   if (gegevens.respondent.status !== "uitgenodigd") {
@@ -56,6 +61,7 @@ export default function IntakePage({
   }
 
   return (
+    <PageWithChrome>
     <div className="mx-auto w-full max-w-xl flex-1 px-6 py-16">
       <span className="inline-block rounded-full bg-or-faint px-3 py-1 text-xs font-semibold uppercase tracking-wide text-or">
         {assessment.naam}
@@ -117,5 +123,6 @@ export default function IntakePage({
         </button>
       </form>
     </div>
+    </PageWithChrome>
   );
 }
