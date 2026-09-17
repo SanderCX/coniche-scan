@@ -24,5 +24,3 @@ export const demoAntwoorden: Record<string, number> = Object.fromEntries(
     scores.map((score, i) => [`${bouwblokId}-v${i + 1}`, score])
   )
 );
-
-export const demoRespondentNaam = "Voorbeeldrespondent";
