@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useRespondent, updateRespondent } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { isGeverifieerd } from "@/lib/verificatie";
+import { useTestModus } from "@/lib/instellingen";
 import { PageWithChrome } from "@/components/PageWithChrome";
 
 export default function IntakePage({
@@ -16,6 +17,7 @@ export default function IntakePage({
   const gegevens = useRespondent(respondentId);
   const assessment = useAssessment(gegevens?.organisatie.assessmentId ?? "");
   const router = useRouter();
+  const testModus = useTestModus();
 
   const [naam, setNaam] = useState("");
   const [rol, setRol] = useState("");
@@ -24,7 +26,7 @@ export default function IntakePage({
 
   useEffect(() => {
     if (!gegevens) return;
-    if (!isGeverifieerd(respondentId)) {
+    if (!isGeverifieerd(respondentId) && !testModus) {
       router.replace(`/uitnodiging/${respondentId}`);
       return;
     }
@@ -33,7 +35,7 @@ export default function IntakePage({
     } else if (gegevens.respondent.status === "afgerond") {
       router.replace(`/scan/${respondentId}/resultaten`);
     }
-  }, [gegevens, respondentId, router]);
+  }, [gegevens, respondentId, router, testModus]);
 
   if (!gegevens || !assessment) {
     return (

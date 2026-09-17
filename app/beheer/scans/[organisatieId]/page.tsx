@@ -5,14 +5,22 @@ import Link from "next/link";
 import { useAssessment } from "@/lib/assessment-store";
 import { useOrganisatie, updateOrganisatie, nodigRespondentUit } from "@/lib/db";
 import { verstuurUitnodiging } from "@/lib/mailer";
+import { maakUitnodigingUrl } from "@/lib/uitnodiging-link";
 import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
 import { Respondent } from "@/lib/types";
+import { useTestModus } from "@/lib/instellingen";
 
 const STATUS_LABEL: Record<Respondent["status"], string> = {
   uitgenodigd: "Uitgenodigd",
   bezig: "Bezig",
   afgerond: "Afgerond",
 };
+
+function testUrl(respondent: Respondent): string {
+  if (respondent.status === "afgerond") return `/scan/${respondent.id}/resultaten`;
+  if (respondent.status === "bezig") return `/scan/${respondent.id}/doorloop`;
+  return `/scan/${respondent.id}/intake`;
+}
 
 export default function ScanDetailPage({
   params,
@@ -28,16 +36,21 @@ export default function ScanDetailPage({
   const [laatsteLinkVerstuurd, setLaatsteLinkVerstuurd] = useState(false);
   const [gekopieerd, setGekopieerd] = useState(false);
   const [versturen, setVersturen] = useState(false);
+  const testModus = useTestModus();
 
   if (!organisatie || !assessment) {
     return <p className="text-sm text-ink-m">Scan niet gevonden.</p>;
   }
+  // Vastgezet na de guard hierboven, zodat de nested functies hieronder
+  // (die TS niet automatisch herkent als na de guard aangeroepen) hem als
+  // gegarandeerd aanwezig zien in plaats van `Organisatie | undefined`.
+  const organisatieVast = organisatie;
 
   async function handleUitnodigen(e: React.FormEvent) {
     e.preventDefault();
     const respondent = nodigRespondentUit(organisatieId, email.trim());
     if (!respondent) return;
-    const url = `${window.location.origin}/uitnodiging/${respondent.id}`;
+    const url = maakUitnodigingUrl(window.location.origin, organisatieVast, respondent);
     setVersturen(true);
     const verstuurd = await verstuurUitnodiging(email.trim(), url);
     setVersturen(false);
@@ -134,11 +147,23 @@ export default function ScanDetailPage({
                 </span>
                 <button
                   type="button"
-                  onClick={() => kopieerLink(`${window.location.origin}/uitnodiging/${r.id}`)}
+                  onClick={() =>
+                    kopieerLink(maakUitnodigingUrl(window.location.origin, organisatie, r))
+                  }
                   className="text-xs text-ink-m hover:text-ink"
                 >
                   Kopieer link
                 </button>
+                {testModus && (
+                  <button
+                    type="button"
+                    onClick={() => kopieerLink(`${window.location.origin}${testUrl(r)}`)}
+                    title="Alleen werkzaam zolang test-modus aanstaat (zie Dashboard)"
+                    className="text-xs text-or hover:underline"
+                  >
+                    Kopieer testlink
+                  </button>
+                )}
               </div>
             </li>
           ))}

@@ -1,10 +1,11 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useRespondent } from "@/lib/db";
+import { useRespondent, importRespondent } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { controleerCode, stuurVerificatiecode } from "@/lib/verificatie";
+import { decodeBootstrap } from "@/lib/uitnodiging-link";
 import { PageWithChrome } from "@/components/PageWithChrome";
 
 function volgendeUrl(respondentId: string, status: string): string {
@@ -15,10 +16,13 @@ function volgendeUrl(respondentId: string, status: string): string {
 
 export default function UitnodigingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ respondentId: string }>;
+  searchParams: Promise<{ b?: string }>;
 }) {
   const { respondentId } = use(params);
+  const { b: bootstrapParam } = use(searchParams);
   const gegevens = useRespondent(respondentId);
   const assessment = useAssessment(gegevens?.organisatie.assessmentId ?? "");
   const router = useRouter();
@@ -33,7 +37,27 @@ export default function UitnodigingPage({
   // Geen auto-skip bij een reeds eerder voltooide verificatie: de link zelf
   // verloopt niet en is niet eenmalig (v1-aanpassingen.md, correctie op punt
   // 2) — elke keer dat hij geopend wordt, opnieuw e-mail + verse code vragen.
+
+  // Deze browser heeft mogelijk nog geen lokale data (bijv. de respondent
+  // die de link vanuit zijn eigen e-mailclient opent, i.p.v. de browser
+  // waarin de scan is aangemaakt) — de link draagt de benodigde gegevens
+  // dan zelf mee via de `b`-param, zie lib/uitnodiging-link.ts.
+  useEffect(() => {
+    if (gegevens || !bootstrapParam) return;
+    const bootstrap = decodeBootstrap(bootstrapParam);
+    if (bootstrap && bootstrap.respondent.id === respondentId) {
+      importRespondent(bootstrap.organisatie, bootstrap.respondent);
+    }
+  }, [gegevens, bootstrapParam, respondentId]);
+
   if (!gegevens) {
+    if (bootstrapParam) {
+      return (
+        <PageWithChrome>
+          <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>
+        </PageWithChrome>
+      );
+    }
     return (
       <PageWithChrome>
         <div className="mx-auto w-full max-w-md flex-1 px-6 py-16 text-center">

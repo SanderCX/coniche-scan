@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useRespondent } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { isGeverifieerd } from "@/lib/verificatie";
+import { useTestModus } from "@/lib/instellingen";
 import { ResultsView } from "@/components/ResultsView";
 import { PageWithChrome } from "@/components/PageWithChrome";
 
@@ -18,10 +19,11 @@ export default function ResultatenPage({
   const gegevens = useRespondent(respondentId);
   const assessment = useAssessment(gegevens?.organisatie.assessmentId ?? "");
   const router = useRouter();
+  const testModus = useTestModus();
 
   useEffect(() => {
     if (!gegevens) return;
-    if (!isGeverifieerd(respondentId)) {
+    if (!isGeverifieerd(respondentId) && !testModus) {
       router.replace(`/uitnodiging/${respondentId}`);
       return;
     }
@@ -30,7 +32,7 @@ export default function ResultatenPage({
     } else if (gegevens.respondent.status === "bezig") {
       router.replace(`/scan/${respondentId}/doorloop`);
     }
-  }, [gegevens, respondentId, router]);
+  }, [gegevens, respondentId, router, testModus]);
 
   if (!gegevens || !assessment) {
     return (

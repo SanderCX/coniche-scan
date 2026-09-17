@@ -6,6 +6,7 @@ import { useRespondent, updateRespondent } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
 import { isGeverifieerd } from "@/lib/verificatie";
+import { useTestModus } from "@/lib/instellingen";
 import { Sidebar } from "@/components/Sidebar";
 import { BouwblokForm } from "@/components/BouwblokForm";
 
@@ -21,6 +22,7 @@ export default function DoorloopPage({
   const gegevens = useRespondent(respondentId);
   const assessment = useAssessment(gegevens?.organisatie.assessmentId ?? "");
   const router = useRouter();
+  const testModus = useTestModus();
 
   const alleBouwblokken = assessment ? alleBouwblokkenMetGroep(assessment) : [];
 
@@ -36,14 +38,14 @@ export default function DoorloopPage({
 
   useEffect(() => {
     if (!gegevens) return;
-    if (!isGeverifieerd(respondentId)) {
+    if (!isGeverifieerd(respondentId) && !testModus) {
       router.replace(`/uitnodiging/${respondentId}`);
       return;
     }
     if (gegevens.respondent.status === "uitgenodigd") {
       router.replace(`/scan/${respondentId}/intake`);
     }
-  }, [gegevens, respondentId, router]);
+  }, [gegevens, respondentId, router, testModus]);
 
   if (!gegevens || !assessment || !actieveBouwblokId) {
     return <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>;

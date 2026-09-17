@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties } from "@/lib/db";
+import { useTestModus, zetTestModus } from "@/lib/instellingen";
 
 export default function BeheerDashboard() {
   const assessments = useAssessments();
   const organisaties = useOrganisaties();
   const alleRespondenten = organisaties.flatMap((o) => o.respondenten);
+  const testModus = useTestModus();
 
   const stats = [
     { label: "Assessment-types", waarde: assessments.length, href: "/beheer/content" },
@@ -51,6 +53,28 @@ export default function BeheerDashboard() {
         >
           Content beheren
         </Link>
+      </div>
+
+      <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-6">
+        <label className="flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            checked={testModus}
+            onChange={(e) => zetTestModus(e.target.checked)}
+            className="mt-1 h-4 w-4 accent-or"
+          />
+          <span>
+            <span className="block text-sm font-medium text-ink">
+              Test-modus: verificatie overslaan
+            </span>
+            <span className="mt-0.5 block text-sm text-ink-m">
+              Als dit aanstaat, mogen respondent-links (intake/doorloop/resultaten)
+              rechtstreeks geopend worden zonder e-mail+code-verificatie — handig om
+              de vragenlijst snel te testen. Zet uit voor een realistische test van de
+              volledige uitnodigingsflow.
+            </span>
+          </span>
+        </label>
       </div>
     </div>
   );

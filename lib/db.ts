@@ -115,6 +115,31 @@ export function nodigRespondentUit(organisatieId: string, email: string): Respon
   return respondent;
 }
 
+/**
+ * Zonder gedeelde backend leeft elke organisatie/respondent alleen in de
+ * localStorage van de browser waarin hij is aangemaakt (bijv. het
+ * beheer-scherm). Een respondent die de uitnodigingslink in een ANDERE
+ * browser opent (zijn eigen e-mailclient) heeft dus geen lokale data. Deze
+ * functie "importeert" de organisatie (basisgegevens, geen andere
+ * respondenten) + deze ene respondent, aangeleverd via de link zelf — zie
+ * de `b`-query-param op /uitnodiging/[respondentId].
+ */
+export function importRespondent(
+  organisatieBasis: Omit<Organisatie, "respondenten">,
+  respondent: Respondent
+): void {
+  const alles = laadAlles();
+  let organisatie = alles.find((o) => o.id === organisatieBasis.id);
+  if (!organisatie) {
+    organisatie = { ...organisatieBasis, respondenten: [] };
+    alles.push(organisatie);
+  }
+  if (!organisatie.respondenten.some((r) => r.id === respondent.id)) {
+    organisatie.respondenten.push(respondent);
+  }
+  slaAlles(alles);
+}
+
 export function getRespondent(
   respondentId: string
 ): { organisatie: Organisatie; respondent: Respondent } | null {
