@@ -1,7 +1,12 @@
-import { assessments } from "@/data/assessments";
+"use client";
+
+import Link from "next/link";
+import { useAssessments } from "@/lib/assessment-store";
 import { AssessmentCard } from "@/components/AssessmentCard";
 
 export default function Home() {
+  const assessments = useAssessments();
+
   return (
     <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
       <div className="mb-12 text-center">
@@ -21,6 +26,12 @@ export default function Home() {
         {assessments.map((assessment) => (
           <AssessmentCard key={assessment.id} assessment={assessment} />
         ))}
+      </div>
+
+      <div className="mt-12 text-center">
+        <Link href="/beheer" className="text-sm text-slate-400 hover:text-slate-600">
+          Coniche-medewerker? Ga naar Beheer →
+        </Link>
       </div>
     </div>
   );

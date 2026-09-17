@@ -1,17 +1,19 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAssessment } from "@/data/assessments";
-import { starteRespondent } from "@/lib/storage";
+import { useRespondent, updateRespondent } from "@/lib/db";
+import { useAssessment } from "@/lib/assessment-store";
+import { isGeverifieerd } from "@/lib/verificatie";
 
-export default function StartPage({
+export default function IntakePage({
   params,
 }: {
-  params: Promise<{ assessmentId: string }>;
+  params: Promise<{ respondentId: string }>;
 }) {
-  const { assessmentId } = use(params);
-  const assessment = getAssessment(assessmentId);
+  const { respondentId } = use(params);
+  const gegevens = useRespondent(respondentId);
+  const assessment = useAssessment(gegevens?.organisatie.assessmentId ?? "");
   const router = useRouter();
 
   const [naam, setNaam] = useState("");
@@ -19,23 +21,46 @@ export default function StartPage({
   const [team, setTeam] = useState("");
   const [notities, setNotities] = useState("");
 
-  if (!assessment) {
-    return (
-      <div className="mx-auto w-full max-w-xl flex-1 px-6 py-16 text-center text-slate-600">
-        Assessment niet gevonden.
-      </div>
-    );
+  useEffect(() => {
+    if (!gegevens) return;
+    if (!isGeverifieerd(respondentId)) {
+      router.replace(`/uitnodiging/${respondentId}`);
+      return;
+    }
+    if (gegevens.respondent.status === "bezig") {
+      router.replace(`/scan/${respondentId}/doorloop`);
+    } else if (gegevens.respondent.status === "afgerond") {
+      router.replace(`/scan/${respondentId}/resultaten`);
+    }
+  }, [gegevens, respondentId, router]);
+
+  if (!gegevens || !assessment) {
+    return <div className="flex-1 px-6 py-16 text-center text-slate-400">Laden...</div>;
+  }
+
+  if (gegevens.respondent.status !== "uitgenodigd") {
+    return null;
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    starteRespondent({ naam, rol, team, notities });
-    router.push(`/${assessmentId}/scan`);
+    updateRespondent(respondentId, (r) => ({
+      ...r,
+      naam,
+      rol,
+      team,
+      notities,
+      status: "bezig",
+    }));
+    router.push(`/scan/${respondentId}/doorloop`);
   }
 
   return (
     <div className="mx-auto w-full max-w-xl flex-1 px-6 py-16">
-      <h1 className="text-2xl font-bold text-slate-900">Voordat je begint</h1>
+      <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+        {assessment.naam}
+      </p>
+      <h1 className="mt-1 text-2xl font-bold text-slate-900">Voordat je begint</h1>
       <p className="mt-2 text-sm text-slate-500">
         De organisatiegegevens staan al vast — we hebben alleen een paar gegevens
         van jou nodig.
@@ -43,9 +68,7 @@ export default function StartPage({
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-800">
-            Naam
-          </label>
+          <label className="mb-1 block text-sm font-medium text-slate-800">Naam</label>
           <input
             required
             value={naam}

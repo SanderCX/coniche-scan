@@ -1,6 +1,8 @@
+"use client";
+
+import { use } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getAssessment } from "@/data/assessments";
+import { useAssessment } from "@/lib/assessment-store";
 
 const featureCards = [
   {
@@ -18,14 +20,21 @@ const featureCards = [
   },
 ];
 
-export default async function AssessmentLandingPage({
+export default function AssessmentLandingPage({
   params,
 }: {
   params: Promise<{ assessmentId: string }>;
 }) {
-  const { assessmentId } = await params;
-  const assessment = getAssessment(assessmentId);
-  if (!assessment) notFound();
+  const { assessmentId } = use(params);
+  const assessment = useAssessment(assessmentId);
+
+  if (!assessment) {
+    return (
+      <div className="mx-auto w-full max-w-xl flex-1 px-6 py-16 text-center text-slate-600">
+        Assessment niet gevonden.
+      </div>
+    );
+  }
 
   const totaalVragen = assessment.categorieen.reduce(
     (som, c) => som + c.bouwblokken.reduce((s, b) => s + b.vragen.length, 0),
@@ -45,18 +54,17 @@ export default async function AssessmentLandingPage({
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
-            href={`/${assessment.id}/start`}
-            className="rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-          >
-            Start de scan
-          </Link>
-          <Link
             href={`/${assessment.id}/voorbeeld`}
-            className="rounded-lg border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400"
+            className="rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
           >
             Bekijk voorbeeld-output
           </Link>
         </div>
+        <p className="mx-auto mt-4 max-w-md text-xs text-slate-400">
+          Deze scan vul je in via een persoonlijke uitnodiging per e-mail —
+          neem contact op met Coniche om een scan te starten voor jouw
+          organisatie.
+        </p>
       </div>
 
       <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -92,7 +100,8 @@ export default async function AssessmentLandingPage({
           <div>
             <dt className="text-sm font-medium text-slate-800">Privacy</dt>
             <dd className="text-sm text-slate-600">
-              Je antwoorden blijven op dit apparaat opgeslagen totdat de scan is afgerond.
+              Toegang verloopt via een persoonlijke, niet-herleidbare link en
+              een verificatiecode per e-mail.
             </dd>
           </div>
         </dl>

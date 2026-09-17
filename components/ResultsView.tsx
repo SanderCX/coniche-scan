@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Assessment } from "@/lib/types";
 import {
   alleBouwblokResultaten,
@@ -17,11 +18,14 @@ export function ResultsView({
   antwoorden,
   respondentNaam,
   isPreview = false,
+  bouwblokHref,
 }: {
   assessment: Assessment;
   antwoorden: Record<string, number>;
   respondentNaam?: string;
   isPreview?: boolean;
+  /** Als gezet: bouwblokken in de top 3-lijsten linken hiernaartoe om het antwoord aan te passen. */
+  bouwblokHref?: (bouwblokId: string) => string;
 }) {
   const bouwblokResultaten = alleBouwblokResultaten(assessment, antwoorden);
   const categorieResultaten = alleCategorieResultaten(assessment, bouwblokResultaten);
@@ -74,7 +78,16 @@ export function ResultsView({
           <ol className="space-y-3">
             {sterktes.map((r) => (
               <li key={r.bouwblok.id} className="flex items-center justify-between">
-                <span className="text-sm text-slate-700">{r.bouwblok.naam}</span>
+                {bouwblokHref ? (
+                  <Link
+                    href={bouwblokHref(r.bouwblok.id)}
+                    className="text-sm text-slate-700 hover:underline"
+                  >
+                    {r.bouwblok.naam}
+                  </Link>
+                ) : (
+                  <span className="text-sm text-slate-700">{r.bouwblok.naam}</span>
+                )}
                 <span className="font-semibold text-green-600">{r.score.toFixed(1)}</span>
               </li>
             ))}
@@ -87,7 +100,16 @@ export function ResultsView({
           <ol className="space-y-3">
             {verbeterkansen.map((r) => (
               <li key={r.bouwblok.id} className="flex items-center justify-between">
-                <span className="text-sm text-slate-700">{r.bouwblok.naam}</span>
+                {bouwblokHref ? (
+                  <Link
+                    href={bouwblokHref(r.bouwblok.id)}
+                    className="text-sm text-slate-700 hover:underline"
+                  >
+                    {r.bouwblok.naam}
+                  </Link>
+                ) : (
+                  <span className="text-sm text-slate-700">{r.bouwblok.naam}</span>
+                )}
                 <span className="font-semibold text-red-600">{r.score.toFixed(1)}</span>
               </li>
             ))}
