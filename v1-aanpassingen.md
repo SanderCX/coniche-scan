@@ -35,6 +35,19 @@ Legenda:
    van de doorloopflow uit CLAUDE.md sectie 2 (respondent-uitnodiging per
    e-mail), dus niet pas bij de beheerpagina oppakken.
 
+   **Correctie, was niet expliciet genoeg gespecificeerd**: alleen de
+   verificatiecode (stap 4) is tijdgebonden, 15 minuten. De link/token
+   zelf (stap 1) verloopt NIET en is NIET eenmalig — die moet onbeperkt
+   herbruikbaar blijven, ook na een voltooide verificatie, zodat een
+   respondent later via dezelfde link kan terugkeren (zie ook
+   BACKLOG.md, "Terugkomen bij eerdere scans"). Elke keer dat de link
+   geopend wordt, opnieuw naar de verificatiepagina, opnieuw een nieuwe
+   code aanvragen — de link zelf hoeft daarvoor niet ongeldig te worden.
+   Als er nu een foutmelding "link niet meer geldig" verschijnt ongeacht
+   welk e-mailadres wordt ingevuld, is dat vermoedelijk hierdoor: de
+   link zelf is ergens single-use of tijdgebonden gemaakt, terwijl alleen
+   de code dat had moeten zijn.
+
 ## Toelichting per bouwblok
 
 3. **[Aanpassing]** Elke bouwblok-kop in de doorloopflow krijgt een link/

@@ -1,14 +1,10 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useRespondent } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
-import {
-  controleerCode,
-  isGeverifieerd,
-  stuurVerificatiecode,
-} from "@/lib/verificatie";
+import { controleerCode, stuurVerificatiecode } from "@/lib/verificatie";
 import { PageWithChrome } from "@/components/PageWithChrome";
 
 function volgendeUrl(respondentId: string, status: string): string {
@@ -34,12 +30,9 @@ export default function UitnodigingPage({
   const [devCode, setDevCode] = useState<string | null>(null);
   const [versturen, setVersturen] = useState(false);
 
-  useEffect(() => {
-    if (gegevens && isGeverifieerd(respondentId)) {
-      router.replace(volgendeUrl(respondentId, gegevens.respondent.status));
-    }
-  }, [gegevens, respondentId, router]);
-
+  // Geen auto-skip bij een reeds eerder voltooide verificatie: de link zelf
+  // verloopt niet en is niet eenmalig (v1-aanpassingen.md, correctie op punt
+  // 2) — elke keer dat hij geopend wordt, opnieuw e-mail + verse code vragen.
   if (!gegevens) {
     return (
       <PageWithChrome>
