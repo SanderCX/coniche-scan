@@ -16,7 +16,7 @@ export default function VoorbeeldPage({
 
   if (!assessment) {
     return (
-      <div className="mx-auto w-full max-w-xl flex-1 px-6 py-16 text-center text-slate-600">
+      <div className="mx-auto w-full max-w-xl flex-1 px-6 py-16 text-center text-muted">
         Assessment niet gevonden.
       </div>
     );
@@ -26,14 +26,14 @@ export default function VoorbeeldPage({
     <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+          <p className="text-sm font-semibold uppercase tracking-wide text-muted">
             Voorbeeld-output
           </p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900">{assessment.naam}</h1>
+          <h1 className="mt-1 text-2xl font-bold text-ink">{assessment.naam}</h1>
         </div>
         <Link
           href={`/${assessment.id}`}
-          className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400"
+          className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-gray-400"
         >
           ← Terug
         </Link>

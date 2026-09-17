@@ -12,8 +12,8 @@ function VeldInput({
   if (veld.type === "groep") {
     const obj = (waarde as Record<string, unknown>) ?? {};
     return (
-      <fieldset className="rounded-lg border border-slate-200 p-4">
-        <legend className="px-1 text-sm font-semibold text-slate-800">{veld.label}</legend>
+      <fieldset className="rounded-lg border border-gray-200 p-4">
+        <legend className="px-1 text-sm font-semibold text-ink">{veld.label}</legend>
         <div className="mt-2 space-y-3">
           {(veld.subvelden ?? []).map((sub) => (
             <VeldInput
@@ -31,11 +31,11 @@ function VeldInput({
   if (veld.type === "select") {
     return (
       <label className="block text-sm">
-        <span className="mb-1 block text-slate-700">{veld.label}</span>
+        <span className="mb-1 block text-ink">{veld.label}</span>
         <select
           value={(waarde as string) ?? ""}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+          className="w-full rounded-lg border border-gray-200 p-2 text-sm"
         >
           <option value="">Kies...</option>
           {(veld.opties ?? []).map((o) => (
@@ -51,15 +51,15 @@ function VeldInput({
   const isNumeriek = veld.type === "getal" || veld.type === "percentage";
   return (
     <label className="block text-sm">
-      <span className="mb-1 block text-slate-700">
+      <span className="mb-1 block text-ink">
         {veld.label}
-        {veld.type === "percentage" && <span className="text-slate-400"> (%)</span>}
+        {veld.type === "percentage" && <span className="text-muted"> (%)</span>}
       </span>
       <input
         type={isNumeriek ? "number" : "text"}
         value={(waarde as string | number) ?? ""}
         onChange={(e) => onChange(isNumeriek ? Number(e.target.value) : e.target.value)}
-        className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+        className="w-full rounded-lg border border-gray-200 p-2 text-sm"
       />
     </label>
   );

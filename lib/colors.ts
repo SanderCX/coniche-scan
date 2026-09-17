@@ -1,50 +1,44 @@
 import { Classificatie } from "./types";
 
-export const CATEGORIE_COLORS: Record<
-  string,
-  { bg: string; text: string; border: string; bgLicht: string; ring: string }
-> = {
+/**
+ * Officiële Coniche-huisstijlkleuren per categorie, zie stylesheet.md.
+ * De keys (oranje/blauw/paars/groen/goud) blijven ongewijzigd t.o.v. eerdere
+ * versies zodat bestaande content (categorie.kleur-waarden) blijft werken —
+ * alleen de kleuren zelf zijn vervangen door de officiële huisstijl.
+ */
+export const CATEGORIE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   oranje: {
-    bg: "bg-orange-500",
-    text: "text-orange-600",
-    border: "border-orange-500",
-    bgLicht: "bg-orange-50",
-    ring: "ring-orange-500",
+    bg: "bg-cat-overkoepelend",
+    text: "text-cat-overkoepelend",
+    border: "border-cat-overkoepelend",
   },
   blauw: {
-    bg: "bg-blue-500",
-    text: "text-blue-600",
-    border: "border-blue-500",
-    bgLicht: "bg-blue-50",
-    ring: "ring-blue-500",
+    bg: "bg-cat-organisatie",
+    text: "text-cat-organisatie",
+    border: "border-cat-organisatie",
   },
   paars: {
-    bg: "bg-purple-500",
-    text: "text-purple-600",
-    border: "border-purple-500",
-    bgLicht: "bg-purple-50",
-    ring: "ring-purple-500",
+    bg: "bg-cat-procestech",
+    text: "text-cat-procestech",
+    border: "border-cat-procestech",
   },
   groen: {
-    bg: "bg-green-500",
-    text: "text-green-600",
-    border: "border-green-500",
-    bgLicht: "bg-green-50",
-    ring: "ring-green-500",
+    bg: "bg-cat-mens",
+    text: "text-cat-mens",
+    border: "border-cat-mens",
   },
   goud: {
-    bg: "bg-amber-500",
-    text: "text-amber-600",
-    border: "border-amber-500",
-    bgLicht: "bg-amber-50",
-    ring: "ring-amber-500",
+    bg: "bg-cat-fundament",
+    text: "text-cat-fundament",
+    border: "border-cat-fundament",
   },
 };
 
+/** Universele statuskleuren, geen merkidentiteit — exacte Tailwind-tinten (zie stylesheet.md). */
 export const CLASSIFICATIE_HEX: Record<Classificatie, string> = {
-  rood: "#ef4444",
+  rood: "#dc2626",
   oranje: "#f97316",
-  groen: "#22c55e",
+  groen: "#16a34a",
 };
 
 export const CLASSIFICATIE_INFO: Record<
@@ -53,7 +47,7 @@ export const CLASSIFICATIE_INFO: Record<
 > = {
   rood: {
     label: "Basis op Orde",
-    bg: "bg-red-500",
+    bg: "bg-red-600",
     text: "text-red-600",
     omschrijving:
       "De basis moet op dit punt eerst op orde gemaakt worden om verder te kunnen uitbouwen.",
@@ -67,7 +61,7 @@ export const CLASSIFICATIE_INFO: Record<
   },
   groen: {
     label: "Sterk punt",
-    bg: "bg-green-500",
+    bg: "bg-green-600",
     text: "text-green-600",
     omschrijving:
       "Hier is de organisatie al heel goed in. Benut dit optimaal en bouw het verder uit, ook ter ondersteuning van zwakkere bouwblokken.",

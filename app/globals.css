@@ -12,6 +12,25 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Coniche Scan-huisstijl, zie stylesheet.md — enige bron voor deze waarden. */
+@theme {
+  /* Tekstkleuren (gemeten, referentiemateriaal voor niet-merkgebonden elementen) */
+  --color-ink: #2e3138;
+  --color-muted: #6a7181;
+
+  /* Primaire merkkleur zoals gerenderd (knoppen/CTA's, geen categoriekleur) */
+  --color-brand: #f25d26;
+  --color-brand-disabled: #f8ae92;
+  --color-brand-badge: #fdeee9;
+
+  /* Officiële Coniche-huisstijlkleuren per categorie (leidend, CON_Kleurenschema2022.pdf) */
+  --color-cat-overkoepelend: #ff671f;
+  --color-cat-organisatie: #225ba0;
+  --color-cat-procestech: #392944;
+  --color-cat-mens: #197f4e;
+  --color-cat-fundament: #ffc043;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;

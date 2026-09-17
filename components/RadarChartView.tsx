@@ -20,17 +20,17 @@ export function RadarChartView({ resultaten }: { resultaten: BouwblokResultaat[]
     <div className="h-96 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={data} outerRadius="70%">
-          <PolarGrid stroke="#e2e8f0" />
+          <PolarGrid stroke="#e5e7eb" />
           <PolarAngleAxis
             dataKey="naam"
-            tick={{ fontSize: 10, fill: "#475569" }}
+            tick={{ fontSize: 10, fill: "#6a7181" }}
           />
-          <PolarRadiusAxis domain={[0, 5]} tickCount={6} tick={{ fontSize: 10 }} />
+          <PolarRadiusAxis domain={[0, 5]} tickCount={6} tick={{ fontSize: 10, fill: "#6a7181" }} />
           <Radar
             name="Score"
             dataKey="score"
-            stroke="#0f172a"
-            fill="#0f172a"
+            stroke="#f25d26"
+            fill="#f25d26"
             fillOpacity={0.25}
           />
         </RadarChart>

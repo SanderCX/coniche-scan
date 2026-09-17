@@ -35,7 +35,7 @@ export default function IntakePage({
   }, [gegevens, respondentId, router]);
 
   if (!gegevens || !assessment) {
-    return <div className="flex-1 px-6 py-16 text-center text-slate-400">Laden...</div>;
+    return <div className="flex-1 px-6 py-16 text-center text-muted">Laden...</div>;
   }
 
   if (gegevens.respondent.status !== "uitgenodigd") {
@@ -57,61 +57,61 @@ export default function IntakePage({
 
   return (
     <div className="mx-auto w-full max-w-xl flex-1 px-6 py-16">
-      <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+      <span className="inline-block rounded-full bg-brand-badge px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand">
         {assessment.naam}
-      </p>
-      <h1 className="mt-1 text-2xl font-bold text-slate-900">Voordat je begint</h1>
-      <p className="mt-2 text-sm text-slate-500">
+      </span>
+      <h1 className="mt-3 text-2xl font-bold text-ink">Voordat je begint</h1>
+      <p className="mt-2 text-sm text-muted">
         De organisatiegegevens staan al vast — we hebben alleen een paar gegevens
         van jou nodig.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-800">Naam</label>
+          <label className="mb-1 block text-sm font-medium text-ink">Naam</label>
           <input
             required
             value={naam}
             onChange={(e) => setNaam(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 p-3 text-sm focus:border-slate-400 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-800">
+          <label className="mb-1 block text-sm font-medium text-ink">
             Rol / functie
           </label>
           <input
             required
             value={rol}
             onChange={(e) => setRol(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 p-3 text-sm focus:border-slate-400 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-800">
-            Team <span className="font-normal text-slate-400">(optioneel)</span>
+          <label className="mb-1 block text-sm font-medium text-ink">
+            Team <span className="font-normal text-muted">(optioneel)</span>
           </label>
           <input
             value={team}
             onChange={(e) => setTeam(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 p-3 text-sm focus:border-slate-400 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-800">
-            Notities <span className="font-normal text-slate-400">(optioneel)</span>
+          <label className="mb-1 block text-sm font-medium text-ink">
+            Notities <span className="font-normal text-muted">(optioneel)</span>
           </label>
           <textarea
             value={notities}
             onChange={(e) => setNotities(e.target.value)}
             rows={3}
-            className="w-full rounded-lg border border-slate-200 p-3 text-sm focus:border-slate-400 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
           />
         </div>
 
         <button
           type="submit"
-          className="w-full rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+          className="w-full rounded-lg bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:brightness-90"
         >
           Start de scan
         </button>

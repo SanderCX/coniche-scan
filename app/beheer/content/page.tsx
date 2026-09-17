@@ -9,8 +9,8 @@ export default function ContentOverzichtPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="text-2xl font-bold text-slate-900">Content</h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <h1 className="text-2xl font-bold text-ink">Content</h1>
+      <p className="mt-1 text-sm text-muted">
         Assessment-instellingen, organisatievelden en de vragencontent.
       </p>
 
@@ -19,13 +19,13 @@ export default function ContentOverzichtPage() {
           <Link
             key={a.id}
             href={`/beheer/content/${a.id}`}
-            className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow"
+            className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow"
           >
             <div>
-              <p className="font-semibold text-slate-900">
+              <p className="font-semibold text-ink">
                 {a.icoon} {a.naam}
               </p>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted">
                 {a.categorieen
                   ? `${a.categorieen.length} categorieën · `
                   : "Geen categorie-laag · "}

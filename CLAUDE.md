@@ -282,9 +282,11 @@ bewust anders, geen fout):
 - Mens: groen
 - Fundament: geel/goud
 
-Exacte hex-waarden nog niet bevestigd — gebruik voorlopig standaard
-Tailwind-tinten (orange-500, blue-500, purple-500, green-500, amber-500)
-totdat de huisstijlkleuren van Coniche.nl bekend zijn.
+Voor alle opmaak — exacte hex-waarden per categorie, tekstkleuren,
+randen/achtergronden, classificatiekleuren, knopstaten, en wat nog niet
+met zekerheid vastligt (font-family, spacing, interactiestaten) — is
+`stylesheet.md` de enige bron. Niet hier dupliceren, dat voorkomt dat de
+twee documenten uit elkaar gaan lopen zodra er een kleur wijzigt.
 
 ---
 
@@ -342,9 +344,11 @@ globale schaal die bij dat Assessment-type hoort (sectie 3).
 
 ## 7. Open punten / aannames om later te verifiëren
 
-- Exacte hex-kleurcodes per categorie
 - Hoe de aggregatie van meerdere respondenten per organisatie wordt getoond
   (gemiddelde, afwijking t.o.v. gemiddelde, spreiding hoog/laag) — bewust
   nog niet uitgewerkt
 - Of "Rol / Functie" bij de respondent een vrij tekstveld blijft of een
   vaste lijst wordt
+- Font-family, exacte border-radius/spacing-schaal en interactiestaten
+  (hover/focus/error) — niet met zekerheid uit screenshots te meten, zie
+  `stylesheet.md`

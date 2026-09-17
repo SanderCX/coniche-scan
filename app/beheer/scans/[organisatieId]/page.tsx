@@ -30,7 +30,7 @@ export default function ScanDetailPage({
   const [versturen, setVersturen] = useState(false);
 
   if (!organisatie || !assessment) {
-    return <p className="text-sm text-slate-500">Scan niet gevonden.</p>;
+    return <p className="text-sm text-muted">Scan niet gevonden.</p>;
   }
 
   async function handleUitnodigen(e: React.FormEvent) {
@@ -54,14 +54,14 @@ export default function ScanDetailPage({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <Link href="/beheer/scans" className="text-sm text-slate-400 hover:text-slate-600">
+      <Link href="/beheer/scans" className="text-sm text-muted hover:text-muted">
         ← Alle scans
       </Link>
-      <h1 className="mt-2 text-2xl font-bold text-slate-900">{organisatie.naam}</h1>
-      <p className="text-sm text-slate-500">{assessment.naam}</p>
+      <h1 className="mt-2 text-2xl font-bold text-ink">{organisatie.naam}</h1>
+      <p className="text-sm text-muted">{assessment.naam}</p>
 
-      <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-slate-900">
+      <section className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">
+        <h2 className="mb-4 text-lg font-semibold text-ink">
           Respondent uitnodigen
         </h2>
         <form onSubmit={handleUitnodigen} className="flex gap-3">
@@ -71,12 +71,12 @@ export default function ScanDetailPage({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="naam@organisatie.nl"
-            className="flex-1 rounded-lg border border-slate-200 p-3 text-sm"
+            className="flex-1 rounded-lg border border-gray-200 p-3 text-sm"
           />
           <button
             type="submit"
             disabled={versturen}
-            className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
+            className="rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:brightness-90 disabled:cursor-not-allowed disabled:bg-brand-disabled disabled:hover:brightness-100"
           >
             {versturen ? "Versturen..." : "Uitnodigen"}
           </button>
@@ -108,17 +108,17 @@ export default function ScanDetailPage({
         )}
       </section>
 
-      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-slate-900">Respondenten</h2>
+      <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-6">
+        <h2 className="mb-4 text-lg font-semibold text-ink">Respondenten</h2>
         {organisatie.respondenten.length === 0 && (
-          <p className="text-sm text-slate-500">Nog geen respondenten uitgenodigd.</p>
+          <p className="text-sm text-muted">Nog geen respondenten uitgenodigd.</p>
         )}
-        <ul className="divide-y divide-slate-100">
+        <ul className="divide-y divide-gray-100">
           {organisatie.respondenten.map((r) => (
             <li key={r.id} className="flex items-center justify-between py-3 text-sm">
               <div>
-                <p className="font-medium text-slate-800">{r.naam || r.email}</p>
-                <p className="text-slate-500">{r.email}</p>
+                <p className="font-medium text-ink">{r.naam || r.email}</p>
+                <p className="text-muted">{r.email}</p>
               </div>
               <div className="flex items-center gap-3">
                 <span
@@ -127,7 +127,7 @@ export default function ScanDetailPage({
                       ? "bg-green-100 text-green-700"
                       : r.status === "bezig"
                         ? "bg-amber-100 text-amber-700"
-                        : "bg-slate-100 text-slate-500"
+                        : "bg-gray-100 text-muted"
                   }`}
                 >
                   {STATUS_LABEL[r.status]}
@@ -135,7 +135,7 @@ export default function ScanDetailPage({
                 <button
                   type="button"
                   onClick={() => kopieerLink(`${window.location.origin}/uitnodiging/${r.id}`)}
-                  className="text-xs text-slate-400 hover:text-slate-700"
+                  className="text-xs text-muted hover:text-ink"
                 >
                   Kopieer link
                 </button>
@@ -145,10 +145,10 @@ export default function ScanDetailPage({
         </ul>
       </section>
 
-      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-slate-900">Organisatiekenmerken</h2>
+      <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-6">
+        <h2 className="mb-4 text-lg font-semibold text-ink">Organisatiekenmerken</h2>
         {assessment.organisatieVelden.length === 0 ? (
-          <p className="text-sm text-slate-500">Geen organisatievelden gedefinieerd.</p>
+          <p className="text-sm text-muted">Geen organisatievelden gedefinieerd.</p>
         ) : (
           <KenmerkenForm
             velden={assessment.organisatieVelden}

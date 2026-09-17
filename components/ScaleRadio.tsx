@@ -18,8 +18,8 @@ export function ScaleRadio({
           key={s.waarde}
           className={`flex cursor-pointer flex-col items-center gap-2 rounded-xl border p-3 text-center transition ${
             waarde === s.waarde
-              ? "border-slate-900 bg-slate-900 text-white"
-              : "border-slate-200 bg-white hover:border-slate-400"
+              ? "border-brand bg-brand-badge"
+              : "border-gray-200 bg-white hover:border-brand"
           }`}
         >
           <input
@@ -28,10 +28,10 @@ export function ScaleRadio({
             value={s.waarde}
             checked={waarde === s.waarde}
             onChange={() => onChange(s.waarde)}
-            className="sr-only"
+            className="h-5 w-5 accent-brand"
           />
-          <span className="text-lg font-semibold">{s.waarde}</span>
-          <span className="text-xs leading-snug">{s.label}</span>
+          <span className="text-sm font-semibold text-ink">{s.waarde}</span>
+          <span className="text-xs leading-snug text-muted">{s.label}</span>
         </label>
       ))}
     </div>

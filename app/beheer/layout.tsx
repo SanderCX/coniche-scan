@@ -14,7 +14,7 @@ export default function BeheerLayout({ children }: { children: React.ReactNode }
   return (
     <div className="flex flex-1">
       <BeheerNav />
-      <main className="flex-1 overflow-y-auto bg-slate-50 px-8 py-10">{children}</main>
+      <main className="flex-1 overflow-y-auto bg-gray-50 px-8 py-10">{children}</main>
     </div>
   );
 }

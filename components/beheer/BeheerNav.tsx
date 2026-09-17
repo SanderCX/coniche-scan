@@ -14,10 +14,10 @@ export function BeheerNav() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-56 flex-shrink-0 flex-col gap-6 border-r border-slate-200 bg-white p-6">
+    <aside className="flex w-56 flex-shrink-0 flex-col gap-6 border-r border-gray-200 bg-white p-6">
       <div>
-        <p className="text-lg font-bold text-slate-900">Coniche</p>
-        <p className="text-sm text-slate-500">Beheer</p>
+        <p className="text-lg font-bold text-ink">Coniche</p>
+        <p className="text-sm text-muted">Beheer</p>
       </div>
       <nav className="flex flex-col gap-1">
         {links.map((link) => {
@@ -28,7 +28,7 @@ export function BeheerNav() {
               key={link.href}
               href={link.href}
               className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                actief ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-100"
+                actief ? "bg-brand text-white" : "text-ink hover:bg-gray-100"
               }`}
             >
               {link.label}
@@ -39,7 +39,7 @@ export function BeheerNav() {
       <button
         type="button"
         onClick={logout}
-        className="mt-auto text-left text-sm text-slate-400 hover:text-slate-600"
+        className="mt-auto text-left text-sm text-muted hover:text-muted"
       >
         Uitloggen
       </button>

@@ -181,18 +181,18 @@ function BouwblokEditor({
   bouwblok: Bouwblok;
 }) {
   return (
-    <details className="rounded-lg border border-slate-100 p-3">
+    <details className="rounded-lg border border-gray-100 p-3">
       <summary className="flex cursor-pointer flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold text-slate-400">#{bouwblok.volgnummer}</span>
+        <span className="text-xs font-semibold text-muted">#{bouwblok.volgnummer}</span>
         <input
           value={bouwblok.naam}
           onChange={(e) =>
             patchBouwblok(assessmentId, categorieId, bouwblok.id, { naam: e.target.value })
           }
           onClick={(e) => e.stopPropagation()}
-          className="flex-1 rounded-lg border border-slate-200 p-1.5 text-sm font-medium"
+          className="flex-1 rounded-lg border border-gray-200 p-1.5 text-sm font-medium"
         />
-        <span className="text-xs text-slate-400">{bouwblok.vragen.length} vragen</span>
+        <span className="text-xs text-muted">{bouwblok.vragen.length} vragen</span>
         <button
           type="button"
           onClick={(e) => {
@@ -207,7 +207,7 @@ function BouwblokEditor({
 
       <div className="mt-3 space-y-3">
         <label className="block text-sm">
-          <span className="mb-1 block text-slate-700">Omschrijving</span>
+          <span className="mb-1 block text-ink">Omschrijving</span>
           <textarea
             value={bouwblok.omschrijving}
             onChange={(e) =>
@@ -216,11 +216,11 @@ function BouwblokEditor({
               })
             }
             rows={2}
-            className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+            className="w-full rounded-lg border border-gray-200 p-2 text-sm"
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block text-slate-700">Tags (komma-gescheiden)</span>
+          <span className="mb-1 block text-ink">Tags (komma-gescheiden)</span>
           <input
             value={bouwblok.tags.join(", ")}
             onChange={(e) =>
@@ -231,23 +231,23 @@ function BouwblokEditor({
                   .filter(Boolean),
               })
             }
-            className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+            className="w-full rounded-lg border border-gray-200 p-2 text-sm"
           />
         </label>
 
         <div>
-          <p className="mb-2 text-sm font-medium text-slate-800">Vragen</p>
+          <p className="mb-2 text-sm font-medium text-ink">Vragen</p>
           <div className="space-y-2">
             {bouwblok.vragen.map((vraag) => (
               <div key={vraag.id} className="flex items-start gap-2">
-                <span className="mt-2 w-4 text-xs text-slate-400">{vraag.volgnummer}.</span>
+                <span className="mt-2 w-4 text-xs text-muted">{vraag.volgnummer}.</span>
                 <textarea
                   value={vraag.tekst}
                   onChange={(e) =>
                     patchVraag(assessmentId, categorieId, bouwblok.id, vraag.id, e.target.value)
                   }
                   rows={2}
-                  className="flex-1 rounded-lg border border-slate-200 p-2 text-sm"
+                  className="flex-1 rounded-lg border border-gray-200 p-2 text-sm"
                 />
                 <button
                   type="button"
@@ -262,7 +262,7 @@ function BouwblokEditor({
           <button
             type="button"
             onClick={() => addVraag(assessmentId, categorieId, bouwblok.id)}
-            className="mt-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+            className="mt-2 text-sm font-medium text-muted hover:text-ink"
           >
             + Vraag toevoegen
           </button>
@@ -302,7 +302,7 @@ export default function ContentEditorPage({
   const assessment = useAssessment(assessmentId);
 
   if (!assessment) {
-    return <p className="text-sm text-slate-500">Assessment niet gevonden.</p>;
+    return <p className="text-sm text-muted">Assessment niet gevonden.</p>;
   }
 
   const heeftCategorieen = assessment.categorieen !== null;
@@ -310,78 +310,78 @@ export default function ContentEditorPage({
   return (
     <div className="mx-auto max-w-4xl space-y-8 pb-20">
       <div>
-        <Link href="/beheer/content" className="text-sm text-slate-400 hover:text-slate-600">
+        <Link href="/beheer/content" className="text-sm text-muted hover:text-muted">
           ← Alle assessment-types
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-slate-900">{assessment.naam}</h1>
+        <h1 className="mt-2 text-2xl font-bold text-ink">{assessment.naam}</h1>
       </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-slate-900">Instellingen</h2>
+      <section className="rounded-2xl border border-gray-200 bg-white p-6">
+        <h2 className="mb-4 text-lg font-semibold text-ink">Instellingen</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-700">Naam</span>
+            <span className="mb-1 block text-ink">Naam</span>
             <input
               value={assessment.naam}
               onChange={(e) =>
                 updateAssessment(assessmentId, (a) => ({ ...a, naam: e.target.value }))
               }
-              className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-700">Icoon (emoji)</span>
+            <span className="mb-1 block text-ink">Icoon (emoji)</span>
             <input
               value={assessment.icoon}
               onChange={(e) =>
                 updateAssessment(assessmentId, (a) => ({ ...a, icoon: e.target.value }))
               }
-              className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
           <label className="block text-sm sm:col-span-2">
-            <span className="mb-1 block text-slate-700">Subtitel</span>
+            <span className="mb-1 block text-ink">Subtitel</span>
             <input
               value={assessment.subtitel}
               onChange={(e) =>
                 updateAssessment(assessmentId, (a) => ({ ...a, subtitel: e.target.value }))
               }
-              className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
           <label className="block text-sm sm:col-span-2">
-            <span className="mb-1 block text-slate-700">Beschrijving</span>
+            <span className="mb-1 block text-ink">Beschrijving</span>
             <textarea
               value={assessment.beschrijving}
               onChange={(e) =>
                 updateAssessment(assessmentId, (a) => ({ ...a, beschrijving: e.target.value }))
               }
               rows={3}
-              className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
           <label className="block text-sm sm:col-span-2">
-            <span className="mb-1 block text-slate-700">Doelgroep</span>
+            <span className="mb-1 block text-ink">Doelgroep</span>
             <input
               value={assessment.doelgroep}
               onChange={(e) =>
                 updateAssessment(assessmentId, (a) => ({ ...a, doelgroep: e.target.value }))
               }
-              className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-700">Geschatte duur</span>
+            <span className="mb-1 block text-ink">Geschatte duur</span>
             <input
               value={assessment.geschatteDuur}
               onChange={(e) =>
                 updateAssessment(assessmentId, (a) => ({ ...a, geschatteDuur: e.target.value }))
               }
-              className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-700">Eenheid enkelvoud</span>
+            <span className="mb-1 block text-ink">Eenheid enkelvoud</span>
             <input
               value={assessment.bouwblokEenheidEnkelvoud}
               onChange={(e) =>
@@ -391,11 +391,11 @@ export default function ContentEditorPage({
                 }))
               }
               placeholder="Bouwblok / Domein"
-              className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-700">Eenheid meervoud</span>
+            <span className="mb-1 block text-ink">Eenheid meervoud</span>
             <input
               value={assessment.bouwblokEenheidMeervoud}
               onChange={(e) =>
@@ -405,12 +405,12 @@ export default function ContentEditorPage({
                 }))
               }
               placeholder="bouwblokken / AI-domeinen"
-              className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
         </div>
 
-        <label className="mt-4 flex items-center gap-2 text-sm text-slate-700">
+        <label className="mt-4 flex items-center gap-2 text-sm text-ink">
           <input
             type="checkbox"
             checked={assessment.scoresPerGroepGesorteerd}
@@ -424,7 +424,7 @@ export default function ContentEditorPage({
           Scores op het resultatenscherm sorteren van hoog naar laag
         </label>
 
-        <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
+        <label className="mt-2 flex items-center gap-2 text-sm text-ink">
           <input
             type="checkbox"
             checked={heeftCategorieen}
@@ -433,11 +433,11 @@ export default function ContentEditorPage({
           Bouwblokken groeperen in categorieën
         </label>
 
-        <p className="mb-2 mt-6 text-sm font-medium text-slate-800">Schaal-labels (1–5)</p>
+        <p className="mb-2 mt-6 text-sm font-medium text-ink">Schaal-labels (1–5)</p>
         <div className="space-y-2">
           {assessment.schaal.map((s, i) => (
             <div key={s.waarde} className="flex items-center gap-3">
-              <span className="w-4 text-sm font-semibold text-slate-500">{s.waarde}</span>
+              <span className="w-4 text-sm font-semibold text-muted">{s.waarde}</span>
               <input
                 value={s.label}
                 onChange={(e) =>
@@ -446,39 +446,39 @@ export default function ContentEditorPage({
                     return a;
                   })
                 }
-                className="flex-1 rounded-lg border border-slate-200 p-2 text-sm"
+                className="flex-1 rounded-lg border border-gray-200 p-2 text-sm"
               />
             </div>
           ))}
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="rounded-2xl border border-gray-200 bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">Feature-cards (landingspagina)</h2>
+          <h2 className="text-lg font-semibold text-ink">Feature-cards (landingspagina)</h2>
           <button
             type="button"
             onClick={() => addFeatureCard(assessmentId)}
-            className="rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-slate-400"
+            className="rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-muted hover:border-gray-400"
           >
             + Kaart
           </button>
         </div>
         <div className="space-y-3">
           {assessment.featureCards.map((card, i) => (
-            <div key={i} className="flex gap-2 rounded-lg border border-slate-100 p-3">
+            <div key={i} className="flex gap-2 rounded-lg border border-gray-100 p-3">
               <div className="flex-1 space-y-2">
                 <input
                   value={card.titel}
                   onChange={(e) => patchFeatureCard(assessmentId, i, { titel: e.target.value })}
-                  className="w-full rounded-lg border border-slate-200 p-2 text-sm font-medium"
+                  className="w-full rounded-lg border border-gray-200 p-2 text-sm font-medium"
                   placeholder="Titel"
                 />
                 <textarea
                   value={card.tekst}
                   onChange={(e) => patchFeatureCard(assessmentId, i, { tekst: e.target.value })}
                   rows={2}
-                  className="w-full rounded-lg border border-slate-200 p-2 text-sm"
+                  className="w-full rounded-lg border border-gray-200 p-2 text-sm"
                   placeholder="Tekst"
                 />
               </div>
@@ -494,8 +494,8 @@ export default function ContentEditorPage({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-slate-900">Organisatievelden</h2>
+      <section className="rounded-2xl border border-gray-200 bg-white p-6">
+        <h2 className="mb-4 text-lg font-semibold text-ink">Organisatievelden</h2>
         <VeldDefinitieEditor
           velden={assessment.organisatieVelden}
           onChange={(velden: VeldDefinitie[]) =>
@@ -504,9 +504,9 @@ export default function ContentEditorPage({
         />
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="rounded-2xl border border-gray-200 bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-lg font-semibold text-ink">
             {heeftCategorieen
               ? "Categorieën & bouwblokken"
               : `${assessment.bouwblokEenheidMeervoud} (geen categorie-laag)`}
@@ -515,7 +515,7 @@ export default function ContentEditorPage({
             <button
               type="button"
               onClick={() => addCategorie(assessmentId)}
-              className="rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-slate-400"
+              className="rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-muted hover:border-gray-400"
             >
               + Categorie
             </button>
@@ -523,7 +523,7 @@ export default function ContentEditorPage({
             <button
               type="button"
               onClick={() => addBouwblok(assessmentId, null)}
-              className="rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-slate-400"
+              className="rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-muted hover:border-gray-400"
             >
               + {assessment.bouwblokEenheidEnkelvoud}
             </button>
@@ -535,10 +535,10 @@ export default function ContentEditorPage({
             {[...(assessment.categorieen ?? [])]
               .sort((a, b) => a.volgorde - b.volgorde)
               .map((categorie) => (
-                <details key={categorie.id} className="rounded-xl border border-slate-200 p-4" open>
+                <details key={categorie.id} className="rounded-xl border border-gray-200 p-4" open>
                   <summary className="flex cursor-pointer flex-wrap items-center gap-3">
                     <span
-                      className={`h-3 w-3 rounded-full ${CATEGORIE_COLORS[categorie.kleur]?.bg ?? "bg-slate-400"}`}
+                      className={`h-3 w-3 rounded-full ${CATEGORIE_COLORS[categorie.kleur]?.bg ?? "bg-gray-400"}`}
                     />
                     <input
                       value={categorie.naam}
@@ -546,7 +546,7 @@ export default function ContentEditorPage({
                         patchCategorie(assessmentId, categorie.id, { naam: e.target.value })
                       }
                       onClick={(e) => e.stopPropagation()}
-                      className="flex-1 rounded-lg border border-slate-200 p-1.5 text-sm font-semibold"
+                      className="flex-1 rounded-lg border border-gray-200 p-1.5 text-sm font-semibold"
                     />
                     <select
                       value={categorie.kleur}
@@ -554,7 +554,7 @@ export default function ContentEditorPage({
                         patchCategorie(assessmentId, categorie.id, { kleur: e.target.value })
                       }
                       onClick={(e) => e.stopPropagation()}
-                      className="rounded-lg border border-slate-200 p-1.5 text-sm"
+                      className="rounded-lg border border-gray-200 p-1.5 text-sm"
                     >
                       {Object.keys(CATEGORIE_COLORS).map((k) => (
                         <option key={k} value={k}>
@@ -574,7 +574,7 @@ export default function ContentEditorPage({
                     </button>
                   </summary>
 
-                  <div className="mt-4 space-y-3 border-l-2 border-slate-100 pl-4">
+                  <div className="mt-4 space-y-3 border-l-2 border-gray-100 pl-4">
                     {categorie.bouwblokken.map((bouwblok) => (
                       <BouwblokEditor
                         key={bouwblok.id}
@@ -586,7 +586,7 @@ export default function ContentEditorPage({
                     <button
                       type="button"
                       onClick={() => addBouwblok(assessmentId, categorie.id)}
-                      className="rounded-lg border border-dashed border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-slate-400"
+                      className="rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-sm font-medium text-muted hover:border-gray-400"
                     >
                       + {assessment.bouwblokEenheidEnkelvoud}
                     </button>

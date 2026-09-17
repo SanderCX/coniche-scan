@@ -31,33 +31,36 @@ export function BouwblokForm({
 
   return (
     <div className="mx-auto max-w-3xl">
-      <div className={`rounded-t-2xl px-6 py-5 text-white ${kleur?.bg ?? "bg-slate-700"}`}>
-        <p className="text-xs font-medium uppercase tracking-wide opacity-80">
-          {eenheid} {bouwblok.volgnummer}
-        </p>
-        <h1 className="mt-1 text-2xl font-bold">{bouwblok.naam}</h1>
-        <p className="mt-2 text-sm opacity-90">{bouwblok.omschrijving}</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {bouwblok.tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium"
-            >
-              {tag}
-            </span>
-          ))}
+      <div className="flex gap-4 rounded-t-2xl border border-b-0 border-gray-200 bg-white p-6">
+        <div className={`w-1.5 flex-shrink-0 rounded-full ${kleur?.bg ?? "bg-gray-300"}`} />
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted">
+            {eenheid} {bouwblok.volgnummer}
+          </p>
+          <h1 className="mt-1 text-2xl font-bold text-ink">{bouwblok.naam}</h1>
+          <p className="mt-2 text-sm text-muted">{bouwblok.omschrijving}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {bouwblok.tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-ink"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="space-y-8 rounded-b-2xl border border-t-0 border-slate-200 bg-white px-6 py-6">
-        <p className="rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-500">
+      <div className="space-y-8 rounded-b-2xl border border-t-0 border-gray-200 bg-white px-6 py-6">
+        <p className="rounded-lg bg-gray-100 px-4 py-3 text-sm text-muted">
           Beantwoord op basis van wat aantoonbaar geregeld is (documenten, ritmes, tooling,
           afspraken).
         </p>
 
         {bouwblok.vragen.map((vraag) => (
           <div key={vraag.id}>
-            <p className="mb-3 text-sm font-medium text-slate-800">
+            <p className="mb-3 text-sm font-medium text-ink">
               {vraag.volgnummer}. {vraag.tekst}
             </p>
             <ScaleRadio
@@ -70,14 +73,14 @@ export function BouwblokForm({
         ))}
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-800">
+          <label className="mb-2 block text-sm font-medium text-ink">
             Opmerkingen bij dit bouwblok (optioneel)
           </label>
           <textarea
             value={respondent.opmerkingenPerBouwblok[bouwblok.id] ?? ""}
             onChange={(e) => onOpmerking(e.target.value)}
             rows={3}
-            className="w-full rounded-lg border border-slate-200 p-3 text-sm focus:border-slate-400 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
             placeholder="Toelichting, context of voorbeelden..."
           />
         </div>
@@ -87,7 +90,7 @@ export function BouwblokForm({
             type="button"
             disabled={!alleBeantwoord}
             onClick={onVolgende}
-            className="rounded-lg bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-30"
+            className="rounded-lg bg-brand px-6 py-2.5 text-sm font-semibold text-white transition hover:brightness-90 disabled:cursor-not-allowed disabled:bg-brand-disabled disabled:hover:brightness-100"
           >
             {isLaatsteBouwblok ? "Bekijk resultaten" : "Volgende"}
           </button>

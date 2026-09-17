@@ -20,12 +20,12 @@ function VeldRow({
   onRemove: () => void;
 }) {
   return (
-    <div className="rounded-lg border border-slate-200 p-3">
+    <div className="rounded-lg border border-gray-200 p-3">
       <div className="flex flex-wrap items-center gap-2">
         <input
           value={veld.label}
           onChange={(e) => onChange({ ...veld, label: e.target.value })}
-          className="min-w-[10rem] flex-1 rounded-lg border border-slate-200 p-2 text-sm"
+          className="min-w-[10rem] flex-1 rounded-lg border border-gray-200 p-2 text-sm"
           placeholder="Label"
         />
         <select
@@ -39,7 +39,7 @@ function VeldRow({
               opties: type === "select" ? (veld.opties ?? []) : undefined,
             });
           }}
-          className="rounded-lg border border-slate-200 p-2 text-sm"
+          className="rounded-lg border border-gray-200 p-2 text-sm"
         >
           {VELD_TYPES.map((t) => (
             <option key={t} value={t}>
@@ -69,12 +69,12 @@ function VeldRow({
             })
           }
           placeholder="Opties, komma-gescheiden"
-          className="mt-2 w-full rounded-lg border border-slate-200 p-2 text-sm"
+          className="mt-2 w-full rounded-lg border border-gray-200 p-2 text-sm"
         />
       )}
 
       {veld.type === "groep" && (
-        <div className="mt-3 space-y-2 border-l-2 border-slate-100 pl-4">
+        <div className="mt-3 space-y-2 border-l-2 border-gray-100 pl-4">
           {(veld.subvelden ?? []).map((sub, i) => (
             <VeldRow
               key={sub.id}
@@ -103,7 +103,7 @@ function VeldRow({
                 ],
               })
             }
-            className="text-sm font-medium text-slate-600 hover:text-slate-900"
+            className="text-sm font-medium text-muted hover:text-ink"
           >
             + Subveld toevoegen
           </button>
@@ -139,7 +139,7 @@ export function VeldDefinitieEditor({
         onClick={() =>
           onChange([...velden, { id: nieuwId(), label: "Nieuw veld", type: "tekst" }])
         }
-        className="rounded-lg border border-dashed border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:border-slate-400"
+        className="rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm font-medium text-muted hover:border-gray-400"
       >
         + Veld toevoegen
       </button>

@@ -41,79 +41,85 @@ export function ResultsView({
   return (
     <div className="space-y-10">
       {isPreview && (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+        <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-muted">
           Dit is een voorbeeld met demo-data — zo ziet jouw resultatenscherm eruit
           na afronding van de scan.
         </div>
       )}
 
-      <section className="flex flex-col items-center gap-6 rounded-2xl border border-slate-200 bg-white p-8 text-center sm:flex-row sm:justify-center sm:gap-12 sm:text-left">
+      <section className="flex flex-col items-center gap-6 rounded-2xl border border-gray-200 bg-white p-8 text-center sm:flex-row sm:justify-center sm:gap-12 sm:text-left">
         {overall !== null && <ScoreCircle score={overall} classificatie={classificatie(overall)} />}
         <div>
-          <p className="text-sm font-medium text-slate-500">
+          <p className="text-sm font-medium text-muted">
             {respondentNaam ? `Resultaat voor ${respondentNaam}` : "Overall score"}
           </p>
-          <h2 className="mt-1 text-2xl font-bold text-slate-900">
+          <h2 className="mt-1 text-2xl font-bold text-ink">
             {assessment.naam}
           </h2>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-muted">
             {beantwoord} van {totaal} vragen beantwoord
           </p>
         </div>
       </section>
 
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h3 className="mb-2 text-lg font-semibold text-slate-900">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6">
+          <h3 className="mb-2 text-lg font-semibold text-ink">
             Alle {assessment.bouwblokEenheidMeervoud}
           </h3>
           <RadarChartView resultaten={bouwblokResultaten} />
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h3 className="mb-2 text-lg font-semibold text-slate-900">{groepHeading}</h3>
+        <div className="rounded-2xl border border-gray-200 bg-white p-6">
+          <h3 className="mb-2 text-lg font-semibold text-ink">{groepHeading}</h3>
           <CategoryBarChart resultaten={groepResultaten} />
         </div>
       </section>
 
       <section className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h3 className="mb-4 text-lg font-semibold text-slate-900">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6">
+          <h3 className="mb-4 text-lg font-semibold text-ink">
             Top 3 Sterktes
           </h3>
-          <ol className="space-y-3">
+          <ol className="space-y-2">
             {sterktes.map((r) => (
-              <li key={r.bouwblok.id} className="flex items-center justify-between">
+              <li
+                key={r.bouwblok.id}
+                className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2"
+              >
                 {bouwblokHref ? (
                   <Link
                     href={bouwblokHref(r.bouwblok.id)}
-                    className="text-sm text-slate-700 hover:underline"
+                    className="text-sm text-ink hover:underline"
                   >
                     {r.bouwblok.naam}
                   </Link>
                 ) : (
-                  <span className="text-sm text-slate-700">{r.bouwblok.naam}</span>
+                  <span className="text-sm text-ink">{r.bouwblok.naam}</span>
                 )}
                 <span className="font-semibold text-green-600">{r.score.toFixed(1)}</span>
               </li>
             ))}
           </ol>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h3 className="mb-4 text-lg font-semibold text-slate-900">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6">
+          <h3 className="mb-4 text-lg font-semibold text-ink">
             Top 3 Verbeterkansen
           </h3>
-          <ol className="space-y-3">
+          <ol className="space-y-2">
             {verbeterkansen.map((r) => (
-              <li key={r.bouwblok.id} className="flex items-center justify-between">
+              <li
+                key={r.bouwblok.id}
+                className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2"
+              >
                 {bouwblokHref ? (
                   <Link
                     href={bouwblokHref(r.bouwblok.id)}
-                    className="text-sm text-slate-700 hover:underline"
+                    className="text-sm text-ink hover:underline"
                   >
                     {r.bouwblok.naam}
                   </Link>
                 ) : (
-                  <span className="text-sm text-slate-700">{r.bouwblok.naam}</span>
+                  <span className="text-sm text-ink">{r.bouwblok.naam}</span>
                 )}
                 <span className="font-semibold text-red-600">{r.score.toFixed(1)}</span>
               </li>
@@ -122,8 +128,8 @@ export function ResultsView({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h3 className="mb-4 text-lg font-semibold text-slate-900">Legenda</h3>
+      <section className="rounded-2xl border border-gray-200 bg-white p-6">
+        <h3 className="mb-4 text-lg font-semibold text-ink">Legenda</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {(["rood", "oranje", "groen"] as const).map((c) => {
             const info = CLASSIFICATIE_INFO[c];
@@ -132,7 +138,7 @@ export function ResultsView({
                 <span className={`mt-1 h-3 w-3 flex-shrink-0 rounded-full ${info.bg}`} />
                 <div>
                   <p className={`text-sm font-semibold ${info.text}`}>{info.label}</p>
-                  <p className="text-xs text-slate-500">{info.omschrijving}</p>
+                  <p className="text-xs text-muted">{info.omschrijving}</p>
                 </div>
               </div>
             );
@@ -145,7 +151,7 @@ export function ResultsView({
           type="button"
           disabled
           title="Binnenkort beschikbaar"
-          className="cursor-not-allowed rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-400"
+          className="cursor-not-allowed rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-muted"
         >
           Exporteer als PDF
         </button>
@@ -153,7 +159,7 @@ export function ResultsView({
           type="button"
           disabled
           title="Binnenkort beschikbaar"
-          className="cursor-not-allowed rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-400"
+          className="cursor-not-allowed rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-muted"
         >
           Exporteer als CSV
         </button>

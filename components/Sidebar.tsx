@@ -17,24 +17,24 @@ export function Sidebar({
   const { percentage, beantwoord, totaal } = voortgang(assessment, respondent.antwoorden);
 
   return (
-    <aside className="flex w-full flex-col gap-6 border-r border-slate-200 bg-white p-6 sm:w-72 sm:flex-shrink-0">
+    <aside className="flex w-full flex-col gap-6 border-r border-gray-200 bg-white p-6 sm:w-72 sm:flex-shrink-0">
       <div>
-        <p className="text-lg font-bold text-slate-900">Coniche</p>
-        <p className="text-sm text-slate-500">{respondent.naam || "Respondent"}</p>
+        <p className="text-lg font-bold text-ink">Coniche</p>
+        <p className="text-sm text-muted">{respondent.naam || "Respondent"}</p>
       </div>
 
       <div>
-        <div className="flex items-center justify-between text-xs text-slate-500">
+        <div className="flex items-center justify-between text-xs text-muted">
           <span>Voortgang</span>
           <span>{percentage}%</span>
         </div>
-        <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-gray-100">
           <div
-            className="h-full rounded-full bg-slate-900 transition-all"
+            className="h-full rounded-full bg-brand transition-all"
             style={{ width: `${percentage}%` }}
           />
         </div>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="mt-1 text-xs text-muted">
           {beantwoord} van {totaal} vragen
         </p>
       </div>
@@ -46,7 +46,7 @@ export function Sidebar({
               <div key={groep.id}>
                 {groep.naam && (
                   <p
-                    className={`mb-2 text-xs font-semibold uppercase tracking-wide ${kleur?.text ?? "text-slate-500"}`}
+                    className={`mb-2 text-xs font-semibold uppercase tracking-wide ${kleur?.text ?? "text-muted"}`}
                   >
                     {groep.naam}
                   </p>
@@ -63,8 +63,8 @@ export function Sidebar({
                           onClick={() => onSelecteer(bouwblok.id)}
                           className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition ${
                             actief
-                              ? "bg-slate-900 text-white"
-                              : "text-slate-700 hover:bg-slate-100"
+                              ? "bg-brand text-white"
+                              : "text-ink hover:bg-gray-100"
                           }`}
                         >
                           <span
@@ -74,8 +74,8 @@ export function Sidebar({
                                 : status === "afgerond"
                                   ? "bg-green-100 text-green-700"
                                   : status === "bezig"
-                                    ? "bg-slate-200 text-slate-700"
-                                    : "bg-slate-100 text-slate-400"
+                                    ? "bg-gray-200 text-ink"
+                                    : "bg-gray-100 text-muted"
                             }`}
                           >
                             {status === "afgerond" ? "✓" : bouwblok.volgnummer}
@@ -83,7 +83,7 @@ export function Sidebar({
                           <span className="flex-1 truncate">{bouwblok.naam}</span>
                           {status === "bezig" && (
                             <span
-                              className={`text-xs ${actief ? "text-white/70" : "text-slate-400"}`}
+                              className={`text-xs ${actief ? "text-white/70" : "text-muted"}`}
                             >
                               {bbBeantwoord}/{bbTotaal}
                             </span>

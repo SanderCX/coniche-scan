@@ -32,11 +32,11 @@ export default function ScansPage() {
   return (
     <div className="mx-auto max-w-4xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Scans</h1>
+        <h1 className="text-2xl font-bold text-ink">Scans</h1>
         <button
           type="button"
           onClick={() => setFormOpen((v) => !v)}
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+          className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:brightness-90"
         >
           {formOpen ? "Annuleren" : "+ Nieuwe scan"}
         </button>
@@ -45,27 +45,27 @@ export default function ScansPage() {
       {formOpen && (
         <form
           onSubmit={handleSubmit}
-          className="mt-6 space-y-5 rounded-2xl border border-slate-200 bg-white p-6"
+          className="mt-6 space-y-5 rounded-2xl border border-gray-200 bg-white p-6"
         >
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-800">
+            <label className="mb-1 block text-sm font-medium text-ink">
               Organisatienaam
             </label>
             <input
               required
               value={naam}
               onChange={(e) => setNaam(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 p-3 text-sm"
+              className="w-full rounded-lg border border-gray-200 p-3 text-sm"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-800">
+            <label className="mb-1 block text-sm font-medium text-ink">
               Assessment-type
             </label>
             <select
               value={assessmentId}
               onChange={(e) => setAssessmentId(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 p-3 text-sm"
+              className="w-full rounded-lg border border-gray-200 p-3 text-sm"
             >
               {assessments.map((a) => (
                 <option key={a.id} value={a.id}>
@@ -77,7 +77,7 @@ export default function ScansPage() {
 
           {gekozenAssessment && gekozenAssessment.organisatieVelden.length > 0 && (
             <div>
-              <p className="mb-2 text-sm font-medium text-slate-800">Organisatiekenmerken</p>
+              <p className="mb-2 text-sm font-medium text-ink">Organisatiekenmerken</p>
               <KenmerkenForm
                 velden={gekozenAssessment.organisatieVelden}
                 waarden={kenmerken}
@@ -88,7 +88,7 @@ export default function ScansPage() {
 
           <button
             type="submit"
-            className="rounded-lg bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+            className="rounded-lg bg-brand px-6 py-2.5 text-sm font-semibold text-white hover:brightness-90"
           >
             Scan aanmaken
           </button>
@@ -97,7 +97,7 @@ export default function ScansPage() {
 
       <div className="mt-6 space-y-3">
         {organisaties.length === 0 && (
-          <p className="text-sm text-slate-500">Nog geen scans aangemaakt.</p>
+          <p className="text-sm text-muted">Nog geen scans aangemaakt.</p>
         )}
         {organisaties.map((org) => {
           const assessment = assessments.find((a) => a.id === org.assessmentId);
@@ -106,13 +106,13 @@ export default function ScansPage() {
             <Link
               key={org.id}
               href={`/beheer/scans/${org.id}`}
-              className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow"
+              className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow"
             >
               <div>
-                <p className="font-semibold text-slate-900">{org.naam}</p>
-                <p className="text-sm text-slate-500">{assessment?.naam ?? "Onbekend type"}</p>
+                <p className="font-semibold text-ink">{org.naam}</p>
+                <p className="text-sm text-muted">{assessment?.naam ?? "Onbekend type"}</p>
               </div>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted">
                 {afgerond}/{org.respondenten.length} afgerond
               </p>
             </Link>

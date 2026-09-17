@@ -22,18 +22,18 @@ export default function BeheerDashboard() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-      <p className="mt-1 text-sm text-slate-500">Overzicht van scans en content.</p>
+      <h1 className="text-2xl font-bold text-ink">Dashboard</h1>
+      <p className="mt-1 text-sm text-muted">Overzicht van scans en content.</p>
 
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map((s) => (
           <Link
             key={s.label}
             href={s.href}
-            className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow"
+            className="rounded-2xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow"
           >
-            <p className="text-3xl font-bold text-slate-900">{s.waarde}</p>
-            <p className="mt-1 text-sm text-slate-500">{s.label}</p>
+            <p className="text-3xl font-bold text-ink">{s.waarde}</p>
+            <p className="mt-1 text-sm text-muted">{s.label}</p>
           </Link>
         ))}
       </div>
@@ -41,13 +41,13 @@ export default function BeheerDashboard() {
       <div className="mt-10 flex gap-3">
         <Link
           href="/beheer/scans"
-          className="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+          className="rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:brightness-90"
         >
           Nieuwe scan aanmaken
         </Link>
         <Link
           href="/beheer/content"
-          className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:border-slate-400"
+          className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-ink hover:border-gray-400"
         >
           Content beheren
         </Link>

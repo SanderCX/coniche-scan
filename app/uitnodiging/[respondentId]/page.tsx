@@ -42,8 +42,8 @@ export default function UitnodigingPage({
   if (!gegevens) {
     return (
       <div className="mx-auto w-full max-w-md flex-1 px-6 py-16 text-center">
-        <h1 className="text-xl font-bold text-slate-900">Ongeldige link</h1>
-        <p className="mt-2 text-sm text-slate-500">
+        <h1 className="text-xl font-bold text-ink">Ongeldige link</h1>
+        <p className="mt-2 text-sm text-muted">
           Deze uitnodiging bestaat niet (meer). Neem contact op met Coniche
           voor een nieuwe link.
         </p>
@@ -99,20 +99,20 @@ export default function UitnodigingPage({
 
   return (
     <div className="mx-auto w-full max-w-md flex-1 px-6 py-16">
-      <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+      <p className="text-sm font-semibold uppercase tracking-wide text-muted">
         {organisatie.naam}
       </p>
-      <h1 className="mt-1 text-2xl font-bold text-slate-900">
+      <h1 className="mt-1 text-2xl font-bold text-ink">
         {assessment?.naam ?? "Uitnodiging"}
       </h1>
-      <p className="mt-2 text-sm text-slate-500">
+      <p className="mt-2 text-sm text-muted">
         Bevestig je e-mailadres om toegang te krijgen tot deze scan.
       </p>
 
       {stap === "email" && (
         <form onSubmit={handleEmailSubmit} className="mt-8 space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-800">
+            <label className="mb-1 block text-sm font-medium text-ink">
               E-mailadres
             </label>
             <input
@@ -120,7 +120,7 @@ export default function UitnodigingPage({
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 p-3 text-sm focus:border-slate-400 focus:outline-none"
+              className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-brand focus:outline-none"
               placeholder="naam@organisatie.nl"
             />
           </div>
@@ -128,7 +128,7 @@ export default function UitnodigingPage({
           <button
             type="submit"
             disabled={versturen}
-            className="w-full rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50"
+            className="w-full rounded-lg bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:brightness-90 disabled:cursor-not-allowed disabled:bg-brand-disabled disabled:hover:brightness-100"
           >
             {versturen ? "Versturen..." : "Verstuur verificatiecode"}
           </button>
@@ -150,7 +150,7 @@ export default function UitnodigingPage({
             </div>
           )}
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-800">
+            <label className="mb-1 block text-sm font-medium text-ink">
               Verificatiecode
             </label>
             <input
@@ -158,22 +158,22 @@ export default function UitnodigingPage({
               value={code}
               onChange={(e) => setCode(e.target.value)}
               maxLength={6}
-              className="w-full rounded-lg border border-slate-200 p-3 text-center font-mono text-lg tracking-widest focus:border-slate-400 focus:outline-none"
+              className="w-full rounded-lg border border-gray-200 p-3 text-center font-mono text-lg tracking-widest focus:border-brand focus:outline-none"
               placeholder="123456"
             />
-            <p className="mt-1 text-xs text-slate-400">Geldig gedurende 15 minuten.</p>
+            <p className="mt-1 text-xs text-muted">Geldig gedurende 15 minuten.</p>
           </div>
           {fout && <p className="text-sm text-red-600">{fout}</p>}
           <button
             type="submit"
-            className="w-full rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            className="w-full rounded-lg bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:brightness-90"
           >
             Bevestig code
           </button>
           <button
             type="button"
             onClick={handleOpnieuwVersturen}
-            className="w-full text-sm text-slate-500 hover:text-slate-700"
+            className="w-full text-sm text-muted hover:text-ink"
           >
             Geen code ontvangen? Opnieuw versturen
           </button>

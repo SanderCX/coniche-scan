@@ -46,7 +46,7 @@ export default function DoorloopPage({
   }, [gegevens, respondentId, router]);
 
   if (!gegevens || !assessment || !actieveBouwblokId) {
-    return <div className="flex-1 px-6 py-16 text-center text-slate-400">Laden...</div>;
+    return <div className="flex-1 px-6 py-16 text-center text-muted">Laden...</div>;
   }
 
   if (gegevens.respondent.status === "uitgenodigd") {
@@ -95,7 +95,7 @@ export default function DoorloopPage({
         actieveBouwblokId={actieveBouwblokId}
         onSelecteer={setHandmatigGekozenId}
       />
-      <main className="flex-1 overflow-y-auto bg-slate-50 px-6 py-10">
+      <main className="flex-1 overflow-y-auto bg-gray-50 px-6 py-10">
         <BouwblokForm
           bouwblok={huidig.bouwblok}
           categorieKleur={huidig.groepKleur}

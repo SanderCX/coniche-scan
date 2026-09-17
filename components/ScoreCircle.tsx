@@ -15,7 +15,7 @@ export function ScoreCircle({
   return (
     <div className="flex flex-col items-center gap-3">
       <div
-        className={`flex ${dims} items-center justify-center rounded-full border-8 font-bold text-slate-900`}
+        className={`flex ${dims} items-center justify-center rounded-full border-8 font-bold text-ink`}
         style={{ borderColor: CLASSIFICATIE_HEX[classificatie] }}
       >
         {score.toFixed(1)}
