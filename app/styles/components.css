@@ -1,0 +1,739 @@
+/* ---------- Navigatie ----------
+   Structuur/gedrag overgenomen van de bestaande BOKS-app (.topbar): sticky,
+   altijd witte achtergrond, oranje onderrand, subtiele schaduw — geen
+   transparant-wordt-wit-bij-scroll, dat bleek in de praktijk niet de
+   werkende referentie te zijn. */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--nav-h);
+  background: var(--bg);
+  border-bottom: 3px solid var(--or);
+  box-shadow: 0 2px 12px rgba(28, 28, 26, 0.06);
+  padding: 0.9rem 2rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 0.6rem;
+}
+
+.nav-logo {
+  display: block;
+  line-height: 0;
+}
+
+.nav-logo img {
+  height: 44px;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+  object-position: left center;
+  display: block;
+}
+
+.nav-badge {
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 100px;
+  margin-left: 0.9rem;
+}
+
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem 1.6rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .nav {
+    /* .nav-right wrapt hieronder naar een eigen regel, dus de vaste
+       nav-hoogte moet hier weer los — anders klipt de balk. */
+    height: auto;
+  }
+  .nav-right {
+    margin-left: 0;
+    width: 100%;
+    gap: 0.9rem 1.2rem;
+  }
+}
+
+.nav-right a {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-m);
+  text-decoration: none;
+}
+
+.nav-right a:hover,
+.nav-right a.actief {
+  color: var(--or);
+}
+
+.nav-right a.actief {
+  text-decoration: underline;
+}
+
+/* Compacte knopmaat — losgetild van .nav-right (waar 'm oorspronkelijk
+   alleen stond) zodat elke bulk-actiebalk 'm ook kan gebruiken (bijv.
+   "N geselecteerd" + Exporteren/Verwijderen), niet de standaardmaat. */
+.btn-compact {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+}
+
+.nav-right .btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  font-size: 0.78rem;
+  color: var(--ink-s);
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+}
+
+.mini-logo {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+}
+
+.footer-admin-link {
+  color: var(--ink-s);
+  text-decoration: underline;
+}
+.footer-admin-link:hover {
+  color: var(--or);
+}
+
+/* ---------- Knoppen ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--r);
+  padding: 0.82rem 1.7rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.15s ease, color 0.15s ease;
+}
+
+.btn-or {
+  background: var(--or);
+  color: #fff;
+}
+.btn-or:hover {
+  background: var(--or-l);
+  transform: translateY(-1px);
+}
+
+.btn-outline-w {
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+.btn-outline-w:hover {
+  border-color: #fff;
+}
+
+.btn-w {
+  background: #fff;
+  color: var(--or);
+}
+.btn-w:hover {
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border: 2px solid var(--border-d);
+}
+.btn-outline:hover {
+  border-color: var(--ink-s);
+}
+
+.btn-danger {
+  background: var(--stat-red);
+  color: #fff;
+}
+.btn-danger:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* Knoppen die functioneel bij elkaar horen in één rij (bijv. de bulkbalk
+   "Exporteer selectie" + "Verwijderen") krijgen gelijke breedte i.p.v. elk
+   hun eigen breedte — geldt per actierij, niet voor elke knop op de pagina. */
+.btn-rij {
+  display: flex;
+  gap: 0.8rem;
+}
+.btn-rij .btn {
+  flex: 1;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  background: var(--bg-mid);
+  color: var(--ink-s);
+  border-color: var(--border);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---------- Badges / pills ---------- */
+.hero-tag {
+  display: inline-block;
+  background: var(--or);
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.8rem;
+  border-radius: 3px;
+}
+
+.g-badge {
+  display: inline-block;
+  background: var(--or-faint);
+  color: var(--or);
+  border: 1px solid var(--or-mid);
+  border-radius: 100px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* ---------- Kaarten ---------- */
+.card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.8rem;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.card-warm {
+  background: var(--bg-warm);
+}
+
+.card-accent-top {
+  border-top: 4px solid var(--accent, var(--or));
+}
+
+.card-accent-left {
+  border-left: 4px solid var(--accent, var(--or));
+}
+
+/* Assessment-keuzekaart */
+.assessment-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  text-decoration: none;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+/* Generiek: elke klikbare kaart (`<a class="card ...">`) krijgt dezelfde
+   lift + schaduw — bevestigd door Joost, geldt overal in de app, niet
+   hardcoded aan `.assessment-card` alleen. */
+a.card:hover,
+.assessment-card:hover {
+  box-shadow: 0 12px 28px rgba(28, 28, 26, 0.08);
+  transform: translateY(-2px);
+}
+
+.assessment-card .icoon {
+  font-size: 2rem;
+}
+
+.assessment-card .duur {
+  color: var(--ink-s);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ---------- Formulieren ---------- */
+.field {
+  margin-bottom: 1.4rem;
+}
+
+.field label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+
+.field .hint {
+  font-size: 0.78rem;
+  color: var(--ink-s);
+  margin-top: 0.3rem;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"],
+.field input[type="number"],
+.field textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border-d);
+  border-radius: var(--r);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.field input[type="text"]:focus,
+.field input[type="email"]:focus,
+.field input[type="password"]:focus,
+.field input[type="number"]:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--or);
+  box-shadow: 0 0 0 3px var(--or-faint);
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 5.5rem;
+}
+
+/* ---------- Radiobuttons (5-punts schaal) ---------- */
+.schaal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.schaal-optie {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--r);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.schaal-optie:hover {
+  background: var(--bg-warm);
+}
+
+.schaal-optie input[type="radio"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--accent, var(--or));
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  margin: 0;
+}
+
+.schaal-optie input[type="radio"]::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: scale(0);
+  transition: transform 0.1s ease;
+  background: var(--accent, var(--or));
+}
+
+.schaal-optie input[type="radio"]:checked::before {
+  transform: scale(1);
+}
+
+.schaal-optie .optie-tekst {
+  font-size: 0.92rem;
+  color: var(--ink-m);
+}
+
+/* ---------- Instructievlak ---------- */
+.instructievlak {
+  background: var(--bg-mid);
+  border-radius: var(--r);
+  padding: 0.9rem 1.1rem;
+  font-size: 0.85rem;
+  color: var(--ink-m);
+  margin: 1.2rem 0 1.6rem;
+}
+
+/* ---------- Doorloopflow: sidebar + hoofdscherm ----------
+   Nav/footer zijn hier de gedeelde .nav/.footer (zelfde als overal in de
+   app, logo links in de nav) — de sidebar is puur voortgang/navigatie
+   binnen de scan, geen eigen logo meer. */
+.flow-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+}
+
+.flow-sidebar {
+  border-right: 1px solid var(--border);
+  background: var(--bg-warm);
+  padding: 1.5rem;
+  /* Sticky tegen de nav aan (var(--nav-h)) met een eigen, begrensde
+     scrollhoogte — zonder de vaste height doet overflow-y niets en
+     scrollt de sidebar gewoon mee met de pagina. Alleen boven de
+     900px-breakpoint, zie de media query verderop. */
+  position: sticky;
+  top: var(--nav-h);
+  height: calc(100vh - var(--nav-h));
+  overflow-y: auto;
+}
+
+.flow-sidebar .respondent-naam {
+  font-size: 0.85rem;
+  color: var(--ink-s);
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  height: 8px;
+  border-radius: 100px;
+  background: var(--bg-mid);
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--or);
+  border-radius: 100px;
+  transition: width 0.2s ease;
+}
+
+.progress-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-s);
+  margin-bottom: 1.4rem;
+}
+
+.sidebar-categorie {
+  margin-bottom: 1rem;
+}
+
+.sidebar-categorie-naam {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent, var(--ink-s));
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-bouwblok {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--r);
+  font-size: 0.85rem;
+  color: var(--ink-m);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.sidebar-bouwblok:hover {
+  background: var(--bg-mid);
+}
+
+.sidebar-bouwblok.actief {
+  background: var(--bg-mid);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.sidebar-bouwblok .status-icoon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--ink-s);
+  border: 1.5px solid var(--border-d);
+}
+
+.sidebar-bouwblok.status-bezig .status-icoon {
+  background: var(--accent, var(--or));
+  border-color: var(--accent, var(--or));
+  color: #fff;
+}
+
+.sidebar-bouwblok.status-afgerond .status-icoon {
+  background: var(--stat-green);
+  border-color: var(--stat-green);
+  color: #fff;
+}
+
+.status-icoon svg {
+  display: block;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  display: block;
+}
+
+.flow-main {
+  padding: 2.5rem 3rem 4rem;
+  max-width: 760px;
+}
+
+.bouwblok-kop {
+  border-left: 4px solid var(--accent, var(--or));
+  padding-left: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.bouwblok-kop-titelrij {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.bouwblok-kop h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.toelichting-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--accent, var(--or));
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0.2rem;
+}
+
+.bouwblok-omschrijving {
+  color: var(--ink-m);
+  margin: 0;
+}
+
+.tags-rij {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.4rem;
+}
+
+.vraag-blok {
+  margin-bottom: 2.2rem;
+  padding-bottom: 1.8rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.vraag-blok:last-of-type {
+  border-bottom: none;
+}
+
+.vraag-tekst {
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.8rem;
+}
+
+.opmerking-veld {
+  margin-top: 1rem;
+}
+
+.flow-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+/* ---------- Modal / overlay ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 28, 26, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 1.5rem;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 10px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 2rem;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.1rem;
+  background: var(--bg-mid);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--ink-m);
+}
+
+/* ---------- Classificatie / legenda ---------- */
+.classificatie-cirkel {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 8px solid var(--kleur, var(--stat-amber));
+  margin: 0 auto;
+}
+
+.classificatie-cirkel .score {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.classificatie-cirkel .label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--kleur, var(--stat-amber));
+}
+
+.legenda {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.legenda-item {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+}
+
+.legenda-stip {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-top: 0.3rem;
+  background: var(--kleur);
+  flex: none;
+}
+
+.legenda-item h3 {
+  margin-bottom: 0.2rem;
+  font-size: 0.95rem;
+}
+
+.legenda-item p {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* ---------- Top 3 lijstjes ---------- */
+.top3-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.top3-lijst {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.top3-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  border-radius: var(--r);
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+}
+
+.top3-item .score-pill {
+  font-weight: 800;
+  color: var(--kleur);
+}
+
+/* ---------- Voortgang resultaten ---------- */
+.resultaten-header {
+  text-align: center;
+  padding: 3rem 0 2rem;
+}
+
+.resultaten-voortgang {
+  color: var(--ink-s);
+  font-size: 0.9rem;
+  margin-top: 0.6rem;
+}
+
+.preview-banner {
+  background: var(--or-faint);
+  border: 1px solid var(--or-mid);
+  color: var(--or);
+  text-align: center;
+  padding: 0.8rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 900px) {
+  .flow-layout {
+    grid-template-columns: 1fr;
+  }
+  .flow-sidebar {
+    position: static;
+    height: auto;
+    overflow-y: visible;
+  }
+  .flow-main {
+    padding: 2rem 1.2rem 3rem;
+  }
+}

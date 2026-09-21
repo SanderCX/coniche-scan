@@ -5,6 +5,83 @@ Bouwbeslissingen die niet uit een van de content-/specdocumenten
 door Sander zijn genomen — meestal om een tegenstrijdigheid tussen twee
 eerder aangeleverde documenten op te lossen. Nieuwste bovenaan.
 
+## 2026-09-21 — Rebuild op de aangeleverde `tokens.css`/`components.css`/`admin.css`/`charts.css`
+
+**Aanleiding**: Joost leverde een volledig statisch HTML/CSS/JS-ontwerp
+aan (`index.html`, `designer-preview-homepage.html`, `css/`, `js/`,
+`assets/`) dat stylesheet.md nu expliciet als de letterlijke, leidende
+CSS-bron aanwijst ("Sander neemt deze bestanden letterlijk over, niet
+herschrijven"). Tegelijk een grote update van CLAUDE.md,
+admin-beheerpagina.md en v1-aanpassingen.md.
+
+**Doorgevoerd**:
+- De 5 aangeleverde CSS-bestanden zijn 1-op-1 gekopieerd naar
+  `app/styles/` en geïmporteerd in `app/globals.css` (na Tailwind). Alle
+  nieuwe/herbouwde UI (nav, footer, sidebar, knoppen, badges, admin-
+  schermen, resultatenscherm) gebruikt de letterlijke klassenamen
+  daaruit (`.nav`, `.btn-or`, `.admin-table`, `.flow-sidebar`, ...) i.p.v.
+  ad-hoc Tailwind-kleurutilities. Enige bewuste afwijking: `.field`/
+  `input[type=text]` in components.css dekte geen `email`/`password`/
+  `number`-velden — dat selector-bereik is lokaal verbreed (zelfde
+  waarden, geen nieuw ontwerp) zodat login-/uitnodigingsformulieren
+  bruikbaar blijven.
+- Nav/footer/sidebar volledig herbouwd naar de nu vastgelegde specs:
+  sticky nav, permanent wit, 3px oranje onderrand, vaste hoogte
+  (`--nav-h`), logo 44px, `.nav-right`-patroon (acties → scheidingslijn
+  → "← Terug naar site"). Footer zonder logo (nog open designpunt).
+  Sidebar sticky met een eigen scrollgebied, geen eigen logo meer.
+- Radiobutton-accentkleur volgt nu de categorie (`--accent`) i.p.v. vast
+  oranje. Classificatiekleuren (rood/oranje/groen) volgen nu
+  `--stat-red`/`--stat-amber`/`--stat-green` uit tokens.css — dit zijn
+  ANDERE hex-waarden dan de eerder geïmplementeerde Tailwind
+  red-600/orange-500/green-600.
+- **Toegangsflow vervangen door de "2a. Tussenoplossing" uit
+  v1-aanpassingen.md**: de eerder gebouwde e-mail+verificatiecode-flow
+  (`lib/verificatie.ts`, `/uitnodiging/[respondentId]`) en de bijbehorende
+  test-modus-schakelaar (`lib/instellingen.ts`) zijn verwijderd. Daarvoor
+  in de plaats: een "Publieke link" (`/scan/[respondentId]`, opgebouwd in
+  `lib/uitnodiging-link.ts`) die direct doorstuurt naar het scherm dat bij
+  de status van de respondent hoort — geen verificatiescherm. De admin
+  deelt deze link zelf (kopieerknop op de organisatie-detailpagina en op
+  de scandetailpagina), er wordt niets automatisch gemaild. Reden om dit
+  nu als DE actieve flow te bouwen i.p.v. ernaast: de aangeleverde
+  mockup (`js/screens/admin/adminScanDetail.js`) implementeert uitsluitend
+  dit publieke-link-patroon, zonder verificatiescherm. De volledige
+  e-mail+code-verificatie (v1-aanpassingen.md punt 2, nog niet afgevinkt)
+  is dus niet geschrapt als toekomstig doel, alleen niet meer de actieve
+  bouw — bij oppakken: git-historie vóór dit commit (`lib/verificatie.ts`,
+  `app/uitnodiging/[respondentId]/`) als startpunt.
+- `lib/mailer.ts`/`lib/gmail.ts`/`app/api/mail/route.ts` (Gmail-integratie)
+  zijn UIT gebruik gehaald (nieuw uitnodigen toont alleen nog de publieke
+  link, mailt niet automatisch — expliciet zo gevraagd in punt 2a) maar
+  bewust niet verwijderd: herbruikbaar zodra de volledige verificatieflow
+  hierboven weer wordt opgepakt.
+- Respondent-datamodel: `naam` is nu `string | null` (leeg tot de intake
+  is ingevuld, met e-mailadres als fallback in admin-lijsten — zie
+  CLAUDE.md sectie 1). Nieuw veld `uitgenodigdOp` toegevoegd, los van
+  `gestartOp` (dat nu `string | null` is en pas gezet wordt zodra de
+  respondent scherm 4 indient) — nodig omdat de cascade-regels in
+  admin-beheerpagina.md `gestartOp` bij een reset laten wissen terwijl de
+  uitnodigingsdatum moet blijven staan, en dat kon niet allebei op
+  hetzelfde veld.
+- Admin herbouwd naar de 3-schermen-plus-tabel-structuur uit
+  admin-beheerpagina.md: `/beheer/organisaties` (lijst, was voorheen
+  `/beheer/scans`), `/beheer/organisaties/nieuw`, `/beheer/organisaties/
+  [id]` (detail, was voorheen `/beheer/scans/[organisatieId]`), en
+  `/beheer/scans` is nu de platte "Ingevulde scans"-tabel over alle
+  organisaties heen (Organisatie-kolom, sorteerbare kolommen,
+  bulk-selectie/verwijderen, exportknop als stub) met een aparte
+  scandetailpagina op `/beheer/scans/[respondentId]`. De admin-navigatie
+  is vervangen door de gedeelde publieke nav/footer met "Beheer"-badge en
+  admin-links (was een losse linker-sidebar) — zie stylesheet.md/
+  admin-beheerpagina.md "Admin hergebruikt de publieke nav/footer".
+- Verwijder-cascades geïmplementeerd volgens admin-beheerpagina.md:
+  "Ingevulde scans" verwijderen = reset (status → "uitgenodigd", data
+  gewist, naam/rol/team/notities blijven staan), "Respondenten"
+  verwijderen = harde verwijdering (vanuit Organisatie-detail), Organisatie
+  verwijderen cascadeert naar al haar respondenten. Bevestigingsteksten
+  letterlijk overgenomen uit de aangeleverde mockup.
+
 ## 2026-09-17 — Test-modus: verificatie overslaan, instelbaar in beheer
 
 **Aanleiding**: Sander kreeg "Ongeldige link" bij het openen van een

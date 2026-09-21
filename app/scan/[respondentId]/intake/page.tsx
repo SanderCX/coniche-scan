@@ -1,11 +1,9 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useRespondent, updateRespondent } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
-import { isGeverifieerd } from "@/lib/verificatie";
-import { useTestModus } from "@/lib/instellingen";
 import { PageWithChrome } from "@/components/PageWithChrome";
 
 export default function IntakePage({
@@ -17,25 +15,15 @@ export default function IntakePage({
   const gegevens = useRespondent(respondentId);
   const assessment = useAssessment(gegevens?.organisatie.assessmentId ?? "");
   const router = useRouter();
-  const testModus = useTestModus();
-
-  const [naam, setNaam] = useState("");
-  const [rol, setRol] = useState("");
-  const [team, setTeam] = useState("");
-  const [notities, setNotities] = useState("");
 
   useEffect(() => {
     if (!gegevens) return;
-    if (!isGeverifieerd(respondentId) && !testModus) {
-      router.replace(`/uitnodiging/${respondentId}`);
-      return;
-    }
     if (gegevens.respondent.status === "bezig") {
       router.replace(`/scan/${respondentId}/doorloop`);
     } else if (gegevens.respondent.status === "afgerond") {
       router.replace(`/scan/${respondentId}/resultaten`);
     }
-  }, [gegevens, respondentId, router, testModus]);
+  }, [gegevens, respondentId, router]);
 
   if (!gegevens || !assessment) {
     return (
@@ -49,82 +37,65 @@ export default function IntakePage({
     return null;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  const { respondent } = gegevens;
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const data = new FormData(e.currentTarget);
     updateRespondent(respondentId, (r) => ({
       ...r,
-      naam,
-      rol,
-      team,
-      notities,
+      naam: String(data.get("naam") ?? "").trim(),
+      rol: String(data.get("rol") ?? "").trim(),
+      team: String(data.get("team") ?? "").trim(),
+      notities: String(data.get("notities") ?? "").trim(),
       status: "bezig",
+      gestartOp: new Date().toISOString(),
     }));
     router.push(`/scan/${respondentId}/doorloop`);
   }
 
   return (
     <PageWithChrome>
-    <div className="mx-auto w-full max-w-xl flex-1 px-6 py-16">
-      <span className="inline-block rounded-full bg-or-faint px-3 py-1 text-xs font-semibold uppercase tracking-wide text-or">
-        {assessment.naam}
-      </span>
-      <h1 className="mt-3 text-2xl font-bold text-ink">Voordat je begint</h1>
-      <p className="mt-2 text-sm text-ink-m">
-        De organisatiegegevens staan al vast — we hebben alleen een paar gegevens
-        van jou nodig.
-      </p>
+      <div className="container section" style={{ maxWidth: "36rem" }}>
+        <span className="eyebrow">{assessment.naam}</span>
+        <h1>Voordat je begint</h1>
+        <p>
+          De organisatiegegevens staan al vast — we hebben alleen een paar gegevens van jou
+          nodig.
+        </p>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-ink">Naam</label>
-          <input
-            required
-            value={naam}
-            onChange={(e) => setNaam(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-ink">
-            Rol / functie
-          </label>
-          <input
-            required
-            value={rol}
-            onChange={(e) => setRol(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-ink">
-            Team <span className="font-normal text-ink-m">(optioneel)</span>
-          </label>
-          <input
-            value={team}
-            onChange={(e) => setTeam(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-ink">
-            Notities <span className="font-normal text-ink-m">(optioneel)</span>
-          </label>
-          <textarea
-            value={notities}
-            onChange={(e) => setNotities(e.target.value)}
-            rows={3}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="mt-8">
+          <div className="field">
+            <label>Naam</label>
+            <input
+              type="text"
+              name="naam"
+              required
+              defaultValue={respondent.naam ?? ""}
+            />
+          </div>
+          <div className="field">
+            <label>Rol / functie</label>
+            <input type="text" name="rol" required defaultValue={respondent.rol} />
+          </div>
+          <div className="field">
+            <label>
+              Team <span className="font-normal text-ink-s">(optioneel)</span>
+            </label>
+            <input type="text" name="team" defaultValue={respondent.team} />
+          </div>
+          <div className="field">
+            <label>
+              Notities <span className="font-normal text-ink-s">(optioneel)</span>
+            </label>
+            <textarea name="notities" rows={3} defaultValue={respondent.notities} />
+          </div>
 
-        <button
-          type="submit"
-          className="w-full rounded-lg bg-or px-6 py-3 text-sm font-semibold text-white transition hover:bg-or-l hover:-translate-y-px"
-        >
-          Start de scan
-        </button>
-      </form>
-    </div>
+          <button type="submit" className="btn btn-or" style={{ width: "100%" }}>
+            Start de scan
+          </button>
+        </form>
+      </div>
     </PageWithChrome>
   );
 }

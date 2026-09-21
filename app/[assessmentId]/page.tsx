@@ -36,26 +36,22 @@ export default function AssessmentLandingPage({
           <p className="mx-auto mt-4 max-w-2xl text-ink-m">{assessment.beschrijving}</p>
           <p className="mt-3 text-sm text-ink-m">Bedoeld voor: {assessment.doelgroep}</p>
 
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <div className="btn-rij" style={{ margin: "2rem auto 0", maxWidth: "26rem" }}>
             <button
               type="button"
               disabled
-              title="Toegang verloopt via een persoonlijke uitnodiging per e-mail — neem contact op met Coniche."
-              className="cursor-not-allowed rounded-lg bg-or-disabled px-6 py-3 text-sm font-semibold text-white"
+              title="Toegang verloopt via een persoonlijke link die Coniche met je deelt."
+              className="btn btn-or"
             >
               Start assessment
             </button>
-            <Link
-              href={`/${assessment.id}/voorbeeld`}
-              className="rounded-lg border border-gray-300 px-6 py-3 text-sm font-semibold text-ink transition hover:border-gray-400"
-            >
+            <Link href={`/${assessment.id}/voorbeeld`} className="btn btn-outline">
               Bekijk wat je krijgt
             </Link>
           </div>
-          <p className="mx-auto mt-4 max-w-md text-xs text-ink-m">
-            Deze scan vul je in via een persoonlijke uitnodiging per e-mail —
-            neem contact op met Coniche om een scan te starten voor jouw
-            organisatie.
+          <p className="mx-auto mt-4 max-w-md text-xs text-ink-s">
+            Deze scan vul je in via een persoonlijke link die Coniche met je deelt — neem contact
+            op met Coniche om een scan te starten voor jouw organisatie.
           </p>
         </div>
 
@@ -86,8 +82,8 @@ export default function AssessmentLandingPage({
             <div>
               <dt className="text-sm font-medium text-ink">Privacy</dt>
               <dd className="text-sm text-ink-m">
-                Toegang verloopt via een persoonlijke, niet-herleidbare link en
-                een verificatiecode per e-mail.
+                Toegang verloopt via een persoonlijke, niet-herleidbare link die Coniche met je
+                deelt.
               </dd>
             </div>
           </dl>

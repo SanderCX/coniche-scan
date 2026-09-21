@@ -8,24 +8,18 @@ export default function ContentOverzichtPage() {
   const assessments = useAssessments();
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <h1 className="text-2xl font-bold text-ink">Content</h1>
-      <p className="mt-1 text-sm text-ink-m">
-        Assessment-instellingen, organisatievelden en de vragencontent.
-      </p>
+    <div className="admin-main">
+      <h1>Content</h1>
+      <p>Assessment-instellingen, organisatievelden en de vragencontent.</p>
 
-      <div className="mt-6 space-y-3">
+      <div className="admin-list">
         {assessments.map((a) => (
-          <Link
-            key={a.id}
-            href={`/beheer/content/${a.id}`}
-            className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow"
-          >
+          <Link key={a.id} href={`/beheer/content/${a.id}`} className="admin-row">
             <div>
-              <p className="font-semibold text-ink">
+              <p className="admin-row-titel">
                 {a.icoon} {a.naam}
               </p>
-              <p className="text-sm text-ink-m">
+              <p className="admin-row-sub">
                 {a.categorieen
                   ? `${a.categorieen.length} categorieën · `
                   : "Geen categorie-laag · "}

@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { useRespondent, updateRespondent } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
-import { isGeverifieerd } from "@/lib/verificatie";
-import { useTestModus } from "@/lib/instellingen";
+import { PageWithChrome } from "@/components/PageWithChrome";
 import { Sidebar } from "@/components/Sidebar";
 import { BouwblokForm } from "@/components/BouwblokForm";
 
@@ -22,7 +21,6 @@ export default function DoorloopPage({
   const gegevens = useRespondent(respondentId);
   const assessment = useAssessment(gegevens?.organisatie.assessmentId ?? "");
   const router = useRouter();
-  const testModus = useTestModus();
 
   const alleBouwblokken = assessment ? alleBouwblokkenMetGroep(assessment) : [];
 
@@ -38,17 +36,17 @@ export default function DoorloopPage({
 
   useEffect(() => {
     if (!gegevens) return;
-    if (!isGeverifieerd(respondentId) && !testModus) {
-      router.replace(`/uitnodiging/${respondentId}`);
-      return;
-    }
     if (gegevens.respondent.status === "uitgenodigd") {
       router.replace(`/scan/${respondentId}/intake`);
     }
-  }, [gegevens, respondentId, router, testModus]);
+  }, [gegevens, respondentId, router]);
 
   if (!gegevens || !assessment || !actieveBouwblokId) {
-    return <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>;
+    return (
+      <PageWithChrome>
+        <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>
+      </PageWithChrome>
+    );
   }
 
   if (gegevens.respondent.status === "uitgenodigd") {
@@ -90,26 +88,28 @@ export default function DoorloopPage({
   }
 
   return (
-    <div className="flex flex-1 flex-col sm:flex-row">
-      <Sidebar
-        assessment={assessment}
-        respondent={respondent}
-        actieveBouwblokId={actieveBouwblokId}
-        onSelecteer={setHandmatigGekozenId}
-      />
-      <main className="flex-1 overflow-y-auto bg-gray-50 px-6 py-10">
-        <BouwblokForm
-          bouwblok={huidig.bouwblok}
-          categorieKleur={huidig.groepKleur}
-          eenheid={assessment.bouwblokEenheidEnkelvoud}
-          schaal={assessment.schaal}
+    <PageWithChrome>
+      <div className="flow-layout flex-1">
+        <Sidebar
+          assessment={assessment}
           respondent={respondent}
-          isLaatsteBouwblok={isLaatsteBouwblok}
-          onAntwoord={handleAntwoord}
-          onOpmerking={handleOpmerking}
-          onVolgende={handleVolgende}
+          actieveBouwblokId={actieveBouwblokId}
+          onSelecteer={setHandmatigGekozenId}
         />
-      </main>
-    </div>
+        <main className="flow-main">
+          <BouwblokForm
+            bouwblok={huidig.bouwblok}
+            categorieKleur={huidig.groepKleur}
+            eenheid={assessment.bouwblokEenheidEnkelvoud}
+            schaal={assessment.schaal}
+            respondent={respondent}
+            isLaatsteBouwblok={isLaatsteBouwblok}
+            onAntwoord={handleAntwoord}
+            onOpmerking={handleOpmerking}
+            onVolgende={handleVolgende}
+          />
+        </main>
+      </div>
+    </PageWithChrome>
   );
 }

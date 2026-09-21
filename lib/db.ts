@@ -80,6 +80,12 @@ export function verwijderOrganisatie(organisatieId: string): void {
   slaAlles(laadAlles().filter((o) => o.id !== organisatieId));
 }
 
+/** Cascadeert naar alle respondenten (en hun scan-invullingen) binnen elke organisatie. */
+export function verwijderOrganisaties(organisatieIds: string[]): void {
+  const ids = new Set(organisatieIds);
+  slaAlles(laadAlles().filter((o) => !ids.has(o.id)));
+}
+
 export function updateOrganisatie(
   organisatieId: string,
   updater: (organisatie: Organisatie) => Organisatie
@@ -100,14 +106,15 @@ export function nodigRespondentUit(organisatieId: string, email: string): Respon
     id: nieuwId(),
     organisatieId,
     email,
-    naam: "",
+    naam: null,
     rol: "",
     team: "",
     notities: "",
     antwoorden: {},
     opmerkingenPerBouwblok: {},
     status: "uitgenodigd",
-    gestartOp: new Date().toISOString(),
+    uitgenodigdOp: new Date().toISOString(),
+    gestartOp: null,
     afgerondOp: null,
   };
   organisatie.respondenten.push(respondent);
@@ -122,7 +129,7 @@ export function nodigRespondentUit(organisatieId: string, email: string): Respon
  * browser opent (zijn eigen e-mailclient) heeft dus geen lokale data. Deze
  * functie "importeert" de organisatie (basisgegevens, geen andere
  * respondenten) + deze ene respondent, aangeleverd via de link zelf — zie
- * de `b`-query-param op /uitnodiging/[respondentId].
+ * de `b`-query-param op de publieke link, /scan/[respondentId].
  */
 export function importRespondent(
   organisatieBasis: Omit<Organisatie, "respondenten">,
@@ -168,6 +175,48 @@ export function updateRespondent(
     }
   }
   return null;
+}
+
+/**
+ * "Respondenten verwijderen" (admin-beheerpagina.md, "Verwijderen —
+ * cascade-regels"): verwijdert de hele respondent, inclusief zijn
+ * scan-invulling. De organisatie en overige respondenten blijven ongemoeid.
+ */
+export function verwijderRespondenten(respondentIds: string[]): void {
+  const ids = new Set(respondentIds);
+  const alles = laadAlles();
+  for (const organisatie of alles) {
+    organisatie.respondenten = organisatie.respondenten.filter((r) => !ids.has(r.id));
+  }
+  slaAlles(alles);
+}
+
+/**
+ * "Ingevulde scans verwijderen" (admin-beheerpagina.md, "Verwijderen —
+ * cascade-regels" + v1-aanpassingen.md punt 2a): gooit alleen de
+ * scan-invulling weg, niet de respondent. Status terug naar "uitgenodigd",
+ * antwoorden/opmerkingen/data gewist — naam/rol/team/notities blijven staan
+ * zodat de respondent bij een volgend bezoek weer op scherm 4 terechtkomt
+ * met zijn eerdere gegevens al vooringevuld.
+ */
+export function resetRespondentInvulling(respondentIds: string[]): void {
+  const ids = new Set(respondentIds);
+  const alles = laadAlles();
+  for (const organisatie of alles) {
+    organisatie.respondenten = organisatie.respondenten.map((r) =>
+      ids.has(r.id)
+        ? {
+            ...r,
+            status: "uitgenodigd" as const,
+            antwoorden: {},
+            opmerkingenPerBouwblok: {},
+            gestartOp: null,
+            afgerondOp: null,
+          }
+        : r
+    );
+  }
+  slaAlles(alles);
 }
 
 export function useOrganisaties(): Organisatie[] {

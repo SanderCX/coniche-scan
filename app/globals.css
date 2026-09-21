@@ -1,58 +1,62 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Stylesheet.md laag 1: dit ZIJN de door Joost aangeleverde brondocumenten,
+ * niet een reconstructie. Letterlijk overgenomen, niet herschrijven — zie
+ * app/styles/*.css. Volgorde is van belang: tokens eerst (custom properties),
+ * dan base (resets/typografie), dan de componentbibliotheken.
+ */
+@import "./styles/tokens.css";
+@import "./styles/base.css";
+@import "./styles/components.css";
+@import "./styles/admin.css";
+@import "./styles/charts.css";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-epilogue);
   --font-mono: var(--font-geist-mono);
 }
 
 /*
- * Coniche Scan-huisstijl, zie stylesheet.md — enige bron voor deze waarden.
- * Overgenomen uit coniche-v4.html (bevestigde, al geïmplementeerde referentie
- * voor dezelfde officiële huisstijlkleuren), met --pu toegevoegd voor
- * Proces & Tech (kwam niet voor op de marketingpagina).
+ * Brugtokens naar Tailwind's utility-generator (bg-or, text-ink-m, ...) voor
+ * plekken die nog gewone Tailwind-kleurutilities gebruiken i.p.v. de
+ * literal-CSS-componentklassen hierboven. Waarden komen 1-op-1 uit
+ * app/styles/tokens.css — hier niet opnieuw verzinnen bij een kleurwijziging,
+ * daar aanpassen.
  */
 @theme {
   --color-ink: #1c1c1a;
   --color-ink-m: #4d4d49;
   --color-ink-s: #888884;
 
+  --color-bg: #ffffff;
   --color-bg-warm: #faf9f7;
   --color-bg-mid: #f2f0eb;
   --color-border: #e8e6e1;
   --color-border-d: #d4d1ca;
 
-  /* Primaire merkkleur (knoppen/CTA's) = officiële Overkoepelend-kleur */
   --color-or: #ff671f;
   --color-or-l: #ff7f41;
   --color-or-faint: #fff2ec;
   --color-or-mid: #ffd5c0;
   --color-or-disabled: #f8ae92;
 
-  /* Officiële Coniche-huisstijlkleuren, gedeeld tussen categorieën en overige merktoepassingen */
   --color-bl: #225ba0;
+  --color-bl-l: #3a70bf;
   --color-bl-faint: #ebf1fb;
   --color-gr: #197f4e;
+  --color-gr-l: #38845e;
   --color-gr-faint: #e8f5ee;
   --color-ye: #ffc043;
+  --color-ye-l: #ffcb57;
   --color-pu: #392944;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-epilogue), Arial, Helvetica, sans-serif;
+  /* Classificatiekleuren (Basis op Orde/Uitbouwen/Sterk punt) — bewust andere
+     waarden dan de categoriekleuren hierboven, zie stylesheet.md. */
+  --color-stat-red: #dc2626;
+  --color-stat-red-faint: #fdecec;
+  --color-stat-amber: #e8871e;
+  --color-stat-amber-faint: #fdf2e3;
+  --color-stat-green: #22a06b;
+  --color-stat-green-faint: #e7f6ef;
 }

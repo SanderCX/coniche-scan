@@ -1,0 +1,47 @@
+/* Design tokens — stylesheet.md laag 1 (enige bron voor opmaak). */
+:root {
+  --or: #ff671f;
+  --or-l: #ff7f41;
+  --or-faint: #fff2ec;
+  --or-mid: #ffd5c0;
+
+  --bl: #225ba0;
+  --bl-l: #3a70bf;
+  --bl-faint: #ebf1fb;
+
+  --gr: #197f4e;
+  --gr-l: #38845e;
+  --gr-faint: #e8f5ee;
+
+  --ye: #ffc043;
+  --ye-l: #ffcb57;
+
+  --pu: #392944; /* Proces & Tech — toegevoegd vanuit het merkpalet */
+
+  --ink: #1c1c1a;
+  --ink-m: #4d4d49;
+  --ink-s: #888884;
+
+  --bg: #ffffff;
+  --bg-warm: #faf9f7;
+  --bg-mid: #f2f0eb;
+
+  --border: #e8e6e1;
+  --border-d: #d4d1ca;
+
+  --r: 6px;
+
+  /* Vaste nav-hoogte — nodig zodat .flow-sidebar (doorloopflow) hier sticky
+     tegenaan kan zetten (`top: var(--nav-h)`). Geldt boven de
+     900px-breakpoint; zie components.css. */
+  --nav-h: 4.5rem;
+
+  /* Classificatiekleuren — bewust NIET --or/--gr, universele statustinten
+     los van de merkkleuren (stylesheet.md, "Nog open"). */
+  --stat-red: #dc2626;
+  --stat-red-faint: #fdecec;
+  --stat-amber: #e8871e;
+  --stat-amber-faint: #fdf2e3;
+  --stat-green: #22a06b;
+  --stat-green-faint: #e7f6ef;
+}

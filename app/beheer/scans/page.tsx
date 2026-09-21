@@ -1,124 +1,175 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
-import { useOrganisaties, maakOrganisatie } from "@/lib/db";
-import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
+import { useOrganisaties, resetRespondentInvulling } from "@/lib/db";
+import { voortgang } from "@/lib/scoring";
+import { useBulkSelect } from "@/lib/useBulkSelect";
+import { IndeterminateCheckbox } from "@/components/beheer/IndeterminateCheckbox";
+import { BulkToolbar } from "@/components/beheer/BulkToolbar";
+import { Respondent } from "@/lib/types";
 
-export default function ScansPage() {
-  const assessments = useAssessments();
+const STATUS_LABEL: Record<Respondent["status"], string> = {
+  uitgenodigd: "Uitgenodigd",
+  bezig: "Bezig",
+  afgerond: "Afgerond",
+};
+
+type Kolom = "naam" | "organisatie" | "assessment" | "rolTeam" | "status" | "voortgang" | "gestart";
+
+interface Rij {
+  respondentId: string;
+  organisatieId: string;
+  naam: string;
+  organisatie: string;
+  assessment: string;
+  rolTeam: string;
+  status: Respondent["status"];
+  voortgang: number;
+  gestart: number;
+}
+
+const KOLOMMEN: { key: Kolom; label: string }[] = [
+  { key: "naam", label: "Naam" },
+  { key: "organisatie", label: "Organisatie" },
+  { key: "assessment", label: "Assessment" },
+  { key: "rolTeam", label: "Rol / team" },
+  { key: "status", label: "Status" },
+  { key: "voortgang", label: "Voortgang" },
+  { key: "gestart", label: "Gestart" },
+];
+
+export default function IngevuldeScansPage() {
   const organisaties = useOrganisaties();
-  const router = useRouter();
+  const assessments = useAssessments();
+  const [sortKolom, setSortKolom] = useState<Kolom>("gestart");
+  const [sortRichting, setSortRichting] = useState<"asc" | "desc">("desc");
 
-  const [naam, setNaam] = useState("");
-  const [assessmentId, setAssessmentId] = useState(assessments[0]?.id ?? "");
-  const [kenmerken, setKenmerken] = useState<Record<string, unknown>>({});
-  const [formOpen, setFormOpen] = useState(false);
+  const rijen = useMemo<Rij[]>(() => {
+    return organisaties.flatMap((org) => {
+      const assessment = assessments.find((a) => a.id === org.assessmentId);
+      return org.respondenten.map((r): Rij => {
+        const { percentage } = assessment
+          ? voortgang(assessment, r.antwoorden)
+          : { percentage: 0 };
+        return {
+          respondentId: r.id,
+          organisatieId: org.id,
+          naam: r.naam || r.email,
+          organisatie: org.naam,
+          assessment: assessment?.naam ?? "Onbekend",
+          rolTeam: [r.rol, r.team].filter(Boolean).join(" / ") || "—",
+          status: r.status,
+          voortgang: percentage,
+          gestart: r.gestartOp ? new Date(r.gestartOp).getTime() : 0,
+        };
+      });
+    });
+  }, [organisaties, assessments]);
 
-  const gekozenAssessment = assessments.find((a) => a.id === assessmentId);
+  const gesorteerd = useMemo(() => {
+    const kopie = [...rijen];
+    kopie.sort((a, b) => {
+      const va = a[sortKolom];
+      const vb = b[sortKolom];
+      const cmp =
+        typeof va === "number" && typeof vb === "number"
+          ? va - vb
+          : String(va).localeCompare(String(vb), "nl");
+      return sortRichting === "asc" ? cmp : -cmp;
+    });
+    return kopie;
+  }, [rijen, sortKolom, sortRichting]);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!assessmentId) return;
-    const organisatie = maakOrganisatie({ naam, assessmentId, kenmerken });
-    setNaam("");
-    setKenmerken({});
-    setFormOpen(false);
-    router.push(`/beheer/scans/${organisatie.id}`);
+  const bulk = useBulkSelect(rijen.map((r) => r.respondentId));
+
+  function handleSort(kolom: Kolom) {
+    if (kolom === sortKolom) {
+      setSortRichting((r) => (r === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKolom(kolom);
+      setSortRichting("asc");
+    }
+  }
+
+  function handleVerwijderen() {
+    const ids = [...bulk.selected];
+    if (
+      !window.confirm(
+        `${ids.length} scan-invulling(en) verwijderen? Dit wist de antwoorden en opmerkingen; de respondent en uitnodiging blijven bestaan (status gaat terug naar "uitgenodigd"). Dit kan niet ongedaan gemaakt worden.`
+      )
+    )
+      return;
+    resetRespondentInvulling(ids);
+    bulk.clear();
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-ink">Scans</h1>
-        <button
-          type="button"
-          onClick={() => setFormOpen((v) => !v)}
-          className="rounded-lg bg-or px-4 py-2 text-sm font-semibold text-white hover:bg-or-l hover:-translate-y-px"
-        >
-          {formOpen ? "Annuleren" : "+ Nieuwe scan"}
-        </button>
-      </div>
+    <div className="admin-main admin-main--breed">
+      <h1>Ingevulde scans</h1>
+      <p>Overzicht over alle organisaties heen. Voor scans per organisatie, zie Organisaties.</p>
 
-      {formOpen && (
-        <form
-          onSubmit={handleSubmit}
-          className="mt-6 space-y-5 rounded-2xl border border-gray-200 bg-white p-6"
-        >
-          <div>
-            <label className="mb-1 block text-sm font-medium text-ink">
-              Organisatienaam
-            </label>
-            <input
-              required
-              value={naam}
-              onChange={(e) => setNaam(e.target.value)}
-              className="w-full rounded-lg border border-gray-200 p-3 text-sm"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-ink">
-              Assessment-type
-            </label>
-            <select
-              value={assessmentId}
-              onChange={(e) => setAssessmentId(e.target.value)}
-              className="w-full rounded-lg border border-gray-200 p-3 text-sm"
-            >
-              {assessments.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.naam}
-                </option>
+      {gesorteerd.length === 0 ? (
+        <p className="admin-notice">Nog geen scans ingevuld.</p>
+      ) : (
+        <>
+          <BulkToolbar
+            aantal={bulk.selected.size}
+            onVerwijderen={handleVerwijderen}
+            verwijderLabel="Verwijderen"
+          />
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>
+                  <IndeterminateCheckbox
+                    checked={bulk.alleGeselecteerd}
+                    indeterminate={bulk.sommigeGeselecteerd}
+                    onChange={bulk.toggleAll}
+                  />
+                </th>
+                {KOLOMMEN.map((k) => (
+                  <th key={k.key}>
+                    <button type="button" className="admin-sort-btn" onClick={() => handleSort(k.key)}>
+                      {k.label}
+                      {sortKolom === k.key ? (sortRichting === "asc" ? " ▲" : " ▼") : ""}
+                    </button>
+                  </th>
+                ))}
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {gesorteerd.map((r) => (
+                <tr key={r.respondentId}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={bulk.isSelected(r.respondentId)}
+                      onChange={() => bulk.toggle(r.respondentId)}
+                    />
+                  </td>
+                  <td>{r.naam}</td>
+                  <td>{r.organisatie}</td>
+                  <td>{r.assessment}</td>
+                  <td>{r.rolTeam}</td>
+                  <td>
+                    <span className={`admin-badge status-${r.status}`}>
+                      {STATUS_LABEL[r.status]}
+                    </span>
+                  </td>
+                  <td>{r.voortgang}%</td>
+                  <td>{r.gestart ? new Date(r.gestart).toLocaleDateString("nl-NL") : "—"}</td>
+                  <td>
+                    <Link href={`/beheer/scans/${r.respondentId}`}>Bekijk</Link>
+                  </td>
+                </tr>
               ))}
-            </select>
-          </div>
-
-          {gekozenAssessment && gekozenAssessment.organisatieVelden.length > 0 && (
-            <div>
-              <p className="mb-2 text-sm font-medium text-ink">Organisatiekenmerken</p>
-              <KenmerkenForm
-                velden={gekozenAssessment.organisatieVelden}
-                waarden={kenmerken}
-                onChange={setKenmerken}
-              />
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="rounded-lg bg-or px-6 py-2.5 text-sm font-semibold text-white hover:bg-or-l hover:-translate-y-px"
-          >
-            Scan aanmaken
-          </button>
-        </form>
+            </tbody>
+          </table>
+        </>
       )}
-
-      <div className="mt-6 space-y-3">
-        {organisaties.length === 0 && (
-          <p className="text-sm text-ink-m">Nog geen scans aangemaakt.</p>
-        )}
-        {organisaties.map((org) => {
-          const assessment = assessments.find((a) => a.id === org.assessmentId);
-          const afgerond = org.respondenten.filter((r) => r.status === "afgerond").length;
-          return (
-            <Link
-              key={org.id}
-              href={`/beheer/scans/${org.id}`}
-              className="flex items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow"
-            >
-              <div>
-                <p className="font-semibold text-ink">{org.naam}</p>
-                <p className="text-sm text-ink-m">{assessment?.naam ?? "Onbekend type"}</p>
-              </div>
-              <p className="text-sm text-ink-m">
-                {afgerond}/{org.respondenten.length} afgerond
-              </p>
-            </Link>
-          );
-        })}
-      </div>
     </div>
   );
 }

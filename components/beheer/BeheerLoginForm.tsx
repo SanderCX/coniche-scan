@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { login } from "@/lib/admin-auth";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export function BeheerLoginForm() {
   const [email, setEmail] = useState("");
@@ -16,41 +18,42 @@ export function BeheerLoginForm() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-sm flex-1 px-6 py-24">
-      <h1 className="text-xl font-bold text-ink">Coniche Scan — Beheer</h1>
-      <p className="mt-2 text-sm text-ink-m">
-        Prototype-inlog voor Joost en Sander. Nog geen 2FA — zie admin-beheerpagina.md
-        voor de vervolgstap.
-      </p>
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-ink">E-mailadres</label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
-          />
+    <>
+      <SiteHeader badge="Beheer" />
+      <main className="flex-1">
+        <div className="container section" style={{ maxWidth: "24rem" }}>
+          <h1 style={{ fontSize: "1.5rem" }}>Coniche Scan — Beheer</h1>
+          <p>
+            Prototype-inlog voor Joost en Sander. Nog geen 2FA — zie admin-beheerpagina.md voor
+            de vervolgstap.
+          </p>
+          <form onSubmit={handleSubmit} className="mt-6">
+            <div className="field">
+              <label>E-mailadres</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="field">
+              <label>Wachtwoord</label>
+              <input
+                type="password"
+                required
+                value={wachtwoord}
+                onChange={(e) => setWachtwoord(e.target.value)}
+              />
+            </div>
+            {fout && <p className="text-sm text-stat-red">{fout}</p>}
+            <button type="submit" className="btn btn-or" style={{ width: "100%" }}>
+              Inloggen
+            </button>
+          </form>
         </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-ink">Wachtwoord</label>
-          <input
-            type="password"
-            required
-            value={wachtwoord}
-            onChange={(e) => setWachtwoord(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-or focus:outline-none"
-          />
-        </div>
-        {fout && <p className="text-sm text-red-600">{fout}</p>}
-        <button
-          type="submit"
-          className="w-full rounded-lg bg-or px-6 py-3 text-sm font-semibold text-white transition hover:bg-or-l hover:-translate-y-px"
-        >
-          Inloggen
-        </button>
-      </form>
-    </div>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

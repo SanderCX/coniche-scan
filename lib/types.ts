@@ -92,14 +92,18 @@ export interface Respondent {
   id: string;
   organisatieId: string;
   email: string;
-  naam: string;
+  /** Leeg totdat de respondent scherm 4 (intake) invult, zie CLAUDE.md sectie 1. */
+  naam: string | null;
   rol: string;
   team: string;
   notities: string;
   antwoorden: Record<string, number>;
   opmerkingenPerBouwblok: Record<string, string>;
   status: RespondentStatus;
-  gestartOp: string;
+  /** Moment van uitnodigen door Coniche — blijft staan, ook na een reset van de invulling. */
+  uitgenodigdOp: string;
+  /** Moment dat de respondent scherm 4 (intake) indiende, null zolang status "uitgenodigd" is. */
+  gestartOp: string | null;
   afgerondOp: string | null;
 }
 

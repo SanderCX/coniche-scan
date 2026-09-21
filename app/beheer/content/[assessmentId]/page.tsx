@@ -318,13 +318,17 @@ export default function ContentEditorPage({
   const assessment = useAssessment(assessmentId);
 
   if (!assessment) {
-    return <p className="text-sm text-ink-m">Assessment niet gevonden.</p>;
+    return (
+      <div className="admin-main">
+        <p className="text-sm text-ink-m">Assessment niet gevonden.</p>
+      </div>
+    );
   }
 
   const heeftCategorieen = assessment.categorieen !== null;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 pb-20">
+    <div className="admin-main space-y-8 pb-20">
       <div>
         <Link href="/beheer/content" className="text-sm text-ink-m hover:text-ink">
           ← Alle assessment-types

@@ -1,0 +1,321 @@
+/* De beheeromgeving hergebruikt de publieke .nav/.footer (zelfde logo,
+   zelfde balk) — zie components/adminNav.js. Hier alleen nog de styling
+   voor de beheer-specifieke navigatielinks binnen die balk. */
+.admin-nav-terug {
+  border-left: 1px solid var(--border-d);
+  padding-left: 1.6rem;
+}
+
+.admin-main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 5rem;
+}
+
+/* Bredere variant voor schermen met een brede tabel (bijv. Ingevulde
+   scans, met checkbox/Naam/Organisatie/Assessment/Rol/Status/Voortgang/
+   Gestart/bekijk) — voorkomt een onnodige horizontale scrollbar terwijl
+   de rest van de admin op de smallere, leesbare breedte blijft. */
+.admin-main--breed {
+  max-width: 1300px;
+}
+
+.admin-main h1 {
+  font-size: 1.9rem;
+}
+
+.admin-main h2 {
+  font-size: 1.15rem;
+  margin: 1.6rem 0 1rem;
+}
+
+.admin-notice {
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 0.9rem 1.1rem;
+  font-size: 0.82rem;
+  color: var(--ink-m);
+  margin-bottom: 2rem;
+}
+
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.admin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: #fff;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s ease, transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+/* Zelfde kaart-hover (lift + zachte schaduw) als de assessment-kaarten op
+   scherm 1 — bevestigd door Joost: geldt voor klikbare kaarten overal in
+   de app, niet alleen waar het al zichtbaar was. */
+.admin-row:hover {
+  border-color: var(--or-mid);
+  background: var(--or-faint);
+  box-shadow: 0 12px 28px rgba(28, 28, 26, 0.08);
+  transform: translateY(-2px);
+}
+
+.admin-row-titel {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.admin-row-sub {
+  font-size: 0.8rem;
+  color: var(--ink-s);
+  margin-top: 0.2rem;
+}
+
+.admin-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 100px;
+  background: var(--bg-mid);
+  color: var(--ink-m);
+  white-space: nowrap;
+}
+
+.admin-badge.status-afgerond {
+  background: var(--stat-green-faint);
+  color: var(--stat-green);
+}
+.admin-badge.status-bezig {
+  background: var(--stat-amber-faint);
+  color: var(--stat-amber);
+}
+/* Bewust een rustige, neutrale tint (nog geen respons, dus geen
+   voortgangskleur) — geen fel accent zoals bezig/afgerond, wel duidelijk
+   onderscheiden van de standaard-badge. Sluit het open punt uit
+   stylesheet.md ("nog geen aparte stijl voor 'uitgenodigd'"). */
+.admin-badge.status-uitgenodigd {
+  background: var(--bl-faint);
+  color: var(--bl);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.admin-table th {
+  text-align: left;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-s);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border-d);
+}
+
+.admin-table td {
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.admin-sort-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.admin-sort-btn:hover {
+  color: var(--or);
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table a {
+  color: var(--or);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-field {
+  margin-bottom: 1.1rem;
+}
+
+.admin-field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-s);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.admin-field input[type="text"],
+.admin-field input[type="number"],
+.admin-field input[type="email"],
+.admin-field select,
+.admin-field textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-d);
+  border-radius: var(--r);
+  background: #fff;
+  color: var(--ink);
+}
+
+.admin-field textarea {
+  min-height: 4rem;
+  resize: vertical;
+}
+
+.admin-field input:focus,
+.admin-field select:focus,
+.admin-field textarea:focus {
+  outline: none;
+  border-color: var(--or);
+  box-shadow: 0 0 0 3px var(--or-faint);
+}
+
+/* ---------- Organisatievelden-formulier (aanmaken/detail) ---------- */
+.veld-groep {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem 1.4rem 0.6rem;
+  margin: 0 0 1.2rem;
+}
+
+.veld-groep legend {
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0 0.5rem;
+  color: var(--ink);
+}
+
+.veld-groep .veld-groep {
+  background: var(--bg-warm);
+}
+
+.veld-verdeling {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.veld-verdeling-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.veld-verdeling-item input {
+  width: 5rem;
+}
+
+.admin-save-state {
+  font-size: 0.72rem;
+  color: var(--stat-green);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.admin-save-state.zichtbaar {
+  opacity: 1;
+}
+
+.admin-bouwblok-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.4rem;
+  margin-bottom: 1.2rem;
+  background: #fff;
+}
+
+.admin-bouwblok-card summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--ink);
+  list-style: none;
+}
+.admin-bouwblok-card summary::-webkit-details-marker {
+  display: none;
+}
+.admin-bouwblok-card summary::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 0.5rem;
+  color: var(--ink-s);
+  transition: transform 0.15s ease;
+}
+.admin-bouwblok-card[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.admin-vraag-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  margin-bottom: 0.6rem;
+}
+.admin-vraag-row .vraag-nr {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-s);
+  padding-top: 0.6rem;
+  min-width: 1.4rem;
+}
+
+.admin-back {
+  display: inline-block;
+  margin-bottom: 1.4rem;
+  font-size: 0.85rem;
+  color: var(--ink-s);
+  text-decoration: none;
+}
+.admin-back:hover {
+  color: var(--or);
+}
+
+.admin-detail-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.admin-detail-meta div {
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 0.8rem 1rem;
+}
+.admin-detail-meta .label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--ink-s);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+.admin-detail-meta .waarde {
+  font-weight: 700;
+  color: var(--ink);
+}
