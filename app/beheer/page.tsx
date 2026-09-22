@@ -1,13 +1,24 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties } from "@/lib/db";
+import { useTestModus, zetTestModus } from "@/lib/instellingen";
+import { maakPubliekeLink } from "@/lib/uitnodiging-link";
+
+const TEST_KLANT_ID = "resp-testklant";
 
 export default function BeheerDashboard() {
   const assessments = useAssessments();
   const organisaties = useOrganisaties();
+  const testModus = useTestModus();
+  const [gekopieerd, setGekopieerd] = useState(false);
   const alleRespondenten = organisaties.flatMap((o) => o.respondenten);
+
+  const testKlant = organisaties
+    .flatMap((o) => o.respondenten.map((r) => ({ organisatie: o, respondent: r })))
+    .find((r) => r.respondent.id === TEST_KLANT_ID);
 
   const stats = [
     { label: "Assessment-types", waarde: assessments.length, href: "/beheer/content" },
@@ -19,6 +30,15 @@ export default function BeheerDashboard() {
       href: "/beheer/scans",
     },
   ];
+
+  function kopieerTestLink() {
+    if (!testKlant) return;
+    navigator.clipboard.writeText(
+      maakPubliekeLink(window.location.origin, testKlant.organisatie, testKlant.respondent)
+    );
+    setGekopieerd(true);
+    setTimeout(() => setGekopieerd(false), 1600);
+  }
 
   return (
     <div className="admin-main">
@@ -41,6 +61,44 @@ export default function BeheerDashboard() {
         <Link href="/beheer/content" className="btn btn-outline">
           Content beheren
         </Link>
+      </div>
+
+      <div className="admin-notice mt-10" style={{ maxWidth: "36rem" }}>
+        <label className="flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            checked={testModus}
+            onChange={(e) => zetTestModus(e.target.checked)}
+            className="mt-1"
+          />
+          <span>
+            <span className="block font-semibold text-ink">Test-modus: inloggen overslaan</span>
+            <span className="mt-0.5 block text-sm text-ink-m">
+              Staat dit aan, dan is Beheer direct open zonder e-mail+wachtwoord — handig om snel
+              te testen en de vragenlijsten door te ontwikkelen. Zet uit voor een realistische
+              test van de inlogflow.
+            </span>
+          </span>
+        </label>
+
+        {testKlant && (
+          <div className="mt-4 border-t border-border pt-4">
+            <p className="text-sm font-medium text-ink">
+              Testklant: {testKlant.organisatie.naam} ({testKlant.respondent.email})
+            </p>
+            <div className="mt-2 flex items-center gap-2">
+              <button type="button" onClick={kopieerTestLink} className="btn btn-outline btn-compact">
+                {gekopieerd ? "Gekopieerd!" : "Kopieer publieke link"}
+              </button>
+              <Link
+                href={`/beheer/organisaties/${testKlant.organisatie.id}`}
+                className="text-sm text-ink-m hover:text-ink"
+              >
+                Bekijk in Organisaties →
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

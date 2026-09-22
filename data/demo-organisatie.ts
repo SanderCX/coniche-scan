@@ -1,4 +1,26 @@
-import { Organisatie, TechstackItem } from "@/lib/types";
+import { Organisatie, Respondent, TechstackItem } from "@/lib/types";
+
+/**
+ * Vaste testklant voor tijdens de bouw (zie changelog.md, test-modus):
+ * altijd een kant-en-klare, uitgenodigde respondent zodat de vragenlijst
+ * direct getest kan worden zonder eerst handmatig een organisatie en
+ * respondent aan te maken.
+ */
+const testKlant: Respondent = {
+  id: "resp-testklant",
+  organisatieId: "org-demo",
+  email: "sander_hesselink@hotmail.com",
+  naam: null,
+  rol: "",
+  team: "",
+  notities: "",
+  antwoorden: {},
+  opmerkingenPerBouwblok: {},
+  status: "uitgenodigd",
+  uitgenodigdOp: new Date().toISOString(),
+  gestartOp: null,
+  afgerondOp: null,
+};
 
 const techstack: Record<string, TechstackItem> = {
   "techstack-contact-center": {
@@ -32,7 +54,7 @@ const techstack: Record<string, TechstackItem> = {
 export const demoOrganisatie: Organisatie = {
   id: "org-demo",
   assessmentId: "klantcontact-volwassenheid",
-  naam: "Demo Organisatie B.V.",
+  naam: "TestConicheScan BV",
   kenmerken: {
     "volume-klantbasis": {
       "totaal-klanten": { totaal: 480000, "b2b-percentage": 15, "b2c-percentage": 85 },
@@ -55,5 +77,5 @@ export const demoOrganisatie: Organisatie = {
     },
     kpis: { aht: 285, nps: 32, csat: 84, sla: 88, ftr: 76 },
   },
-  respondenten: [],
+  respondenten: [testKlant],
 };

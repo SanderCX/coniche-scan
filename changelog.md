@@ -5,6 +5,35 @@ Bouwbeslissingen die niet uit een van de content-/specdocumenten
 door Sander zijn genomen — meestal om een tegenstrijdigheid tussen twee
 eerder aangeleverde documenten op te lossen. Nieuwste bovenaan.
 
+## 2026-09-22 — Test-modus voor Beheer: inloggen overslaan, standaard aan
+
+**Aanleiding**: op expliciet verzoek van Sander, om tijdens de bouw snel
+Beheer in te kunnen en de vragenlijsten door te kunnen ontwikkelen zonder
+elke keer in te loggen. Dit is een ANDER "test-modus"-concept dan de
+schakelaar die op 2026-09-17 was toegevoegd en op 2026-09-21 weer is
+verwijderd (die sloeg op het overslaan van de respondent-
+e-mailverificatie, inmiddels vervangen door de "Publieke link"-flow
+zonder verificatiescherm) — dit gaat over de admin-inlog uit
+admin-beheerpagina.md ("Login": e-mail + wachtwoord + 2FA, hier nog een
+prototype-inlog).
+
+**Doorgevoerd**: `lib/instellingen.ts` (opnieuw toegevoegd, zelfde
+bestandsnaam als eerder maar andere inhoud) met een schakelaar, standaard
+AAN. Staat hij aan, dan slaat `app/beheer/layout.tsx` de inlogcheck over
+en is Beheer direct open. Schakelaar staat op het beheer-dashboard, samen
+met een vaste testklant (organisatie "TestConicheScan BV", respondent
+`sander_hesselink@hotmail.com`, status "uitgenodigd") die als seed-data in
+`data/demo-organisatie.ts` staat, met een kopieerknop voor de publieke
+link zodat de doorloopflow direct getest kan worden. Omdat de seed alleen
+bij een lege localStorage wordt geschreven, is een browser die de scan al
+eerder had geopend (bijv. tijdens eerder testen) niet automatisch
+bijgewerkt — die testklant moet er dan handmatig bij, of localStorage
+wissen.
+
+Dit is uitdrukkelijk een tijdelijk bouwhulpmiddel, geen vervanger voor de
+echte e-mail+wachtwoord+2FA-inlog uit admin-beheerpagina.md — die blijft
+de standaard zodra test-modus uitstaat.
+
 ## 2026-09-21 — Rebuild op de aangeleverde `tokens.css`/`components.css`/`admin.css`/`charts.css`
 
 **Aanleiding**: Joost leverde een volledig statisch HTML/CSS/JS-ontwerp
