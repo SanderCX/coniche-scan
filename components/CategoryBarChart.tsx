@@ -17,7 +17,7 @@ export function CategoryBarChart({ resultaten }: { resultaten: GroepResultaat[] 
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 16, left: -16, bottom: 8 }}>
           <XAxis dataKey="naam" tick={{ fontSize: 11, fill: "#4d4d49" }} />
-          <YAxis domain={[0, 5]} tick={{ fontSize: 11, fill: "#4d4d49" }} />
+          <YAxis domain={[0, 5]} ticks={[0, 1, 2, 3, 4, 5]} tick={{ fontSize: 11, fill: "#4d4d49" }} />
           <Tooltip formatter={(value) => Number(value).toFixed(1)} />
           <Bar dataKey="score" radius={[6, 6, 0, 0]}>
             {data.map((entry, i) => (
