@@ -7,6 +7,7 @@ import { useAssessment } from "@/lib/assessment-store";
 import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { Sidebar } from "@/components/Sidebar";
+import { MobielVoortgang } from "@/components/MobielVoortgang";
 import { BouwblokForm } from "@/components/BouwblokForm";
 
 export default function DoorloopPage({
@@ -89,6 +90,7 @@ export default function DoorloopPage({
 
   return (
     <PageWithChrome>
+      <MobielVoortgang assessment={assessment} respondent={respondent} />
       <div className="flow-layout flex-1">
         <Sidebar
           assessment={assessment}

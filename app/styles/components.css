@@ -737,3 +737,25 @@ a.card:hover,
     padding: 2rem 1.2rem 3rem;
   }
 }
+
+/* Compacte, altijd zichtbare voortgangsbalk voor kleine schermen — op
+   verzoek van Sander (zie changelog.md): .flow-sidebar is hierboven bewust
+   position: static onder 900px en scrolt dus weg, maar tijdens het
+   beantwoorden van vragen moet de voortgang toch zichtbaar blijven. Staat
+   buiten .flow-layout (geen grid-item) zodat sticky over de volle
+   paginahoogte werkt, niet alleen binnen de sidebar zelf. */
+.flow-mobiel-voortgang {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .flow-mobiel-voortgang {
+    display: block;
+    position: sticky;
+    top: var(--nav-h);
+    z-index: 10;
+    background: var(--bg-warm);
+    border-bottom: 1px solid var(--border);
+    padding: 0.8rem 1.2rem;
+  }
+}

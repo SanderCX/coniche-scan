@@ -5,6 +5,27 @@ Bouwbeslissingen die niet uit een van de content-/specdocumenten
 door Sander zijn genomen — meestal om een tegenstrijdigheid tussen twee
 eerder aangeleverde documenten op te lossen. Nieuwste bovenaan.
 
+## 2026-09-22 — Compacte voortgangsbalk onder de 900px-breakpoint
+
+**Aanleiding**: op verzoek van Sander — tijdens het beantwoorden van
+vragen op een smal scherm moet de voortgang altijd zichtbaar blijven.
+Dit botst met de bestaande, expliciet vastgelegde afspraak in
+`stylesheet.md`/`components.css` (v1-aanpassingen.md punt 11): de sticky
+sidebar-fix geldt uitdrukkelijk alleen boven de 900px-breakpoint,
+daaronder is `.flow-sidebar` bewust `position: static` en scrolt dus
+mee weg — een volledige sticky sidebar past simpelweg niet naast de
+inhoud op een telefoonbreedte.
+
+**Doorgevoerd**: een nieuw, compact element (`.flow-mobiel-voortgang` in
+components.css, component `components/MobielVoortgang.tsx`) met alleen de
+voortgangsbalk + "X% — Y van Z vragen", dat ALLEEN onder 900px zichtbaar
+is en daar altijd sticky blijft — niet als kind van `.flow-sidebar` (die
+blijft ongewijzigd static/wegscrollend), maar als eigen element vóór
+`.flow-layout`, zodat het sticky blijft over de volledige paginahoogte
+(inclusief het scrollen door de vragen in `.flow-main`), niet alleen
+binnen de sidebar zelf. Boven 900px ongewijzigd: de volledige sidebar is
+daar al sticky, dus dit element blijft verborgen.
+
 ## 2026-09-22 — Test-modus: "Start assessment" ook bruikbaar op de landingspagina
 
 **Aanleiding**: op verzoek van Sander — test-modus moest ook gelden voor
