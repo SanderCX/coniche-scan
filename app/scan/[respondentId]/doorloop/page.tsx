@@ -42,6 +42,14 @@ export default function DoorloopPage({
     }
   }, [gegevens, respondentId, router]);
 
+  // Bij een nieuw bouwblok (via "Volgende" of een klik in de sidebar) moet het
+  // hoofdscherm bovenaan beginnen — anders blijft de scrollpositie van het
+  // vorige bouwblok staan en start je middenin de nieuwe vragenlijst.
+  useEffect(() => {
+    if (!actieveBouwblokId) return;
+    window.scrollTo({ top: 0 });
+  }, [actieveBouwblokId]);
+
   if (!gegevens || !assessment || !actieveBouwblokId) {
     return (
       <PageWithChrome>
