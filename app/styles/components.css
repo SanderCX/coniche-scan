@@ -395,15 +395,47 @@ a.card:hover,
 .flow-sidebar {
   border-right: 1px solid var(--border);
   background: var(--bg-warm);
-  padding: 1.5rem;
-  /* Sticky tegen de nav aan (var(--nav-h)) met een eigen, begrensde
-     scrollhoogte — zonder de vaste height doet overflow-y niets en
-     scrollt de sidebar gewoon mee met de pagina. Alleen boven de
-     900px-breakpoint, zie de media query verderop. */
+  /* Geen eigen hoogte/sticky hier: CSS Grid rekt deze kolom vanzelf even
+     hoog als .flow-main (de langste van de twee, standaard align-items:
+     stretch), zodat .flow-sidebar-inner hieronder de volledige scrolhoogte
+     van de vragen tot zijn beschikking heeft — anders loopt een sticky box
+     die maar 100vh hoog is voortijdig "op" tegen de onderkant van een lang
+     bouwblok (met veel vragen) en scrollt de koptekst (naam/voortgang)
+     alsnog weg vlak vóór het einde. Zie changelog.md. */
+}
+
+/*
+ * Koptekst (naam + voortgang) en lijst (categorieën/bouwblokken) zijn
+ * bewust TWEE aparte sticky elementen, niet één gedeelde box — op verzoek
+ * van Sander (zie changelog.md): elk position:sticky-element ontsnapt
+ * onvermijdelijk aan het "vastplakken" zodra de scroll de onderkant van
+ * zijn eigen containing block nadert. Bij één gedeelde box gebeurt dat
+ * exact aan het EINDE van elk bouwblok (bij de "Volgende"-knop) — precies
+ * het moment waarop de voortgang zichtbaar moet blijven. Door de koptekst
+ * los te maken (eigen, kleine sticky box) kan die nooit "op raken": zijn
+ * eigen hoogte is te klein om ooit de bodem van een bouwblok te bereiken.
+ * De lijst blijft apart sticky+begrensd voor zoveel mogelijk zichtbaarheid,
+ * maar mag — anders dan de koptekst — wél een keer wegscrollen bij een kort
+ * bouwblok; dat was niet het gemelde probleem.
+ */
+.flow-sidebar-koptekst {
   position: sticky;
   top: var(--nav-h);
-  height: calc(100vh - var(--nav-h));
+  z-index: 6;
+  background: var(--bg-warm);
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+.flow-sidebar-lijst {
+  position: sticky;
+  /* 9rem ≈ gemeten hoogte van .flow-sidebar-koptekst (naam + voortgangsbalk
+     + label + padding, ~139px/8.7rem) plus wat marge — geen exacte meting
+     via JS, dus ruim genoeg gekozen dat een naam op één regel niet
+     overlapt met de lijst eronder. */
+  top: calc(var(--nav-h) + 9rem);
+  max-height: calc(100vh - var(--nav-h) - 9rem);
   overflow-y: auto;
+  padding: 0 1.5rem 1.5rem;
 }
 
 .flow-sidebar .respondent-naam {
@@ -457,6 +489,12 @@ a.card:hover,
   color: var(--ink-m);
   cursor: pointer;
   text-decoration: none;
+  /* <button> heeft van de browser standaard text-align: center — zonder
+     deze override drijft een korte bouwbloknaam (bijv. "Cultuur") naar het
+     midden van de beschikbare breedte i.p.v. netjes na het icoon te
+     beginnen, terwijl een lange naam toevallig wel flush oogt (vult de
+     ruimte toch al). Zie changelog.md. */
+  text-align: left;
 }
 
 .sidebar-bouwblok:hover {
@@ -728,9 +766,11 @@ a.card:hover,
   .flow-layout {
     grid-template-columns: 1fr;
   }
-  .flow-sidebar {
+  .flow-sidebar-koptekst,
+  .flow-sidebar-lijst {
     position: static;
-    height: auto;
+    top: auto;
+    max-height: none;
     overflow-y: visible;
   }
   .flow-main {
@@ -739,11 +779,12 @@ a.card:hover,
 }
 
 /* Compacte, altijd zichtbare voortgangsbalk voor kleine schermen — op
-   verzoek van Sander (zie changelog.md): .flow-sidebar is hierboven bewust
-   position: static onder 900px en scrolt dus weg, maar tijdens het
-   beantwoorden van vragen moet de voortgang toch zichtbaar blijven. Staat
-   buiten .flow-layout (geen grid-item) zodat sticky over de volle
-   paginahoogte werkt, niet alleen binnen de sidebar zelf. */
+   verzoek van Sander (zie changelog.md): .flow-sidebar-koptekst/-lijst zijn
+   hierboven bewust position: static onder 900px (in die breedte staat
+   .flow-sidebar in zijn eigen grid-rij, los van .flow-main, dus sticky
+   daarbinnen zou alleen binnen die korte rij werken — niet tijdens het
+   scrollen door de vragen). Dit element staat daarom buiten .flow-layout
+   (geen grid-item) zodat sticky over de volle paginahoogte werkt. */
 .flow-mobiel-voortgang {
   display: none;
 }

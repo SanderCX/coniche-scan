@@ -5,6 +5,37 @@ Bouwbeslissingen die niet uit een van de content-/specdocumenten
 door Sander zijn genomen — meestal om een tegenstrijdigheid tussen twee
 eerder aangeleverde documenten op te lossen. Nieuwste bovenaan.
 
+## 2026-09-22 — Sidebar: koptekst (naam/voortgang) losgemaakt van de lijst
+
+**Aanleiding**: op verzoek van Sander (met screenshot) — de naam en
+voortgang ("X% — Y van Z vragen") verdwenen bovenin de sidebar zodra je
+in `.flow-main` helemaal naar beneden scrolde naar het einde van een
+bouwblok (bij de "Volgende"-knop). Root cause: de sidebar was ÉÉN sticky
+box (naam + voortgang + lijst samen). Een `position: sticky`-element
+ontsnapt onvermijdelijk aan het vastplakken zodra de scroll de onderkant
+van zijn eigen containing block nadert — en dat gebeurt bij een gedeelde
+box exact aan het eind van elk bouwblok, precies het moment waarop de
+voortgang zichtbaar moet blijven. Eerdere tussenstap (`.flow-sidebar`
+laten meegroeien met `.flow-main` i.p.v. vaste 100vh-hoogte) hielp wel
+(later probleem pas), maar loste het niet fundamenteel op: bij het einde
+van ÉÉN bouwblok is er per definitie nooit genoeg resterende scrolhoogte
+over voor een grote sticky box om vast te blijven plakken.
+
+**Doorgevoerd**: de koptekst (naam + voortgangsbalk + label) en de lijst
+(categorieën/bouwblokken) zijn nu twee aparte sticky elementen
+(`.flow-sidebar-koptekst` / `.flow-sidebar-lijst` in components.css, zie
+`components/Sidebar.tsx`) i.p.v. één gedeelde box. De koptekst is klein
+genoeg dat hij nooit de bodem van een bouwblok kan bereiken, en blijft
+dus altijd zichtbaar. De lijst mag — anders dan de koptekst — nog wél een
+keer wegscrollen bij een kort bouwblok; dat was niet het gemelde
+probleem. `.flow-sidebar` zelf rekt via CSS Grid mee met `.flow-main`
+(geen vaste 100vh-hoogte meer) zodat de lijst zo lang mogelijk zichtbaar
+blijft. Geldt alleen boven de 900px-breakpoint; de mobiele variant
+(`.flow-mobiel-voortgang`, zie het vorige punt hieronder) was al apart
+opgelost en blijft ongewijzigd.
+
+## 2026-09-21 — Rebuild op de aangeleverde `tokens.css`/`components.css`/`admin.css`/`charts.css`
+
 ## 2026-09-22 — Compacte voortgangsbalk onder de 900px-breakpoint
 
 **Aanleiding**: op verzoek van Sander — tijdens het beantwoorden van
