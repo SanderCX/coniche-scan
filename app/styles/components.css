@@ -423,33 +423,32 @@ a.card:hover,
   top: var(--nav-h);
   z-index: 6;
   background: var(--bg-warm);
-  padding: 1.5rem 1.5rem 1rem;
+  padding: 1rem 1.25rem 0.6rem;
 }
 
 .flow-sidebar-lijst {
   position: sticky;
-  /* 9rem ≈ gemeten hoogte van .flow-sidebar-koptekst (naam + voortgangsbalk
-     + label + padding, ~139px/8.7rem) plus wat marge — geen exacte meting
-     via JS, dus ruim genoeg gekozen dat een naam op één regel niet
-     overlapt met de lijst eronder. */
-  top: calc(var(--nav-h) + 9rem);
-  max-height: calc(100vh - var(--nav-h) - 9rem);
+  /* 5.5rem ≈ gemeten hoogte van .flow-sidebar-koptekst (naam +
+     voortgangsbalk + label + padding) na het compacter maken hieronder —
+     geen exacte meting via JS, dus iets ruimer gekozen dan strikt nodig. */
+  top: calc(var(--nav-h) + 5.5rem);
+  max-height: calc(100vh - var(--nav-h) - 5.5rem);
   overflow-y: auto;
-  padding: 0 1.5rem 1.5rem;
+  padding: 0 1.25rem 1rem;
 }
 
 .flow-sidebar .respondent-naam {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: var(--ink-s);
-  margin-bottom: 1rem;
+  margin-bottom: 0.4rem;
 }
 
 .progress-bar {
-  height: 8px;
+  height: 6px;
   border-radius: 100px;
   background: var(--bg-mid);
   overflow: hidden;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.3rem;
 }
 
 .progress-bar-fill {
@@ -460,32 +459,33 @@ a.card:hover,
 }
 
 .progress-label {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--ink-s);
-  margin-bottom: 1.4rem;
+  margin-bottom: 0;
 }
 
 .sidebar-categorie {
-  margin-bottom: 1rem;
+  margin-bottom: 0.4rem;
 }
 
 .sidebar-categorie-naam {
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--accent, var(--ink-s));
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.15rem;
 }
 
 .sidebar-bouwblok {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.6rem;
+  gap: 0.5rem;
+  padding: 0.25rem 0.4rem;
   border-radius: var(--r);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
+  line-height: 1.25;
   color: var(--ink-m);
   cursor: pointer;
   text-decoration: none;
@@ -508,14 +508,14 @@ a.card:hover,
 }
 
 .sidebar-bouwblok .status-icoon {
-  width: 20px;
-  height: 20px;
-  min-width: 20px;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   font-weight: 700;
   color: var(--ink-s);
   border: 1.5px solid var(--border-d);
