@@ -521,6 +521,17 @@ a.card:hover,
   border: 1.5px solid var(--border-d);
 }
 
+/* Niet-beantwoorde bouwblokken vallen extra op: rondje 1,5x groter en
+   oranje i.p.v. het neutrale grijs. */
+.sidebar-bouwblok.status-onbegonnen .status-icoon {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  font-size: 0.93rem;
+  color: var(--or);
+  border-color: var(--or);
+}
+
 .sidebar-bouwblok.status-bezig .status-icoon {
   background: var(--accent, var(--or));
   border-color: var(--accent, var(--or));
