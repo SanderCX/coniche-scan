@@ -466,7 +466,7 @@ a.card:hover,
 }
 
 .sidebar-categorie {
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
 }
 
 .sidebar-categorie-naam {
@@ -482,7 +482,7 @@ a.card:hover,
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.25rem 0.4rem;
+  padding: 0.45rem 0.4rem;
   border-radius: var(--r);
   font-size: 0.78rem;
   line-height: 1.25;
