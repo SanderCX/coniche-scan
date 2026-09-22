@@ -28,7 +28,7 @@ export function BouwblokForm({
 }) {
   const kleur = categorieKleur ? CATEGORIE_COLORS[categorieKleur] : undefined;
   const accentStyle = kleur
-    ? ({ ["--accent" as string]: kleur.hex } as React.CSSProperties)
+    ? ({ ["--accent" as string]: kleur.textHex } as React.CSSProperties)
     : undefined;
   const alleBeantwoord = bouwblok.vragen.every(
     (v) => typeof respondent.antwoorden[v.id] === "number"
@@ -101,7 +101,7 @@ export function BouwblokForm({
             schaal={schaal}
             waarde={respondent.antwoorden[vraag.id]}
             onChange={(waarde) => handleAntwoord(vraag.id, waarde)}
-            accentHex={kleur?.hex}
+            accentHex={kleur?.textHex}
           />
         </div>
       ))}

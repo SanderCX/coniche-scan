@@ -5,16 +5,23 @@ import { Classificatie } from "./types";
  * (bevestigd via `tokens.css`). De keys (oranje/blauw/paars/groen/goud)
  * blijven ongewijzigd t.o.v. eerdere versies zodat bestaande content
  * (categorie.kleur-waarden) blijft werken.
+ *
+ * `textHex` is een donkerdere variant voor tekst/wit-op-kleur (bijv. het
+ * "bezig"-rondje in de sidebar): `--ye` (#ffc043) uit tokens.css is te
+ * licht om als tekstkleur of als achtergrond onder witte tekst te lezen —
+ * geen aanname, het merkpalet zelf heeft geen donkerder geel. Alleen
+ * "goud" wijkt daarom af; de andere categorieën zijn zelf al donker
+ * genoeg en gebruiken hun eigen hex ook als textHex.
  */
 export const CATEGORIE_COLORS: Record<
   string,
-  { bg: string; text: string; border: string; hex: string }
+  { bg: string; text: string; border: string; hex: string; textHex: string }
 > = {
-  oranje: { bg: "bg-or", text: "text-or", border: "border-or", hex: "#ff671f" },
-  blauw: { bg: "bg-bl", text: "text-bl", border: "border-bl", hex: "#225ba0" },
-  paars: { bg: "bg-pu", text: "text-pu", border: "border-pu", hex: "#392944" },
-  groen: { bg: "bg-gr", text: "text-gr", border: "border-gr", hex: "#197f4e" },
-  goud: { bg: "bg-ye", text: "text-ye", border: "border-ye", hex: "#ffc043" },
+  oranje: { bg: "bg-or", text: "text-or", border: "border-or", hex: "#ff671f", textHex: "#ff671f" },
+  blauw: { bg: "bg-bl", text: "text-bl", border: "border-bl", hex: "#225ba0", textHex: "#225ba0" },
+  paars: { bg: "bg-pu", text: "text-pu", border: "border-pu", hex: "#392944", textHex: "#392944" },
+  groen: { bg: "bg-gr", text: "text-gr", border: "border-gr", hex: "#197f4e", textHex: "#197f4e" },
+  goud: { bg: "bg-ye", text: "text-ye", border: "border-ye", hex: "#ffc043", textHex: "#8a6d00" },
 };
 
 /**

@@ -1,5 +1,24 @@
 # Coniche Scan — Changelog
 
+## 2026-09-22 — Fundament-geel te licht als tekstkleur, donkerdere variant toegevoegd
+
+**Aanleiding**: Sander meldde dat de gele Fundament-kleur (`--ye:
+#ffc043` uit tokens.css) slecht leesbaar is — als tekst ("FUNDAMENT" in
+de sidebar, "BOUWBLOK 15" boven een bouwblok) en als achtergrond onder
+witte tekst (het "bezig"-rondje) heeft dit geel te weinig contrast op
+een lichte achtergrond. Geen bouwfout: het officiële merkpalet in
+stylesheet.md heeft zelf geen donkerder geel/goud naast `--ye`/`--ye-l`.
+
+**Doorgevoerd**: `lib/colors.ts` → `CATEGORIE_COLORS.goud` heeft nu een
+los `textHex: "#8a6d00"` naast de officiële `hex: "#ffc043"`. Alle
+plekken die de categoriekleur als `--accent` (tekst, wit-op-kleur
+achtergrond, randen) gebruiken — `Sidebar.tsx`, `BouwblokForm.tsx`, en
+via `accentHex` ook `ScaleRadio.tsx` — gebruiken nu `textHex` in plaats
+van `hex`. Voor de andere vier categorieën (oranje/blauw/paars/groen)
+is `textHex` gelijk aan `hex`, die zijn zelf al donker genoeg. De
+officiële `#ffc043`/`bg-ye` blijft ongewijzigd beschikbaar voor plekken
+waar geel puur als kleurvlak dient, niet als tekst.
+
 Bouwbeslissingen die niet uit een van de content-/specdocumenten
 (CLAUDE.md, v1-aanpassingen.md, etc.) volgen, maar tijdens het bouwen
 door Sander zijn genomen — meestal om een tegenstrijdigheid tussen twee
