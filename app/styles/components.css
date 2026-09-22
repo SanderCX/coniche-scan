@@ -593,6 +593,9 @@ a.card:hover,
   margin-bottom: 2.2rem;
   padding-bottom: 1.8rem;
   border-bottom: 1px solid var(--border);
+  /* Zodat scrollIntoView (automatisch doorscrollen na een antwoord) de
+     vraag niet half onder de sticky nav laat verdwijnen. */
+  scroll-margin-top: calc(var(--nav-h) + 1rem);
 }
 
 .vraag-blok:last-of-type {
@@ -607,6 +610,7 @@ a.card:hover,
 
 .opmerking-veld {
   margin-top: 1rem;
+  scroll-margin-top: calc(var(--nav-h) + 1rem);
 }
 
 .flow-actions {

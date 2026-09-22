@@ -35,6 +35,24 @@ export function BouwblokForm({
   );
   const [toelichtingOpen, setToelichtingOpen] = useState(false);
 
+  /** Scrollt na het kiezen van een antwoord naar de volgende vraag (of, bij
+   * de laatste vraag, naar het opmerkingenveld/de knop) — een korte
+   * vertraging zodat de gekozen radio eerst zichtbaar gevuld wordt voordat
+   * de pagina beweegt. */
+  function scrollNaarVolgende(huidigeVraagId: string) {
+    const index = bouwblok.vragen.findIndex((v) => v.id === huidigeVraagId);
+    const volgende = bouwblok.vragen[index + 1];
+    const targetId = volgende ? `vraag-${volgende.id}` : "bouwblok-einde";
+    setTimeout(() => {
+      document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 250);
+  }
+
+  function handleAntwoord(vraagId: string, waarde: number) {
+    onAntwoord(vraagId, waarde);
+    scrollNaarVolgende(vraagId);
+  }
+
   return (
     <div>
       <div className="bouwblok-kop" style={accentStyle}>
@@ -74,7 +92,7 @@ export function BouwblokForm({
       </div>
 
       {bouwblok.vragen.map((vraag) => (
-        <div key={vraag.id} className="vraag-blok">
+        <div key={vraag.id} id={`vraag-${vraag.id}`} className="vraag-blok">
           <p className="vraag-tekst">
             {vraag.volgnummer}. {vraag.tekst}
           </p>
@@ -82,13 +100,13 @@ export function BouwblokForm({
             naam={vraag.id}
             schaal={schaal}
             waarde={respondent.antwoorden[vraag.id]}
-            onChange={(waarde) => onAntwoord(vraag.id, waarde)}
+            onChange={(waarde) => handleAntwoord(vraag.id, waarde)}
             accentHex={kleur?.hex}
           />
         </div>
       ))}
 
-      <div className="field opmerking-veld">
+      <div className="field opmerking-veld" id="bouwblok-einde">
         <label>Opmerkingen bij dit bouwblok (optioneel)</label>
         <textarea
           value={respondent.opmerkingenPerBouwblok[bouwblok.id] ?? ""}
