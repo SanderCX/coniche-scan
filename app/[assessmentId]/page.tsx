@@ -2,8 +2,11 @@
 
 import { use } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAssessment } from "@/lib/assessment-store";
 import { alleVragen } from "@/lib/assessment-structuur";
+import { vindOfMaakTestRespondent } from "@/lib/db";
+import { useTestModus } from "@/lib/instellingen";
 import { PageWithChrome } from "@/components/PageWithChrome";
 
 export default function AssessmentLandingPage({
@@ -13,6 +16,8 @@ export default function AssessmentLandingPage({
 }) {
   const { assessmentId } = use(params);
   const assessment = useAssessment(assessmentId);
+  const testModus = useTestModus();
+  const router = useRouter();
 
   if (!assessment) {
     return (
@@ -24,7 +29,13 @@ export default function AssessmentLandingPage({
     );
   }
 
-  const totaalVragen = alleVragen(assessment).length;
+  const assessmentVast = assessment;
+  const totaalVragen = alleVragen(assessmentVast).length;
+
+  function handleStart() {
+    const respondent = vindOfMaakTestRespondent(assessmentVast.id);
+    router.push(`/scan/${respondent.id}`);
+  }
 
   return (
     <PageWithChrome>
@@ -37,21 +48,33 @@ export default function AssessmentLandingPage({
           <p className="mt-3 text-sm text-ink-m">Bedoeld voor: {assessment.doelgroep}</p>
 
           <div className="btn-rij" style={{ margin: "2rem auto 0", maxWidth: "26rem" }}>
-            <button
-              type="button"
-              disabled
-              title="Toegang verloopt via een persoonlijke link die Coniche met je deelt."
-              className="btn btn-or"
-            >
-              Start assessment
-            </button>
+            {testModus ? (
+              <button
+                type="button"
+                onClick={handleStart}
+                title="Test-modus: start met de vaste testklant, zonder uitnodiging."
+                className="btn btn-or"
+              >
+                Start assessment
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled
+                title="Toegang verloopt via een persoonlijke link die Coniche met je deelt."
+                className="btn btn-or"
+              >
+                Start assessment
+              </button>
+            )}
             <Link href={`/${assessment.id}/voorbeeld`} className="btn btn-outline">
               Bekijk wat je krijgt
             </Link>
           </div>
           <p className="mx-auto mt-4 max-w-md text-xs text-ink-s">
-            Deze scan vul je in via een persoonlijke link die Coniche met je deelt — neem contact
-            op met Coniche om een scan te starten voor jouw organisatie.
+            {testModus
+              ? "Test-modus staat aan (zie Beheer) — \"Start assessment\" gebruikt een vaste testklant i.p.v. een echte uitnodiging."
+              : "Deze scan vul je in via een persoonlijke link die Coniche met je deelt — neem contact op met Coniche om een scan te starten voor jouw organisatie."}
           </p>
         </div>
 

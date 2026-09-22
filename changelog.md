@@ -5,6 +5,28 @@ Bouwbeslissingen die niet uit een van de content-/specdocumenten
 door Sander zijn genomen — meestal om een tegenstrijdigheid tussen twee
 eerder aangeleverde documenten op te lossen. Nieuwste bovenaan.
 
+## 2026-09-22 — Test-modus: "Start assessment" ook bruikbaar op de landingspagina
+
+**Aanleiding**: op verzoek van Sander — test-modus moest ook gelden voor
+de "Start assessment"-knop op scherm 2 (assessment-landingspagina), die
+normaal altijd disabled is omdat toegang uitsluitend via een door Coniche
+aangemaakte uitnodiging loopt (zie de eerdere beslissing van 2026-09-17
+hieronder, die voor de reguliere flow nog steeds geldt).
+
+**Doorgevoerd**: staat test-modus aan (`lib/instellingen.ts`), dan is de
+knop klikbaar en roept `lib/db.ts` → `vindOfMaakTestRespondent(assessmentId)`
+aan: zoekt een bestaande testorganisatie+respondent voor dát
+assessment-type (herkenbaar aan het vaste testklant-e-mailadres
+`sander_hesselink@hotmail.com`), of maakt er één aan (organisatie
+"TestConicheScan BV", lege kenmerken) als die nog niet bestaat. Voor de
+Klantcontact Volwassenheidsscan is dit dezelfde testklant als de
+seed-data; voor elk ander assessment-type (nu: AI-Volwassenheid) ontstaat
+een eigen testorganisatie bij de eerste keer klikken. Navigeert daarna
+naar de publieke-link-gate (`/scan/[respondentId]`), die vervolgens net
+als bij een echte respondent doorstuurt naar intake/doorloop/resultaten
+op basis van status — nogmaals klikken op "Start assessment" begint dus
+niet opnieuw, maar hervat waar de testklant gebleven was.
+
 ## 2026-09-22 — Test-modus voor Beheer: inloggen overslaan, standaard aan
 
 **Aanleiding**: op expliciet verzoek van Sander, om tijdens de bouw snel

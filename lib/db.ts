@@ -122,6 +122,58 @@ export function nodigRespondentUit(organisatieId: string, email: string): Respon
   return respondent;
 }
 
+const TEST_RESPONDENT_EMAIL = "sander_hesselink@hotmail.com";
+
+/**
+ * Test-modus (zie changelog.md): "Start assessment" op de landingspagina
+ * (CLAUDE.md scherm 2) heeft normaal geen respondent om naartoe te gaan —
+ * toegang loopt uitsluitend via een door Coniche aangemaakte uitnodiging.
+ * In test-modus wordt daarom, per assessment-type, een vaste testorganisatie
+ * + -respondent gebruikt (of aangemaakt als hij nog niet bestaat) zodat de
+ * vragenlijst direct doorlopen kan worden zonder eerst handmatig in Beheer
+ * een organisatie aan te maken. Voor de Klantcontact Volwassenheidsscan is
+ * dit dezelfde testklant als de seed-data (`data/demo-organisatie.ts`).
+ */
+export function vindOfMaakTestRespondent(assessmentId: string): Respondent {
+  const alles = laadAlles();
+  let organisatie = alles.find(
+    (o) =>
+      o.assessmentId === assessmentId &&
+      o.respondenten.some((r) => r.email === TEST_RESPONDENT_EMAIL)
+  );
+  if (!organisatie) {
+    organisatie = {
+      id: nieuwId(),
+      assessmentId,
+      naam: "TestConicheScan BV",
+      kenmerken: {},
+      respondenten: [],
+    };
+    alles.push(organisatie);
+  }
+  let respondent = organisatie.respondenten.find((r) => r.email === TEST_RESPONDENT_EMAIL);
+  if (!respondent) {
+    respondent = {
+      id: nieuwId(),
+      organisatieId: organisatie.id,
+      email: TEST_RESPONDENT_EMAIL,
+      naam: null,
+      rol: "",
+      team: "",
+      notities: "",
+      antwoorden: {},
+      opmerkingenPerBouwblok: {},
+      status: "uitgenodigd",
+      uitgenodigdOp: new Date().toISOString(),
+      gestartOp: null,
+      afgerondOp: null,
+    };
+    organisatie.respondenten.push(respondent);
+  }
+  slaAlles(alles);
+  return respondent;
+}
+
 /**
  * Zonder gedeelde backend leeft elke organisatie/respondent alleen in de
  * localStorage van de browser waarin hij is aangemaakt (bijv. het
