@@ -527,8 +527,8 @@ a.card:hover,
   width: 24px;
   height: 24px;
   min-width: 24px;
-  font-size: 0.93rem;
-  color: var(--or);
+  font-size: 0.65rem;
+  color: var(--ink-m);
   border-color: var(--or);
 }
 
