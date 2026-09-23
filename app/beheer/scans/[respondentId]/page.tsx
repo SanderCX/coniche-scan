@@ -6,7 +6,7 @@ import { useRespondent } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
 import { bouwblokScore, overallScore, classificatie, voortgang } from "@/lib/scoring";
-import { CLASSIFICATIE_INFO } from "@/lib/colors";
+import { CLASSIFICATIE_INFO, ANTWOORD_KLEUR } from "@/lib/colors";
 import { maakPubliekeLink } from "@/lib/uitnodiging-link";
 import { Respondent } from "@/lib/types";
 
@@ -127,12 +127,27 @@ export default function ScanDetailPage({
             </summary>
             <table className="admin-table mt-3">
               <tbody>
-                {bouwblok.vragen.map((vraag) => (
-                  <tr key={vraag.id}>
-                    <td style={{ width: "70%" }}>{vraag.tekst}</td>
-                    <td>{respondent.antwoorden[vraag.id] ?? "—"}</td>
-                  </tr>
-                ))}
+                {bouwblok.vragen.map((vraag) => {
+                  const antwoord = respondent.antwoorden[vraag.id];
+                  const kleur = typeof antwoord === "number" ? ANTWOORD_KLEUR[antwoord] : null;
+                  return (
+                    <tr key={vraag.id}>
+                      <td style={{ width: "70%" }}>{vraag.tekst}</td>
+                      <td>
+                        {kleur ? (
+                          <span
+                            className="antwoord-badge"
+                            style={{ background: kleur.bg, color: kleur.text }}
+                          >
+                            {antwoord}
+                          </span>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
             {opmerking && (

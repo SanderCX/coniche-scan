@@ -155,6 +155,17 @@
   text-decoration: none;
 }
 
+/* Conditionele opmaak per antwoord (1-5), zie lib/colors.ts ANTWOORD_KLEUR. */
+.antwoord-badge {
+  display: inline-block;
+  min-width: 1.7rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 100px;
+}
+
 .admin-field {
   margin-bottom: 1.1rem;
 }

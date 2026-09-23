@@ -25,6 +25,21 @@ export const CATEGORIE_COLORS: Record<
 };
 
 /**
+ * Conditionele opmaak per individueel antwoord (1–5-schaal) in het
+ * admin-scanoverzicht ("Antwoorden per bouwblok") — op verzoek van Sander.
+ * Losse schaal van de 3-staps classificatie (--stat-*) hierboven: hier
+ * gaat het om de score per vraag, niet om de classificatie van een
+ * bouwblok/categorie.
+ */
+export const ANTWOORD_KLEUR: Record<number, { bg: string; text: string }> = {
+  1: { bg: "#dc2626", text: "#ffffff" },
+  2: { bg: "#f97316", text: "#ffffff" },
+  3: { bg: "#facc15", text: "#1c1c1a" },
+  4: { bg: "#84cc16", text: "#1c1c1a" },
+  5: { bg: "#16a34a", text: "#ffffff" },
+};
+
+/**
  * Universele statuskleuren voor de classificatie "Basis op Orde"/"Uitbouwen"/
  * "Sterk punt" — bewust GEEN categoriekleur (zie stylesheet.md, `--stat-*`
  * in tokens.css). Exacte waarden komen letterlijk uit tokens.css.
