@@ -62,7 +62,7 @@ export const organisatieVelden: VeldDefinitie[] = [
       label: categorie,
       type: "groep" as const,
       subvelden: [
-        { id: "leverancier", label: "Leverancier", type: "tekst" as const },
+        { id: "leverancier", label: "Oplossing", type: "tekst" as const },
         {
           id: "ondersteuning",
           label: "Zelf / extern ondersteund",
