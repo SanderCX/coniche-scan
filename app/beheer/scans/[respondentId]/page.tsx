@@ -133,7 +133,7 @@ export default function ScanDetailPage({
                   return (
                     <tr key={vraag.id}>
                       <td style={{ width: "70%" }}>{vraag.tekst}</td>
-                      <td>
+                      <td className="antwoord-cel">
                         {kleur ? (
                           <span
                             className="antwoord-badge"

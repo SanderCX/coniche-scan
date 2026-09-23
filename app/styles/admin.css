@@ -155,15 +155,25 @@
   text-decoration: none;
 }
 
-/* Conditionele opmaak per antwoord (1-5), zie lib/colors.ts ANTWOORD_KLEUR. */
+/* Conditionele opmaak per antwoord (1-5), zie lib/colors.ts ANTWOORD_KLEUR.
+   Vierkant vakje dat de hele tabelcel vult (rand tot rand), niet een pil
+   met ruimte eromheen — daarom padding op de cel zelf op 0. */
+.admin-table td.antwoord-cel {
+  padding: 0;
+}
+
 .antwoord-badge {
-  display: inline-block;
-  min-width: 1.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 2.6rem;
+  box-sizing: border-box;
   text-align: center;
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 0.15rem 0.5rem;
-  border-radius: 100px;
+  padding: 0.7rem 0.8rem;
 }
 
 .admin-field {
