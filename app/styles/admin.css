@@ -280,10 +280,21 @@
 }
 
 .admin-bouwblok-card summary {
+  display: flex;
+  align-items: center;
   cursor: pointer;
   font-weight: 700;
   color: var(--ink);
   list-style: none;
+}
+
+.admin-bouwblok-titel {
+  flex: 1;
+}
+
+.admin-bouwblok-score {
+  font-size: 0.95rem;
+  font-weight: 800;
 }
 .admin-bouwblok-card summary::-webkit-details-marker {
   display: none;

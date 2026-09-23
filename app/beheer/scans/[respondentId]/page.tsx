@@ -120,10 +120,21 @@ export default function ScanDetailPage({
       <h2>Antwoorden per {assessment.bouwblokEenheidEnkelvoud.toLowerCase()}</h2>
       {bouwblokken.map(({ bouwblok }) => {
         const opmerking = respondent.opmerkingenPerBouwblok[bouwblok.id];
+        const score = bouwblokScore(bouwblok, respondent.antwoorden);
         return (
           <details key={bouwblok.id} className="admin-bouwblok-card">
             <summary>
-              {bouwblok.volgnummer}. {bouwblok.naam}
+              <span className="admin-bouwblok-titel">
+                {bouwblok.volgnummer}. {bouwblok.naam}
+              </span>
+              {score !== null && (
+                <span
+                  className="admin-bouwblok-score"
+                  style={{ color: CLASSIFICATIE_INFO[classificatie(score)].kleur }}
+                >
+                  {score.toFixed(1)}
+                </span>
+              )}
             </summary>
             <table className="admin-table mt-3">
               <tbody>
