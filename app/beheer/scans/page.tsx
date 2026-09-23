@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties, resetRespondentInvulling } from "@/lib/db";
 import { voortgang } from "@/lib/scoring";
@@ -42,6 +42,7 @@ const KOLOMMEN: { key: Kolom; label: string }[] = [
 ];
 
 export default function IngevuldeScansPage() {
+  const router = useRouter();
   const organisaties = useOrganisaties();
   const assessments = useAssessments();
   const [sortKolom, setSortKolom] = useState<Kolom>("gestart");
@@ -217,13 +218,16 @@ export default function IngevuldeScansPage() {
                         </button>
                       </th>
                     ))}
-                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   {gesorteerd.map((r) => (
-                    <tr key={r.respondentId}>
-                      <td>
+                    <tr
+                      key={r.respondentId}
+                      className="admin-table-rij-klikbaar"
+                      onClick={() => router.push(`/beheer/scans/${r.respondentId}`)}
+                    >
+                      <td onClick={(e) => e.stopPropagation()}>
                         <input
                           type="checkbox"
                           checked={bulk.isSelected(r.respondentId)}
@@ -241,9 +245,6 @@ export default function IngevuldeScansPage() {
                       </td>
                       <td>{r.voortgang}%</td>
                       <td>{r.gestart ? new Date(r.gestart).toLocaleDateString("nl-NL") : "—"}</td>
-                      <td>
-                        <Link href={`/beheer/scans/${r.respondentId}`}>Bekijk</Link>
-                      </td>
                     </tr>
                   ))}
                 </tbody>

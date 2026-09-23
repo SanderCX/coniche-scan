@@ -149,6 +149,14 @@
   border-bottom: none;
 }
 
+.admin-table-rij-klikbaar {
+  cursor: pointer;
+}
+
+.admin-table-rij-klikbaar:hover {
+  background: var(--or-faint);
+}
+
 .admin-table a {
   color: var(--or);
   font-weight: 600;
