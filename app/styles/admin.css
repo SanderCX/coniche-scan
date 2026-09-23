@@ -156,24 +156,23 @@
 }
 
 /* Conditionele opmaak per antwoord (1-5), zie lib/colors.ts ANTWOORD_KLEUR.
-   Vierkant vakje dat de hele tabelcel vult (rand tot rand), niet een pil
-   met ruimte eromheen — daarom padding op de cel zelf op 0. */
+   Vierkant vakje, gecentreerd in de cel — geen pil, geen volle-celbreedte
+   rechthoek. */
 .admin-table td.antwoord-cel {
-  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+  width: 4.5rem;
 }
 
 .antwoord-badge {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  min-height: 2.6rem;
+  width: 2.75rem;
+  height: 2.75rem;
   box-sizing: border-box;
-  text-align: center;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.7rem 0.8rem;
+  font-size: 1.2rem;
+  font-weight: 800;
 }
 
 .admin-field {
