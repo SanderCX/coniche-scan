@@ -22,7 +22,7 @@ export default function AssessmentLandingPage({
   if (!assessment) {
     return (
       <PageWithChrome>
-        <div className="mx-auto w-full max-w-xl flex-1 px-6 py-16 text-center text-ink-m">
+        <div className="container section" style={{ textAlign: "center" }}>
           Assessment niet gevonden.
         </div>
       </PageWithChrome>
@@ -39,15 +39,48 @@ export default function AssessmentLandingPage({
 
   return (
     <PageWithChrome>
-      <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-16">
-        <div className="text-center">
-          <span className="text-4xl">{assessment.icoon}</span>
-          <h1 className="mt-4 text-3xl font-bold text-ink sm:text-4xl">{assessment.naam}</h1>
-          <p className="mt-2 text-lg text-ink-m">{assessment.subtitel}</p>
-          <p className="mx-auto mt-4 max-w-2xl text-ink-m">{assessment.beschrijving}</p>
-          <p className="mt-3 text-sm text-ink-m">Bedoeld voor: {assessment.doelgroep}</p>
+      <div
+        style={{
+          background: "linear-gradient(180deg, var(--or-faint) 0%, var(--bg) 65%)",
+        }}
+      >
+        <div className="container" style={{ padding: "4.5rem 2rem 3rem", textAlign: "center" }}>
+          <div style={{ marginBottom: "1.5rem" }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "4.75rem",
+                height: "4.75rem",
+                borderRadius: "50%",
+                background: "var(--bg)",
+                boxShadow: "0 10px 28px rgba(28, 28, 26, 0.1)",
+                fontSize: "2.25rem",
+              }}
+            >
+              {assessment.icoon}
+            </div>
+          </div>
+          <span className="eyebrow">Coniche Scan</span>
+          <h1>{assessment.naam}</h1>
+          <p
+            style={{
+              maxWidth: "34rem",
+              margin: "0 auto",
+              fontSize: "1.15rem",
+              fontWeight: 700,
+              color: "var(--ink)",
+            }}
+          >
+            {assessment.subtitel}
+          </p>
+          <p style={{ maxWidth: "38rem", margin: "1rem auto 0" }}>{assessment.beschrijving}</p>
+          <p className="text-sm" style={{ color: "var(--ink-s)", marginTop: "0.6rem" }}>
+            Bedoeld voor: {assessment.doelgroep}
+          </p>
 
-          <div className="btn-rij" style={{ margin: "2rem auto 0", maxWidth: "26rem" }}>
+          <div className="btn-rij" style={{ margin: "2.5rem auto 0", maxWidth: "26rem" }}>
             {testModus ? (
               <button
                 type="button"
@@ -71,40 +104,70 @@ export default function AssessmentLandingPage({
               Bekijk wat je krijgt
             </Link>
           </div>
-          <p className="mx-auto mt-4 max-w-md text-xs text-ink-s">
+          <p className="text-xs" style={{ maxWidth: "26rem", margin: "1rem auto 0", color: "var(--ink-s)" }}>
             {testModus
-              ? "Test-modus staat aan (zie Beheer) — \"Start assessment\" gebruikt een vaste testklant i.p.v. een echte uitnodiging."
+              ? 'Test-modus staat aan (zie Beheer) — "Start assessment" gebruikt een vaste testklant i.p.v. een echte uitnodiging.'
               : "Deze scan vul je in via een persoonlijke link die Coniche met je deelt — neem contact op met Coniche om een scan te starten voor jouw organisatie."}
           </p>
         </div>
+      </div>
 
-        <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {assessment.featureCards.map((card) => (
-            <div key={card.titel} className="rounded-2xl border border-gray-200 bg-white p-6">
-              <h3 className="font-semibold text-ink">{card.titel}</h3>
-              <p className="mt-2 text-sm text-ink-m">{card.tekst}</p>
+      <div className="container" style={{ paddingBottom: "5rem" }}>
+        <div
+          className="grid grid-cols-1 gap-6 sm:grid-cols-3"
+          style={{ marginTop: "-2.5rem", position: "relative", zIndex: 1 }}
+        >
+          {assessment.featureCards.map((card, i) => (
+            <div key={card.titel} className="card card-accent-top" style={{ background: "var(--bg)" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "2.2rem",
+                  height: "2.2rem",
+                  borderRadius: "50%",
+                  background: "var(--or-faint)",
+                  color: "var(--or)",
+                  fontWeight: 800,
+                  fontSize: "0.9rem",
+                  marginBottom: "0.9rem",
+                }}
+              >
+                {i + 1}
+              </span>
+              <h3>{card.titel}</h3>
+              <p className="text-sm" style={{ color: "var(--ink-m)" }}>
+                {card.tekst}
+              </p>
             </div>
           ))}
         </div>
 
-        <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-6">
-          <h3 className="font-semibold text-ink">Praktische informatie</h3>
-          <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="card card-warm" style={{ marginTop: "2.5rem" }}>
+          <h3>Praktische informatie</h3>
+          <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3" style={{ marginTop: "1.2rem" }}>
             <div>
-              <dt className="text-sm font-medium text-ink">Invultijd</dt>
-              <dd className="text-sm text-ink-m">
+              <dt className="eyebrow" style={{ marginBottom: "0.3rem" }}>
+                Invultijd
+              </dt>
+              <dd className="text-sm" style={{ color: "var(--ink-m)" }}>
                 {assessment.geschatteDuur}, verdeeld over {totaalVragen} vragen.
               </dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-ink">Direct resultaat</dt>
-              <dd className="text-sm text-ink-m">
+              <dt className="eyebrow" style={{ marginBottom: "0.3rem" }}>
+                Direct resultaat
+              </dt>
+              <dd className="text-sm" style={{ color: "var(--ink-m)" }}>
                 Na afronding zie je meteen je scores en classificaties.
               </dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-ink">Privacy</dt>
-              <dd className="text-sm text-ink-m">
+              <dt className="eyebrow" style={{ marginBottom: "0.3rem" }}>
+                Privacy
+              </dt>
+              <dd className="text-sm" style={{ color: "var(--ink-m)" }}>
                 Toegang verloopt via een persoonlijke, niet-herleidbare link die Coniche met je
                 deelt.
               </dd>
