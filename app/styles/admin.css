@@ -244,6 +244,22 @@
   background: var(--bg-warm);
 }
 
+/* Losse getal/percentage/tekst-subvelden van een groep (bijv. "Totaal
+   aantal klanten" + de B2B/B2C-verdeling) naast elkaar i.p.v. onder
+   elkaar — een subgroep van groepen (bijv. techstack) blijft wel
+   onder elkaar staan, zie components/beheer/KenmerkenForm.tsx. */
+.veld-rij {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.veld-rij .admin-field {
+  flex: 1;
+  min-width: 9rem;
+  margin-bottom: 0;
+}
+
 .veld-verdeling {
   display: flex;
   gap: 1.2rem;

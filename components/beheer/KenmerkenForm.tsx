@@ -11,17 +11,24 @@ function VeldInput({
 }) {
   if (veld.type === "groep") {
     const obj = (waarde as Record<string, unknown>) ?? {};
+    const subvelden = veld.subvelden ?? [];
+    // Subvelden die zelf geen groep zijn (dus losse getal/percentage/tekst/
+    // select-velden) passen naast elkaar op één regel — een groep van
+    // groepen (bijv. techstack) blijft onder elkaar staan, die is te breed.
+    const opEenRegel = subvelden.length > 0 && subvelden.every((sub) => sub.type !== "groep");
     return (
       <fieldset className="veld-groep">
         <legend>{veld.label}</legend>
-        {(veld.subvelden ?? []).map((sub) => (
-          <VeldInput
-            key={sub.id}
-            veld={sub}
-            waarde={obj[sub.id]}
-            onChange={(w) => onChange({ ...obj, [sub.id]: w })}
-          />
-        ))}
+        <div className={opEenRegel ? "veld-rij" : undefined}>
+          {subvelden.map((sub) => (
+            <VeldInput
+              key={sub.id}
+              veld={sub}
+              waarde={obj[sub.id]}
+              onChange={(w) => onChange({ ...obj, [sub.id]: w })}
+            />
+          ))}
+        </div>
       </fieldset>
     );
   }
