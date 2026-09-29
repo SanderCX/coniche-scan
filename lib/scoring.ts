@@ -1,4 +1,4 @@
-import { Assessment, Bouwblok, Classificatie, Respondent } from "./types";
+import { Assessment, Bouwblok, Classificatie } from "./types";
 import { alleBouwblokkenMetGroep, alleVragen } from "./assessment-structuur";
 
 function round1(n: number): number {
@@ -147,7 +147,10 @@ export function topSterktesEnVerbeterkansen(bouwblokResultaten: BouwblokResultaa
   };
 }
 
-export function isVolledigIngevuld(respondent: Respondent, assessment: Assessment): boolean {
-  const v = voortgang(assessment, respondent.antwoorden);
+export function isVolledigIngevuld(
+  antwoorden: Record<string, number>,
+  assessment: Assessment
+): boolean {
+  const v = voortgang(assessment, antwoorden);
   return v.beantwoord === v.totaal;
 }

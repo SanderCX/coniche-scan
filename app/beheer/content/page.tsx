@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAssessments } from "@/lib/assessment-store";
 import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
+import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
 
 export default function ContentOverzichtPage() {
   const assessments = useAssessments();
@@ -12,22 +13,31 @@ export default function ContentOverzichtPage() {
       <h1>Content</h1>
       <p>Assessment-instellingen, organisatievelden en de vragencontent.</p>
 
+      <Link href="/beheer/content/nieuw" className="btn btn-or" style={{ marginBottom: "1.5rem" }}>
+        + Nieuw Assessment
+      </Link>
+
       <div className="admin-list">
-        {assessments.map((a) => (
-          <Link key={a.id} href={`/beheer/content/${a.id}`} className="admin-row">
-            <div>
-              <p className="admin-row-titel">
-                {a.icoon} {a.naam}
-              </p>
-              <p className="admin-row-sub">
-                {a.categorieen
-                  ? `${a.categorieen.length} categorieën · `
-                  : "Geen categorie-laag · "}
-                {alleBouwblokkenMetGroep(a).length} {a.bouwblokEenheidMeervoud}
-              </p>
-            </div>
-          </Link>
-        ))}
+        {assessments.map((a) => {
+          const template = assessments.find((t) => t.id === a.afgeleidVanAssessmentId);
+          return (
+            <Link key={a.id} href={`/beheer/content/${a.id}`} className="admin-row">
+              <div>
+                <p className="admin-row-titel flex items-center gap-2">
+                  <AssessmentIcon name={a.icoon} style={{ width: "1.1rem", height: "1.1rem" }} />
+                  {a.naam}
+                </p>
+                <p className="admin-row-sub">
+                  {a.categorieen
+                    ? `${a.categorieen.length} categorieën · `
+                    : "Geen categorie-laag · "}
+                  {alleBouwblokkenMetGroep(a).length} {a.bouwblokEenheidMeervoud}
+                  {template && ` · Afgeleid van: ${template.naam}`}
+                </p>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

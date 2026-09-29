@@ -3,24 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAssessments } from "@/lib/assessment-store";
 import { maakOrganisatie } from "@/lib/db";
+import { organisatieVelden } from "@/data/organisatie-velden";
 import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
 
 export default function NieuweOrganisatiePage() {
-  const assessments = useAssessments();
   const router = useRouter();
 
   const [naam, setNaam] = useState("");
-  const [assessmentId, setAssessmentId] = useState(assessments[0]?.id ?? "");
   const [kenmerken, setKenmerken] = useState<Record<string, unknown>>({});
-
-  const gekozenAssessment = assessments.find((a) => a.id === assessmentId);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!assessmentId) return;
-    const organisatie = maakOrganisatie({ naam, assessmentId, kenmerken });
+    const organisatie = maakOrganisatie({ naam, kenmerken });
     router.push(`/beheer/organisaties/${organisatie.id}`);
   }
 
@@ -30,31 +25,21 @@ export default function NieuweOrganisatiePage() {
         ← Organisaties
       </Link>
       <h1>Nieuwe organisatie</h1>
+      <p className="text-sm text-ink-m">
+        Een organisatie is niet langer aan één scan-type gebonden — welke scan(s) je hierbinnen
+        plant, kies je zo op de organisatiepagina.
+      </p>
 
       <form onSubmit={handleSubmit}>
         <div className="admin-field">
           <label>Organisatienaam</label>
           <input type="text" required value={naam} onChange={(e) => setNaam(e.target.value)} />
         </div>
-        <div className="admin-field">
-          <label>Assessment-type</label>
-          <select value={assessmentId} onChange={(e) => setAssessmentId(e.target.value)}>
-            {assessments.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.naam}
-              </option>
-            ))}
-          </select>
-        </div>
 
-        {gekozenAssessment && gekozenAssessment.organisatieVelden.length > 0 && (
+        {organisatieVelden.length > 0 && (
           <div className="mb-6">
             <h2>Organisatiekenmerken</h2>
-            <KenmerkenForm
-              velden={gekozenAssessment.organisatieVelden}
-              waarden={kenmerken}
-              onChange={setKenmerken}
-            />
+            <KenmerkenForm velden={organisatieVelden} waarden={kenmerken} onChange={setKenmerken} />
           </div>
         )}
 

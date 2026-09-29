@@ -2,11 +2,17 @@
 
 import { use } from "react";
 import Link from "next/link";
-import { useAssessment, updateAssessment } from "@/lib/assessment-store";
-import { Assessment, Bouwblok, FeatureCard, VeldDefinitie } from "@/lib/types";
+import { useAssessment, useAssessments, updateAssessment } from "@/lib/assessment-store";
+import { Assessment, Bouwblok, ContentBron, FeatureCard } from "@/lib/types";
 import { nieuwId } from "@/lib/id";
 import { CATEGORIE_COLORS } from "@/lib/colors";
-import { VeldDefinitieEditor } from "@/components/beheer/VeldDefinitieEditor";
+import { AssessmentIcon, ASSESSMENT_ICONS } from "@/components/icons/AssessmentIcons";
+
+/** Vaste lijst, zie lib/types.ts `ContentBron` en export-pdf-visual-volwassenheidsscan.md, "Slotsectie per scan-type". */
+const SLOTSECTIE_OPTIES: { bron: ContentBron; titel: string }[] = [
+  { bron: "visie-coniche.md-deel1", titel: "Visie" },
+  { bron: "content-2030.md", titel: "2030" },
+];
 
 /** Leest/schrijft de bouwblokken op hun plek: genest in een categorie, of
  * plat op de assessment zelf als `categorieId` null is (geen categorie-laag). */
@@ -41,6 +47,7 @@ function addCategorie(assessmentId: string) {
       naam: "Nieuwe categorie",
       kleur: "blauw",
       volgorde: categorieen.length + 1,
+      gewicht: 1,
       bouwblokken: [],
     });
     return { ...a, categorieen };
@@ -50,7 +57,7 @@ function addCategorie(assessmentId: string) {
 function patchCategorie(
   assessmentId: string,
   categorieId: string,
-  patch: Partial<{ naam: string; kleur: string }>
+  patch: Partial<{ naam: string; kleur: string; gewicht: number }>
 ) {
   updateAssessment(assessmentId, (a) => ({
     ...a,
@@ -77,6 +84,7 @@ function addBouwblok(assessmentId: string, categorieId: string | null) {
         omschrijving: "",
         toelichting: "",
         tags: [],
+        gewicht: 1,
         vragen: [],
       },
     ]);
@@ -158,6 +166,7 @@ function schakelCategorieLaag(assessmentId: string, aanzetten: boolean) {
             naam: "Nieuwe categorie",
             kleur: "blauw",
             volgorde: 1,
+            gewicht: 1,
             bouwblokken: a.bouwblokken ?? [],
           },
         ],
@@ -250,6 +259,23 @@ function BouwblokEditor({
             className="w-full rounded-lg border border-gray-200 p-2 text-sm"
           />
         </label>
+        <label className="block text-sm" style={{ maxWidth: "10rem" }}>
+          <span className="mb-1 block text-ink">
+            Gewicht <span className="font-normal text-ink-m">(standaard 1, nog geen effect op de score)</span>
+          </span>
+          <input
+            type="number"
+            min={0}
+            step={0.1}
+            value={bouwblok.gewicht}
+            onChange={(e) =>
+              patchBouwblok(assessmentId, categorieId, bouwblok.id, {
+                gewicht: Number(e.target.value),
+              })
+            }
+            className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+          />
+        </label>
 
         <div>
           <p className="mb-2 text-sm font-medium text-ink">Vragen</p>
@@ -316,6 +342,7 @@ export default function ContentEditorPage({
 }) {
   const { assessmentId } = use(params);
   const assessment = useAssessment(assessmentId);
+  const alleAssessments = useAssessments();
 
   if (!assessment) {
     return (
@@ -326,6 +353,7 @@ export default function ContentEditorPage({
   }
 
   const heeftCategorieen = assessment.categorieen !== null;
+  const template = alleAssessments.find((a) => a.id === assessment.afgeleidVanAssessmentId);
 
   return (
     <div className="admin-main space-y-8 pb-20">
@@ -334,6 +362,11 @@ export default function ContentEditorPage({
           ← Alle assessment-types
         </Link>
         <h1 className="mt-2 text-2xl font-bold text-ink">{assessment.naam}</h1>
+        {assessment.afgeleidVanAssessmentId && (
+          <p className="mt-1 text-xs text-ink-m">
+            Afgeleid van: {template ? template.naam : "(verwijderd Assessment)"}
+          </p>
+        )}
       </div>
 
       <section className="rounded-2xl border border-gray-200 bg-white p-6">
@@ -350,14 +383,26 @@ export default function ContentEditorPage({
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-ink">Icoon (emoji)</span>
-            <input
-              value={assessment.icoon}
-              onChange={(e) =>
-                updateAssessment(assessmentId, (a) => ({ ...a, icoon: e.target.value }))
-              }
-              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
-            />
+            <span className="mb-1 block text-ink">Icoon</span>
+            <div className="flex items-center gap-2">
+              <AssessmentIcon
+                name={assessment.icoon}
+                style={{ width: "1.25rem", height: "1.25rem", color: "var(--or)" }}
+              />
+              <select
+                value={assessment.icoon}
+                onChange={(e) =>
+                  updateAssessment(assessmentId, (a) => ({ ...a, icoon: e.target.value }))
+                }
+                className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+              >
+                {Object.keys(ASSESSMENT_ICONS).map((key) => (
+                  <option key={key} value={key}>
+                    {key}
+                  </option>
+                ))}
+              </select>
+            </div>
           </label>
           <label className="block text-sm sm:col-span-2">
             <span className="mb-1 block text-ink">Subtitel</span>
@@ -396,6 +441,18 @@ export default function ContentEditorPage({
               value={assessment.geschatteDuur}
               onChange={(e) =>
                 updateAssessment(assessmentId, (a) => ({ ...a, geschatteDuur: e.target.value }))
+              }
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="mb-1 block text-ink">
+              Kort label <span className="font-normal text-ink-m">(PDF-footer, bijv. &quot;Volwassenheidsscan&quot;)</span>
+            </span>
+            <input
+              value={assessment.kortLabel}
+              onChange={(e) =>
+                updateAssessment(assessmentId, (a) => ({ ...a, kortLabel: e.target.value }))
               }
               className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
@@ -452,6 +509,56 @@ export default function ContentEditorPage({
           />
           Bouwblokken groeperen in categorieën
         </label>
+
+        <div className="mt-6">
+          <p className="mb-1 text-sm font-medium text-ink">
+            Slotsectie voor de PDF-export
+          </p>
+          <p className="mb-2 text-xs text-ink-m">
+            Titel en bron uit een vaste lijst, zie export-pdf-visual-volwassenheidsscan.md,
+            &quot;Slotsectie per scan-type&quot;.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <select
+              value={assessment.pdfContentSecties?.bron ?? ""}
+              onChange={(e) =>
+                updateAssessment(assessmentId, (a) => ({
+                  ...a,
+                  pdfContentSecties: e.target.value
+                    ? {
+                        titel: SLOTSECTIE_OPTIES.find((o) => o.bron === e.target.value)!.titel,
+                        bron: e.target.value as ContentBron,
+                      }
+                    : null,
+                }))
+              }
+              className="rounded-lg border border-gray-200 p-2 text-sm"
+            >
+              <option value="">Geen slotsectie</option>
+              {SLOTSECTIE_OPTIES.map((o) => (
+                <option key={o.bron} value={o.bron}>
+                  {o.titel} ({o.bron})
+                </option>
+              ))}
+            </select>
+            {assessment.pdfContentSecties && (
+              <label className="flex items-center gap-2 text-sm">
+                Titel
+                <input
+                  value={assessment.pdfContentSecties.titel}
+                  onChange={(e) =>
+                    updateAssessment(assessmentId, (a) =>
+                      a.pdfContentSecties
+                        ? { ...a, pdfContentSecties: { ...a.pdfContentSecties, titel: e.target.value } }
+                        : a
+                    )
+                  }
+                  className="w-32 rounded-lg border border-gray-200 p-2 text-sm"
+                />
+              </label>
+            )}
+          </div>
+        </div>
 
         <p className="mb-2 mt-6 text-sm font-medium text-ink">Schaal-labels (1–5)</p>
         <div className="space-y-2">
@@ -515,16 +622,6 @@ export default function ContentEditorPage({
       </section>
 
       <section className="rounded-2xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-ink">Organisatievelden</h2>
-        <VeldDefinitieEditor
-          velden={assessment.organisatieVelden}
-          onChange={(velden: VeldDefinitie[]) =>
-            updateAssessment(assessmentId, (a) => ({ ...a, organisatieVelden: velden }))
-          }
-        />
-      </section>
-
-      <section className="rounded-2xl border border-gray-200 bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-ink">
             {heeftCategorieen
@@ -582,6 +679,19 @@ export default function ContentEditorPage({
                         </option>
                       ))}
                     </select>
+                    <label className="flex items-center gap-1 text-xs text-ink-m" onClick={(e) => e.stopPropagation()}>
+                      Gewicht
+                      <input
+                        type="number"
+                        min={0}
+                        step={0.1}
+                        value={categorie.gewicht}
+                        onChange={(e) =>
+                          patchCategorie(assessmentId, categorie.id, { gewicht: Number(e.target.value) })
+                        }
+                        className="w-16 rounded-lg border border-gray-200 p-1 text-sm"
+                      />
+                    </label>
                     <button
                       type="button"
                       onClick={(e) => {

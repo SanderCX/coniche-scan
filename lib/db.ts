@@ -1,7 +1,15 @@
 import { useSyncExternalStore } from "react";
-import { Organisatie, Respondent } from "./types";
+import {
+  Organisatie,
+  OrganisatieLid,
+  ScanInvulling,
+  ScanUitvoering,
+  ScanWeergave,
+} from "./types";
 import { nieuwId } from "./id";
+import { genereerToegangscode } from "./toegangscode";
 import { demoOrganisatie } from "@/data/demo-organisatie";
+import { GevalideerdeRij } from "./import-legacy";
 
 const KEY = "coniche-scan:organisaties";
 const SERVER_SENTINEL = "__server__";
@@ -31,10 +39,37 @@ function getServerSnapshot(): string {
   return SERVER_SENTINEL;
 }
 
+/**
+ * Vangt oudere of beschadigde localStorage-data op: elke plek in dit
+ * bestand gaat ervan uit dat `leden`/`scanUitvoeringen`/`invullingen`
+ * altijd arrays zijn (bijv. `organisatie.leden.find(...)`), zonder losse
+ * undefined-checks per aanroep. Zonder deze normalisatie crasht de hele
+ * app op een enkel organisatie-record dat niet meer helemaal klopt met
+ * het huidige `Organisatie`-type (bijv. een browser met een oudere versie
+ * van de opslag, of een handmatig bewerkte localStorage-waarde) — dat is
+ * hier gemeld als "Cannot read properties of undefined (reading 'find')"
+ * op `organisatie.leden`. Geen migratie van de inhoud, alleen de vorm.
+ */
+function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
+  return {
+    ...ruw,
+    kenmerken: ruw.kenmerken && typeof ruw.kenmerken === "object" ? ruw.kenmerken : {},
+    leden: Array.isArray(ruw.leden) ? ruw.leden : [],
+    scanUitvoeringen: Array.isArray(ruw.scanUitvoeringen)
+      ? ruw.scanUitvoeringen.map((s) => ({
+          ...s,
+          invullingen: Array.isArray(s.invullingen) ? s.invullingen : [],
+        }))
+      : [],
+  };
+}
+
 function parseSnapshot(snapshot: string): Organisatie[] {
   if (snapshot === SERVER_SENTINEL) return [];
   try {
-    return JSON.parse(snapshot) as Organisatie[];
+    const alles = JSON.parse(snapshot) as Organisatie[];
+    if (!Array.isArray(alles)) return [];
+    return alles.map(normaliseerOrganisatie);
   } catch {
     return [];
   }
@@ -50,25 +85,28 @@ function slaAlles(alles: Organisatie[]): void {
   emitChange();
 }
 
-export function getOrganisaties(): Organisatie[] {
-  return laadAlles();
+export function useOrganisaties(): Organisatie[] {
+  const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return parseSnapshot(snapshot);
 }
 
-export function getOrganisatie(id: string): Organisatie | undefined {
-  return laadAlles().find((o) => o.id === id);
+export function useOrganisatie(id: string): Organisatie | undefined {
+  return useOrganisaties().find((o) => o.id === id);
 }
 
 export function maakOrganisatie(input: {
   naam: string;
-  assessmentId: string;
   kenmerken: Record<string, unknown>;
 }): Organisatie {
+  const nu = new Date().toISOString();
   const organisatie: Organisatie = {
     id: nieuwId(),
-    assessmentId: input.assessmentId,
     naam: input.naam,
     kenmerken: input.kenmerken,
-    respondenten: [],
+    leden: [],
+    scanUitvoeringen: [],
+    aangemaaktOp: nu,
+    gewijzigdOp: nu,
   };
   const alles = laadAlles();
   alles.push(organisatie);
@@ -76,11 +114,7 @@ export function maakOrganisatie(input: {
   return organisatie;
 }
 
-export function verwijderOrganisatie(organisatieId: string): void {
-  slaAlles(laadAlles().filter((o) => o.id !== organisatieId));
-}
-
-/** Cascadeert naar alle respondenten (en hun scan-invullingen) binnen elke organisatie. */
+/** Cascadeert naar alle leden, scanuitvoeringen en invullingen van elke organisatie. */
 export function verwijderOrganisaties(organisatieIds: string[]): void {
   const ids = new Set(organisatieIds);
   slaAlles(laadAlles().filter((o) => !ids.has(o.id)));
@@ -93,200 +127,406 @@ export function updateOrganisatie(
   const alles = laadAlles();
   const index = alles.findIndex((o) => o.id === organisatieId);
   if (index === -1) return;
-  const respondenten = alles[index].respondenten;
-  alles[index] = { ...updater(structuredClone(alles[index])), respondenten };
+  const { leden, scanUitvoeringen } = alles[index];
+  alles[index] = {
+    ...updater(structuredClone(alles[index])),
+    leden,
+    scanUitvoeringen,
+    gewijzigdOp: new Date().toISOString(),
+  };
   slaAlles(alles);
 }
 
-export function nodigRespondentUit(organisatieId: string, email: string): Respondent | null {
+/** Plant een nieuwe scanronde (assessment-type) binnen een organisatie. */
+export function maakScanUitvoering(
+  organisatieId: string,
+  input: { assessmentId: string; label: string }
+): ScanUitvoering | null {
   const alles = laadAlles();
   const organisatie = alles.find((o) => o.id === organisatieId);
   if (!organisatie) return null;
-  const respondent: Respondent = {
+  const scanUitvoering: ScanUitvoering = {
     id: nieuwId(),
     organisatieId,
-    email,
-    naam: null,
-    rol: "",
-    team: "",
-    notities: "",
+    assessmentId: input.assessmentId,
+    label: input.label,
+    aangemaaktOp: new Date().toISOString(),
+    invullingen: [],
+  };
+  organisatie.scanUitvoeringen.push(scanUitvoering);
+  slaAlles(alles);
+  return scanUitvoering;
+}
+
+/** Genereert een toegangscode die nog niet in gebruik is (zie lib/toegangscode.ts). */
+function genereerUniekeToegangscode(alles: Organisatie[]): string {
+  const inGebruik = new Set(alles.flatMap((o) => o.leden.map((l) => l.toegangscode)));
+  let code = genereerToegangscode();
+  while (inGebruik.has(code)) code = genereerToegangscode();
+  return code;
+}
+
+function maakInvulling(scanUitvoeringId: string, organisatieLidId: string): ScanInvulling {
+  return {
+    id: nieuwId(),
+    scanUitvoeringId,
+    organisatieLidId,
+    status: "uitgenodigd",
     antwoorden: {},
     opmerkingenPerBouwblok: {},
-    status: "uitgenodigd",
     uitgenodigdOp: new Date().toISOString(),
     gestartOp: null,
     afgerondOp: null,
   };
-  organisatie.respondenten.push(respondent);
-  slaAlles(alles);
-  return respondent;
-}
-
-const TEST_RESPONDENT_EMAIL = "sander_hesselink@hotmail.com";
-
-/**
- * Test-modus (zie changelog.md): "Start assessment" op de landingspagina
- * (CLAUDE.md scherm 2) heeft normaal geen respondent om naartoe te gaan —
- * toegang loopt uitsluitend via een door Coniche aangemaakte uitnodiging.
- * In test-modus wordt daarom, per assessment-type, een vaste testorganisatie
- * + -respondent gebruikt (of aangemaakt als hij nog niet bestaat) zodat de
- * vragenlijst direct doorlopen kan worden zonder eerst handmatig in Beheer
- * een organisatie aan te maken. Voor de Klantcontact Volwassenheidsscan is
- * dit dezelfde testklant als de seed-data (`data/demo-organisatie.ts`).
- */
-export function vindOfMaakTestRespondent(assessmentId: string): Respondent {
-  const alles = laadAlles();
-  let organisatie = alles.find(
-    (o) =>
-      o.assessmentId === assessmentId &&
-      o.respondenten.some((r) => r.email === TEST_RESPONDENT_EMAIL)
-  );
-  if (!organisatie) {
-    organisatie = {
-      id: nieuwId(),
-      assessmentId,
-      naam: "TestConicheScan BV",
-      kenmerken: {},
-      respondenten: [],
-    };
-    alles.push(organisatie);
-  }
-  let respondent = organisatie.respondenten.find((r) => r.email === TEST_RESPONDENT_EMAIL);
-  if (!respondent) {
-    respondent = {
-      id: nieuwId(),
-      organisatieId: organisatie.id,
-      email: TEST_RESPONDENT_EMAIL,
-      naam: null,
-      rol: "",
-      team: "",
-      notities: "",
-      antwoorden: {},
-      opmerkingenPerBouwblok: {},
-      status: "uitgenodigd",
-      uitgenodigdOp: new Date().toISOString(),
-      gestartOp: null,
-      afgerondOp: null,
-    };
-    organisatie.respondenten.push(respondent);
-  }
-  slaAlles(alles);
-  return respondent;
 }
 
 /**
- * Zonder gedeelde backend leeft elke organisatie/respondent alleen in de
- * localStorage van de browser waarin hij is aangemaakt (bijv. het
- * beheer-scherm). Een respondent die de uitnodigingslink in een ANDERE
- * browser opent (zijn eigen e-mailclient) heeft dus geen lokale data. Deze
- * functie "importeert" de organisatie (basisgegevens, geen andere
- * respondenten) + deze ene respondent, aangeleverd via de link zelf — zie
- * de `b`-query-param op de publieke link, /scan/[respondentId].
+ * Nodigt een lid uit voor een scanuitvoering: hergebruikt een bestaand
+ * OrganisatieLid met dit e-mailadres binnen de organisatie (bijv. iemand die
+ * al eerder een andere scan deed), anders wordt een nieuw lid aangemaakt.
+ * Maakt daarbinnen een nieuwe ScanInvulling — of geeft de bestaande terug als
+ * dit lid al voor deze scanuitvoering was uitgenodigd.
  */
-export function importRespondent(
-  organisatieBasis: Omit<Organisatie, "respondenten">,
-  respondent: Respondent
-): void {
-  const alles = laadAlles();
-  let organisatie = alles.find((o) => o.id === organisatieBasis.id);
-  if (!organisatie) {
-    organisatie = { ...organisatieBasis, respondenten: [] };
-    alles.push(organisatie);
-  }
-  if (!organisatie.respondenten.some((r) => r.id === respondent.id)) {
-    organisatie.respondenten.push(respondent);
-  }
-  slaAlles(alles);
-}
-
-export function getRespondent(
-  respondentId: string
-): { organisatie: Organisatie; respondent: Respondent } | null {
+export function nodigLidUit(
+  scanUitvoeringId: string,
+  email: string
+): { lid: OrganisatieLid; invulling: ScanInvulling } | null {
   const alles = laadAlles();
   for (const organisatie of alles) {
-    const respondent = organisatie.respondenten.find((r) => r.id === respondentId);
-    if (respondent) return { organisatie, respondent };
+    const scanUitvoering = organisatie.scanUitvoeringen.find((s) => s.id === scanUitvoeringId);
+    if (!scanUitvoering) continue;
+
+    let lid = organisatie.leden.find(
+      (l) => l.email.trim().toLowerCase() === email.trim().toLowerCase()
+    );
+    if (!lid) {
+      lid = {
+        id: nieuwId(),
+        organisatieId: organisatie.id,
+        email: email.trim(),
+        naam: null,
+        functie: "",
+        team: "",
+        notities: "",
+        toegangscode: genereerUniekeToegangscode(alles),
+        aangemaaktOp: new Date().toISOString(),
+      };
+      organisatie.leden.push(lid);
+    }
+
+    let invulling = scanUitvoering.invullingen.find((i) => i.organisatieLidId === lid!.id);
+    if (!invulling) {
+      invulling = maakInvulling(scanUitvoeringId, lid.id);
+      scanUitvoering.invullingen.push(invulling);
+    }
+
+    slaAlles(alles);
+    return { lid, invulling };
   }
   return null;
 }
 
-/** Generieke update op een respondent binnen zijn organisatie. */
-export function updateRespondent(
-  respondentId: string,
-  updater: (respondent: Respondent) => Respondent
-): Respondent | null {
+interface ScanInvullingContext {
+  organisatie: Organisatie;
+  scanUitvoering: ScanUitvoering;
+  lid: OrganisatieLid;
+  invulling: ScanInvulling;
+}
+
+function zoekScanInvulling(alles: Organisatie[], scanInvullingId: string): ScanInvullingContext | null {
+  for (const organisatie of alles) {
+    for (const scanUitvoering of organisatie.scanUitvoeringen) {
+      const invulling = scanUitvoering.invullingen.find((i) => i.id === scanInvullingId);
+      if (!invulling) continue;
+      const lid = organisatie.leden.find((l) => l.id === invulling.organisatieLidId);
+      if (!lid) continue;
+      return { organisatie, scanUitvoering, lid, invulling };
+    }
+  }
+  return null;
+}
+
+export function getScanInvulling(scanInvullingId: string): ScanInvullingContext | null {
+  return zoekScanInvulling(laadAlles(), scanInvullingId);
+}
+
+export function useScanInvulling(scanInvullingId: string): ScanInvullingContext | null {
+  const alles = useOrganisaties();
+  return zoekScanInvulling(alles, scanInvullingId);
+}
+
+export interface RespondentContext {
+  organisatie: Organisatie;
+  lid: OrganisatieLid;
+  /** Al diens invullingen, over alle scanuitvoeringen van de organisatie heen. */
+  invullingen: { scanUitvoering: ScanUitvoering; invulling: ScanInvulling }[];
+}
+
+/**
+ * Zoekt het lid achter een toegangscode (de publieke link, v1-
+ * aanpassingen.md punt 2) en al zijn invullingen. Retourneert null als de
+ * code niet (meer) bestaat — bijv. na verwijderen van het lid, waarmee de
+ * code vanzelf ongeldig wordt (staat immers op het lid zelf).
+ */
+function zoekRespondentPerToegangscode(alles: Organisatie[], code: string): RespondentContext | null {
+  for (const organisatie of alles) {
+    const lid = organisatie.leden.find((l) => l.toegangscode === code);
+    if (!lid) continue;
+    const invullingen = organisatie.scanUitvoeringen.flatMap((scanUitvoering) =>
+      scanUitvoering.invullingen
+        .filter((invulling) => invulling.organisatieLidId === lid.id)
+        .map((invulling) => ({ scanUitvoering, invulling }))
+    );
+    return { organisatie, lid, invullingen };
+  }
+  return null;
+}
+
+export function useRespondentPerToegangscode(code: string): RespondentContext | null {
+  const alles = useOrganisaties();
+  return zoekRespondentPerToegangscode(alles, code);
+}
+
+interface ScanUitvoeringContext {
+  organisatie: Organisatie;
+  scanUitvoering: ScanUitvoering;
+}
+
+function zoekScanUitvoering(alles: Organisatie[], scanUitvoeringId: string): ScanUitvoeringContext | null {
+  for (const organisatie of alles) {
+    const scanUitvoering = organisatie.scanUitvoeringen.find((s) => s.id === scanUitvoeringId);
+    if (scanUitvoering) return { organisatie, scanUitvoering };
+  }
+  return null;
+}
+
+/** Voor de rapportage-pagina (gemiddelde over alle afgeronde invullingen van één meting). */
+export function useScanUitvoering(scanUitvoeringId: string): ScanUitvoeringContext | null {
+  const alles = useOrganisaties();
+  return zoekScanUitvoering(alles, scanUitvoeringId);
+}
+
+/** Weergavemodel voor Sidebar/BouwblokForm/MobielVoortgang, zie lib/types.ts `ScanWeergave`. */
+export function scanWeergave(lid: OrganisatieLid, invulling: ScanInvulling): ScanWeergave {
+  return {
+    naam: lid.naam,
+    antwoorden: invulling.antwoorden,
+    opmerkingenPerBouwblok: invulling.opmerkingenPerBouwblok,
+  };
+}
+
+/** Generieke update op een scan-invulling (antwoorden, opmerkingen, status, ...). */
+export function updateScanInvulling(
+  scanInvullingId: string,
+  updater: (invulling: ScanInvulling) => ScanInvulling
+): ScanInvulling | null {
   const alles = laadAlles();
   for (const organisatie of alles) {
-    const index = organisatie.respondenten.findIndex((r) => r.id === respondentId);
-    if (index !== -1) {
-      organisatie.respondenten[index] = updater(
-        structuredClone(organisatie.respondenten[index])
-      );
-      slaAlles(alles);
-      return organisatie.respondenten[index];
+    for (const scanUitvoering of organisatie.scanUitvoeringen) {
+      const index = scanUitvoering.invullingen.findIndex((i) => i.id === scanInvullingId);
+      if (index !== -1) {
+        scanUitvoering.invullingen[index] = updater(
+          structuredClone(scanUitvoering.invullingen[index])
+        );
+        slaAlles(alles);
+        return scanUitvoering.invullingen[index];
+      }
     }
   }
   return null;
 }
 
 /**
- * "Respondenten verwijderen" (admin-beheerpagina.md, "Verwijderen —
- * cascade-regels"): verwijdert de hele respondent, inclusief zijn
- * scan-invulling. De organisatie en overige respondenten blijven ongemoeid.
+ * Scherm 4 (intake): naam/functie/team/notities horen bij de PERSOON
+ * (OrganisatieLid), status/gestartOp bij deze ene invulling — vóór deze
+ * refactor stond dat allemaal op hetzelfde record, nu twee updates in één
+ * stap voor het intakeformulier.
  */
-export function verwijderRespondenten(respondentIds: string[]): void {
-  const ids = new Set(respondentIds);
+export function voltooiIntake(
+  scanInvullingId: string,
+  input: { naam: string; functie: string; team: string; notities: string }
+): void {
+  const alles = laadAlles();
+  const gevonden = zoekScanInvulling(alles, scanInvullingId);
+  if (!gevonden) return;
+  const { organisatie, scanUitvoering, lid, invulling } = gevonden;
+  const lidIndex = organisatie.leden.findIndex((l) => l.id === lid.id);
+  organisatie.leden[lidIndex] = {
+    ...lid,
+    naam: input.naam,
+    functie: input.functie,
+    team: input.team,
+    notities: input.notities,
+  };
+  const invullingIndex = scanUitvoering.invullingen.findIndex((i) => i.id === invulling.id);
+  scanUitvoering.invullingen[invullingIndex] = {
+    ...invulling,
+    status: "bezig",
+    gestartOp: new Date().toISOString(),
+  };
+  slaAlles(alles);
+}
+
+/**
+ * "Ingevulde scans verwijderen": gooit de scan-invulling zelf helemaal weg
+ * (de rij verdwijnt uit "Ingevulde scans"), niet alleen resetten. Het lid
+ * blijft bestaan — inclusief eventuele ANDERE invullingen die diezelfde
+ * persoon voor andere metingen heeft — er verdwijnt alleen deze ene
+ * uitnodiging/poging voor deze ene scanuitvoering.
+ */
+export function verwijderScanInvullingen(scanInvullingIds: string[]): void {
+  const ids = new Set(scanInvullingIds);
   const alles = laadAlles();
   for (const organisatie of alles) {
-    organisatie.respondenten = organisatie.respondenten.filter((r) => !ids.has(r.id));
+    for (const scanUitvoering of organisatie.scanUitvoeringen) {
+      scanUitvoering.invullingen = scanUitvoering.invullingen.filter((i) => !ids.has(i.id));
+    }
   }
   slaAlles(alles);
 }
 
 /**
- * "Ingevulde scans verwijderen" (admin-beheerpagina.md, "Verwijderen —
- * cascade-regels" + v1-aanpassingen.md punt 2a): gooit alleen de
- * scan-invulling weg, niet de respondent. Status terug naar "uitgenodigd",
- * antwoorden/opmerkingen/data gewist — naam/rol/team/notities blijven staan
- * zodat de respondent bij een volgend bezoek weer op scherm 4 terechtkomt
- * met zijn eerdere gegevens al vooringevuld.
+ * "Leden verwijderen": verwijdert het hele OrganisatieLid, met cascade naar
+ * al diens scan-invullingen (in elke scanuitvoering van de organisatie). De
+ * organisatie en overige leden blijven ongemoeid.
  */
-export function resetRespondentInvulling(respondentIds: string[]): void {
-  const ids = new Set(respondentIds);
+export function verwijderLeden(ledIds: string[]): void {
+  const ids = new Set(ledIds);
   const alles = laadAlles();
   for (const organisatie of alles) {
-    organisatie.respondenten = organisatie.respondenten.map((r) =>
-      ids.has(r.id)
-        ? {
-            ...r,
-            status: "uitgenodigd" as const,
-            antwoorden: {},
-            opmerkingenPerBouwblok: {},
-            gestartOp: null,
-            afgerondOp: null,
-          }
-        : r
-    );
+    organisatie.leden = organisatie.leden.filter((l) => !ids.has(l.id));
+    for (const scanUitvoering of organisatie.scanUitvoeringen) {
+      scanUitvoering.invullingen = scanUitvoering.invullingen.filter(
+        (i) => !ids.has(i.organisatieLidId)
+      );
+    }
   }
   slaAlles(alles);
 }
 
-export function useOrganisaties(): Organisatie[] {
-  const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  return parseSnapshot(snapshot);
-}
-
-export function useOrganisatie(id: string): Organisatie | undefined {
-  return useOrganisaties().find((o) => o.id === id);
-}
-
-export function useRespondent(
-  respondentId: string
-): { organisatie: Organisatie; respondent: Respondent } | null {
-  const alles = useOrganisaties();
-  for (const organisatie of alles) {
-    const respondent = organisatie.respondenten.find((r) => r.id === respondentId);
-    if (respondent) return { organisatie, respondent };
+/**
+ * "Geen achterblijvende data na verwijderen" (v1-aanpassingen.md punt 14):
+ * controleert of elke ScanInvulling nog naar een bestaand lid wijst.
+ * Organisaties/scanuitvoeringen/invullingen kunnen zelf niet verweesd
+ * raken (ze zitten genest in hun eigen ouder, dus verdwijnen automatisch
+ * met die ouder) — dit is de enige plek waar dat WEL kan: `verwijderLeden`
+ * moet cascaderen naar alle scanuitvoeringen van de organisatie. Lege
+ * lijst = geen achterblijvende data gevonden.
+ */
+export function controleerDataIntegriteit(): string[] {
+  const problemen: string[] = [];
+  for (const organisatie of laadAlles()) {
+    const ledenIds = new Set(organisatie.leden.map((l) => l.id));
+    for (const scanUitvoering of organisatie.scanUitvoeringen) {
+      for (const invulling of scanUitvoering.invullingen) {
+        if (!ledenIds.has(invulling.organisatieLidId)) {
+          problemen.push(
+            `Invulling ${invulling.id} (meting "${scanUitvoering.label}" bij organisatie "${organisatie.naam}") verwijst naar een niet-bestaand lid ${invulling.organisatieLidId}.`
+          );
+        }
+      }
+    }
   }
-  return null;
+  return problemen;
 }
+
+export interface LegacyImportKeuze {
+  rij: GevalideerdeRij;
+  assessmentId: string;
+  /** null = nieuwe organisatie aanmaken met `rij.organisatieNaam`. */
+  organisatieId: string | null;
+}
+
+/**
+ * Schrijft gevalideerde rijen (`lib/import-legacy.ts`) definitief weg
+ * (`import-legacy-scans.md`, Werkwijze in beheer, stap 4-5). Per rij altijd
+ * een nieuwe Meting ("Legacy-import {jaar}"): De oude tool kende geen
+ * Meting, dus imports in hetzelfde jaar voor dezelfde organisatie delen wel
+ * het label maar blijven losse Meting-records, niet samengevoegd.
+ *
+ * Een respondent die al bestaat (zelfde e-mailadres binnen de organisatie)
+ * wordt hergebruikt zonder zijn naam/functie/team/notities te overschrijven
+ * — dat is bewust een terughoudende keuze (niet in de spec expliciet
+ * vastgelegd): De import mag geen recentere, zelf ingevoerde gegevens van
+ * een bestaande respondent overschrijven met oudere importdata.
+ */
+export function voerLegacyImportUit(keuzes: LegacyImportKeuze[]): { geimporteerd: number } {
+  const alles = laadAlles();
+  let geimporteerd = 0;
+
+  for (const { rij, assessmentId, organisatieId } of keuzes) {
+    let organisatie = organisatieId ? alles.find((o) => o.id === organisatieId) : undefined;
+    let nieuwAangemaakt = false;
+    if (!organisatie) {
+      const nu = new Date().toISOString();
+      organisatie = {
+        id: nieuwId(),
+        naam: rij.organisatieNaam,
+        kenmerken: {},
+        leden: [],
+        scanUitvoeringen: [],
+        aangemaaktOp: nu,
+        gewijzigdOp: nu,
+      };
+      alles.push(organisatie);
+      nieuwAangemaakt = true;
+    }
+
+    // "nieuw"-formaat: organisatie_kenmerken is al compleet, alleen toepassen bij een
+    // nieuw aangemaakte organisatie — bij hergebruik van een bestaande organisatie
+    // blijven haar eigen, mogelijk recentere kenmerken staan.
+    if (rij.organisatieKenmerken && nieuwAangemaakt) {
+      organisatie.kenmerken = { ...rij.organisatieKenmerken };
+    } else if ((rij.sectorTitel || rij.subsectorTitel) && !organisatie.kenmerken["sector-subsector"]) {
+      organisatie.kenmerken["sector-subsector"] = {
+        sector: rij.sectorTitel ?? "",
+        subsector: rij.subsectorTitel ?? "",
+      };
+    }
+
+    let lid = organisatie.leden.find(
+      (l) => l.email.trim().toLowerCase() === rij.respondentEmail.trim().toLowerCase()
+    );
+    if (!lid) {
+      lid = {
+        id: nieuwId(),
+        organisatieId: organisatie.id,
+        email: rij.respondentEmail.trim(),
+        naam: rij.respondentNaam || null,
+        functie: rij.respondentFunctie,
+        team: rij.respondentTeam,
+        notities: rij.respondentNotities,
+        toegangscode: genereerUniekeToegangscode(alles),
+        aangemaaktOp: new Date().toISOString(),
+      };
+      organisatie.leden.push(lid);
+    }
+
+    const scanUitvoering: ScanUitvoering = {
+      id: nieuwId(),
+      organisatieId: organisatie.id,
+      assessmentId,
+      label: rij.meetingLabel,
+      aangemaaktOp: new Date().toISOString(),
+      invullingen: [],
+    };
+    const invulling: ScanInvulling = {
+      id: nieuwId(),
+      scanUitvoeringId: scanUitvoering.id,
+      organisatieLidId: lid.id,
+      status: rij.status,
+      antwoorden: rij.antwoorden,
+      opmerkingenPerBouwblok: rij.opmerkingenPerBouwblok,
+      uitgenodigdOp: rij.uitgenodigdOp,
+      gestartOp: rij.gestartOp,
+      afgerondOp: rij.afgerondOp,
+    };
+    scanUitvoering.invullingen.push(invulling);
+    organisatie.scanUitvoeringen.push(scanUitvoering);
+    geimporteerd++;
+  }
+
+  slaAlles(alles);
+  return { geimporteerd };
+}
+

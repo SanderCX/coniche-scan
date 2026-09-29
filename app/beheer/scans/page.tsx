@@ -3,30 +3,47 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
-import { useOrganisaties, resetRespondentInvulling } from "@/lib/db";
+import { useOrganisaties, verwijderScanInvullingen } from "@/lib/db";
 import { voortgang } from "@/lib/scoring";
 import { useBulkSelect } from "@/lib/useBulkSelect";
 import { IndeterminateCheckbox } from "@/components/beheer/IndeterminateCheckbox";
 import { BulkToolbar } from "@/components/beheer/BulkToolbar";
-import { Respondent } from "@/lib/types";
+import { BevestigModal } from "@/components/beheer/BevestigModal";
+import { ScanInvulling } from "@/lib/types";
+import {
+  CsvRijContext,
+  csvBestandsnaamBulk,
+  csvBestandsnaamEnkel,
+  downloadTekstBestand,
+  genereerScansCsv,
+} from "@/lib/csv-export";
 
-const STATUS_LABEL: Record<Respondent["status"], string> = {
+const STATUS_LABEL: Record<ScanInvulling["status"], string> = {
   uitgenodigd: "Uitgenodigd",
   bezig: "Bezig",
   afgerond: "Afgerond",
 };
 
-type Kolom = "naam" | "organisatie" | "assessment" | "rolTeam" | "status" | "voortgang" | "gestart";
+type Kolom =
+  | "naam"
+  | "organisatie"
+  | "assessment"
+  | "scanLabel"
+  | "rolTeam"
+  | "status"
+  | "voortgang"
+  | "gestart";
 
 interface Rij {
-  respondentId: string;
+  invullingId: string;
   organisatieId: string;
   assessmentId: string;
   naam: string;
   organisatie: string;
   assessment: string;
+  scanLabel: string;
   rolTeam: string;
-  status: Respondent["status"];
+  status: ScanInvulling["status"];
   voortgang: number;
   gestart: number;
 }
@@ -35,6 +52,7 @@ const KOLOMMEN: { key: Kolom; label: string }[] = [
   { key: "naam", label: "Naam" },
   { key: "organisatie", label: "Organisatie" },
   { key: "assessment", label: "Assessment" },
+  { key: "scanLabel", label: "Meting" },
   { key: "rolTeam", label: "Rol / team" },
   { key: "status", label: "Status" },
   { key: "voortgang", label: "Voortgang" },
@@ -52,26 +70,50 @@ export default function IngevuldeScansPage() {
   const [filterStatus, setFilterStatus] = useState("");
 
   const rijen = useMemo<Rij[]>(() => {
-    return organisaties.flatMap((org) => {
-      const assessment = assessments.find((a) => a.id === org.assessmentId);
-      return org.respondenten.map((r): Rij => {
-        const { percentage } = assessment
-          ? voortgang(assessment, r.antwoorden)
-          : { percentage: 0 };
-        return {
-          respondentId: r.id,
-          organisatieId: org.id,
-          assessmentId: org.assessmentId,
-          naam: r.naam || r.email,
-          organisatie: org.naam,
-          assessment: assessment?.naam ?? "Onbekend",
-          rolTeam: [r.rol, r.team].filter(Boolean).join(" / ") || "—",
-          status: r.status,
-          voortgang: percentage,
-          gestart: r.gestartOp ? new Date(r.gestartOp).getTime() : 0,
-        };
-      });
-    });
+    return organisaties.flatMap((org) =>
+      org.scanUitvoeringen.flatMap((scanUitvoering) => {
+        const assessment = assessments.find((a) => a.id === scanUitvoering.assessmentId);
+        return scanUitvoering.invullingen.flatMap((invulling): Rij[] => {
+          const lid = org.leden.find((l) => l.id === invulling.organisatieLidId);
+          if (!lid) return [];
+          const { percentage } = assessment
+            ? voortgang(assessment, invulling.antwoorden)
+            : { percentage: 0 };
+          return [
+            {
+              invullingId: invulling.id,
+              organisatieId: org.id,
+              assessmentId: scanUitvoering.assessmentId,
+              naam: lid.naam || lid.email,
+              organisatie: org.naam,
+              assessment: assessment?.naam ?? "Onbekend",
+              scanLabel: scanUitvoering.label,
+              rolTeam: [lid.functie, lid.team].filter(Boolean).join(" / ") || "—",
+              status: invulling.status,
+              voortgang: percentage,
+              gestart: invulling.gestartOp ? new Date(invulling.gestartOp).getTime() : 0,
+            },
+          ];
+        });
+      })
+    );
+  }, [organisaties, assessments]);
+
+  /** Voor CSV-export: de volledige context per rij, buiten de platte weergave-`Rij` om. */
+  const csvContextPerInvulling = useMemo(() => {
+    const map = new Map<string, CsvRijContext>();
+    for (const organisatie of organisaties) {
+      for (const scanUitvoering of organisatie.scanUitvoeringen) {
+        const assessment = assessments.find((a) => a.id === scanUitvoering.assessmentId);
+        if (!assessment) continue;
+        for (const invulling of scanUitvoering.invullingen) {
+          const lid = organisatie.leden.find((l) => l.id === invulling.organisatieLidId);
+          if (!lid) continue;
+          map.set(invulling.id, { organisatie, scanUitvoering, lid, invulling, assessment });
+        }
+      }
+    }
+    return map;
   }, [organisaties, assessments]);
 
   const gefilterd = useMemo(() => {
@@ -97,7 +139,7 @@ export default function IngevuldeScansPage() {
     return kopie;
   }, [gefilterd, sortKolom, sortRichting]);
 
-  const bulk = useBulkSelect(gesorteerd.map((r) => r.respondentId));
+  const bulk = useBulkSelect(gesorteerd.map((r) => r.invullingId));
 
   function handleSort(kolom: Kolom) {
     if (kolom === sortKolom) {
@@ -108,15 +150,35 @@ export default function IngevuldeScansPage() {
     }
   }
 
-  function handleVerwijderen() {
-    const ids = [...bulk.selected];
-    if (
-      !window.confirm(
-        `${ids.length} scan-invulling(en) verwijderen? Dit wist de antwoorden en opmerkingen; de respondent en uitnodiging blijven bestaan (status gaat terug naar "uitgenodigd"). Dit kan niet ongedaan gemaakt worden.`
-      )
-    )
-      return;
-    resetRespondentInvulling(ids);
+  const [verwijderenOpen, setVerwijderenOpen] = useState(false);
+
+  function handleVerwijderenBevestigd() {
+    verwijderScanInvullingen([...bulk.selected]);
+    bulk.clear();
+    setVerwijderenOpen(false);
+  }
+
+  // Bulk-CSV-export mag geen data van meerdere organisaties samenvoegen
+  // (export-csv.md, "Bulk-export blijft binnen één organisatie") — hier op
+  // het globale overzicht (admin-beheerpagina.md punt 7) is de selectie dus
+  // alleen exporteerbaar zolang die toevallig, of via het organisatiefilter
+  // hierboven, tot één organisatie beperkt blijft.
+  const geselecteerdeOrganisatieIds = new Set(
+    [...bulk.selected].map((id) => csvContextPerInvulling.get(id)?.organisatie.id).filter(Boolean)
+  );
+  const exporterenDisabledReden =
+    geselecteerdeOrganisatieIds.size > 1
+      ? "Selecteer scans van één organisatie om samen te exporteren (filter op Organisatie hierboven)."
+      : undefined;
+
+  function handleExporteren() {
+    const rijen = [...bulk.selected]
+      .map((id) => csvContextPerInvulling.get(id))
+      .filter((r): r is CsvRijContext => r !== undefined);
+    if (rijen.length === 0) return;
+    const csv = genereerScansCsv(rijen);
+    const bestandsnaam = rijen.length === 1 ? csvBestandsnaamEnkel(rijen[0]) : csvBestandsnaamBulk();
+    downloadTekstBestand(csv, bestandsnaam, "text/csv;charset=utf-8");
     bulk.clear();
   }
 
@@ -193,8 +255,17 @@ export default function IngevuldeScansPage() {
             <>
               <BulkToolbar
                 aantal={bulk.selected.size}
-                onVerwijderen={handleVerwijderen}
+                onVerwijderen={() => setVerwijderenOpen(true)}
                 verwijderLabel="Verwijderen"
+                onExporteren={handleExporteren}
+                exporterenDisabledReden={exporterenDisabledReden}
+              />
+              <BevestigModal
+                open={verwijderenOpen}
+                titel="Scans verwijderen"
+                bericht={`${bulk.selected.size} scan-invulling(en) definitief verwijderen? De respondent zelf en eventuele andere metingen van deze persoon blijven bestaan — alleen deze scan(s) verdwijnen. Dit kan niet ongedaan gemaakt worden.`}
+                onBevestigen={handleVerwijderenBevestigd}
+                onAnnuleren={() => setVerwijderenOpen(false)}
               />
               <table className="admin-table">
                 <thead>
@@ -223,20 +294,21 @@ export default function IngevuldeScansPage() {
                 <tbody>
                   {gesorteerd.map((r) => (
                     <tr
-                      key={r.respondentId}
+                      key={r.invullingId}
                       className="admin-table-rij-klikbaar"
-                      onClick={() => router.push(`/beheer/scans/${r.respondentId}`)}
+                      onClick={() => router.push(`/beheer/scans/${r.invullingId}`)}
                     >
                       <td onClick={(e) => e.stopPropagation()}>
                         <input
                           type="checkbox"
-                          checked={bulk.isSelected(r.respondentId)}
-                          onChange={() => bulk.toggle(r.respondentId)}
+                          checked={bulk.isSelected(r.invullingId)}
+                          onChange={() => bulk.toggle(r.invullingId)}
                         />
                       </td>
                       <td>{r.naam}</td>
                       <td>{r.organisatie}</td>
                       <td>{r.assessment}</td>
+                      <td>{r.scanLabel}</td>
                       <td>{r.rolTeam}</td>
                       <td>
                         <span className={`admin-badge status-${r.status}`}>

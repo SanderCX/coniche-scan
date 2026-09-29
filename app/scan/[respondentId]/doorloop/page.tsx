@@ -1,10 +1,11 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRespondent, updateRespondent } from "@/lib/db";
+import { useScanInvulling, updateScanInvulling, scanWeergave } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
-import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
+import { alleBouwblokkenMetGroep, alleVragen } from "@/lib/assessment-structuur";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { Sidebar } from "@/components/Sidebar";
 import { MobielVoortgang } from "@/components/MobielVoortgang";
@@ -19,8 +20,8 @@ export default function DoorloopPage({
 }) {
   const { respondentId } = use(params);
   const { bouwblok: gevraagdBouwblokId } = use(searchParams);
-  const gegevens = useRespondent(respondentId);
-  const assessment = useAssessment(gegevens?.organisatie.assessmentId ?? "");
+  const gegevens = useScanInvulling(respondentId);
+  const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
   const router = useRouter();
 
   const alleBouwblokken = assessment ? alleBouwblokkenMetGroep(assessment) : [];
@@ -29,6 +30,7 @@ export default function DoorloopPage({
   // lezing) gevuld, dus het actieve bouwblok wordt bij elke render opnieuw afgeleid
   // in plaats van één keer bij mount vastgezet.
   const [handmatigGekozenId, setHandmatigGekozenId] = useState<string | null>(null);
+  const [testGemiddelde, setTestGemiddelde] = useState(3);
   const kandidaatId = handmatigGekozenId ?? gevraagdBouwblokId ?? null;
   const actieveBouwblokId =
     kandidaatId && alleBouwblokken.some((b) => b.bouwblok.id === kandidaatId)
@@ -37,7 +39,7 @@ export default function DoorloopPage({
 
   useEffect(() => {
     if (!gegevens) return;
-    if (gegevens.respondent.status === "uitgenodigd") {
+    if (gegevens.invulling.status === "uitgenodigd") {
       router.replace(`/scan/${respondentId}/intake`);
     }
   }, [gegevens, respondentId, router]);
@@ -58,34 +60,52 @@ export default function DoorloopPage({
     );
   }
 
-  if (gegevens.respondent.status === "uitgenodigd") {
+  if (gegevens.invulling.status === "uitgenodigd") {
     return null;
   }
 
-  const { respondent } = gegevens;
+  const { lid, invulling } = gegevens;
+  const assessmentVast = assessment;
+  const respondent = scanWeergave(lid, invulling);
   const huidigeIndex = alleBouwblokken.findIndex((b) => b.bouwblok.id === actieveBouwblokId);
   const huidig = alleBouwblokken[huidigeIndex];
   const isLaatsteBouwblok = huidigeIndex === alleBouwblokken.length - 1;
 
   function handleAntwoord(vraagId: string, waarde: number) {
-    updateRespondent(respondentId, (r) => ({
-      ...r,
-      antwoorden: { ...r.antwoorden, [vraagId]: waarde },
+    updateScanInvulling(respondentId, (i) => ({
+      ...i,
+      antwoorden: { ...i.antwoorden, [vraagId]: waarde },
     }));
   }
 
   function handleOpmerking(tekst: string) {
-    updateRespondent(respondentId, (r) => ({
-      ...r,
-      opmerkingenPerBouwblok: { ...r.opmerkingenPerBouwblok, [huidig.bouwblok.id]: tekst },
+    updateScanInvulling(respondentId, (i) => ({
+      ...i,
+      opmerkingenPerBouwblok: { ...i.opmerkingenPerBouwblok, [huidig.bouwblok.id]: tekst },
     }));
+  }
+
+  function handleTestVulAutomatisch() {
+    const vragen = alleVragen(assessmentVast);
+    const nieuweAntwoorden: Record<string, number> = {};
+    vragen.forEach((vraag, i) => {
+      const offset = (i % 3) - 1; // cyclisch: gemiddelde-1, gemiddelde, gemiddelde+1
+      nieuweAntwoorden[vraag.id] = Math.min(5, Math.max(1, testGemiddelde + offset));
+    });
+    updateScanInvulling(respondentId, (i) => ({
+      ...i,
+      antwoorden: { ...i.antwoorden, ...nieuweAntwoorden },
+      status: "afgerond",
+      afgerondOp: i.afgerondOp ?? new Date().toISOString(),
+    }));
+    router.push(`/scan/${respondentId}/resultaten`);
   }
 
   function handleVolgende() {
     if (isLaatsteBouwblok) {
-      if (respondent.status !== "afgerond") {
-        updateRespondent(respondentId, (r) => ({
-          ...r,
+      if (invulling.status !== "afgerond") {
+        updateScanInvulling(respondentId, (i) => ({
+          ...i,
           status: "afgerond",
           afgerondOp: new Date().toISOString(),
         }));
@@ -97,7 +117,63 @@ export default function DoorloopPage({
   }
 
   return (
-    <PageWithChrome>
+    <PageWithChrome
+      logoHref={`/s/${lid.toegangscode}`}
+      code={lid.toegangscode}
+      toonTerug
+      navRight={
+        invulling.status === "afgerond" ? (
+          <Link href={`/scan/${respondentId}/resultaten`}>Naar resultaten →</Link>
+        ) : undefined
+      }
+    >
+      {/* TIJDELIJKE TESTKNOP — op verzoek van Sander, om het resultatenscherm
+          (classificatiekleuren, radar chart, spreiding) te kunnen testen
+          zonder alle vragen met de hand te beantwoorden. Verwijderen voor
+          productie. */}
+      <div
+        className="container"
+        style={{
+          margin: "1rem auto 0",
+          padding: "0.75rem 1rem",
+          border: "1px dashed var(--or)",
+          borderRadius: "0.5rem",
+          background: "var(--or-faint)",
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          gap: "0.75rem",
+        }}
+      >
+        <span className="text-xs font-semibold" style={{ color: "var(--or)" }}>
+          TESTKNOP (tijdelijk)
+        </span>
+        <label
+          className="text-sm"
+          style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}
+        >
+          Gemiddelde score
+          <input
+            type="number"
+            min={2}
+            max={4}
+            step={1}
+            value={testGemiddelde}
+            onChange={(e) =>
+              setTestGemiddelde(Math.min(4, Math.max(2, Number(e.target.value) || 3)))
+            }
+            style={{ width: "4rem" }}
+          />
+        </label>
+        <button
+          type="button"
+          onClick={handleTestVulAutomatisch}
+          className="btn btn-outline btn-compact"
+        >
+          Vul alle vragen automatisch in
+        </button>
+      </div>
+
       <MobielVoortgang assessment={assessment} respondent={respondent} />
       <div className="flow-layout flex-1">
         <Sidebar

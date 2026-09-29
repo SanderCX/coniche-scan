@@ -1,4 +1,4 @@
-import { Assessment, Respondent } from "@/lib/types";
+import { Assessment, ScanWeergave } from "@/lib/types";
 import { bouwblokStatus, voortgang } from "@/lib/scoring";
 import { getGroepen } from "@/lib/assessment-structuur";
 import { CATEGORIE_COLORS } from "@/lib/colors";
@@ -10,7 +10,7 @@ export function Sidebar({
   onSelecteer,
 }: {
   assessment: Assessment;
-  respondent: Respondent;
+  respondent: ScanWeergave;
   actieveBouwblokId: string;
   onSelecteer: (bouwblokId: string) => void;
 }) {
@@ -38,7 +38,7 @@ export function Sidebar({
                 {groep.naam && (
                   <p
                     className="sidebar-categorie-naam"
-                    style={kleur ? ({ ["--accent" as string]: kleur.textHex } as React.CSSProperties) : undefined}
+                    style={kleur ? ({ ["--accent" as string]: kleur.hex } as React.CSSProperties) : undefined}
                   >
                     {groep.naam}
                   </p>
@@ -58,7 +58,7 @@ export function Sidebar({
                           className={`sidebar-bouwblok status-${status === "nog-niet-begonnen" ? "onbegonnen" : status} w-full border-0 bg-transparent ${
                             actief ? "actief" : ""
                           }`}
-                          style={kleur ? ({ ["--accent" as string]: kleur.textHex } as React.CSSProperties) : undefined}
+                          style={kleur ? ({ ["--accent" as string]: kleur.hex } as React.CSSProperties) : undefined}
                         >
                           <span className="status-icoon">
                             {status === "afgerond" ? (

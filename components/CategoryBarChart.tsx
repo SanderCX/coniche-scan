@@ -2,14 +2,13 @@
 
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { GroepResultaat } from "@/lib/scoring";
-import { classificatie } from "@/lib/scoring";
-import { CLASSIFICATIE_HEX } from "@/lib/colors";
+import { scoreKleur } from "@/lib/colors";
 
 export function CategoryBarChart({ resultaten }: { resultaten: GroepResultaat[] }) {
   const data = resultaten.map((r) => ({
     naam: r.groepNaam,
     score: r.score ?? 0,
-    kleur: r.score !== null ? CLASSIFICATIE_HEX[classificatie(r.score)] : "#e8e6e1",
+    kleur: r.score !== null ? scoreKleur(r.score) : "#e8e6e1",
   }));
 
   return (

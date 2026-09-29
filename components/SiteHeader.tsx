@@ -10,15 +10,18 @@ import Link from "next/link";
 export function SiteHeader({
   badge,
   navRight,
+  logoHref = "/",
 }: {
   /** bijv. "Beheer" — de zwarte pil naast het logo. */
   badge?: string;
   /** Pagina-specifieke acties/links, rechts uitgelijnd. */
   navRight?: React.ReactNode;
+  /** Binnen een persoonlijke respondent-link gaat het logo naar "Mijn metingen" i.p.v. de publieke homepage (CLAUDE.md sectie 3). */
+  logoHref?: string;
 }) {
   return (
     <header className="nav">
-      <Link href="/" className="nav-logo">
+      <Link href={logoHref} className="nav-logo">
         <Image
           src="/LOGO/Coniche_MMW_standard.svg"
           alt="Coniche"

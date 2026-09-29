@@ -1,223 +1,290 @@
-# Coniche Scan — Admin-beheerpagina
+# Coniche Scan: Beheeromgeving
 
-Vervolgstap na v1, samen met Joost uitgewerkt. 1 rol (admin), toegang voor
-Joost en Sander. Geen rechtenmodel nodig, wel het volledige beheer van
-content en scans.
+De omgeving waarin Coniche scans, content en organisaties beheert.
 
-## Login
+## Toegang
 
-Simpel houden: 2 vaste accounts, geen zelfregistratie of rollenstructuur.
-E-mail + wachtwoord + 2FA voor de admin-omgeving. Geldt uitdrukkelijk NIET
-voor respondenten die een scan invullen, die loggen niet in (zie hieronder).
+Beheer is alleen toegankelijk met een account. Nu met e-mail en
+wachtwoord; 2FA volgt zodra er een backend is. Rollen binnen beheer
+(Admin, Consultant) staan in `datamodel.md` deel 2 en worden met
+de backend gebouwd. Tot die tijd hebben alle beheeraccounts dezelfde
+rechten.
+
+Respondenten loggen niet in. Zij krijgen een persoonlijke link, zie
+`datamodel.md`, Toegangscode.
 
 ## Vormgeving
 
-Bevestigd in `admin.css`: de beheeromgeving hergebruikt de publieke nav
-en footer (zelfde logo, zelfde balk), met alleen een extra "terug"-link
-binnen diezelfde balk. Geen aparte admin-huisstijl bouwen. Concrete
-componenten (inklapbare bouwblok-kaarten voor content-beheer,
-statusbadges voor alle drie respondent-statussen, tabelstijl) staan al
-klaar — zie `stylesheet.md`, sectie "Bevestigde componenten".
+Dezelfde nav en footer als de rest van de app, met een badge "Beheer" en
+de beheerlinks in `.nav-right`. Componenten staan in `stylesheet.md`.
 
-## Toegang voor respondenten
+In de interface: "Respondenten" (niet "leden"), "Meting" en "Ingevulde
+scans". Zie CLAUDE.md, Terminologie.
 
-Geen login voor respondenten. Volledige mechanisme (uniek per scan-instantie
-én per respondent-invulversie, plus verificatiecode-flow) staat in
-v1-aanpassingen.md punt 2 — dat is al bij Sander in bouw, niet hier
-dupliceren.
+### Accountmenu
 
-## Wat beheerbaar moet zijn
+Niet te verwarren met beheeronderdeel 9, "Gebruikers" (de link naar het
+beheerscherm voor Admin/Consultant-accounts): Dit is de weergave van de
+ingelogde gebruiker zelf, in `.nav-right`.
+
+Helemaal uiterst rechts, ná "← Terug naar site" (de exit-actie), niet
+ervoor: Punt 7 van de nav-volgorderegel in CLAUDE.md, Globale layout.
+Conventie: Een account-/profielmenu staat vrijwel altijd als
+allerlaatste element in een nav, voorbij terug-links. Volgorde in
+`.nav-right`, van links naar rechts: Scherm-specifieke acties
+(Overzicht/Organisaties/Gebruikers/Ingevulde scans) → scheidingslijn →
+"← Terug naar site" → scheidingslijn → Accountmenu.
+
+Eén dropdown-knop, zelfde patroon als de Dropdown-knop uit
+`stylesheet.md` (zoals "Exporteren" op de resultatenpagina), niet twee
+losse elementen naast elkaar.
+
+- **Knop**: Toont het e-mailadres van de ingelogde gebruiker (bijv.
+  "admin@coniche.nl"), met het pijltje van de dropdown-knop.
+- **Dropdown-inhoud**: Eerste rij, niet-klikbaar: E-mailadres + rol
+  tussen haakjes (bijv. "admin@coniche.nl (Consultant)"). Tweede rij,
+  klikbaar: "Uitloggen". Functionaliteit van uitloggen blijft ongewijzigd
+  ten opzichte van nu, alleen de plek en vormgeving veranderen.
+- **Stand van zaken**: De dropdown-knop zelf staat er al (één knop,
+  "admin@coniche.nl" met pijltje). Wat nog niet klopt: Hij staat rechts
+  van "← Terug naar site" in plaats van links ervan, zie de volgorde
+  hierboven. Eerdere, inmiddels vervallen situatie (los e-mailadres,
+  rol en "Uitloggen" naast elkaar, met een scheidingslijn ná "Uitloggen"
+  die nergens naar scheidde) is al opgelost door de dropdown-knop zelf.
+
+## Status
+
+- **Gebouwd**: Organisaties (lijst, aanmaken, detail), metingen per
+  organisatie, respondenten uitnodigen, Ingevulde scans met filters.
+- **Nog te bouwen**: Beheer van assessment-types, content en
+  organisatievelden. Gebruikersbeheer (Admin/Consultant), zie punt 9.
+
+---
+
+## Wat beheerbaar is
 
 ### 1. Assessment-types
-Aanmaken/bewerken van een `Assessment` (zie CLAUDE.md sectie 1): naam,
-subtitel, beschrijving, doelgroep, geschatte duur, en de globale schaal-
-labels (5 stuks, instelbaar per Assessment-type — dus voor Klantcontact
-Volwassenheid anders dan straks voor een AI-scan).
 
-### 2. Content: categorieën, bouwblokken, vragen
-Per Assessment: categorieën met kleur en volgorde, bouwblokken daarbinnen
-(naam, omschrijving, **toelichting** — de langere uitlegtekst achter de
-overlay-link, zie v1-aanpassingen.md punt 3 — tags, variabel aantal tags),
-en de vragen per bouwblok (tekst). Dit is de contentset die nu in
-CLAUDE.md sectie 6 hardcoded staat voor de Klantcontact
-Volwassenheidsscan — dat wordt hiermee bewerkbaar in plaats van vast in
-code.
+Aanmaken en bewerken van een `Assessment` (`datamodel.md`): Naam, kort
+label (voor de PDF-footer, bijv. "Volwassenheidsscan"), subtitel,
+beschrijving, doelgroep, geschatte duur, de vijf schaallabels, en de
+slotsectie voor de PDF-export (`pdfContentSecties`, zie
+  `export-pdf-visual-volwassenheidsscan.md`, Slotsectie per scan-type):
+Een titel en een bron, gekozen uit een vaste lijst, geen vrij
+tekstveld.
 
-### 3. Organisatievelden (VeldDefinitie's)
-De veldenlijst uit CLAUDE.md sectie 2 (volume/klantbasis, digitalisering,
-techstack, FTE, KPI's) wordt zelf ook beheerbaar: label, type, vaste
-antwoordcategorieën waar van toepassing. Dit is een meta-laag boven de
-scans zelf.
+**Sector-variant aanmaken vanuit een template** (`datamodel.md`,
+Sector-varianten): Naast "Nieuw Assessment aanmaken" (leeg) een tweede
+actie, "Aanmaken vanuit bestaand Assessment". Kies een bestaand
+Assessment als template; de actie kopieert al zijn Categorieën,
+Bouwblokken en Vragen naar nieuwe content-records onder het nieuwe
+Assessment (`afgeleidVanAssessmentId` wijst terug naar het template,
+puur ter herkomst). Daarna bewerk je de kopie als een gewoon
+Assessment: Naam/kortLabel aanpassen (bijv. "Zorgscan"), en per
+Bouwblok/Vraag de tekst, en per Categorie/Bouwblok het gewicht. Geen
+lopende koppeling met het template: Een latere wijziging daarop werkt
+niet door in de sector-variant.
 
-### 4. Organisaties — lijst, aanmaken, detail
+In de Assessment-lijst in beheer: Bij een afgeleid Assessment een
+regel "Afgeleid van: <naam template>", puur informatief.
 
-Dit stond er eerder als abstracte eis ("scans aanmaken", "respondenten
-toevoegen"), maar is nog nergens als concreet scherm gebouwd — de
-huidige "Ingevulde scans"-pagina (zie punt 6) is een platte lijst zonder
-organisatie-laag erboven. Drie schermen nodig:
+### 2. Content
 
-- **Organisaties-lijst**: alle aangemaakte organisaties, met per rij in
-  elk geval naam, aantal uitgenodigde respondenten, aantal afgerond.
-- **Organisatie aanmaken**: kies een Assessment-type, vul organisatienaam
-  en -kenmerken in volgens de veldenlijst van punt 3.
-- **Organisatie-detail**: toont de organisatiekenmerken (read-only na
-  aanmaken, of bewerkbaar — nog te bevestigen), en de lijst respondenten
-  binnen die organisatie met hun status. Vanaf hier respondenten
-  toevoegen: e-mailadres invoeren, uitnodiging versturen (zie het
-  verificatiemechanisme in v1-aanpassingen.md punt 2 voor hoe de
-  respondent vervolgens toegang krijgt).
+Per Assessment: Categorieën met kleur en volgorde, bouwblokken (naam,
+omschrijving, toelichting, tags) en de vragen per bouwblok. Content waar
+al antwoorden aan hangen wordt gearchiveerd, niet verwijderd
+(`datamodel.md`, Content bewerken).
 
-### 5. Respondenten toevoegen
+### 3. Organisatievelden
 
-Gebeurt vanuit de Organisatie-detailpagina (punt 4), niet als los scherm:
-e-mailadres invoeren, voortgang/status per respondent zien (uitgenodigd /
-bezig / afgerond — alle drie hebben inmiddels een badge-stijl, zie
-`stylesheet.md`).
+De organisatievelden uit `datamodel.md` (volume en klantbasis,
+digitalisering, techstack, FTE, KPI's) wordt zelf ook beheerbaar: Label,
+type en vaste antwoordcategorieën.
 
-### 6. Ingevulde scans — overzicht met bulk-acties
+### 4. Organisaties
 
-Bestaat al als eerste versie, met kolommen Naam, Assessment, Rol/Team,
-Status, Voortgang, Gestart, en een "bekijk"-link per rij. Nog toe te
-voegen:
+- **Lijst**: Alle organisaties, met per rij de naam, het aantal
+  respondenten en het aantal afgeronde scans.
+- **Aanmaken**: Naam en kenmerken invullen.
+- **Detail**: Kenmerken (altijd bewerkbaar), de metingen van deze
+  organisatie, en de respondenten met hun status.
+- **Respondent of losse respons naar een andere organisatie
+  verplaatsen**: Bedoeld om een verkeerde organisatiekoppeling recht te
+  zetten, bijvoorbeeld na een import (`import-legacy-scans.md`) waarbij
+  per ongeluk een tweede organisatie is aangemaakt voor een klant die al
+  bestond onder een net iets andere naam. Twee aparte acties vanaf de
+  respondentenlijst in het organisatie-detail, elk met een ander effect:
 
-- **Organisatie-kolom**: ontbreekt nog, moet erbij — logisch, want dit
-  overzicht spant over alle organisaties heen (zie "Bevestigd"
-  hieronder), dus zonder die kolom is niet te zien bij welke organisatie
-  een rij hoort. Plek in de kolomvolgorde: voor de hand liggend vlak na
-  of voor Naam, definitieve positie aan de bouwer.
-- **Sorteerbare kolommen**: alle kolommen (dus ook de nieuwe
-  Organisatie-kolom) klikbaar sorteerbaar maken, niet later maar nu al.
-- **Selectievakjes per rij**, plus een "alles selecteren"-vakje in de
-  koprij.
-- **Verwijderen**: een prullenbak-icoon dat verschijnt zodra er iets
-  geselecteerd is, verwijdert de geselecteerde scan-instanties.
-- **Exporteren**: de knop staat er, de functie nog niet. Dit wordt de
-  ENE herbruikbare exportfunctie die ook op de resultatenpagina gebruikt
-  wordt (zie BACKLOG.md, "PDF- en CSV-export van resultaten") — niet twee
-  keer bouwen. Op dit scherm waarschijnlijk een bulk-export van de
-  geselecteerde rijen, op de resultatenpagina een export van die ene
-  scan — zelfde onderliggende functie, ander bereik.
-- Nog te beslissen: hoort deze lijst hier los te blijven staan (alle
-  scans, over alle organisaties heen, handig voor snel overzicht), of
-  verhuist hij naar binnen de Organisatie-detailpagina (punt 4)? Beide
-  kunnen ook naast elkaar bestaan — dit overzicht dan als "alles",
-  Organisatie-detail als gefilterde weergave.
+  1. **Hele respondent verplaatsen** (actie per respondent): Zet
+     `Respondent.organisatieId` om naar een andere, bestaande
+     organisatie. Alle ScanInvullingen van deze respondent gaan mee.
+  2. **Eén losse respons verplaatsen** (actie per ingevulde scan in de
+     scanlijst van een respondent): De respondent zelf blijft in zijn
+     huidige organisatie, alleen deze ene ScanInvulling gaat naar een
+     andere organisatie.
 
-## Nog meer te overwegen (nog geen besluit, ter bespreking)
+  **Doelorganisatie**: Zoeken en kiezen uit bestaande organisaties.
+  Geen nieuwe organisatie aanmaken vanuit deze actie, dat gebeurt bij
+  Aanmaken hierboven.
 
-Functionaliteit die logisch bij dit soort beheeromgeving hoort, maar nog
-niet is gevraagd of vastgelegd:
+  **E-mailconflict in de doelorganisatie**: Bestaat daar al een
+  Respondent met hetzelfde e-mailadres, dan geldt de bestaande regel uit
+  `datamodel.md` (Respondent): Hergebruiken in plaats van dupliceren.
+  Bij "hele respondent verplaatsen" gaan alle ScanInvullingen dan naar
+  die bestaande Respondent, en wordt de verplaatste Respondent zelf (met
+  zijn Toegangscode) verwijderd: Zijn persoonlijke link werkt daarna
+  niet meer, de link van de bestaande respondent in de doelorganisatie
+  blijft gelden. De beheerder bevestigt dit expliciet voordat het
+  gebeurt, geen automatische stille samenvoeging. Bij "losse respons
+  verplaatsen" gaat alleen die ene respons naar de bestaande (of een
+  nieuw aangemaakte) Respondent in de doelorganisatie; de oorspronkelijke
+  Respondent blijft gewoon bestaan met zijn overige responsen.
 
-- Filteren/zoeken in "Ingevulde scans" (op organisatie, assessment-type,
-  status, periode) en sorteren op kolom — wordt al snel nodig zodra er
-  meer dan een paar organisaties zijn.
-- Respondent opnieuw uitnodigen (bijv. de verificatiemail is kwijt of
-  verlopen) zonder een compleet nieuwe respondent aan te maken.
-- Toegang van een respondent intrekken (per ongeluk verkeerd
-  e-mailadres uitgenodigd).
-- Bulk-uitnodigen: meerdere e-mailadressen in één keer toevoegen (bijv.
-  plakken uit een lijst) in plaats van steeds één voor één.
-- Herinneringsmail naar respondenten die al een tijd op "uitgenodigd" of
-  "bezig" blijven staan.
-- Organisatie dupliceren/als sjabloon gebruiken (zelfde
-  organisatiekenmerken-structuur hergebruiken voor een nieuwe klant).
+  **Meting in de doelorganisatie**: Een ScanInvulling hangt aan een
+  Meting, en een Meting hoort bij precies één organisatie
+  (`datamodel.md`). Verplaatsen van een respons vraagt dus ook een
+  Meting in de doelorganisatie, van hetzelfde Assessment-type. Bestaat
+  die al, dan kiest de beheerder welke. Bestaat die nog niet, dan maakt
+  de actie er automatisch één aan, met hetzelfde label als de
+  oorspronkelijke.
 
-Geen van deze hoeft nu een besluit te krijgen, maar zeg het als er iets
-bij zit dat je alsnog wilt meenemen, dan zet ik het in BACKLOG.md of hier
-concreet.
+  **Leeggeraakte respondent**: Verplaatst een losse respons de laatste
+  ScanInvulling van een respondent weg, dan blijft die respondent zonder
+  scans, maar mét zijn toegangscode, gewoon staan in de oorspronkelijke
+  organisatie. Geen automatische opruiming: Er kan bewust reden zijn om
+  deze respondent daar te laten staan, bijvoorbeeld om later opnieuw uit
+  te nodigen voor een nieuwe meting. Opruimen blijft een aparte, bewuste
+  actie (bestaande verwijderfunctie op de respondent).
 
-## Verwijderen — cascade-regels
+  **Resultaat**: Een organisatie waar na het verplaatsen niets meer
+  onder hangt, is te verwijderen via de bestaande verwijderfunctie
+  hieronder (Verwijderen). Die cascade is dan leeg, geen nieuwe logica
+  nodig.
 
-**Twee verschillende acties, niet één**:
-- **Op "Ingevulde scans" verwijderen** → gooit alleen díe ene scan-
-  invulling weg (antwoorden, opmerkingen, status, start-/einddatum van
-  die poging). De respondent zelf (naam, e-mailadres, uitnodiging)
-  blijft bestaan.
-- **Op "Respondenten" verwijderen** → gooit de hele respondent weg, met
-  cascade naar al diens scan-invullingen.
+### 5. Metingen
 
-**Dit vraagt op termijn een knip in het datamodel die er nu nog niet
-is.** CLAUDE.md sectie 1 modelleert `antwoorden`/`opmerkingenPerBouwblok`/
-`status`/`gestartOp`/`afgerondOp` nu rechtstreeks als velden ÓP
-`Respondent` — dat gaat uit van precies één invulling per respondent.
-Zodra dezelfde respondent later nogmaals een scan moet kunnen invullen
-(dezelfde of een andere), moeten die velden verhuizen naar een los
-`ScanInvulling`-record (N per Respondent) in plaats van vaste velden op
-Respondent zelf. Dat is bewust NIET nu te bouwen — staat als apart punt
-in BACKLOG.md — maar de twee verwijderacties hierboven moeten er nu al
-wel rekening mee houden dat ze straks los van elkaar moeten werken. Met
-precies 1 invulling per respondent komt "scan verwijderen" in de
-praktijk nog op hetzelfde neer als "antwoorden van deze respondent
-wissen zonder de respondent zelf te verwijderen" — bouw het dus als twee
-aparte acties, ook al is het effect nu bijna gelijk.
+Vanuit de organisatie: Een meting aanmaken met een assessment-type en
+een label (bijv. "Nulmeting 2026"). Een organisatie kan meerdere metingen
+hebben, ook van verschillende scan-types.
 
-**Concreet, nu al bevestigd** (via de tussenoplossing in
-v1-aanpassingen.md punt 2a): "Ingevulde scans" verwijderen = status
-terug naar `"uitgenodigd"`, `antwoorden`/`opmerkingenPerBouwblok`/
-`gestartOp`/`afgerondOp` gewist — maar `naam`/`rol`/`team`/`notities`
-blijven staan. Bij een volgend bezoek aan dezelfde link komt de
-respondent dus weer op scherm 4 (intake) terecht, met die eerdere
-gegevens al vooringevuld, in plaats van bij nul te moeten beginnen.
+### 6. Respondenten uitnodigen
 
-**Organisatie verwijderen** → cascadeert naar:
-- Alle `Respondenten` binnen die organisatie, inclusief al hun
-  scan-invullingen
-- De organisatiekenmerken zelf
-- Raakt NIET het Assessment-type — dat is generiek en blijft bestaan voor
-  andere organisaties
+Binnen een meting: E-mailadres invoeren. Bestaat dat adres al binnen de
+organisatie, dan wordt dezelfde respondent hergebruikt. Er ontstaat een
+ingevulde scan met status `"uitgenodigd"`. Zolang er geen mailserver is,
+kopieert de beheerder de persoonlijke link van de respondent (knop
+"Kopieer link") en deelt die zelf.
 
-Risico, gezien wat we net over terugkerende organisaties bespraken: een
-harde verwijdering van een hele organisatie kost mogelijk waardevolle
-historie van een klant die later terugkomt. Overweeg een stevige
-bevestigingsstap ("Dit verwijdert ook N respondenten en hun ingevulde
-antwoorden, dit kan niet ongedaan gemaakt worden") in plaats van
-verwijderen zonder waarschuwing. Een echte archief-/soft-delete-optie is
-een grotere wijziging, zet ik desgewenst in BACKLOG.md.
+### 7. Ingevulde scans
 
-**Respondent verwijderen** → verwijdert alleen die ene respondent (naam,
-rol, team, notities, antwoorden, opmerkingen, status, data). De
-organisatie en de overige respondenten blijven ongemoeid. Geen
-automatische cascade omhoog: als het de laatste respondent was, blijft
-de organisatie gewoon leeg bestaan.
+Overzicht van alle ingevulde scans over alle organisaties heen, met
+daarnaast een gefilterde versie op de detailpagina van elke organisatie.
+Er is altijd een pad van organisatie via meting en respondent naar de
+scan.
 
-**Select + verwijderen wordt een terugkerend patroon**, niet uniek voor
-"Ingevulde scans": zelfde functionaliteit (selectievakjes, "alles
-selecteren", `.btn-danger` in de compacte maat) hoort ook op de
-Organisaties-lijst en op de respondentenlijst binnen een
-Organisatie-detailpagina. Eén herbruikbare component, niet drie keer
-apart bouwen.
+- **Kolommen**: Naam, Organisatie, Meting, Assessment, Rol/Team, Status,
+  Voortgang, Gestart, en een link "bekijk". Alle kolommen sorteerbaar.
+- **Filters**: Aanwezig, zoals gebouwd.
+- **Selectie**: Selectievakje per rij en "alles selecteren" in de koprij.
+- **Acties op de selectie**: Exporteren en Verwijderen (compacte knoppen,
+  gelijke breedte).
+- **Export**: Eén gedeelde exportfunctie voor dit overzicht (meerdere
+  scans) en de resultatenpagina (één scan), zie `export-csv.md` voor de
+  exacte kolommen. **Bulk-CSV (meerdere scans in één export) alleen
+  vanaf de organisatie-gefilterde versie van dit overzicht (punt 4,
+  organisatie-detailpagina), niet hier op het globale overzicht over
+  alle organisaties heen** — in verband met datavermenging, zie
+  `export-csv.md`. Hier op het globale overzicht blijft dus alleen
+  losse export per scan mogelijk. PDF en de InDesign-export (XML) zijn
+  sowieso alleen beschikbaar bij precies één scan (hier, org-gefilterd,
+  of op de resultatenpagina), zie
+  `export-pdf-visual-volwassenheidsscan.md`, Export van één scan, geen
+  aggregatie, en `export-indesign.md`.
 
+Selecteren en verwijderen is een terugkerend patroon: Dezelfde component
+komt ook op de lijst van organisaties, de metingen en de respondenten.
 
+### 8. Import van scans (CSV)
 
-- Exacte login-methode (zie aanname hierboven)
-- Of bouwblokken/vragen alleen bewerkbaar zijn per Assessment-type, of ook
-  herbruikbaar tussen types (bijv. een bouwblok delen tussen de
-  Volwassenheidsscan en de Zorg-variant)
+Twee bronformaten, met een keuze vooraf: De oude, stopgezette tool
+(eenmalige/periodieke historische migratie) en onze eigen "Als
+CSV"-export (`export-csv.md` teruglezen, o.a. om data tussen browsers te
+verplaatsen zolang de opslag nog localStorage is). Volledige spec,
+inclusief veldmapping en matchingregels per formaat:
+`import-legacy-scans.md`.
 
-## Bevestigd
+### 9. Gebruikers (Admin en Consultant)
 
-- **Organisatiekenmerken blijven altijd bewerkbaar**, ook nadat
-  respondenten al zijn uitgenodigd. Geen vergrendel-logica. Reden, niet
-  alleen foutcorrectie: organisaties komen terug voor een volgende scan,
-  en de kenmerken worden in de praktijk niet altijd in één keer
-  ingevuld — een deel vult Coniche zelf, een deel wordt samen met
-  medewerkers van de klantorganisatie doorlopen. Zie de opmerking
-  hieronder over wat dat betekent voor het huidige model.
-- **"Ingevulde scans" blijft het volledige overzicht** (over alle
-  organisaties heen), naast de gefilterde weergave per Organisatie-
-  detailpagina — beide bestaan naast elkaar. Belangrijkste eis: er moet
-  altijd een pad zijn van organisatie → respondent → scan, niet welke
-  pagina daarbij "primair" is.
+Los beheeronderdeel, uitsluitend voor Admin- en Consultant-accounts
+(`datamodel.md` deel 2, `Gebruiker`). Respondenten en Leads blijven
+bereikbaar via de organisatie (punt 4), niet hier.
 
-## Spanning met CLAUDE.md, nog niet opgelost
+- **Lijst**: Naam, e-mail, rol, status (actief/gedeactiveerd), laatst
+  ingelogd.
+- **Aanmaken**: Naam, e-mail, rol. Wachtwoord stelt de gebruiker zelf in
+  via een link (verificatiepad volgt met de mailserver, `backlog.md`).
+- **Wijzigen**: Naam, e-mail, rol.
+- **Deactiveren, niet verwijderen**: Nooit hard verwijderd
+  (`datamodel.md` deel 2). Actie heet "Deactiveren", `.btn-danger` met
+  bevestiging.
+- **Eigenaarschap bij deactiveren van een Consultant**: Verplicht
+  overzetten van diens organisaties naar een andere Consultant of Admin
+  vóórdat deactiveren definitief is (per organisatie of in bulk).
+- **Minimaal 1 actieve Admin verplicht**: Deactiveren van een Admin is
+  geblokkeerd zolang hij de laatste actieve Admin is, met een duidelijke
+  melding waarom. Geldt ook bij zelf-deactivering: Geen aparte regel
+  nodig, dezelfde check geldt altijd.
+- **2FA**: `tfaActief` verplicht voordat beheer toegankelijk is
+  (`datamodel.md` deel 2). Komt met de backend, niet in dit punt. Al
+  genoteerd in `backlog.md` onder rollen/rechten/inlog.
 
-CLAUDE.md sectie 1 omschrijft `Organisatie.kenmerken` nog als "ingevuld
-door Coniche, read-only voor respondenten". Dat klopt niet meer met wat
-hierboven bevestigd is: soms vult een medewerker van de klantorganisatie
-zelf een deel van de kenmerken in, niet alleen Coniche. Dat is een
-groter punt dan alleen "bewerkbaar blijven" — het raakt namelijk ook wie
-er toegang toe heeft en via welk mechanisme (huidige respondenten-
-toegang is per scan-invulling, niet voor het bewerken van
-organisatiekenmerken). Voor nu geen wijziging in de bouw, maar dit moet
-op een gegeven moment een eigen besluit krijgen — zie BACKLOG.md.
+**`.nav-right`**: Nieuwe link "Gebruikers", tussen "Organisaties" en
+"Ingevulde scans".
 
+**Toegang tot dit scherm**: Alleen Admin (`gebruikers.beheren`, bereik
+`alle`, Rechtenmatrix). Een Consultant ziet deze link niet.
+
+---
+
+## Verwijderen
+
+Wat er precies wordt verwijderd, staat in `datamodel.md` onder
+"Verwijderen en datakoppelingen". Kort:
+
+- **Ingevulde scan**: Alleen die invulling. De respondent en zijn link
+  blijven bestaan.
+- **Respondent**: De persoon met al zijn ingevulde scans.
+- **Meting**: De meting met alle ingevulde scans daarin.
+- **Organisatie**: Alles wat eronder hangt.
+
+Elke verwijderactie vraagt een bevestiging die noemt wat er mee
+verdwijnt, bij een organisatie met aantallen. Na verwijderen blijft er
+geen losse data achter.
+
+Opnieuw invullen is iets wat de respondent later zelf vanuit de scan
+doet, niet een beheeractie (`backlog.md`).
+
+---
+
+## Ter overweging, nog niet besloten
+
+- Een respondent opnieuw uitnodigen zonder een nieuwe aan te maken
+- Toegang van een respondent intrekken (nieuwe code, oude link werkt dan
+  niet meer)
+- Meerdere e-mailadressen tegelijk uitnodigen
+- Herinneringsmail bij respondenten die lang op "uitgenodigd" of "bezig"
+  staan
+- Een organisatie dupliceren als sjabloon
+
+## Open punten
+
+- Of bouwblokken en vragen herbruikbaar moeten zijn tussen
+  assessment-types.
+- Organisatiekenmerken worden in de praktijk soms samen met medewerkers
+  van de klant ingevuld. Het huidige model kent die toegang niet
+  (`backlog.md`).
+- Geen eigen schermflow-beschrijving voor de beheerkant (Overzicht,
+  Organisaties, Ingevulde scans als schermen), zoals CLAUDE.md die wel
+  heeft voor de respondentkant. De navigatie-items worden in CLAUDE.md
+  sectie 3 als voorbeeld genoemd, maar de schermen zelf staan alleen
+  hier, per onderdeel, niet als doorlopende flow.

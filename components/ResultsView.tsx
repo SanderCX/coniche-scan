@@ -9,7 +9,7 @@ import {
   topSterktesEnVerbeterkansen,
   voortgang,
 } from "@/lib/scoring";
-import { CLASSIFICATIE_INFO } from "@/lib/colors";
+import { CLASSIFICATIE_INFO, CLASSIFICATIE_SCORES, SCORE_KLEUR, scoreKleur } from "@/lib/colors";
 import { ScoreCircle } from "./ScoreCircle";
 import { RadarChartView } from "./RadarChartView";
 import { CategoryBarChart } from "./CategoryBarChart";
@@ -84,7 +84,7 @@ export function ResultsView({
                 )}
                 <span
                   className="score-pill"
-                  style={{ ["--kleur" as string]: CLASSIFICATIE_INFO[classificatie(r.score)].kleur } as React.CSSProperties}
+                  style={{ ["--kleur" as string]: scoreKleur(r.score) } as React.CSSProperties}
                 >
                   {r.score.toFixed(1)}
                 </span>
@@ -106,7 +106,7 @@ export function ResultsView({
                 )}
                 <span
                   className="score-pill"
-                  style={{ ["--kleur" as string]: CLASSIFICATIE_INFO[classificatie(r.score)].kleur } as React.CSSProperties}
+                  style={{ ["--kleur" as string]: scoreKleur(r.score) } as React.CSSProperties}
                 >
                   {r.score.toFixed(1)}
                 </span>
@@ -121,14 +121,20 @@ export function ResultsView({
         <div className="legenda">
           {(["rood", "oranje", "groen"] as const).map((c) => {
             const info = CLASSIFICATIE_INFO[c];
+            const scores = CLASSIFICATIE_SCORES[c];
             return (
               <div key={c} className="legenda-item">
-                <span
-                  className="legenda-stip"
-                  style={{ ["--kleur" as string]: info.kleur } as React.CSSProperties}
-                />
+                <span className="legenda-stippen">
+                  {scores.map((s) => (
+                    <span
+                      key={s}
+                      className="legenda-stip"
+                      style={{ ["--kleur" as string]: SCORE_KLEUR[s].hex } as React.CSSProperties}
+                    />
+                  ))}
+                </span>
                 <div>
-                  <h3 style={{ color: info.kleur }}>{info.label}</h3>
+                  <h3 style={{ color: SCORE_KLEUR[scores[0]].hex }}>{info.label}</h3>
                   <p>{info.omschrijving}</p>
                 </div>
               </div>
@@ -137,14 +143,6 @@ export function ResultsView({
         </div>
       </div>
 
-      <div className="btn-rij" style={{ marginTop: "2.5rem", maxWidth: "26rem" }}>
-        <button type="button" disabled title="Binnenkort beschikbaar" className="btn btn-outline">
-          Exporteer als PDF
-        </button>
-        <button type="button" disabled title="Binnenkort beschikbaar" className="btn btn-outline">
-          Exporteer als CSV
-        </button>
-      </div>
     </div>
   );
 }

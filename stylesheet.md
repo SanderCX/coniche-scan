@@ -1,24 +1,18 @@
-# Coniche Scan — Stylesheet
+# Coniche Scan: Stylesheet
 
-Drie lagen, niet door elkaar gebruiken:
+Enige bron voor opmaak. Twee bronnen liggen eronder: Het officiële
+Coniche-merkpalet (`CON_Kleurenschema2022.pdf`) en de CSS-bestanden van de
+app (`tokens.css`, `base.css`, `components.css`, `charts.css`,
+`admin.css`). Die CSS-bestanden worden letterlijk gebruikt. Dit document
+vat samen wat erin staat en welke keuzes daarmee vastliggen.
 
-1. **Officieel/leidend** — het merkpalet (`CON_Kleurenschema2022.pdf`) en
-   de echte CSS-bron van de app zelf: `tokens.css`, `base.css`,
-   `components.css`, `charts.css`, `admin.css` (allemaal aangeleverd door
-   Joost). Dit zijn geen reconstructies meer, dit IS de broncode. Sander
-   neemt deze bestanden letterlijk over; dit document vat samen wat erin
-   zit en welke beslissingen daarmee vastliggen, het herhaalt niet elke
-   regel CSS.
-2. **Scan-specifieke patronen** — vorm en gedrag van componenten die
-   alleen in de scan-app voorkomen. Grotendeels nu ook gedekt door de
-   CSS-bestanden uit laag 1, hier staat vooral toelichting bij *waarom*.
-3. **Afgekeurd** — een paar categoriekleuren die eerder verkeerd
-   gerenderd werden, kort gedocumenteerd zodat niemand ze per ongeluk
-   terugzet.
+De app hoeft voorlopig niet responsive te zijn. Bestaande media queries
+in de CSS mogen blijven staan, maar er wordt alleen op desktop ontworpen
+en getest.
 
-## Laag 1 — Officieel/leidend
+---
 
-### Merkpalet
+## Merkpalet
 
 | Kleur | Hex | RGB |
 |---|---|---|
@@ -34,16 +28,14 @@ Drie lagen, niet door elkaar gebruiken:
 | White | `#FFFFFF` | 255, 255, 255 |
 | Black | `#000000` | 0, 0, 0 |
 
-Geen officieel rood in de huisstijl — relevant voor de classificatiekleur
-"Basis op Orde", zie verderop.
+Het merkpalet heeft geen rood. Daarom hebben de scorekleuren eigen
+waarden (zie hieronder).
 
-### CSS custom properties (`tokens.css`, aangeleverd door Joost — bron voor de hele app)
+## Tokens
 
-Dit is niet langer een reconstructie, dit is het echte bestand. Sander
-neemt dit letterlijk over, niet herschrijven:
+Stand van `tokens.css`, aangevuld met `--nav-h`:
 
 ```css
-/* Design tokens — stylesheet.md laag 1 (enige bron voor opmaak). */
 :root {
   --or: #ff671f;
   --or-l: #ff7f41;
@@ -61,7 +53,8 @@ neemt dit letterlijk over, niet herschrijven:
   --ye: #ffc043;
   --ye-l: #ffcb57;
 
-  --pu: #392944; /* Proces & Tech — toegevoegd vanuit het merkpalet */
+  --pu: #392944;          /* Proces & Tech */
+  --fu: #44403c;          /* Fundament, antraciet (voorstel) */
 
   --ink: #1c1c1a;
   --ink-m: #4d4d49;
@@ -75,256 +68,263 @@ neemt dit letterlijk over, niet herschrijven:
   --border-d: #d4d1ca;
 
   --r: 6px;
-  --nav-h: 4.5rem; /* nieuw: vaste nav-hoogte, nodig om de sidebar in de
-                       doorloopflow sticky tegenaan te zetten, zie
-                       "Sticky sidebar" hieronder */
+  --nav-h: 4.5rem;        /* vaste nav-hoogte, nodig voor de sticky sidebar */
 
-  /* Classificatiekleuren — bewust NIET --or/--gr, universele statustinten
-     los van de merkkleuren. */
+  /* Statuskleuren voor de UI (statusbadges, afgerond-vinkje, verwijderknop) */
   --stat-red: #dc2626;
   --stat-red-faint: #fdecec;
   --stat-amber: #e8871e;
   --stat-amber-faint: #fdf2e3;
   --stat-green: #22a06b;
   --stat-green-faint: #e7f6ef;
+
+  /* Scorekleuren, 1 t/m 5 (voorstel, zie "Scorekleuren") */
+  --score-1: #dc2626;     /* rood */
+  --score-1-faint: #fdecec;
+  --score-2: #e8871e;     /* oranje */
+  --score-2-faint: #fdf2e3;
+  --score-3: #eab308;     /* geel */
+  --score-3-faint: #fdf7dc;
+  --score-4: #7bc043;     /* lichtgroen */
+  --score-4-faint: #eef7e6;
+  --score-5: #15803d;     /* donkergroen */
+  --score-5-faint: #e6f2ea;
 }
 ```
 
-Dit dekt meteen het eerdere open punt op: de classificatiekleuren
-(rood/oranje/groen voor "Basis op Orde"/"Uitbouwen"/"Sterk punt") zijn nu
-vastgelegd als `--stat-red`/`--stat-amber`/`--stat-green`, bewust andere
-waarden dan de categoriekleuren, elk met een bijpassende `-faint`
-achtergrondtint voor badges.
+## Categoriekleuren
 
-Categorie-toewijzing (Dark-variant als hoofdkleur, Light-variant waar een
-tweede tint nodig is, bijv. hover):
+- Overkoepelend: `--or`
+- Organisatie: `--bl`
+- Proces & Tech: `--pu`
+- Mens: `--gr`
+- Fundament: `--fu`
 
-- Overkoepelend: `--or` (Dark Orange)
-- Organisatie: `--bl` (Dark Blue)
-- Mens: `--gr` (Dark Green)
-- Fundament: `--ye` (Dark Yellow)
-- Proces & Tech: `--pu` (Dark Purple)
+Elke categoriekleur moet leesbaar zijn als tekst op wit en onder witte
+tekst (bijv. het "bezig"-rondje in de sidebar). Daarom is Fundament niet
+geel of goud. Voorstel is een warm antraciet (`#44403c`), dat past bij de
+warme grijstinten van de huisstijl en ruim voldoende contrast heeft.
+Alternatief als het te ingetogen oogt: Petrol (`#1f6f78`), dat zich
+duidelijk onderscheidt van de andere vier categoriekleuren.
 
-### Typografie
+Er is geen aparte tekstvariant per categorie meer nodig: Alle vijf
+categoriekleuren zijn zelf donker genoeg.
+
+De Light-varianten zijn beschikbaar waar een tweede tint nodig is, bijv.
+bij hover.
+
+## Scorekleuren
+
+Elke score krijgt een kleur op een vijfstapsschaal:
+
+| Score | Kleur | Token |
+|---|---|---|
+| 5 | Donkergroen | `--score-5` |
+| 4 | Lichtgroen | `--score-4` |
+| 3 | Geel | `--score-3` |
+| 2 | Oranje | `--score-2` |
+| 1 | Rood | `--score-1` |
+
+Een gemiddelde score (bijv. 2,7) krijgt de kleur van de afgeronde waarde,
+met dezelfde afronding als in CLAUDE.md sectie 1 (half-away-from-zero).
+2,7 wordt dus 3, geel.
+
+De drie classificaties vallen daar precies binnen, omdat hun grenzen (2,5
+en 3,5) samenvallen met de afrondingsgrenzen:
+- Basis op Orde: Rood (1) of oranje (2)
+- Uitbouwen: Geel (3)
+- Sterk punt: Lichtgroen (4) of donkergroen (5)
+
+Een classificatielabel neemt de kleur van de afgeronde score over.
+
+Gebruikt voor: Scores per bouwblok en per categorie, de overall score,
+de classificatiecirkel, de staafdiagrammen, de top 3 en de legenda. Niet
+voor de antwoordopties in de vragenlijst zelf, om respondenten niet
+richting een kleur te sturen.
+
+Tekst op geel en lichtgroen is `var(--ink)`, op de andere drie wit, voor
+voldoende contrast.
+
+De hexwaarden zijn een voorstel. Rood en oranje zijn gelijk aan de
+bestaande statuskleuren. Donkergroen is bewust iets anders dan `--gr`
+(categorie Mens), en de scorekleuren staan los van de categoriekleuren,
+zodat een score nooit met een categorie verward wordt.
+
+---
+
+## Typografie
 
 - **Lettertype**: Epilogue (400/500/600/700/800) via Google Fonts, voor
-  zowel body-tekst als koppen.
-- **Accentfont**: Source Serif 4 (italic 400/600) — alleen voor citaten/
-  quotes, niet voor gewone UI-tekst.
-- **Koppen**: font-weight 800 (h1/h2) of 700 (h3), line-height 1.1,
+  body-tekst en koppen.
+- **Accentfont**: Source Serif 4 (italic 400/600), alleen voor citaten.
+- **Koppen**: Font-weight 800 (h1/h2) of 700 (h3), line-height 1.1,
   licht negatieve letter-spacing, kleur `var(--ink)`.
   - h1: `clamp(2.5rem, 5vw, 4rem)`
   - h2: `clamp(1.85rem, 3.5vw, 2.65rem)`
   - h3: `1.12rem`
-- **Body-tekst**: line-height 1.78, kleur `var(--ink-m)`.
-- **Label/eyebrow-tekst**: font-size `.69rem`, font-weight 700,
-  letter-spacing `.14em`, hoofdletters, kleur `var(--or)` — het patroon
-  voor kleine kop-labels zoals "AI Assessment" boven een scanpagina.
+- **Body-tekst**: Line-height 1.78, kleur `var(--ink-m)`.
+- **Label/eyebrow**: Font-size `.69rem`, font-weight 700, letter-spacing
+  `.14em`, hoofdletters, kleur `var(--or)`. Voor kleine kop-labels zoals
+  "AI Assessment" boven een scanpagina.
 
-### Layout en spacing
+## Layout
 
-- **Border-radius**: `--r: 6px` voor knoppen; cards gebruiken los `10px`.
+- **Border-radius**: `--r` (6px) voor knoppen, 10px voor kaarten.
 - **Container**: `max-width: 1160px`, `padding: 0 2rem`.
 - **Sectie-padding**: `6rem 0` verticaal.
+- **Ruimte bovenaan**: Extra witruimte tussen de nav en de eerste inhoud,
+  op elk scherm.
+- **Nav**: `position: sticky`, vaste hoogte `var(--nav-h)`, altijd witte
+  achtergrond, `3px solid var(--or)` onderrand, zachte schaduw.
+  Overgenomen van de bestaande BOKS-app (`.topbar`).
+- **Sidebar in de doorloopflow**: Twee losse sticky elementen onder de
+  nav. De koptekst (`.flow-sidebar-koptekst`, met naam, voortgangsbalk en
+  label) blijft altijd zichtbaar. De lijst met bouwblokken
+  (`.flow-sidebar-lijst`) blijft zo lang mogelijk staan, maar mag aan
+  het eind van een kort bouwblok alsnog wegscrollen. Zo gebouwd en
+  akkoord.
+- **Voortgang op smalle schermen**: Onder 900px toont
+  `.flow-mobiel-voortgang` een compacte, sticky voortgangsbalk. Bestaat
+  al, verder geen werk aan zolang de app niet responsive hoeft.
 
-### Logo-gebruik
+## Logo
 
-- **Nav**: `<img>`, hoogte `44px`, breedte automatisch. Definitief
-  besloten, zie hierboven bij nav-gedrag.
-- **Footer**: voorlopig geen logo, alleen tekst — zie "Nog open". CSS
-  staat al klaar (`.mini-logo`, hoogte `28px`) voor zodra dit wel gebouwd
-  wordt; dan is een witte/inverse variant van het logo nodig (het huidige
-  logobestand is niet geschikt voor een donkere achtergrond).
-- Als los beeldbestand (PNG/SVG), niet als CSS-achtergrond.
+- **Nav**: `<img>`, hoogte 44px, breedte automatisch.
+- **Footer**: Voorlopig geen logo, alleen tekst (zie Open punten). De
+  class `.mini-logo` (28px) staat klaar.
+- Altijd als los bestand (SVG of PNG) uit `/assets/`, niet als
+  CSS-achtergrond.
+- **Linkgedrag, contextafhankelijk** (stond hier nog niet, zie CLAUDE.md
+  sectie 3): Op de publieke schermen gaat het logo naar `#/`. Zodra een
+  respondent binnen zijn persoonlijke link zit, gaat het logo naar "Mijn
+  metingen" in plaats van naar de publieke homepage.
 
-### Componenten
+---
 
-**Knoppen** (`border-radius: var(--r)`, `padding: .82rem 1.7rem`,
-`font-weight: 700`, `font-size: .9rem`):
-- `.btn-or` — primair: gevuld `var(--or)`, witte tekst, hover
-  `var(--or-l)` + lichte `translateY(-1px)`.
-- `.btn-outline-w` — secundair op donkere/foto-achtergrond: witte rand
-  (`2px solid rgba(255,255,255,.5)`), transparante vulling.
-- `.btn-w` — knop op een oranje sectie-achtergrond: witte vulling,
-  oranje tekst.
-- `.btn-outline` — secundair op een gewone (lichte) achtergrond:
-  transparante vulling, `2px solid var(--border-d)`, donkere tekst
-  (`var(--ink)`). Dit is de neutrale tweede knop naast `.btn-or`, bijv.
-  "Annuleren" naast "Opslaan".
+## Componenten
+
+### Knoppen
+
+Standaardmaat: `border-radius: var(--r)`, `padding: .82rem 1.7rem`,
+`font-weight: 700`, `font-size: .9rem`.
+
+- `.btn-or`: Primair. Gevuld `var(--or)`, witte tekst, hover `var(--or-l)`
+  met lichte `translateY(-1px)`.
+- `.btn-outline`: Secundair op een lichte achtergrond. Transparant,
+  `2px solid var(--border-d)`, tekst `var(--ink)`. Bijv. "Annuleren" naast
+  "Opslaan".
+- `.btn-outline-w`: Secundair op een donkere of foto-achtergrond. Witte
+  rand (`2px solid rgba(255,255,255,.5)`), transparant.
+- `.btn-w`: Op een oranje achtergrond. Witte vulling, oranje tekst.
+- `.btn-danger`: Destructieve acties zoals verwijderen. Gevuld
+  `var(--stat-red)`, witte tekst, hover iets donkerder. Geen rode
+  outline-variant.
 - **Disabled**: `background: var(--bg-mid)`, tekst `var(--ink-s)`, rand
-  `var(--border)`, `cursor: not-allowed`. Geldt voor elke knopvariant.
-- **Destructief/verwijderen — ONTBRAK, nu toegevoegd**: `.btn-danger`,
-  zelfde maatvoering als de rest, gevulde `var(--stat-red)` met witte
-  tekst (consistent met hoe classificatie/status al rood gebruikt),
-  hover een tikje donkerder. Niet de rode outline-knop die nu op
-  "Verwijderen" staat — die stijl bestaat nergens in components.css,
-  dat was een ad-hoc invulling zonder spec. Vervang 'm door deze
-  `.btn-danger`.
-- **Compacte knopmaat voor actiebalken — nieuw, corrigeert een te
-  dominante "Verwijderen"-knop**: `.nav-right .btn` had al een kleinere
-  maat (`padding: .5rem 1rem; font-size: .8rem`) dan de standaardknop
-  (`.82rem 1.7rem` / `.9rem`), maar dat stond vast aan de nav. Til dat
-  los als algemene `.btn-compact`-variant, en gebruik die voor elke
-  bulk-actiebalk (bijv. "N geselecteerd" + Exporteren/Verwijderen), niet
-  de standaardmaat. Dat voorkomt dat een verwijderknop in zo'n rij
-  zwaarder oogt dan de primaire actie op de pagina.
+  `var(--border)`, `cursor: not-allowed`. Geldt voor elke variant.
+- `.btn-compact`: Kleinere maat (`padding: .5rem 1rem; font-size: .8rem`)
+  voor knoppen in de nav en in bulk-actiebalken, zoals "N geselecteerd"
+  met Exporteren en Verwijderen.
 
-**Knopbreedte binnen een actierij**: knoppen die samen in één rij staan
-(bijv. de bulkbalk "Exporteer selectie" + "Verwijderen", of een
-formulier met "Annuleren" + "Opslaan") krijgen gelijke breedte — niet
-elk hun eigen breedte op basis van teksthoeveelheid. Concreet:
-`display: flex` op de container, `flex: 1` (of een gedeelde `min-width`)
-op elke `.btn` daarbinnen. Geldt voor knoppen die functioneel bij elkaar
-horen in dezelfde rij, niet voor elke knop op de hele pagina — een
-volledige-breedte formulierknop en een klein knopje in de nav hoeven
-niet gelijk te zijn. Zeg het als je dit breder bedoelt dan dat.
+**Gelijke breedte**: Knoppen die samen in één actierij staan, krijgen
+dezelfde breedte (`display: flex` op de rij, `flex: 1` of een gedeelde
+`min-width` op elke knop). Dat geldt per rij, niet voor alle knoppen op
+een pagina.
 
-**Badges/pills**:
-- Kop-label (`.hero-tag`) — gevuld `var(--or)`, witte tekst,
-  hoofdletters, `border-radius: 3px`.
-- Content-tag onder een sectiekop (`.g-badge`) — lichte `var(--or-faint)`
-  achtergrond, oranje tekst, volledig rond (`border-radius: 100px`),
-  dunne `var(--or-mid)` rand. Vermoedelijk het patroon voor de
-  bouwblok-tags in de scan zelf.
+### Dropdown-knop
 
-**Kaarten**: witte of `var(--bg-warm)` achtergrond, `1px solid
-var(--border)`, `border-radius: 10px`, `padding: 1.8rem`. Terugkerend
-patroon: een gekleurde accentrand aan één zijde (top óf links) geeft de
-categorie of het content-type aan — precies hetzelfde idee als de
-verticale accentbalk bij de bouwblok-koppen in de scan-app.
+Nieuw, nog niet eerder gespecificeerd. Voor acties met meerdere opties
+onder één knop, zoals "Exporteren" op de resultatenpagina (CLAUDE.md
+sectie 3): Eén knop in de gewenste variant hierboven (meestal
+`.btn-outline` of `.btn-compact`, niet `.btn-or`, want dit is meestal
+geen primaire actie), met een klein pijltje. Bij klikken opent een
+menu direct eronder, links uitgelijnd met de knop: Witte achtergrond,
+`1px solid var(--border)`, `border-radius: var(--r)`, zachte schaduw
+(zelfde als een gehoverde kaart). Elke optie in het menu is een rij met
+`padding: .6rem 1rem`, tekst `var(--ink)`, hover `background:
+var(--bg-mid)`. Sluit bij een klik buiten het menu of op een optie.
 
----
+### Badges
 
-## Laag 2 — Scan-specifieke patronen (vorm/gedrag, geen eigen kleur)
+- `.hero-tag`: Kop-label. Gevuld `var(--or)`, witte tekst, hoofdletters,
+  `border-radius: 3px`.
+- `.g-badge`: Tag onder een kop, ook voor de bouwblok-tags. Achtergrond
+  `var(--or-faint)`, oranje tekst, `border-radius: 100px`, rand
+  `var(--or-mid)`.
+- `.admin-badge`: Status van een respondent. `.status-afgerond` groen,
+  `.status-bezig` amber, `.status-uitgenodigd` blauw.
 
-Componenten die alleen in de scan-app voorkomen. Kleur komt altijd uit
-laag 1 hierboven, hier staat alleen vastgelegd hoe ze zich gedragen:
+### Kaarten
 
-- **Radiobuttons**: dunne cirkel met categoriekleur als rand, leeg tot
-  geselecteerd (dan gevuld).
-- **Bouwblok-kop**: verticale accentbalk (categoriekleur) links, titel
-  vetgedrukt, omschrijving direct eronder in `var(--ink-m)`.
-- **Instructievlak**: lichtgrijs vlak (`var(--bg-mid)` of vergelijkbaar)
-  met de vaste tekst "Beantwoord op basis van wat aantoonbaar geregeld is
-  (documenten, ritmes, tooling, afspraken)."
-- **Knop, disabled/inactieve staat**: een duidelijk lichtere,
-  verzadigingsarme versie van de primaire knopkleur, niet zomaar een
-  opacity-verlaging — zichtbaar op het intake-formulier vóór het
-  aanvinken van de toestemmingscheckbox.
-- **Classificatiekleuren** (rood/oranje/groen voor "Basis op Orde"/
-  "Uitbouwen"/"Sterk punt"): bevestigd, zie `--stat-red`/`--stat-amber`/
-  `--stat-green` (+ `-faint` varianten) in laag 1. Bewust géén
-  `--or`/`--gr`, dat zou classificatie met categoriekleur laten
-  samenvallen.
+Witte of `var(--bg-warm)` achtergrond, `1px solid var(--border)`,
+`border-radius: 10px`, `padding: 1.8rem`. Een gekleurde rand aan één zijde
+(boven of links) geeft de categorie of het type inhoud aan.
 
-## Globaal, bevestigd door Joost — geldt op elke pagina
+Elke klikbare kaart (`a.card`, `.assessment-card`, `.admin-row`) krijgt
+bij hover een lichte lift (`translateY(-2px)`) en een zachte schaduw.
 
-- **Ruimte bovenaan de pagina** (extra padding direct onder de nav, vóór
-  de eerste sectie-inhoud begint): bevestigd goed, aanhouden op alle
-  schermen, niet alleen de homepage.
-- **Kaart-hover**: lichte lift (`translateY(-2px)`) plus een zachte
-  schaduw bij hover op klikbare kaarten (bijv. de assessment-kaarten op
-  scherm 1). Bevestigd, geldt voor kaarten overal in de app, niet alleen
-  daar waar het nu zichtbaar is.
-- **Nav-gedrag — definitief besloten, niet langer open**: `position:
-  sticky`, permanent witte achtergrond, `3px solid var(--or)` onderrand,
-  zachte schaduw, logo op 44px. Géén transparant-over-hero-gedrag zoals
-  in coniche-v4.html — dat patroon is bewust losgelaten. Bron:
-  `components.css`, met de expliciete toelichting dat dit is overgenomen
-  van de bestaande BOKS-app (`.topbar`), waar het al in de praktijk
-  werkt. Sander bouwt dit patroon, geen van beide eerdere varianten.
-  **Nieuw**: vaste hoogte `height: var(--nav-h)` (4.5rem) in plaats van
-  hoogte die meebeweegt met de inhoud — nodig zodat de sidebar in de
-  doorloopflow daar sticky tegenaan kan zetten, zie hieronder. Geldt
-  alleen boven de 900px-breakpoint waar `.nav-right` niet wrapt (zie de
-  bestaande `@media (max-width: 640px)`-regel op `.nav-right`); onder
-  900px is `.flow-sidebar` toch al `position: static` (zie de bestaande
-  `@media (max-width: 900px)`-regel), dus daar speelt dit niet.
+### Formulieren
 
-## Bevestigde componenten uit components.css / charts.css / admin.css
+`.field` geldt voor tekst-, e-mail-, wachtwoord- en getalvelden (in
+`components.css` stond alleen tekst). Focus-state: Rand `var(--or)` met
+een zachte ring in `var(--or-faint)`.
 
-Niet hier herhaald regel voor regel, dit zijn de bestanden zelf — alleen
-een routekaart van wat erin zit, zodat je weet waar je moet zijn:
+### Doorloopflow
 
-- **Doorloopflow** (`.flow-layout`, `.flow-sidebar`, `.flow-main`):
-  sidebar 300px vast, hoofdgedeelte flexibel, 1 kolom onder 900px breed.
-  Geen eigen logo meer in de sidebar (zat er eerder dubbel in, nu terecht
-  verwijderd — logo zit alleen nog in de gedeelde nav). Voortgangsbalk,
-  categorienaam in categoriekleur (via `--accent`), bouwblok-status in 3
-  staten — onbegonnen (lege cirkel), bezig (gevuld in categoriekleur),
-  afgerond (altijd `--stat-green`, ongeacht categorie).
-- **Sticky sidebar — correctie, huidige bouw is fout**: `.flow-sidebar`
-  heeft nu wel `overflow-y: auto`, maar zonder begrensde hoogte doet dat
-  niets — de sidebar scrollt gewoon mee met de rest van de pagina in
-  plaats van op zijn plek te blijven staan. Fix (alleen boven de
-  900px-breakpoint, zie hierboven bij nav):
-  ```css
-  .flow-sidebar {
-    position: sticky;
-    top: var(--nav-h);
-    height: calc(100vh - var(--nav-h));
-    overflow-y: auto;
-  }
-  ```
-  Dat geeft de sidebar precies één eigen, intern scrollgebied — geen
-  dubbele scrollbar op de pagina — terwijl `.flow-main` gewoon normaal
-  meescrollt met de rest van de pagina.
-- **Radiobuttons**: rand én gevulde stip in categoriekleur (`--accent`),
-  niet vast oranje — dat had ik eerder generiek beschreven, nu
-  preciezer.
-- **Toelichting-overlay**: `.toelichting-link` (icoon naast de
-  bouwblok-titel) opent `.modal-overlay`/`.modal-box`. Bevestigt de
-  aanname uit v1-aanpassingen.md punt 3.
-- **Classificatiecirkel en legenda** (`.classificatie-cirkel`,
-  `.legenda`): voor de overall-score en de "Basis op Orde/Uitbouwen/
-  Sterk punt"-legenda op het resultatenscherm.
-- **Bar- en radar-chart** (`charts.css`): bar-rijen kleuren op
-  classificatie (`--kleur`, default `--stat-amber`), niet op categorie —
-  consistent met wat al in CLAUDE.md sectie 4 stond. Radar is SVG-
-  gebaseerd.
-- **Formuliervelden**: focus-state nu bekend — oranje rand plus een
-  zachte ring in `--or-faint`. Dit was een open punt, is opgelost.
-- **Kaart-hover is nu letterlijk generiek**: de CSS-selector is
-  `a.card:hover, .assessment-card:hover`, dus elke klikbare kaart met de
-  `.card`-klasse krijgt de lift + schaduw, niet alleen de
-  assessment-kaarten. Zelfde patroon bevestigd op `.admin-row:hover` in
-  admin.css. Geen losse afspraak meer nodig per plek.
-- **Nav-actieknoppen**: `.nav-right .btn` bestaat nu, expliciet bedoeld
-  voor "resultatenscherm: terug naar de scan + exporteren" (letterlijk zo
-  in de CSS-comment). Dit is precies wat in v1-aanpassingen.md punt 1
-  gevraagd werd — CSS-kant staat klaar, de daadwerkelijke koppeling
-  (welke knoppen, welke acties) moet Sander nog bouwen.
-- **Admin hergebruikt de publieke nav/footer** — expliciet zo in
-  `admin.css` gedocumenteerd ("zelfde logo, zelfde balk"), met alleen een
-  extra "terug"-link binnen diezelfde balk. Bevestigt wat
-  admin-beheerpagina.md al aannam.
-- **Admin-componenten**: inklapbare bouwblok-kaarten (`.admin-bouwblok-
-  card`, `<details>/<summary>`) voor het bewerken van bouwblokken en
-  vragen, statusbadges voor respondenten — nu alle drie statussen gedekt:
-  `.status-afgerond` (groen), `.status-bezig` (amber), en `.status-
-  uitgenodigd` (nu toegevoegd, blauw-getint — sluit het eerdere open punt
-  hierover af).
+- **Layout**: Sidebar 300px, hoofdgedeelte flexibel. Het logo staat
+  alleen in de nav, niet in de sidebar.
+- **Sidebar**: Voortgangsbalk, categorienaam in categoriekleur (via
+  `--accent`), status per bouwblok: Leeg (niet begonnen), gevuld in
+  categoriekleur (bezig), `--stat-green` (afgerond, ongeacht categorie).
+- **Bouwblok-kop**: Verticale accentbalk in categoriekleur, titel
+  vetgedrukt, omschrijving eronder in `var(--ink-m)`.
+- **Toelichting**: `.toelichting-link` naast de titel opent
+  `.modal-overlay` met `.modal-box`.
+- **Instructievlak**: Vlak in `var(--bg-mid)` met de vaste
+  instructietekst.
+- **Radiobuttons**: Rand en gevulde stip in categoriekleur (`--accent`).
+- **Scans zonder categorie-laag** (bijv. de AI-Volwassenheidsscan): Overal
+  waar hierboven `--accent` staat, valt dat terug op `--or` zodra er geen
+  categoriekleur is om te zetten (`var(--accent, var(--or))`, al zo
+  gebouwd in `components.css`). Dat is de kleurkeuze voor elk scherm dat
+  bouwblokken toont zonder categorieën, niet alleen de doorloopflow, bijv.
+  ook `ai-domeinenmodel-visual.md`.
 
-## Nog open — wacht op designbeslissing van Joost
+### Resultaten
 
-- **Footer-logo**: de CSS staat al klaar (`.mini-logo`, 28px — preciezer
-  dan de 30px die ik eerder noemde), maar wordt nog niet gebruikt. Zelfde
-  reden als eerder: vereist een witte/inverse logovariant, bewust geen
-  prioriteit nu. Sander bouwt de class niet actief in totdat dit besluit
-  valt.
+- `.classificatie-cirkel` en `.legenda` voor de overall score en de
+  legenda.
+- Staafdiagram (`charts.css`): Kleur volgt de scorekleur van die balk
+  (`--kleur` gezet op `--score-1` t/m `--score-5`), niet de categorie.
+  Radar als SVG.
+
+### Beheer
+
+De beheeromgeving gebruikt dezelfde nav en footer, met alleen een extra
+terug-link in de balk. Inklapbare bouwblok-kaarten (`.admin-bouwblok-card`
+met `<details>`) voor contentbeheer, tabelstijl uit `admin.css`.
+
+### Footer
+
+Op elk scherm, met dezelfde `.container`-breedte als de rest van de
+pagina. Twee links naast elkaar: "Beheer" (naar de inlogpagina) en
+"Privacy" (naar `privacy-pagina.md`). Geen logo (zie Open punten,
+Footer-logo, en Logo hierboven).
 
 ---
 
-## Laag 3 — Afgekeurd
+## Niet gebruiken
 
-Deze categoriekleuren zijn op enig moment fout gerenderd geweest
-(gemeten met pixelanalyse, ver vóór het merkpalet bekend was). Niet
-gebruiken, alleen hier zodat niemand ze per ongeluk terugzet:
+Eerder gebruikte categoriekleuren die niet (meer) gebruikt worden:
 
-| Categorie | Afgekeurde kleur | Was bedoeld als | Afstand tot officieel |
-|---|---|---|---|
-| Organisatie | `#0da2e7` | Dark Blue `#225BA0` | Te fel/cyaan |
-| Proces & Tech | `#7c3bed` | Dark Purple `#392944` | Compleet mis, geen enkele gelijkenis |
-| Mens | `#21c45d` | Dark Green `#197F4E` | Te fel/fluorescerend |
-| Fundament | `#e7b008` | Dark Yellow `#FFC043` | Te donker/mosterdkleurig |
-| Overkoepelend | `#f25d26` | Dark Orange `#FF671F` | Dichtbij, niet exact |
+| Categorie | Niet gebruiken | Wel |
+|---|---|---|
+| Overkoepelend | `#f25d26` | `--or` |
+| Organisatie | `#0da2e7` | `--bl` |
+| Proces & Tech | `#7c3bed` | `--pu` |
+| Mens | `#21c45d` | `--gr` |
+| Fundament | `#e7b008`, `#ffc043`, `#8a6d00` | `--fu` |
+
+## Open punten
+
+- Footer-logo: Vraagt een witte variant van het logo, nu geen prioriteit.
+- Focus- en error-states bij formuliervalidatie.

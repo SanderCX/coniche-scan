@@ -1,29 +1,32 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties, verwijderOrganisaties } from "@/lib/db";
 import { useBulkSelect } from "@/lib/useBulkSelect";
 import { IndeterminateCheckbox } from "@/components/beheer/IndeterminateCheckbox";
 import { BulkToolbar } from "@/components/beheer/BulkToolbar";
+import { BevestigModal } from "@/components/beheer/BevestigModal";
 
 export default function OrganisatiesPage() {
   const assessments = useAssessments();
   const organisaties = useOrganisaties();
   const bulk = useBulkSelect(organisaties.map((o) => o.id));
+  const [verwijderenOpen, setVerwijderenOpen] = useState(false);
 
-  function handleVerwijderen() {
-    const ids = [...bulk.selected];
-    const respondentAantal = organisaties
-      .filter((o) => ids.includes(o.id))
-      .reduce((sum, o) => sum + o.respondenten.length, 0);
-    const melding =
-      respondentAantal > 0
-        ? `${ids.length} organisatie(s) verwijderen? Dit verwijdert ook ${respondentAantal} respondent(en) en hun ingevulde antwoorden. Dit kan niet ongedaan gemaakt worden.`
-        : `${ids.length} organisatie(s) verwijderen? Dit kan niet ongedaan gemaakt worden.`;
-    if (!window.confirm(melding)) return;
-    verwijderOrganisaties(ids);
+  const ledenAantal = organisaties
+    .filter((o) => bulk.selected.has(o.id))
+    .reduce((sum, o) => sum + o.leden.length, 0);
+  const verwijderMelding =
+    ledenAantal > 0
+      ? `${bulk.selected.size} organisatie(s) verwijderen? Dit verwijdert ook ${ledenAantal} respondent(en) en hun ingevulde antwoorden. Dit kan niet ongedaan gemaakt worden.`
+      : `${bulk.selected.size} organisatie(s) verwijderen? Dit kan niet ongedaan gemaakt worden.`;
+
+  function handleVerwijderenBevestigd() {
+    verwijderOrganisaties([...bulk.selected]);
     bulk.clear();
+    setVerwijderenOpen(false);
   }
 
   return (
@@ -48,12 +51,22 @@ export default function OrganisatiesPage() {
             Alles selecteren
           </label>
 
-          <BulkToolbar aantal={bulk.selected.size} onVerwijderen={handleVerwijderen} />
+          <BulkToolbar aantal={bulk.selected.size} onVerwijderen={() => setVerwijderenOpen(true)} />
+          <BevestigModal
+            open={verwijderenOpen}
+            titel="Organisaties verwijderen"
+            bericht={verwijderMelding}
+            onBevestigen={handleVerwijderenBevestigd}
+            onAnnuleren={() => setVerwijderenOpen(false)}
+          />
 
           <div className="admin-list">
             {organisaties.map((org) => {
-              const assessment = assessments.find((a) => a.id === org.assessmentId);
-              const afgerond = org.respondenten.filter((r) => r.status === "afgerond").length;
+              const scanNamen = org.scanUitvoeringen
+                .map((s) => assessments.find((a) => a.id === s.assessmentId)?.naam ?? "Onbekend type")
+                .join(", ");
+              const alleInvullingen = org.scanUitvoeringen.flatMap((s) => s.invullingen);
+              const afgerond = alleInvullingen.filter((i) => i.status === "afgerond").length;
               return (
                 <div key={org.id} className="flex items-center gap-3">
                   <input
@@ -65,8 +78,10 @@ export default function OrganisatiesPage() {
                     <div>
                       <p className="admin-row-titel">{org.naam}</p>
                       <p className="admin-row-sub">
-                        {assessment?.naam ?? "Onbekend type"} · {org.respondenten.length}{" "}
-                        respondenten, {afgerond} afgerond
+                        {org.scanUitvoeringen.length === 0
+                          ? "Nog geen scan gepland"
+                          : scanNamen}{" "}
+                        · {org.leden.length} respondenten, {afgerond} afgerond
                       </p>
                     </div>
                   </Link>

@@ -1,411 +1,375 @@
-# Coniche Scan — Projectspecificatie
+# Coniche Scan: Projectspecificatie
 
-Herbouw van de klantcontact-volwassenheidsscan (voorheen "Volwassenheidsmodel
-Klantcontact"). Dit is de doorlopende specificatie van de Coniche Scan-app:
-architectuur, datamodel en scoringslogica staan hier, en groeien mee
-terwijl er iteratief functionaliteit en nieuwe scans (assessment-types)
-bijkomen. Content per scan-type staat in losse bestanden (sectie 6),
-lopende aanpassingen en terugkoppeling naar de bouwer in
-v1-aanpassingen.md, wat bewust nog niet is opgepakt in BACKLOG.md. Waar
-dit document ambigu of onvolledig is, wordt dat hier opgelost, niet
-losgelaten.
+Doorlopende specificatie van de Coniche Scan-app: Uitgangspunten,
+scoringslogica en schermflow, met verwijzingen naar het datamodel en de
+opmaak. Het document groeit mee terwijl er
+iteratief functionaliteit en nieuwe scans (assessment-types) bijkomen.
+Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 
-## Kernprincipe
+## Bestanden
 
-Bouw de flow generiek over data heen, niet met hardcoded schermen per
-bouwblok. Bouwblokken, vragen, schaal-labels en organisatievelden zijn data
-(zie hieronder), geen componentstructuur. Dat is het verschil tussen "een
-beheerscherm bouwen dat deze JSON bewerkt" en "alles overnieuw bouwen"
-zodra er een nieuw scan-type of veld bijkomt.
+| Bestand | Inhoud |
+|---|---|
+| `CLAUDE.md` | Dit document. Uitgangspunten, scoring, schermflow |
+| `datamodel.md` | Het datamodel: Deel 1 gebouwd, deel 2 (rollen, rechten, inlog) voorstel |
+| `stylesheet.md` | Alle opmaak: Kleuren, typografie, componenten |
+| `visie-coniche.md` | Visie op goed klantcontact en de vijftien bouwstenen |
+| `inhoudelijk-fundament.md` | Hoe visie, bouwstenen en scan samenhangen, met status per onderdeel |
+| `content-klantcontact-volwassenheid.md` | Vragen en tags van de Klantcontact Volwassenheidsscan |
+| `content-ai-scan.md` | Vragen van de AI-volwassenheidsscan |
+| `content-zorgscan.md` | Vragen van de Zorgscan, sector-variant van de Klantcontact Volwassenheidsscan |
+| `visie-ai-klantcontact.md` | Visie op AI in klantcontact, per domein van de AI-volwassenheidsscan |
+| `content-2030.md` | Duidingsstuk "Klantcontact richting 2030", los van de scanresultaten |
+| `bouwstenenmodel-visual.md` | Spec voor het interactieve overzicht van de 15 bouwstenen |
+| `ai-domeinenmodel-visual.md` | Spec voor het interactieve overzicht van de 8 AI-domeinen |
+| `privacy-pagina.md` | De privacypagina |
+| `export-pdf-visual-volwassenheidsscan.md` | PDF-export van één ingevulde scan: gedeelde regels (bron, slotsectie, bulk-export) plus de visuele opbouw voor de Klantcontact Volwassenheidsscan |
+| `export-pdf-visual-ai-scan.md` | PDF-export: visuele opbouw voor de AI-volwassenheidsscan, verschillen t.o.v. hierboven |
+| `export-indesign.md` | Export van één ingevulde scan als XML + losse chart-afbeeldingen, voor handmatige verwerking in een InDesign-sjabloon |
+| `export-csv.md` | Export naar CSV: kolommen voor de "Als CSV"-optie, één of meerdere scans |
+| `admin-beheerpagina.md` | De beheeromgeving |
+| `import-legacy-scans.md` | Import van scans (CSV): de oude, stopgezette tool, en onze eigen export teruglezen |
+| `sbi-indeling.md` | Vaste optielijst voor Sector/Subsector (SBI2025, top 2 niveaus) |
+| `v1-aanpassingen.md` | Afwijkingen van de spec (bugs) en open vragen aan Sander. Besloten aanpassingen aan de spec zelf komen direct in het betreffende bestand hierboven, niet hier. |
+| `backlog.md` | Bewust nog niet opgepakt |
 
-De doorloopflow is gebouwd, met de content van zowel de Klantcontact
-Volwassenheidsscan als de AI-Volwassenheidsscan (zie sectie 6) al
-ingevuld. Actuele status van wat er wel/niet al staat:
-- **In ontwikkeling**: het beheerscherm (zie `admin-beheerpagina.md` —
-  Organisaties-overzicht en Ingevulde-scans-overzicht bestaan al,
-  content-beheer en organisatievelden-beheer nog niet)
-- **Nog te bouwen**: het verificatiemechanisme voor respondent-toegang
-  (zie v1-aanpassingen.md punt 2, nog actief) — geen los wachtwoord of
-  account is wel het uitgangspunt, maar de flow zelf staat er nog niet
-- **Nog bewust uitgesteld**: AI-gegenereerde managementsamenvatting
-  (placeholder in UI, geen API-integratie), aggregatie van scores over
-  meerdere respondenten binnen één organisatie (nader uit te werken),
-  PDF/CSV-export als werkende functie (knoppen staan er, zie
-  admin-beheerpagina.md punt 6 voor de aanpak)
+## Uitgangspunten
 
----
+- Bouw de flow generiek over data heen, niet met hardcoded schermen per
+  bouwblok. Bouwblokken, vragen, schaallabels en organisatievelden zijn
+  data. Een nieuw scan-type of veld vraagt dan een beheerscherm dat die
+  data bewerkt, geen nieuwe flow.
+- De app hoeft voorlopig niet responsive te zijn. Ontwerp en test voor
+  desktop.
 
-## 1. Datamodel
+## Status
 
-### Assessment (scan-type)
+De doorloopflow en de beheeromgeving (Organisaties, Metingen,
+Ingevulde scans) zijn gebouwd, met de content van de Klantcontact
+Volwassenheidsscan, de AI-volwassenheidsscan en de Zorgscan (sector-variant
+van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
 
-Er is straks meer dan één scan-type (Klantcontact Volwassenheid, Zorg-variant,
-AI-Volwassenheid, later een Adoptiescan). Bouw dus geen vaste lijst
-bouwblokken in de flow-logica, maar een `Assessment`-object waar de intake-
-en doorloopflow generiek doorheen navigeert.
+- **Opslag**: Alles staat nog in de localStorage van de browser. Een
+  Postgres-database (Neon) volgt later (`backlog.md`). Tot die tijd werkt
+  een link alleen in de browser waar de data staat.
+- **Inlog beheer**: E-mail en wachtwoord. 2FA en rollen volgen met de
+  backend (`datamodel.md` deel 2).
+- **Toegang respondenten**: Via een korte persoonlijke link (10-teken
+  code, cryptografisch gegenereerd, zie `datamodel.md`, Toegangscode),
+  zonder verificatiecode. E-mailverificatie volgt als er een backend en
+  een Coniche-mailserver zijn (`backlog.md`).
+- **Bewust uitgesteld**: AI-managementsamenvatting, aggregatie over
+  meerdere respondenten (`backlog.md`).
 
-```
-Assessment {
-  id: string
-  naam: string                    // bijv. "Klantcontact Volwassenheid"
-  subtitel: string                // "±30 minuten. Heldere inzichten. Direct verbeterkansen."
-  beschrijving: string
-  doelgroep: string                // "MT, operations en CX-verantwoordelijken..."
-  icoon: string
-  geschatteDuur: string             // "±30 minuten"
-  categorieen: Categorie[] | null   // optioneel — zie hieronder
-  bouwblokken: Bouwblok[] | null    // gebruikt i.p.v. categorieen als die ontbreken
-  scoresPerGroepGesorteerd: boolean // AI-scan sorteert op waarde, Klantcontact-scan niet
-  schaal: SchaalLabel[5]            // globaal per Assessment, zie sectie 3
-  organisatieVelden: VeldDefinitie[] // zie sectie 2
-}
-```
+## Terminologie
 
-Niet elk Assessment-type heeft een categorie-laag. De Klantcontact
-Volwassenheidsscan groepeert 15 bouwblokken in 5 categorieën, de
-AI-Volwassenheidsscan (zie `content-ai-scan.md`) heeft 8 domeinen plat
-onder elkaar, zonder groepering. Bouw de flow dus zo dat categorieën
-optioneel zijn: als `categorieen` leeg is, toont de sidebar en de
-resultatenpagina de `bouwblokken` direct, zonder categorie-kop erboven.
-Forceer dit niet kunstmatig door 8 categorieën met elk 1 bouwblok aan te
-maken, dat is nep-structuur voor iets dat het brondata gewoon niet heeft.
-
-### Categorie
-
-```
-Categorie {
-  id: string
-  naam: string                     // "Overkoepelend", "Organisatie", "Proces & Tech", "Mens", "Fundament"
-  kleur: string                    // accentkleur, zie sectie 4
-  volgorde: number
-  bouwblokken: Bouwblok[]
-}
-```
-
-### Bouwblok
-
-```
-Bouwblok {
-  id: string
-  volgnummer: number               // 1 t/m 15, doorlopend over alle categorieën
-  naam: string
-  omschrijving: string             // de vraagzin onder de titel
-  toelichting: string              // langere uitleg, zie overlay in sectie 5 — apart van omschrijving, bewerkbaar in beheer
-  tags: string[]                   // variabel aantal! Financial control heeft er maar 1, andere 5-6
-  vragen: Vraag[]                  // steeds 4 in de huidige scan, maar niet hardcoded aannemen
-}
-```
-
-### Vraag
-
-```
-Vraag {
-  id: string
-  volgnummer: number               // 1 t/m 4 binnen het bouwblok
-  tekst: string
-}
-```
-
-### SchaalLabel
-
-Vaste 1–5-schaal, globaal ingesteld per Assessment (dus voor de hele
-Klantcontact Volwassenheidsscan identiek over alle 60 vragen — bij een
-toekomstige AI-scan of Adoptiescan mag dit een andere set zijn):
-
-```
-1: Niet aanwezig
-2: Deels / incidenteel
-3: Aanwezig en meestal toegepast
-4: Structureel geborgd en gemeten
-5: Geoptimaliseerd en continu verbeterd
-```
-
-### Organisatie (scan-instantie, aangemaakt door Coniche in beheer)
-
-Dit is de grote wijziging ten opzichte van de oude versie: een scan wordt
-aangemaakt op organisatieniveau door Coniche, met vaste kenmerken die de
-respondenten niet mogen aanpassen, en respondenten worden per e-mailadres
-uitgenodigd.
-
-```
-Organisatie {
-  id: string
-  assessmentId: string
-  naam: string
-  kenmerken: { [veldId: string]: waarde }   // ingevuld door Coniche, read-only voor respondenten
-  respondenten: Respondent[]
-}
-```
-
-`kenmerken` volgt de `organisatieVelden`-lijst van het Assessment
-(instelbaar in beheer, zie sectie 2). De veldenlijst uit sectie 2 staat
-als data vast; het beheerscherm om die velden zelf te bewerken staat nog
-niet in `admin-beheerpagina.md` als gebouwd (zie de status bovenaan dit
-document).
-
-### Respondent
-
-```
-Respondent {
-  id: string
-  organisatieId: string
-  email: string                    // enige verplichte veld bij uitnodigen
-  naam: string | null              // leeg bij uitnodigen, pas gevuld zodra de respondent scherm 4 (intake) invult — zie toelichting hieronder
-  rol: string
-  team: string                     // optioneel
-  notities: string                 // optioneel
-  antwoorden: { [vraagId: string]: number }  // 1-5 — gaat uit van 1 invulling per respondent, zie vlag hieronder
-  opmerkingenPerBouwblok: { [bouwblokId: string]: string }
-  status: "uitgenodigd" | "bezig" | "afgerond"
-  gestartOp: datetime
-  afgerondOp: datetime | null
-}
-```
-
-**Bekende beperking, bewust nog niet opgelost**: dit model gaat uit van
-precies 1 invulling per respondent. Zodra een respondent later nogmaals
-een scan moet kunnen invullen (BACKLOG.md), verhuizen
-`antwoorden`/`opmerkingenPerBouwblok`/`status`/`gestartOp`/`afgerondOp`
-naar een los `ScanInvulling`-record (N per Respondent) in plaats van
-vaste velden hier. Nu nog niet bouwen, wel al rekening mee houden bij
-bijvoorbeeld verwijderacties in `admin-beheerpagina.md`.
-
-**`naam` is leeg tot de intake is voltooid**: bij het aanmaken van een
-uitnodiging heeft Coniche alleen het e-mailadres. In elk beheeroverzicht
-(bijv. "Ingevulde scans") toont de Naam-kolom dan een fallback: het
-e-mailadres zelf, cursief of anderszins herkenbaar als placeholder — niet
-een lege cel. Zodra de respondent de verificatie doorloopt (v1-
-aanpassingen.md punt 2) én scherm 4 (Respondent-intake: naam, rol, team,
-notities) invult en verzendt, wordt `naam` overschreven met wat de
-respondent zelf invulde, en toont de tabel vanaf dan die echte naam in
-plaats van het e-mailadres.
-
-Dat moment (intake voltooid) is ook waar de status van `"uitgenodigd"`
-naar `"bezig"` springt — niet pas bij de eerste beantwoorde vraag. Dat is
-zichtbaar in de praktijk: een net-uitgenodigde respondent staat op 0%
-met status "uitgenodigd", maar zodra iemand de intake heeft ingevuld
-staat de status al op "bezig" terwijl de voortgang nog 0% is.
-
-Let op: organisatienaam, sector/subsector etc. staan NIET meer in het
-korte respondent-formulier — die liggen al vast op het `Organisatie`-
-niveau voordat de respondent begint. Het respondent-formulier bevat
-alleen nog: naam, rol/functie, team (optioneel), notities (optioneel).
+In de interface en in alle specs: **Organisatie**, **Meting** (een
+geplande ronde van één scan-type bij één organisatie), **Respondent** (de
+persoon), **Ingevulde scan** (één invulling door één respondent binnen
+één meting). Niet "leden" of "scanuitvoering". In de code heten sommige
+typen nog anders; dat staat in het datamodel.
 
 ---
 
-## 2. Organisatievelden (instelbaar in beheer, nu als vaste data)
+## Datamodel en opmaak
 
-Bron: intern rapport dat Coniche zelf samenstelt over klanten (zie
-voorbeeld "4a"). Hardcoded als JSON-structuur, zodat het beheerscherm
-eroverheen kan zonder de flow te herbouwen — zie `admin-beheerpagina.md`
-punt 3 voor de status daarvan.
+Het datamodel en de opmaak staan in eigen bestanden. Ze worden via een
+import bij elke sessie meegeladen:
 
-```
-VeldDefinitie {
-  id: string
-  label: string
-  type: "tekst" | "getal" | "select" | "select-met-verdeling" | "percentage" | "groep"
-  opties?: string[]                // vaste antwoordcategorieën, indien van toepassing
-  subvelden?: VeldDefinitie[]       // voor herhalende structuren, zie techstack hieronder
-}
-```
+- Datamodel (deel 1 gebouwd, deel 2 voorstel): @datamodel.md
+- Opmaak: @stylesheet.md
 
-Veldengroepen uit het bronmateriaal:
-
-**Volume en klantbasis**
-- Totaal aantal klanten (getal, met B2B/B2C-verdeling als percentage)
-- Totaal aantal contacten per jaar, per kanaal: Call, Voicebot, Livechat,
-  Chatbot, E-mail, Whatsapp (elk een getal, "niet van toepassing" toegestaan)
-- Adoptie mijnomgeving/app (percentage)
-
-**Digitalisering**
-- Percentage 2026 (getal)
-- Ambitie 2030 (getal)
-
-**Techstack** — zes herhalende structuren, elk met dezelfde twee subvelden
-(leverancier, zelf/extern ondersteund):
-- Contact center
-- Conversational AI
-- CRM
-- Kennismanagement
-- LLM-oplossing
-- IT en deployment
-
-Model dit dus als één herbruikbare `TechstackItem { categorie, leverancier,
-ondersteuning: "zelf" | "extern" }`, niet als 12 losse velden.
-
-**FTE**
-- Klantcontact medewerkers (getal, met inhouse/BPO-verdeling)
-- Klantcontact management & support (getal)
-- IT DevOps medewerkers (getal, met percentage gericht op Digital)
-
-**KPI's** — vaste set, elk een los numeriek veld: AHT, NPS, CSAT, SLA, FTR
+Wijzig je iets aan de datatypen of de database, lees dan eerst het
+datamodel. Wijzig je iets aan de vormgeving, dan de stylesheet.
 
 ---
 
-## 3. Scoringslogica
+## 1. Scoringslogica
 
-- **Bouwblokscore** = gemiddelde van de scores op de vragen binnen dat
-  bouwblok, afgerond op 1 decimaal.
-- **Categoriescore** = gemiddelde van de bouwblokscores binnen die
+- **Bouwblokscore**: Gemiddelde van de vragen binnen het bouwblok,
+  afgerond op 1 decimaal.
+- **Categoriescore**: Gemiddelde van de bouwblokscores binnen de
   categorie, afgerond op 1 decimaal.
-- **Overall score** = gemiddelde van ALLE 15 bouwblokscores samen — dus
-  NIET het gemiddelde van de 5 categoriescores. Categorieën met meer
-  bouwblokken (Organisatie, Proces & Tech, Mens hebben er 4; Overkoepelend
-  heeft er 2; Fundament heeft er 1) wegen dus niet gelijk mee als je via
-  categoriegemiddelden zou rekenen — bouw dit bewust op bouwblok-niveau.
-- **Afronding**: standaard "half-away-from-zero" (zoals JS `toFixed(1)`).
-- **Voortgang** = aantal beantwoorde vragen / totaal aantal vragen in de
-  hele scan, dus op vraagniveau, niet op bouwblokniveau.
-- **Bouwblok-status in sidebar**: drie staten — nog niet begonnen (grijs
-  nummer), bezig (gevuld cirkeltje + "x/4" naast de titel), afgerond (groen
-  vinkje).
+- **Overall score**: Gemiddelde van alle bouwblokscores samen, dus niet
+  het gemiddelde van de categoriescores. Categorieën hebben een ongelijk
+  aantal bouwblokken (2, 4, 4, 4, 1) en zouden anders ongelijk meewegen.
+- **Afronding**: Half-away-from-zero (zoals JS `toFixed(1)`).
+- **Voortgang**: Beantwoorde vragen gedeeld door het totaal aantal vragen
+  in de scan.
+- **Status in de sidebar**: Nog niet begonnen (grijs nummer), bezig
+  (gevuld cirkeltje met "x/4" naast de titel), afgerond (groen vinkje).
 
-### Classificatie (Basis op Orde / Uitbouwen / Sterk punt)
+### Classificatie
 
-Legenda uit het resultatenscherm:
-- Rood — "Basis op Orde": "De basis moet op dit punt eerst op orde gemaakt
-  worden om verder te kunnen uitbouwen."
-- Oranje — "Uitbouwen": "De basis is op orde en je bent onderweg, maar er
-  is nog een verbeterstap nodig om richting excellent te gaan."
-- Groen — "Sterk punt": "Hier is de organisatie al heel goed in. Benut dit
-  optimaal en bouw het verder uit, ook ter ondersteuning van zwakkere
-  bouwblokken."
+- "Basis op Orde" (onder 2,5): "De basis moet op dit punt eerst op orde
+  gemaakt worden om verder te kunnen uitbouwen."
+- "Uitbouwen" (2,5 tot en met 3,49): "De basis is op orde en je bent
+  onderweg, maar er is nog een verbeterstap nodig om richting excellent
+  te gaan."
+- "Sterk punt" (vanaf 3,5): "Hier is de organisatie al heel goed in.
+  Benut dit optimaal en bouw het verder uit, ook ter ondersteuning van
+  zwakkere bouwblokken."
 
-**Grens: < 2,5 rood, 2,5–3,49 oranje, ≥ 3,5 groen.**
+### Scorekleuren
 
-### Top 3 Sterktes / Top 3 Verbeterkansen
+Elke score krijgt een kleur op basis van de afgeronde waarde: 5
+donkergroen, 4 lichtgroen, 3 geel, 2 oranje, 1 rood. Basis op Orde is
+daarmee rood of oranje, Uitbouwen geel, Sterk punt licht- of donkergroen.
+Tokens en details in `stylesheet.md`.
 
-Simpelweg de 15 bouwblokken gesorteerd op score: hoogste 3 = Sterktes,
-laagste 3 = Verbeterkansen.
+### Top 3
 
----
-
-## 4. Kleuren per categorie
-
-Bevestigd over alle 15 bouwblokken in de interactieve doorloopflow (de
-PDF-export gebruikt overigens overal oranje, ongeacht categorie — dat is
-bewust anders, geen fout):
-
-- Overkoepelend: oranje
-- Organisatie: blauw
-- Proces & Tech: paars
-- Mens: groen
-- Fundament: geel/goud
-
-Voor alle opmaak — exacte hex-waarden per categorie, tekstkleuren,
-randen/achtergronden, classificatiekleuren, knopstaten, en wat nog niet
-met zekerheid vastligt (font-family, spacing, interactiestaten) — is
-`stylesheet.md` de enige bron. Niet hier dupliceren, dat voorkomt dat de
-twee documenten uit elkaar gaan lopen zodra er een kleur wijzigt.
+De bouwblokken gesorteerd op score: De hoogste 3 zijn de sterktes, de
+laagste 3 de verbeterkansen.
 
 ---
 
-## 5. Schermflow
+## 2. Kleuren per categorie
 
-**Globale layout, over alle schermen heen**: een gedeelde navigatiebalk
-en footer, exact zoals beschreven in `stylesheet.md` (logo op 44px in de
-nav, sticky met oranje onderrand — géén transparant-wordt-wit-bij-scroll,
-dat patroon is losgelaten; footer voorlopig zonder logo, alleen tekst,
-zie "Nog open" in stylesheet.md). Dit is één component dat op ELK scherm
-hieronder hergebruikt wordt, niet per pagina opnieuw gebouwd — anders
-lopen ze vanzelf uit elkaar. Idem voor alle kleuren/fonts: elk scherm
-gebruikt de
-tokens uit `stylesheet.md`, dat geldt voor alle 6 schermen hieronder,
-niet alleen waar het expliciet herhaald wordt.
+Overkoepelend oranje, Organisatie blauw, Proces & Tech paars, Mens groen,
+Fundament antraciet. De interactieve flow gebruikt deze kleuren; de
+PDF-export gebruikt overal oranje.
 
-**De nav is niet overal identiek**: het logo-deel links is vast, het
-rechterdeel (`.nav-right` in components.css) is contextueel en toont
-scherm-specifieke acties. Op de resultatenpagina (scherm 6) horen daar
-in elk geval "Terug naar scan" (om een antwoord aan te passen) en de
-export-acties (PDF/CSV). Welke acties op de andere schermen in de nav
-thuishoren, is nog niet compleet vastgelegd — dit is een eerste
-vastlegging van het principe, aan te vullen zodra de visuele uitwerking
-verder komt.
-
-**Vaste volgorde binnen `.nav-right`, overal hetzelfde**: eerst de
-pagina-specifieke acties (bijv. "Terug naar scan", "Exporteren" op de
-resultatenpagina, of "Overzicht"/"Ingevulde scans" in de beheeromgeving),
-dan een verticale scheidingslijn, dan als laatste de "verlaat deze
-sectie"-link (bijv. "← Terug naar site" vanuit beheer). Die laatste staat
-altijd uiterst rechts, met een `←`-pijl ervoor, na de scheidingslijn —
-zo leert de gebruiker één vaste plek voor "hier kom ik weg", ongeacht op
-welk scherm. Bevestigd voorbeeld: de beheer-nav volgt dit al exact
-(Overzicht, Organisaties, Ingevulde scans, scheidingslijn, ← Terug naar site).
-
-1. **Kies jouw assessment** — landingspagina met kaarten per Assessment-type
-   (inmiddels Klantcontact Volwassenheid én AI-Volwassenheid ingevuld, zie
-   sectie 6 — de kaarten-component werkt generiek over `Assessment[]` heen)
-2. **Assessment-landingspagina** — titel, hero, 3 feature-cards, "Praktische
-   informatie"-blok met 3 punten (invultijd, direct resultaat, privacy —
-   AI-samenvatting is hier bewust verwijderd, zie sectie 7). Twee aparte
-   CTA's, niet één: een primaire "Start assessment"-knop direct onder de
-   hero (gaat rechtstreeks naar scherm 4, Respondent-intake) én, verderop
-   op de pagina, een aparte "Bekijk wat je krijgt"-knop die naar scherm 3
-   (Voorbeeld-output preview) gaat.
-3. **Voorbeeld-output preview** — dezelfde resultaatcomponenten als scherm 6,
-   gevuld met vaste demo-data (`isPreview: true` of een aparte mock-dataset,
-   zodat de resultaatcomponent maar één keer gebouwd hoeft te worden)
-4. **Respondent-intake** — alleen naam, rol/functie, team (optioneel),
-   notities (optioneel). Organisatiekenmerken liggen al vast op
-   Organisatie-niveau, dus GEEN organisatienaam/sector/subsector-velden meer
-   in dit scherm.
-5. **Doorloopflow** — logo zit alleen nog in de gedeelde nav (sectie 5,
-   "Globale layout"), niet meer los in de sidebar. Sidebar: naam
-   respondent, voortgangspercentage, 5 categorieën met genummerde
-   bouwblokken, actieve bouwblok gemarkeerd, 3 statussen per bouwblok.
-   Hoofdscherm per bouwblok:
-   gekleurde kop met titel + omschrijving, een link/icoon naast de titel
-   die een overlay (modal) opent met de `toelichting`-tekst van dat
-   bouwblok (langere uitleg dan de omschrijving, bron: eerste versie komt
-   uit `coniche_bouwstenen.md`, later bewerkbaar via beheer — zie
-   `admin-beheerpagina.md`), tags, grijze instructieregel ("Beantwoord op
-   basis van wat aantoonbaar geregeld is (documenten, ritmes, tooling,
-   afspraken)."), 4 vragen met 5-punts radiobuttons, één opmerkingenveld
-   onderaan (per bouwblok, niet per vraag). Knoptekst wisselt op het
-   allerlaatste bouwblok van "Volgende" naar "Bekijk resultaten".
-6. **Resultatenscherm** — overall score (groot getal + classificatie-cirkel
-   + voortgang "60 van 60 vragen"), radar chart (alle 15 bouwblokken),
-   staafdiagram per categorie (5 balken, kleur = classificatie niet
-   categoriekleur), Top 3 Sterktes / Top 3 Verbeterkansen, legenda-blok met
-   de 3 classificaties, export-knoppen (PDF/CSV — zie admin-beheerpagina.md
-   punt 6 voor de aanpak als gedeelde exportfunctie)
+Alle opmaakwaarden (hexcodes, tekstkleuren, scorekleuren, knopstaten)
+staan uitsluitend in `stylesheet.md`.
 
 ---
 
-## 6. Content per scan-type
+## 3. Schermflow
 
-De volledige vragenlijst per Assessment-type staat NIET meer in dit
-document, maar in een los contentbestand per scan-type, zodat dit
-architectuurdocument stabiel blijft terwijl de content per scan-type
-groeit of wijzigt:
+### Globale layout
 
-- **Klantcontact Volwassenheid** → `content-klantcontact-volwassenheid.md`
+Eén gedeelde navigatiebalk en footer op elk scherm, als één component,
+vormgegeven volgens `stylesheet.md`. Alle schermen gebruiken de tokens
+uit `stylesheet.md`.
+
+De nav heeft een vast deel links (logo) en een contextueel deel rechts
+(`.nav-right`) met acties voor het scherm waar je bent. Volgorde binnen
+`.nav-right`, overal gelijk:
+
+1. Scherm-specifieke acties, indien aanwezig, uiterst links (bijv.
+   "Naar resultaten →" op de doorloopflow zodra de scan afgerond is,
+   "← Terug naar de scan" samen met "Exporteren" op de resultatenpagina,
+   geen scheidingslijn tussen die twee onderling, "Overzicht",
+   "Organisaties", "Gebruikers" en "Ingevulde scans" in beheer). Geen
+   apart concept meer voor een terug- versus een vooruit-actie binnen
+   hetzelfde scherm: Beide staan hier, uiterst links, ongeacht de
+   richting.
+2. Een verticale scheidingslijn, **alleen als punt 1 iets bevat**.
+3. **De 4 vaste content-links** (Visie, Bouwstenen, AI, 2030, zie
+   verderop in deze sectie). Aanwezig op elk scherm, inclusief de 3
+   publieke schermen (Kies jouw assessment, Assessment-landingspagina,
+   Voorbeeld-output) en het intake-scherm.
+4. Een verticale scheidingslijn, **alleen als punt 5 iets bevat**.
+5. Uiterst rechts de link om de sectie te verlaten, met een `←` ervoor
+   (bijv. "← Terug naar site" vanuit beheer, "← Terug naar Mijn
+   metingen" op de doorloopflow, de resultatenpagina en de 4
+   content-pagina's).
+6. Een verticale scheidingslijn, **alleen als punt 7 iets bevat**.
+7. **Identiteitsmenu, helemaal uiterst rechts, voorbij de exit-actie**:
+   Het Accountmenu (`admin-beheerpagina.md`) aan de beheerkant, het
+   "Mijn gegevens"-menu (verderop in deze sectie) aan de respondentkant.
+   Conventie: Een account-/profielmenu staat vrijwel altijd als
+   allerlaatste element in een nav, voorbij eventuele terug-links, niet
+   ervoor. Dit corrigeert een eerdere versie van deze spec die het
+   Accountmenu links van de exit-actie plaatste.
+
+**Geen scheidingslijn zonder inhoud aan beide kanten.** Op "Mijn
+metingen" bijvoorbeeld staan de 4 links en het "Mijn gegevens"-menu,
+met precies één scheidingslijn ertussen: Geen scherm-specifieke actie
+(punt 1) en geen exit-actie (punt 5) op dat scherm, dus geen
+scheidingslijn dáár.
+
+**"Terug naar" is niet automatisch de exit-actie.** Op de
+resultatenpagina is "Terug naar de scan" een scherm-specifieke actie
+(punt 1, je blijft binnen dezelfde scan), "Terug naar Mijn metingen" is
+de exit-actie (punt 5, je verlaat de scan). Beide staan er dus naast
+elkaar, niet in plaats van elkaar.
+
+Welke acties op de overige schermen in de nav horen, wordt aangevuld
+zodra de visuele uitwerking verder is.
+
+**Logo, contextafhankelijk**: Op de publieke schermen (Kies jouw
+assessment, Assessment-landingspagina, Voorbeeld-output) gaat het logo
+naar `#/`, zoals nu. Zodra een respondent binnen zijn persoonlijke link
+zit (intake, doorloopflow, resultaten, Mijn metingen, en de 4
+content-pagina's), gaat het logo naar "Mijn metingen" in plaats van naar
+de publieke homepage. Dit stond nergens vastgelegd, dus `#/` overal was
+geen afwijking van de spec maar een gat erin.
+
+### Schermen
+
+1. **Kies jouw assessment**: Kaarten per Assessment-type, generiek over
+   `Assessment[]`.
+2. **Assessment-landingspagina**: Titel, hero, 3 feature-cards en een
+   blok "Praktische informatie" met invultijd, direct resultaat en
+   privacy. "Start assessment" staat direct onder de hero maar is
+   uitgeschakeld, met de uitleg dat toegang via een persoonlijke link
+   loopt. Verderop "Bekijk wat je krijgt" (naar scherm 3). Deze pagina
+   wordt later mogelijk een leadgenerator met "Toegang aanvragen"
+   (`backlog.md`).
+3. **Voorbeeld-output**: Dezelfde resultaatcomponenten als scherm 6, met
+   vaste demodata. De resultaatcomponent wordt één keer gebouwd.
+4. **Respondent-intake**: Naam, rol/functie, team en notities. Verplicht
+   toestemmingsvakje ("Ik geef toestemming om mijn antwoorden te delen
+   met Coniche"), met een link naar `privacy-pagina.md`. Alleen
+   client-side verplicht: Er wordt geen aparte toestemmingsstatus
+   opgeslagen, geen nieuw datamodel-veld.
+
+   **Openen van de persoonlijke link**: De link gaat altijd eerst naar
+   "Mijn metingen" (naam volgt), ook als de respondent maar één
+   invulling heeft. Van daaruit door naar de intake (bij
+   `"uitgenodigd"`), de doorloopflow (bij `"bezig"`) of de resultaten
+   (bij `"afgerond"`), per invulling. Bij meerdere invullingen toont de
+   pagina ze allemaal met hun status.
+
+   **In de header van "Mijn metingen" staan de 4 vaste content-links**
+   (zie de Globale layout hierboven, punt 1 van `.nav-right`), elk naar
+   een gewone leespagina (geen modal, geen visual, alleen tekst):
+   - **Visie** → `visie-coniche.md` deel 1
+   - **Bouwstenen** → de interactieve bouwstenenmodel-visual, route
+     `/bouwstenen` (`bouwstenenmodel-visual.md`). Geen aparte leespagina
+     meer: De beschrijving en centrale vraag per bouwsteen
+     (`visie-coniche.md` deel 2) komen uitsluitend nog terug in de
+     modal die opent bij het klikken op een bouwsteen binnen dit
+     component.
+   - **AI** → de interactieve ai-domeinenmodel-visual, route `/ai-scan`
+     (`ai-domeinenmodel-visual.md`). Zelfde patroon: `visie-ai-
+     klantcontact.md` levert de modal-content per domein, geen losse
+     leespagina.
+   - **2030** → `content-2030.md`, gewone leespagina (geen modal, geen
+     visual, alleen tekst)
+
+   **Deze 4 links staan op elk scherm van de app**, zie de Globale
+   layout hierboven. Sta je al op "Visie", dan zie
+   je in `.nav-right` nog steeds ook Bouwstenen/AI/2030, zodat je
+   rechtstreeks naar een andere kunt springen zonder eerst terug te
+   gaan. Op de 4 content-pagina's, de doorloopflow en de
+   resultatenpagina komt daarna, na de scheidingslijn, de losse
+   exit-actie "← Terug naar Mijn metingen" (zie de nav-volgorderegel
+   hierboven). Die 4 links plus de terugknop staan dus naast elkaar, de
+   een vervangt de ander niet. Op Mijn metingen zelf is die terugknop er
+   niet, dat is al de hub.
+
+   Voor nu staan alle vier er altijd, ongeacht welke scan-type(s) de
+   respondent heeft. **Open, te bespreken met Sander**: Of Bouwstenen en
+   AI straks conditioneel worden (alleen tonen bij het bijbehorende
+   scan-type), zoals eerder overwogen. Nog geen besluit, bewust als
+   vraag laten staan in plaats van stilzwijgend een van beide te kiezen.
+
+   **"Mijn gegevens"-menu.** Niet te verwarren met het Accountmenu uit
+   `admin-beheerpagina.md` (dat is voor beheerders, dit is voor
+   respondenten): Een dropdown-knop, zelfde patroon als de Dropdown-knop
+   uit `stylesheet.md`. Zichtbaar op elk scherm waar een respondent-
+   identiteit bestaat: "Mijn metingen", de doorloopflow, de
+   resultatenpagina en de 4 content-pagina's, wanneer bereikt via een
+   persoonlijke link. Niet op de 3 publieke schermen en niet op de
+   intake zelf (daar is nog geen opgeslagen identiteit om te tonen).
+
+   Positie in `.nav-right`: Punt 7 van de nav-volgorderegel in Globale
+   layout hierboven, helemaal uiterst rechts, voorbij de exit-actie
+   "← Terug naar Mijn metingen" (niet ervoor).
+
+   - **Knop**: Label "Mijn gegevens", met het pijltje van de
+     dropdown-knop. Geen naam/e-mail in de knop zelf: Die staan al in
+     de dropdown-inhoud.
+   - **Dropdown-inhoud, rij 1, klikbaar**: "Gegevens bekijken/wijzigen"
+     → opent een modal (dezelfde `.modal-overlay`/`.modal-box` als de
+     toelichting-overlay in de doorloopflow, `stylesheet.md`), niet een
+     losse pagina. In die modal hetzelfde formulier als de intake (naam,
+     rol/functie, team, notities), vooringevuld met de huidige waarden
+     van `Respondent`. Hergebruik van het intake-formulier, geen nieuw
+     formulier bouwen. Opslaan schrijft direct naar `Respondent`, geen
+     aparte bevestigingsstap.
+   - **Dropdown-inhoud, rij 2, klikbaar**: "Uitloggen" → navigeert naar
+     het nieuwe scherm "Toegang" (zie hieronder) en wist de lokale
+     respondent-sessie in deze browser (de `code` die aan deze sessie
+     gekoppeld is, zie `datamodel.md`, Toegangscode). Respondenten
+     hebben geen account om echt op af te melden, dit is het verlaten
+     van de lokale sessie, niet een serverside logout.
+
+4a. **Toegang** (nieuw scherm, publiek, geen inlog nodig): De
+    bestemming van "Uitloggen" hierboven, en de eerste stap van de
+    toekomstige e-mailverificatie-flow uit `datamodel.md` deel 2
+    (`VerificatieCode`). Nu al gebouwd, zonder de code-stap erachteraan:
+
+    - Eén e-mailveld en een knop "Versturen".
+    - Na versturen: Een vaste, neutrale bevestigingstekst, ongeacht of
+      het adres bestaat (bijv. "Als dit e-mailadres bekend is, ontvang
+      je een nieuwe toegangslink"). Geen daadwerkelijke code of link
+      wordt verstuurd: Dat vraagt de Coniche-mailserver, die er nog
+      niet is (`backlog.md`). Dit scherm is dus nu een niet-functionele
+      voorkant van een latere echte flow, geen mock die iets anders
+      beweert te doen dan het kan.
+    - **Later, met de backend**: Dit scherm wordt gevolgd door een
+      code-invoerstap (`VerificatieCode`, 15 minuten geldig,
+      `datamodel.md` deel 2), en de link naar deze pagina blijft
+      hetzelfde.
+5. **Doorloopflow**: Sidebar met naam respondent, voortgang, categorieën
+   met genummerde bouwblokken, actief bouwblok gemarkeerd en drie
+   statussen. De sidebar blijft staan als de inhoud rechts scrolt (zie
+   `stylesheet.md`). Per bouwblok: Een kop in de categoriekleur met titel
+   en omschrijving, een icoon naast de titel dat een overlay met de
+   `toelichting` opent, tags, de instructieregel "Beantwoord op basis van
+   wat aantoonbaar geregeld is (documenten, ritmes, tooling,
+   afspraken).", de vragen met 5-puntsschaal en één opmerkingenveld per
+   bouwblok. Op het laatste bouwblok wordt "Volgende" de knop "Bekijk
+   resultaten".
+
+   **`.nav-right`**: "Naar resultaten →" als scherm-specifieke actie,
+   uiterst links (met een pijl naar rechts, niet links: Dit is een
+   voorwaartse actie, geen terug-actie. Alleen zichtbaar zodra deze
+   ScanInvulling `"afgerond"` is, gaat rechtstreeks naar scherm 6 zonder
+   opnieuw door de bouwblokken te hoeven klikken). Is deze actie
+   zichtbaar, dan volgt een scheidingslijn; is de invulling nog niet
+   afgerond, dan begint `.nav-right` direct met de 4 vaste links, geen
+   losse scheidingslijn. Dan de 4 vaste content-links, dan de
+   scheidingslijn, dan "← Terug naar Mijn metingen".
+6. **Resultatenscherm**: Overall score met classificatiecirkel en
+   voortgang, radar van alle bouwblokken, staafdiagram per categorie
+   (kleur volgt de score), top 3 sterktes en verbeterkansen, legenda.
+   **Bij AI-volwassenheid** (geen categorielaag, `content-ai-scan.md`)
+   vervalt het staafdiagram per categorie: In plaats daarvan "Scores per
+   Domein", een horizontale balk per domein individueel, gesorteerd van
+   hoog naar laag (`Assessment.scoresPerGroepGesorteerd`).
+
+   **`.nav-right`**: "← Terug naar de scan" samen met één knop
+   "Exporteren" met een dropdown (opties "Als PDF" en "Als CSV", zie
+   `stylesheet.md`, niet twee losse knoppen), als scherm-specifieke
+   acties, uiterst links, geen scheidingslijn tussen die twee onderling.
+   Dan de scheidingslijn, dan de 4 vaste content-links (zie Globale
+   layout hierboven). Dan de scheidingslijn, dan "← Terug naar Mijn
+   metingen". Eén gedeelde exportfunctie, zie `admin-beheerpagina.md`.
+
+**Bron voor de toelichting**: De bouwsteenbeschrijvingen in
+`visie-coniche.md` deel 2. Zolang die op `concept` staan (zie
+`inhoudelijk-fundament.md`), blijft de huidige tekst in de app staan.
+
+---
+
+## 4. Content per scan-type
+
+- **Klantcontact Volwassenheid**: `content-klantcontact-volwassenheid.md`
   (15 bouwblokken, 5 categorieën, 60 vragen)
-- **AI-Volwassenheid in Klantcontact** → `content-ai-scan.md` (8 domeinen,
-  geen categorie-laag, 40 vragen — zie ook de structuurverschillen
-  bovenaan dat bestand)
-- **Zorg-variant, Adoptiescan** → nog niet gestart
+- **AI-volwassenheid in Klantcontact**: `content-ai-scan.md` (8 domeinen,
+  geen categorie-laag, 40 vragen)
+- **Klantcontact Volwassenheid – Zorg (Zorgscan)**: `content-zorgscan.md`
+  (zelfde 15 bouwblokken/5 categorieën/60 vragen als hierboven,
+  sector-variant met vraagteksten herschreven naar patiënt-/cliëntcontact,
+  `afgeleidVanAssessmentId: "klantcontact-volwassenheid"`, zie
+  `datamodel.md`, Sector-varianten). Bouwblok-omschrijving, -toelichting en
+  -tags zijn nog niet sector-vertaald, zie het open punt bovenaan
+  `content-zorgscan.md`.
+- **Adoptiescan**: Nog niet gestart
 
-Elk contentbestand volgt dezelfde structuur: per categorie de bouwblokken
-met naam, omschrijvingszin, tags (variabel aantal) en de vragen, op de
-globale schaal die bij dat Assessment-type hoort (sectie 3).
+Elk contentbestand volgt dezelfde structuur: Per categorie de
+bouwblokken met naam, omschrijving, tags en vragen.
 
 ---
 
-## 7. Open punten / aannames om later te verifiëren
+## 5. Open punten
 
-- Hoe de aggregatie van meerdere respondenten per organisatie wordt getoond
-  (gemiddelde, afwijking t.o.v. gemiddelde, spreiding hoog/laag) — bewust
-  nog niet uitgewerkt
-- Of "Rol / Functie" bij de respondent een vrij tekstveld blijft of een
-  vaste lijst wordt
-- Focus- en error-states (formuliervalidatie) — komen niet voor in het
-  aangeleverde referentiemateriaal, zie `stylesheet.md`. Font-family,
-  kleurtokens, border-radius en knop-hover-states zijn inmiddels wél
-  bekend (uit `coniche-v4.html`).
-- AI-gegenereerde managementsamenvatting: was eerder een placeholder op
-  de assessment-landingspagina (scherm 2), is nu bewust volledig van dat
-  scherm verwijderd voor v1 (geen feature-card, geen bullet in
-  "Praktische informatie"). Staat nog wel in BACKLOG.md als iets om
-  later, anders opgezet, terug te brengen.
+- Weergave van de aggregatie over meerdere respondenten per organisatie
+  (gemiddelde, afwijking, spreiding).
+- Rol/functie bij de respondent: Vrij tekstveld of vaste lijst.
+- Focus- en error-states in formulieren (zie `stylesheet.md`).

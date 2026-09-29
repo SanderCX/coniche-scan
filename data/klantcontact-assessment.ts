@@ -1,5 +1,4 @@
 import { Assessment, Bouwblok } from "@/lib/types";
-import { organisatieVelden } from "./organisatie-velden";
 
 function bb(
   id: string,
@@ -17,6 +16,7 @@ function bb(
     omschrijving,
     toelichting,
     tags,
+    gewicht: 1,
     vragen: vragen.map((tekst, i) => ({
       id: `${id}-v${i + 1}`,
       volgnummer: i + 1,
@@ -90,7 +90,7 @@ const bb3 = bb(
 
 const bb11 = bb(
   "bb11",
-  11,
+  4,
   "Leren uit klantcontact",
   "In hoeverre leert de organisatie structureel van klantcontact (contactredenen, feedback, fouten) en vertaalt dit naar verbeteringen?",
   "Kernwoorden: klantsignalen, klantcontactredenen, conversational intelligence, data naar informatie/inzicht/verbetering, rol van klantcontact in het organisatiebrede verbeterproces. Klanten vertellen je elke dag wat ze van je product of dienst vinden — deze signalen zijn essentieel om de organisatie continu te verbeteren en tegelijkertijd de klanttevredenheid te verhogen. Klantsignaalmanagement is de kern van deze bouwsteen.",
@@ -112,7 +112,7 @@ const bb11 = bb(
 
 const bb13 = bb(
   "bb13",
-  13,
+  5,
   "Financial control",
   "In hoeverre is de financiële huishouding van de klantcontactorganisatie inzichtelijk en op orde?",
   "Kernwoorden: inzicht in kosten en bijdragen van klantcontact, financiële kengetallen en KPI's, budgetmodel. Hoe zorg je dat je 'in control' bent en blijft en niet verrast wordt? Dit wordt vaak gezien als een van de belangrijkste bouwstenen binnen klantcontact.",
@@ -127,7 +127,7 @@ const bb13 = bb(
 
 const bb14 = bb(
   "bb14",
-  14,
+  6,
   "Positionering klantcontact",
   "Welke rol speelt klantcontact in de organisatie en wat is de slagkracht?",
   "Kernwoorden: plaats in het organigram, interne zichtbaarheid, stakeholdermanagement, interne slagkracht, positie aan de besluitvormingstafel. Is klantbeleving een serieus gespreksonderwerp aan de directietafel, of wordt klantcontact gezien als 'noodzakelijk kwaad'?",
@@ -148,7 +148,7 @@ const bb14 = bb(
 
 const bb4 = bb(
   "bb4",
-  4,
+  7,
   "Systemen & Tools",
   "In hoeverre is de klantcontactorganisatie goed gefaciliteerd met de juiste systemen en tooling?",
   "Kernwoorden: omnichannel klantcontactplatform, CRM-integratie, integraal klantbeeld. AI, AQM, routering, spraakherkenning... techniek en digitalisering gaan razendsnel. Dit alles vooral bekeken vanuit de functionaliteit voor klanten en medewerkers.",
@@ -172,7 +172,7 @@ const bb4 = bb(
 
 const bb6 = bb(
   "bb6",
-  6,
+  8,
   "Workforce Management",
   "In hoeverre is de planning/capaciteit goed ingericht om servicelevels te halen tegen acceptabele kosten?",
   "Kernwoorden: WFM-volwassenheid, WFM-cyclus, nauwkeurigheid van het forecastingmodel, skills en routering. Aan de hand van de schijf van 6 wordt het proces geanalyseerd en per stap het verbeterpotentieel in kaart gebracht.",
@@ -195,7 +195,7 @@ const bb6 = bb(
 
 const bb10 = bb(
   "bb10",
-  10,
+  9,
   "Kennismanagement",
   "In hoeverre is kennis vastgelegd, onderhouden en vindbaar zodat medewerkers en klanten snel het juiste antwoord krijgen?",
   "Kernwoorden: kennisbank, kennisbeheer, verantwoordelijkheid en eigenaarschap. Alle informatie is beschikbaar — 'je hoeft mensen alleen nog maar te leren zoeken'.",
@@ -217,7 +217,7 @@ const bb10 = bb(
 
 const bb12 = bb(
   "bb12",
-  12,
+  10,
   "Kanaalmanagement",
   "In hoeverre is de kanaalstrategie (voice, mail, chat, messaging, selfservice) bewust ingericht en optimaal gemanaged?",
   "Kernwoorden: kanaalstrategie, kanaalsturing en kanaalverleiding, omnichannel, selfservice, technologie zoals chatbots en speech analytics. Elke klant heeft een voorkeurskanaal — hoe manage je dat het beste, en kun je klanten misschien 'verleiden' naar het voorkeurskanaal van de organisatie?",
@@ -239,7 +239,7 @@ const bb12 = bb(
 
 const bb5 = bb(
   "bb5",
-  5,
+  11,
   "Performance Management",
   "In hoeverre wordt performance van medewerkers en teams structureel gemeten, besproken en verbeterd?",
   "Kernwoorden: succesfactoren, KPI's, impact van het KPI-huis op medewerkers, kwaliteitsmanagement en monitoring, coaching.",
@@ -261,7 +261,7 @@ const bb5 = bb(
 
 const bb7 = bb(
   "bb7",
-  7,
+  12,
   "Learning & Development",
   "In hoeverre zijn onboarding, training en ontwikkeling structureel ingericht en passend bij de klantcontactstrategie?",
   "Kernwoorden: vinden, binden en boeien, training van nieuwe medewerkers, onboarding, terugdringen van vroege uitstroom, coaching, leerpaden en perspectief, learningmanagementsysteem.",
@@ -284,7 +284,7 @@ const bb7 = bb(
 
 const bb8 = bb(
   "bb8",
-  8,
+  13,
   "Employee Engagement",
   "In hoeverre is er aandacht voor betrokkenheid, welzijn en duurzame inzetbaarheid binnen klantcontact?",
   "Kernwoorden: visie op werkgeverschap, autonomie, verbinding, purpose, gezondheid en welzijn, verzuim en verloop, employee journey. Belangrijk thema voor elke organisatie in een steeds krapper wordende arbeidsmarkt.",
@@ -306,7 +306,7 @@ const bb8 = bb(
 
 const bb9 = bb(
   "bb9",
-  9,
+  14,
   "Leiderschap",
   "In hoeverre is het leiderschap binnen klantcontact effectief en in lijn met de gewenste cultuur en prestaties?",
   "Kernwoorden: nieuw leiderschap, faciliteren, ontwikkelen, winnen, zelfsturen en zelfroosteren. Leiderschap is allesbepalend voor de cultuur en daarmee voor het succes van de organisatie — het gaat over autonomie en high performing teams.",
@@ -343,13 +343,16 @@ const bb15 = bb(
 
 export const klantcontactVolwassenheid: Assessment = {
   id: "klantcontact-volwassenheid",
+  afgeleidVanAssessmentId: null,
   naam: "Klantcontact Volwassenheid",
   subtitel: "±30 minuten. Heldere inzichten. Direct verbeterkansen.",
   beschrijving:
     "Breng in kaart hoe volwassen jouw klantcontactorganisatie is op 15 bouwblokken, verdeeld over 5 pijlers — van strategie tot cultuur. Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken.",
   doelgroep: "MT, operations en CX-verantwoordelijken binnen klantcontactorganisaties",
-  icoon: "🎯",
+  icoon: "target",
   geschatteDuur: "±30 minuten",
+  kortLabel: "Volwassenheidsscan",
+  pdfContentSecties: { titel: "Visie", bron: "visie-coniche.md-deel1" },
   bouwblokken: null,
   scoresPerGroepGesorteerd: false,
   bouwblokEenheidEnkelvoud: "Bouwblok",
@@ -376,13 +379,13 @@ export const klantcontactVolwassenheid: Assessment = {
     { waarde: 4, label: "Structureel geborgd en gemeten" },
     { waarde: 5, label: "Geoptimaliseerd en continu verbeterd" },
   ],
-  organisatieVelden,
   categorieen: [
     {
       id: "overkoepelend",
       naam: "Overkoepelend",
       kleur: "oranje",
       volgorde: 1,
+      gewicht: 1,
       bouwblokken: [bb1, bb2],
     },
     {
@@ -390,6 +393,7 @@ export const klantcontactVolwassenheid: Assessment = {
       naam: "Organisatie",
       kleur: "blauw",
       volgorde: 2,
+      gewicht: 1,
       bouwblokken: [bb3, bb11, bb13, bb14],
     },
     {
@@ -397,6 +401,7 @@ export const klantcontactVolwassenheid: Assessment = {
       naam: "Proces & Tech",
       kleur: "paars",
       volgorde: 3,
+      gewicht: 1,
       bouwblokken: [bb4, bb6, bb10, bb12],
     },
     {
@@ -404,13 +409,15 @@ export const klantcontactVolwassenheid: Assessment = {
       naam: "Mens",
       kleur: "groen",
       volgorde: 4,
+      gewicht: 1,
       bouwblokken: [bb5, bb7, bb8, bb9],
     },
     {
       id: "fundament",
       naam: "Fundament",
-      kleur: "goud",
+      kleur: "antraciet",
       volgorde: 5,
+      gewicht: 1,
       bouwblokken: [bb15],
     },
   ],

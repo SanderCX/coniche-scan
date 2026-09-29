@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
-import { Assessment } from "./types";
+import { Assessment, Bouwblok, Vraag } from "./types";
 import { assessments as seedAssessments } from "@/data/assessments";
+import { nieuwId } from "./id";
 
 const KEY = "coniche-scan:assessments";
 const SERVER_SENTINEL = "__server__";
@@ -67,6 +68,77 @@ export function updateAssessment(
   if (index === -1) return;
   alles[index] = updater(structuredClone(alles[index]));
   slaAlles(alles);
+}
+
+/** "Nieuw Assessment aanmaken" (leeg), admin-beheerpagina.md punt 1. */
+export function createAssessment(input: { naam: string; kortLabel: string }): Assessment {
+  const assessment: Assessment = {
+    id: nieuwId(),
+    afgeleidVanAssessmentId: null,
+    naam: input.naam,
+    subtitel: "",
+    beschrijving: "",
+    doelgroep: "",
+    icoon: "sparkle",
+    geschatteDuur: "",
+    kortLabel: input.kortLabel,
+    pdfContentSecties: null,
+    categorieen: null,
+    bouwblokken: [],
+    scoresPerGroepGesorteerd: false,
+    bouwblokEenheidEnkelvoud: "Bouwblok",
+    bouwblokEenheidMeervoud: "bouwblokken",
+    featureCards: [],
+    schaal: [
+      { waarde: 1, label: "Niet aanwezig" },
+      { waarde: 2, label: "Deels / incidenteel" },
+      { waarde: 3, label: "Aanwezig en meestal toegepast" },
+      { waarde: 4, label: "Structureel geborgd en gemeten" },
+      { waarde: 5, label: "Geoptimaliseerd en continu verbeterd" },
+    ],
+  };
+  const alles = laadAlles();
+  alles.push(assessment);
+  slaAlles(alles);
+  return assessment;
+}
+
+function nieuweVraag(vraag: Vraag): Vraag {
+  return { ...vraag, id: nieuwId() };
+}
+
+function nieuwBouwblok(bouwblok: Bouwblok): Bouwblok {
+  return { ...bouwblok, id: nieuwId(), vragen: bouwblok.vragen.map(nieuweVraag) };
+}
+
+/**
+ * "Aanmaken vanuit bestaand Assessment" (sector-variant), datamodel.md
+ * "Sector-varianten": Kopieert alle Categorieën/Bouwblokken/Vragen naar
+ * nieuwe, losse content-records (nieuwe id's) onder een nieuw Assessment.
+ * Geen levende koppeling met het template na het kopiëren.
+ */
+export function duplicateAssessmentAsVariant(
+  templateId: string,
+  input: { naam: string; kortLabel: string }
+): Assessment | null {
+  const alles = laadAlles();
+  const template = alles.find((a) => a.id === templateId);
+  if (!template) return null;
+  const kloon = structuredClone(template);
+  const assessment: Assessment = {
+    ...kloon,
+    id: nieuwId(),
+    naam: input.naam,
+    kortLabel: input.kortLabel,
+    afgeleidVanAssessmentId: templateId,
+    categorieen: kloon.categorieen
+      ? kloon.categorieen.map((c) => ({ ...c, id: nieuwId(), bouwblokken: c.bouwblokken.map(nieuwBouwblok) }))
+      : null,
+    bouwblokken: kloon.bouwblokken ? kloon.bouwblokken.map(nieuwBouwblok) : null,
+  };
+  alles.push(assessment);
+  slaAlles(alles);
+  return assessment;
 }
 
 export function resetAssessments(): void {
