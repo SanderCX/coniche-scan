@@ -1,27 +1,22 @@
 import { Classificatie } from "./types";
 
 /**
- * Officiële Coniche-huisstijlkleuren per categorie, zie stylesheet.md
- * (bevestigd via `tokens.css`). De keys (oranje/blauw/paars/groen/goud)
- * blijven ongewijzigd t.o.v. eerdere versies zodat bestaande content
- * (categorie.kleur-waarden) blijft werken.
- *
- * `textHex` is een donkerdere variant voor tekst/wit-op-kleur (bijv. het
- * "bezig"-rondje in de sidebar): `--ye` (#ffc043) uit tokens.css is te
- * licht om als tekstkleur of als achtergrond onder witte tekst te lezen —
- * geen aanname, het merkpalet zelf heeft geen donkerder geel. Alleen
- * "goud" wijkt daarom af; de andere categorieën zijn zelf al donker
- * genoeg en gebruiken hun eigen hex ook als textHex.
+ * Officiële Coniche-huisstijlkleuren per categorie (stylesheet.md,
+ * Categoriekleuren). Alle vijf zijn zelf donker genoeg voor tekst op wit en
+ * voor witte tekst erop — geen aparte tekstvariant meer nodig (v1-
+ * aanpassingen.md punt 15). Fundament was eerder "goud" (`--ye`, te licht
+ * om als tekst/achtergrond-onder-witte-tekst te lezen), nu "antraciet"
+ * (`--fu`).
  */
 export const CATEGORIE_COLORS: Record<
   string,
-  { bg: string; text: string; border: string; hex: string; textHex: string }
+  { bg: string; text: string; border: string; hex: string }
 > = {
-  oranje: { bg: "bg-or", text: "text-or", border: "border-or", hex: "#ff671f", textHex: "#ff671f" },
-  blauw: { bg: "bg-bl", text: "text-bl", border: "border-bl", hex: "#225ba0", textHex: "#225ba0" },
-  paars: { bg: "bg-pu", text: "text-pu", border: "border-pu", hex: "#392944", textHex: "#392944" },
-  groen: { bg: "bg-gr", text: "text-gr", border: "border-gr", hex: "#197f4e", textHex: "#197f4e" },
-  goud: { bg: "bg-ye", text: "text-ye", border: "border-ye", hex: "#ffc043", textHex: "#8a6d00" },
+  oranje: { bg: "bg-or", text: "text-or", border: "border-or", hex: "#ff671f" },
+  blauw: { bg: "bg-bl", text: "text-bl", border: "border-bl", hex: "#225ba0" },
+  paars: { bg: "bg-pu", text: "text-pu", border: "border-pu", hex: "#392944" },
+  groen: { bg: "bg-gr", text: "text-gr", border: "border-gr", hex: "#197f4e" },
+  antraciet: { bg: "bg-fu", text: "text-fu", border: "border-fu", hex: "#44403c" },
 };
 
 /**
@@ -40,41 +35,53 @@ export const ANTWOORD_KLEUR: Record<number, { bg: string; text: string }> = {
 };
 
 /**
- * Universele statuskleuren voor de classificatie "Basis op Orde"/"Uitbouwen"/
- * "Sterk punt" — bewust GEEN categoriekleur (zie stylesheet.md, `--stat-*`
- * in tokens.css). Exacte waarden komen letterlijk uit tokens.css.
+ * Scorekleuren op een vijfstapsschaal (stylesheet.md, "Scorekleuren"; v1-
+ * aanpassingen.md punt 13). Exacte waarden komen letterlijk uit tokens.css
+ * (`--score-1` t/m `--score-5`). Gebruikt voor scores per bouwblok en
+ * categorie, de overall score, de classificatiecirkel, de staafdiagrammen,
+ * de top 3 en de legenda — NIET voor de antwoordopties in de vragenlijst
+ * zelf (zie ANTWOORD_KLEUR hierboven, dat is een los, ouder mechanisme voor
+ * al ingevulde antwoorden in het beheerscherm).
  */
-export const CLASSIFICATIE_HEX: Record<Classificatie, string> = {
-  rood: "#dc2626",
-  oranje: "#e8871e",
-  groen: "#22a06b",
+export const SCORE_KLEUR: Record<1 | 2 | 3 | 4 | 5, { hex: string; textOp: string }> = {
+  1: { hex: "#dc2626", textOp: "#ffffff" },
+  2: { hex: "#e8871e", textOp: "#ffffff" },
+  3: { hex: "#eab308", textOp: "#1c1c1a" },
+  4: { hex: "#7bc043", textOp: "#1c1c1a" },
+  5: { hex: "#15803d", textOp: "#ffffff" },
 };
 
-export const CLASSIFICATIE_INFO: Record<
-  Classificatie,
-  { label: string; bg: string; text: string; kleur: string; omschrijving: string }
-> = {
+/** Rondt af naar de dichtstbijzijnde score (half-away-from-zero, zie lib/scoring.ts) en geeft de kleur. */
+export function scoreKleur(score: number): string {
+  const afgerond = Math.min(5, Math.max(1, Math.round(score))) as 1 | 2 | 3 | 4 | 5;
+  return SCORE_KLEUR[afgerond].hex;
+}
+
+/**
+ * Welke scorewaarden een classificatie omvat, omdat de grenzen (2,5 en
+ * 3,5) samenvallen met de afrondingsgrenzen (stylesheet.md, Scorekleuren).
+ * Gebruikt om de legenda per classificatie de juiste scorekleur(en) te
+ * tonen in plaats van een eigen vaste statuskleur.
+ */
+export const CLASSIFICATIE_SCORES: Record<Classificatie, (1 | 2 | 3 | 4 | 5)[]> = {
+  rood: [1, 2],
+  oranje: [3],
+  groen: [4, 5],
+};
+
+export const CLASSIFICATIE_INFO: Record<Classificatie, { label: string; omschrijving: string }> = {
   rood: {
     label: "Basis op Orde",
-    bg: "bg-stat-red",
-    text: "text-stat-red",
-    kleur: "var(--stat-red)",
     omschrijving:
       "De basis moet op dit punt eerst op orde gemaakt worden om verder te kunnen uitbouwen.",
   },
   oranje: {
     label: "Uitbouwen",
-    bg: "bg-stat-amber",
-    text: "text-stat-amber",
-    kleur: "var(--stat-amber)",
     omschrijving:
       "De basis is op orde en je bent onderweg, maar er is nog een verbeterstap nodig om richting excellent te gaan.",
   },
   groen: {
     label: "Sterk punt",
-    bg: "bg-stat-green",
-    text: "text-stat-green",
-    kleur: "var(--stat-green)",
     omschrijving:
       "Hier is de organisatie al heel goed in. Benut dit optimaal en bouw het verder uit, ook ter ondersteuning van zwakkere bouwblokken.",
   },

@@ -1,5 +1,4 @@
 import { Assessment, Bouwblok } from "@/lib/types";
-import { organisatieVelden } from "./organisatie-velden";
 
 function domein(
   id: string,
@@ -18,6 +17,7 @@ function domein(
     // de omschrijving totdat hier eigen content voor is.
     toelichting: omschrijving,
     tags: [],
+    gewicht: 1,
     vragen: vragen.map((tekst, i) => ({
       id: `${id}-v${i + 1}`,
       volgnummer: i + 1,
@@ -135,14 +135,17 @@ const domeinen: Bouwblok[] = [
 
 export const aiVolwassenheid: Assessment = {
   id: "ai-volwassenheid",
-  naam: "AI-Volwassenheid in Klantcontact",
+  afgeleidVanAssessmentId: null,
+  naam: "AI-volwassenheid in Klantcontact",
   subtitel: "±20 minuten. Helder inzicht. Direct vervolgstappen.",
   beschrijving:
     "Deze assessment geeft inzicht in hoe volwassen jouw organisatie is in het inzetten van AI binnen klantcontact. Je krijgt zicht op sterke punten, ontwikkelgebieden en waar gerichte vervolgstappen nodig zijn.",
   doelgroep:
     "Organisaties die AI inzetten of overwegen en willen weten waar ze staan én wat de volgende stap is.",
-  icoon: "🤖",
+  icoon: "sparkle",
   geschatteDuur: "±20 minuten",
+  kortLabel: "AI-scan",
+  pdfContentSecties: { titel: "2030", bron: "content-2030.md" },
   categorieen: null,
   bouwblokken: domeinen,
   scoresPerGroepGesorteerd: true,
@@ -171,5 +174,4 @@ export const aiVolwassenheid: Assessment = {
     { waarde: 4, label: "Structureel geborgd en gemeten" },
     { waarde: 5, label: "Geoptimaliseerd en continu verbeterd" },
   ],
-  organisatieVelden,
 };

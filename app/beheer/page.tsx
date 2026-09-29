@@ -3,42 +3,27 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAssessments } from "@/lib/assessment-store";
-import { useOrganisaties } from "@/lib/db";
-import { useTestModus, zetTestModus } from "@/lib/instellingen";
-import { maakPubliekeLink } from "@/lib/uitnodiging-link";
-
-const TEST_KLANT_ID = "resp-testklant";
+import { useOrganisaties, controleerDataIntegriteit } from "@/lib/db";
 
 export default function BeheerDashboard() {
   const assessments = useAssessments();
   const organisaties = useOrganisaties();
-  const testModus = useTestModus();
-  const [gekopieerd, setGekopieerd] = useState(false);
-  const alleRespondenten = organisaties.flatMap((o) => o.respondenten);
+  const [integriteitResultaat, setIntegriteitResultaat] = useState<string[] | null>(null);
 
-  const testKlant = organisaties
-    .flatMap((o) => o.respondenten.map((r) => ({ organisatie: o, respondent: r })))
-    .find((r) => r.respondent.id === TEST_KLANT_ID);
+  const alleInvullingen = organisaties.flatMap((o) =>
+    o.scanUitvoeringen.flatMap((s) => s.invullingen)
+  );
 
   const stats = [
     { label: "Assessment-types", waarde: assessments.length, href: "/beheer/content" },
     { label: "Organisaties", waarde: organisaties.length, href: "/beheer/organisaties" },
-    { label: "Respondenten totaal", waarde: alleRespondenten.length, href: "/beheer/scans" },
+    { label: "Ingevulde scans totaal", waarde: alleInvullingen.length, href: "/beheer/scans" },
     {
-      label: "Respondenten afgerond",
-      waarde: alleRespondenten.filter((r) => r.status === "afgerond").length,
+      label: "Afgerond",
+      waarde: alleInvullingen.filter((i) => i.status === "afgerond").length,
       href: "/beheer/scans",
     },
   ];
-
-  function kopieerTestLink() {
-    if (!testKlant) return;
-    navigator.clipboard.writeText(
-      maakPubliekeLink(window.location.origin, testKlant.organisatie, testKlant.respondent)
-    );
-    setGekopieerd(true);
-    setTimeout(() => setGekopieerd(false), 1600);
-  }
 
   return (
     <div className="admin-main">
@@ -64,39 +49,31 @@ export default function BeheerDashboard() {
       </div>
 
       <div className="admin-notice mt-10" style={{ maxWidth: "36rem" }}>
-        <label className="flex cursor-pointer items-start gap-3">
-          <input
-            type="checkbox"
-            checked={testModus}
-            onChange={(e) => zetTestModus(e.target.checked)}
-            className="mt-1"
-          />
-          <span>
-            <span className="block font-semibold text-ink">Test-modus: inloggen overslaan</span>
-            <span className="mt-0.5 block text-sm text-ink-m">
-              Staat dit aan, dan is Beheer direct open zonder e-mail+wachtwoord — handig om snel
-              te testen en de vragenlijsten door te ontwikkelen. Zet uit voor een realistische
-              test van de inlogflow.
-            </span>
-          </span>
-        </label>
-
-        {testKlant && (
-          <div className="mt-4 border-t border-border pt-4">
-            <p className="text-sm font-medium text-ink">
-              Testklant: {testKlant.organisatie.naam} ({testKlant.respondent.email})
-            </p>
-            <div className="mt-2 flex items-center gap-2">
-              <button type="button" onClick={kopieerTestLink} className="btn btn-outline btn-compact">
-                {gekopieerd ? "Gekopieerd!" : "Kopieer publieke link"}
-              </button>
-              <Link
-                href={`/beheer/organisaties/${testKlant.organisatie.id}`}
-                className="text-sm text-ink-m hover:text-ink"
-              >
-                Bekijk in Organisaties →
-              </Link>
-            </div>
+        <p className="font-medium text-ink">Data-integriteit</p>
+        <p className="mt-0.5 text-sm text-ink-m">
+          Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar
+          een niet-bestaande respondent verwijzen (v1-aanpassingen.md punt 14).
+        </p>
+        <button
+          type="button"
+          onClick={() => setIntegriteitResultaat(controleerDataIntegriteit())}
+          className="btn btn-outline btn-compact mt-3"
+        >
+          Controleer nu
+        </button>
+        {integriteitResultaat && (
+          <div className="mt-3">
+            {integriteitResultaat.length === 0 ? (
+              <p className="text-sm font-medium" style={{ color: "var(--stat-green)" }}>
+                ✓ Geen achterblijvende data gevonden.
+              </p>
+            ) : (
+              <ul className="text-sm" style={{ color: "var(--stat-red)" }}>
+                {integriteitResultaat.map((probleem, i) => (
+                  <li key={i}>{probleem}</li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
       </div>

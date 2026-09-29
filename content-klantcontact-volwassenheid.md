@@ -1,9 +1,10 @@
-# Content — Klantcontact Volwassenheidsscan
+# Content: Klantcontact Volwassenheidsscan
 
-Bijlage bij CLAUDE.md sectie 6. Dit is de volledige contentset voor het
-`Assessment`-object "Klantcontact Volwassenheid": 15 bouwblokken, 5
-categorieën, 60 vragen, allemaal op de globale 1–5-schaal uit CLAUDE.md
-sectie 3.
+Vragen en tags voor het `Assessment`-object "Klantcontact
+Volwassenheid": 15 bouwblokken, 5 categorieën, 60 vragen op de 1–5-schaal
+uit `datamodel.md`. Nummering volgens `visie-coniche.md`. De
+beschrijving en centrale vraag per bouwblok staan in `visie-coniche.md`
+deel 2.
 
 ### Overkoepelend (oranje)
 
@@ -53,7 +54,7 @@ KPI-huis, Reporting en dashboards
 4. Zijn dashboards/rapportages voor klantcontact minimaal wekelijks
    beschikbaar en worden ze aantoonbaar gebruikt (notulen/acties)?
 
-**11. Leren uit klantcontact**
+**4. Leren uit klantcontact**
 > In hoeverre leert de organisatie structureel van klantcontact
 > (contactredenen, feedback, fouten) en vertaalt dit naar verbeteringen?
 Tags: Contact drivers, VOC (Voice of Customer), Continuous improvement,
@@ -67,11 +68,10 @@ Root cause analysis, Closed feedback loop, Verbeterbacklog
 4. Is er een closed-loop terugkoppeling: verbeteringen resulteren
    aantoonbaar in updates in kennis/training/proces?
 
-**13. Financial control**
+**5. Financial control**
 > In hoeverre is de financiële huishouding van de klantcontactorganisatie
 > inzichtelijk en op orde?
-Tags: Inzicht in CC kosten en bijdragen *(let op: dit bouwblok heeft maar 1
-tag, tags-lijst is dus variabel qua lengte, niet vast aantal)*
+Tags: Inzicht in CC kosten en bijdragen
 1. Is er een gespecificeerd klantcontactbudget (mensen, tooling,
    leveranciers) en wordt realisatie minimaal per maand bijgehouden?
 2. Zijn kosten per kanaal of per type contact inzichtelijk (desnoods via
@@ -81,7 +81,7 @@ tag, tags-lijst is dus variabel qua lengte, niet vast aantal)*
 4. Is er een forecast-/scenario-aanpak voor capaciteit en kosten (minimaal
    per kwartaal herijkt)?
 
-**14. Positionering klantcontact**
+**6. Positionering klantcontact**
 > Welke rol speelt klantcontact in de organisatie en wat is de slagkracht?
 Tags: Plaats van klantcontact in organigram, Interne zichtbaarheid
 klantcontact (afdeling) / PR, Stakeholder management, Interne slagkracht
@@ -97,7 +97,7 @@ klantcontact afdeling, "seat at the table"
 
 ### Proces & Tech (paars)
 
-**4. Systemen & Tools**
+**7. Systemen & Tools**
 > In hoeverre is de klantcontactorganisatie goed gefaciliteerd met de
 > juiste systemen en tooling?
 Tags: CRM/klantbeeld, Ticketing/Case management, Telefonie / CC platform,
@@ -113,7 +113,7 @@ Chat / messaging, Kennisbank tooling, Rapportage / BI tooling, Integraties
 4. Is er een beheerproces voor tooling (release/changes, rechten,
    integraties) inclusief owner en documentatie?
 
-**6. Workforce Management**
+**8. Workforce Management**
 > In hoeverre is de planning/capaciteit goed ingericht om servicelevels te
 > halen tegen acceptabele kosten?
 Tags: Forecasting, Capaciteitsplanning, Roostering, Intra-day management,
@@ -127,7 +127,7 @@ Shrinkage, Skill-based routing, Servicelevel/ASA/abandonment
 4. Worden roosters/skills afgestemd op kanaal- en skillvraag
    (skill-based), en is dat aantoonbaar ingericht in tooling/werkwijze?
 
-**10. Kennismanagement**
+**9. Kennismanagement**
 > In hoeverre is kennis vastgelegd, onderhouden en vindbaar zodat
 > medewerkers en klanten snel het juiste antwoord krijgen?
 Tags: Kennisstructuur/taxonomie, Ownership (knowledge owners), Content
@@ -141,7 +141,7 @@ lifecycle, Zoekbaarheid, Kenniskwaliteit, Selfservice content
 4. Wordt kennisgebruik gemeten (views/search/no-result/feedback) en worden
    artikelen aantoonbaar verbeterd op basis van data?
 
-**12. Kanaalmanagement**
+**10. Kanaalmanagement**
 > In hoeverre is de kanaalstrategie (voice, mail, chat, messaging,
 > selfservice) bewust ingericht en optimaal gemanaged?
 Tags: Kanaalstrategie, Kanaalshift, Routing & triage, Selfservice,
@@ -157,7 +157,7 @@ Omnichannel customer experience, Kanaalperformance
 
 ### Mens (groen)
 
-**5. Performance Management**
+**11. Performance Management**
 > In hoeverre wordt performance van medewerkers en teams structureel
 > gemeten, besproken en verbeterd?
 Tags: Doelen en KPI's op team/individu, Ritme van performance gesprekken,
@@ -172,7 +172,7 @@ balans, Feedback cultuur
 4. Is er een formele verbeterroute voor onderperformance (plan, termijnen,
    support, evaluatie) die ook daadwerkelijk wordt toegepast?
 
-**7. Learning & Development**
+**12. Learning & Development**
 > In hoeverre zijn onboarding, training en ontwikkeling structureel
 > ingericht en passend bij de klantcontactstrategie?
 Tags: Onboarding, Opleidingsplan, Skills matrix, Coaching & mentoring, LMS
@@ -186,7 +186,7 @@ Tags: Onboarding, Opleidingsplan, Skills matrix, Coaching & mentoring, LMS
 4. Worden leerinterventies geëvalueerd op effect (minimaal 1 van:
    QA-score, AHT, FCR, CSAT) en wordt het programma daarop aangepast?
 
-**8. Employee Engagement**
+**13. Employee Engagement**
 > In hoeverre is er aandacht voor betrokkenheid, welzijn en duurzame
 > inzetbaarheid binnen klantcontact?
 Tags: Medewerkerstevredenheid, Bevlogenheid, Verzuim / welzijn, Retentie,
@@ -200,7 +200,7 @@ Psychologische veiligheid, Erkenning en waardering
 4. Zijn er aantoonbare interventies voor duurzame inzetbaarheid (bijv.
    roosterkeuzes, werkdrukmaatregelen, coaching) met monitoring?
 
-**9. Leiderschap**
+**14. Leiderschap**
 > In hoeverre is het leiderschap binnen klantcontact effectief en in lijn
 > met de gewenste cultuur en prestaties?
 Tags: Leiderschapsstijl, Voorbeeldgedrag, Coachend leiderschap,
@@ -214,7 +214,7 @@ Besluitvaardigheid, Stakeholder management, Teamontwikkeling
 4. Is er opvolgingsplanning of talent-review (minimaal jaarlijks) voor
    sleutelrollen binnen klantcontact?
 
-### Fundament (geel/goud)
+### Fundament (antraciet)
 
 **15. Cultuur**
 > Hoe kan de heersende afdelingscultuur beschreven worden en in hoeverre

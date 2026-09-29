@@ -1,49 +1,32 @@
-# Content — AI-Volwassenheid in Klantcontact
+# Content: AI-Volwassenheid in Klantcontact
 
-Bijlage bij CLAUDE.md sectie 6. Content voor het `Assessment`-object
-"AI-Volwassenheid in Klantcontact": 8 domeinen, 40 vragen, op de globale
-1–5-schaal uit CLAUDE.md sectie 3 (dezelfde labels als de Klantcontact
-Volwassenheidsscan, maar dat is per Assessment-type instelbaar — hier
-toevallig identiek).
+Vragen voor het `Assessment`-object "AI-Volwassenheid in Klantcontact": 8
+domeinen, 40 vragen (5 per domein), op dezelfde 1–5-schaal als de
+Klantcontact Volwassenheidsscan.
 
-## Structuurverschil met de Klantcontact Volwassenheidsscan
+## Verschillen met de Klantcontact Volwassenheidsscan
 
-Deze scan heeft GEEN categorie-laag. In de sidebar staan de 8 domeinen
-plat onder elkaar, niet gegroepeerd. Geen van de 8 domeinen heeft een
-tags-rij (bij de Klantcontact-scan had vrijwel elk bouwblok die wel).
-Zie CLAUDE.md sectie 1 voor de aanpassing aan het datamodel die dit
-vraagt: `categorieen` wordt optioneel op `Assessment`, en zonder
-categorieën toont de flow de `bouwblokken` (hier "domeinen" genoemd in de
-UI-tekst) direct.
+- **Geen categorieën**: De 8 domeinen staan plat onder elkaar in de
+  sidebar. In de UI heten bouwblokken hier "domeinen". Zie
+  `datamodel.md` (`categorieen` is optioneel).
+- **Geen tags**: Geen van de domeinen heeft een tags-rij.
+- **Scores gesorteerd**: "Scores per Domein" op het resultatenscherm is
+  gesorteerd van hoog naar laag (`scoresPerGroepGesorteerd: true`).
 
-Assessment-metadata (voor sectie 1 / het kaartenscherm):
+## Assessment-gegevens
+
 - Naam: "AI-Volwassenheid in Klantcontact"
-- Subtitel: "±30 minuten. Helder inzicht. Direct vervolgstappen."
+- Subtitel: "±20 minuten. Helder inzicht. Direct vervolgstappen."
 - Beschrijving: "Deze assessment geeft inzicht in hoe volwassen jouw
   organisatie is in het inzetten van AI binnen klantcontact. Je krijgt
   zicht op sterke punten, ontwikkelgebieden en waar gerichte
   vervolgstappen nodig zijn."
 - Doelgroep: "Organisaties die AI inzetten of overwegen en willen weten
   waar ze staan én wat de volgende stap is."
-- Geschatte duur: let op inconsistentie in de bron — de kaart op het
-  keuzescherm zegt ±20 minuten, het voorbeeldscherm eigen verderop zegt
-  nog ±30 minuten (kennelijk letterlijk gekopieerd van de Klantcontact-
-  scan in de oude app). Voor de nieuwe content: **±20 minuten** aanhouden,
-  consistent overal, dit is geen bewuste keuze om over te nemen.
-- Feature-cards op de landingspagina: "8 AI-domeinen" (i.p.v. "15
-  Bouwblokken"), "Visueel Rapport", en een derde kaart die NIET
-  "AI-Samenvatting" is — die is voor v1 bewust geschrapt (zie CLAUDE.md
-  sectie 5 en 7). Kies een vervangende derde kaart in lijn met de andere
-  twee (bijv. iets over de 8 domeinen zelf of de duur), Sander/Joost mag
-  hier een keuze in maken.
-
-Resultatenscherm-verschil: "Scores per Domein" is hier expliciet
-gesorteerd van hoog naar laag (zo genoemd in de UI: "Gedetailleerde
-scores gesorteerd van hoog naar laag"). Bij de Klantcontact-scan stond
-"Score per Categorie" in vaste volgorde, niet gesorteerd. Dit is dus een
-bewust verschil tussen de twee scans, niet een fout in een van beide —
-de sorteer-instelling hoort dus bij het Assessment-type, niet vast in de
-resultatencomponent.
+- Geschatte duur: ±20 minuten, overal hetzelfde.
+- Feature-cards: "8 AI-domeinen", "Visueel Rapport" en een derde kaart
+  die nog gekozen moet worden (geen AI-samenvatting, die is voor nu
+  geschrapt).
 
 ---
 

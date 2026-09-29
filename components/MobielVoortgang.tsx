@@ -1,4 +1,4 @@
-import { Assessment, Respondent } from "@/lib/types";
+import { Assessment, ScanWeergave } from "@/lib/types";
 import { voortgang } from "@/lib/scoring";
 
 /**
@@ -16,7 +16,7 @@ export function MobielVoortgang({
   respondent,
 }: {
   assessment: Assessment;
-  respondent: Respondent;
+  respondent: ScanWeergave;
 }) {
   const { percentage, beantwoord, totaal } = voortgang(assessment, respondent.antwoorden);
 

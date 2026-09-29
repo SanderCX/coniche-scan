@@ -2,15 +2,16 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
-import { useRespondent } from "@/lib/db";
+import { useScanInvulling } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
-import { bouwblokScore, overallScore, classificatie, voortgang } from "@/lib/scoring";
-import { CLASSIFICATIE_INFO, ANTWOORD_KLEUR } from "@/lib/colors";
+import { bouwblokScore, overallScore, voortgang } from "@/lib/scoring";
+import { ANTWOORD_KLEUR, scoreKleur } from "@/lib/colors";
 import { maakPubliekeLink } from "@/lib/uitnodiging-link";
-import { Respondent } from "@/lib/types";
+import { kopieerNaarKlembord } from "@/lib/clipboard";
+import { ScanInvulling } from "@/lib/types";
 
-const STATUS_LABEL: Record<Respondent["status"], string> = {
+const STATUS_LABEL: Record<ScanInvulling["status"], string> = {
   uitgenodigd: "Uitgenodigd",
   bezig: "Bezig",
   afgerond: "Afgerond",
@@ -22,9 +23,9 @@ export default function ScanDetailPage({
   params: Promise<{ respondentId: string }>;
 }) {
   const { respondentId } = use(params);
-  const gegevens = useRespondent(respondentId);
-  const assessment = useAssessment(gegevens?.organisatie.assessmentId ?? "");
-  const [gekopieerd, setGekopieerd] = useState(false);
+  const gegevens = useScanInvulling(respondentId);
+  const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
+  const [kopieerStatus, setKopieerStatus] = useState<"idle" | "gelukt" | "mislukt">("idle");
 
   if (!gegevens || !assessment) {
     return (
@@ -34,16 +35,16 @@ export default function ScanDetailPage({
     );
   }
 
-  const { organisatie, respondent } = gegevens;
+  const { organisatie, scanUitvoering, lid, invulling } = gegevens;
   const bouwblokken = alleBouwblokkenMetGroep(assessment);
-  const scores = bouwblokken.map((b) => bouwblokScore(b.bouwblok, respondent.antwoorden));
+  const scores = bouwblokken.map((b) => bouwblokScore(b.bouwblok, invulling.antwoorden));
   const overall = overallScore(scores);
-  const { percentage } = voortgang(assessment, respondent.antwoorden);
+  const { percentage } = voortgang(assessment, invulling.antwoorden);
 
-  function kopieerLink() {
-    navigator.clipboard.writeText(maakPubliekeLink(window.location.origin, organisatie, respondent));
-    setGekopieerd(true);
-    setTimeout(() => setGekopieerd(false), 1600);
+  async function kopieerLink() {
+    const gelukt = await kopieerNaarKlembord(maakPubliekeLink(window.location.origin, lid));
+    setKopieerStatus(gelukt ? "gelukt" : "mislukt");
+    setTimeout(() => setKopieerStatus("idle"), 1600);
   }
 
   return (
@@ -51,15 +52,25 @@ export default function ScanDetailPage({
       <Link href="/beheer/scans" className="admin-back">
         ← Ingevulde scans
       </Link>
-      <h1>{respondent.naam || respondent.email}</h1>
-      <p className="text-sm text-ink-s">{organisatie.naam}</p>
+      <h1>{lid.naam || lid.email}</h1>
+      <p className="text-sm text-ink-s">
+        {organisatie.naam} · {scanUitvoering.label}
+      </p>
 
       <div className="admin-field mt-6" style={{ maxWidth: "34rem" }}>
         <label>Publieke link</label>
         <div className="flex items-center gap-2">
-          <input type="text" readOnly value={maakPubliekeLink(typeof window !== "undefined" ? window.location.origin : "", organisatie, respondent)} />
+          <input
+            type="text"
+            readOnly
+            value={typeof window !== "undefined" ? maakPubliekeLink(window.location.origin, lid) : ""}
+          />
           <button type="button" onClick={kopieerLink} className="btn btn-outline btn-compact">
-            {gekopieerd ? "Gekopieerd!" : "Kopieer"}
+            {kopieerStatus === "gelukt"
+              ? "Gekopieerd!"
+              : kopieerStatus === "mislukt"
+                ? "Mislukt, probeer opnieuw"
+                : "Kopieer"}
           </button>
         </div>
       </div>
@@ -71,13 +82,13 @@ export default function ScanDetailPage({
         </div>
         <div>
           <p className="label">Rol / team</p>
-          <p className="waarde">{[respondent.rol, respondent.team].filter(Boolean).join(" / ") || "—"}</p>
+          <p className="waarde">{[lid.functie, lid.team].filter(Boolean).join(" / ") || "—"}</p>
         </div>
         <div>
           <p className="label">Status</p>
           <p className="waarde">
-            <span className={`admin-badge status-${respondent.status}`}>
-              {STATUS_LABEL[respondent.status]}
+            <span className={`admin-badge status-${invulling.status}`}>
+              {STATUS_LABEL[invulling.status]}
             </span>
           </p>
         </div>
@@ -87,40 +98,40 @@ export default function ScanDetailPage({
         </div>
         <div>
           <p className="label">Uitgenodigd</p>
-          <p className="waarde">{new Date(respondent.uitgenodigdOp).toLocaleDateString("nl-NL")}</p>
+          <p className="waarde">{new Date(invulling.uitgenodigdOp).toLocaleDateString("nl-NL")}</p>
         </div>
         <div>
           <p className="label">Gestart</p>
           <p className="waarde">
-            {respondent.gestartOp ? new Date(respondent.gestartOp).toLocaleDateString("nl-NL") : "—"}
+            {invulling.gestartOp ? new Date(invulling.gestartOp).toLocaleDateString("nl-NL") : "—"}
           </p>
         </div>
         <div>
           <p className="label">Afgerond</p>
           <p className="waarde">
-            {respondent.afgerondOp ? new Date(respondent.afgerondOp).toLocaleDateString("nl-NL") : "—"}
+            {invulling.afgerondOp ? new Date(invulling.afgerondOp).toLocaleDateString("nl-NL") : "—"}
           </p>
         </div>
         {overall !== null && (
           <div>
             <p className="label">Overall score</p>
-            <p className="waarde" style={{ color: CLASSIFICATIE_INFO[classificatie(overall)].kleur }}>
+            <p className="waarde" style={{ color: scoreKleur(overall) }}>
               {overall.toFixed(1)}
             </p>
           </div>
         )}
       </div>
 
-      {respondent.notities && (
+      {lid.notities && (
         <div className="admin-notice">
-          <strong>Notities:</strong> {respondent.notities}
+          <strong>Notities:</strong> {lid.notities}
         </div>
       )}
 
       <h2>Antwoorden per {assessment.bouwblokEenheidEnkelvoud.toLowerCase()}</h2>
       {bouwblokken.map(({ bouwblok }) => {
-        const opmerking = respondent.opmerkingenPerBouwblok[bouwblok.id];
-        const score = bouwblokScore(bouwblok, respondent.antwoorden);
+        const opmerking = invulling.opmerkingenPerBouwblok[bouwblok.id];
+        const score = bouwblokScore(bouwblok, invulling.antwoorden);
         return (
           <details key={bouwblok.id} className="admin-bouwblok-card">
             <summary>
@@ -130,7 +141,7 @@ export default function ScanDetailPage({
               {score !== null && (
                 <span
                   className="admin-bouwblok-score"
-                  style={{ color: CLASSIFICATIE_INFO[classificatie(score)].kleur }}
+                  style={{ color: scoreKleur(score) }}
                 >
                   {score.toFixed(1)}
                 </span>
@@ -139,7 +150,7 @@ export default function ScanDetailPage({
             <table className="admin-table mt-3">
               <tbody>
                 {bouwblok.vragen.map((vraag) => {
-                  const antwoord = respondent.antwoorden[vraag.id];
+                  const antwoord = invulling.antwoorden[vraag.id];
                   const kleur = typeof antwoord === "number" ? ANTWOORD_KLEUR[antwoord] : null;
                   return (
                     <tr key={vraag.id}>

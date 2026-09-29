@@ -77,6 +77,13 @@
   color: var(--or);
 }
 
+.nav-divider {
+  width: 1px;
+  height: 1.2rem;
+  background: var(--border-d);
+  flex: none;
+}
+
 .nav-right a.actief {
   text-decoration: underline;
 }
@@ -92,6 +99,47 @@
 .nav-right .btn {
   padding: 0.5rem 1rem;
   font-size: 0.8rem;
+}
+
+/* Dropdown-knop (stylesheet.md, "Dropdown-knop") — voor acties met
+   meerdere opties onder één knop, bijv. "Exporteren" (Als PDF/Als CSV). */
+.dropdown-knop {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  z-index: 20;
+  min-width: 10rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: 0 12px 28px rgba(28, 28, 26, 0.08);
+  overflow: hidden;
+}
+
+.dropdown-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.6rem 1rem;
+  color: var(--ink);
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.dropdown-menu-item:hover {
+  background: var(--bg-mid);
+}
+
+.dropdown-menu-item:disabled {
+  color: var(--ink-s);
+  cursor: not-allowed;
 }
 
 /* ---------- Footer ---------- */
@@ -243,6 +291,25 @@
   border-left: 4px solid var(--accent, var(--or));
 }
 
+/* Inklapbare kaart (bijv. bouwstenen-pagina): zelfde chevron-patroon als
+   .admin-bouwblok-card in admin.css, hier generiek voor het publieke deel. */
+details.card > summary {
+  list-style: none;
+}
+details.card > summary::-webkit-details-marker {
+  display: none;
+}
+details.card > summary::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 0.6rem;
+  color: var(--ink-s);
+  transition: transform 0.15s ease;
+}
+details.card[open] > summary::before {
+  transform: rotate(90deg);
+}
+
 /* Assessment-keuzekaart */
 .assessment-card {
   display: flex;
@@ -256,6 +323,7 @@
    lift + schaduw — bevestigd door Joost, geldt overal in de app, niet
    hardcoded aan `.assessment-card` alleen. */
 a.card:hover,
+button.card:hover,
 .assessment-card:hover {
   box-shadow: 0 12px 28px rgba(28, 28, 26, 0.08);
   transform: translateY(-2px);
@@ -705,11 +773,17 @@ a.card:hover,
   align-items: flex-start;
 }
 
+.legenda-stippen {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+  flex: none;
+}
+
 .legenda-stip {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  margin-top: 0.3rem;
   background: var(--kleur);
   flex: none;
 }

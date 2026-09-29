@@ -17,6 +17,7 @@
   --ye-l: #ffcb57;
 
   --pu: #392944; /* Proces & Tech — toegevoegd vanuit het merkpalet */
+  --fu: #44403c; /* Fundament, antraciet — vervangt --ye (v1-aanpassingen.md 15) */
 
   --ink: #1c1c1a;
   --ink-m: #4d4d49;
@@ -44,4 +45,19 @@
   --stat-amber-faint: #fdf2e3;
   --stat-green: #22a06b;
   --stat-green-faint: #e7f6ef;
+
+  /* Scorekleuren, 1 t/m 5 (v1-aanpassingen.md 13, stylesheet.md
+     "Scorekleuren") — voor bouwblok-/categoriescores, overall score,
+     classificatiecirkel, staafdiagrammen, top 3 en legenda. Niet voor de
+     antwoordopties in de vragenlijst zelf. */
+  --score-1: #dc2626;
+  --score-1-faint: #fdecec;
+  --score-2: #e8871e;
+  --score-2-faint: #fdf2e3;
+  --score-3: #eab308;
+  --score-3-faint: #fdf7dc;
+  --score-4: #7bc043;
+  --score-4-faint: #eef7e6;
+  --score-5: #15803d;
+  --score-5-faint: #e6f2ea;
 }

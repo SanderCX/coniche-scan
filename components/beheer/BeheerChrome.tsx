@@ -11,6 +11,7 @@ const links = [
   { href: "/beheer/organisaties", label: "Organisaties" },
   { href: "/beheer/scans", label: "Ingevulde scans" },
   { href: "/beheer/content", label: "Content" },
+  { href: "/beheer/import", label: "Import" },
 ];
 
 /**
