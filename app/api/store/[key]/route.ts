@@ -22,13 +22,11 @@ import { getSql } from "@/lib/neon";
  * gedeelde, publieke omgeving. "Laatste schrijver wint" is voor dat doel
  * voldoende — hetzelfde uitgangspunt als vóór deze migratie.
  */
-const TOEGESTANE_SLEUTELS = new Set([
-  "organisaties",
-  "assessments",
-  "gebruikers",
-  "instellingen",
-  "algemene-teksten",
-]);
+const MAX_BODY_TEKENS = 5_000_000;
+
+// `gebruikers` staat hier bewust niet in: Die accounts bevatten nog wachtwoorden
+// in leesbare tekst en deze route heeft geen autorisatie (backlog.md).
+const TOEGESTANE_SLEUTELS = new Set(["organisaties", "assessments", "instellingen", "algemene-teksten"]);
 
 export async function GET(_request: Request, { params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
@@ -70,6 +68,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ key:
   const tekst = await request.text();
   if (!tekst) {
     return new Response("Lege body.", { status: 400 });
+  }
+  if (tekst.length > MAX_BODY_TEKENS) {
+    return new Response("Body te groot.", { status: 413 });
   }
   const sql = getSql();
   if (!sql) {

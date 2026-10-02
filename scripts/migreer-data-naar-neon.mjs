@@ -22,7 +22,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { neon } from "@neondatabase/serverless";
 
-const SLEUTELS = ["organisaties", "assessments", "gebruikers", "instellingen", "algemene-teksten"];
+const SLEUTELS = ["organisaties", "assessments", "instellingen", "algemene-teksten"];
 
 if (!process.env.DATABASE_URL) {
   console.error(

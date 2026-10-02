@@ -20,13 +20,35 @@ import { buildResultatenPdfHtml, ExportPdfPayload } from "@/lib/pdf/build-html";
  * Puppeteer's `displayHeaderFooter`/`footerTemplate` (zie
  * export-pdf-visual-volwassenheidsscan.md).
  */
+const MAX_BODY_BYTES = 2_000_000;
+const MAX_GELIJKTIJDIG = 2;
+let actief = 0;
+
 export async function POST(request: Request) {
-  const payload = (await request.json()) as ExportPdfPayload;
+  // Zonder inlog bereikbaar (backlog.md, fase 3): Tot die er is, begrenzen we
+  // wat één verzoek mag kosten, zodat de route geen onbeperkt aantal
+  // headless browsers kan starten.
+  if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY_BYTES) {
+    return Response.json({ fout: "te-groot" }, { status: 413 });
+  }
+  if (actief >= MAX_GELIJKTIJDIG) {
+    return Response.json({ fout: "bezet" }, { status: 429 });
+  }
+  const payload = (await request.json().catch(() => null)) as ExportPdfPayload | null;
 
   if (!payload?.assessment || !payload.antwoorden || !payload.organisatieNaam) {
     return Response.json({ fout: "ongeldig-verzoek" }, { status: 400 });
   }
 
+  actief++;
+  try {
+    return await maakPdf(payload);
+  } finally {
+    actief--;
+  }
+}
+
+async function maakPdf(payload: ExportPdfPayload): Promise<Response> {
   const logoPad = path.join(process.cwd(), "public/LOGO/Coniche_MMW_standard.svg");
   const logoSvg = await readFile(logoPad, "utf-8");
   const logoDataUri = `data:image/svg+xml;base64,${Buffer.from(logoSvg).toString("base64")}`;

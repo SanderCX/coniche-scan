@@ -1,6 +1,6 @@
 /**
  * Bridge tussen elke losse `localStorage`-store (`lib/db.ts`,
- * `lib/assessment-store.ts`, `lib/gebruikers-store.ts`,
+ * `lib/assessment-store.ts`,
  * `lib/instellingen-store.ts`, `lib/algemene-teksten-store.ts`) en de
  * lokale, host-brede opslag (`app/api/store/[key]/route.ts`) — zodat
  * elke browser op hetzelfde apparaat met dezelfde data start, i.p.v. elk

@@ -2,7 +2,6 @@ import { useSyncExternalStore } from "react";
 import { BeheerRol, Gebruiker } from "./types";
 import { nieuwId } from "./id";
 import { normaliseerEmail } from "./email";
-import { haalServerKopieOp, stuurNaarServer } from "./server-sync";
 
 /**
  * Gebruikersbeheer (Admin/Consultant), `datamodel.md` deel 2 en
@@ -17,7 +16,6 @@ import { haalServerKopieOp, stuurNaarServer } from "./server-sync";
  * (bijv. een eigen account voor Joost).
  */
 const KEY = "coniche-scan:gebruikers";
-const SERVER_SLEUTEL = "gebruikers";
 const SERVER_SENTINEL = "__server__";
 
 type Listener = () => void;
@@ -47,8 +45,6 @@ function getSnapshot(): string {
   if (typeof window === "undefined") return SERVER_SENTINEL;
   const ruw = window.localStorage.getItem(KEY);
   if (ruw) return ruw;
-  // Niet meteen pushen naar de server, zie dezelfde kanttekening in
-  // lib/db.ts (race met `haalServerKopieOp`'s async ophaalronde).
   const seed = JSON.stringify([zaadGebruiker()]);
   window.localStorage.setItem(KEY, seed);
   return seed;
@@ -57,12 +53,11 @@ function getServerSnapshot(): string {
   return SERVER_SENTINEL;
 }
 
-// Bij het laden van de pagina: eenmalig de lokale, host-brede serverkopie
-// ophalen zodat elke browser op dit apparaat met dezelfde data (en
-// dezelfde gezaaide admin-gebruiker) start (lib/server-sync.ts).
-if (typeof window !== "undefined") {
-  haalServerKopieOp(SERVER_SLEUTEL, KEY, emitChange);
-}
+// Bewust GEEN synchronisatie met de server (lib/server-sync.ts, anders dan de
+// andere vier stores): De accounts bevatten nog wachtwoorden in leesbare tekst
+// en `/api/store` heeft geen autorisatie, dus ze horen niet in Neon. Gebruikers
+// leven daarom per browser tot de database met echte inlog er is
+// (backlog.md, fase 2 en 3).
 
 function parseSnapshot(snapshot: string): Gebruiker[] {
   if (snapshot === SERVER_SENTINEL) return [];
@@ -86,7 +81,6 @@ function slaAlles(alles: Gebruiker[]): void {
   const json = JSON.stringify(alles);
   window.localStorage.setItem(KEY, json);
   emitChange();
-  stuurNaarServer(SERVER_SLEUTEL, json);
 }
 
 export function useGebruikers(): Gebruiker[] {
