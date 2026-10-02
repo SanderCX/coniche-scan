@@ -1,6 +1,7 @@
 /**
- * Statische content voor de publieke "AI"-pagina (`app/ai-domeinen/page.tsx`),
- * letterlijk overgenomen uit `visie-ai-klantcontact.md`.
+ * Statische content voor de interactieve AI-domeinenmodel-visual
+ * (`app/ai-scan/page.tsx`, route `/ai-scan`), letterlijk overgenomen uit
+ * `visie-ai-klantcontact.md`.
  */
 
 export interface AiDomeinContent {
@@ -27,7 +28,7 @@ export const aiDomeinen: AiDomeinContent[] = [
     beschrijving: [
       "De kwaliteit van AI wordt begrensd door de kwaliteit van de onderliggende data en systemen.",
       "AI moet kunnen beschikken over betrouwbare informatie, actuele kennis en een technische omgeving waarin gegevens veilig, consistent en herleidbaar beschikbaar zijn. Dat vraagt om integratie tussen systemen, duidelijke definities en een architectuur die groei en verandering ondersteunt. Ook is vastgelegd wat er gebeurde, wanneer en met welke input, zodat AI achteraf te controleren blijft.",
-      "Een organisatie met een sterke basis voorkomt dat AI-oplossingen afhankelijk worden van losse databronnen, handmatig beheer of individuele kennis.",
+      "Een organisatie met een sterke basis voorkomt dat AI-oplossingen afhankelijk worden van losse databronnen, handmatig beheer of individuele kennis. Die sterke basis vraagt in de praktijk een centraal platform als randvoorwaarde, niet een verzameling losse koppelingen die per toepassing opnieuw wordt uitgevonden.",
     ],
     centraleVraag: "Beschikt AI over de gegevens, kennis en technische basis die nodig zijn om betrouwbaar te functioneren?",
   },

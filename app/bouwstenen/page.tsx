@@ -3,6 +3,7 @@
 import { Suspense, useLayoutEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PageWithChrome } from "@/components/PageWithChrome";
+import { MijnGegevensMenuVoorCode } from "@/components/MijnGegevensMenuVoorCode";
 import { Modal } from "@/components/Modal";
 import { bouwstenenGroepen, BouwsteenContent } from "@/data/bouwstenen-content";
 import { CATEGORIE_COLORS } from "@/lib/colors";
@@ -60,7 +61,7 @@ function BouwsteenKaart({
           position: "absolute",
           top: "0.7rem",
           right: "0.9rem",
-          fontSize: "0.75rem",
+          fontSize: "var(--fs-xs)",
           fontWeight: 700,
           color: actief ? "rgba(255,255,255,0.75)" : "var(--ink-s)",
         }}
@@ -249,7 +250,12 @@ function BouwstenenInhoud() {
   const code = useSearchParams().get("code") ?? undefined;
 
   return (
-    <PageWithChrome logoHref={code ? `/s/${code}` : undefined} code={code} toonTerug>
+    <PageWithChrome
+      logoHref={code ? `/s/${code}` : undefined}
+      code={code}
+      toonTerug
+      identiteitMenu={code ? <MijnGegevensMenuVoorCode code={code} /> : undefined}
+    >
       <div style={{ background: "linear-gradient(180deg, var(--or-faint) 0%, var(--bg) 65%)" }}>
         <div className="container" style={{ padding: "4.5rem 2rem 3.5rem", textAlign: "center" }}>
           <span className="eyebrow">Coniche Scan</span>

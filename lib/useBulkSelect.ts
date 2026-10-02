@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-/** Herbruikbaar select-all/bulk-select patroon (admin-beheerpagina.md: "Select + verwijderen wordt een terugkerend patroon"). */
+/** Herbruikbaar select-all/bulk-select patroon (beheerpagina.md: "Select + verwijderen wordt een terugkerend patroon"). */
 export function useBulkSelect(alleIds: string[]) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
 

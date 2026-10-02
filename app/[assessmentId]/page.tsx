@@ -3,7 +3,7 @@
 import { use } from "react";
 import Link from "next/link";
 import { useAssessment } from "@/lib/assessment-store";
-import { alleVragen } from "@/lib/assessment-structuur";
+import { actieveVragen } from "@/lib/assessment-structuur";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
 
@@ -26,7 +26,7 @@ export default function AssessmentLandingPage({
   }
 
   const assessmentVast = assessment;
-  const totaalVragen = alleVragen(assessmentVast).length;
+  const totaalVragen = actieveVragen(assessmentVast).length;
 
   return (
     <PageWithChrome>
@@ -61,7 +61,7 @@ export default function AssessmentLandingPage({
             style={{
               maxWidth: "34rem",
               margin: "0 auto",
-              fontSize: "1.15rem",
+              fontSize: "var(--fs-l)",
               fontWeight: 700,
               color: "var(--ink)",
             }}
@@ -111,7 +111,7 @@ export default function AssessmentLandingPage({
                   background: "var(--or-faint)",
                   color: "var(--or)",
                   fontWeight: 800,
-                  fontSize: "0.9rem",
+                  fontSize: "var(--fs-m)",
                   marginBottom: "0.9rem",
                 }}
               >

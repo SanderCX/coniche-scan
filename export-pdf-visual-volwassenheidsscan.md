@@ -19,7 +19,7 @@ Uitsluitend één scan per PDF: Geen geaggregeerde data over meerdere
 respondenten, dat is een apart, onbesloten punt (`backlog.md`,
 Aggregatie).
 
-**Bulk-export vanuit Ingevulde scans (`admin-beheerpagina.md` punt 7)
+**Bulk-export vanuit Ingevulde scans (`beheerpagina.md` punt 7)
 blijft beperkt tot CSV.** Geen bulk-PDF: Bij een CSV met meerdere rijen
 is er geen aggregatie-vraagstuk (elke rij blijft een eigen scan), bij
 een PDF met meerdere scans wel. "Eén gedeelde exportfunctie" (punt 7)
@@ -55,7 +55,7 @@ type ContentBron =
   | "content-2030.md"
 ```
 
-Beheerbaar bij punt 1 (Assessment-types) in `admin-beheerpagina.md`,
+Beheerbaar bij punt 1 (Assessment-types) in `beheerpagina.md`,
 als dropdown met deze vaste bronnen, geen vrij tekstveld (voorkomt een
 stille lege sectie bij een tikfout).
 
@@ -66,14 +66,13 @@ stille lege sectie bij een tikfout).
 
 ## Techniek in het kort
 
-- Server-side HTML naar PDF met Puppeteer (Chromium), één functie:
-  `buildResultatenPdfHtml` in `lib/pdf/build-html.ts`. Route:
-  `app/api/export-pdf/route.ts`. De browser stuurt de volledige payload
-  mee (opslag is nog localStorage).
-- Charts zijn handgebouwde SVG's (`lib/pdf/charts.ts`), kleuren uit
-  `lib/colors.ts`.
-- Footer via CSS `@page`-marginboxen, niet via Puppeteer's
-  footerTemplate: Alleen zo kan het logo pas vanaf pagina 2 verschijnen.
+- Server-side gerenderd naar PDF (headless Chromium), niet een platte
+  browser-print: Alleen zo is een echte "Pagina X/Y" mogelijk. De
+  browser stuurt de volledige payload mee (opslag is nog localStorage).
+- Charts zijn handgebouwde SVG's, dezelfde kleuren als op het scherm.
+- Footer via CSS `@page`-marginboxen, niet via de standaard
+  footer-template van de renderer: Alleen zo kan het logo pas vanaf
+  pagina 2 verschijnen.
 - Volle paginabreedte voor de gloed: Zijmarges van de pagina zijn 0, de
   `body` heeft `padding: 0 16mm`.
 - **Paginanummering werkt.** Een eerdere versie van deze spec noemde dit
@@ -122,20 +121,27 @@ gelijkmatig vullen.
 
 ## Pagina 2 t/m 9: Bouwstenen, 2 per pagina
 
-Vier pagina's, elk een paar bouwstenen (15 bouwstenen; het laatste paar
-telt er één). Per pagina een flex-kolom (`min-height: 245mm`) met een
-**oranje horizontale lijn (2px) precies in het midden** tussen de twee
-bouwstenen; de ruimte boven en onder de lijn is gelijk (7mm padding plus
-de resterende ruimte verdeeld met `margin: auto`). Een bouwsteen wordt
-nooit over twee pagina's gesplitst.
+Acht pagina's, elk een paar bouwstenen (15 bouwstenen; het laatste paar
+telt er één). Per pagina een flex-kolom (`min-height: 245mm`) met de
+**oranje horizontale lijn (2px)** tussen de twee bouwstenen. De twee
+bouwstenen staan top-aligned direct onder elkaar, met de lijn op een
+vaste, kleine afstand ertussen (ca. 1 regel: 3mm onder de eerste
+bouwsteen, 4mm boven de tweede — bij de compacte variant 2mm/3mm, zie
+`export-pdf-visual-ai-scan.md`), **geen ruimteverdeling meer via
+`margin: auto`** op de lijn (op verzoek van Sander teruggedraaid: dat liet
+de lijn voorheen zweven in het midden van de vrije ruimte op de pagina,
+met een veel grotere en per pagina wisselende afstand tot gevolg).
+Onbenutte ruimte op een korter paar blijft nu gewoon onderaan de pagina
+staan. Een bouwsteen wordt nooit over twee pagina's gesplitst.
 
 **Val op, opgelost**: Een lange opmerking bij een of beide bouwstenen van
 een paar kon het paar over de beschikbare paginahoogte laten heen groeien
 — omdat elk bouwsteenblok ongesplitst moet blijven, sprong het tweede
 blok dan in zijn geheel naar een volgende, verder lege pagina (bijv.
 bouwsteen 7 wel, bouwsteen 8 niet meer op dezelfde pagina). De tekst en
-marges hieronder zijn daarom verdicht t.o.v. een eerdere versie van deze
-pagina's, met meer buffer voor een opmerking. Bij een uitzonderlijk lange
+marges zijn daarom verdicht t.o.v. een eerdere versie van deze pagina's,
+met meer buffer voor een opmerking — de kleinere, vaste ruimte rond de
+lijn (hierboven) vergroot die buffer verder. Bij een uitzonderlijk lange
 opmerking kan dit zich nog steeds voordoen; zie "Let op bij
 aanpassingen".
 
@@ -177,11 +183,10 @@ Tekst iets verdicht (8,5pt, regelhoogte 1,42) zodat alles past.
 ## Bron van de tekst
 
 Zelfde databestanden als de webpagina's, zodat pagina en PDF nooit uit
-elkaar lopen: `data/visie-content.ts` (Visie),
-`data/bouwstenen-content.ts` en `lib/bouwblok-info.ts` (uitleg per
-bouwsteen), `data/klantcontact-assessment.ts` (vragen, schaal, en de
-scan-brede PDF-instellingen, in de code `pdfContentSecties` genoemd —
-zelfde naam als `Assessment.pdfContentSecties` in `datamodel.md`).
+elkaar lopen: `data/visie-content.ts` (Visie), `data/bouwstenen-
+content.ts` (uitleg per bouwsteen), `data/klantcontact-assessment.ts`
+(vragen, schaal, en de scan-brede PDF-instellingen, `Assessment.
+pdfContentSecties` in `datamodel.md`).
 
 ## Open punten
 
@@ -195,5 +200,3 @@ zelfde naam als `Assessment.pdfContentSecties` in `datamodel.md`).
   `.pdf-pagina`'s.
 - Bouwstenen met veel langere uitleg kunnen het paar over de pagina
   duwen; controleer na een contentwijziging het aantal pagina's (10).
-- Geen backticks in de CSS-commentaren in `build-html.ts` (de HTML staat
-  in een template literal).

@@ -1,4 +1,5 @@
 import { Assessment } from "@/lib/types";
+import { isVlakkeAssessment } from "@/lib/assessment-structuur";
 import {
   alleBouwblokResultaten,
   alleGroepResultaten,
@@ -49,16 +50,20 @@ export function buildIndesignExport(payload: ExportIndesignPayload): IndesignExp
   const { beantwoord, totaal } = voortgang(assessment, antwoorden);
   const { sterktes, verbeterkansen } = topSterktesEnVerbeterkansen(bouwblokResultaten);
 
+  // Valt terug op de volledige assessment-naam als een (oud opgeslagen)
+  // assessment nog geen kortLabel heeft — zelfde afwijking als
+  // lib/pdf/bestandsnaam.ts, hier ook toegepast op het <kortLabel>-element
+  // verderop, niet alleen op de bestandsnaam-slug.
+  const kortLabel = assessment.kortLabel || assessment.naam;
   const orgSlug = slug(organisatieNaam);
-  const scanSlug = slug(assessment.kortLabel || assessment.naam);
+  const scanSlug = slug(kortLabel);
   const bestandsnaamRadar = `${orgSlug}-${scanSlug}-radar.svg`;
   const bestandsnaamStaaf = `${orgSlug}-${scanSlug}-staafdiagram.svg`;
   const bestandsnaamScoreAlgemeen = `${orgSlug}-${scanSlug}-score-algemeen.svg`;
   const bestandsnaamTop3Sterktes = `${orgSlug}-${scanSlug}-top3-sterktes.svg`;
   const bestandsnaamTop3Verbeterkansen = `${orgSlug}-${scanSlug}-top3-verbeterkansen.svg`;
 
-  const isVlak = !assessment.categorieen || assessment.categorieen.length === 0;
-  const groepsScoresXml = `<groepsScores type="${isVlak ? "bouwblok" : "categorie"}">${groepResultaten
+  const groepsScoresXml = `<groepsScores type="${isVlakkeAssessment(assessment) ? "bouwblok" : "categorie"}">${groepResultaten
     .map((g) => `<groep naam="${escapeXml(g.groepNaam)}" score="${g.score !== null ? g.score.toFixed(1) : ""}" />`)
     .join("")}</groepsScores>`;
 
@@ -69,7 +74,7 @@ export function buildIndesignExport(payload: ExportIndesignPayload): IndesignExp
     `<organisatie><naam>${escapeXml(organisatieNaam)}</naam>${kenmerkenXml(organisatieKenmerken)}</organisatie>` +
     `<respondent><naam>${escapeXml(respondentNaam)}</naam><functie>${escapeXml(respondentFunctie || "n.v.t.")}</functie><team>${escapeXml(respondentTeam || "n.v.t.")}</team></respondent>` +
     `<meting><label>${escapeXml(metingLabel)}</label></meting>` +
-    `<assessment><naam>${escapeXml(assessment.naam)}</naam><kortLabel>${escapeXml(assessment.kortLabel)}</kortLabel></assessment>` +
+    `<assessment><naam>${escapeXml(assessment.naam)}</naam><kortLabel>${escapeXml(kortLabel)}</kortLabel></assessment>` +
     `<datum>${formatDatum(afgerondOp)}</datum>` +
     `<overallScore waarde="${overall !== null ? overall.toFixed(1) : ""}" van="5" />` +
     `<voortgang beantwoord="${beantwoord}" totaal="${totaal}" />` +

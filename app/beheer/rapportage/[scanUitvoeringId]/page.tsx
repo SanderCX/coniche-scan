@@ -1,11 +1,13 @@
 "use client";
 
 import { use } from "react";
-import Link from "next/link";
 import { useScanUitvoering } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
-import { alleVragen } from "@/lib/assessment-structuur";
+import { useIngelogdeGebruiker } from "@/lib/admin-auth";
+import { magOrganisatieToegang } from "@/lib/rechten";
+import { gemiddeldeAntwoordenVoorMeting } from "@/lib/scoring";
 import { ResultsView } from "@/components/ResultsView";
+import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 
 /**
  * Rapportage over één meting: het gemiddelde per vraag over alle
@@ -22,6 +24,7 @@ export default function RapportagePage({
   const { scanUitvoeringId } = use(params);
   const gegevens = useScanUitvoering(scanUitvoeringId);
   const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
+  const ingelogd = useIngelogdeGebruiker();
 
   if (!gegevens || !assessment) {
     return (
@@ -32,15 +35,34 @@ export default function RapportagePage({
   }
 
   const { organisatie, scanUitvoering } = gegevens;
+
+  // Bereik "eigen" (datamodel.md deel 2, Rechtenmatrix, resultaten.inzien):
+  // een Consultant mag alleen rapportages inzien van organisaties die hij
+  // zelf aanmaakte of waaraan een Admin hem toewees.
+  if (!magOrganisatieToegang(ingelogd, organisatie)) {
+    return (
+      <div className="admin-main">
+        <p className="admin-notice">
+          Geen toegang: deze meting hoort bij een organisatie die niet door
+          jou aangemaakt is en ook niet aan jou toegewezen.
+        </p>
+      </div>
+    );
+  }
   const afgerond = scanUitvoering.invullingen.filter((i) => i.status === "afgerond");
 
   if (afgerond.length === 0) {
     return (
       <div className="admin-main">
-        <Link href={`/beheer/organisaties/${organisatie.id}`} className="admin-back">
-          ← {organisatie.naam}
-        </Link>
-        <h1>Rapportage</h1>
+        <Kruimelpad
+          delen={[
+            { label: "Organisaties", href: "/beheer/organisaties" },
+            { label: organisatie.naam, href: `/beheer/organisaties/${organisatie.id}` },
+            { label: scanUitvoering.label, href: `/beheer/metingen/${scanUitvoering.id}` },
+            { label: "Resultaten van de Meting" },
+          ]}
+        />
+        <h1>Resultaten van de Meting</h1>
         <p className="admin-notice">
           Nog geen afgeronde scans voor {scanUitvoering.label} — {assessment.naam}.
         </p>
@@ -48,23 +70,19 @@ export default function RapportagePage({
     );
   }
 
-  const vragen = alleVragen(assessment);
-  const gemiddeldeAntwoorden: Record<string, number> = {};
-  for (const vraag of vragen) {
-    const waarden = afgerond
-      .map((i) => i.antwoorden[vraag.id])
-      .filter((w): w is number => typeof w === "number");
-    if (waarden.length > 0) {
-      gemiddeldeAntwoorden[vraag.id] = waarden.reduce((a, b) => a + b, 0) / waarden.length;
-    }
-  }
+  const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMeting(assessment, scanUitvoering.invullingen);
 
   return (
     <div className="admin-main admin-main--breed">
-      <Link href={`/beheer/organisaties/${organisatie.id}`} className="admin-back">
-        ← {organisatie.naam}
-      </Link>
-      <h1>Rapportage</h1>
+      <Kruimelpad
+        delen={[
+          { label: "Organisaties", href: "/beheer/organisaties" },
+          { label: organisatie.naam, href: `/beheer/organisaties/${organisatie.id}` },
+          { label: scanUitvoering.label, href: `/beheer/metingen/${scanUitvoering.id}` },
+          { label: "Resultaten van de Meting" },
+        ]}
+      />
+      <h1>Resultaten van de Meting</h1>
       <p className="text-sm text-ink-m">
         {scanUitvoering.label} — {assessment.naam} · gemiddelde over {afgerond.length}{" "}
         {afgerond.length === 1 ? "afgeronde respondent" : "afgeronde respondenten"}

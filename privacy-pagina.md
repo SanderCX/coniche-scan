@@ -116,4 +116,7 @@ gebruikt buiten wat technisch noodzakelijk is voor de sessie.
 - Verwerkersovereenkomst nodig tussen Coniche en de klantorganisatie,
   gezien Coniche in deze opzet de gegevens verwerkt namens de klant.
   Losstaand van deze pagina, wel eraan gerelateerd.
-- Exacte bewaartermijn, afhankelijk van het backlogpunt "Data-ouderdom".
+- Exacte bewaartermijn (het getal, niet het mechanisme): Het mechanisme
+  staat vast (`datamodel.md` deel 2, Bewaartermijn ingevulde scans;
+  `beheerpagina.md`, punt 4), de waarde van `bewaarTermijnDagen` zelf
+  nog niet.

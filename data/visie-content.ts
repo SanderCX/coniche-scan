@@ -52,6 +52,6 @@ export const watIsGoedKlantcontact: string[] = [
 ];
 
 export const watIsGoedKlantcontactSlot =
-  "Die eisen kunnen met elkaar botsen. Een organisatie kan tevreden klanten hebben tegen kosten die niet vol te houden zijn. Ze kan ook efficiënt werken terwijl klanten steeds opnieuw moeten bellen voor dezelfde vraag. Coniche beoordeelt klantcontact daarom altijd over meerdere onderdelen tegelijk.";
+  "Die eisen kunnen met elkaar botsen. Een organisatie kan tevreden klanten hebben tegen kosten die niet vol te houden zijn. Ze kan ook efficiënt werken terwijl klanten steeds opnieuw moeten bellen voor dezelfde vraag. Een medewerker kan een gesprek goed voeren terwijl het proces erachter vastloopt. Coniche beoordeelt klantcontact daarom altijd over meerdere onderdelen tegelijk.";
 
 export const verbetercyclus: string[] = ["Meten", "Begrijpen", "Besluiten", "Doen", "Leren"];

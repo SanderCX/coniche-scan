@@ -3,7 +3,7 @@ import { alleBouwblokkenMetGroep, alleVragen } from "./assessment-structuur";
 import { organisatieVelden } from "@/data/organisatie-velden";
 
 /**
- * Import van scans (CSV), in twee bronformaten (`import-legacy-scans.md`):
+ * Import van scans (CSV), in twee bronformaten (`import-scans.md`):
  * "oud" (de externe, stopgezette tool) en "nieuw" (onze eigen "Als
  * CSV"-export, `export-csv.md`) — dat laatste vooral bedoeld om data te
  * verplaatsen tussen browsers, zolang de opslag nog localStorage is
@@ -16,7 +16,7 @@ import { organisatieVelden } from "@/data/organisatie-velden";
  * tonen, dan pas schrijven) los te testen is.
  *
  * De vorm van de `answers`-kolom (JSON), bevestigd tegen de daadwerkelijke
- * exports (`import-legacy-scans.md`, "Bronformaat"): een **platte lijst**
+ * exports (`import-scans.md`, "Bronformaat"): een **platte lijst**
  * van losse vraag-items (60 bij Klantcontact, 40 bij de AI-scan), geen
  * geneste structuur per bouwblok. `groepeerPerBouwblok` hieronder groepeert
  * deze lijst eerst op `buildingBlockId` (volgorde van eerste voorkomen),
@@ -235,6 +235,16 @@ export interface GevalideerdeRij {
   /** Automatisch bepaald ("oud": `detecteerAssessment`; "nieuw": op naam), leeg als dat niet lukte. */
   assessmentId?: string;
   assessmentNaam?: string;
+  /**
+   * Alleen "oud", bij een 95%+-vraagtekstmatch i.p.v. een 100%-bloknaam-
+   * match (import-scans.md, Assessment- en bouwblok-matching, stap 2):
+   * deze rij is wel gedetecteerd, maar vereist een losse bevestiging per
+   * rij vóór import, nooit in bulk. `assessmentMatchPercentage`/
+   * `afwijkendeVragen` zijn dan gezet, voor de voorbeeldweergave.
+   */
+  vereistBevestiging?: boolean;
+  assessmentMatchPercentage?: number;
+  afwijkendeVragen?: string[];
   organisatieNaam: string;
   /** Alleen ter info in de preview; de daadwerkelijke matching gebeurt bij het schrijven (lib/db.ts), op naam op dat moment. */
   organisatieBestaatMogelijk: boolean;
@@ -295,7 +305,7 @@ function matchAntwoorden(
     blok.items.forEach((item, i) => {
       antwoorden[bouwblok.vragen[i].id] = item.answerScore;
     });
-    // blockComment staat op elk vraag-item binnen het blok herhaald (import-legacy-scans.md,
+    // blockComment staat op elk vraag-item binnen het blok herhaald (import-scans.md,
     // "Opmerkingen per bouwblok") — dedupliceren tot één waarde, tegenstrijdige waarden binnen
     // hetzelfde blok is een reden om de hele rij niet te importeren.
     const opmerkingWaarden = new Set(blok.items.map((item) => item.blockComment).filter((c): c is string => !!c));
@@ -310,24 +320,53 @@ function matchAntwoorden(
   return { ok: true, antwoorden, opmerkingen };
 }
 
-type DetectieResultaat = { ok: true; assessment: Assessment } | { ok: false; reden: string };
+type DetectieResultaat =
+  | { ok: true; assessment: Assessment; vereistBevestiging: false }
+  | { ok: true; assessment: Assessment; vereistBevestiging: true; percentage: number; afwijkendeVragen: string[] }
+  | { ok: false; reden: string };
+
+/** 95%-drempel voor de vraagtekst-tiebreak (import-scans.md, Assessment- en bouwblok-matching) — vast, niet beheerbaar. */
+const VRAAGTEKST_DREMPEL = 95;
 
 /**
- * Controleert of de vraagteksten van elk blok in de CSV woordelijk
- * overeenkomen met de huidige content van dat Assessment (op volgorde,
- * zelfde regel als `matchAntwoorden`). Gebruikt om twee scan-types met
- * identieke bloknamen te onderscheiden (zie `detecteerAssessment`) — een
- * ontbrekende `questionText` telt als geen match, nooit als een gok.
+ * Berekent het percentage vragen (op volgorde, per blok) dat woordelijk
+ * overeenkomt tussen de CSV en de huidige content van dit Assessment-type,
+ * plus een leesbare lijst van de afwijkende vragen — gebruikt om twee
+ * scan-types met identieke bloknamen te onderscheiden (zie
+ * `detecteerAssessment`). Een ontbrekende `questionText`, of een blok/
+ * vragenaantal dat niet overeenkomt, telt als geen match voor die vraag,
+ * nooit als een gok. `null` als het totaal aantal vragen niet te bepalen
+ * is (zou hier niet moeten voorkomen, bouwblokken-aantal is al gelijk).
  */
-function vraagtekstenKomenOvereen(groepen: LegacyBlok[], assessment: Assessment): boolean {
+function vraagtekstMatch(
+  groepen: LegacyBlok[],
+  assessment: Assessment
+): { percentage: number; afwijkendeVragen: string[] } {
   const bouwblokken = alleBouwblokkenMetGroep(assessment).map((b) => b.bouwblok);
-  return groepen.every((groep) => {
+  let totaal = 0;
+  let gematcht = 0;
+  const afwijkendeVragen: string[] = [];
+  for (const groep of groepen) {
     const bouwblok = bouwblokken.find((b) => b.naam === groep.buildingBlockName);
-    if (!bouwblok || bouwblok.vragen.length !== groep.items.length) return false;
-    return groep.items.every(
-      (item, i) => !!item.questionText && item.questionText.trim() === bouwblok.vragen[i].tekst.trim()
-    );
-  });
+    if (!bouwblok) {
+      totaal += groep.items.length;
+      afwijkendeVragen.push(`${groep.buildingBlockName}: hele blok niet gevonden`);
+      continue;
+    }
+    const n = Math.max(bouwblok.vragen.length, groep.items.length);
+    totaal += n;
+    for (let i = 0; i < n; i++) {
+      const item = groep.items[i];
+      const vraag = bouwblok.vragen[i];
+      if (item && vraag && !!item.questionText && item.questionText.trim() === vraag.tekst.trim()) {
+        gematcht++;
+      } else {
+        afwijkendeVragen.push(`${bouwblok.naam}, vraag ${i + 1}`);
+      }
+    }
+  }
+  const percentage = totaal === 0 ? 0 : Math.round((gematcht / totaal) * 1000) / 10;
+  return { percentage, afwijkendeVragen };
 }
 
 /**
@@ -342,12 +381,19 @@ function vraagtekstenKomenOvereen(groepen: LegacyBlok[], assessment: Assessment)
  * template één-op-één (bijv. de Zorgscan heeft exact dezelfde 15
  * bouwblok-namen als de Klantcontact Volwassenheidsscan, alleen de
  * vraagteksten wijken af) — de eerste stap alleen levert dan meerdere
- * kandidaten op. In dat geval beslissen de vraagteksten: Is er precies één
- * kandidaat waarvan alle vraagteksten (op volgorde, per blok) woordelijk
- * overeenkomen met de CSV, dan is dat het gedetecteerde type. Blijft ook
- * dat niet eenduidig (geen enkele volledige inhoudsmatch, of méér dan één),
- * dan blijft de rij onbepaald met een duidelijk matchingprobleem — geen gok
- * die een fout bestand stilzwijgend op het verkeerde scan-type plakt.
+ * kandidaten op. In dat geval beslissen de vraagteksten, met een
+ * matchpercentage in plaats van alles-of-niets (dit voorkomt dat een CSV
+ * die vóór een latere, kleine tekstcorrectie in de content was
+ * geëxporteerd, helemaal niet meer te importeren is):
+ *
+ * - Precies één kandidaat op 100%: gedetecteerd, automatisch.
+ * - Geen enkele kandidaat op 100%, maar precies één op of boven de 95%-
+ *   drempel: ook gedetecteerd, maar niet automatisch — de rij vereist een
+ *   losse bevestiging per rij (nooit in bulk), met het percentage en de
+ *   afwijkende vragen erbij.
+ * - Geen enkele kandidaat op of boven 95%, of meerdere op of boven 95%:
+ *   onbepaald, geen gok die een fout bestand stilzwijgend op het
+ *   verkeerde scan-type plakt.
  */
 function detecteerAssessment(groepen: LegacyBlok[], assessments: Assessment[]): DetectieResultaat {
   const naamKandidaten = assessments.filter((assessment) => {
@@ -364,20 +410,35 @@ function detecteerAssessment(groepen: LegacyBlok[], assessments: Assessment[]): 
     };
   }
   if (naamKandidaten.length === 1) {
-    return { ok: true, assessment: naamKandidaten[0] };
+    return { ok: true, assessment: naamKandidaten[0], vereistBevestiging: false };
   }
 
-  const inhoudsKandidaten = naamKandidaten.filter((assessment) => vraagtekstenKomenOvereen(groepen, assessment));
-  if (inhoudsKandidaten.length === 1) {
-    return { ok: true, assessment: inhoudsKandidaten[0] };
+  const metScore = naamKandidaten.map((assessment) => ({ assessment, ...vraagtekstMatch(groepen, assessment) }));
+  const op100 = metScore.filter((k) => k.percentage === 100);
+  if (op100.length === 1) {
+    return { ok: true, assessment: op100[0].assessment, vereistBevestiging: false };
   }
+  if (op100.length === 0) {
+    const op95 = metScore.filter((k) => k.percentage >= VRAAGTEKST_DREMPEL);
+    if (op95.length === 1) {
+      return {
+        ok: true,
+        assessment: op95[0].assessment,
+        vereistBevestiging: true,
+        percentage: op95[0].percentage,
+        afwijkendeVragen: op95[0].afwijkendeVragen,
+      };
+    }
+  }
+
   const namenLijst = naamKandidaten.map((a) => `"${a.naam}"`).join(", ");
+  const besteScore = Math.max(...metScore.map((k) => k.percentage));
   return {
     ok: false,
     reden:
-      inhoudsKandidaten.length === 0
-        ? `de bloknamen komen overeen met meerdere scan-types (${namenLijst}), maar de vraagteksten in de CSV komen met geen daarvan exact overeen`
-        : `de bloknamen én vraagteksten komen overeen met meerdere scan-types (${namenLijst}), handmatig oplossen`,
+      besteScore < VRAAGTEKST_DREMPEL
+        ? `de bloknamen komen overeen met meerdere scan-types (${namenLijst}), maar de vraagteksten in de CSV komen met geen daarvan voor minstens ${VRAAGTEKST_DREMPEL}% overeen`
+        : `de bloknamen én vraagteksten komen overeen met meerdere scan-types (${namenLijst}, elk op of boven ${VRAAGTEKST_DREMPEL}%), handmatig oplossen`,
   };
 }
 
@@ -386,7 +447,7 @@ function detecteerAssessment(groepen: LegacyBlok[], assessments: Assessment[]): 
  * (`detecteerAssessment`) en matcht daarna tegen die content. Geeft voor
  * elke rij een resultaat terug (ook de rijen met een probleem), zodat de
  * preview-stap alles in één tabel kan tonen — rijen met een probleem
- * blokkeren de rest niet (import-legacy-scans.md, Werkwijze in beheer).
+ * blokkeren de rest niet (import-scans.md, Werkwijze in beheer).
  */
 export function valideerLegacyRijen(rijen: LegacyCsvRow[], assessments: Assessment[]): GevalideerdeRij[] {
   return rijen.map((rij, index) => {
@@ -451,12 +512,20 @@ export function valideerLegacyRijen(rijen: LegacyCsvRow[], assessments: Assessme
       };
     }
     const assessment = detectie.assessment;
+    const detectieVelden = detectie.vereistBevestiging
+      ? {
+          vereistBevestiging: true as const,
+          assessmentMatchPercentage: detectie.percentage,
+          afwijkendeVragen: detectie.afwijkendeVragen,
+        }
+      : { vereistBevestiging: false as const };
 
     const bouwblokken = alleBouwblokkenMetGroep(assessment).map((b) => b.bouwblok);
     const resultaat = matchAntwoorden(groepen, bouwblokken);
     if (!resultaat.ok) {
       return {
         ...basis,
+        ...detectieVelden,
         assessmentId: assessment.id,
         assessmentNaam: assessment.naam,
         ok: false,
@@ -468,6 +537,7 @@ export function valideerLegacyRijen(rijen: LegacyCsvRow[], assessments: Assessme
 
     return {
       ...basis,
+      ...detectieVelden,
       ok: true,
       assessmentId: assessment.id,
       assessmentNaam: assessment.naam,
@@ -529,6 +599,45 @@ export function parseNieuweExportCsv(tekst: string): CsvParseResultaat<NieuweExp
 }
 
 /**
+ * Bepaalt het bronformaat uit de headerregel zelf, in plaats van de
+ * beheerder dit vooraf te laten kiezen (`import-scans.md`, Werkwijze in
+ * beheer): Net als de Assessment-detectie hieronder is er geen reden om
+ * een keuze te vragen die uit de data zelf al ondubbelzinnig volgt — de
+ * twee formaten delen geen van hun onderscheidende kolomnamen
+ * (`organisatie_naam`/`meting_label`/`antwoorden` bij "nieuw" tegenover
+ * `assessment_id`/`organization_name`/`answers` bij "oud"), dus een
+ * verkeerde gok is uitgesloten. Kijkt naar de headerregel met beide
+ * mogelijke scheidingstekens (een kolomnaam uit het ene formaat bevat
+ * nooit het scheidingsteken van het andere), zodat er nog geen keuze
+ * voor een scheidingsteken nodig is om te bepalen wélk scheidingsteken
+ * hoort bij dit bestand. Geen match voor geen van beide: `undefined`,
+ * dezelfde "niet importeren en melden"-regel als de rest van dit bestand.
+ *
+ * **Leest de headerregel met dezelfde aanhalingstekens-bewuste `parseCsv`
+ * die ook de rijen zelf parseert** (`parseCsvNaarRijen` hierboven), niet
+ * met een kale `split` op het scheidingsteken: Een bulk-export met
+ * aangehaalde kolomkoppen (`"organization_name","answers",...`,
+ * gebruikelijk bij Excel-/pandas-achtige bulk-exports) matchte anders
+ * nergens mee, want de aanhalingstekens bleven dan letterlijk in elke
+ * kolomnaam staan (`"organization_name"` i.p.v. `organization_name`) —
+ * een echte parserbug, ontdekt doordat losse per-organisatie-exports
+ * toevallig niet aangehaald waren en het dus niet eerder opviel.
+ */
+export function detecteerBronFormaat(tekst: string): ImportBronFormaat | undefined {
+  const schoon = tekst.replace(/^﻿/, "");
+  const heeftAlleKolommen = (kolommen: string[], verplicht: readonly string[]) =>
+    verplicht.every((v) => kolommen.includes(v));
+
+  const kolommenPuntkomma = (parseCsv(schoon, ";")[0] ?? []).map((k) => k.trim());
+  if (heeftAlleKolommen(kolommenPuntkomma, VERPLICHTE_KOLOMMEN_NIEUW)) return "nieuw";
+
+  const kolommenKomma = (parseCsv(schoon, ",")[0] ?? []).map((k) => k.trim());
+  if (heeftAlleKolommen(kolommenKomma, VERPLICHTE_KOLOMMEN)) return "oud";
+
+  return undefined;
+}
+
+/**
  * Valideert rijen uit onze eigen export. Matcht `antwoorden`/
  * `opmerkingen_per_bouwblok` rechtstreeks op `bouwblokId`/`vraagId` tegen de
  * huidige content; bestaat een id niet meer (content is intussen gewijzigd),
@@ -557,7 +666,10 @@ export function valideerNieuweExportRijen(
       uitgenodigdOp: rij.uitgenodigd_op || new Date().toISOString(),
       gestartOp: rij.gestart_op || null,
       afgerondOp: rij.afgerond_op || null,
-      meetingLabel: rij.meting_label || "Geïmporteerde meting",
+      // import-scans.md, Meting: label "Import {meting_label}", niet het
+      // kale label zelf — onderscheidt een geïmporteerde Meting meteen van
+      // een handmatig aangemaakte met toevallig dezelfde naam.
+      meetingLabel: `Import ${rij.meting_label || "Geïmporteerde meting"}`,
     };
 
     if (!rij.organisatie_naam.trim() || !rij.respondent_email.trim()) {

@@ -1,6 +1,6 @@
 import { Assessment, ScanWeergave } from "@/lib/types";
 import { bouwblokStatus, voortgang } from "@/lib/scoring";
-import { getGroepen } from "@/lib/assessment-structuur";
+import { actieveGroepen } from "@/lib/assessment-structuur";
 import { CATEGORIE_COLORS } from "@/lib/colors";
 
 export function Sidebar({
@@ -31,7 +31,7 @@ export function Sidebar({
 
       <div className="flow-sidebar-lijst">
         <nav>
-          {getGroepen(assessment).map((groep) => {
+          {actieveGroepen(assessment).map((groep) => {
             const kleur = groep.kleur ? CATEGORIE_COLORS[groep.kleur] : undefined;
             return (
               <div key={groep.id} className="sidebar-categorie">

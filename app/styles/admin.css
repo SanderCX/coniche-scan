@@ -25,7 +25,7 @@
 }
 
 .admin-main h2 {
-  font-size: 1.15rem;
+  font-size: var(--fs-l);
   margin: 1.6rem 0 1rem;
 }
 
@@ -34,7 +34,7 @@
   border: 1px solid var(--border);
   border-radius: var(--r);
   padding: 0.9rem 1.1rem;
-  font-size: 0.82rem;
+  font-size: var(--fs-s);
   color: var(--ink-m);
   margin-bottom: 2rem;
 }
@@ -75,13 +75,13 @@
 }
 
 .admin-row-sub {
-  font-size: 0.8rem;
+  font-size: var(--fs-s);
   color: var(--ink-s);
   margin-top: 0.2rem;
 }
 
 .admin-badge {
-  font-size: 0.72rem;
+  font-size: var(--fs-xs);
   font-weight: 700;
   padding: 0.25rem 0.6rem;
   border-radius: 100px;
@@ -106,16 +106,26 @@
   background: var(--bl-faint);
   color: var(--bl);
 }
+/* Status van een Gebruiker (admin-beheerpagina.md punt 9), niet van een
+   ingevulde scan — los stel klassen, zelfde statuskleuren-token. */
+.admin-badge.status-actief {
+  background: var(--stat-green-faint);
+  color: var(--stat-green);
+}
+.admin-badge.status-gedeactiveerd {
+  background: var(--stat-red-faint);
+  color: var(--stat-red);
+}
 
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: var(--fs-s);
 }
 
 .admin-table th {
   text-align: left;
-  font-size: 0.72rem;
+  font-size: var(--fs-xs);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ink-s);
@@ -189,7 +199,7 @@
 
 .admin-field label {
   display: block;
-  font-size: 0.75rem;
+  font-size: var(--fs-xs);
   font-weight: 700;
   color: var(--ink-s);
   text-transform: uppercase;
@@ -204,12 +214,22 @@
 .admin-field textarea {
   width: 100%;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: var(--fs-m);
   padding: 0.6rem 0.75rem;
   border: 1px solid var(--border-d);
   border-radius: var(--r);
   background: #fff;
   color: var(--ink);
+}
+
+/* Vaste hoogte, gelijk aan de compacte knop ernaast (`--control-h`):
+   Een `<select>` is door zijn eigen pijl 2px hoger dan een `<input>` bij
+   dezelfde padding, en de dropdown is de maatvoering (stylesheet.md). */
+.admin-field input[type="text"],
+.admin-field input[type="number"],
+.admin-field input[type="email"],
+.admin-field select {
+  height: var(--control-h);
 }
 
 .admin-field textarea {
@@ -235,7 +255,7 @@
 
 .veld-groep legend {
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: var(--fs-s);
   padding: 0 0.5rem;
   color: var(--ink);
 }
@@ -270,7 +290,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.85rem;
+  font-size: var(--fs-s);
 }
 
 .veld-verdeling-item input {
@@ -278,7 +298,7 @@
 }
 
 .admin-save-state {
-  font-size: 0.72rem;
+  font-size: var(--fs-xs);
   color: var(--stat-green);
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -309,7 +329,7 @@
 }
 
 .admin-bouwblok-score {
-  font-size: 0.95rem;
+  font-size: var(--fs-m);
   font-weight: 800;
 }
 .admin-bouwblok-card summary::-webkit-details-marker {
@@ -333,7 +353,7 @@
   margin-bottom: 0.6rem;
 }
 .admin-vraag-row .vraag-nr {
-  font-size: 0.78rem;
+  font-size: var(--fs-xs);
   font-weight: 700;
   color: var(--ink-s);
   padding-top: 0.6rem;
@@ -343,7 +363,7 @@
 .admin-back {
   display: inline-block;
   margin-bottom: 1.4rem;
-  font-size: 0.85rem;
+  font-size: var(--fs-s);
   color: var(--ink-s);
   text-decoration: none;
 }
@@ -364,7 +384,7 @@
   padding: 0.8rem 1rem;
 }
 .admin-detail-meta .label {
-  font-size: 0.7rem;
+  font-size: var(--fs-xs);
   text-transform: uppercase;
   color: var(--ink-s);
   letter-spacing: 0.05em;
@@ -373,4 +393,251 @@
 .admin-detail-meta .waarde {
   font-weight: 700;
   color: var(--ink);
+}
+
+/* Tabbalk onder de nav (beheerpagina.md, "Navigatie in beheer"): de
+   onderdelen van de gekozen hoofdlink, alleen op lijstpagina's. */
+.beheer-tabs {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.beheer-tabs-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  gap: 1.8rem;
+}
+.beheer-tab {
+  padding: 0.85rem 0.1rem 0.75rem;
+  font-size: var(--fs-s);
+  font-weight: 600;
+  color: var(--ink-m);
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+}
+.beheer-tab:hover {
+  color: var(--ink);
+}
+.beheer-tab.actief {
+  color: var(--ink);
+  border-bottom-color: var(--or);
+}
+
+/* Kruimelpad boven de paginatitel op detailpagina's. */
+.kruimelpad {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1.2rem;
+  font-size: var(--fs-s);
+  color: var(--ink-s);
+}
+.kruimelpad a {
+  color: var(--ink-s);
+  text-decoration: none;
+}
+.kruimelpad a:hover {
+  color: var(--or);
+}
+.kruimelpad-scheiding {
+  color: var(--border-d);
+}
+
+/* Melding bovenaan een beheerpagina, bijv. na het verplaatsen of
+   samenvoegen van een Respondent. */
+.beheer-melding {
+  max-width: 1300px;
+  margin: 1.2rem auto 0;
+  padding: 0 2rem;
+}
+.beheer-melding .admin-notice {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--stat-green-faint);
+  border-color: var(--stat-green);
+  color: var(--ink);
+}
+
+/* Overzichtsmodal (Respondent-overzicht en Scan-overzicht). */
+.modal-box--breed {
+  max-width: 720px;
+  max-height: 88vh;
+  padding: 1.8rem 2rem 2rem;
+}
+.overzicht-kop h2 {
+  margin: 0 2rem 0.2rem 0;
+  font-size: var(--fs-l);
+}
+.overzicht-kop-sub {
+  font-size: var(--fs-s);
+  color: var(--ink-m);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.6rem;
+  align-items: center;
+}
+.overzicht-melding {
+  margin: 1rem 0 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--r);
+  background: var(--stat-green-faint);
+  border: 1px solid var(--stat-green);
+  font-size: var(--fs-s);
+  color: var(--ink);
+}
+.overzicht-melding.fout {
+  background: var(--stat-red-faint);
+  border-color: var(--stat-red);
+}
+.overzicht-blok {
+  margin-top: 1.4rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border);
+}
+.overzicht-blok-kop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.7rem;
+}
+.overzicht-blok-kop h3 {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-s);
+  margin: 0;
+}
+.beschrijvingslijst {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: 0.45rem 1rem;
+  font-size: var(--fs-s);
+  margin: 0;
+}
+.beschrijvingslijst dt {
+  color: var(--ink-s);
+}
+.beschrijvingslijst dd {
+  margin: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.overzicht-link-rij {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.overzicht-link-rij input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.7rem;
+  font-size: var(--fs-s);
+  border: 1px solid var(--border-d);
+  border-radius: var(--r);
+  background: var(--bg-warm);
+}
+.overzicht-scanregel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-s);
+}
+.overzicht-scanregel:last-child {
+  border-bottom: none;
+}
+.overzicht-scanregel-rechts {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: none;
+}
+.overzicht-acties {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+.overzicht-stap-terug {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: var(--fs-s);
+  color: var(--ink-s);
+  cursor: pointer;
+  margin-bottom: 0.8rem;
+}
+.overzicht-stap-terug:hover {
+  color: var(--or);
+}
+.overzicht-stap-rij {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-s);
+}
+.overzicht-stap-rij:last-child {
+  border-bottom: none;
+}
+.lead-badge {
+  display: inline-block;
+  background: var(--pu);
+  color: #fff;
+  text-transform: uppercase;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.12rem 0.4rem;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+.admin-bekijk-knop {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: var(--fs-s);
+  font-weight: 600;
+  color: var(--or);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.admin-bekijk-knop:hover {
+  text-decoration: underline;
+}
+.lijst-meer-link {
+  display: inline-block;
+  margin-top: 0.7rem;
+  font-size: var(--fs-s);
+  font-weight: 600;
+  color: var(--or);
+  text-decoration: none;
+}
+.lijst-meer-link:hover {
+  text-decoration: underline;
+}
+
+/* Titel van elke modal (Modal, BevestigModal, Overzichtsmodal): Dezelfde
+   maat ongeacht waar de modal in de pagina staat. Zonder deze regel erfde
+   hij de h2-regel van de omgeving (18,4px binnen `.admin-main`, daarbuiten
+   de volle paginatitel-h2). */
+.modal-overlay .modal-box h2 {
+  font-size: var(--fs-l);
+  line-height: 1.2;
+}
+
+.modal-box--breed h2 {
+  margin: 0 2rem 0.7rem 0;
 }

@@ -136,7 +136,7 @@ const domeinen: Bouwblok[] = [
 export const aiVolwassenheid: Assessment = {
   id: "ai-volwassenheid",
   afgeleidVanAssessmentId: null,
-  naam: "AI-volwassenheid in Klantcontact",
+  naam: "AI-Volwassenheid in Klantcontact",
   subtitel: "±20 minuten. Helder inzicht. Direct vervolgstappen.",
   beschrijving:
     "Deze assessment geeft inzicht in hoe volwassen jouw organisatie is in het inzetten van AI binnen klantcontact. Je krijgt zicht op sterke punten, ontwikkelgebieden en waar gerichte vervolgstappen nodig zijn.",

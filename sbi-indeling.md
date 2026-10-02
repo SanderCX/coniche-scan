@@ -155,7 +155,7 @@ deze twee lijsten, geen andere aanpak.
 
 ## Vertaling van de importdata
 
-De twee geïmporteerde exports (`import-legacy-scans.md`) gebruikten
+De twee geïmporteerde exports (`import-scans.md`) gebruikten
 zelf een verkorte, eigen formulering, geen letterlijke SBI-tekst:
 `sector_name` "Financiële dienstverlening" en `subsector_name`
 "Verzekeringen en pensioenfondsen". Dit komt inhoudelijk overeen met

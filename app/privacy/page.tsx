@@ -79,14 +79,21 @@ export default function PrivacyPage() {
         <h2 style={{ fontSize: "1.3rem" }}>6. Wie de gegevens kan zien</h2>
         <ul className="list-disc pl-5 space-y-1">
           <li>Respondenten: alleen hun eigen scan-invulling(en).</li>
-          <li>Coniche-beheerders: organisaties en respondenten die zij zelf beheren.</li>
-          <li>Geen derden, behalve waar dat nodig is voor de techniek zelf (hosting).</li>
+          <li>
+            Coniche-beheerders: organisaties en respondenten die zij zelf beheren, of, met de rol
+            Admin, alles.
+          </li>
+          <li>Een Lead: resultaten van de metingen waar hij toegang toe heeft.</li>
+          <li>
+            Geen derden, behalve waar dat nodig is voor de techniek zelf (hosting,
+            e-mailverzending).
+          </li>
         </ul>
 
         <h2 style={{ fontSize: "1.3rem" }}>7. Beveiliging</h2>
         <ul className="list-disc pl-5 space-y-1">
           <li>Toegang voor respondenten via een niet-herleidbare link, geen wachtwoord.</li>
-          <li>Beheertoegang met wachtwoord.</li>
+          <li>Beheertoegang met wachtwoord, 2FA volgt met de backend.</li>
         </ul>
         <p>
           <em className="text-ink-s">Placeholder: waar de data wordt gehost, en of dat binnen de EU is.</em>

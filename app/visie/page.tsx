@@ -1,4 +1,5 @@
 import { PageWithChrome } from "@/components/PageWithChrome";
+import { MijnGegevensMenuVoorCode } from "@/components/MijnGegevensMenuVoorCode";
 import {
   visieSecties,
   watIsGoedKlantcontact,
@@ -15,7 +16,12 @@ export default async function VisiePage({
 }) {
   const { code } = await searchParams;
   return (
-    <PageWithChrome logoHref={code ? `/s/${code}` : undefined} code={code} toonTerug>
+    <PageWithChrome
+      logoHref={code ? `/s/${code}` : undefined}
+      code={code}
+      toonTerug
+      identiteitMenu={code ? <MijnGegevensMenuVoorCode code={code} /> : undefined}
+    >
       <div
         style={{
           background: "linear-gradient(180deg, var(--or-faint) 0%, var(--bg) 65%)",
@@ -67,7 +73,7 @@ export default async function VisiePage({
                     borderRadius: "50%",
                     background: "var(--or)",
                     color: "#fff",
-                    fontSize: "0.75rem",
+                    fontSize: "var(--fs-xs)",
                     fontWeight: 800,
                     flex: "none",
                     marginTop: "0.1rem",

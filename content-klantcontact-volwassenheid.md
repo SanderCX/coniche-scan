@@ -54,7 +54,7 @@ KPI-huis, Reporting en dashboards
 4. Zijn dashboards/rapportages voor klantcontact minimaal wekelijks
    beschikbaar en worden ze aantoonbaar gebruikt (notulen/acties)?
 
-**4. Leren uit klantcontact**
+**4. Leren uit Klantcontact**
 > In hoeverre leert de organisatie structureel van klantcontact
 > (contactredenen, feedback, fouten) en vertaalt dit naar verbeteringen?
 Tags: Contact drivers, VOC (Voice of Customer), Continuous improvement,

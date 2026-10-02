@@ -62,3 +62,37 @@ export function alleBouwblokkenMetGroep(assessment: Assessment): BouwblokMetGroe
 export function alleVragen(assessment: Assessment) {
   return alleBouwblokkenMetGroep(assessment).flatMap((b) => b.bouwblok.vragen);
 }
+
+/**
+ * Alleen niet-gearchiveerde groepen/bouwblokken/vragen (`Bouwblok.
+ * gearchiveerd`, datamodel.md "Content bewerken"): wat een NIEUWE
+ * invulling nog te zien krijgt en moet afronden. Gebruikt door de
+ * doorloopflow, de sidebar, `voortgang()` en de tellingen op de
+ * landingspagina/contentbeheer-overzicht — nooit door scoring/exports op
+ * een BESTAANDE invulling, die lezen bewust de ongefilterde
+ * `alleBouwblokkenMetGroep`/`alleVragen` hierboven, zodat een antwoord op
+ * een inmiddels gearchiveerde vraag in de score blijft meetellen.
+ */
+export function actieveGroepen(assessment: Assessment): Groep[] {
+  return getGroepen(assessment)
+    .filter((groep) => groep.id === "_vlak" || !(assessment.categorieen ?? []).find((c) => c.id === groep.id)?.gearchiveerd)
+    .map((groep) => ({
+      ...groep,
+      bouwblokken: groep.bouwblokken.filter((b) => !b.gearchiveerd),
+    }));
+}
+
+export function actieveBouwblokkenMetGroep(assessment: Assessment): BouwblokMetGroep[] {
+  return actieveGroepen(assessment).flatMap((groep) =>
+    groep.bouwblokken.map((bouwblok) => ({
+      bouwblok: { ...bouwblok, vragen: bouwblok.vragen.filter((v) => !v.gearchiveerd) },
+      groepId: groep.id,
+      groepNaam: groep.naam,
+      groepKleur: groep.kleur,
+    }))
+  );
+}
+
+export function actieveVragen(assessment: Assessment) {
+  return actieveBouwblokkenMetGroep(assessment).flatMap((b) => b.bouwblok.vragen);
+}

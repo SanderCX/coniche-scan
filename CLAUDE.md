@@ -25,13 +25,14 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `privacy-pagina.md` | De privacypagina |
 | `export-pdf-visual-volwassenheidsscan.md` | PDF-export van één ingevulde scan: gedeelde regels (bron, slotsectie, bulk-export) plus de visuele opbouw voor de Klantcontact Volwassenheidsscan |
 | `export-pdf-visual-ai-scan.md` | PDF-export: visuele opbouw voor de AI-volwassenheidsscan, verschillen t.o.v. hierboven |
+| `export-pdf-visual-zorgscan.md` | PDF-export: visuele opbouw voor de Zorgscan, verschillen t.o.v. `export-pdf-visual-volwassenheidsscan.md` (grotendeels geen, zelfde structuur als het template) |
 | `export-indesign.md` | Export van één ingevulde scan als XML + losse chart-afbeeldingen, voor handmatige verwerking in een InDesign-sjabloon |
 | `export-csv.md` | Export naar CSV: kolommen voor de "Als CSV"-optie, één of meerdere scans |
-| `admin-beheerpagina.md` | De beheeromgeving |
-| `import-legacy-scans.md` | Import van scans (CSV): de oude, stopgezette tool, en onze eigen export teruglezen |
+| `beheerpagina.md` | De beheeromgeving |
+| `import-scans.md` | Import van scans (CSV): de oude, stopgezette tool, en onze eigen export teruglezen |
 | `sbi-indeling.md` | Vaste optielijst voor Sector/Subsector (SBI2025, top 2 niveaus) |
-| `v1-aanpassingen.md` | Afwijkingen van de spec (bugs) en open vragen aan Sander. Besloten aanpassingen aan de spec zelf komen direct in het betreffende bestand hierboven, niet hier. |
 | `backlog.md` | Bewust nog niet opgepakt |
+| `changelog.md` | Bouwlog van Sander: per datum wat er in de code veranderd is, waarom, en welke specs daarbij zijn bijgewerkt |
 
 ## Uitgangspunten
 
@@ -41,6 +42,8 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
   data bewerkt, geen nieuwe flow.
 - De app hoeft voorlopig niet responsive te zijn. Ontwerp en test voor
   desktop.
+- Uitleg bij een veld, knop of instelling staat in een Info-icoon
+  (`stylesheet.md`, Info-icoon), niet als vaste tekst eronder.
 
 ## Status
 
@@ -60,6 +63,10 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   een Coniche-mailserver zijn (`backlog.md`).
 - **Bewust uitgesteld**: AI-managementsamenvatting, aggregatie over
   meerdere respondenten (`backlog.md`).
+- **Export**: Als PDF (`export-pdf-visual-volwassenheidsscan.md` e.v.),
+  als CSV (`export-csv.md`) en voor InDesign als XML (`export-indesign.md`)
+  zijn alle drie gebouwd, vanuit dezelfde Exporteren-dropdown op de
+  resultatenpagina en bij Ingevulde scans (`beheerpagina.md` punt 7).
 
 ## Terminologie
 
@@ -86,14 +93,31 @@ datamodel. Wijzig je iets aan de vormgeving, dan de stylesheet.
 
 ## 1. Scoringslogica
 
+> **Status weging: op de backlog, niet gebouwd** (eerst overleggen met
+> Joost, `backlog.md`). Alles in deze spec over gewichten, de
+> Wegingskaart op de intake en de "2×"-markering is voorlopig
+> toekomstig. Tot het besluit valt rekent de app ongewogen (alle
+> gewichten 1) en geldt de formule uit de vorige versie: Gemiddelde van
+> de bouwblokscores per categorie, overall als som van alle antwoorden
+> gedeeld door het totaal aantal vragen.
+
+Elk bouwblok heeft een gewicht `g` (standaard 1, zie `datamodel.md`,
+`Bouwblok.gewicht`). Alleen de Zorgscan heeft nu bouwblokken met een
+ander gewicht (4, 10 en 11 op 2). Volledige uitwerking en rekenvoorbeeld
+staan in `datamodel.md`, Scoreberekening.
+
 - **Bouwblokscore**: Gemiddelde van de vragen binnen het bouwblok,
-  afgerond op 1 decimaal.
-- **Categoriescore**: Gemiddelde van de bouwblokscores binnen de
-  categorie, afgerond op 1 decimaal.
-- **Overall score**: Gemiddelde van alle bouwblokscores samen, dus niet
-  het gemiddelde van de categoriescores. Categorieën hebben een ongelijk
-  aantal bouwblokken (2, 4, 4, 4, 1) en zouden anders ongelijk meewegen.
-- **Afronding**: Half-away-from-zero (zoals JS `toFixed(1)`).
+  ongewogen, afgerond op 1 decimaal.
+- **Categoriescore**: Gewogen gemiddelde van de bouwblokscores binnen de
+  categorie (`Σ(g × score) / Σ g`), afgerond op 1 decimaal.
+- **Overall score**: `Σ(g × som antwoorden per bouwblok) / Σ(g × aantal
+  vragen per bouwblok)`. Bij gewicht 1 overal is dat de som van alle
+  antwoorden gedeeld door 60. Dit is niet het gemiddelde van de
+  categoriescores: Categorieën hebben een ongelijk aantal bouwblokken (2,
+  4, 4, 4, 1) en zouden anders ongelijk meewegen. De overall komt uit de
+  ruwe antwoorden en niet uit afgeronde bouwblokscores.
+- **Afronding**: Half-away-from-zero (zoals JS `toFixed(1)`), alleen op
+  getoonde waarden.
 - **Voortgang**: Beantwoorde vragen gedeeld door het totaal aantal vragen
   in de scan.
 - **Status in de sidebar**: Nog niet begonnen (grijs nummer), bezig
@@ -150,8 +174,10 @@ De nav heeft een vast deel links (logo) en een contextueel deel rechts
 1. Scherm-specifieke acties, indien aanwezig, uiterst links (bijv.
    "Naar resultaten →" op de doorloopflow zodra de scan afgerond is,
    "← Terug naar de scan" samen met "Exporteren" op de resultatenpagina,
-   geen scheidingslijn tussen die twee onderling, "Overzicht",
-   "Organisaties", "Gebruikers" en "Ingevulde scans" in beheer). Geen
+   geen scheidingslijn tussen die twee onderling, in beheer:
+   "Applicatie", "Assessments" en "Organisaties" voor een Admin, alleen
+   "Organisaties" voor een Consultant, zie `beheerpagina.md`, Wat
+   beheerbaar is). Geen
    apart concept meer voor een terug- versus een vooruit-actie binnen
    hetzelfde scherm: Beide staan hier, uiterst links, ongeacht de
    richting.
@@ -162,14 +188,27 @@ De nav heeft een vast deel links (logo) en een contextueel deel rechts
    Voorbeeld-output) en het intake-scherm.
 4. Een verticale scheidingslijn, **alleen als punt 5 iets bevat**.
 5. Uiterst rechts de link om de sectie te verlaten, met een `←` ervoor
-   (bijv. "← Terug naar site" vanuit beheer, "← Terug naar Mijn
-   metingen" op de doorloopflow, de resultatenpagina en de 4
-   content-pagina's).
+   (bijv. "← Terug naar Mijn metingen" op de doorloopflow, de
+   resultatenpagina en de 4 content-pagina's). Op de 4 content-pagina's
+   staat deze link alleen bij een herkende gebruiker; zonder sessie
+   ontbreekt hij, met de scheidingslijn ervoor (punt 4), en eindigt de
+   nav op de 4 links en "Inloggen". Terug gaat dan via het logo.
+   **Beheer heeft geen
+   exit-actie**: Geen "← Terug naar site" — voegde niets toe en
+   verwarde met "Uitloggen" in het Accountmenu ernaast (twee manieren
+   om "weg te gaan" naast elkaar). Uitloggen is de enige manier om
+   beheer te verlaten. Was eerder wél gespecificeerd, hierbij vervallen.
 6. Een verticale scheidingslijn, **alleen als punt 7 iets bevat**.
 7. **Identiteitsmenu, helemaal uiterst rechts, voorbij de exit-actie**:
-   Het Accountmenu (`admin-beheerpagina.md`) aan de beheerkant, het
+   Het Accountmenu (`beheerpagina.md`) aan de beheerkant, het
    "Mijn gegevens"-menu (verderop in deze sectie) aan de respondentkant.
-   Conventie: Een account-/profielmenu staat vrijwel altijd als
+   Op elk scherm zonder ingelogde/herkende gebruiker (scherm 1, Kies jouw
+   assessment, de andere publieke schermen en de 4 content-pagina's
+   zonder sessie) staat hier in plaats daarvan **"Inloggen"** —
+   zelfde plek, uitgelogde variant van datzelfde slot, geen dropdown en
+   geen pijltje ervoor of erachter. Het slot is dus nooit leeg: Met een
+   herkende gebruiker staat er het menu, zonder staat er "Inloggen". Conventie: Een account-/profielmenu
+   (of de uitgelogde variant ervan) staat vrijwel altijd als
    allerlaatste element in een nav, voorbij eventuele terug-links, niet
    ervoor. Dit corrigeert een eerdere versie van deze spec die het
    Accountmenu links van de exit-actie plaatste.
@@ -200,7 +239,13 @@ geen afwijking van de spec maar een gat erin.
 ### Schermen
 
 1. **Kies jouw assessment**: Kaarten per Assessment-type, generiek over
-   `Assessment[]`.
+   `Assessment[]`. **`.nav-right`**: De 4 vaste content-links, dan
+   "Inloggen" in het identiteitsmenu-slot (Globale layout hierboven,
+   punt 7) — gaat naar scherm 4a, Toegang (e-mail + verificatiecode),
+   voor een respondent/Lead die al een account heeft maar zijn
+   persoonlijke link niet bij de hand heeft. Nu de enige weg naar
+   scherm 4a buiten "Uitloggen" om. Geen scherm-specifieke actie op dit
+   scherm (punt 1 leeg), dus geen scheidingslijn daarvóór.
 2. **Assessment-landingspagina**: Titel, hero, 3 feature-cards en een
    blok "Praktische informatie" met invultijd, direct resultaat en
    privacy. "Start assessment" staat direct onder de hero maar is
@@ -216,12 +261,34 @@ geen afwijking van de spec maar een gat erin.
    client-side verplicht: Er wordt geen aparte toestemmingsstatus
    opgeslagen, geen nieuw datamodel-veld.
 
+   **Wegingskaart**: Heeft het Assessment minstens één bouwblok met een
+   gewicht ongelijk aan 1, dan staat bovenaan de intake (boven het
+   formulier) een kaart (`stylesheet.md`, Wegingskaart) met een
+   weegschaalicoon, met:
+   `Assessment.wegingTitel`, `Assessment.wegingToelichting` en daaronder
+   een chip per bouwblok met gewicht ongelijk aan 1, bijvoorbeeld
+   "Kanaalmanagement (2×)". De chips staan op volgorde van het
+   bouwblok-nummer. Zijn titel of toelichting leeg, dan geldt de
+   standaardtitel "Gewogen scoring" en de standaardtekst "Binnen dit
+   assessment wegen niet alle bouwblokken even zwaar mee in de
+   totaalscore. De volgende bouwblokken tellen extra mee:". Heeft geen
+   enkel bouwblok een afwijkend gewicht, dan verschijnt de kaart niet.
+   Gewicht 1 is de normale situatie en wordt nergens getoond. De tekst
+   is per Assessment aanpasbaar in beheer (`beheerpagina.md`).
+
    **Openen van de persoonlijke link**: De link gaat altijd eerst naar
    "Mijn metingen" (naam volgt), ook als de respondent maar één
    invulling heeft. Van daaruit door naar de intake (bij
    `"uitgenodigd"`), de doorloopflow (bij `"bezig"`) of de resultaten
    (bij `"afgerond"`), per invulling. Bij meerdere invullingen toont de
-   pagina ze allemaal met hun status.
+   pagina ze allemaal met hun status. Bovenaan, boven de lijst, een
+   introtekst uit `mijnMetingenIntro` (`datamodel.md`, Algemene
+   teksten) — beheerbaar, geen vaste tekst in de code.
+
+   **Bij een Lead-rol** (`datamodel.md` deel 2) komen hier ook de
+   resultaten van en de uitnodigen-actie voor zijn toegewezen Metingen
+   bij (niet de hele organisatie), ongeacht of de Lead zelf invullingen
+   heeft — zie `beheerpagina.md`, punt 6a.
 
    **In de header van "Mijn metingen" staan de 4 vaste content-links**
    (zie de Globale layout hierboven, punt 1 van `.nav-right`), elk naar
@@ -258,7 +325,7 @@ geen afwijking van de spec maar een gat erin.
    vraag laten staan in plaats van stilzwijgend een van beide te kiezen.
 
    **"Mijn gegevens"-menu.** Niet te verwarren met het Accountmenu uit
-   `admin-beheerpagina.md` (dat is voor beheerders, dit is voor
+   `beheerpagina.md` (dat is voor beheerders, dit is voor
    respondenten): Een dropdown-knop, zelfde patroon als de Dropdown-knop
    uit `stylesheet.md`. Zichtbaar op elk scherm waar een respondent-
    identiteit bestaat: "Mijn metingen", de doorloopflow, de
@@ -274,8 +341,8 @@ geen afwijking van de spec maar een gat erin.
      dropdown-knop. Geen naam/e-mail in de knop zelf: Die staan al in
      de dropdown-inhoud.
    - **Dropdown-inhoud, rij 1, klikbaar**: "Gegevens bekijken/wijzigen"
-     → opent een modal (dezelfde `.modal-overlay`/`.modal-box` als de
-     toelichting-overlay in de doorloopflow, `stylesheet.md`), niet een
+     → opent een modal (dezelfde basismodal uit
+     `stylesheet.md`, "Modal en Toelichtingsmodal"), niet een
      losse pagina. In die modal hetzelfde formulier als de intake (naam,
      rol/functie, team, notities), vooringevuld met de huidige waarden
      van `Respondent`. Hergebruik van het intake-formulier, geen nieuw
@@ -289,9 +356,10 @@ geen afwijking van de spec maar een gat erin.
      van de lokale sessie, niet een serverside logout.
 
 4a. **Toegang** (nieuw scherm, publiek, geen inlog nodig): De
-    bestemming van "Uitloggen" hierboven, en de eerste stap van de
-    toekomstige e-mailverificatie-flow uit `datamodel.md` deel 2
-    (`VerificatieCode`). Nu al gebouwd, zonder de code-stap erachteraan:
+    bestemming van "Uitloggen" hierboven, én van "Inloggen" op scherm 1,
+    en de eerste stap van de toekomstige e-mailverificatie-flow uit
+    `datamodel.md` deel 2 (`VerificatieCode`). Nu al gebouwd, zonder de
+    code-stap erachteraan:
 
     - Eén e-mailveld en een knop "Versturen".
     - Na versturen: Een vaste, neutrale bevestigingstekst, ongeacht of
@@ -309,11 +377,14 @@ geen afwijking van de spec maar een gat erin.
    met genummerde bouwblokken, actief bouwblok gemarkeerd en drie
    statussen. De sidebar blijft staan als de inhoud rechts scrolt (zie
    `stylesheet.md`). Per bouwblok: Een kop in de categoriekleur met titel
-   en omschrijving, een icoon naast de titel dat een overlay met de
-   `toelichting` opent, tags, de instructieregel "Beantwoord op basis van
+   en omschrijving, een icoon naast de titel dat de Toelichtingsmodal
+   opent (`stylesheet.md`: eyebrow, naam, centrale vraag en
+   `toelichting`, dezelfde modal als in de visuals), tags, de instructieregel "Beantwoord op basis van
    wat aantoonbaar geregeld is (documenten, ritmes, tooling,
    afspraken).", de vragen met 5-puntsschaal en één opmerkingenveld per
-   bouwblok. Op het laatste bouwblok wordt "Volgende" de knop "Bekijk
+   bouwblok. Heeft een bouwblok een gewicht ongelijk aan 1, dan staat
+   naast de titel een kleine chip met de factor ("2×") en in de sidebar
+   achter het bouwblok dezelfde marker. Bij gewicht 1 staat er niets. Op het laatste bouwblok wordt "Volgende" de knop "Bekijk
    resultaten".
 
    **`.nav-right`**: "Naar resultaten →" als scherm-specifieke actie,
@@ -325,6 +396,15 @@ geen afwijking van de spec maar een gat erin.
    afgerond, dan begint `.nav-right` direct met de 4 vaste links, geen
    losse scheidingslijn. Dan de 4 vaste content-links, dan de
    scheidingslijn, dan "← Terug naar Mijn metingen".
+   **Eén persoon tegelijk per scan** (geldt voor de intake en de
+   doorloopflow): Wie de vragenlijst als eerste opent, houdt hem vast zolang
+   zijn pagina openstaat. Opent iemand anders in die periode dezelfde scan,
+   dan ziet die in plaats van de intake of vragenlijst de melding "Deze scan
+   wordt op dit moment al bewerkt", met uitleg dat er maar één persoon
+   tegelijk kan invullen, een knop "Opnieuw proberen" en een automatische
+   controle: Zodra de eerste klaar is of zijn pagina sluit, opent de
+   vragenlijst vanzelf. Het resultatenscherm is niet geblokkeerd. Zie
+   `datamodel.md`, Scanslot, voor het mechanisme.
 6. **Resultatenscherm**: Overall score met classificatiecirkel en
    voortgang, radar van alle bouwblokken, staafdiagram per categorie
    (kleur volgt de score), top 3 sterktes en verbeterkansen, legenda.
@@ -333,13 +413,26 @@ geen afwijking van de spec maar een gat erin.
    Domein", een horizontale balk per domein individueel, gesorteerd van
    hoog naar laag (`Assessment.scoresPerGroepGesorteerd`).
 
+   **Weging in de resultaten**: Een bouwblok met een gewicht ongelijk
+   aan 1 toont zijn factor ("2×") bij de naam, in de radar-legenda en de
+   lijst per bouwblok, en in de top 3 als het daarin staat. De getoonde
+   bouwblokscore zelf blijft ongewogen. Categoriescore en overall zijn
+   gewogen (zie Scoringslogica). Geen factor bij gewicht 1. Dezelfde
+   markering komt terug in de PDF en staat als `gewicht` per bouwblok in
+   de JSON-kolom `groepsScores` van de CSV (`export-csv.md`). De
+   InDesign-export krijgt voorlopig alleen de gewogen scores
+   (`export-indesign.md`, Weging). De PDF-specs
+   (`export-pdf-visual-*.md`) volgen later; tot die tijd geldt deze
+   regel ook voor de PDF.
+
    **`.nav-right`**: "← Terug naar de scan" samen met één knop
-   "Exporteren" met een dropdown (opties "Als PDF" en "Als CSV", zie
-   `stylesheet.md`, niet twee losse knoppen), als scherm-specifieke
-   acties, uiterst links, geen scheidingslijn tussen die twee onderling.
-   Dan de scheidingslijn, dan de 4 vaste content-links (zie Globale
-   layout hierboven). Dan de scheidingslijn, dan "← Terug naar Mijn
-   metingen". Eén gedeelde exportfunctie, zie `admin-beheerpagina.md`.
+   "Exporteren" met een dropdown (opties "Als PDF", "Als CSV" en "Voor
+   InDesign (XML)", zie `stylesheet.md`, niet losse knoppen), als
+   scherm-specifieke acties, uiterst links, geen scheidingslijn tussen
+   die twee onderling. Dan de scheidingslijn, dan de 4 vaste
+   content-links (zie Globale layout hierboven). Dan de scheidingslijn,
+   dan "← Terug naar Mijn metingen". Eén gedeelde exportfunctie, zie
+   `beheerpagina.md` en `export-indesign.md`.
 
 **Bron voor de toelichting**: De bouwsteenbeschrijvingen in
 `visie-coniche.md` deel 2. Zolang die op `concept` staan (zie
@@ -369,7 +462,8 @@ bouwblokken met naam, omschrijving, tags en vragen.
 
 ## 5. Open punten
 
-- Weergave van de aggregatie over meerdere respondenten per organisatie
-  (gemiddelde, afwijking, spreiding).
+- Aggregatie over meerdere respondenten: Het gemiddelde per Meting is
+  gebouwd (`beheerpagina.md`, Organisatie-resultaten). Afwijking en
+  spreiding daarbovenop zijn nog niet ontworpen (`backlog.md`).
 - Rol/functie bij de respondent: Vrij tekstveld of vaste lijst.
 - Focus- en error-states in formulieren (zie `stylesheet.md`).

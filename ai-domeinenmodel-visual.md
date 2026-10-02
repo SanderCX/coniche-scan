@@ -1,8 +1,8 @@
 # Coniche Scan: AI-domeinenmodel, interactief overzicht
 
-**Status: Specificatie, klaar om te bouwen.** Analoog aan
+Route `/ai-scan`. Analoog aan
 `bouwstenenmodel-visual.md`, met één structureel verschil: De
-AI-Volwassenheidsscan heeft geen categorielaag (CLAUDE.md, Assessment).
+AI-volwassenheidsscan heeft geen categorielaag (CLAUDE.md, Assessment).
 Waar dat verschil doorwerkt staat hieronder expliciet; de rest is
 hetzelfde patroon, niet opnieuw uitgelegd.
 
@@ -13,13 +13,14 @@ een domein toont de beschrijving en de centrale vraag.
 
 ## Hergebruik van bestaande content, geen nieuwe
 
-Zelfde modal als bij de toelichting-icoontjes ("i") per bouwblok in de
-doorloopflow (`stylesheet.md`, `.modal-overlay` / `.modal-box`), en
-zelfde patroon als `bouwstenenmodel-visual.md`. Het i-icoontje in de
-doorloopflow en een klik op een blok in dit overzicht openen dezelfde
+De Toelichtingsmodal (`stylesheet.md`, "Modal en Toelichtingsmodal"),
+dezelfde als bij de toelichting-icoontjes ("i") per bouwblok in de
+doorloopflow en als in `bouwstenenmodel-visual.md`. Het i-icoontje in de
+doorloopflow en een klik op een domein in dit overzicht openen dezelfde
 modal met dezelfde content (`Bouwblok.toelichting` en
 `Bouwblok.centraleVraag`, hier gevuld vanuit `visie-ai-klantcontact.md`).
-Geen nieuwe overlay bouwen, geen content dupliceren.
+Eén functie en één opmaak: Geen tweede modalfunctie, geen eigen stijlen,
+geen content dupliceren.
 
 ## Waar dit component een plek krijgt
 
@@ -67,7 +68,10 @@ waar daar `--accent` (de categorietoken) staat:
 
 - **Standaard**: Witte kaart (`.card`), `border-left: 4px solid var(--or)`
   (`.card-accent-left`), donkere tekst, klein gedempt volgnummer
-  rechtsboven, geen schaduw.
+  rechtsboven, geen schaduw. **Omtrek `1.5px solid var(--border)`**, niet
+  de gewone `1px` van `.card` — zelfde afwijking en zelfde reden als
+  `bouwstenenmodel-visual.md`: kleinere kaarten, dicht op elkaar in een
+  grid, dus iets meer gewicht in de rand om ze los van elkaar te houden.
 - **Hover**: Lift en zachte schaduw (`a.card:hover`), `cursor: pointer`.
 - **Actief** (het geopende domein): `background: var(--or)`, witte
   tekst, wit/gedempt-wit volgnummer.
@@ -77,12 +81,13 @@ Gelijke celgrootte binnen de grid, vaste 4 kolommen, geen wrap-logica
 
 ## Interactie
 
-Modal-overlay, hetzelfde component als `bouwstenenmodel-visual.md` en de
-toelichting in de doorloopflow (`stylesheet.md`, `.modal-overlay` /
-`.modal-box`). Inhoud:
+De Toelichtingsmodal, identiek aan die van `bouwstenenmodel-visual.md` en
+aan het i-icoon in de doorloopflow (`stylesheet.md`, "Modal en
+Toelichtingsmodal"). Inhoud:
 
-1. Klein label: Domeinnummer (geen categorie te noemen, die is er niet),
-   bijv. "AI-DOMEIN 1", stijl zoals `.eyebrow`, kleur `--or`.
+1. Klein label: `Assessment.bouwblokLabel` ("AI-domein") met het
+   volgnummer, bijv. "AI-DOMEIN 1" (geen categorie te noemen, die is er
+   niet), stijl zoals `.eyebrow`, kleur `--or`.
 2. Naam van het domein (kop).
 3. Centrale vraag, linker accentbalk in `--or`, label "CENTRALE VRAAG"
    erboven.
@@ -92,5 +97,5 @@ toelichting in de doorloopflow (`stylesheet.md`, `.modal-overlay` /
 
 ## Open punten
 
-- Precieze bewoording van het kleine label (nu "AI-DOMEIN N" als
-  werktitel, geen definitieve tekst).
+- Precieze bewoording van het kleine label (nu "AI-domein" in
+  `bouwblokLabel`, geen definitieve tekst; aanpasbaar in beheer).

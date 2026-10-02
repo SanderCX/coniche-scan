@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAssessments, createAssessment, duplicateAssessmentAsVariant } from "@/lib/assessment-store";
 
 /**
- * admin-beheerpagina.md punt 1: "Nieuw Assessment aanmaken" (leeg) en
+ * beheerpagina.md punt 1: "Nieuw Assessment aanmaken" (leeg) en
  * "Aanmaken vanuit bestaand Assessment" (sector-variant, datamodel.md
  * "Sector-varianten") als twee aparte acties op één scherm.
  */

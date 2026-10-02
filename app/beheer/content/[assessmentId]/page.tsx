@@ -1,12 +1,14 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { useAssessment, useAssessments, updateAssessment } from "@/lib/assessment-store";
-import { Assessment, Bouwblok, ContentBron, FeatureCard } from "@/lib/types";
+import { Assessment, Bouwblok, Categorie, ContentBron, FeatureCard } from "@/lib/types";
+import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { nieuwId } from "@/lib/id";
 import { CATEGORIE_COLORS } from "@/lib/colors";
 import { AssessmentIcon, ASSESSMENT_ICONS } from "@/components/icons/AssessmentIcons";
+import { InfoIcoon } from "@/components/InfoIcoon";
 
 /** Vaste lijst, zie lib/types.ts `ContentBron` en export-pdf-visual-volwassenheidsscan.md, "Slotsectie per scan-type". */
 const SLOTSECTIE_OPTIES: { bron: ContentBron; titel: string }[] = [
@@ -65,10 +67,30 @@ function patchCategorie(
   }));
 }
 
+/**
+ * "Verwijderen" archiveert (datamodel.md, "Content bewerken") i.p.v. het
+ * record echt te verwijderen: anders verdwijnen scores uit eerdere
+ * invullingen die deze categorie/bouwblok/vraag nog gebruikten.
+ * Gearchiveerde items blijven in de array staan (voor scoring/exports),
+ * maar tellen niet meer mee voor nieuwe invullingen (`lib/assessment-
+ * structuur.ts`, `actieve*`-functies) en zijn hier verplaatst naar een
+ * apart "Gearchiveerd"-blokje met een Herstellen-knop.
+ */
 function removeCategorie(assessmentId: string, categorieId: string) {
   updateAssessment(assessmentId, (a) => ({
     ...a,
-    categorieen: (a.categorieen ?? []).filter((c) => c.id !== categorieId),
+    categorieen: (a.categorieen ?? []).map((c) =>
+      c.id === categorieId ? { ...c, gearchiveerd: true } : c
+    ),
+  }));
+}
+
+function herstelCategorie(assessmentId: string, categorieId: string) {
+  updateAssessment(assessmentId, (a) => ({
+    ...a,
+    categorieen: (a.categorieen ?? []).map((c) =>
+      c.id === categorieId ? { ...c, gearchiveerd: false } : c
+    ),
   }));
 }
 
@@ -106,7 +128,17 @@ function patchBouwblok(
 
 function removeBouwblok(assessmentId: string, categorieId: string | null, bouwblokId: string) {
   updateAssessment(assessmentId, (a) =>
-    metBouwblokken(a, categorieId, (bouwblokken) => bouwblokken.filter((b) => b.id !== bouwblokId))
+    metBouwblokken(a, categorieId, (bouwblokken) =>
+      bouwblokken.map((b) => (b.id === bouwblokId ? { ...b, gearchiveerd: true } : b))
+    )
+  );
+}
+
+function herstelBouwblok(assessmentId: string, categorieId: string | null, bouwblokId: string) {
+  updateAssessment(assessmentId, (a) =>
+    metBouwblokken(a, categorieId, (bouwblokken) =>
+      bouwblokken.map((b) => (b.id === bouwblokId ? { ...b, gearchiveerd: false } : b))
+    )
   );
 }
 
@@ -149,7 +181,26 @@ function removeVraag(
   updateAssessment(assessmentId, (a) =>
     metBouwblokken(a, categorieId, (bouwblokken) =>
       bouwblokken.map((b) =>
-        b.id !== bouwblokId ? b : { ...b, vragen: b.vragen.filter((v) => v.id !== vraagId) }
+        b.id !== bouwblokId
+          ? b
+          : { ...b, vragen: b.vragen.map((v) => (v.id === vraagId ? { ...v, gearchiveerd: true } : v)) }
+      )
+    )
+  );
+}
+
+function herstelVraag(
+  assessmentId: string,
+  categorieId: string | null,
+  bouwblokId: string,
+  vraagId: string
+) {
+  updateAssessment(assessmentId, (a) =>
+    metBouwblokken(a, categorieId, (bouwblokken) =>
+      bouwblokken.map((b) =>
+        b.id !== bouwblokId
+          ? b
+          : { ...b, vragen: b.vragen.map((v) => (v.id === vraagId ? { ...v, gearchiveerd: false } : v)) }
       )
     )
   );
@@ -190,7 +241,12 @@ function BouwblokEditor({
   categorieId: string | null;
   bouwblok: Bouwblok;
 }) {
+  // Geen `window.confirm()`: Dat wordt in sommige browseromgevingen stil
+  // onderdrukt, waardoor de knop niets lijkt te doen (BevestigModal.tsx).
+  const [archiveren, setArchiveren] = useState<{ soort: "bouwblok" } | { soort: "vraag"; vraagId: string } | null>(null);
+
   return (
+    <>
     <details className="rounded-lg border border-gray-100 p-3">
       <summary className="flex cursor-pointer flex-wrap items-center gap-2">
         <span className="text-xs font-semibold text-ink-m">#{bouwblok.volgnummer}</span>
@@ -202,16 +258,18 @@ function BouwblokEditor({
           onClick={(e) => e.stopPropagation()}
           className="flex-1 rounded-lg border border-gray-200 p-1.5 text-sm font-medium"
         />
-        <span className="text-xs text-ink-m">{bouwblok.vragen.length} vragen</span>
+        <span className="text-xs text-ink-m">
+          {bouwblok.vragen.filter((v) => !v.gearchiveerd).length} vragen
+        </span>
         <button
           type="button"
           onClick={(e) => {
             e.preventDefault();
-            removeBouwblok(assessmentId, categorieId, bouwblok.id);
+            setArchiveren({ soort: "bouwblok" });
           }}
           className="text-sm text-red-600 hover:underline"
         >
-          Verwijderen
+          Archiveren
         </button>
       </summary>
 
@@ -280,26 +338,28 @@ function BouwblokEditor({
         <div>
           <p className="mb-2 text-sm font-medium text-ink">Vragen</p>
           <div className="space-y-2">
-            {bouwblok.vragen.map((vraag) => (
-              <div key={vraag.id} className="flex items-start gap-2">
-                <span className="mt-2 w-4 text-xs text-ink-m">{vraag.volgnummer}.</span>
-                <textarea
-                  value={vraag.tekst}
-                  onChange={(e) =>
-                    patchVraag(assessmentId, categorieId, bouwblok.id, vraag.id, e.target.value)
-                  }
-                  rows={2}
-                  className="flex-1 rounded-lg border border-gray-200 p-2 text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeVraag(assessmentId, categorieId, bouwblok.id, vraag.id)}
-                  className="mt-2 text-xs text-red-600 hover:underline"
-                >
-                  Verwijder
-                </button>
-              </div>
-            ))}
+            {bouwblok.vragen
+              .filter((v) => !v.gearchiveerd)
+              .map((vraag) => (
+                <div key={vraag.id} className="flex items-start gap-2">
+                  <span className="mt-2 w-4 text-xs text-ink-m">{vraag.volgnummer}.</span>
+                  <textarea
+                    value={vraag.tekst}
+                    onChange={(e) =>
+                      patchVraag(assessmentId, categorieId, bouwblok.id, vraag.id, e.target.value)
+                    }
+                    rows={2}
+                    className="flex-1 rounded-lg border border-gray-200 p-2 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setArchiveren({ soort: "vraag", vraagId: vraag.id })}
+                    className="mt-2 text-xs text-red-600 hover:underline"
+                  >
+                    Archiveer
+                  </button>
+                </div>
+              ))}
           </div>
           <button
             type="button"
@@ -308,9 +368,50 @@ function BouwblokEditor({
           >
             + Vraag toevoegen
           </button>
+
+          {bouwblok.vragen.some((v) => v.gearchiveerd) && (
+            <details className="mt-3">
+              <summary className="cursor-pointer text-xs font-medium text-ink-m">
+                Gearchiveerd ({bouwblok.vragen.filter((v) => v.gearchiveerd).length})
+              </summary>
+              <div className="mt-2 space-y-1">
+                {bouwblok.vragen
+                  .filter((v) => v.gearchiveerd)
+                  .map((vraag) => (
+                    <div key={vraag.id} className="flex items-center gap-2 text-xs text-ink-m">
+                      <span className="flex-1 truncate">{vraag.tekst}</span>
+                      <button
+                        type="button"
+                        onClick={() => herstelVraag(assessmentId, categorieId, bouwblok.id, vraag.id)}
+                        className="text-ink-m underline hover:text-ink"
+                      >
+                        Herstellen
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </details>
+          )}
         </div>
       </div>
     </details>
+    <BevestigModal
+      open={archiveren !== null}
+      titel={archiveren?.soort === "vraag" ? "Vraag archiveren" : "Bouwblok archiveren"}
+      bericht={
+        archiveren?.soort === "vraag"
+          ? 'Vraag archiveren? Ze verdwijnt uit de doorloopflow voor nieuwe invullingen, maar bestaande antwoorden blijven behouden in de score. Je kunt dit terugzetten via "Gearchiveerd" hieronder.'
+          : `Bouwblok "${bouwblok.naam}" archiveren? Het verdwijnt uit de doorloopflow voor nieuwe invullingen, maar bestaande scores op zijn vragen blijven behouden. Je kunt dit terugzetten via "Gearchiveerd" hieronder.`
+      }
+      bevestigLabel="Archiveren"
+      onBevestigen={() => {
+        if (archiveren?.soort === "vraag") removeVraag(assessmentId, categorieId, bouwblok.id, archiveren.vraagId);
+        else removeBouwblok(assessmentId, categorieId, bouwblok.id);
+        setArchiveren(null);
+      }}
+      onAnnuleren={() => setArchiveren(null)}
+    />
+    </>
   );
 }
 
@@ -343,6 +444,7 @@ export default function ContentEditorPage({
   const { assessmentId } = use(params);
   const assessment = useAssessment(assessmentId);
   const alleAssessments = useAssessments();
+  const [categorieArchiveren, setCategorieArchiveren] = useState<Categorie | null>(null);
 
   if (!assessment) {
     return (
@@ -389,19 +491,19 @@ export default function ContentEditorPage({
                 name={assessment.icoon}
                 style={{ width: "1.25rem", height: "1.25rem", color: "var(--or)" }}
               />
-              <select
+              <input
                 value={assessment.icoon}
                 onChange={(e) =>
                   updateAssessment(assessmentId, (a) => ({ ...a, icoon: e.target.value }))
                 }
+                placeholder="Een emoji, bijv. 🩺"
                 className="w-full rounded-lg border border-gray-200 p-2 text-sm"
-              >
-                {Object.keys(ASSESSMENT_ICONS).map((key) => (
-                  <option key={key} value={key}>
-                    {key}
-                  </option>
-                ))}
-              </select>
+              />
+              <InfoIcoon>
+                Een letterlijke emoji (datamodel.md, Assessment.icoon), bijv. 🩺. De sleutels{" "}
+                {Object.keys(ASSESSMENT_ICONS).map((k) => `“${k}”`).join(" en ")} geven in plaats daarvan
+                een eigen SVG-icoon.
+              </InfoIcoon>
             </div>
           </label>
           <label className="block text-sm sm:col-span-2">
@@ -511,13 +613,7 @@ export default function ContentEditorPage({
         </label>
 
         <div className="mt-6">
-          <p className="mb-1 text-sm font-medium text-ink">
-            Slotsectie voor de PDF-export
-          </p>
-          <p className="mb-2 text-xs text-ink-m">
-            Titel en bron uit een vaste lijst, zie export-pdf-visual-volwassenheidsscan.md,
-            &quot;Slotsectie per scan-type&quot;.
-          </p>
+          <p className="mb-2 text-sm font-semibold text-ink">Slotsectie voor de PDF-export</p>
           <div className="flex flex-wrap items-center gap-3">
             <select
               value={assessment.pdfContentSecties?.bron ?? ""}
@@ -557,6 +653,10 @@ export default function ContentEditorPage({
                 />
               </label>
             )}
+            <InfoIcoon>
+              Titel en bron uit een vaste lijst, zie export-pdf-visual-volwassenheidsscan.md, &quot;Slotsectie
+              per scan-type&quot;.
+            </InfoIcoon>
           </div>
         </div>
 
@@ -650,6 +750,7 @@ export default function ContentEditorPage({
         {heeftCategorieen ? (
           <div className="space-y-4">
             {[...(assessment.categorieen ?? [])]
+              .filter((c) => !c.gearchiveerd)
               .sort((a, b) => a.volgorde - b.volgorde)
               .map((categorie) => (
                 <details key={categorie.id} className="rounded-xl border border-gray-200 p-4" open>
@@ -696,23 +797,25 @@ export default function ContentEditorPage({
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();
-                        removeCategorie(assessmentId, categorie.id);
+                        setCategorieArchiveren(categorie);
                       }}
                       className="text-sm text-red-600 hover:underline"
                     >
-                      Verwijderen
+                      Archiveren
                     </button>
                   </summary>
 
                   <div className="mt-4 space-y-3 border-l-2 border-gray-100 pl-4">
-                    {categorie.bouwblokken.map((bouwblok) => (
-                      <BouwblokEditor
-                        key={bouwblok.id}
-                        assessmentId={assessmentId}
-                        categorieId={categorie.id}
-                        bouwblok={bouwblok}
-                      />
-                    ))}
+                    {categorie.bouwblokken
+                      .filter((b) => !b.gearchiveerd)
+                      .map((bouwblok) => (
+                        <BouwblokEditor
+                          key={bouwblok.id}
+                          assessmentId={assessmentId}
+                          categorieId={categorie.id}
+                          bouwblok={bouwblok}
+                        />
+                      ))}
                     <button
                       type="button"
                       onClick={() => addBouwblok(assessmentId, categorie.id)}
@@ -720,23 +823,112 @@ export default function ContentEditorPage({
                     >
                       + {assessment.bouwblokEenheidEnkelvoud}
                     </button>
+
+                    {categorie.bouwblokken.some((b) => b.gearchiveerd) && (
+                      <details className="mt-2">
+                        <summary className="cursor-pointer text-xs font-medium text-ink-m">
+                          Gearchiveerd (
+                          {categorie.bouwblokken.filter((b) => b.gearchiveerd).length})
+                        </summary>
+                        <div className="mt-2 space-y-1">
+                          {categorie.bouwblokken
+                            .filter((b) => b.gearchiveerd)
+                            .map((bouwblok) => (
+                              <div key={bouwblok.id} className="flex items-center gap-2 text-xs text-ink-m">
+                                <span className="flex-1 truncate">{bouwblok.naam}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => herstelBouwblok(assessmentId, categorie.id, bouwblok.id)}
+                                  className="text-ink-m underline hover:text-ink"
+                                >
+                                  Herstellen
+                                </button>
+                              </div>
+                            ))}
+                        </div>
+                      </details>
+                    )}
                   </div>
                 </details>
               ))}
+
+            {(assessment.categorieen ?? []).some((c) => c.gearchiveerd) && (
+              <details>
+                <summary className="cursor-pointer text-sm font-medium text-ink-m">
+                  Gearchiveerde categorieën (
+                  {(assessment.categorieen ?? []).filter((c) => c.gearchiveerd).length})
+                </summary>
+                <div className="mt-2 space-y-1">
+                  {(assessment.categorieen ?? [])
+                    .filter((c) => c.gearchiveerd)
+                    .map((categorie) => (
+                      <div key={categorie.id} className="flex items-center gap-2 text-sm text-ink-m">
+                        <span className="flex-1">{categorie.naam}</span>
+                        <button
+                          type="button"
+                          onClick={() => herstelCategorie(assessmentId, categorie.id)}
+                          className="text-ink-m underline hover:text-ink"
+                        >
+                          Herstellen
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              </details>
+            )}
           </div>
         ) : (
           <div className="space-y-3">
-            {(assessment.bouwblokken ?? []).map((bouwblok) => (
-              <BouwblokEditor
-                key={bouwblok.id}
-                assessmentId={assessmentId}
-                categorieId={null}
-                bouwblok={bouwblok}
-              />
-            ))}
+            {(assessment.bouwblokken ?? [])
+              .filter((b) => !b.gearchiveerd)
+              .map((bouwblok) => (
+                <BouwblokEditor
+                  key={bouwblok.id}
+                  assessmentId={assessmentId}
+                  categorieId={null}
+                  bouwblok={bouwblok}
+                />
+              ))}
+
+            {(assessment.bouwblokken ?? []).some((b) => b.gearchiveerd) && (
+              <details>
+                <summary className="cursor-pointer text-sm font-medium text-ink-m">
+                  Gearchiveerd (
+                  {(assessment.bouwblokken ?? []).filter((b) => b.gearchiveerd).length})
+                </summary>
+                <div className="mt-2 space-y-1">
+                  {(assessment.bouwblokken ?? [])
+                    .filter((b) => b.gearchiveerd)
+                    .map((bouwblok) => (
+                      <div key={bouwblok.id} className="flex items-center gap-2 text-sm text-ink-m">
+                        <span className="flex-1">{bouwblok.naam}</span>
+                        <button
+                          type="button"
+                          onClick={() => herstelBouwblok(assessmentId, null, bouwblok.id)}
+                          className="text-ink-m underline hover:text-ink"
+                        >
+                          Herstellen
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              </details>
+            )}
           </div>
         )}
       </section>
+
+      <BevestigModal
+        open={categorieArchiveren !== null}
+        titel="Categorie archiveren"
+        bericht={`Categorie "${categorieArchiveren?.naam ?? ""}" archiveren? Ze en haar bouwblokken verdwijnen uit de doorloopflow voor nieuwe invullingen, maar bestaande scores blijven behouden. Je kunt dit terugzetten via "Gearchiveerde categorieën" hieronder.`}
+        bevestigLabel="Archiveren"
+        onBevestigen={() => {
+          if (categorieArchiveren) removeCategorie(assessmentId, categorieArchiveren.id);
+          setCategorieArchiveren(null);
+        }}
+        onAnnuleren={() => setCategorieArchiveren(null)}
+      />
     </div>
   );
 }

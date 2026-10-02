@@ -2,6 +2,8 @@ export interface Vraag {
   id: string;
   volgnummer: number;
   tekst: string;
+  /** Zie `Bouwblok.gearchiveerd` hieronder — dezelfde reden, op vraagniveau. */
+  gearchiveerd?: boolean;
 }
 
 export interface Bouwblok {
@@ -15,6 +17,18 @@ export interface Bouwblok {
   /** Standaard 1 (geen effect op de score-berekening, die blijft nog een ongewogen gemiddelde). Zie datamodel.md, Bouwblok. */
   gewicht: number;
   vragen: Vraag[];
+  /**
+   * "Verwijderen" in het contentbeheerscherm zet dit i.p.v. het record echt
+   * te verwijderen (datamodel.md, "Content bewerken"): een bouwblok/vraag
+   * waar al antwoorden aan hangen mag niet verdwijnen, anders verdwijnen
+   * scores uit eerdere invullingen mee. Gearchiveerde bouwblokken/vragen
+   * tellen niet meer mee voor NIEUWE invullingen (doorloopflow, voortgang,
+   * landingspagina-tellingen — `lib/assessment-structuur.ts`,
+   * `actieve*`-functies) maar blijven gewoon staan voor het herberekenen
+   * van bestaande scores (`bouwblokScore` e.a. lezen nog altijd het volledige,
+   * ongefilterde `vragen`/`bouwblokken`-array).
+   */
+  gearchiveerd?: boolean;
 }
 
 export interface Categorie {
@@ -25,6 +39,8 @@ export interface Categorie {
   /** Standaard 1 (geen effect op de score-berekening, die blijft nog een ongewogen gemiddelde). Zie datamodel.md, Categorie. */
   gewicht: number;
   bouwblokken: Bouwblok[];
+  /** Zie `Bouwblok.gearchiveerd` hierboven — dezelfde reden, op categorieniveau. */
+  gearchiveerd?: boolean;
 }
 
 export interface SchaalLabel {
@@ -117,10 +133,45 @@ export interface Assessment {
   afgeleidVanAssessmentId: string | null;
 }
 
+/** Rollen aan de beheerkant (`datamodel.md` deel 2, Rollen). Lead en
+ * Respondent zijn organisatiekant-rollen, geen `Gebruiker` — die hebben nog
+ * geen eigen UI (`beheerpagina.md` punt 9: "Respondenten en Leads
+ * blijven bereikbaar via de organisatie, niet hier"). */
+export type BeheerRol = "admin" | "consultant";
+
 /**
- * Datamodel vanaf hier volgt datamodel-rbac-voorstel.md, sectie 1/3 (deel 1:
- * alleen de structuur, geen Gebruiker/Sessie/Rol/Permissie/VerificatieCode/
- * AuditEvent — dat vereist een echte backend, zie changelog.md).
+ * Iemand van Coniche die inlogt in beheer (`datamodel.md` deel 2,
+ * Gebruiker). **Prototype-niveau**, zelfde disclaimer als
+ * `lib/admin-auth.ts`: `wachtwoord` staat hier in platte tekst
+ * (localStorage, geen backend), geen 2FA (`tfaGeheim`/`tfaActief` uit de
+ * spec bewust weggelaten — die komen pas met een echte backend, ook zo
+ * genoemd in `beheerpagina.md` punt 9). Ook geen aparte
+ * `Rol`/`Permissie`/`RolPermissie`-tabellen: Met precies twee beheerrollen
+ * en een rechtenmatrix die voor de helft nog "te bevestigen" is
+ * (`datamodel.md` deel 2, Rechtenmatrix), zou een volledig databankdreven
+ * permissiesysteem nu ongebruikte flexibiliteit zijn. Rechten staan
+ * daarom in code, gecentraliseerd in `lib/rechten.ts`, niet als losse
+ * datarecords — makkelijk later alsnog te normaliseren als de matrix
+ * stabiel is.
+ */
+export interface Gebruiker {
+  id: string;
+  email: string;
+  naam: string;
+  wachtwoord: string;
+  rol: BeheerRol;
+  /** Nooit hard verwijderd (`datamodel.md` deel 2, Verwijderen en archiveren). */
+  actief: boolean;
+  laatstIngelogdOp: string | null;
+  aangemaaktOp: string;
+}
+
+/**
+ * Datamodel vanaf hier volgt datamodel-rbac-voorstel.md, sectie 1/3 voor de
+ * structuur (`Gebruiker` hierboven is inmiddels wel gebouwd, prototype-
+ * niveau — zie `datamodel.md` deel 2; `Sessie`/`VerificatieCode`/
+ * `ToegangsSessie`/`AuditEvent` nog niet, dat vereist een echte backend,
+ * zie changelog.md).
  *
  * Organisatie is niet langer aan één scan-type gebonden: een organisatie kan
  * meerdere ScanUitvoeringen hebben (verschillende assessment-types, of
@@ -142,6 +193,24 @@ export interface Organisatie {
   kenmerken: Record<string, unknown>;
   leden: OrganisatieLid[];
   scanUitvoeringen: ScanUitvoering[];
+  /**
+   * `gebruikerId` van de Consultant/Admin die deze organisatie aanmaakte —
+   * samen met `toegewezenAan` het bereik "eigen" in de rechtenmatrix
+   * (`datamodel.md` deel 2, Eigenaarschap en toegang van/tot
+   * organisaties). `null` bij organisaties die al bestonden vóór dit veld
+   * (seed-data, of aangemaakt vóór gebruikersbeheer): Die zijn alleen voor
+   * een Admin zichtbaar/bewerkbaar, nooit voor een Consultant, tot een
+   * Admin het eigenaarschap alsnog toekent of de organisatie toewijst.
+   */
+  aangemaaktDoor: string | null;
+  /**
+   * `gebruikerId`'s van Consultants die een Admin deze organisatie expliciet
+   * heeft toegewezen, bovenop het eigenaarschap van `aangemaaktDoor`
+   * (`OrganisatieToegang` in `datamodel.md` deel 2). Genest hier in plaats
+   * van een losse tabel — zelfde structuurkeuze als `leden`/
+   * `scanUitvoeringen` hierboven, praktisch voor een localStorage-blob.
+   */
+  toegewezenAan: string[];
   aangemaaktOp: string;
   gewijzigdOp: string;
 }
@@ -170,6 +239,15 @@ export interface OrganisatieLid {
   notities: string;
   /** Uniek over alle organisaties heen, zie lib/toegangscode.ts. */
   toegangscode: string;
+  /**
+   * `ScanUitvoering.id`'s (van deze organisatie) waar dit lid Lead-toegang
+   * toe heeft — `datamodel.md` deel 2, `RespondentRolMeting`. Leeg = geen
+   * Lead. Bewust genest hier in plaats van een losse
+   * `RespondentRolMeting`-tabel/-array: een Lead bestaat per definitie niet
+   * zonder minstens 1 gekoppelde Meting (`beheerpagina.md` punt 6a), dus is
+   * er ook geen apart "is Lead"-veld nodig.
+   */
+  leadMetingIds: string[];
   aangemaaktOp: string;
 }
 
@@ -202,6 +280,8 @@ export interface ScanInvulling {
   /** Moment dat de respondent scherm 4 (intake) indiende, null zolang status "uitgenodigd" is. */
   gestartOp: string | null;
   afgerondOp: string | null;
+  /** Bewaartermijn ingevulde scans (datamodel.md deel 2): zet de "Data ouder dan de bewaartermijn"-melding uit tot deze datum. `null` = geen verlenging aangevraagd. */
+  bewaarVerlengdTot: string | null;
 }
 
 /**

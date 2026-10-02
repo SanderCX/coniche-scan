@@ -19,9 +19,17 @@ export interface ToelichtingInfo {
  * bouwblokken ("bb…") uit `visie-coniche.md` deel 2, AI-domeinen ("ai…")
  * uit `visie-ai-klantcontact.md`. Geen match (nog niet bestaande content)
  * geeft `undefined`.
+ *
+ * **Zorgscan ("zorg-…")**: Hergebruikt bewust dezelfde bouwsteen-content
+ * als het template, gematcht op `volgnummer` (de Zorgscan heeft exact
+ * dezelfde 15 bouwblokken/nummering, `datamodel.md`, Sector-varianten).
+ * Die tekst is nog niet sector-vertaald naar patiënt-/cliëntcontact (zie
+ * het open punt bovenaan `content-zorgscan.md`) — dit dicht alleen het
+ * gat dat de PDF/overlay anders helemaal geen "CENTRALE VRAAG"-content
+ * en geen beschrijving toonden (`v1-aanpassingen.md`).
  */
 export function toelichtingVoor(bouwblok: Bouwblok): ToelichtingInfo | undefined {
-  if (bouwblok.id.startsWith("bb")) {
+  if (bouwblok.id.startsWith("bb") || bouwblok.id.startsWith("zorg-")) {
     const info = alleBouwstenen.find((b) => b.nummer === bouwblok.volgnummer);
     if (!info) return undefined;
     return {

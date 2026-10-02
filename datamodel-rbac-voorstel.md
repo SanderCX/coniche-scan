@@ -1,8 +1,23 @@
 # Coniche Scan: Datamodel (voorstel, compleet)
 
-**Status: Voorstel, nog niet gevalideerd.** Dit bestand staat los van
-CLAUDE.md en de andere specs. Er is nog niets van overgenomen. Na
-validatie wordt dit verwerkt volgens de impactbeschrijving in sectie 11.
+**Status: Grotendeels achterhaald.** De daadwerkelijk gebouwde Lead-rol
+en rechtenstructuur (`datamodel.md` deel 2) zijn na dit voorstel anders
+uitgevallen op vrijwel elk punt hieronder: geen `ScanUitvoering.status`,
+geen losse `Antwoord`/`BouwblokOpmerking`-records (de JSON-velden op
+`ScanInvulling` bleven staan), bereik-termen "eigen"/"toegewezen
+metingen" in plaats van "aangemaakt"/"organisatie", en een Lead-rol die
+expliciet PER Meting toegang krijgt (`RespondentRolMeting`) — dit
+voorstel had een Lead juist org-breed toegang geven (sectie 2,
+`bereik: "organisatie"`), het tegenovergestelde van wat uiteindelijk is
+gebouwd. **Eén punt is wel overgenomen**: Organisatievelden zijn
+platformbreed geworden in plaats van per Assessment, zoals "keuze 4" in
+sectie 9 hier voorstelde (zie `datamodel.md`, Assessment, en
+`data/organisatie-velden.ts`).
+
+Dit bestand blijft staan als historisch denkwerk, niet als geldende
+spec — `datamodel.md` deel 2 is de enige bron van waarheid voor rollen
+en rechten. **Met Sander te bespreken**: Verwijderen, of laten staan als
+archief?
 
 Opgebouwd uit wat nu in CLAUDE.md, admin-beheerpagina.md,
 v1-aanpassingen.md en backlog.md staat, aangevuld met de rollen uit het
@@ -197,7 +212,7 @@ In beheeroverzichten toont de naam het e-mailadres als fallback zolang
 
 ### ScanUitvoering (nieuw)
 
-E�n geplande ronde van één scan-type bij één organisatie. Dit is wat de
+E�n geplande ronde van één scan-type bij één organisatie. Dit is wat de
 Consultant "plant".
 
 ```
@@ -216,7 +231,7 @@ ScanUitvoering {
 
 ### ScanInvulling
 
-E�n keer invullen door één lid binnen één ScanUitvoering. Neemt de velden
+E�n keer invullen door één lid binnen één ScanUitvoering. Neemt de velden
 over die nu nog op Respondent staan.
 
 ```

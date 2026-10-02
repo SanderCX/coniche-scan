@@ -29,17 +29,24 @@ Assessment {
   subtitel: string
   beschrijving: string
   doelgroep: string
-  icoon: string
+  icoon: string                     // sleutel in ASSESSMENT_ICONS ("target", "sparkle", "heart") voor een eigen SVG, anders een letterlijke emoji (valt terug op platte tekst)
   geschatteDuur: string             // bijv. "±30 minuten"
   categorieen: Categorie[] | null   // optioneel, zie hieronder
   bouwblokken: Bouwblok[] | null    // gebruikt als categorieen ontbreken
   scoresPerGroepGesorteerd: boolean // AI-scan sorteert op waarde, Klantcontact-scan niet
   schaal: SchaalLabel[5]            // per Assessment, zie hieronder
-  organisatieVelden: VeldDefinitie[] // zie Organisatievelden
   pdfContentSecties: { titel: string, bron: ContentBron } | null // zie export-pdf-visual-volwassenheidsscan.md
   afgeleidVanAssessmentId: string | null // zie Sector-varianten hieronder
 }
 ```
+
+**Geen `organisatieVelden` meer op `Assessment`.** Stond hier eerder per
+Assessment-type, maar is platformbreed geworden: Eén vaste lijst in
+`data/organisatie-velden.ts`, gebruikt door elk Assessment-type. Reden:
+Een organisatie kan meerdere scan-types doen (`Meting` koppelt aan één
+Assessment, `Organisatie` niet), en de kenmerken (volume, techstack, FTE,
+KPI's, zie Organisatievelden hieronder) gaan over de organisatie als
+geheel, niet over één scan. Zie `data/organisatie-velden.ts`.
 
 Niet elk scan-type heeft een categorie-laag. De Klantcontact
 Volwassenheidsscan groepeert 15 bouwblokken in 5 categorieën, de
@@ -107,13 +114,49 @@ Bouwblok {
   volgnummer: number                // 1 t/m 15, volgens de nummering in visie-coniche.md
   naam: string
   omschrijving: string              // de vraagzin onder de titel
-  toelichting: string               // tekst in de overlay, zie CLAUDE.md sectie 3
-  centraleVraag: string             // label "CENTRALE VRAAG" in dezelfde overlay, bron: visie-coniche.md deel 2 / visie-ai-klantcontact.md
+  toelichting: string               // korte tekst, beheerbaar in het contentbeheerscherm — zie de kanttekening hieronder
   tags: string[]                    // variabel aantal
   gewicht: number                   // standaard 1, zie toelichting hieronder
   vragen: Vraag[]                   // nu steeds 4 (AI-scan: 5), niet hardcoded aannemen
 }
 ```
+
+**Geen `centraleVraag`-veld op `Bouwblok`.** Het label "CENTRALE VRAAG"
+in de toelichting-overlay (CLAUDE.md sectie 3) en op de interactieve
+visuals (`bouwstenenmodel-visual.md`, `ai-domeinenmodel-visual.md`) komt
+niet uit een veld op `Bouwblok` zelf, maar uit een aparte, hand-
+geschreven lookup-tabel (`data/bouwstenen-content.ts` voor de Klantcontact-
+en Zorgscan-bouwblokken, `data/ai-domeinen-content.ts` voor de
+AI-domeinen), gekoppeld via `Bouwblok.volgnummer` en of `Bouwblok.id`
+begint met `"bb"`, `"zorg-"` of `"ai"` (`lib/bouwblok-info.ts`,
+`toelichtingVoor`). Diezelfde lookup levert ook de rijke beschrijving die
+in de overlay/visual getoond wordt — **niet** `Bouwblok.toelichting`: Dat
+veld is wél beheerbaar in het contentbeheerscherm, maar voor de drie
+bestaande Assessment-types (Klantcontact, AI, Zorg) heeft een wijziging
+daaraan **zichtbaar geen effect**, omdat de overlay/visual altijd de
+lookup-tabel gebruikt zodra die een match vindt. Twee gevolgen die nergens
+anders vastliggen:
+- Een nieuw, zelf aangemaakt bouwblok (via het contentbeheerscherm, met
+  een gegenereerde UUID als `id`) matcht nooit een `"bb"/"zorg-"/"ai"`-
+  prefix, en krijgt dus nooit een "CENTRALE VRAAG" of rijke beschrijving
+  te zien — alleen zijn eigen `toelichting`-tekst, die dan wél gewoon
+  gebruikt wordt (`components/BouwblokForm.tsx` valt terug op
+  `Bouwblok.toelichting` als `toelichtingVoor` niets teruggeeft).
+- Voor de drie bestaande Assessment-types is het "Toelichting"-veld in
+  het contentbeheerscherm dus feitelijk dode invoer. Dit is niet ergens
+  anders gedocumenteerd of met een waarschuwing in de UI gemeld — puur
+  hier vastgelegd zodat het niet als losstaande bug herontdekt hoeft te
+  worden.
+
+  **Sector-variant kopiëren (`lib/assessment-store.ts`,
+  `duplicateAssessmentAsVariant`) behoudt dit voorvoegsel bewust** bij het
+  genereren van het nieuwe bouwblok-id (`nieuwBouwblokId`): zonder die
+  fix verloor elke via "Aanmaken vanuit bestaand Assessment" gekopieerde
+  bouwsteen stilzwijgend haar CENTRALE VRAAG/beschrijving, omdat een kale
+  UUID geen van de drie voorvoegsels meer matcht. Dit loste een reëel
+  gemelde bug op zonder de lookup-architectuur zelf te vervangen — die
+  grotere stap (`centraleVraag`/rijke beschrijving echt op `Bouwblok`
+  zetten, content overzetten uit de twee lookup-bestanden) staat nog open.
 
 **`gewicht`** (op zowel `Categorie` als `Bouwblok`, niet op `Vraag`):
 Bepaalt hoe zwaar een groepering meetelt binnen de laag die
@@ -141,7 +184,7 @@ gewichten op categorie-/bouwblokniveau (nieuw). Hoe een afwijkend
 gewicht precies doorwerkt in de score-berekening (nu een ongewogen
 gemiddelde) is nog niet uitgewerkt — dat volgt zodra de eerste
 sector-variant zelf wordt opgepakt, deze velden liggen er alvast zodat
-historische data (`import-legacy-scans.md`) er niet opnieuw bij hoeft.
+historische data (`import-scans.md`) er niet opnieuw bij hoeft.
 
 ### Vraag
 
@@ -191,7 +234,7 @@ De persoon, los van hoe vaak die een scan invult.
 Respondent {
   id: string
   organisatieId: string
-  email: string                     // uniek binnen de organisatie
+  email: string                     // uniek binnen de organisatie, genormaliseerd (zie hieronder)
   naam: string | null               // leeg tot de eerste intake
   functie: string | null            // in de interface: "Rol / Functie"
   team: string | null
@@ -202,6 +245,15 @@ Respondent {
 
 Wordt iemand uitgenodigd met een e-mailadres dat al bestaat binnen de
 organisatie, dan wordt dezelfde respondent hergebruikt.
+
+**E-mailadres altijd genormaliseerd** (getrimd, lowercase) vóór
+opslag én bij elke vergelijking — ook bij de verificatiecode-flow
+(Toegang voor respondenten hieronder) en bij Respondent-matching in
+uitnodigen en import (`import-scans.md`). Zonder normalisatie
+ontstaat bij een andere schrijfwijze (hoofdletters, spaties) een
+dubbele respondent in plaats van hergebruik. Geldt hetzelfde voor
+`Gebruiker.email` hieronder — anders herkent een latere login een
+eerder toegewezen organisatie niet.
 
 Zolang `naam` leeg is, tonen beheeroverzichten het e-mailadres als
 herkenbare placeholder in de Naam-kolom. Intakegegevens (naam, functie,
@@ -238,6 +290,7 @@ ScanInvulling {
   afgerondOp: datetime | null
   antwoorden: { [vraagId: string]: number }            // 1-5
   opmerkingenPerBouwblok: { [bouwblokId: string]: string }
+  bewaarVerlengdTot: datetime | null        // zie Bewaartermijn ingevulde scans
 }
 ```
 
@@ -286,15 +339,49 @@ Toegangscode {
 - **Wat de link opent**: Zie CLAUDE.md sectie 3, "Openen van de
   persoonlijke link".
 
-**Afwijking, nog te bespreken met Sander**: Gebouwd als veld op
-`Respondent` (`toegangscode`) in plaats van als aparte tabel. Niet hier
-al doorgevoerd zolang dat gesprek nog loopt; zie `v1-aanpassingen.md`.
+**Afwijking, bewust zo gebouwd**: Gebouwd als veld op `Respondent`
+(`toegangscode`) in plaats van als aparte tabel zoals hierboven staat.
+Geeft hetzelfde resultaat (respondent weg → code weg) zonder een tweede
+structuur ernaast.
 
 Zolang er geen database is, werkt een link alleen in de browser waar de
 data staat: Zonder gegevens in de link kan een andere browser zich niet
 meer "bootstrappen" (zie CLAUDE.md, Status). E-mailverificatie bij het
 openen van de link (code per mail, 15 minuten geldig) blijft het doel,
 maar volgt pas met backend en Coniche-mailserver (`backlog.md`).
+
+### Scanslot
+
+Voorkomt dat twee personen tegelijk dezelfde ingevulde scan bewerken
+(CLAUDE.md, scherm 5, "Eén persoon tegelijk per scan"). Tijdelijke data,
+geen onderdeel van de scan zelf:
+
+```
+Scanslot {
+  scanInvullingId: string
+  houder: string                    // willekeurige id per browsertabblad, geen persoonsgegeven
+  verlooptOp: datetime              // laatste hartslag + 90 seconden
+}
+```
+
+- **Claimen**: De intake- en vragenlijstpagina claimen het slot bij het
+  openen en vernieuwen het elke 15 seconden (hartslag). Dat is één atomaire
+  database-instructie: Alleen de huidige houder, of iemand bij een
+  verlopen slot, krijgt het slot. Wie het niet krijgt, ziet de melding.
+- **Vrijgeven**: Bij het verlaten van de pagina. Lukt dat niet (browser
+  gesloten, laptop in slaap), dan vervalt het slot vanzelf na 90 seconden:
+  Een scan kan dus nooit blijvend geblokkeerd raken.
+- **Houder is per tabblad**: Dezelfde persoon in twee tabbladen telt als
+  twee bewerkers. Een herlaadbeurt behoudt de houder (`sessionStorage`).
+- **Opslag**: Tabel `scan_sloten` in Neon (`scripts/maak-sloten-tabel.mjs`),
+  via `app/api/slot/[scanId]/route.ts`. Zonder database valt het terug op
+  een slot in `localStorage`, dat alleen tabbladen in dezelfde browser
+  beschermt.
+- **Verwijderen**: Een slot hoort bij een scan maar wordt niet apart
+  opgeruimd; het vervalt vanzelf.
+- **Beheer**: Is niet geblokkeerd en ziet (nog) niet dat een scan in gebruik
+  is. Opent een beheerder via "Openen" de persoonlijke link van een
+  respondent, dan houdt hij het slot zolang die pagina openstaat.
 
 ### Verwijderen en datakoppelingen
 
@@ -314,9 +401,39 @@ verwijst wat niet meer bestaat.
 
 ### Content bewerken
 
-Een vraag of bouwblok waar al antwoorden aan hangen, wordt niet
-verwijderd maar gearchiveerd. Anders verdwijnen scores uit eerdere
-invullingen.
+Een categorie, bouwblok of vraag waar al antwoorden aan hangen, wordt
+niet verwijderd maar gearchiveerd (`gearchiveerd: boolean`, standaard
+`false`/afwezig). Anders verdwijnen scores uit eerdere invullingen: een
+gearchiveerd item blijft in `Assessment.categorieen`/`bouwblokken`/
+`vragen` staan, dus telt een bestaand antwoord er nog altijd in mee bij
+het herberekenen van een score. Voor een NIEUWE invulling telt het niet
+meer mee (doorloopflow, voortgangspercentage, de tellingen op de
+assessment-landingspagina) — `lib/assessment-structuur.ts` heeft daarvoor
+een eigen set functies (`actieveGroepen`/`actieveBouwblokkenMetGroep`/
+`actieveVragen`) naast de ongefilterde versies die scoring/exports op een
+bestaande invulling gebruiken. "Verwijderen" in het contentbeheerscherm
+archiveert dus; ernaast staat een "Gearchiveerd"-lijstje met een
+Herstellen-knop per item, geen aparte prullenbak-pagina.
+
+### Algemene teksten
+
+Losse stukken tekst in de app die niet bij één Assessment horen (dus
+geen `Bouwblok`/`Vraag`/`Categorie`), en die anders hardcoded in de
+code zouden staan. Generiek in plaats van een apart veld per tekst, zodat
+er telkens gewoon een rij bijkomt in plaats van een nieuw datamodel-veld:
+
+```
+AlgemeneTekst {
+  sleutel: string                   // bijv. "mijnMetingenIntro"
+  waarde: string
+}
+```
+
+Eerste en enige nu: `mijnMetingenIntro` — de introtekst boven de lijst
+met scans op "Mijn metingen" (CLAUDE.md schermflow, scherm 4). Eén
+tekst voor iedereen, niet per Assessment of per organisatie: Die pagina
+toont immers alle scans van een respondent door elkaar, ongeacht
+scan-type. Beheerbaar bij `beheerpagina.md` punt 2, Content.
 
 ### Organisatievelden
 
@@ -389,9 +506,34 @@ Kennismanagement, LLM-oplossing en IT en deployment. Modelleer dit als
 | Rol | Kant | Wat de rol mag |
 |---|---|---|
 | Admin | Beheer | Alles, inclusief rechten toekennen en verwijderen |
-| Consultant | Beheer | Organisaties aanmaken, metingen plannen, respondenten uitnodigen, resultaten inzien van organisaties die hij zelf aanmaakte |
-| Lead | Organisatie | Respondenten uitnodigen en alle resultaten van de eigen organisatie inzien. Kan ook zelf invullen, maar hoeft niet |
+| Consultant | Beheer | Organisaties en metingen aanmaken, Lead en respondenten koppelen (en weer loskoppelen), resultaten inzien — voor organisaties die hij zelf aanmaakte of die een Admin aan hem toewees |
+| Lead | Organisatie | Respondenten uitnodigen voor en resultaten inzien van zijn toegewezen Metingen. Kan ook zelf invullen, maar hoeft niet |
 | (geen rol) | Organisatie | Gewone respondent: Eigen scans invullen en eigen resultaten zien |
+
+**Een Lead ziet niet automatisch alle Metingen van de organisatie.**
+Toegang wordt per Meting toegekend, niet als blanket-toegang op de hele
+organisatie: Anders zou een nieuwe Meting die later wordt aangemaakt
+meteen zichtbaar zijn voor elke bestaande Lead, zonder dat iemand dat
+bewust besloot. Een Lead kan aan meerdere Metingen tegelijk gekoppeld
+zijn.
+
+```
+RespondentRolMeting {
+  respondentId: string
+  metingId: string               // een Meting waar deze Lead toegang toe heeft
+}
+```
+
+Minstens 1 koppeling verplicht bij het toekennen van de Lead-rol (zie
+`beheerpagina.md`, punt 6a): Geen Lead zonder minstens één toegewezen
+Meting.
+
+**Wat de Lead op zijn eigen pagina ziet**: Zijn eigen vragenlijst,
+alleen als hij ook zelf respondent is (dus zelf invult); en sowieso de
+resultaten van elke Meting waar hij aan gekoppeld is, zodra daar
+minstens 1 scan binnen is afgerond, geen hoger minimum. Zelfde
+aggregatieweergave (gemiddelde per Meting) als de organisatie-resultaten
+in beheer, zie `beheerpagina.md`, Organisatie-resultaten.
 
 ---
 
@@ -402,16 +544,56 @@ Kennismanagement, LLM-oplossing en IT en deployment. Modelleer dit als
 ```
 Gebruiker {
   id: string
-  email: string                  // uniek
+  email: string                  // uniek, genormaliseerd (zie Respondent hierboven)
   naam: string
   wachtwoordHash: string
-  tfaGeheim: string | null       // versleuteld opgeslagen
+  tfaGeheim: string | null       // versleuteld opgeslagen, TOTP-secret (zie 2FA hieronder)
   tfaActief: boolean             // verplicht true voordat beheer toegankelijk is
   actief: boolean                // false = gedeactiveerd, nooit hard verwijderd
   laatstIngelogdOp: datetime | null
   aangemaaktOp: datetime
 }
 ```
+
+#### 2FA: TOTP via authenticator-app
+
+**Gekozen mechanisme: TOTP (RFC 6238)**, niet sms of e-mail. Werkt met
+elke authenticator-app die de standaard volgt (Google Authenticator,
+Microsoft Authenticator, Authy, 1Password, ...) — geen koppeling aan
+één leverancier. Geen extra kosten (in tegenstelling tot sms), werkt
+offline, en is de gangbare standaard voor dit soort tools.
+
+```
+TfaHerstelcode {
+  id: string
+  gebruikerId: string
+  codeHash: string                // nooit leesbaar opgeslagen, net als codeHash bij VerificatieCode
+  gebruiktOp: datetime | null      // eenmalig bruikbaar
+  aangemaaktOp: datetime
+}
+```
+
+**Instellen** (eenmalig, per Gebruiker): `tfaGeheim` genereren, tonen
+als QR-code (en als tekst, voor wie niet kan scannen). Bevestigen door
+éénmalig een geldige code in te voeren, pas dan `tfaActief = true`.
+Tegelijk **10 herstelcodes** tonen (eenmalig zichtbaar, daarna alleen
+gehasht bewaard, net als `VerificatieCode`/`Toegangscode`) — voor een
+kwijtgeraakt toestel. Op = op: Zijn alle 10 gebruikt, dan moet een
+Admin `tfaActief` resetten (zie hieronder), geen automatisch nieuwe
+lichting genereren.
+
+**Inloggen**: Na e-mail + wachtwoord, bij `tfaActief = true`, een
+tweede stap met de 6-cijferige TOTP-code óf een herstelcode.
+
+**Kwijtgeraakt toestel én herstelcodes op**: Een Admin kan bij een
+andere Gebruiker `tfaActief` terugzetten naar `false` (en `tfaGeheim`
+naar `null`), zodat die Gebruiker bij de volgende login opnieuw door
+het instellen heen moet. Geen zelfbediening hiervoor (zou 2FA
+zinloos maken als je 'm zelf kan uitzetten zonder tweede factor).
+Een Admin kan dit niet bij zichzelf doen zolang hij de enige actieve
+Admin is, zelfde soort regel als "Minimaal 1 actieve Admin verplicht"
+(`beheerpagina.md`, punt 9) — anders sluit hij zichzelf mogelijk
+volledig buiten.
 
 #### Sessie
 
@@ -428,11 +610,43 @@ Sessie {
 Een Gebruiker wordt nooit hard verwijderd, alleen gedeactiveerd, zodat
 eigenaarschap en audit blijven kloppen.
 
-#### Eigenaarschap van organisaties
+#### Eigenaarschap en toegang van/tot organisaties
 
-Organisatie krijgt een veld `aangemaaktDoor` (gebruikerId). Daarop is het
-bereik "aangemaakt" van de Consultant gebaseerd. Bij het deactiveren van
-een Consultant kan een Admin het eigenaarschap overzetten.
+Organisatie krijgt een veld `aangemaaktDoor` (gebruikerId): De
+Consultant die de organisatie aanmaakte, is er automatisch eigenaar
+van. Een Consultant ziet en beheert niet alleen zijn eigen
+organisaties: Een Admin kan een organisatie ook expliciet aan een
+andere Consultant **toewijzen**, bovenop het eigenaarschap:
+
+```
+OrganisatieToegang {
+  organisatieId: string
+  gebruikerId: string             // de Consultant
+  toegekendDoor: string           // Admin
+  toegekendOp: datetime
+}
+```
+
+Het bereik "eigen" van de Consultant (Rechtenmatrix hieronder) is dus
+`aangemaaktDoor = deze Consultant` **of** een regel in
+`OrganisatieToegang` voor deze Consultant en organisatie. Toewijzen en
+intrekken zijn beide Admin-only acties (`beheerpagina.md`, punt 4,
+Organisatie-toegang toewijzen). Intrekken is de spiegel van toewijzen:
+Kan een Admin toewijzen, dan moet een Admin het ook weer kunnen
+intrekken.
+
+**"Eigen" is alleen een rechten-groepering, geen verlies van herkomst.**
+Wie de organisatie daadwerkelijk aanmaakte (`aangemaaktDoor`) blijft
+altijd apart zichtbaar in beheer, ook al vallen eigenaar en toegewezen
+Consultants samen onder hetzelfde toegangsbereik (`beheerpagina.md`,
+punt 4: "Aangemaakt door" in de lijst en het detail).
+
+Bij het deactiveren van een Consultant kan een Admin het eigenaarschap
+(`aangemaaktDoor`) overzetten naar een andere Consultant of Admin;
+`OrganisatieToegang`-koppelingen van de gedeactiveerde Consultant
+vervallen gewoon, dat blokkeert het deactiveren niet (in tegenstelling
+tot eigenaarschap, dat wél verplicht wordt overgezet, zie
+`beheerpagina.md` punt 9).
 
 ---
 
@@ -464,7 +678,7 @@ Permissie {
 RolPermissie {
   rolId: string
   permissieId: string
-  bereik: "alle" | "aangemaakt" | "organisatie" | "zelf"
+  bereik: "alle" | "eigen" | "toegewezen metingen" | "zelf"
 }
 
 GebruikerRol {
@@ -482,11 +696,18 @@ RespondentRol {
 }
 ```
 
+Bij de Lead-rol komt hier `RespondentRolMeting` bij (zie Rollen
+hierboven): Welke specifieke Metingen deze Lead mag zien, niet
+automatisch de hele organisatie.
+
 Betekenis van `bereik`:
 - `alle`: Alle records (Admin).
-- `aangemaakt`: Organisaties die deze Gebruiker aanmaakte, met alles
-  wat daaronder hangt (Consultant).
-- `organisatie`: De eigen organisatie van deze respondent (Lead).
+- `eigen`: Organisaties die deze Gebruiker aanmaakte (`aangemaaktDoor`),
+  óf die een Admin expliciet aan hem toewees (`OrganisatieToegang`),
+  met alles wat daaronder hangt (Consultant). Zie Eigenaarschap en
+  toegang van/tot organisaties hierboven.
+- `toegewezen metingen`: Alleen de Metingen die via `RespondentRolMeting`
+  expliciet aan deze Lead zijn gekoppeld (Lead).
 - `zelf`: Alleen de eigen ingevulde scans (respondent).
 
 Een respondent zonder RespondentRol is een gewone respondent.
@@ -507,13 +728,14 @@ VerificatieCode {
   verlooptOp: datetime           // aangemaaktOp + 15 minuten
   gebruiktOp: datetime | null    // eenmalig bruikbaar
   mislukkePogingen: number
+  geblokkeerd: boolean           // true na 3 mislukte pogingen
 }
 
 ToegangsSessie {
   id: string
   respondentId: string
   aangemaaktOp: datetime
-  verlooptOp: datetime
+  verlooptOp: datetime           // aangemaaktOp + sessieDuurUren, zie Instellingen hieronder
 }
 ```
 
@@ -521,6 +743,36 @@ Een code wordt alleen verstuurd als het ingevulde e-mailadres hoort bij
 de respondent van de link. De pagina geeft in beide gevallen dezelfde
 melding. De ToegangsSessie voorkomt dat bij elke pagina opnieuw een code
 nodig is, en staat los van de Sessie aan de beheerkant.
+
+**Lockout na 3 mislukte pogingen**: `mislukkePogingen` telt foutieve
+codes bij deze `VerificatieCode`. Bij de 3e mislukte poging
+`geblokkeerd = true`: Geen nieuwe pogingen meer op déze code, ook al
+is de geldigheidstermijn (15 minuten) nog niet voorbij. De respondent
+kan opnieuw een code aanvragen (nieuwe `VerificatieCode`, nieuwe teller),
+**tenzij** een Admin de blokkade expliciet heeft opgeheven aan de
+beheerkant (`beheerpagina.md`, analoog aan de 2FA-reset bij Gebruikers)
+— dat vangt het scenario op waarin herhaaldelijk aanvragen zelf ook
+wordt misbruikt, niet alleen het gokken op één code.
+
+**Sessieduur, instelbaar**: `ToegangsSessie.verlooptOp` volgt uit een
+globale instelling `sessieDuurUren` (default **4 uur**), door een
+Admin aan te passen in beheer. Na het verlopen moet de respondent
+opnieuw zijn e-mailadres invullen en een nieuwe code opvragen — geen
+stilzwijgende verlenging.
+
+#### Bewaartermijn ingevulde scans
+
+Twee globale instellingen, in dagen, door een Admin te bepalen in beheer
+(`beheerpagina.md`, punt 4, samen met AVG-verzoek): `bewaarTermijnDagen`
+(vanaf `ScanInvulling.afgerondOp`, geen default) en
+`verlengTermijnDagen` (hoe lang een expliciete "Verlengen"-actie de
+melding uitstelt). Verstrijkt `bewaarTermijnDagen` (of, na een eerdere
+verlenging, `ScanInvulling.bewaarVerlengdTot`), dan verschijnt de scan in
+een "Data ouder dan de bewaartermijn"-lijst in beheer. **Geen
+automatische verwijdering**: Zonder actie van een Admin/Consultant
+blijft de scan gewoon bestaan. Verwijderen gebruikt de bestaande
+verwijderactie (Verwijderen en datakoppelingen hieronder); Verlengen zet
+alleen `bewaarVerlengdTot`.
 
 ---
 
@@ -551,21 +803,39 @@ Een streepje betekent geen toegang.
 |---|---|---|---|---|
 | `gebruikers.beheren` | alle | - | - | - |
 | `rollen.toekennen` | alle | - | - | - |
-| `content.beheren` | alle | te bevestigen | - | - |
+| `content.beheren` | alle | - | - | - |
 | `organisaties.aanmaken` | alle | ja | - | - |
-| `organisaties.bewerken` (incl. kenmerken) | alle | aangemaakt | te bevestigen | - |
-| `organisaties.verwijderen` | alle | te bevestigen | - | - |
-| `metingen.plannen` | alle | aangemaakt | - | - |
-| `respondenten.uitnodigen` | alle | aangemaakt | organisatie | - |
-| `respondenten.leadToekennen` | alle | te bevestigen | te bevestigen | - |
-| `respondenten.verwijderen` | alle | te bevestigen | - | - |
-| `scans.verwijderen` | alle | te bevestigen | - | - |
+| `organisaties.toewijzen` (aan een Consultant) | alle | - | - | - |
+| `organisaties.bewerken` (incl. kenmerken) | alle | eigen | te bevestigen | - |
+| `organisaties.verwijderen` | alle | eigen | - | - |
+| `metingen.plannen` | alle | eigen | - | - |
+| `respondenten.uitnodigen` | alle | eigen | toegewezen metingen | - |
+| `respondenten.leadToekennen` | alle | eigen | - | - |
+| `respondenten.verwijderen` | alle | eigen | - | - |
+| `scans.verwijderen` | alle | eigen | - | - |
 | `scan.invullen` | - | - | zelf | zelf |
-| `resultaten.inzien` | alle | aangemaakt | organisatie | zelf |
-| `export.uitvoeren` | alle | aangemaakt | te bevestigen | - |
+| `resultaten.inzien` | alle | eigen | toegewezen metingen | zelf |
+| `export.uitvoeren` | alle | eigen | zelf, of toegewezen Metingen | zelf |
 
 Een Lead die zelf invult, doet dat met het bereik `zelf`, net als elke
 respondent.
+
+**`export.uitvoeren`, bereik van een Lead/Respondent**: Bewust smaller dan
+`resultaten.inzien` hierboven. Een Respondent en een Lead kunnen alleen
+exporteren wat ze ook al zelf op hun eigen scherm zien: een Respondent zijn
+eigen ingevulde scan (resultatenpagina, bereik `zelf`), een Lead daarnaast
+ook de Metingen waarvoor hij Lead is (`respondent.leadMetingIds`) — dus
+niet elke Meting die hij toevallig kan *inzien* via een andere weg. Geen
+bulk-export en geen toegang tot exports van andere organisaties/Metingen,
+ook niet "te bevestigen": dat was hier eerder nog open, nu vastgelegd. Voor
+Admin en Consultant blijft dit ongewijzigd: bereik `alle`/`eigen`, zoals de
+rest van deze matrix, inclusief de bulk-acties in `beheerpagina.md` punt 7.
+
+`content.beheren` is Admin-only: Assessment-types en Content
+(bouwblokken, vragen, categorieën) zitten in beheer onder de link
+"Assessments", die een Consultant niet ziet (`beheerpagina.md`, Wat
+beheerbaar is). Een Consultant beheert alleen zijn eigen organisaties,
+metingen en respondenten, niet de scaninhoud zelf.
 
 ---
 
@@ -574,6 +844,4 @@ respondent.
 1. Eén gedeelde Rol-tabel (zoals hier) of aparte tabellen voor beheer en
    organisatie.
 2. De cellen "te bevestigen" in de rechtenmatrix.
-3. Duur van een ToegangsSessie, en na hoeveel mislukte pogingen een code
-   ongeldig wordt.
-4. Bestaand auth-framework of zelf bouwen (keuze voor de bouwer).
+3. Bestaand auth-framework of zelf bouwen (keuze voor de bouwer).

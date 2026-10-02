@@ -35,13 +35,20 @@
 .nav-badge {
   background: var(--ink);
   color: #fff;
-  font-size: 0.68rem;
+  font-size: var(--fs-xs);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 0.25rem 0.6rem;
   border-radius: 100px;
   margin-left: 0.9rem;
+}
+
+/* Rolbadge (stylesheet.md): zelfde plek als .nav-badge, maar de vorm van
+   .hero-tag (border-radius 3px i.p.v. een pil) en een rolkleur i.p.v. zwart,
+   gezet via inline style (zie SiteHeader.tsx, badgeKleur). */
+.nav-badge-rol {
+  border-radius: 3px;
 }
 
 .nav-right {
@@ -66,7 +73,7 @@
 }
 
 .nav-right a {
-  font-size: 0.85rem;
+  font-size: var(--fs-s);
   font-weight: 600;
   color: var(--ink-m);
   text-decoration: none;
@@ -90,22 +97,46 @@
 
 /* Compacte knopmaat — losgetild van .nav-right (waar 'm oorspronkelijk
    alleen stond) zodat elke bulk-actiebalk 'm ook kan gebruiken (bijv.
-   "N geselecteerd" + Exporteren/Verwijderen), niet de standaardmaat. */
-.btn-compact {
-  padding: 0.5rem 1rem;
-  font-size: 0.8rem;
+   "N geselecteerd" + Exporteren/Verwijderen), niet de standaardmaat.
+   Selector is bewust `.btn.btn-compact` (twee klassen), niet los
+   `.btn-compact`: Met gelijke specificiteit wint anders de latere
+   `.btn`-regel hieronder gewoon omdat die verderop in dit bestand staat,
+   waardoor elke `.btn-compact`-knop buiten `.nav-right` alsnog de volle
+   `.btn`-padding kreeg — bevestigd via een hoogtemeting op de knoppen in
+   de organisatiedetailpagina, ze waren allemaal ~52px in plaats van de
+   bedoelde ~38px. */
+.btn.btn-compact {
+  /* Vaste hoogte `--control-h`, gelijk aan `.admin-field input/select`:
+     Een knop naast een veld in dezelfde rij is nooit hoger of lager (bijv.
+     "+ Meting plannen" naast het Label-veld). Zie stylesheet.md. */
+  padding-block: 0;
+  padding-inline: 1rem;
+  height: var(--control-h);
+  font-size: var(--fs-s);
 }
 
 .nav-right .btn {
+  height: auto;
   padding: 0.5rem 1rem;
-  font-size: 0.8rem;
+  font-size: var(--fs-s);
+}
+
+/* Het pijltje komt uit een ander lettertype met een hogere regelhoogte dan
+   de knoptekst: Zonder dit is een dropdown-knop 2,5px hoger dan de knoppen
+   naast hem. */
+.dropdown-pijl {
+  line-height: 0;
 }
 
 /* Dropdown-knop (stylesheet.md, "Dropdown-knop") — voor acties met
    meerdere opties onder één knop, bijv. "Exporteren" (Als PDF/Als CSV). */
 .dropdown-knop {
   position: relative;
-  display: inline-block;
+  /* `inline-flex` i.p.v. `inline-block`: Een inline-block-wrapper krijgt
+     een eigen regelhoogte (de 1.78 van de body-tekst) en is daardoor hoger
+     dan de knop erin, wat naastgelegen knoppen in een rij meerekt. */
+  display: inline-flex;
+  vertical-align: top;
 }
 
 .dropdown-menu {
@@ -129,7 +160,7 @@
   color: var(--ink);
   background: none;
   border: none;
-  font-size: 0.85rem;
+  font-size: var(--fs-s);
   cursor: pointer;
 }
 
@@ -142,11 +173,21 @@
   cursor: not-allowed;
 }
 
+/* Niet-klikbare infrorij bovenaan een dropdown-menu, bijv. het Accountmenu
+   (admin-beheerpagina.md: "e-mailadres + rol tussen haakjes"). */
+.dropdown-menu-header {
+  padding: 0.6rem 1rem;
+  font-size: var(--fs-s);
+  color: var(--ink-m);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
 /* ---------- Footer ---------- */
 .footer {
   text-align: center;
   padding: 1.5rem 1rem;
-  font-size: 0.78rem;
+  font-size: var(--fs-xs);
   color: var(--ink-s);
   border-top: 1px solid var(--border);
   margin-top: 2rem;
@@ -175,8 +216,14 @@
   border-radius: var(--r);
   padding: 0.82rem 1.7rem;
   font-weight: 700;
-  font-size: 0.9rem;
-  border: none;
+  font-size: var(--fs-m);
+  /* Elke knopvariant heeft dezelfde 2px rand (transparant bij de gevulde
+     varianten), anders is een `.btn-outline` 4px hoger dan een `.btn-or` of
+     `.btn-danger` naast elkaar in één rij. `line-height: normal` zoals bij
+     `button` (base.css): Een `<a class="btn">` erfde anders de 1.78 van de
+     body-tekst en werd daardoor hoger dan een `<button>`. */
+  border: 2px solid transparent;
+  line-height: normal;
   cursor: pointer;
   text-decoration: none;
   transition: background 0.15s ease, transform 0.15s ease, color 0.15s ease;
@@ -252,7 +299,7 @@
   background: var(--or);
   color: #fff;
   text-transform: uppercase;
-  font-size: 0.7rem;
+  font-size: var(--fs-xs);
   font-weight: 700;
   letter-spacing: 0.08em;
   padding: 0.3rem 0.8rem;
@@ -266,7 +313,7 @@
   border: 1px solid var(--or-mid);
   border-radius: 100px;
   padding: 0.3rem 0.85rem;
-  font-size: 0.78rem;
+  font-size: var(--fs-xs);
   font-weight: 600;
 }
 
@@ -335,7 +382,7 @@ button.card:hover,
 
 .assessment-card .duur {
   color: var(--ink-s);
-  font-size: 0.85rem;
+  font-size: var(--fs-s);
   font-weight: 600;
 }
 
@@ -347,13 +394,13 @@ button.card:hover,
 .field label {
   display: block;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: var(--fs-s);
   color: var(--ink);
   margin-bottom: 0.4rem;
 }
 
 .field .hint {
-  font-size: 0.78rem;
+  font-size: var(--fs-xs);
   color: var(--ink-s);
   margin-top: 0.3rem;
 }
@@ -365,7 +412,7 @@ button.card:hover,
 .field textarea {
   width: 100%;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: var(--fs-m);
   padding: 0.75rem 0.9rem;
   border: 1px solid var(--border-d);
   border-radius: var(--r);
@@ -437,7 +484,7 @@ button.card:hover,
 }
 
 .schaal-optie .optie-tekst {
-  font-size: 0.92rem;
+  font-size: var(--fs-m);
   color: var(--ink-m);
 }
 
@@ -446,7 +493,7 @@ button.card:hover,
   background: var(--bg-mid);
   border-radius: var(--r);
   padding: 0.9rem 1.1rem;
-  font-size: 0.85rem;
+  font-size: var(--fs-s);
   color: var(--ink-m);
   margin: 1.2rem 0 1.6rem;
 }
@@ -506,7 +553,7 @@ button.card:hover,
 }
 
 .flow-sidebar .respondent-naam {
-  font-size: 0.78rem;
+  font-size: var(--fs-xs);
   color: var(--ink-s);
   margin-bottom: 0.4rem;
 }
@@ -527,7 +574,7 @@ button.card:hover,
 }
 
 .progress-label {
-  font-size: 0.72rem;
+  font-size: var(--fs-xs);
   font-weight: 700;
   color: var(--ink-s);
   margin-bottom: 0;
@@ -538,7 +585,7 @@ button.card:hover,
 }
 
 .sidebar-categorie-naam {
-  font-size: 0.66rem;
+  font-size: var(--fs-xs);
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -552,7 +599,7 @@ button.card:hover,
   gap: 0.5rem;
   padding: 0.45rem 0.4rem;
   border-radius: var(--r);
-  font-size: 0.78rem;
+  font-size: var(--fs-xs);
   line-height: 1.25;
   color: var(--ink-m);
   cursor: pointer;
@@ -756,7 +803,7 @@ button.card:hover,
 }
 
 .classificatie-cirkel .label {
-  font-size: 0.78rem;
+  font-size: var(--fs-xs);
   font-weight: 700;
   color: var(--kleur, var(--stat-amber));
 }
@@ -790,11 +837,11 @@ button.card:hover,
 
 .legenda-item h3 {
   margin-bottom: 0.2rem;
-  font-size: 0.95rem;
+  font-size: var(--fs-m);
 }
 
 .legenda-item p {
-  font-size: 0.85rem;
+  font-size: var(--fs-s);
   margin: 0;
 }
 
@@ -837,7 +884,7 @@ button.card:hover,
 
 .resultaten-voortgang {
   color: var(--ink-s);
-  font-size: 0.9rem;
+  font-size: var(--fs-m);
   margin-top: 0.6rem;
 }
 
@@ -848,7 +895,7 @@ button.card:hover,
   text-align: center;
   padding: 0.8rem;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: var(--fs-s);
 }
 
 @media (max-width: 900px) {
@@ -888,4 +935,85 @@ button.card:hover,
     border-bottom: 1px solid var(--border);
     padding: 0.8rem 1.2rem;
   }
+}
+
+/* ---------- Info-icoon (stylesheet.md, "Info-icoon") ---------- */
+.info-icoon-wrap {
+  flex: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+.info-icoon-wrap--veld {
+  height: var(--control-h);
+}
+.info-icoon {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  background: var(--or);
+  color: #fff;
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.info-icoon:hover,
+.info-icoon[aria-expanded="true"] {
+  background: var(--or-l);
+}
+.info-veld {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: -0.4rem;
+  z-index: 30;
+  width: min(26rem, 80vw);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0.8rem 1rem;
+  background: var(--bg-warm);
+  border: 1px solid var(--border-d);
+  border-left: 4px solid var(--or);
+  border-radius: var(--r);
+  box-shadow: 0 12px 28px rgba(28, 28, 26, 0.08);
+  font-size: var(--fs-s);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink-m);
+  text-align: left;
+  text-transform: none;
+  letter-spacing: normal;
+}
+/* Overbrugt de ruimte tussen icoon en veld, zodat de muis er tijdens het
+   verplaatsen niet "buiten" komt en het veld sluit. */
+.info-veld::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -0.5rem;
+  height: 0.5rem;
+}
+.info-veld p {
+  margin: 0;
+  flex: 1;
+}
+.info-veld-sluit {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ink-s);
+  font-size: var(--fs-s);
+  cursor: pointer;
+  line-height: 1;
+}
+.info-veld-sluit:hover {
+  color: var(--ink);
 }

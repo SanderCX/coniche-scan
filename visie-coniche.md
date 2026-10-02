@@ -64,7 +64,7 @@ Als daar iets schuift, merkt de klant dat, hoe goed de medewerker ook is.
 Kwaliteit is in dit model daarom geen losse bouwsteen. Het komt op
 meerdere plekken terug. In de scan zit het expliciet bij Performance
 Management (een vast kwaliteitsproces), Kennismanagement (actuele en
-vindbare kennis), Leren uit klantcontact (verbeteringen die aantoonbaar
+vindbare kennis), Leren uit Klantcontact (verbeteringen die aantoonbaar
 doorwerken) en Kanaalmanagement (een klant hoeft zijn verhaal niet
 opnieuw te doen).
 
@@ -116,7 +116,7 @@ strategie vraagt.
 **Centrale vraag:** Is de strategie concreet genoeg, en wordt die actief
 gevolgd, om er keuzes in klantcontact op te baseren?
 
-### 2. Klantcontactvisie & Strategie
+### 2. Klantcontact visie & strategie
 
 De klantcontactstrategie vertaalt de doelen van de organisatie naar
 dienstverlening. Ze legt vast welke rol klantcontact speelt en verwijst
@@ -153,7 +153,7 @@ komen terug in verslagen en leiden tot acties.
 **Centrale vraag:** Is duidelijk wie waarover beslist, en wordt er op
 basis van betrouwbare cijfers gestuurd?
 
-### 4. Leren uit klantcontact
+### 4. Leren uit Klantcontact
 
 Elke vraag of klacht die binnenkomt, zegt iets over hoe de organisatie
 werkt. Die informatie is alleen bruikbaar als contactredenen consequent
@@ -172,7 +172,7 @@ Van alle bouwstenen volgt deze de verbetercyclus het meest letterlijk.
 **Centrale vraag:** Leiden signalen uit klantcontact aantoonbaar tot
 verbeteringen in de organisatie?
 
-### 5. Financial Control
+### 5. Financial control
 
 Keuzes over capaciteit, kanalen en investeringen vragen inzicht in wat
 klantcontact kost en wat verbeteringen opleveren. Dat begint bij een
@@ -189,7 +189,7 @@ laat zien wat er de komende periode nodig is.
 **Centrale vraag:** Worden keuzes over de inzet van middelen onderbouwd
 met inzicht in kosten en effect?
 
-### 6. Positionering Klantcontact
+### 6. Positionering klantcontact
 
 Klantcontact ziet vaak als eerste wat er misgaat in producten en
 processen. Of daar iets mee gebeurt, hangt af van de positie die

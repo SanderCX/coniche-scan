@@ -12,10 +12,6 @@ export function SiteFooter() {
       © {new Date().getFullYear()} Coniche — Maakt Meer Werkend ·{" "}
       <Link href="/privacy" className="footer-admin-link">
         Privacy
-      </Link>{" "}
-      ·{" "}
-      <Link href="/beheer" className="footer-admin-link">
-        Beheer
       </Link>
     </footer>
   );

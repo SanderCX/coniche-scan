@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PageWithChrome } from "@/components/PageWithChrome";
+import { MijnGegevensMenuVoorCode } from "@/components/MijnGegevensMenuVoorCode";
 import { Modal } from "@/components/Modal";
 import { aiDomeinen, AiDomeinContent } from "@/data/ai-domeinen-content";
 
@@ -33,6 +34,10 @@ function DomeinKaart({
           position: "relative",
           padding: "1.1rem 2.2rem 1.1rem 1.2rem",
           background: actief ? "var(--or)" : "var(--bg)",
+          // ai-domeinenmodel-visual.md: 1.5px i.p.v. de gewone 1px van
+          // `.card` — kleinere kaarten, dicht op elkaar in een grid.
+          border: "1.5px solid var(--border)",
+          borderLeft: "4px solid var(--or)",
         } as React.CSSProperties
       }
     >
@@ -41,7 +46,7 @@ function DomeinKaart({
           position: "absolute",
           top: "0.7rem",
           right: "0.9rem",
-          fontSize: "0.75rem",
+          fontSize: "var(--fs-xs)",
           fontWeight: 700,
           color: actief ? "rgba(255,255,255,0.75)" : "var(--ink-s)",
         }}
@@ -74,7 +79,12 @@ function AiDomeinenInhoud() {
   const code = useSearchParams().get("code") ?? undefined;
 
   return (
-    <PageWithChrome logoHref={code ? `/s/${code}` : undefined} code={code} toonTerug>
+    <PageWithChrome
+      logoHref={code ? `/s/${code}` : undefined}
+      code={code}
+      toonTerug
+      identiteitMenu={code ? <MijnGegevensMenuVoorCode code={code} /> : undefined}
+    >
       <div style={{ background: "linear-gradient(180deg, var(--or-faint) 0%, var(--bg) 65%)" }}>
         <div className="container" style={{ padding: "4.5rem 2rem 3.5rem", textAlign: "center" }}>
           <span className="eyebrow">Coniche Scan</span>

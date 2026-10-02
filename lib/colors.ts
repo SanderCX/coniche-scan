@@ -1,4 +1,4 @@
-import { Classificatie } from "./types";
+import { BeheerRol, Classificatie } from "./types";
 
 /**
  * Officiële Coniche-huisstijlkleuren per categorie (stylesheet.md,
@@ -17,6 +17,21 @@ export const CATEGORIE_COLORS: Record<
   paars: { bg: "bg-pu", text: "text-pu", border: "border-pu", hex: "#392944" },
   groen: { bg: "bg-gr", text: "text-gr", border: "border-gr", hex: "#197f4e" },
   antraciet: { bg: "bg-fu", text: "text-fu", border: "border-fu", hex: "#44403c" },
+};
+
+/**
+ * Rolkleuren (stylesheet.md, "Rolkleuren"): los van de categoriekleuren
+ * hierboven, maar hergebruikt vier van dezelfde merkkleuren. Voor de
+ * Rolbadge naast het logo (vervangt de vaste zwarte "Beheer"-badge) —
+ * momenteel alleen `admin`/`consultant` daadwerkelijk zichtbaar (de enige
+ * twee `Gebruiker`-rollen, `lib/types.ts`); `lead`/`respondent` liggen
+ * klaar voor als de organisatiekant een eigen ingelogde weergave krijgt.
+ */
+export const ROL_KLEUR: Record<BeheerRol | "lead" | "respondent", { hex: string; label: string }> = {
+  admin: { hex: "#225ba0", label: "Admin" },
+  consultant: { hex: "#ff671f", label: "Consultant" },
+  lead: { hex: "#392944", label: "Lead" },
+  respondent: { hex: "#197f4e", label: "Respondent" },
 };
 
 /**

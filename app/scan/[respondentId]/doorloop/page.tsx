@@ -5,11 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useScanInvulling, updateScanInvulling, scanWeergave } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
-import { alleBouwblokkenMetGroep, alleVragen } from "@/lib/assessment-structuur";
+import { actieveBouwblokkenMetGroep, actieveVragen } from "@/lib/assessment-structuur";
 import { PageWithChrome } from "@/components/PageWithChrome";
+import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { Sidebar } from "@/components/Sidebar";
 import { MobielVoortgang } from "@/components/MobielVoortgang";
 import { BouwblokForm } from "@/components/BouwblokForm";
+import { ScanBezet } from "@/components/ScanBezet";
+import { useScanSlot } from "@/lib/scan-slot";
 
 export default function DoorloopPage({
   params,
@@ -23,8 +26,12 @@ export default function DoorloopPage({
   const gegevens = useScanInvulling(respondentId);
   const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
   const router = useRouter();
+  // Eén persoon tegelijk per scan (lib/scan-slot.ts): De eerste houdt het slot, een tweede ziet een melding.
+  const slot = useScanSlot(gegevens ? respondentId : null);
 
-  const alleBouwblokken = assessment ? alleBouwblokkenMetGroep(assessment) : [];
+  // Gearchiveerde bouwblokken (datamodel.md, "Content bewerken") krijgt een
+  // nieuwe invulling niet meer te zien.
+  const alleBouwblokken = assessment ? actieveBouwblokkenMetGroep(assessment) : [];
 
   // Geen lazy-initializer: alleBouwblokken is pas na hydration (async localStorage-
   // lezing) gevuld, dus het actieve bouwblok wordt bij elke render opnieuw afgeleid
@@ -64,6 +71,17 @@ export default function DoorloopPage({
     return null;
   }
 
+  if (slot.status === "bezet") {
+    return <ScanBezet toegangscode={gegevens.lid.toegangscode} onOpnieuw={slot.opnieuw} />;
+  }
+  if (slot.status === "controleren") {
+    return (
+      <PageWithChrome>
+        <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>
+      </PageWithChrome>
+    );
+  }
+
   const { lid, invulling } = gegevens;
   const assessmentVast = assessment;
   const respondent = scanWeergave(lid, invulling);
@@ -86,7 +104,7 @@ export default function DoorloopPage({
   }
 
   function handleTestVulAutomatisch() {
-    const vragen = alleVragen(assessmentVast);
+    const vragen = actieveVragen(assessmentVast);
     const nieuweAntwoorden: Record<string, number> = {};
     vragen.forEach((vraag, i) => {
       const offset = (i % 3) - 1; // cyclisch: gemiddelde-1, gemiddelde, gemiddelde+1
@@ -126,6 +144,7 @@ export default function DoorloopPage({
           <Link href={`/scan/${respondentId}/resultaten`}>Naar resultaten →</Link>
         ) : undefined
       }
+      identiteitMenu={<MijnGegevensMenu lid={lid} />}
     >
       {/* TIJDELIJKE TESTKNOP — op verzoek van Sander, om het resultatenscherm
           (classificatiekleuren, radar chart, spreiding) te kunnen testen

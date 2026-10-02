@@ -65,7 +65,7 @@ export function ResultsView({
         </div>
         <div className="chart-block">
           <h3>{groepHeading}</h3>
-          <CategoryBarChart resultaten={groepResultaten} />
+          <CategoryBarChart resultaten={groepResultaten} horizontaal={vlak} />
         </div>
       </div>
 

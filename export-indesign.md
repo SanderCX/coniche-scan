@@ -1,6 +1,6 @@
 # Coniche Scan: Export voor InDesign (XML)
 
-**Status: Specificatie, klaar om te bouwen.** Levert de inhoud van één
+Levert de inhoud van één
 ingevulde scan (scores, top 3, contentsectie) los aan als XML plus
 losse chart-afbeeldingen, zodat een designer die in een handmatig
 opgemaakt InDesign-document kan verwerken — zoals het bredere
@@ -11,13 +11,35 @@ kant-en-klare, door Coniche vastgelegde lay-out; deze export levert
 dezelfde inhoud in onderdelen, voor een sjabloon dat niet door de app
 wordt bepaald.
 
+**Bekende beperking**: Automatisch plaatsen van de SVG's via de
+XML-`href`'s bleek in de praktijk niet te werken — het Structuur-paneel
+laat de elementen na importeren wel labelen, maar het Koppelingen-paneel
+(Venster > Koppelingen) toont daarna geen daadwerkelijke link naar de
+SVG-bestanden. De structuur en `href`-syntax in dit document zijn
+gecontroleerd en kloppen met de spec; de oorzaak van het uitblijven van
+een link ligt in InDesign zelf en is niet gevonden. Tot dat opgelost is:
+handmatig plaatsen (File > Place) per SVG.
+
 ## Waar dit een plek krijgt
 
 Derde optie in dezelfde Exporteren-dropdown als nu (resultatenpagina
-en `admin-beheerpagina.md` punt 7, Ingevulde scans): Naast "Als PDF"
+en `beheerpagina.md` punt 7, Ingevulde scans): Naast "Als PDF"
 en "Als CSV" komt **"Voor InDesign (XML)"**. Beschikbaar bij precies
 één scan, net als PDF — geen bulk-variant, zie "Wat nog niet kan"
 hieronder.
+
+**Toegang** (`datamodel.md` deel 2, Rechtenmatrix, `export.uitvoeren`):
+Admin en Consultant hebben deze optie overal waar de Exporteren-dropdown
+al staat (bereik `alle`/`eigen`, zoals de rest van beheer) — dat dekt
+zowel de resultatenpagina als `beheerpagina.md` punt 7. Een Respondent of
+Lead ziet "Voor InDesign (XML)" alléén op de resultatenpagina van zijn
+eigen ingevulde scan (bereik `zelf`); een Lead ziet 'm daarnaast ook op de
+resultatenpagina van een Meting waarvoor hij Lead is, zodra die pagina
+zelf export krijgt — nu nog niet het geval, zie `beheerpagina.md` punt 4,
+"Organisatie-resultaten", "Nog niet gedekt". Geen van beide rollen krijgt
+'m ergens anders (geen toegang tot andermans scan, geen toegang tot een
+Meting waar hij geen Lead voor is), en geen bulk-InDesign-export voor een
+Lead sowieso, zie hieronder.
 
 ## Wat wordt geëxporteerd
 
@@ -157,7 +179,7 @@ element — zelfde reden als bij de CSV: Een leeg element is in
 InDesign niet te onderscheiden van "nog niet getagd".
 
 **Kwetsbaarheid van deze aanpak**: Zodra organisatievelden zelf
-beheerbaar worden (`admin-beheerpagina.md`, "Nog te bouwen") en de
+beheerbaar worden (`beheerpagina.md`, "Nog te bouwen") en de
 lijst dus kan wijzigen, moeten deze elementnamen en het sjabloon
 gelijk opgaan. Geen nieuw risico t.o.v. de rest van deze spec (zie
 "Eigenaarschap van de tagnamen" onderaan), maar hier weegt het zwaarder
@@ -203,13 +225,12 @@ alleen losstaand vet of cursief per stuk tekst.
 
 ## Techniek in het kort
 
-- Zelfde data-verzameling als `buildResultatenPdfHtml`
-  (`lib/pdf/build-html.ts`), alleen de output-stap verschilt: XML +
-  losse bestanden in plaats van HTML-naar-PDF.
-- De charts zijn er al als SVG (`lib/pdf/charts.ts`); deze export
-  hergebruikt die renderfunctie en schrijft het resultaat weg als los
-  bestand in plaats van in te bedden in de PDF-HTML. Top3Sterktes en
-  Top3Verbeterkansen krijgen een eigen, vergelijkbare renderfunctie
+- Zelfde data-verzameling als de PDF-export, alleen de output-stap
+  verschilt: XML + losse bestanden in plaats van HTML-naar-PDF.
+- De charts zijn er al als SVG voor de PDF-export; deze export
+  hergebruikt diezelfde opmaak en schrijft het resultaat weg als los
+  bestand in plaats van in te bedden in de PDF. Top3Sterktes en
+  Top3Verbeterkansen krijgen een vergelijkbare eigen weergave
   (rangcirkel + naam + scorebadge), dezelfde aanpak als de charts.
 - Bestandsnamen: `<organisatie-slug>-<scannaam-slug>-radar.svg`,
   `...-staafdiagram.svg`, `...-top3-sterktes.svg` en
@@ -234,14 +255,14 @@ voor het taggen, niet andersom.
   de ZIP, of samengevoegd?) zonder een aggregatie-vraagstuk aan te
   raken. Zelfde grens als bij PDF (`export-pdf-visual-volwassenheidsscan.md`,
   "Export van één scan, geen aggregatie").
-- **Geen aggregatie over meerdere respondenten binnen een Meting.**
-  Staat in `backlog.md` onder Functioneel als nog niet ontworpen. Deze
-  XML-structuur is er wel naar toe te groeien: Een aggregaat zou
-  dezelfde `groepsScores`/`top3Sterktes`/`top3Verbeterkansen`-vorm
-  krijgen, één laag hoger (per Meting in plaats van per
-  ScanInvulling), plus een veld voor het aantal respondenten. Dat is
-  hier bewust niet vastgelegd zolang de aggregatie zelf geen
-  ontwerpkeuze heeft.
+- **Geen aggregatie over meerdere respondenten binnen een Meting.** De
+  aggregatieweergave zelf bestaat wel (`beheerpagina.md`,
+  Organisatie-resultaten, en zie de Lead-rol in `datamodel.md` deel 2),
+  een InDesign-export ervan nog niet. Deze XML-structuur is er wel naar
+  toe te groeien: Een aggregaat zou dezelfde
+  `groepsScores`/`top3Sterktes`/`top3Verbeterkansen`-vorm krijgen, één
+  laag hoger (per Meting in plaats van per ScanInvulling), plus een veld
+  voor het aantal respondenten. Dat is hier bewust nog niet vastgelegd.
 
 ## Beslist
 

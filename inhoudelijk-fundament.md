@@ -96,7 +96,7 @@ de cyclus voor dat onderdeel op orde.
 een stap. Naast de vijf stappen van de cyclus gebruiken we daarbij
 **Basis**: De vraag toetst of iets is vastgelegd of ingericht (een
 document, een structuur, een systeem). Dat is de voorwaarde waar de
-cyclus op draait. Leren uit klantcontact volgt de cyclus het meest
+cyclus op draait. Leren uit Klantcontact volgt de cyclus het meest
 letterlijk, met achtereenvolgens Meten, Begrijpen, Besluiten en Doen /
 Leren.
 
@@ -140,8 +140,7 @@ stellen dat het op iedere bouwsteen van toepassing is.
 **Status: Akkoord.**
 
 De nummering uit `visie-coniche.md` is leidend. Het contentbestand is
-omgenummerd; beide zijn geverifieerd consistent (zie `v1-aanpassingen.md`,
-"Verwerkt in de specs").
+omgenummerd; beide zijn geverifieerd consistent.
 
 ---
 
@@ -182,7 +181,7 @@ en welke stap elke scanvraag raakt. Alle bouwstenen staan op `concept`.
 - Vraag 3 (KPI-huis met definities): Meten
 - Vraag 4 (dashboards aantoonbaar gebruikt): Doen
 
-#### 4. Leren uit klantcontact
+#### 4. Leren uit Klantcontact
 **Status: Concept.**
 - Aangepast: Beschrijving volgt nu de vier vragen stap voor stap.
 - Vraag 1 (contactredenen vastleggen): Meten
@@ -323,13 +322,17 @@ perspectief:
 
 ## 5. Relatie met de app (later uit te werken)
 
-- De bouwsteenbeschrijvingen uit `visie-coniche.md` worden de tekst voor
-  het veld `toelichting` (de overlay per bouwblok). Tot ze `akkoord` zijn,
-  blijft de huidige tekst in de app staan.
-- De centrale vraag heeft een plek in het datamodel: `Bouwblok.centraleVraag`
-  (`datamodel.md`). Al gebouwd en in gebruik in de toelichting-overlay,
-  zie het label "CENTRALE VRAAG" onder de titel.
+- De bouwsteenbeschrijvingen uit `visie-coniche.md` zijn de tekst in de
+  toelichting-overlay per bouwblok, inclusief de centrale vraag (label
+  "CENTRALE VRAAG" onder de titel) — via `data/bouwstenen-content.ts`,
+  niet via een veld op `Bouwblok` zelf (zie `datamodel.md`, Bouwblok,
+  voor de precieze koppeling).
 - De uitleg per schaalniveau (sectie 1) als hulptekst bij de vragen.
 
-Geen van deze punten wordt doorgevoerd in de specs voordat dit document
-op het betreffende onderdeel `akkoord` is.
+**Afwijking van een eerdere versie van dit document**: Die stelde dat
+niets hiervan wordt doorgevoerd voordat de status per bouwsteen op
+`akkoord` staat. In de praktijk is de volledige `visie-coniche.md`-tekst
+al gebouwd en live (alle 15 bouwstenen staan hier nog op `Concept`, zie
+sectie 1) — die gate is dus nooit technisch afgedwongen. De statuskolom
+blijft een nuttige redactionele tracker (wat Sander nog wil nalopen),
+maar is geen blokkade voor wat al in de app staat.

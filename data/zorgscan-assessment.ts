@@ -3,19 +3,27 @@ import { Assessment, Bouwblok } from "@/lib/types";
 /**
  * Sector-variant van "Klantcontact Volwassenheid" voor Zorg & Welzijn
  * (`afgeleidVanAssessmentId`, zie datamodel.md "Sector-varianten"). Zelfde
- * 15 bouwblokken, 5 categorieën en volgorde als het template — alleen de
- * vraagteksten zijn herschreven naar patiënt-/cliëntcontact, medische en
- * niet-medische contactredenen en zorgtaal (bron: Joost, PDF-export
- * "Volwassenheidsmodel Klantcontact" + CSV-export van een proefinvulling,
- * huisartsenpraktijk).
+ * 15 bouwblokken, 5 categorieën en volgorde als het template — de
+ * vraagteksten zijn BEDOELD als herschreven naar patiënt-/cliëntcontact,
+ * medische en niet-medische contactredenen en zorgtaal (bron: Joost,
+ * PDF-export "Volwassenheidsmodel Klantcontact" + CSV-export van een
+ * proefinvulling, huisartsenpraktijk).
  *
  * Bouwblok-naam, -omschrijving, -toelichting en -tags zijn hier bewust nog
  * identiek aan `klantcontact-assessment.ts` overgenomen: In de brontekst
  * van Joost stond letterlijk de notitie "LET OP: Terminologie in
  * toelichtingenbalkje bovenaan de pagina nog wel aanpassen op zorg(taal)"
  * — die sectorvertaling van de intro-/toelichtingteksten is dus nog niet
- * gemaakt, alleen de vraagteksten zijn af. Dat is een open punt voor Joost,
- * geen aanname die hier stilzwijgend is ingevuld.
+ * gemaakt. Dat is een open punt voor Joost, geen aanname die hier
+ * stilzwijgend is ingevuld.
+ *
+ * **Afwijking, ontdekt 30-9-2026**: In tegenstelling tot wat hier eerder
+ * stond, zijn NIET alle 60 vraagteksten herschreven — 29 zijn nog
+ * woordelijk gelijk aan `klantcontact-assessment.ts` (o.a. bouwblok 7
+ * "Systemen & Tools" en bouwblok 15 "Cultuur" volledig ongewijzigd). Zie
+ * `content-zorgscan.md` voor de volledige toelichting; nog niet
+ * gecorrigeerd, met Sander/Joost te bespreken welke vragen dat precies
+ * zijn.
  */
 function bb(
   id: string,
@@ -366,9 +374,13 @@ export const zorgscan: Assessment = {
   beschrijving:
     "Breng in kaart hoe volwassen het patiënt- of cliëntcontact van jouw zorg- of welzijnsorganisatie is op 15 bouwblokken, verdeeld over 5 pijlers — van strategie tot cultuur. Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken.",
   doelgroep: "Praktijkmanagers, zorgcoördinatoren en teamleads binnen zorg- en welzijnsorganisaties",
+  // Hartje-outline, zelfde SVG-lijnstijl als "target" (Klantcontact
+  // Volwassenheid) en "sparkle" (AI-volwassenheid), op verzoek van Sander
+  // — niet de eerder overwogen stethoscoop-emoji (content-zorgscan.md,
+  // inmiddels bijgewerkt).
   icoon: "heart",
   geschatteDuur: "±30 minuten",
-  kortLabel: "Zorgscan",
+  kortLabel: "Volwassenheidsscan Zorg",
   pdfContentSecties: { titel: "Visie", bron: "visie-coniche.md-deel1" },
   bouwblokken: null,
   scoresPerGroepGesorteerd: false,

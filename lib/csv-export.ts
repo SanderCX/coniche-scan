@@ -1,10 +1,10 @@
 import { Assessment, Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering } from "./types";
-import { alleBouwblokkenMetGroep } from "./assessment-structuur";
+import { alleBouwblokkenMetGroep, isVlakkeAssessment } from "./assessment-structuur";
 import { alleBouwblokResultaten, alleGroepResultaten, overallScore, voortgang } from "./scoring";
 
 /**
  * CSV-export van ingevulde scans (`export-csv.md`), vanaf de
- * resultatenpagina (één scan) en `admin-beheerpagina.md` punt 7,
+ * resultatenpagina (één scan) en `beheerpagina.md` punt 7,
  * Ingevulde scans (één of meerdere geselecteerde scans, binnen één
  * organisatie). Client-side: alle data staat al in de browser
  * (localStorage), geen serverroute nodig zoals bij de PDF-export.
@@ -76,38 +76,46 @@ function bouwRij(ctx: CsvRijContext): string[] {
 
   let overallVeld = "";
   let groepen = "";
-  let antwoordenVeld = "[]";
-  let opmerkingenVeld = "{}";
 
   // Score-samenvatting alleen bij een afgeronde invulling (export-csv.md,
   // "Berekende score-samenvatting"): geen score op een onvolledige invulling.
+  // `antwoorden`/`opmerkingen_per_bouwblok` hieronder kennen die restrictie
+  // niet — die tonen gewoon wat er tot nu toe al ingevuld is, ook bij
+  // "bezig" (`aantal_beantwoord` hierboven doet dat ook al).
   if (invulling.status === "afgerond") {
     const bouwblokResultaten = alleBouwblokResultaten(assessment, invulling.antwoorden);
     const groepResultaten = alleGroepResultaten(assessment, bouwblokResultaten);
     const overall = overallScore(bouwblokResultaten.map((r) => r.score));
     overallVeld = overall !== null ? csvGetal(overall) : "";
 
-    const isVlak = !assessment.categorieen || assessment.categorieen.length === 0;
     groepen = groepsScoresVeld(
-      isVlak ? "bouwblok" : "categorie",
+      isVlakkeAssessment(assessment) ? "bouwblok" : "categorie",
       groepResultaten.map((g) => ({ groepNaam: g.groepNaam, score: g.score }))
     );
-
-    const antwoordItems = alleBouwblokkenMetGroep(assessment).flatMap(({ bouwblok }) =>
-      bouwblok.vragen
-        .filter((v) => typeof invulling.antwoorden[v.id] === "number")
-        .map((v) => ({
-          bouwblokId: bouwblok.id,
-          bouwblokNaam: bouwblok.naam,
-          vraagId: v.id,
-          vraagTekst: v.tekst,
-          score: invulling.antwoorden[v.id],
-          schaalLabel: labelVoorSchaal(assessment, invulling.antwoorden[v.id]),
-        }))
-    );
-    antwoordenVeld = JSON.stringify(antwoordItems);
-    opmerkingenVeld = JSON.stringify(invulling.opmerkingenPerBouwblok);
   }
+
+  const antwoordItems = alleBouwblokkenMetGroep(assessment).flatMap(({ bouwblok }) =>
+    bouwblok.vragen
+      .filter((v) => typeof invulling.antwoorden[v.id] === "number")
+      .map((v) => ({
+        bouwblokId: bouwblok.id,
+        bouwblokNaam: bouwblok.naam,
+        vraagId: v.id,
+        vraagTekst: v.tekst,
+        score: invulling.antwoorden[v.id],
+        schaalLabel: labelVoorSchaal(assessment, invulling.antwoorden[v.id]),
+      }))
+  );
+  const antwoordenVeld = JSON.stringify(antwoordItems);
+
+  // Alleen bouwblokken met een ingevulde opmerking (export-csv.md,
+  // "Antwoorden"): een leeg gemaakte opmerking (respondent typt iets en
+  // wist het weer) laat een lege string in `opmerkingenPerBouwblok` achter
+  // die hier niet als "ingevuld" mag tellen.
+  const opmerkingenMetInhoud = Object.fromEntries(
+    Object.entries(invulling.opmerkingenPerBouwblok).filter(([, tekst]) => tekst.trim() !== "")
+  );
+  const opmerkingenVeld = JSON.stringify(opmerkingenMetInhoud);
 
   return [
     organisatie.naam,

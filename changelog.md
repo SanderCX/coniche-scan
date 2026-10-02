@@ -1,5 +1,1262 @@
 # Coniche Scan — Changelog
 
+## 2026-10-02 — Resterende uitlegteksten in beheer naar het Info-icoon
+
+Algemene teksten (toelichting bij het veld), Content (Icoon en Slotsectie voor de
+PDF-export) en Applicatie (Data-integriteit) gebruiken nu het Info-icoon in plaats van
+vaste tekst eronder. "Afgeleid van: …" (een gegeven, geen uitleg) en lege-lijstmeldingen
+blijven staan. Lijst van plekken in `stylesheet.md`, Info-icoon.
+
+## 2026-10-02 — Getalvelden zonder pijltjes
+
+Alle `input[type="number"]` (bewaartermijn, verlenging, weging/gewicht in Content,
+organisatiekenmerken zoals aantallen en percentages, de testknop) tonen alleen de waarde,
+zonder de pijltjes om met 1 te verhogen of te verlagen. Eén regel in `base.css`, dus ook voor
+toekomstige getalvelden. Vastgelegd in `stylesheet.md` (Formulieren, Getalvelden zonder pijltjes).
+
+## 2026-10-02 — Info-icoon in plaats van vaste uitleg bij Bewaartermijn
+
+`components/InfoIcoon.tsx` (oranje rondje met uitroepteken, klik opent een afsluitbaar
+informatieveld) vervangt de vaste uitlegtekst onder het formulier "Bewaartermijn ingevulde
+scans" (`app/beheer/organisaties/page.tsx`), zowel in de Admin-weergave (naast Opslaan) als
+in de weergave voor een Consultant (achter de termijnen). Vastgelegd in `stylesheet.md`,
+Info-icoon. Gotcha: Tailwind-marges zoals `mt-6` op een `h3` werken niet, omdat de
+ongelaagde `h3`-regel in `base.css` ze overschrijft: Marges op koppen daarom inline of in CSS.
+Daarna ook omgezet: De twee uitlegteksten op de Import-pagina (bij "Bestanden kiezen" en
+bij "rijen importeren") en de uitleg bij het bewerkformulier in het Respondent-overzicht.
+De regel "uitleg in een Info-icoon, niet als vaste tekst" staat nu in `CLAUDE.md`
+(Uitgangspunten), `beheerpagina.md` (Vormgeving) en `stylesheet.md` (Info-icoon). Het
+informatieveld opent ook met mouse-over (sluit weer bij weggaan), en een klik zet het vast.
+Het Respondent-overzicht kon niet in de browser getest worden: Er zijn op dit moment geen
+respondenten.
+
+## 2026-10-02 — Typografie: één schaal voor interface-tekst, vaste veld- en knophoogte
+
+**Aanleiding**: Sander wil consistente lettertypes en maten, en een melding bij
+wat niet gespecificeerd is. Gemeten: Eén beheerpagina toonde 10 tot 13 lettergroottes.
+
+**Besluit (Sander)**: Schaal `--fs-xs/s/m/l` = .75/.85/.9/1.15rem, gewichten 400/600/700/800
+(500 vervalt), Geist Mono weg, `code` in Epilogue, PDF blijft Helvetica/Arial.
+
+**Gedaan**: Tokens in `tokens.css`; 57 `font-size`-waarden in `components.css`,
+`admin.css` en `charts.css` op die tokens gezet (eyebrow, koppen, iconen en
+display-maten bewust niet); Tailwind `text-xs/sm/base/lg` volgen dezelfde waarden
+(`globals.css`); 22 keer `font-medium` naar `font-semibold`; inline `fontSize` op de
+tokens; één modaltitelregel (`.modal-overlay .modal-box h2`, was afhankelijk van de
+plek in de pagina: 18,4px binnen `.admin-main`, daarbuiten de volle h2); Geist Mono uit
+`layout.tsx`; `font-family: inherit` voor alle formulierelementen en `code`.
+Veldhoogte: `--control-h` (2,4rem) voor `.admin-field input/select` en
+`.btn.btn-compact`, gemeten 38,4px voor allemaal (ook dropdown en selectiebalk).
+
+**Gemeten na afloop**: Per beheerpagina nog 12 / 13,6 / 14,4 / 18,4 / 30,4px plus de
+lopende tekst van 16px. **Niet in de schaal** (staat in `stylesheet.md`, Open punten):
+inleidende regels, privacykoppen, bouwblokkoppen, de score in de cirkel en de
+grafiektekst.
+
+## 2026-10-02 — Scanslot: één persoon tegelijk per scan, scan-bevindingen op de backlog
+
+**Aanleiding**: Uit de scan van de oplossing bleek dat twee gelijktijdige
+bewerkers van één scan elkaars antwoorden kunnen overschrijven. Besluit
+(Sander): De eerste respondent blokkeert de scan tijdens het invullen, een
+tweede krijgt een melding.
+
+**Gebouwd**: `lib/scan-slot.ts` (`useScanSlot`, hartslag elke 15 seconden,
+vrijgeven bij verlaten), `app/api/slot/[scanId]/route.ts` (één atomaire
+`INSERT … ON CONFLICT … WHERE`, TTL 90 seconden), tabel `scan_sloten`
+(`scripts/maak-sloten-tabel.mjs`, eenmalig gedraaid in Neon),
+`components/ScanBezet.tsx` en de koppeling in de intake- en doorloopflow. De
+wachtende pagina controleert zelf opnieuw en opent de vragenlijst zodra het
+slot vrij is. Zonder database valt het slot terug op `localStorage`. Het
+vrijgeven wacht 400 ms en kijkt of een volgende pagina in hetzelfde tabblad het
+slot al heeft overgenomen, anders wist de overgang intake naar vragenlijst het
+net geclaimde slot weer.
+
+**Getest**: De API met twee houders (claim, bezet, hartslag, vrijgeven door de
+verkeerde houder, verlopen slot) en in de browser met twee tabbladen: Het
+tweede tabblad kreeg de melding en kreeg na het sluiten van het eerste
+automatisch de vragenlijst. Eén keer bleef een nieuw tabblad op "Laden…"
+hangen terwijl de data al in `localStorage` stond; na een herlaadbeurt en met
+leeg geheugen was het niet te reproduceren.
+
+**Specs**: `CLAUDE.md` (scherm 5, Eén persoon tegelijk per scan) en
+`datamodel.md` (Scanslot). **Backlog**: De bevindingen van de scan staan in
+`backlog.md` onder "Uit de scan van 2 oktober 2026", verdeeld over drie fasen
+(functioneel afronden, database en rollen, deployment en beveiliging).
+
+## 2026-10-02 — Beheer herbouwd naar Respondent-/Scan-overzicht, Meting-pagina en tabbalk
+
+**Aanleiding**: De nieuwe `beheerpagina.md` (Navigatie in beheer, punt 4 t/m
+7) beschrijft een andere beheerstructuur dan er stond: Een tabbalk, kruimelpad,
+één lijst Respondenten en het Respondent-/Scan-overzicht als modal in plaats
+van acties per rij en een detailpagina per scan.
+
+**Gebouwd**
+- **Tabbalk** (Organisaties, Respondenten, Ingevulde scans, Import) in
+  `BeheerChrome`, alleen op de lijstpagina's. De losse nav-links "Ingevulde
+  scans →" en "Import van scans →" zijn vervallen. **Kruimelpad**
+  (`components/beheer/Kruimelpad.tsx`) op organisatie-detail,
+  Meting-overzicht en de resultatenschermen.
+- **Respondent-overzicht** en **Scan-overzicht** als modal
+  (`RespondentOverzicht.tsx`, `ScanOverzicht.tsx`, gehost door
+  `BeheerOverzichten.tsx` in `BeheerChrome`) via `?respondent=<id>` en
+  `?scan=<id>`. De terugknop van de browser sluit de modal, een gedeelde link
+  opent hem alleen bij toegang. `lib/beheer-url.ts` houdt filters, sortering en
+  de modal in de adresbalk. Gotcha: `history.replaceState(window.history.state,
+  …)` synchroniseert in Next.js niet met `useSearchParams` (het interne state-object
+  geldt als Next-eigen aanroep), daarom geeft `schoneState()` een schoon object door.
+- **Vervolgstappen** in dezelfde modal (`VerplaatsStappen.tsx`): Scan naar
+  andere Meting (ook bulk), scan naar andere organisatie, hele Respondent
+  verplaatsen met een Meting-keuze per bron-Meting, samenvoegen bij
+  e-mailconflict, Lead-toegang beheren.
+- **Nieuwe pagina's**: `/beheer/respondenten` (lijst met filters en zoekveld),
+  `/beheer/metingen/[id]` (Meting-overzicht met uitnodigen, selectie, label wijzigen,
+  verwijderen), `/beheer/resultaten/[id]` (resultaten van één scan in beheer, met
+  Exporteren in de nav). `/beheer/scans/[respondentId]` is vervallen.
+- **Organisatie-detail** toont Metingen, Respondenten en scans met "Bekijk >>" en
+  maximaal 5 rijen, met een link naar de gefilterde lijst.
+- **Samenvoeg- en verplaatslogica** in `lib/db.ts` volgt nu de spec: Een scan
+  waarvan de bestaande Respondent in dezelfde Meting al een scan heeft, wordt
+  overgeslagen en blijft staan, de oorspronkelijke Respondent wordt dan niet
+  verwijderd. Voorheen verdween zo'n scan stilzwijgend. Ongeldige Meting-keuze
+  breekt de hele actie af. Lead-koppelingen vervallen bij het verplaatsen naar een
+  andere organisatie (ze verwijzen naar Metingen van de oude).
+- Import: naast "Bestanden kiezen" nu "Map kiezen" (`webkitdirectory`).
+
+**Specs bijgewerkt**: `beheerpagina.md` (Status, bewaartermijn in dagen, teruggekomen
+oude tekst over Toegang, Rolbadge en Gebruikers hersteld, Respondenten op gebouwd),
+`stylesheet.md` (Tabbalk en kruimelpad, Overzichtsmodal, Vervolgstappen), `backlog.md` en
+`CLAUDE.md` (Weging op de backlog, niet gebouwd).
+
+**Bewust niet gebouwd**: Audit-log en Content-pagina's (staan in de spec als nog niet
+gebouwd), de tab Organisatievelden, Verificatie-blokkade opheffen, paginering,
+Weging (backlog). Overgeslagen scans komen dus nog niet in een audit-log terecht.
+
+## 2026-10-01 — Lokale, host-brede opslag + bugfix bronformaat-detectie
+
+**Aanleiding**: "Ik wil lokaal op dezelfde host met dezelfde data kunnen
+werken" — alles stond puur in de `localStorage` van de browser die er
+toevallig in zat (CLAUDE.md, Status), dus elke browser op hetzelfde
+apparaat had zijn eigen, geïsoleerde data.
+
+**Nieuw: `app/api/store/[key]/route.ts`** (GET/PUT, JSON-tekst 1-op-1 naar
+een bestand onder `.data/` in de projectroot, niet gecommit). **Nieuw:
+`lib/server-sync.ts`** met twee functies, ingebouwd in alle vijf losse
+localStorage-stores (`lib/db.ts`, `lib/assessment-store.ts`,
+`lib/gebruikers-store.ts`, `lib/instellingen-store.ts`,
+`lib/algemene-teksten-store.ts`): `haalServerKopieOp` haalt bij het laden
+van de pagina eenmalig de serverkopie op en overschrijft de lokale
+`localStorage`-waarde ermee als ze verschilt; `stuurNaarServer` stuurt na
+elke schrijfactie (fire-and-forget) de nieuwe staat naar de server. Geen
+server bereikbaar (bijv. een productie-build zonder deze route): beide
+falen stil, `localStorage` blijft dan gewoon de enige bron, zoals
+voorheen.
+
+Bewust **niet** de geplande Postgres-database (Neon, `backlog.md`) —
+geen auth, geen gelijktijdigheidscontrole, "laatste schrijver wint". Puur
+bedoeld voor één persoon die op één apparaat tussen browsers wisselt
+tijdens lokale ontwikkeling, niet voor gedeeld/productiegebruik.
+
+**Een race geconstateerd en gefixt vóórdat 'm iemand trof**: Eerste versie
+pushte bij het zaaien van nieuwe localStorage (lege browser) meteen de
+standaardseed naar de server — dat kon een al bestaande, echte serverkopie
+overschrijven vóórdat de asynchrone ophaalronde had kunnen draaien. Seed-
+push verwijderd: Een lege browser wacht nu op `haalServerKopieOp` en pusht
+pas iets bij een eerste echte schrijfactie.
+
+Geverifieerd in de browser: een instelling opgeslagen → terug te vinden in
+`.data/instellingen.json`; daarna `localStorage` gewist en herladen → de
+server-waarde kwam terug i.p.v. de standaardwaarde. Zelfde bevestigd voor
+de echte organisatiedata (`.data/organisaties.json`, de drie bestaande
+organisaties).
+
+**Bugfix, `detecteerBronFormaat` (`lib/import-legacy.ts`)**: Las de
+headerregel met een kale `split(",")`/`split(";")` i.p.v. de
+aanhalingstekens-bewuste `parseCsv` die de rijen zelf al wél gebruikten.
+Een bulk-export met aangehaalde kolomkoppen (`"organisatie_naam";...`,
+gebruikelijk bij Excel-/pandas-achtige bulk-exports) matchte daardoor
+nergens mee — de aanhalingstekens bleven letterlijk in elke kolomnaam
+staan, dus geen enkele kolom kwam overeen met de verwachte naam, en het
+hele bestand werd afgewezen met "kon het bronformaat niet bepalen",
+ook al stond er verder een geldig bestand in. Root cause aangedragen
+door Sander (zelf gevonden in het gedrag, hier toegepast op
+`lib/import-legacy.ts`); nu lost `detecteerBronFormaat` de headerregel
+op met dezelfde `parseCsv`-tokenizer. Geverifieerd met een scriptje (4
+combinaties: oud/nieuw formaat × wel/niet aangehaalde headers, alle vier
+correct) en in de browser met een bestand dat exact het gemelde probleem
+reproduceerde (aangehaalde headers, bronformaat "Coniche Scan (eigen
+export)") — detecteert nu correct i.p.v. de foutmelding te geven.
+
+## 2026-10-01 — Import van scans: bijgewerkt op `import-scans.md`
+
+**Aanleiding**: "Pas import aan op basis van md" — `import-scans.md` was
+fors uitgebreid (meerdere organisaties/Assessment-types in één bestand,
+organisatie-koppeling per unieke naam i.p.v. per rij, een 95%-
+vraagtekst-tiebreak voor Assessment-detectie, en Metingen die binnen één
+beheersessie worden samengevoegd), de implementatie liep daar nog niet
+in mee.
+
+**`lib/import-legacy.ts`**: `detecteerAssessment`'s vraagtekst-tiebreak
+(nodig zodra bouwblok-namen tussen scan-types botsen, zoals Klantcontact
+Volwassenheid/Zorgscan) ging van alles-of-niets naar een percentage:
+exact één kandidaat op 100% blijft automatisch; geen 100%, maar precies
+één kandidaat op of boven de 95%-drempel, wordt óók gedetecteerd maar
+vereist een losse bevestiging per rij (nooit in bulk), met het
+percentage en de afwijkende vragen in `GevalideerdeRij`. Geverifieerd
+met een scriptje tegen de echte Klantcontact-/Zorgscan-content (100%,
+96,7% met 2 gewijzigde vragen, en 83,3% met 10 gewijzigde vragen —
+respectievelijk automatisch, losse bevestiging, en onbepaald). Ook: het
+Meting-label voor de eigen export kreeg de specced "Import "-prefix
+(stond er nog niet).
+
+**`lib/db.ts`**, `voerLegacyImportUit`: Maakte voorheen altijd een
+nieuwe organisatie/Meting per rij, ook als twee rijen dezelfde
+(nieuwe) organisatienaam of dezelfde organisatie/Assessment/Meting-label
+deelden — in strijd met "Organisatie, één keer per unieke naam" en
+"Binnen één import delen rijen één Meting". Nu: dedupliceert binnen één
+aanroep op naam resp. op organisatie+Assessment+label, en `LegacyImportKeuze`
+accepteert optioneel een al bekend `organisatieId`/`metingId` zodat een
+latere, aparte bevestiging binnen dezelfde beheersessie (bijv. een
+95%-rij die pas na de bulk-import wordt bevestigd) bij dezelfde
+organisatie/Meting aansluit in plaats van een dubbele aan te maken.
+Geverifieerd in de browser: twee rijen met een nieuwe, gedeelde
+organisatienaam en hetzelfde Meting-label kwamen samen in precies één
+organisatie met precies één Meting (2 invullingen), niet twee losse.
+
+**`app/beheer/import/page.tsx`**, flink herbouwd:
+- Organisatiekoppeling is nu één keuze per unieke organisatienaam
+  (koppelen aan bestaand / nieuw aanmaken / overslaan), niet meer een
+  dropdown per rij — met een "Organisaties koppelen"-tabel boven de
+  voorbeeldweergave. Een exacte naam-match wordt nog steeds automatisch
+  gekoppeld, zonder keuze te vragen.
+- Nieuwe samenvatting bovenaan: aantal rijen, organisaties
+  (bestaand/nieuw/nog te kiezen), rijen per Assessment-type, rijen met
+  een probleem.
+- Rijen met een 95%+-match krijgen een eigen "Importeer deze rij"-knop en
+  tellen niet mee in de bulkknop; een "overslaan"-organisatie toont
+  "Organisatie overgeslagen" i.p.v. een importeerbare rij.
+- Na een bevestiging (bulk of los) blijven alle rijen zichtbaar in de
+  voorbeeldweergave; geïmporteerde rijen krijgen de badge "Geïmporteerd"
+  en zijn niet opnieuw te bevestigen, in plaats van dat het hele scherm
+  na één druk op de knop leegt.
+- Bronformaat-tekst in `import-scans.md` zelf rechtgezet: Twee plekken
+  (de inleiding en "Werkwijze in beheer" stap 1) beschreven nog een
+  handmatige bronformaat-keuze vooraf, terwijl dat al eerder deze sessie
+  bewust is vervangen door automatische detectie (`detecteerBronFormaat`)
+  — en de rest van het document (en de code-comments die ernaar
+  verwijzen) ging daar ook al van uit. Rechtgezet naar automatische
+  detectie, consistent met de rest van de spec en de al bestaande
+  implementatie.
+
+## 2026-10-01 — "Ingevulde scans"/"Import" naar `.nav-right`, Bewaartermijn in dagen
+
+**"Ingevulde scans →"/"Import van scans →" van de pagina-body naar
+`.nav-right`**: Stonden als platte tekstlinks bovenaan de body van
+`/beheer/organisaties` — hoorden daar niet, het zijn scherm-specifieke
+navigatie-acties (CLAUDE.md sectie 3, Globale layout, punt 1), net als
+"Naar resultaten →" op de doorloopflow. Nieuw:
+`components/beheer/BeheerNavActions.tsx`, een context waarmee een
+beheerpagina haar eigen nav-right-content kan registreren — nodig omdat
+`BeheerChrome` in `app/beheer/layout.tsx` zit, één laag boven elke
+pagina, en dus geen `navRight`-prop van de pagina zelf kan aannemen
+zoals `PageWithChrome` dat op de respondentkant wel kan.
+
+**Bewaartermijn/Verlenging: maanden → dagen.** `Instellingen.
+bewaarTermijnMaanden`/`verlengTermijnMaanden` hernoemd naar
+`bewaarTermijnDagen`/`verlengTermijnDagen` (`lib/instellingen-store.ts`),
+`isOuderDanBewaartermijn` en `verlengBewaartermijn` (`lib/db.ts`)
+gebruiken nu `setDate` i.p.v. `setMonth`. Labels op
+`/beheer/organisaties` aangepast ("(dagen)"), `datamodel.md` deel 2,
+`beheerpagina.md` punt 4 en `privacy-pagina.md` bijgewerkt. Geen
+migratie van bestaande waarden nodig: Zonder eerder ingestelde termijn
+(`null`, geen default) was er niets om om te rekenen.
+
+## 2026-09-30 — Volledige app-audit (3 lenzen) en de fixes daaruit
+
+**Aanleiding**: "Kun je de coniche app nog een keer doorlopen, met de
+blik vanuit bouwfout/aanname/elegantie?" Vier parallelle audits (eigen
+beheer-review + drie subagents: respondent-flow, exports, content-
+fidelity, datamodel/rechten) leverden ~19 bouwfouten, ~21 aannames en
+~15 elegantie-suggesties op. Op "fix all" hieronder verwerkt, met
+tsc/eslint/next build + browsertests na elke groep.
+
+**Toegang/rechten (de twee met echt databeveiligingsrisico)**:
+- Scan-detail (`/beheer/scans/[respondentId]`) en Rapportage
+  (`/beheer/rapportage/[scanUitvoeringId]`) hadden geen `magOrganisatie
+  Toegang`-guard: Een Consultant die een id van een andere organisatie
+  kende/raadde, zag volledige antwoorden/scores. Guard toegevoegd, zelfde
+  patroon als de organisatie-detailpagina.
+- Import (`/beheer/import`) gebruikte het ongefilterde `useOrganisaties()`
+  voor matching/dropdown: Een Consultant kon zo importeren in een
+  organisatie buiten zijn bereik. Nu gescopet via `zichtbareOrganisaties`.
+- Lead `export.uitvoeren` voor toegewezen Metingen (rechtenmatrix
+  inmiddels vastgelegd) ontbrak: PDF-exportknop toegevoegd aan de Lead-
+  resultatenpagina (`/s/[code]/resultaten/[scanUitvoeringId]`), met een
+  omschrijvende naam i.p.v. een respondentnaam. CSV/InDesign voor een
+  Meting-gemiddelde zijn bewust nog niet gebouwd (geen vastgelegd
+  kolomformaat voor een aggregaat) — open punt.
+
+**Content bewerken: archiveren i.p.v. hard verwijderen** (datamodel.md
+zei dit al, was nooit gebouwd): `gearchiveerd?: boolean` op
+`Categorie`/`Bouwblok`/`Vraag`. "Verwijderen" in het contentbeheerscherm
+zet dit veld, met een "Gearchiveerd"-lijstje en Herstellen-knop erbij,
+i.p.v. het record te verwijderen. Nieuwe invullingen krijgen gearchiveerde
+content niet meer te zien (`lib/assessment-structuur.ts`, nieuwe
+`actieveGroepen`/`actieveBouwblokkenMetGroep`/`actieveVragen`, gebruikt
+door de doorloopflow, `Sidebar`, `voortgang()` en de tellingen op
+landingspagina/contentoverzicht); scoring/exports op een bestaande
+invulling blijven de ongefilterde functies gebruiken, dus scores uit
+eerdere invullingen blijven behouden — geverifieerd met een losse
+scoring-test (antwoord op een inmiddels gearchiveerde vraag telt nog mee)
+en in de browser (archiveren/herstellen via `/beheer/content/...`).
+
+**Meting verwijderen**: Bestond niet, ondanks dat datamodel.md het als
+gebouwd documenteerde. `verwijderMeting` (`lib/db.ts`) + knop naast
+"Wijzig label" in het organisatie-detail, met bevestiging.
+
+**Sector-variant kopiëren brak stilzwijgend de bouwsteen-content**:
+`duplicateAssessmentAsVariant` gaf gekopieerde bouwblokken een kale UUID,
+die geen `"bb"/"zorg-"/"ai"`-voorvoegsel meer matchte in
+`lib/bouwblok-info.ts` — dus verloor elke sector-variant zijn CENTRALE
+VRAAG/beschrijving. `nieuwBouwblokId` behoudt nu het voorvoegsel van het
+bronbouwblok. De onderliggende lookup-architectuur (i.p.v. een echt
+`centraleVraag`-veld) staat gedocumenteerd als bekende, grotere
+vervolgstap in `datamodel.md`, Bouwblok.
+
+**Lead-toegang beheren, per respondent-rij** (beheerpagina.md punt 6a,
+was alleen als losse "Leads"-sectie gebouwd met e-mail opnieuw intikken):
+Nieuwe `LeadToegangDropdown` in de respondententabel van het organisatie-
+detail — checkbox per Meting, "Vragenlijst sturen" waar nog geen
+invulling bestaat. De losse "Leads"-sectie blijft ernaast bestaan voor
+het aanmaken van een Lead met een nog onbekend e-mailadres.
+
+**"Mijn gegevens"-menu** (CLAUDE.md sectie 3, was nergens gebouwd):
+Nieuwe `MijnGegevensMenu`/`MijnGegevensMenuVoorCode`/
+`RespondentGegevensVelden`-componenten (het laatste hergebruikt door
+zowel de intake als deze modal, geen nieuw formulier). Toegevoegd aan
+"Mijn metingen", doorloopflow, resultatenpagina, Lead-resultatenpagina en
+de 4 content-pagina's — niet op intake (nog geen identiteit om te tonen)
+of de 3 publieke schermen. "Uitloggen" navigeert naar `/toegang`; een
+lokale sessie om te wissen bestaat nog niet (`ToegangsSessie`, deel 2).
+
+**Bulk-Exporteren bood nooit PDF/InDesign, ook niet bij 1 selectie**
+(beide export-specs eisen dat wel): `BulkToolbar`'s Exporteren-knop is nu
+een Dropdown-knop (Als PDF/Als CSV/Voor InDesign), met PDF/InDesign
+uitgeschakeld ("Beschikbaar bij precies één scan") tenzij precies 1 rij
+geselecteerd is. Toegepast op zowel "Ingevulde scans" (globaal) als de
+organisatie-detailpagina.
+
+**Twee CSV-bugs** (`lib/csv-export.ts`): `opmerkingen_per_bouwblok` nam
+lege strings mee (een gewiste opmerking bleef als `""`-entry staan) —
+nu gefilterd. `antwoorden`/`opmerkingen_per_bouwblok` werden leeggemaakt
+bij een niet-afgeronde scan, een restrictie die de spec alleen voor de
+score-samenvatting stelt — nu altijd gevuld met wat er al ingevuld is.
+
+**Respondent-flow, dode eindes en naam-mismatches**:
+- Samengevoegde Lead/eigen-Meting-kaart (`/s/[code]`) had geen link naar
+  de eigen invulling zodra die nog niet afgerond was én niemand anders in
+  de meting al klaar was — beide knoppen bleven dan onzichtbaar. Fallback-
+  link toegevoegd ("Start/Ga verder met jouw scan").
+- Nav-label "AI-scan" → "AI" (CLAUDE.md noemt de 4 links consistent
+  Visie/Bouwstenen/AI/2030).
+- AI-domeinkaarten kregen de specced 1,5px rand i.p.v. de gewone 1px.
+
+**Contentfidelity-fixes** (data vs. spec-tekst):
+- Drie bouwsteennamen liepen uiteen tussen `data/klantcontact-
+  assessment.ts` en `data/bouwstenen-content.ts` (#2, #5, #6) — bron was
+  dat `content-klantcontact-volwassenheid.md` en `visie-coniche.md` zelf
+  al niet overeenkwamen. `coniche_bouwstenen.md` (het officiële
+  Excel-/coniche.nl-referentiedocument) als scheidsrechter genomen:
+  "Klantcontact visie & strategie" / "Financial control" /
+  "Positionering klantcontact" overal doorgevoerd (ook in
+  `visie-coniche.md` en `bouwstenenmodel-visual.md`).
+- Bouwsteen 1/15 renderen niet edge-to-edge op `/bouwstenen`, in
+  tegenstelling tot de tekst van `bouwstenenmodel-visual.md` — bleek een
+  bewuste eerdere keuze van Sander ("op verzoek", staat als comment in de
+  code), dus niet teruggedraaid maar als afwijking gedocumenteerd in de
+  spec zelf.
+- `data/ai-scan-assessment.ts`'s naam kreeg de hoofdletter terug
+  ("AI-Volwassenheid", matcht `content-ai-scan.md`).
+- Een weggevallen zin in `data/visie-content.ts` ("Een medewerker kan een
+  gesprek goed voeren terwijl het proces erachter vastloopt.")
+  teruggezet — het bestand claimt een letterlijke kopie van
+  `visie-coniche.md` te zijn.
+
+**Kleinere elegantie-opruiming**: `isVlakkeAssessment()` (bestond al in
+`lib/assessment-structuur.ts`) vervangt drie losse herimplementaties in
+`lib/scoring.ts`/`lib/csv-export.ts`/`lib/indesign/build-xml.ts`. InDesign
+deelt nu de `kortLabel`-fallback (oud opgeslagen assessment zonder
+`kortLabel`) met de PDF-export, was eerder alleen in de bestandsnaam-slug
+toegepast, niet in het `<kortLabel>`-element zelf.
+
+**Niet aangepakt, bewust**: Het volledig omzetten van `centraleVraag`/de
+rijke beschrijving naar echte velden op `Bouwblok` (i.p.v. de losse
+lookup-tabellen `data/bouwstenen-content.ts`/`data/ai-domeinen-
+content.ts`) — dat vraagt het overzetten van tekst voor 15+8+15
+bouwblokken, een grotere, foutgevoelige contentmigratie die beter apart
+en met Sander's review gebeurt dan als onderdeel van deze bugfix-ronde.
+CSV/InDesign voor een Meting-gemiddelde (Lead-export): zie hierboven.
+
+## 2026-09-30 — Meting-label wijzigen, Score/Voortgang, AVG-verzoek, Bewaartermijn
+
+**Aanleiding**: "Kijk naar nieuwe MD's voor wijzigingen en voer deze
+door." `beheerpagina.md` bleek fors uitgebreid met vijf nieuwe,
+grotendeels zelfstandig bouwbare stukken (geen backend nodig), plus de
+gebruikelijke teruggevallen statusregels.
+
+**Weer teruggevallen statusregels** (zelfde terugkerend patroon):
+"Toegang", "Vormgeving"/Rolbadge en "## Status" stonden weer op de oude,
+van-vóór-de-RBAC-bouw tekst. Rechtgezet.
+
+**Foute claim gecorrigeerd**: Punt 12 (nieuw, "Audit-log") beweerde dat
+`AuditEvent` "al gelogd wordt" — klopt niet, er staat nergens in de code
+ook maar één `AuditEvent`. `datamodel.md` deel 2 classificeert
+`AuditEvent` zelf al als "vereist een echte backend" (naast
+`Sessie`/`VerificatieCode`) — logisch, een audit-log die door dezelfde
+localStorage leest die hij zou moeten controleren biedt geen garantie.
+Rechtgezet: Audit-log-scherm kan pas gebouwd worden zodra `AuditEvent`
+er is, niet ervoor.
+
+**Vier nieuwe stukken gebouwd, alle vier prototype-niveau (localStorage,
+geen backend nodig)**:
+
+- **Meting-label wijzigen** (punt 5): "Wijzig label" naast elke Meting-
+  titel in het organisatie-detail, `hernoemMeting` (`lib/db.ts`). Het
+  assessment-type blijft vast na aanmaken, zoals gespecificeerd.
+- **Score/Voortgang-kolommen, Consultant-only** (punt 4): Op
+  `/beheer/organisaties`, alleen zichtbaar voor een Consultant. Score =
+  gemiddelde van de meest recente Meting met ≥1 afgeronde scan (zelfde
+  drempel als Organisatie-resultaten); Voortgang = "X van Y afgerond"
+  van diezelfde Meting, verborgen zodra die volledig afgerond is.
+- **AVG-verzoek verwerken** (punt 4): Twee knoppen per respondent in de
+  organisatiedetail-tabel. "AVG-inzage" exporteert alle data van die
+  respondent (persoonsgegevens + antwoorden over alle metingen van de
+  organisatie heen) als JSON-download. "AVG-verwijdering" hergebruikt de
+  bestaande `verwijderLeden` — geen nieuwe verwijderlogica. Nog niet
+  gelogd naar `AuditEvent` (bestaat nog niet, zie hierboven).
+- **Bewaartermijn ingevulde scans** (punt 4, `datamodel.md` deel 2):
+  Nieuwe `lib/instellingen-store.ts` (`bewaarTermijnMaanden`,
+  `verlengTermijnMaanden`, beide zonder default) en `ScanInvulling.
+  bewaarVerlengdTot` (nieuw veld, `lib/types.ts`, met defensieve
+  normalisatie voor oudere localStorage-data). Nieuw blok onderaan
+  `/beheer/organisaties`: instellingen Admin-only bewerkbaar (Consultant
+  ziet ze read-only), de "Data ouder dan de bewaartermijn"-lijst zelf
+  volgt het bereik van de rest van het scherm (alle organisaties voor
+  Admin, eigen voor Consultant) — dat stond expliciet zo in de spec,
+  in tegenspraak met de eerste "(Admin-only)"-parenthese erboven; de
+  preciezere, uitgeschreven bereik-regel heeft gewonnen. Geen
+  automatische verwijdering: Verwijderen (bestaande actie) of Verlengen
+  (zet `bewaarVerlengdTot`) per rij, verder blijft een scan gewoon
+  bestaan.
+
+**Getest in de browser**: Meting hernoemd en teruggezien. Bewaartermijn
+op 6/3 maanden gezet, een testscan 8 maanden terug afgerond gezet —
+verscheen in de lijst, "Verlengen" haalde 'm er weer uit. Als
+Consultant: Score-badge (3.0) correct berekend, Voortgang verborgen bij
+volledig afgerond, Bewaartermijn-instellingen read-only met de eigen
+(gefilterde) lijst erbij. AVG-inzage triggerde een download zonder
+console-fouten. `tsc --noEmit`, `eslint .` en `next build` lopen schoon
+door. Testdata na afloop opgeruimd.
+
+## 2026-09-30 — Twee CSS-bugs die knoppen/velden door elkaar lieten hoogte-variëren
+
+**Aanleiding**: Screenshot van de Metingen-rij (Assessment-type-select,
+Label-veld, "+ Meting plannen"-knop) — "wil je de knoppen en invulvakken
+netter maken zelfde hoogte."
+
+Bij het opmeten van de daadwerkelijke gerenderde hoogtes bleken er **twee
+losstaande, sessie-brede CSS-bugs** te zitten, niet iets wat alleen deze
+ene rij raakte:
+
+1. **`.btn-compact` deed het niet buiten `.nav-right`.** De regel stond
+   vóór de algemene `.btn`-regel in `components.css`; bij gelijke
+   specificiteit wint de latere regel, dus elke `.btn-compact`-knop
+   buiten de nav (Uitnodigen, Rapportage, Lead toevoegen, Meting
+   plannen, bulk-toolbars) kreeg stilzwijgend de volle `.btn`-padding
+   (~52px hoog in plaats van de bedoelde ~30px). Gefixt door de selector
+   te veranderen naar `.btn.btn-compact` (twee klassen, hogere
+   specificiteit, wint altijd ongeacht volgorde in het bestand) —
+   dezelfde truc die `.nav-right .btn` toevallig al goed deed.
+2. **`<select>` erft `body`'s `line-height: 1.78` niet, `<input>`/
+   `<textarea>`/`<button>` wél.** Daardoor was een `<input>` met
+   identieke padding/font-size als een `<select>` toch merkbaar hoger
+   (47px tegenover 38px, gemeten op de Metingen-rij). Gefixt met een
+   line-height-reset op alle vier formulierelementen in `base.css`.
+
+**Resultaat**: Select, input en (compacte) knop in de Metingen-rij
+verschillen nu nog ~2px in hoogte (38 / 36 / 35px) in plaats van 38 / 47
+/ 52px — visueel gelijk. `.btn-compact` kreeg daarnaast iets meer
+verticale padding (0,5rem → 0,7rem) om dat laatste stukje te dichten.
+
+**Impact breder dan gevraagd**: Beide bugs golden voor elke
+`.btn-compact`-knop en elk formulier in heel beheer, niet alleen de
+Metingen-rij — bulk-toolbars, Uitnodigen/Rapportage/Lead-knoppen zien er
+nu allemaal merkbaar compacter uit. Gecontroleerd dat dit geen
+ongewenste neveneffecten geeft: bulk-toolbar (Organisaties-lijst),
+nav-dropdown en de standaard `.btn-or`-knoppen (niet-compact) zien er
+nog hetzelfde uit.
+
+**Getest in de browser**: Hoogtes opgemeten vóór en na de fix via
+`getBoundingClientRect()`, visueel gecontroleerd op de Metingen-rij, de
+organisatielijst en de bulk-toolbar. `tsc --noEmit`, `eslint .` en
+`next build` lopen schoon door (zuiver CSS, geen TS-impact).
+
+## 2026-09-30 — Bronformaat automatisch gedetecteerd, beheernav naar 3 hoofdlinks
+
+**Aanleiding**: "Bronformaat moet je bij import zelf uitvogelen en volg
+bij het menu bovenin de specs!" Twee losse punten in één zin.
+
+**1. Bronformaat-detectie** (`import-scans.md`, Werkwijze in beheer):
+De handmatige "Bronformaat"-dropdown op `/beheer/import` is vervangen
+door automatische detectie uit de headerregel van het bestand zelf
+(`detecteerBronFormaat`, `lib/import-legacy.ts`) — zelfde soort
+detectie als het Assessment-type per rij hieronder al deed. De twee
+formaten delen geen van hun onderscheidende kolomnamen, dus geen risico
+op een verkeerde gok; geen van beide herkend geeft een duidelijke
+melding in plaats van een gok. Het gedetecteerde formaat blijft zichtbaar
+als info-regel. Getest: beide formaten correct herkend, en een
+onherkenbaar bestand geeft de nieuwe foutmelding in plaats van stil te
+falen.
+
+**2. Beheernav naar drie hoofdlinks** (`beheerpagina.md`, "Wat
+beheerbaar is" — deze sectie beschreef de doelstructuur al, maar de
+navigatie in de code was nog de oude platte lijst van 7 links):
+`components/beheer/BeheerChrome.tsx` toont nu **Applicatie** (Admin-only:
+Gebruikers, Algemene teksten; Instellingen en Content-pagina's staan er
+met een toelichting waarom nog niet), **Assessments** (Admin-only, was
+"Content") en **Organisaties** (Admin: alle, Consultant: eigen) — geen
+"Overzicht" meer. `/beheer` stuurt nu door naar `/beheer/organisaties`,
+de enige van de drie die ook een Consultant ziet. Nieuwe hub-pagina
+`/beheer/applicatie` (met de verplaatste Data-integriteit-check).
+"Ingevulde scans" en "Import" hebben geen eigen navlink meer; twee
+nieuwe links bovenaan `/beheer/organisaties` houden ze bereikbaar.
+
+**Ook meteen rechtgezet**: `beheerpagina.md`'s eigen "## Status"-sectie
+stond weer op een oude versie (zei nog "Gebruikersbeheer... nog te
+bouwen", terwijl dat al weken klaar is) — dezelfde terugkerende
+concurrent-edit-situatie als eerder deze sessie.
+
+**Getest in de browser**: Als Admin alle drie de links zichtbaar,
+actief-status klopt op subpagina's (bijv. `/beheer/scans` licht
+"Organisaties" op). Als Consultant alleen "Organisaties" zichtbaar, en
+inloggen stuurt meteen daarheen door. `tsc --noEmit`, `eslint .` en
+`next build` lopen schoon door.
+
+## 2026-09-30 — Import: onopgemerkte leesfout kon "er gebeurt niets" veroorzaken
+
+**Aanleiding**: "Waarom werkt de import niet?" Zowel het "oude tool"- als
+het "eigen export"-formaat bleken end-to-end te werken tegen realistische
+testdata (rechtstreeks tegen `lib/import-legacy.ts` getest via `tsx`, én
+via de echte `/beheer/import`-pagina met een geïnjecteerd testbestand) —
+geen reproductie van een gebroken matching/validatie. Navraag bij Sander:
+het scherm doet "helemaal niets" na het kiezen van een bestand.
+
+**Gevonden**: `handleBestand` (`app/beheer/import/page.tsx`) had geen
+`.catch()` op `bestand.text().then(...)`. Faalt het lezen van het bestand
+zelf, of gooit er iets een fout binnen die keten, dan werd dat een
+onopgemerkte "unhandled promise rejection" — geen voorbeeldweergave, geen
+melding, precies het "er gebeurt niets"-symptoom. De validatiefuncties
+zelf zijn goed met try/catch afgeschermd (ongeldige JSON in `answers` etc.
+geeft al netjes een probleemrij), dus dit gat zat specifiek in het
+allereerste stapje: het bestand inlezen.
+
+**Doorgevoerd**: `.catch()` toegevoegd met een zichtbare foutmelding
+(nieuwe `leesFout`-state, getoond boven de voorbeeldweergave). Geverifieerd
+door `File.prototype.text` tijdelijk te laten falen: De melding "Bestand
+lezen mislukt: ..." verschijnt nu, in plaats van niets.
+
+**Nog open**: De onderliggende oorzaak van Sanders "niets gebeurt" is
+zelf niet gereproduceerd — dit legt 'm alleen bloot in plaats van hem op
+te lossen. Volgende stap: opnieuw proberen en de foutmelding delen die nu
+verschijnt (of, als het na deze fix wél gewoon werkt, was het probleem
+deze silent failure zelf).
+
+## 2026-09-30 — Rol als extra veld op het inlogscherm
+
+**Aanleiding**: "Bij het inloggen bij beheer wil ik de rol kunnen kiezen
+admin of consultant." Gevraagd via `AskUserQuestion` hoe dat moest werken
+— gekozen: rol als extra veld náást het bestaande e-mail/wachtwoord-
+formulier, geen los sneltoegang-pad zonder wachtwoord.
+
+**Doorgevoerd**: `zoekGebruikerVoorLogin` (`lib/gebruikers-store.ts`)
+en `login` (`lib/admin-auth.ts`) kregen een derde parameter `rol`.
+Inloggen lukt alleen als e-mail, wachtwoord én de gekozen rol allemaal
+kloppen voor hetzelfde account — een Consultant die "Admin" selecteert
+komt er dus niet in, met dezelfde foutmelding als een verkeerd
+wachtwoord (geen aparte melding die zou verklappen dát de rol het
+probleem was). `components/beheer/BeheerLoginForm.tsx` kreeg de
+dropdown. `beheerpagina.md`, Toegang, bijgewerkt (en de status daar
+tegelijk teruggezet: was weer teruggevallen op de oude "alle
+beheeraccounts dezelfde rechten"-tekst van vóór de RBAC-bouw).
+
+**Getest in de browser**: Admin-account + "Consultant" geselecteerd →
+geweigerd. Admin-account + "Admin" geselecteerd → gelukt. `tsc
+--noEmit` en `eslint .` schoon.
+
+## 2026-09-30 — E-mailadres altijd genormaliseerd (getrimd, lowercase)
+
+**Aanleiding**: "Fix import met nieuwe MD." `datamodel.md`, Respondent,
+was aangevuld met een nieuwe, harde regel: e-mailadres altijd
+genormaliseerd (getrimd, lowercase) vóór opslag én bij elke vergelijking
+— ook bij Respondent-matching in uitnodigen en import, en hetzelfde voor
+`Gebruiker.email`. De bestaande code normaliseerde alleen bij de
+vergelijking zelf (`.trim().toLowerCase()` aan beide kanten van een
+`===`), niet bij opslag: Een nieuw lid/gebruiker kreeg zijn e-mailadres
+met de originele schrijfwijze/hoofdletters opgeslagen. Werkte toevallig
+nog goed zolang alle vergelijkingen zelf ook normaliseerden, maar was
+een tikkende tijdbom zodra een plek dat een keer vergat.
+
+**Doorgevoerd**: Eén gedeelde `normaliseerEmail` (`lib/email.ts`),
+gebruikt bij elke plek waar een e-mailadres wordt opgeslagen of
+vergeleken: `nodigLidUit`, `voegLeadToe`, `voerLegacyImportUit`
+(`lib/db.ts`), `maakGebruiker`, `zoekGebruikerVoorLogin`
+(`lib/gebruikers-store.ts`), en het wijzigen van een Gebruiker
+(`app/beheer/gebruikers/[gebruikerId]/page.tsx`). Ook met terugwerkende
+kracht: `normaliseerOrganisatie` (`lib/db.ts`) en `parseSnapshot` in
+`lib/gebruikers-store.ts` normaliseren nu ook bestaande e-mailadressen
+uit oudere localStorage-data bij het inlezen, zodat matching ook daar
+blijft werken.
+
+**Getest in de browser**: Ingelogd met `"  Admin@Coniche.NL  "` (spaties
++ hoofdletters) tegen het bestaande, kleine-letters wachtwoord — werkt.
+`tsc --noEmit`, `eslint .` en `next build` lopen schoon door.
+
+**Losstaand, ook deze sessie**: `.claude/launch.json` kan geen pad
+meenemen in een localhost-`url` (de preview-tool weigert dat) — Sander
+wil de preview altijd op `/beheer` starten in plaats van de publieke
+homepage. Vastgelegd als geheugen-item in plaats van in de launch-config:
+voortaan expliciet naar `/beheer` navigeren direct na elke
+`preview_start` voor dit project.
+
+## 2026-09-30 — Volledige spec-audit: alle MD's tegen de code gelegd
+
+**Aanleiding**: "Ik wil dat je alle specs in de MD files heel zorgvuldig
+bekijkt en verwerkt." Alle specs (behalve wat al net was doorgenomen)
+systematisch tegen de code gelegd via 6 parallelle deelaudits (content/
+bouwstenen, AI-scan, Zorgscan + bouwstenenmodel-visual, 2030 + privacy,
+exports, import + SBI), plus een eigen doorlichting van `datamodel.md`'s
+`Assessment`/`Bouwblok`-types.
+
+**Doorgevoerd (concrete bugs, geen spec-keuzes)**:
+
+- `data/ai-domeinen-content.ts`: ontbrekende zin bij AI-domein 2
+  toegevoegd (stond wel in `visie-ai-klantcontact.md`, was niet
+  overgenomen), plus een stale bestandsverwijzing in de bovenste comment
+  gecorrigeerd (`app/ai-domeinen/page.tsx` bestaat niet, is `app/ai-scan/
+  page.tsx`).
+- `app/klantcontact-2030/page.tsx`: ontbrekende `<h2>Geen vast
+  eindbeeld</h2>` toegevoegd — enige sectie zonder kop, verder klopte de
+  hele pagina woordelijk met `content-2030.md`.
+- `app/privacy/page.tsx`: sectie 6 ("Wie de gegevens kan zien") miste de
+  Admin-uitzondering, de hele Lead-regel en "e-mailverzending"; sectie 7
+  ("Beveiliging") miste de 2FA-zin. Beide teruggezet conform
+  `privacy-pagina.md`, en de Lead-regel geactualiseerd naar wat er
+  inmiddels staat ("resultaten van zijn toegewezen Metingen", niet "de
+  hele organisatie" — dat laatste was toch al nooit gebouwd).
+- `lib/pdf/build-html.ts`: de kop "Per categorie" boven het staafdiagram
+  stond hard gecodeerd, ook voor de AI-scan (die geen categorieën heeft).
+  Gebruikt nu `isVlakkeAssessment`, zoals `components/ResultsView.tsx`
+  al deed.
+- **AI-scan resultatenscherm, horizontale balk** (CLAUDE.md schermflow
+  punt 6): "Scores per Domein" gebruikte dezelfde verticale
+  `CategoryBarChart` als de categorieën-versie — de spec vraagt expliciet
+  om een horizontale balk per domein. `CategoryBarChart` kreeg een
+  `horizontaal`-modus (recharts `layout="vertical"`), aangezet via
+  `isVlakkeAssessment` in `ResultsView`. Getest: Klantcontact-scan
+  ongewijzigd (verticaal), AI-scan nu horizontaal en aflopend gesorteerd.
+- **Bulk-CSV-export op de organisatiedetailpagina**: stond er nog
+  helemaal niet (`export-csv.md` vroeg hier expliciet om, als plek voor
+  bulk-export binnen één organisatie) — toegevoegd aan
+  `ScanUitvoeringBlok` in `app/beheer/organisaties/[organisatieId]/
+  page.tsx`, hergebruikt dezelfde `lib/csv-export.ts`-functies als het
+  globale overzicht.
+- **Geen bevestiging vóór verwijderen in het contentbeheerscherm**: Een
+  categorie/bouwblok/vraag verwijderen kon zonder enige confirmatie.
+  Toegevoegd als stopgap (`confirm()` per actie,
+  `app/beheer/content/[assessmentId]/page.tsx`) — de eigenlijke
+  archiveer-in-plaats-van-verwijderen-logica uit `datamodel.md` bestaat
+  nog niet, zie de open punten hieronder.
+- Kleine naamgevings-inconsistenties tussen specs rechtgezet
+  ("Klantcontact visie & strategie", "Financial control",
+  "Positionering klantcontact" — kleine letter, matcht de code) in
+  `visie-coniche.md` en `coniche_bouwstenen.md`.
+
+**Doorgevoerd (documentatiecorrecties, geen gedragswijziging)**:
+
+- `datamodel.md`, `Assessment`: `featureCards`,
+  `bouwblokEenheidEnkelvoud`/`Meervoud` toegevoegd (bestonden in de code,
+  stonden nergens in het datamodel); `organisatieVelden` als veld
+  verwijderd (is platformbreed geworden, `data/organisatie-velden.ts` —
+  een stille, nooit doorgevoerde keuze uit `datamodel-rbac-voorstel.md`);
+  `icoon`-comment rechtgezet (was weer "letterlijke emoji" met de allang
+  teruggedraaide stethoscoop-verwijzing).
+- `datamodel.md`, `Bouwblok`: `centraleVraag` bestaat niet als veld —
+  gecorrigeerd naar de werkelijke opzet (losse lookup-tabel per
+  Assessment-type, gekoppeld op `volgnummer`/id-prefix,
+  `lib/bouwblok-info.ts`), met de twee ontdekte gevolgen expliciet
+  vastgelegd: Een zelf aangemaakt bouwblok krijgt nooit een centrale
+  vraag, en het "Toelichting"-veld in het contentbeheerscherm heeft voor
+  de 3 bestaande Assessment-types geen zichtbaar effect. Zelfde correctie
+  doorgevoerd in `ai-domeinenmodel-visual.md` en
+  `bouwstenenmodel-visual.md`, die dezelfde onjuiste claim maakten.
+- `datamodel.md` deel 2: statusregel bovenaan was weer teruggevallen op
+  "Voorstel, wordt gebouwd samen met de database" — rechtgezet naar wat
+  er inmiddels allemaal staat (Gebruikers, Lead-rol, aggregatie) en wat
+  echt nog op een backend wacht.
+- `inhoudelijk-fundament.md`: de claim dat niets wordt doorgevoerd voordat
+  een bouwsteen-status op `akkoord` staat, klopte niet — alle content
+  stond allang live terwijl alle 15 bouwstenen nog op `Concept` staan.
+  Rechtgezet: De status is een redactionele tracker, geen technische
+  gate.
+- `privacy-pagina.md`: statusregel ("nog niets van overgenomen") en de
+  footer-verwijzing naar de inmiddels verwijderde "Beheer"-link
+  rechtgezet.
+- `export-csv.md`: "geen bulk-export op het globale overzicht" was niet
+  (meer) waar — het globale overzicht staat bulk-export toe, maar
+  uitgeschakeld zodra de selectie meer dan één organisatie beslaat.
+  Vastgelegd als bewuste, gelijkwaardige oplossing voor hetzelfde
+  datavermenging-risico, naast de nieuw toegevoegde plek op de
+  organisatiedetailpagina.
+- `CLAUDE.md`: bestandenindex kreeg `v1-aanpassingen.md` en
+  `coniche_bouwstenen.md` (stonden er niet in, terwijl ze allebei actief
+  gebruikt worden); de nav-voorbeeldzin bij punt 5 verwees nog naar "←
+  Terug naar site vanuit beheer", die actie bestaat niet meer.
+- `datamodel-rbac-voorstel.md`: statusregel toegevoegd die vastlegt dat
+  dit voorstel op vrijwel elk punt anders is uitgevallen dan wat
+  uiteindelijk gebouwd is (met één uitzondering: platformbrede
+  organisatievelden, die wel is overgenomen).
+
+**Bewust niet zelf opgelost, vastgelegd in `v1-aanpassingen.md`**:
+
+- **Zorgscan-content**: 29 van de 60 vraagteksten blijken woordelijk
+  gelijk aan het Klantcontact-template — dus niet sector-vertaald, in
+  tegenspraak met wat `content-zorgscan.md` beweerde. Dit is
+  inhoudelijke scaninhoud voor een echte doelgroep (zorgorganisaties);
+  vraagt Joost/Sander's input, geen aanname die ik er zelf in typ.
+- **Content archiveren i.p.v. verwijderen**: `datamodel.md` beschrijft
+  dit als bedoeld gedrag, maar er is geen `gearchiveerd`-veld en geen
+  logica — alleen de bevestigingsvraag hierboven is als stopgap
+  toegevoegd. De eigenlijke functie is een grotere klus.
+- **`datamodel-rbac-voorstel.md` laten staan of verwijderen**: Nu als
+  historisch archief gemarkeerd, definitieve keuze aan Sander.
+- **"Toelichting"-veld zonder zichtbaar effect**: Of dit acceptabel is
+  zolang het maar gedocumenteerd staat, of dat het contentbeheerscherm
+  een waarschuwing verdient.
+
+**Niet aangeraakt, want al consistent**: import/SBI (`import-scans.md`,
+`sbi-indeling.md`), InDesign-export, PDF-export voor de Zorgscan,
+`gewicht`-velden, de bouwstenenmodel-visual/ai-domeinenmodel-visual
+routing en modal-hergebruik, en alle 15×4/8×5 vraagstructuren.
+
+**Getest**: `tsc --noEmit`, `eslint .`, `next build` schoon. In de
+browser: AI-scan-resultaten tonen een horizontale, aflopend gesorteerde
+balk (Klantcontact-scan ongewijzigd verticaal), bulk-export op de
+organisatiedetailpagina werkt, privacy- en 2030-pagina tonen de
+aangevulde tekst. Testdata na afloop opgeruimd.
+
+## 2026-09-30 — Vier nieuwe MD's verwerkt: Toegang-scherm, Algemene teksten, Meting-samenvalling
+
+**Aanleiding**: "Verwerk de 4 nieuwe MD's" — CLAUDE.md, `datamodel.md`,
+`stylesheet.md` en `beheerpagina.md` bleken tussentijds fors uitgebreid
+(publiek/beheer-scheiding aangescherpt, scherm 4a "Toegang", Algemene
+teksten, een nieuwe 3-links beheer-IA, Instellingen, 2FA/TOTP-uitwerking,
+Verificatie-blokkade, en het samenvallen van een eigen Meting met een
+toegewezen Meting bij een Lead).
+
+**Weer een gedeeltelijke terugval**, zelfde terugkerend patroon: de
+RBAC-statusregels in `beheerpagina.md` ("Toegang", "## Status",
+Rolbadge) en `datamodel.md` deel 2 (de openingsalinea) stonden weer op
+een oudere, van-vóór-de-RBAC versie — rechtgezet zonder Sander's
+intussen toegevoegde nieuwe content te verliezen. Ook een sinds eerder
+al stale referentie in CLAUDE.md ("← Terug naar site vanuit beheer" in
+de generieke nav-voorbeeldzin) rechtgezet: Beheer heeft inmiddels geen
+exit-actie meer, zie hieronder.
+
+**Concreet gebouwd, want zelfstandig en niet afhankelijk van een nog
+ontbrekende backend**:
+
+- **Scherm 4a, "Toegang"** (`app/toegang/page.tsx`, CLAUDE.md sectie 3):
+  Publiek, e-mailveld + "Versturen", vaste neutrale bevestigingstekst.
+  Geen echte code/link verstuurd (vraagt de Coniche-mailserver,
+  `backlog.md`). Bereikbaar via een nieuwe "Inloggen"-link op scherm 1
+  ("Kies jouw assessment"), op de identiteitsmenu-plek in `.nav-right`
+  (`PageWithChrome` kreeg hiervoor een nieuwe `identiteitMenu`-prop).
+- **Footer**: "Beheer"-link verwijderd (`components/SiteFooter.tsx`) —
+  nu alleen nog "Privacy", conform stylesheet.md's aangescherpte
+  publiek/beheer-scheiding.
+- **Beheer-nav**: "← Terug naar site" en de scheidingslijn ervoor
+  verwijderd (`components/beheer/BeheerChrome.tsx`) — Uitloggen is nu de
+  enige weg uit beheer, conform `beheerpagina.md`'s expliciete
+  "hierbij vervallen".
+- **Algemene teksten** (`datamodel.md`, `AlgemeneTekst`;
+  `beheerpagina.md` punt 2a): `lib/algemene-teksten-store.ts` (zelfde
+  localStorage-patroon als de andere stores), nieuw scherm
+  `/beheer/teksten` (Admin-only, `magAlgemeneTekstenBeheren`), en de
+  eerste tekst (`mijnMetingenIntro`) die nu op "Mijn metingen"
+  (`app/s/[code]/page.tsx`) verschijnt in plaats van hardcoded te zijn.
+- **Meting-samenvalling bij een Lead** (`beheerpagina.md` punt 6a, "Valt
+  een eigen Meting samen met een toegewezen Meting"): Is een Lead voor
+  dezelfde Meting ook zelf respondent, dan toont "Mijn metingen" nu één
+  kaart (`EigenEnLeadMetingKaart`) met "Bekijk jouw resultaten" (alleen
+  als de eigen invulling afgerond is) naast "Bekijk de resultaten van de
+  hele meting" — niet langer twee losse kaarten.
+
+**Bewust nog niet gebouwd, met reden**: De volledige herschikking van de
+beheer-nav naar drie links (Applicatie/Assessments/Organisaties) — raakt
+routing/IA breed en de helft van de onderliggende schermen (Instellingen,
+Content-pagina's-editor) bestaat nog niet, dus eerst de losse onderdelen.
+Instellingen (`sessieDuurUren`) en Verificatie-blokkade opheffen: hebben
+allebei een `VerificatieCode`/`ToegangsSessie` nodig die nog niet bestaat
+(wacht op de backend) — de gekozen defaultwaarden staan al vast in
+`datamodel.md`. Content-pagina's beheerbaar maken (punt 11): het
+onderliggende datamodel is in het document zelf nog als open punt
+gemarkeerd.
+
+**Getest in de browser**: "Inloggen" → "Toegang" → e-mail versturen →
+neutrale bevestiging. Footer toont alleen Privacy. Beheer-nav toont geen
+"Terug naar site" meer. Een Lead aangemaakt die tegelijk zelf
+uitgenodigd is voor dezelfde Meting ("Ook Lead maken"), invulling op
+"afgerond" gezet: "Mijn metingen" toonde de samengevoegde kaart met
+beide knoppen. `/beheer/teksten` opgeslagen tekst kwam meteen terug op
+"Mijn metingen". `tsc --noEmit`, `eslint .` en `next build` lopen schoon
+door. Testdata na afloop uit localStorage verwijderd.
+
+## 2026-09-30 — Lead-rol en Meting-niveau resultatenaggregatie
+
+**Aanleiding**: Vervolg op de vorige entry — Sander koos expliciet "Nu
+doorbouwen" toen gevraagd of de Lead-rol en de aggregatie er in dezelfde
+beurt bij moesten (`beheerpagina.md` punt 6a, `datamodel.md` deel 2,
+`RespondentRolMeting`).
+
+**Datamodel**: `OrganisatieLid.leadMetingIds: string[]` (`lib/types.ts`)
+— `ScanUitvoering.id`'s waar dit lid Lead-toegang toe heeft. Leeg = geen
+Lead; er is bewust geen apart "is Lead"-veld, want een Lead bestaat per
+spec niet zonder minstens 1 gekoppelde Meting. Genormaliseerd in
+`normaliseerOrganisatie` (`lib/db.ts`) voor oudere localStorage-data
+zonder dit veld.
+
+**`lib/db.ts`**:
+- `nodigLidUit` kreeg een derde parameter `ookLeadMaken` — voegt de
+  scanUitvoeringId toe aan `leadMetingIds` naast de uitnodiging zelf.
+  Ook hergebruikt voor "Vragenlijst sturen" vanaf een bestaande Lead
+  (zelfde functie, met `ookLeadMaken: true` en het e-mailadres van de
+  Lead).
+- Nieuw: `voegLeadToe` (maakt/hergebruikt een lid zónder ScanInvulling,
+  met een verplichte, niet-lege lijst Metingen) en `zetLeadMetingen`
+  (zet de volledige lijst in één keer — alles uitvinken trekt de
+  Lead-rol in).
+- `RespondentContext` (gebruikt door "Mijn metingen") kreeg
+  `leadMetingen: ScanUitvoering[]`, los van de eigen `invullingen`.
+
+**Gedeelde scoreberekening**: `gemiddeldeAntwoordenVoorMeting` verhuisd
+naar `lib/scoring.ts` (was inline in de Rapportage-pagina) — dezelfde
+functie voedt nu zowel `/beheer/rapportage/[scanUitvoeringId]` als de
+nieuwe Lead-resultatenpagina, conform datamodel.md's "één gedeelde
+functie, geen tweede herimplementatie".
+
+**Nieuwe route**: `/s/[code]/resultaten/[scanUitvoeringId]` — de
+Lead-variant van de Rapportage-pagina, bereikbaar via de persoonlijke
+link in plaats van een beheerlogin. Beveiligd op
+`lid.leadMetingIds.includes(scanUitvoeringId)`: een toegangscode zonder
+Lead-toegang tot die specifieke Meting krijgt "Geen toegang", geverifieerd
+in de browser met een tweede, niet-gekoppelde toegangscode.
+
+**Admin-UI** (`app/beheer/organisaties/[organisatieId]/page.tsx`):
+- Checkbox "Ook Lead maken" naast het bestaande uitnodigen-formulier per
+  Meting.
+- Nieuwe sectie "Leads" (Admin-only zichtbaar via `magLeadToekennen`):
+  lijst van huidige Leads met per Meting een checkbox
+  (`zetLeadMetingen`) en, waar nog geen invulling bestaat, een knop
+  "Vragenlijst sturen"; een inklapbare "+ Lead toevoegen"-vorm (naam,
+  e-mail, verplichte multi-select van minstens 1 Meting).
+
+**Respondentkant** (`app/s/[code]/page.tsx`): nieuwe sectie "Metingen
+waar je Lead van bent", los van "Mijn metingen" hierboven. Per Meting:
+aantal respondenten/afgerond, een compact uitnodigen-formulier
+(`respondenten.uitnodigen: toegewezen metingen`) en, zodra er
+minstens 1 afgeronde scan is, "Bekijk resultaten" naar de nieuwe route.
+
+**Getest in de browser**: Een Lead aangemaakt zonder eigen invulling,
+bevestigd dat "Mijn metingen" leeg blijft en alleen de Lead-toegang
+toont; via de Lead's eigen pagina een respondent uitgenodigd; twee
+invullingen met testantwoorden op "afgerond" gezet; de resultatenpagina
+gaf dezelfde score als de bestaande beheer-Rapportage zou geven; een
+andere, niet-gekoppelde toegangscode kreeg terecht "Geen toegang" op
+dezelfde resultaten-URL. `tsc --noEmit`, `eslint .` en `next build`
+lopen schoon door. Testdata na afloop uit localStorage verwijderd.
+
+**Doc-fixes tijdens het verwerken**: `beheerpagina.md` punt 6a sprak nog
+van bereik "aangemaakt" in plaats van "eigen" (verouderde term naast de
+al bijgewerkte Rechtenmatrix) — rechtgezet. `v1-aanpassingen.md` punt 3
+bijgewerkt: "Organisatie-toegang toewijzen" lost het zichtbaarheidsprobleem
+van `aangemaaktDoor: null`-organisaties deels op, maar er is nog geen UI
+om `aangemaaktDoor` zelf over te zetten buiten het
+gedeactiveerde-Consultant-pad.
+
+## 2026-09-30 — Organisatie-toegang toewijzen (deel van de nieuwe RBAC-MD's)
+
+**Aanleiding**: "Verwerk nieuwe MD's." `beheerpagina.md` en `datamodel.md`
+bleken flink uitgebreid met een grote nieuwe rechtenlaag: `bereik "eigen"`
+(niet meer alleen `aangemaaktDoor`, ook `OrganisatieToegang`/
+`toegewezenAan`: een Admin kan een organisatie aan een andere Consultant
+toewijzen, bovenop het eigenaarschap van de aanmaker), plus een hele
+nieuwe Lead-rol (`RespondentRolMeting`) en Meting-niveau
+resultatenaggregatie.
+
+**Twee bestanden waren tussentijds teruggevallen** op een ouder moment
+(zelfde terugkerende patroon als eerder deze sessie): De RBAC-statusregel
+in `beheerpagina.md`/`datamodel.md` deel 2 ontbrak. Teruggezet, zonder
+Sander's intussen toegevoegde nieuwe content (Organisatie-toegang,
+Lead-rol, code-referenties uit de proza gehaald — zie de vorige entry's
+patroon) te verliezen.
+
+**Doorgevoerd, het "eigen"-deel van de nieuwe rechtenlaag**:
+
+- `Organisatie.toegewezenAan: string[]` (`lib/types.ts`): gebruikerId's
+  van Consultants die een Admin deze organisatie expliciet toewees,
+  bovenop `aangemaaktDoor`.
+- `lib/rechten.ts`: `magOrganisatieToegang` (hernoemd van
+  `magOrganisatieBeheren`, alias behouden) checkt nu ook `toegewezenAan`.
+  Vier van de vijf eerder "conservatief dichtgezette" permissies
+  (`organisaties.verwijderen`, `respondenten.leadToekennen`,
+  `respondenten.verwijderen`, `scans.verwijderen`) zijn nu expliciet
+  "eigen" in de matrix, dus opengezet voor een Consultant, scoped per
+  organisatie — alleen `content.beheren` blijft "te bevestigen"/Admin-only.
+- **"Organisatie-toegang toewijzen"**, Admin-only, op de organisatie-
+  detailpagina: Multi-select van actieve Consultants (min. de eigenaar
+  zelf), aan-/uitvinken zet direct `toegewezenAan` om.
+- **"Aangemaakt door"** nu altijd zichtbaar (niet alleen voor Admin): Op
+  de organisatielijst per rij, en op het organisatie-detailscherm samen
+  met wie er verder toegewezen is.
+- **"Openen"-knop** naast "Kopieer link", op zowel de net-uitgenodigd-
+  bevestiging als de bestaande respondentenlijst: Opent de publieke link
+  direct in een nieuw tabblad.
+
+**Nog niet gebouwd, bewust apart gehouden gezien de omvang**: De hele
+Lead-rol (`RespondentRolMeting`, "Lead toevoegen"/"Lead-toegang beheren"/
+"Vragenlijst sturen", het "Ook Lead maken"-vinkje, en de Lead's eigen
+weergave op zijn persoonlijke link) en de Meting-niveau
+resultatenaggregatie die zowel Organisatie-resultaten (beheer) als de
+Lead-pagina nodig hebben. Dit raakt zowel de beheer- als de
+respondentkant met substantiële nieuwe schermen — apart voorgelegd aan
+Sander in plaats van er in dezelfde beurt doorheen te bouwen.
+
+**Getest in de browser**: Een testconsultant aangemaakt, een organisatie
+aan hem toegewezen via de nieuwe UI, bevestigd dat "Aangemaakt door"/"Ook
+toegewezen aan" live bijwerkt, en dat de Consultant de organisatie
+daarna zelf kan zien en openen (niet alleen de eigenaar). Testdata na
+afloop opgeruimd. `tsc --noEmit`, `eslint .` en `next build` lopen schoon
+door.
+
+## 2026-09-30 — Zorgscan-icoon toch een hartje-outline
+
+**Verzoek van Sander**, meteen na de vorige entry: "Maak van de icon voor
+Zorg een hart outline in de stijl van de 2 andere icons" — terugdraaien
+van de stethoscoop-emoji naar een eigen SVG-hartje, in dezelfde
+lijnstijl als "target" (Klantcontact Volwassenheid) en "sparkle"
+(AI-volwassenheid).
+
+**Afwijking van wat net nog gedocumenteerd stond**: `content-zorgscan.md`
+noemde de stethoscoop expliciet als Joost's keuze, "boven een hartje-
+outline". Dit verzoek draait die keuze terug — gemeld, niet stilzwijgend
+gecorrigeerd, zie `content-zorgscan.md`.
+
+**Doorgevoerd**:
+
+- `components/icons/AssessmentIcons.tsx`: `HeartIcon` teruggezet, nu als
+  outline (stroke, geen fill — gebruikt de standaard lijnstijl van
+  `IconBase`, net als "target"), niet de eerder verwijderde gevulde
+  variant.
+- `data/zorgscan-assessment.ts`: `icoon: "🩺"` → `icoon: "heart"`.
+- `content-zorgscan.md` en `datamodel.md` (het `Assessment.icoon`-
+  voorbeeld) bijgewerkt: Niet langer de stethoscoop als voorbeeld, met
+  een duidelijke aantekening dat dit teruggedraaid is.
+
+**Getest**: Homepage toont het hartje-icoon, visueel gelijk aan de
+stroke-stijl van de andere twee scan-iconen. `tsc --noEmit`, `eslint .`
+en `next build` lopen schoon door.
+
+**Nagekomen, zelfde verzoeklijn**: Het hartje oogde daarna nog iets te
+dominant naast de cirkels/sparkle (een hart vult de 24x24 viewBox
+optisch voller). Op verzoek 0.9x verkleind, rond het midden van de
+viewBox (`<g transform="translate(1.2 1.2) scale(0.9)">` in
+`HeartIcon`), niet via de buitenste `width`/`height` (die blijven gelijk
+aan de andere iconen, alleen de vorm zelf krimpt lichtjes).
+
+## 2026-09-30 — Nieuwe MD's verwerkt: bestandshernoemingen, anonimisering, icoon-bug
+
+**Aanleiding**: "Kijk naar de laatste nieuwe MD's en voer wijzigingen
+door." Sander had, gelijktijdig met eerder werk, `admin-beheerpagina.md`
+en `import-legacy-scans.md` hernoemd naar `beheerpagina.md` en
+`import-scans.md` (als losse, voorlopige kopieën), en in dat laatste
+bestand een echte klantnaam die in de vraagteksten-CSV van de historische
+import terecht was gekomen, geanonimiseerd.
+
+**Hernoemd, met behoud van de meest recente inhoud** (de losse kopieën
+die Sander achterliet waren gebaseerd op een ouder moment, van vóór het
+role-based-access-werk van vandaag — dat werk stond er niet in, dus de
+hernoeming is toegepast op de huidige inhoud, niet op die oudere kopie):
+
+- `admin-beheerpagina.md` → **`beheerpagina.md`**
+- `import-legacy-scans.md` → **`import-scans.md`**, mét de anonimisering
+  (een echte klantnaam vervangen door `<Organisatie>`/`<organisatie-
+  slug>`-placeholders in de voorbeelden en het scenario "twee organisaties
+  die achteraf dezelfde klant blijken").
+
+Alle kruisverwijzingen naar de oude bestandsnamen bijgewerkt, in elke
+.md- en code-comment in de repository (`CLAUDE.md`, `stylesheet.md`,
+`export-csv.md`, `sbi-indeling.md`, `backlog.md`, `v1-aanpassingen.md`,
+`datamodel.md`, `export-indesign.md`, en alle `app/beheer/*`/`lib/*`
+bronbestanden die ernaar verwezen in een commentaarregel). Dezelfde
+klantnaam ook geanonimiseerd op de drie overige plekken waar hij nog
+stond: `changelog.md` (drie historische vermeldingen) en een
+codevoorbeeld in `lib/pdf/bestandsnaam.ts`.
+
+**Twee losse reverts van eerder werk teruggezet** (dezelfde bestanden
+waren, door hetzelfde gelijktijdige opslaan, teruggevallen naar een
+ouder moment): De RBAC-statusalinea in `datamodel.md` deel 2, en (na
+controle) bevestigd dat `content-zorgscan.md`'s eigen alinea over de
+hergebruikte bouwsteen-content wél intact was — dat was een foutieve
+aanname bij het controleren, geen echte revert.
+
+**Nieuw gevonden bij het doorlezen: een echte bug**. `datamodel.md`
+specificeert `Assessment.icoon` nu expliciet als "letterlijke emoji" —
+`content-zorgscan.md` vermeldt zelfs dat Joost bewust "🩺" (stethoscoop)
+koos boven een hartje-outline voor de Zorgscan. Het Icoon-veld in het
+contentbeheerscherm was echter een vaste `<select>` met alleen de twee
+bestaande SVG-icoonsleutels ("target", "sparkle") — een beheerder kon
+dus nooit zelf een emoji instellen. Rechtgezet:
+
+- `data/zorgscan-assessment.ts`: `icoon: "heart"` → `icoon: "🩺"` (de
+  daadwerkelijke, door Joost gekozen emoji, in plaats van de eerder door
+  mij gebouwde hartje-SVG die dus niet was wat Joost koos).
+- De inmiddels ongebruikte `HeartIcon`/`"heart"`-sleutel verwijderd uit
+  `components/icons/AssessmentIcons.tsx`.
+- Icoon-veld in `/beheer/content/[assessmentId]` van een `<select>` naar
+  een vrij tekstveld, met live preview en een toelichting over de twee
+  resterende SVG-sleutels.
+
+Gedocumenteerd als opgeloste afwijking in `v1-aanpassingen.md`.
+
+**Getest**: Homepage toont 🩺 correct naast "Klantcontact Volwassenheid –
+Zorg"; het Icoon-veld in het contentbeheerscherm toont nu een vrij
+tekstveld met werkende preview. `tsc --noEmit`, `eslint .` en
+`next build` lopen schoon door.
+
+## 2026-09-30 — Role based access (Admin/Consultant), prototype-niveau
+
+**Aanleiding**: "Maak de role based access volgens specificaties in de
+MD's" + twee nieuwe MD-wijzigingen verwerkt (`beheerpagina.md`
+punt 9 "Gebruikers", en `stylesheet.md`'s nieuwe Rolbadge). Gebouwd op
+`datamodel.md` deel 2 (Rollen, rechten en inlog), niet op het losse,
+expliciet nog niet gevalideerde `datamodel-rbac-voorstel.md` (dat
+document zegt zelf: "niets van overgenomen").
+
+**Nieuw**:
+
+- **`Gebruiker`** (`lib/types.ts`, `lib/gebruikers-store.ts`): Admin- en
+  Consultant-accounts, prototype-niveau (localStorage, platte
+  wachtwoorden, geen 2FA — zelfde disclaimer als het bestaande
+  `lib/admin-auth.ts`). Bij eerste gebruik gezaaid met de al werkende
+  inloggegevens (`admin@coniche.nl`/`coniche2026`), zodat een bestaande
+  sessie kan blijven inloggen.
+- **`/beheer/gebruikers`**: Lijst, aanmaken, wijzigen, deactiveren (nooit
+  hard verwijderen). "Minimaal 1 actieve Admin"-check blokkeert de
+  laatste Admin. Deactiveren van een Consultant met eigen organisaties
+  vraagt verplicht een nieuwe eigenaar voor die organisaties
+  ("eigenaarschap overzetten"). Ook "Heractiveren" toegevoegd — niet
+  letterlijk in de spec, maar zonder terugweg zou deactiveren
+  onomkeerbaar zijn.
+- **`lib/admin-auth.ts` herbouwd** op `Gebruiker` in plaats van twee
+  hardcoded inloggegevens: `login()` zoekt nu een Gebruiker op
+  e-mail+wachtwoord, `useIngelogdeGebruiker()` geeft de volledige
+  Gebruiker terug (rol, naam, e-mail) i.p.v. alleen een boolean.
+- **`lib/rechten.ts`** (nieuw): Centrale rechtencontroles uit de
+  Rechtenmatrix, code in plaats van losse `Rol`/`Permissie`/
+  `RolPermissie`-datarecords (met precies 2 beheerrollen en een matrix
+  die voor de helft "te bevestigen" is, zou dat nu ongebruikte
+  flexibiliteit zijn — toegelicht in `lib/types.ts` bij `Gebruiker`).
+  Bereik "aangemaakt" toegepast op Organisaties (lijst + detail-toegang)
+  en Ingevulde scans (globaal overzicht) voor een Consultant, via het
+  nieuwe veld `Organisatie.aangemaaktDoor`.
+- **Rolbadge** (`stylesheet.md`): Vervangt de vaste zwarte "Beheer"-badge
+  naast het logo aan de beheerkant door een badge in de rolkleur (Admin
+  blauw, Consultant oranje) met de echte rol van de ingelogde Gebruiker
+  — geen losse aanduiding meer, de vraag die `stylesheet.md` daarover
+  openliet ("hoe wordt de rol bepaald") is hiermee beantwoord.
+- **Accountmenu** (`beheerpagina.md`): Dropdown-knop met
+  e-mailadres, uiterst rechts ná "← Terug naar site". Inhoud: niet-
+  klikbare rij "e-mail (Rol)", dan "Uitloggen". `DropdownKnop` kreeg
+  hiervoor een optionele niet-klikbare header-rij.
+- **Nav**: "Gebruikers" tussen "Organisaties" en "Ingevulde scans",
+  alleen zichtbaar voor Admin. "Content" ook Admin-only (zie hieronder).
+
+**Conservatieve standaardkeuzes, expliciet als open vraag in
+`v1-aanpassingen.md`**: Vijf permissies staan in de Rechtenmatrix zelf al
+als "te bevestigen" voor een Consultant (`content.beheren`,
+`organisaties.verwijderen`, `respondenten.leadToekennen`,
+`respondenten.verwijderen`, `scans.verwijderen`) — hier allemaal op geen
+toegang gezet, in lijn met "minimale toegang per rol", tot Sander
+bevestigt of een Consultant sommige hiervan wél moet kunnen. Concreet:
+een Consultant ziet de link "Content" niet en kan niets verwijderen
+(organisaties, respondenten, scans) — alleen Admin.
+
+**Niet gebouwd** (vereist een echte backend, `datamodel.md` deel 2):
+2FA, `Sessie`, `VerificatieCode`/`ToegangsSessie`, `AuditEvent`, en de
+hele organisatiekant (Lead heeft nog geen eigen ingelogde weergave —
+`ROL_KLEUR` heeft er wel alvast een kleurtoken voor klaarstaan).
+
+**Getest in de browser**: Ingelogd als de gezaaide Admin (blauwe badge,
+volledige nav, Accountmenu-inhoud correct). Nieuwe Consultant aangemaakt,
+ingelogd (oranje badge, "Gebruikers"/"Content" niet in de nav), een
+organisatie aangemaakt en bevestigd dat die correct `aangemaaktDoor` op
+deze Consultant krijgt, en dat de organisatielijst voor deze Consultant
+alleen die ene organisatie toont (niet de bestaande seed-organisatie,
+die geen `aangemaaktDoor` heeft). Testdata na afloop opgeruimd.
+`tsc --noEmit`, `eslint .` en `next build` lopen schoon door.
+
+## 2026-09-29 — PDF: minder ruimte rond de oranje streep tussen bouwstenen
+
+**Verzoek van Sander**: Op elke bouwsteenpagina (alle scan-types) mag de
+tweede bouwsteen direct onder de oranje streep staan, met ongeveer 1
+regel tussenruimte — merkbaar minder dan voorheen.
+
+**Oorzaak van de ruime afstand**: `.streep` (`lib/pdf/build-html.ts`) had
+`margin: auto 0` binnen de flex-kolom van de pagina, waardoor de streep
+in het midden van de vrije ruimte op de pagina kwam te zweven. Bij een
+korter bouwsteen-paar (weinig tekst, geen opmerking) leverde dat een
+grote, per pagina wisselende afstand op — precies zo bedoeld toen dit
+gebouwd werd (zie de oorspronkelijke code-comment: "de restruimte
+verschijnt zo als één ruime tussenruimte..."), maar niet meer gewenst.
+
+**Fix**: `margin: auto 0` vervangen door een vaste, kleine marge.
+`.bouwsteen-blok:first-child`'s padding-bottom (voor de streep) van 7mm
+naar 3mm, `.streep + .bouwsteen-blok`'s padding-top (na de streep) van
+7mm naar 4mm — voor de compacte variant (AI-scan) van 6mm naar 2mm/3mm.
+Onbenutte ruimte op een korter paar blijft nu gewoon onderaan de pagina
+staan in plaats van rond de streep verdeeld te worden.
+
+**Getest**: Alle drie de scan-types opnieuw geëxporteerd (Klantcontact
+Volwassenheid, AI-scan met de compacte variant, en beide nogmaals met
+een lange opmerking op het eerste bouwblok van een paar, om te
+controleren dat de kleinere marge niet tegen de opmerking aan botst).
+Paginatelling ongewijzigd (10/10/9). Pagina's visueel geïnspecteerd:
+bouwsteen 2 staat nu direct onder de streep, restruimte valt onderaan de
+pagina.
+
+**Doorgevoerd in de specs**, zoals gevraagd: `export-pdf-visual-
+volwassenheidsscan.md` (Pagina 2 t/m 9, inclusief het rechtzetten van
+"Vier pagina's" naar "Acht pagina's" — 15 bouwstenen in paren is altijd al
+acht pagina's geweest, niet vier) en `export-pdf-visual-ai-scan.md` (de
+Normaal/Compact-tabel).
+
+## 2026-09-29 — Bug: complete opmaak/beschrijving per bouwsteen ontbrak in de Zorgscan-PDF
+
+**Gemeld door Sander**, na het zij-aan-zij vergelijken van een echte
+Klantcontact- en Zorgscan-PDF: "In de zorg scan PDF mis ik de opmaak en
+beschrijving per bouwsteen zoals in de andere PDF." De vorige fix (zie
+hieronder, dezelfde dag) loste alleen de lege pagina op met een platte
+alinea — de rijke opmaak (categorie-eyebrow, "CENTRALE VRAAG"-blok, de
+volledige beschrijving) ontbrak nog steeds.
+
+**Oorzaak**: `toelichtingVoor` (`lib/bouwblok-info.ts`) matcht die rijke
+content alleen voor bouwblok-id's die met `bb` (Klantcontact
+Volwassenheid) of `ai` (AI-scan) beginnen. De Zorgscan heeft eigen id's
+(`zorg-...`), dus viel altijd terug op de kale variant. Dezelfde check
+zit dubbel in `components/BouwblokForm.tsx` (de toelichting-overlay in
+de doorloopflow).
+
+**Fix**: Beide plekken matchen nu ook `zorg-...`-id's, op `volgnummer`,
+tegen dezelfde `data/bouwstenen-content.ts` als de Klantcontact
+Volwassenheidsscan — de Zorgscan heeft immers exact dezelfde 15
+bouwblokken/nummering (sector-variant, `datamodel.md`). Resultaat:
+identieke opmaak in de PDF (en de overlay) als het template, met content
+die nog niet sector-vertaald is naar patiënt-/cliëntcontact — dat blijft
+een open punt voor Joost, nu expliciet zo gedocumenteerd in
+`content-zorgscan.md` en `export-pdf-visual-zorgscan.md`.
+
+**Getest**: Zorgscan-PDF opnieuw gegenereerd en pagina 2 en 9 (het
+oneven laatste bouwblok) gerenderd als afbeelding, zij-aan-zij vergeleken
+met de aangeleverde Klantcontact-PDF — identieke lay-out, nog steeds 10
+pagina's, geen overloop. `tsc --noEmit`, `eslint .` en `next build`
+blijven schoon.
+
+## 2026-09-29 — Bug: uitleg-alinea ontbrak per bouwblok in de Zorgscan-PDF
+
+**Gemeld door Sander**: "ik mis in de zorg scan PDF de tekst van de
+bouwstenen."
+
+**Oorzaak**: `lib/pdf/build-html.ts` bouwt de uitleg per bouwblok op uit
+`toelichtingVoor(bouwblok)` (`lib/bouwblok-info.ts`), dat alleen content
+teruggeeft voor bouwblok-id's die met `bb` (Klantcontact Volwassenheid)
+of `ai` (AI-scan) beginnen. De Zorgscan heeft eigen id's (`zorg-...`,
+data/zorgscan-assessment.ts), dus die functie geeft daar altijd
+`undefined` terug. De fallback-tak voor dat geval liet daardoor alleen
+de bouwblok-naam en de score-badge zien — geen enkele uitlegtekst, ook
+niet de gewone `Bouwblok.toelichting` die wél op elk bouwblok staat.
+Dezelfde fallback in de doorloopflow (`components/BouwblokForm.tsx`)
+toont die tekst wel al correct; alleen de PDF-export had dit gat.
+
+**Fix**: De fallback in `build-html.ts` (`uitlegHtml`) rendert nu ook
+`Bouwblok.toelichting` als platte alinea, wanneer er geen rijke content
+is. Geverifieerd door de Zorgscan-PDF opnieuw te genereren (API-route
+rechtstreeks aangeroepen met demo-antwoorden) en de tekst uit pagina 2
+te extraheren: "Kernwoorden: missie en visie, kernwaarden..." staat er nu
+onder de titel, vóór de vragentabel. Nog steeds 10 pagina's, geen
+paginaverschuiving.
+
+**Gedocumenteerd** in `export-pdf-visual-zorgscan.md` ("Bron van de
+tekst": legt nu precies uit welk bouwblok-id-patroon de rijke content
+triggert en wat het fallback-pad laat zien) en als opgeloste afwijking
+in `v1-aanpassingen.md`.
+
+## 2026-09-29 — export-pdf-visual-zorgscan.md: gecondenseerd en hernoemd
+
+**Vervolg op de vorige entry.** Sander bevestigde beide openstaande
+punten uit `v1-aanpassingen.md`:
+
+- `export-pdf-visual-volwassenheidsscan zorg.md` herschreven naar het
+  verschillen-patroon van `export-pdf-visual-ai-scan.md`: Alleen wat voor
+  de Zorgscan anders is (bestandsnaam, footer-label), met een verwijzing
+  terug naar `export-pdf-visual-volwassenheidsscan.md` voor de gedeelde
+  elementen. Aangezien de Zorgscan qua paginaopbouw identiek is aan het
+  template (zelfde 15 bouwblokken/5 categorieën), is het document nu
+  vooral "identiek, met deze twee naamsverschillen" in plaats van een
+  volledige herhaling van elke pagina.
+- Hernoemd naar `export-pdf-visual-zorgscan.md` (geen spatie meer),
+  consistent met `export-pdf-visual-ai-scan.md`.
+
+`CLAUDE.md` (Bestanden-tabel), `content-zorgscan.md` en
+`v1-aanpassingen.md` bijgewerkt met de nieuwe bestandsnaam; beide punten
+verplaatst van "Actief" naar "Verwerkt in de specs".
+
+## 2026-09-29 — Zorgscan: PDF-bestandsnaam rechtgezet op nieuwe MD
+
+**Aanleiding**: Nieuwe spec `export-pdf-visual-volwassenheidsscan
+zorg.md` aangeleverd (PDF-opbouw voor de Zorgscan). Inhoudelijk vrijwel
+gelijk aan `export-pdf-visual-volwassenheidsscan.md` — logisch, de
+PDF-export is generiek gebouwd over elk Assessment heen (CLAUDE.md,
+Uitgangspunten) — maar specificeert wel een expliciete bestandsnaam:
+`<Organisatie> Volwassenheidsscan Zorg Report.pdf`.
+
+**Afwijking gevonden en hersteld**: `pdfBestandsnaam`
+(`lib/pdf/bestandsnaam.ts`) bouwt de naam als `"{organisatie}
+{kortLabel} Report"`. De Zorgscan was gebouwd met `kortLabel:
+"Zorgscan"`, dus de PDF zou `<Organisatie> Zorgscan Report.pdf` heten —
+niet wat de nieuwe spec voorschrijft. `data/zorgscan-assessment.ts`
+aangepast naar `kortLabel: "Volwassenheidsscan Zorg"`; werkt automatisch
+door in de PDF-footer, de PDF-bestandsnaam en de InDesign-bestandsnamen
+(alle drie generiek op hetzelfde veld). `content-zorgscan.md` bijgewerkt.
+
+**Twee open punten voor Sander, in `v1-aanpassingen.md`** (niet zelf
+doorgevoerd): De nieuwe MD is nog bijna een letterlijke kopie van de
+bestaande in plaats van een kort verschillen-document zoals
+`export-pdf-visual-ai-scan.md` dat al is voor de AI-scan, en heeft een
+spatie in de bestandsnaam in plaats van een koppelteken.
+
+**Getest**: `kortLabel` in het contentbeheerscherm en in de opgeslagen
+Assessment-data bevestigd als "Volwassenheidsscan Zorg". `tsc --noEmit`,
+`eslint .` en `next build` blijven schoon.
+
 ## 2026-09-29 — Bug: crash op oudere/beschadigde localStorage-data
 
 **Gemeld door Sander**: In een gewone browser (niet de testomgeving hier)
@@ -43,7 +1300,7 @@ elkaar (zelfde bouwblokken), maar de Zorgscan-vraagteksten zijn anders
 geformuleerd.
 
 **Oorzaak**: `detecteerAssessment` (`lib/import-legacy.ts`,
-`import-legacy-scans.md`, "Assessment- en bouwblok-matching") bepaalde het
+`import-scans.md`, "Assessment- en bouwblok-matching") bepaalde het
 scan-type alleen op bouwblok-/domeinnamen. Sinds de Zorgscan bestaat (vorige
 changelog-entry) is die aanname niet meer waar: Een sector-variant kopieert
 de bouwblok-namen van zijn template één-op-één, dus de Klantcontact
@@ -61,7 +1318,7 @@ alsnog onbepaald (bijv. ontbrekende `questionText`, of — in theorie — twee
 scan-types met zowel identieke namen als identieke vraagteksten), dan
 importeert de tool niets en meldt een duidelijk matchingprobleem, dezelfde
 "niet importeren en melden"-regel als de rest van deze import.
-`import-legacy-scans.md` bijgewerkt met deze tweede stap.
+`import-scans.md` bijgewerkt met deze tweede stap.
 
 **Bestaande foute data hersteld**: De al geïmporteerde meting
 ("Huisartsenpraktijk Fictief-2", Legacy-import 2026) stond met
@@ -143,7 +1400,7 @@ niets scan-specifieks aan aangepast of hoeven aanpassen.
 gespecificeerd in de MD's: `Categorie.gewicht`/`Bouwblok.gewicht`
 (`datamodel.md`), het generieke mechanisme om een Assessment leeg of als
 sector-variant aan te maken (`datamodel.md`, "Sector-varianten";
-`admin-beheerpagina.md`, punt 1), en de InDesign-export
+`beheerpagina.md`, punt 1), en de InDesign-export
 (`export-indesign.md`).
 
 **Gewichten**:
@@ -232,7 +1489,7 @@ ongewijzigd).
 **Aanleiding**: De "Als CSV"-export teruglezen bij "Import van historische
 scans" gaf een foutmelding (alle 6 verplichte kolommen ontbraken) — geen
 bug, maar twee bewust verschillende formaten (`export-csv.md` exporteert
-onze eigen kolommen, `import-legacy-scans.md` verwachtte alleen het
+onze eigen kolommen, `import-scans.md` verwachtte alleen het
 formaat van de externe, stopgezette tool). Op verzoek uitgebreid met een
 tweede bronformaat, zodat een eigen export wél teruggelezen kan worden —
 vooral bedoeld om data tussen browsers te verplaatsen zolang de opslag
@@ -313,7 +1570,7 @@ afgeweken.
 Getest: Sector "Groot- en detailhandel" beperkt Subsector tot precies
 "Groothandel"/"Detailhandel"; Subsector wisselt en wordt leeg zodra
 Sector daarna verandert; Subsector staat uitgeschakeld zonder gekozen
-Sector; een import (Univé, sector "Financiële dienstverlening",
+Sector; een import (<Organisatie>, sector "Financiële dienstverlening",
 subsector "Verzekeringen en pensioenfondsen") vult na import nog
 steeds correct Sectie L / Afdeling 65 in, nu binnen de gecascadeerde
 velden.
@@ -382,7 +1639,7 @@ staan).
 
 **Aanleiding**: Vraag om de importtool het Assessment-type zelf te laten
 vaststellen, in plaats van de beheerder dit vooraf te laten kiezen. Dat
-laatste stond met een expliciete reden in `import-legacy-scans.md`
+laatste stond met een expliciete reden in `import-scans.md`
 ("om te voorkomen dat een fout bestand stilzwijgend op het verkeerde
 scan-type wordt geplakt") — een bewuste spec-keuze, dus rechtstreeks
 gewijzigd in dat bestand (sectie "Assessment- en bouwblok-matching"),
@@ -418,7 +1675,7 @@ gedetecteerd en geïmporteerd; een CSV met twee onbekende bloknamen geeft
 
 **Aanleiding**: `export-csv.md`, een nieuwe, volledige spec voor de tot nu
 toe uitgeschakelde "Als CSV"-optie in de Exporteren-dropdown, op de
-resultatenpagina en in `admin-beheerpagina.md` punt 7 (Ingevulde scans).
+resultatenpagina en in `beheerpagina.md` punt 7 (Ingevulde scans).
 
 **Doorgevoerd**:
 
@@ -473,7 +1730,7 @@ bundelen in het volwassenheidsscan-document als leidend stuk. Mijn twee
 bestanden en het nu overbodige `export-pdf.md` zijn verwijderd; de
 nieuwe bestanden staan al in `CLAUDE.md`'s bestandentabel.
 
-**Kleine inconsistentie gecorrigeerd**: `import-legacy-scans.md` gebruikte
+**Kleine inconsistentie gecorrigeerd**: `import-scans.md` gebruikte
 op twee plekken "AI-Volwassenheid" (hoofdletter V) naast "AI-volwassenheid"
 (kleine v) elders in hetzelfde bestand en in alle andere specs. Rechtgezet
 naar de doorgaande kleine-v-schrijfwijze.
@@ -495,7 +1752,7 @@ naar de doorgaande kleine-v-schrijfwijze.
   `export-pdf-visual-volwassenheidsscan.md`, nog niet in de code
   (`lib/types.ts`, beide assessment-databestanden, `lib/pdf/build-html.ts`,
   `lib/pdf/content-secties.ts`).
-- `import-legacy-scans.md`: Nieuwe beheerfunctie (CSV-import van
+- `import-scans.md`: Nieuwe beheerfunctie (CSV-import van
   historische scans), spec compleet en "klaar om te bouwen", nog niet
   gebouwd.
 
@@ -518,7 +1775,7 @@ naar de doorgaande kleine-v-schrijfwijze.
   gold al voor eerdere velden op `Assessment` en is een bekend,
   geaccepteerd risico van de localStorage-opzet (`CLAUDE.md`, Status).
 
-- **`import-legacy-scans.md` gebouwd**: Nieuwe beheerpagina
+- **`import-scans.md` gebouwd**: Nieuwe beheerpagina
   `/beheer/import` (nav-link "Import", naast Content), met CSV-upload,
   keuze van het Assessment-type, een voorbeeldweergave per rij
   (gevonden/nieuwe organisatie kiezen, matchingproblemen apart getoond
@@ -559,10 +1816,10 @@ naar de doorgaande kleine-v-schrijfwijze.
 
 
 **Nagekomen fix, zelfde dag: de importfunctie werkt nu echt.** Bij het
-testen met een echte export (Univé Zuid-Nederland) bleek mijn eigen
+testen met een echte export (<Organisatie> Zuid-Nederland) bleek mijn eigen
 aanname over de vorm van de `answers`-kolom verkeerd: Ik had een array
 van 15 blok-objecten met een geneste `questions`-array verondersteld.
-Sander en ik hebben `import-legacy-scans.md` (en `datamodel.md`, zie
+Sander en ik hebben `import-scans.md` (en `datamodel.md`, zie
 hieronder) bijgewerkt met de daadwerkelijke structuur uit de twee echte
 exports, en die is nu in `lib/import-legacy.ts` verwerkt:
 
@@ -792,8 +2049,8 @@ domeinen) als los blok aan het eind.
   eerder in localStorage hebben geseed houden de oude naam tot hun
   opgeslagen assessments worden hersteld/gewist.
 - **Bestandsnaam van de PDF per scan-type**: "{bedrijfsnaam} {kortLabel}
-  Report.pdf", dus "Univé Volwassenheidsscan Report.pdf" voor de
-  Klantcontact-scan en "Univé AI-scan Report.pdf" voor de AI-scan (was
+  Report.pdf", dus "<Organisatie> Volwassenheidsscan Report.pdf" voor de
+  Klantcontact-scan en "<Organisatie> AI-scan Report.pdf" voor de AI-scan (was
   "- Resultaten" voor beide). Eén gedeelde functie
   (`lib/pdf/bestandsnaam.ts`) voor zowel de server-header als de
   download-naam in de browser, zodat die niet uit elkaar kunnen lopen.
@@ -946,7 +2203,7 @@ en `npm run lint` slagen zonder nieuwe fouten.
 ## 2026-09-24 — Nav-herstructurering rond "Mijn metingen", export-dropdown, "Naar resultaten →" en 2030-sectie
 
 **Aanleiding**: `CLAUDE.md`, `stylesheet.md`, `content-2030.md`,
-`admin-beheerpagina.md` en `v1-aanpassingen.md` zijn bijgewerkt met een
+`beheerpagina.md` en `v1-aanpassingen.md` zijn bijgewerkt met een
 aantal concrete specificatiewijzigingen. In plaats van die stilzwijgend
 door te voeren (zoals eerder in dit project gebeurde), is per onderdeel
 expliciet gevraagd of het doorgevoerd moest worden — op alle 4 is "ja"
@@ -1205,7 +2462,7 @@ fouten.
 
 ## 2026-09-23 — De 6 actieve punten uit v1-aanpassingen.md verwerkt
 
-**Aanleiding**: Sander en Joost hebben `CLAUDE.md`, `admin-beheerpagina.md`,
+**Aanleiding**: Sander en Joost hebben `CLAUDE.md`, `beheerpagina.md`,
 `v1-aanpassingen.md`, `backlog.md`, de content-bestanden en `stylesheet.md`
 grondig herzien, en drie nieuwe documenten toegevoegd (`datamodel.md`,
 `visie-coniche.md`, `inhoudelijk-fundament.md`). Sander vroeg om deze
@@ -1272,7 +2529,7 @@ naar het juiste scherm. `npx tsc --noEmit`, `npm run build` en
 
 **Aanleiding**: Sander meldde dat hij een scan niet kon verwijderen op
 "Ingevulde scans" — na bevestigen van de verwijderactie bleef de rij
-gewoon staan. Oorzaak: die knop deed wat admin-beheerpagina.md ("Verwijderen
+gewoon staan. Oorzaak: die knop deed wat beheerpagina.md ("Verwijderen
 — cascade-regels") altijd al voorschreef voor déze pagina — alleen de
 antwoorden/status resetten naar "uitgenodigd", niet de rij weggooien, zodat
 het lid en de uitnodiging bleven bestaan. Functioneel werkte dat dus
@@ -1508,7 +2765,7 @@ schakelaar die op 2026-09-17 was toegevoegd en op 2026-09-21 weer is
 verwijderd (die sloeg op het overslaan van de respondent-
 e-mailverificatie, inmiddels vervangen door de "Publieke link"-flow
 zonder verificatiescherm) — dit gaat over de admin-inlog uit
-admin-beheerpagina.md ("Login": e-mail + wachtwoord + 2FA, hier nog een
+beheerpagina.md ("Login": e-mail + wachtwoord + 2FA, hier nog een
 prototype-inlog).
 
 **Doorgevoerd**: `lib/instellingen.ts` (opnieuw toegevoegd, zelfde
@@ -1525,7 +2782,7 @@ bijgewerkt — die testklant moet er dan handmatig bij, of localStorage
 wissen.
 
 Dit is uitdrukkelijk een tijdelijk bouwhulpmiddel, geen vervanger voor de
-echte e-mail+wachtwoord+2FA-inlog uit admin-beheerpagina.md — die blijft
+echte e-mail+wachtwoord+2FA-inlog uit beheerpagina.md — die blijft
 de standaard zodra test-modus uitstaat.
 
 ## 2026-09-21 — Rebuild op de aangeleverde `tokens.css`/`components.css`/`admin.css`/`charts.css`
@@ -1535,7 +2792,7 @@ aan (`index.html`, `designer-preview-homepage.html`, `css/`, `js/`,
 `assets/`) dat stylesheet.md nu expliciet als de letterlijke, leidende
 CSS-bron aanwijst ("Sander neemt deze bestanden letterlijk over, niet
 herschrijven"). Tegelijk een grote update van CLAUDE.md,
-admin-beheerpagina.md en v1-aanpassingen.md.
+beheerpagina.md en v1-aanpassingen.md.
 
 **Doorgevoerd**:
 - De 5 aangeleverde CSS-bestanden zijn 1-op-1 gekopieerd naar
@@ -1584,11 +2841,11 @@ admin-beheerpagina.md en v1-aanpassingen.md.
   CLAUDE.md sectie 1). Nieuw veld `uitgenodigdOp` toegevoegd, los van
   `gestartOp` (dat nu `string | null` is en pas gezet wordt zodra de
   respondent scherm 4 indient) — nodig omdat de cascade-regels in
-  admin-beheerpagina.md `gestartOp` bij een reset laten wissen terwijl de
+  beheerpagina.md `gestartOp` bij een reset laten wissen terwijl de
   uitnodigingsdatum moet blijven staan, en dat kon niet allebei op
   hetzelfde veld.
 - Admin herbouwd naar de 3-schermen-plus-tabel-structuur uit
-  admin-beheerpagina.md: `/beheer/organisaties` (lijst, was voorheen
+  beheerpagina.md: `/beheer/organisaties` (lijst, was voorheen
   `/beheer/scans`), `/beheer/organisaties/nieuw`, `/beheer/organisaties/
   [id]` (detail, was voorheen `/beheer/scans/[organisatieId]`), en
   `/beheer/scans` is nu de platte "Ingevulde scans"-tabel over alle
@@ -1597,8 +2854,8 @@ admin-beheerpagina.md en v1-aanpassingen.md.
   scandetailpagina op `/beheer/scans/[respondentId]`. De admin-navigatie
   is vervangen door de gedeelde publieke nav/footer met "Beheer"-badge en
   admin-links (was een losse linker-sidebar) — zie stylesheet.md/
-  admin-beheerpagina.md "Admin hergebruikt de publieke nav/footer".
-- Verwijder-cascades geïmplementeerd volgens admin-beheerpagina.md:
+  beheerpagina.md "Admin hergebruikt de publieke nav/footer".
+- Verwijder-cascades geïmplementeerd volgens beheerpagina.md:
   "Ingevulde scans" verwijderen = reset (status → "uitgenodigd", data
   gewist, naam/rol/team/notities blijven staan), "Respondenten"
   verwijderen = harde verwijdering (vanuit Organisatie-detail), Organisatie

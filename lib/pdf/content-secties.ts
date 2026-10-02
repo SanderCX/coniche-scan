@@ -83,7 +83,10 @@ function content2030Html(): string {
     `<h2>De machine customer: nieuwe combinaties</h2>` +
     alineas(machineCustomerIntro) +
     p(machineCustomerEffectenIntro) +
-    `<ul>${machineCustomerEffecten.map((e) => `<li>${escapeHtml(e)}</li>`).join("")}</ul>` +
+    // Web toont hier sinds kort een passend icoon per effect i.p.v. een
+    // nummer (app/klantcontact-2030/page.tsx, IconLijst) — de PDF behoudt
+    // de bestaande genummerde kaartstijl, geen losse icoon-rendering hier.
+    kaartenLijst(machineCustomerEffecten) +
     kaartenLijst(machineCustomerPunten) +
     alineas(machineCustomerSlot);
   const pagina3 =

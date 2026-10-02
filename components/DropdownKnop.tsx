@@ -16,10 +16,13 @@ export interface DropdownOptie {
  */
 export function DropdownKnop({
   label,
+  header,
   opties,
   className = "btn btn-outline btn-compact",
 }: {
   label: string;
+  /** Niet-klikbare eerste rij in het menu (bijv. "e-mail (Rol)" in het Accountmenu, beheerpagina.md). */
+  header?: string;
   opties: DropdownOptie[];
   className?: string;
 }) {
@@ -40,10 +43,11 @@ export function DropdownKnop({
   return (
     <div className="dropdown-knop" ref={containerRef}>
       <button type="button" onClick={() => setOpen((o) => !o)} className={className}>
-        {label} ▾
+        {label} <span className="dropdown-pijl" aria-hidden="true">▾</span>
       </button>
       {open && (
         <div className="dropdown-menu">
+          {header && <div className="dropdown-menu-header">{header}</div>}
           {opties.map((optie) => (
             <button
               key={optie.label}

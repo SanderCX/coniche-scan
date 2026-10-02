@@ -1,3 +1,5 @@
+import { DropdownKnop } from "@/components/DropdownKnop";
+
 function TrashIcon() {
   return (
     <svg
@@ -7,7 +9,7 @@ function TrashIcon() {
       strokeWidth={1.75}
       strokeLinecap="round"
       strokeLinejoin="round"
-      style={{ width: "1rem", height: "1rem" }}
+      style={{ width: "0.8rem", height: "0.8rem" }}
     >
       <path d="M4 7h16" />
       <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
@@ -19,7 +21,7 @@ function TrashIcon() {
 }
 
 /**
- * Verschijnt zodra er iets geselecteerd is (admin-beheerpagina.md punt 6 +
+ * Verschijnt zodra er iets geselecteerd is (beheerpagina.md punt 6 +
  * "Verwijderen — cascade-regels"). Gelijke knopbreedte in de rij, compacte
  * knopmaat — zie stylesheet.md "Compacte knopmaat voor actiebalken".
  */
@@ -27,36 +29,83 @@ export function BulkToolbar({
   aantal,
   onVerwijderen,
   verwijderLabel = "Verwijderen",
+  verwijderenDisabledReden,
   onExporteren,
   exporterenDisabledReden,
+  onExporterenPdf,
+  onExporterenIndesign,
+  exportBezig,
+  onNaarAndereMeting,
 }: {
   aantal: number;
   onVerwijderen: () => void;
   verwijderLabel?: string;
-  /** Weglaten houdt de knop uitgeschakeld ("Binnenkort beschikbaar") — zie stylesheet.md, Knoppen, Disabled. */
+  /** Reden waarom Verwijderen nu uitgeschakeld is (bijv. ontbrekend recht, `lib/rechten.ts`). */
+  verwijderenDisabledReden?: string;
+  /** CSV-export, beschikbaar bij elke selectiegrootte. Weglaten houdt de knop uitgeschakeld. */
   onExporteren?: () => void;
   /** Reden waarom Exporteren nu uitgeschakeld is, ook al is `onExporteren` gegeven (bijv. een selectie over meerdere organisaties). */
   exporterenDisabledReden?: string;
+  /**
+   * PDF/InDesign, "beschikbaar bij precies één scan" (export-pdf-visual-
+   * volwassenheidsscan.md / export-indesign.md) — de aanroeper geeft deze
+   * twee dus alleen door als `aantal === 1`, hier alleen het tonen/
+   * uitschakelen van de bijbehorende menu-opties.
+   */
+  onExporterenPdf?: () => void;
+  onExporterenIndesign?: () => void;
+  /** PDF wordt asynchroon gegenereerd (serverroute); schakelt de PDF-optie tijdelijk uit. */
+  exportBezig?: boolean;
+  /**
+   * "Naar andere Meting" (beheerpagina.md punt 7): alleen in een lijst die
+   * binnen één organisatie blijft, omdat de doel-Meting bij dezelfde
+   * organisatie hoort. Weglaten verbergt de knop.
+   */
+  onNaarAndereMeting?: () => void;
 }) {
   if (aantal === 0) return null;
 
   return (
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[var(--r)] border border-border bg-bg-warm px-4 py-3">
       <span className="text-sm font-semibold text-ink">{aantal} geselecteerd</span>
-      <div className="btn-rij" style={{ maxWidth: "22rem" }}>
-        <button
-          type="button"
-          disabled={!onExporteren || Boolean(exporterenDisabledReden)}
-          title={
-            !onExporteren ? "Binnenkort beschikbaar" : (exporterenDisabledReden ?? undefined)
-          }
-          onClick={onExporteren}
+      <div className="btn-rij" style={{ maxWidth: onNaarAndereMeting ? "36rem" : "22rem" }}>
+        {onNaarAndereMeting && (
+          <button type="button" onClick={onNaarAndereMeting} className="btn btn-outline btn-compact">
+            Naar andere Meting
+          </button>
+        )}
+        <DropdownKnop
+          label={exportBezig ? "Bezig…" : "Exporteren"}
           className="btn btn-outline btn-compact"
-        >
-          Exporteren
-        </button>
+          opties={[
+            {
+              label: "Als PDF",
+              onClick: onExporterenPdf,
+              disabled: !onExporterenPdf || Boolean(exportBezig),
+              title: !onExporterenPdf
+                ? "Beschikbaar bij precies één scan"
+                : exportBezig
+                  ? "PDF wordt gemaakt…"
+                  : undefined,
+            },
+            {
+              label: "Als CSV",
+              onClick: onExporteren,
+              disabled: !onExporteren || Boolean(exporterenDisabledReden),
+              title: !onExporteren ? "Binnenkort beschikbaar" : (exporterenDisabledReden ?? undefined),
+            },
+            {
+              label: "Voor InDesign (XML)",
+              onClick: onExporterenIndesign,
+              disabled: !onExporterenIndesign,
+              title: !onExporterenIndesign ? "Beschikbaar bij precies één scan" : undefined,
+            },
+          ]}
+        />
         <button
           type="button"
+          disabled={Boolean(verwijderenDisabledReden)}
+          title={verwijderenDisabledReden}
           onClick={onVerwijderen}
           className="btn btn-danger btn-compact flex items-center justify-center gap-2"
         >

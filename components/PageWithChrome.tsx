@@ -17,6 +17,7 @@ export function PageWithChrome({
   code,
   toonTerug,
   logoHref,
+  identiteitMenu,
 }: {
   children: React.ReactNode;
   /** Scherm-specifieke acties, uiterst links (bijv. resultatenscherm: "← Terug naar de scan" + Exporteren, samen zonder scheidingslijn). */
@@ -27,6 +28,13 @@ export function PageWithChrome({
   toonTerug?: boolean;
   /** Binnen een persoonlijke respondent-link gaat het logo naar "Mijn metingen" i.p.v. "/". */
   logoHref?: string;
+  /**
+   * Punt 7 van de nav-volgorderegel (CLAUDE.md, Globale layout):
+   * helemaal uiterst rechts, voorbij de exit-actie. Op scherm 1 is dit
+   * "Inloggen" (de uitgelogde staat van deze plek); zodra het "Mijn
+   * gegevens"-menu bestaat, hoort dat hier ook.
+   */
+  identiteitMenu?: React.ReactNode;
 }) {
   return (
     <>
@@ -41,6 +49,12 @@ export function PageWithChrome({
               <>
                 <span className="nav-divider" />
                 <Link href={`/s/${code}`}>← Terug naar Mijn metingen</Link>
+              </>
+            )}
+            {identiteitMenu && (
+              <>
+                <span className="nav-divider" />
+                {identiteitMenu}
               </>
             )}
           </>

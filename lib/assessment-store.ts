@@ -2,8 +2,10 @@ import { useSyncExternalStore } from "react";
 import { Assessment, Bouwblok, Vraag } from "./types";
 import { assessments as seedAssessments } from "@/data/assessments";
 import { nieuwId } from "./id";
+import { haalServerKopieOp, stuurNaarServer } from "./server-sync";
 
 const KEY = "coniche-scan:assessments";
+const SERVER_SLEUTEL = "assessments";
 const SERVER_SENTINEL = "__server__";
 
 type Listener = () => void;
@@ -23,12 +25,21 @@ function getSnapshot(): string {
   if (typeof window === "undefined") return SERVER_SENTINEL;
   const ruw = window.localStorage.getItem(KEY);
   if (ruw) return ruw;
+  // Niet meteen pushen naar de server, zie dezelfde kanttekening in
+  // lib/db.ts hierboven (race met `haalServerKopieOp`'s async ophaalronde).
   const seed = JSON.stringify(structuredClone(seedAssessments));
   window.localStorage.setItem(KEY, seed);
   return seed;
 }
 function getServerSnapshot(): string {
   return SERVER_SENTINEL;
+}
+
+// Bij het laden van de pagina: eenmalig de lokale, host-brede serverkopie
+// ophalen zodat elke browser op dit apparaat met dezelfde data start
+// (lib/server-sync.ts).
+if (typeof window !== "undefined") {
+  haalServerKopieOp(SERVER_SLEUTEL, KEY, emitChange);
 }
 
 function parseSnapshot(snapshot: string): Assessment[] {
@@ -46,8 +57,10 @@ function laadAlles(): Assessment[] {
 
 function slaAlles(alles: Assessment[]): void {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(KEY, JSON.stringify(alles));
+  const json = JSON.stringify(alles);
+  window.localStorage.setItem(KEY, json);
   emitChange();
+  stuurNaarServer(SERVER_SLEUTEL, json);
 }
 
 export function getAssessments(): Assessment[] {
@@ -70,7 +83,7 @@ export function updateAssessment(
   slaAlles(alles);
 }
 
-/** "Nieuw Assessment aanmaken" (leeg), admin-beheerpagina.md punt 1. */
+/** "Nieuw Assessment aanmaken" (leeg), beheerpagina.md punt 1. */
 export function createAssessment(input: { naam: string; kortLabel: string }): Assessment {
   const assessment: Assessment = {
     id: nieuwId(),
@@ -107,8 +120,24 @@ function nieuweVraag(vraag: Vraag): Vraag {
   return { ...vraag, id: nieuwId() };
 }
 
+/**
+ * Het nieuwe id krijgt bewust hetzelfde `"bb"`/`"zorg-"`/`"ai"`-voorvoegsel
+ * als het bronbouwblok, in plaats van een kale UUID: `lib/bouwblok-info.ts`
+ * (`toelichtingVoor`) matcht daarop, samen met `volgnummer` (dat ongewijzigd
+ * overgenomen wordt). Zonder dit voorvoegsel verloor elke via "Aanmaken
+ * vanuit bestaand Assessment" (sector-variant) gekopieerde bouwsteen
+ * stilzwijgend zijn "CENTRALE VRAAG" en beschrijving, in zowel de
+ * toelichting-overlay als de PDF-export — een bestaand template dupliceren
+ * bleef zo de enige weg naar die content, wat het hele punt van een
+ * sector-variant ondermijnde.
+ */
+function nieuwBouwblokId(bronId: string): string {
+  const voorvoegsel = ["bb", "zorg-", "ai"].find((p) => bronId.startsWith(p));
+  return voorvoegsel ? `${voorvoegsel}${voorvoegsel.endsWith("-") ? "" : "-"}${nieuwId()}` : nieuwId();
+}
+
 function nieuwBouwblok(bouwblok: Bouwblok): Bouwblok {
-  return { ...bouwblok, id: nieuwId(), vragen: bouwblok.vragen.map(nieuweVraag) };
+  return { ...bouwblok, id: nieuwBouwblokId(bouwblok.id), vragen: bouwblok.vragen.map(nieuweVraag) };
 }
 
 /**

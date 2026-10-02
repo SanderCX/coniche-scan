@@ -157,6 +157,46 @@ zodat een score nooit met een categorie verward wordt.
 - **Lettertype**: Epilogue (400/500/600/700/800) via Google Fonts, voor
   body-tekst en koppen.
 - **Accentfont**: Source Serif 4 (italic 400/600), alleen voor citaten.
+  Nog niet geladen: Er staat in de app geen citaat.
+- **Geen ander lettertype in de interface.** Ook `input`, `select`,
+  `textarea`, `button` en `code` (bijv. een persoonlijke link) zijn
+  Epilogue, vastgelegd in `base.css`. Geist Mono wordt niet meer geladen. De
+  PDF-export houdt bewust Helvetica Neue / Arial
+  (`export-pdf-visual-volwassenheidsscan.md`).
+
+### Lettergroottes voor interface-tekst
+
+Eén schaal voor alles wat geen kop of lopende tekst is, als tokens in
+`tokens.css` (`--fs-*`). Tailwind-klassen volgen dezelfde schaal
+(`app/globals.css`: `text-xs`, `text-sm`, `text-base` en `text-lg` zijn
+dezelfde waarden), dus `text-sm` en `var(--fs-s)` zijn altijd hetzelfde.
+
+| Token | Maat | Gebruik |
+|---|---|---|
+| `--fs-xs` | `.75rem` (12px) | Labels, badges, tabelkoppen, kleine tekst, hints |
+| `--fs-s` | `.85rem` (13,6px) | Tabellen, formulierlabels en -tekst, nav, compacte knoppen, meldingen |
+| `--fs-m` | `.9rem` (14,4px) | Standaardknoppen en invoervelden |
+| `--fs-l` | `1.15rem` (18,4px) | Titel van modals en beheerblokken, `.admin-main h2` |
+
+- **Beheer-paginatitel** (`.admin-main h1`): `1.9rem`.
+- **Modaltitel**: Altijd `--fs-l`, ongeacht waar de modal staat
+  (`.modal-overlay .modal-box h2`).
+- **Gewichten**: 400 (lopende tekst), 600 (labels, links, nav), 700
+  (knoppen, badges, tabelkoppen) en 800 (koppen). Gewicht 500 wordt niet
+  gebruikt.
+- **Eyebrow** (`.69rem`) en de koppen (h1/h2/h3) staan hierboven en wijken
+  bewust af van deze schaal.
+- **Buiten deze schaal, bewust ongewijzigd en nog niet in een eigen
+  schaal gevat**: De inleidende regels op de publieke pagina's (`1.1rem`),
+  de koppen in de privacypagina (`1.3rem`), de koppen van een bouwblok en
+  Assessment-kaart (`1.5rem`/`1.6rem`), de score in de classificatiecirkel
+  (`2.4rem`), het icoon van een Assessment (`2rem`) en de tekst in de
+  grafieken (10 tot 11px, radar `.68rem`).
+
+**Veldhoogte.** Velden en compacte knoppen die in één rij staan, hebben
+dezelfde vaste hoogte: `--control-h` (`2.4rem`, 38,4px), in de CSS voor
+`.admin-field input`/`select` en `.btn.btn-compact`. Een knop in de nav
+(`.nav-right .btn`) is compacter en volgt dit niet.
 - **Koppen**: Font-weight 800 (h1/h2) of 700 (h3), line-height 1.1,
   licht negatieve letter-spacing, kleur `var(--ink)`.
   - h1: `clamp(2.5rem, 5vw, 4rem)`
@@ -221,9 +261,35 @@ Standaardmaat: `border-radius: var(--r)`, `padding: .82rem 1.7rem`,
   outline-variant.
 - **Disabled**: `background: var(--bg-mid)`, tekst `var(--ink-s)`, rand
   `var(--border)`, `cursor: not-allowed`. Geldt voor elke variant.
-- `.btn-compact`: Kleinere maat (`padding: .5rem 1rem; font-size: .8rem`)
+- `.btn-compact`: Kleinere maat (`height: var(--control-h); padding: 0 1rem; font-size: var(--fs-s)`)
   voor knoppen in de nav en in bulk-actiebalken, zoals "N geselecteerd"
-  met Exporteren en Verwijderen.
+  met Exporteren en Verwijderen, en voor een knop die naast een
+  `.admin-field`-invoerveld in dezelfde rij staat (bijv. "+ Meting
+  plannen" naast het Label-veld) — de vaste hoogte `--control-h`
+  (38,4px) is bewust gelijk aan die van een `.admin-field input`/`select`
+  ernaast (gemeten: 38,4px voor beide), geen losse afstemming per rij nodig. **Selector in de code is `.btn.btn-compact`, niet los
+  `.btn-compact`**: Bij gelijke specificiteit met de algemene `.btn`-regel
+  wint anders de regel die later in het bestand staat, ongeacht welke
+  klasse "bedoeld" specifieker is — met los `.btn-compact` kreeg elke
+  compacte knop buiten `.nav-right` stilzwijgend de volle `.btn`-maat.
+
+**Gelijke hoogte voor elke knopvariant.** Elke `.btn` heeft een `2px`
+rand, bij de gevulde varianten (`.btn-or`, `.btn-danger`, `.btn-w`)
+transparant, en `line-height: normal`. Zonder rand is een `.btn-outline`
+4px hoger dan een gevulde knop ernaast, en een `<a class="btn">` erft
+anders de regelhoogte 1.78 van de body-tekst en wordt hoger dan een
+`<button>`. Ook zonder gevolgen voor de hoogte: Een pijltje in een knop
+(Dropdown-knop) staat in een eigen element met `line-height: 0`, een icoon
+in een knop is niet groter dan de tekstregel (`.8rem`), en de wrapper van een
+Dropdown-knop is `inline-flex` zodat hij niet hoger is dan zijn knop.
+
+**Formulierelementen krijgen niet de line-height van lopende tekst.**
+`input`/`select`/`textarea`/`button` erven anders `body`'s
+`line-height: 1.78` ongelijk (`<select>` negeert dat als enige, de
+andere drie wel), wat bij gelijke padding/font-size toch merkbaar
+verschillende hoogtes gaf. Vaste `line-height: normal` op alle vier in
+`base.css` regelt dat: Een `.admin-field select` en het `input` ernaast
+komen daardoor vanzelf op (vrijwel) dezelfde hoogte uit.
 
 **Gelijke breedte**: Knoppen die samen in één actierij staan, krijgen
 dezelfde breedte (`display: flex` op de rij, `flex: 1` of een gedeelde
@@ -252,6 +318,56 @@ var(--bg-mid)`. Sluit bij een klik buiten het menu of op een optie.
   `var(--or-mid)`.
 - `.admin-badge`: Status van een respondent. `.status-afgerond` groen,
   `.status-bezig` amber, `.status-uitgenodigd` blauw.
+- **Rolbadge** (vervangt de vaste, zwarte badge "Beheer" naast het logo):
+  Toont de rol van waaruit je het scherm bekijkt, gevuld met de
+  bijbehorende rolkleur (zie Rolkleuren hieronder), witte tekst, verder
+  zelfde vorm als `.hero-tag` (hoofdletters, `border-radius: 3px`).
+  **Tijdelijke aanduiding**, vooruitlopend op de echte rollen/rechten uit
+  `datamodel.md` deel 2 (nog niet gebouwd): Bedoeld om tijdens het bouwen
+  snel te zien vanuit welk perspectief (Admin/Consultant/Lead/Respondent)
+  een scherm bekeken wordt, niet als een gevalideerde inlogstatus. Hoe de
+  getoonde rol precies bepaald wordt zolang er geen echte rollen/rechten
+  zijn, is aan Sander.
+
+- **Lead-badge in een respondentenlijst** (bijv. `beheerpagina.md`,
+  punt 6a: de chip "LEAD" naast de naam van een respondent met de
+  Lead-rol). **Niet hetzelfde als de Rolbadge hierboven**: De Rolbadge
+  toont vanuit welk perspectief jíj het scherm bekijkt (één badge, bij
+  het logo); dit toont een eigenschap van de respondent in die rij
+  (mogelijk meerdere per lijst). Zelfde rolkleur (Lead = paars,
+  `--pu`), zelfde vorm als `.hero-tag`/Rolbadge (hoofdletters,
+  `border-radius: 3px`, witte tekst).
+
+**Rolkleuren**: Los van de categoriekleuren (CLAUDE.md sectie 2), maar
+hergebruikt vier van dezelfde merkkleuren (geel en antraciet blijven
+ongebruikt voor rollen):
+
+| Rol | Kleur | Token |
+|---|---|---|
+| Admin | Blauw | `--bl` |
+| Consultant | Oranje | `--or` |
+| Lead | Paars | `--pu` |
+| Respondent | Groen | `--gr` |
+
+### Tekstlink-rij
+
+Nieuw, nog niet eerder gespecificeerd. Een set compacte, secundaire
+acties onder of naast een primaire knop/dropdown in een lijstrij, bijv.
+`beheerpagina.md`, punt 6a: "Vragenlijst sturen · Kopieer link ·
+Openen" onder de knop "Lead-toegang beheren". Losse tekstlinks, oranje
+(`var(--or)`), geen onderstreping behalve bij hover, gescheiden door
+"·" met een spatie aan weerszijden (het scheidingsteken zelf niet
+klikbaar, kleur `var(--ink-s)`). Geen knoppen — bedoeld voor lichte,
+secundaire acties naast iets zwaarders erboven, niet als vervanging
+van `.btn-compact` in een bulk-actiebalk.
+
+Staat een `<select>` (bijv. de Meting-keuze) in dezelfde rij als deze
+tekstlinks, dan is dat een compacte variant, niet het volle
+`select.field` uit Formulieren hieronder — die is voor eigen
+formulierrijen (zoals de Assessment-type-dropdown bij een Meting
+aanmaken), niet voor een select die tussen tekstlinks in een tabelrij
+staat. Exacte maatvoering is aan Sander, zolang de select niet groter
+oogt dan de tekstlinks ernaast.
 
 ### Kaarten
 
@@ -267,6 +383,22 @@ bij hover een lichte lift (`translateY(-2px)`) en een zachte schaduw.
 `.field` geldt voor tekst-, e-mail-, wachtwoord- en getalvelden (in
 `components.css` stond alleen tekst). Focus-state: Rand `var(--or)` met
 een zachte ring in `var(--or-faint)`.
+
+**Getalvelden zonder pijltjes.** Een `input[type="number"]` toont alleen de
+waarde, zonder de pijltjes om hem met 1 te verhogen of te verlagen
+(`base.css`). De waarde typ je in; het toetsenbordtype voor getallen blijft.
+
+**Gelijke hoogte voor elk formulier-element.** `.field` (tekstvelden),
+`select.field` (dropdowns) en knoppen (Knoppen hierboven) krijgen
+dezelfde hoogte zodra ze naast elkaar in één rij staan — bijv.
+Assessment-type-dropdown, Label-veld en "Meting plannen"-knop bij het
+aanmaken van een Meting. Nu niet het geval: Het tekstveld en de knop
+wijken zichtbaar af van de dropdown. **De Assessment-type-dropdown is
+het uitgangspunt** (visueel de fijnste van de drie): `.field` en de
+knoppen passen zich daaraan aan, niet andersom. Concreet gelijk:
+verticale padding, `border-radius`, randdikte/-kleur, `font-size`. De
+exacte waarden overnemen van de bestaande dropdown-CSS is aan Sander;
+deze regel legt vast dát ze moeten matchen, niet welk getal.
 
 ### Doorloopflow
 
@@ -303,12 +435,113 @@ De beheeromgeving gebruikt dezelfde nav en footer, met alleen een extra
 terug-link in de balk. Inklapbare bouwblok-kaarten (`.admin-bouwblok-card`
 met `<details>`) voor contentbeheer, tabelstijl uit `admin.css`.
 
+### Info-icoon
+
+Voor een korte uitleg bij een veld of knop, in plaats van een vaste tekst
+eronder (`components/InfoIcoon.tsx`, `.info-icoon`, `.info-veld`).
+
+- **Icoon**: Een oranje rondje (`var(--or)`) van `1.25rem` met een wit
+  uitroepteken (`--fs-xs`, gewicht 800), hover `var(--or-l)`. Het staat naast
+  de knop of het veld waar het over gaat. In een rij met velden en knoppen
+  staat het gecentreerd op de veldhoogte (`--control-h`).
+- **Informatieveld**: Een klik op het icoon opent het veld direct eronder,
+  over de pagina heen (de layout verspringt niet): `var(--bg-warm)`, rand
+  `1px solid var(--border-d)` met links een `4px` oranje rand, `--fs-s`,
+  schaduw zoals de Dropdown-knop, maximaal `26rem` breed. Rechtsboven een
+  sluitkruisje.
+- **Openen**: Met de muis op het icoon (mouse-over) of met een klik.
+  Mouse-over toont het veld zolang de muis op het icoon of op het veld
+  staat, en het veld sluit zodra de muis ervan af gaat. Een klik zet het
+  veld vast, ook als mouse-over het al opende, zodat de muis weg kan.
+- **Sluiten**: Met het kruisje, Esc, een klik ernaast of nog een klik op het
+  icoon. Een veld dat alleen door mouse-over open staat, sluit vanzelf als de
+  muis weggaat.
+- **Wat erin hoort**: Uitleg bij een veld of instelling. Meldingen over wat
+  er is gebeurd of een lege lijst ("Geen scans gevonden") blijven gewone
+  `.admin-notice`s.
+- **Waar het nu staat**: Bij het formulier Bewaartermijn ingevulde scans
+  (Organisaties), bij "Bestanden kiezen" en bij "rijen importeren" op de
+  Import-pagina, bij het bewerkformulier in het Respondent-overzicht, bij het
+  veld op Algemene teksten, bij Icoon en Slotsectie voor de PDF-export in
+  Content en bij Data-integriteit onder Applicatie. Het icoon staat altijd
+  direct achter het invulveld of de knop waar het over gaat (rechts ervan, bij
+  een groot veld zoals een tekstvak op de hoogte van de eerste regel), niet achter
+  het label. Een
+  nieuwe uitleg bij een veld of knop gaat altijd in een Info-icoon en niet als
+  vaste tekst eronder.
+
+### Tabbalk en kruimelpad (beheer)
+
+- **Tabbalk** (`.beheer-tabs`): Direct onder de nav, witte achtergrond met
+  een `1px solid var(--border)` onderrand, op dezelfde breedte als de
+  beheerpagina's (`max-width: 1300px`). Tabtekst `.85rem`, gewicht 600,
+  `var(--ink-m)`. De actieve tab is `var(--ink)` met een onderstreep van
+  `3px solid var(--or)`. Alleen zichtbaar op de lijstpagina's van
+  Organisaties, niet op een detailpagina (`beheerpagina.md`, Navigatie in
+  beheer).
+- **Kruimelpad** (`.kruimelpad`): Boven de paginatitel, `.85rem`,
+  `var(--ink-s)`, gescheiden door een `›` in `var(--border-d)`. Elk deel is
+  een link, het laatste deel staat in `var(--ink)` en is niet klikbaar. Een
+  link krijgt bij hover `var(--or)`.
+- **Melding bovenaan een beheerpagina** (`.beheer-melding`): Een
+  `.admin-notice` met groene tint (`--stat-green-faint`, rand
+  `--stat-green`) en een sluitkruisje, na een actie die de Respondent van de
+  pagina haalt. Verdwijnt bij het wisselen van pagina.
+
+### Overzichtsmodal
+
+Voor het Respondent-overzicht en het Scan-overzicht in beheer
+(`beheerpagina.md`, punt 6b en 7). Dezelfde `.modal-overlay` en `.modal-box`
+als de andere modals, met `.modal-box--breed`: `max-width: 720px`,
+`max-height: 88vh`, scrollt binnen de modal. Sluiten met het kruisje, Esc,
+een klik naast de modal of de terugknop van de browser.
+
+- **Kop** (`.overzicht-kop`): Naam als `h2` (`1.3rem`), eronder een regel
+  `.85rem` met organisatie en de statusbadge. Een Lead krijgt de Lead-badge
+  (zie Badges).
+- **Blokken** (`.overzicht-blok`): Elk blok begint met een scheidingslijn
+  (`1px solid var(--border)`) en een kopje in kapitalen (`.72rem`,
+  `letter-spacing: .08em`, `var(--ink-s)`). Rechts in de kop mag één kleine
+  knop staan, bijv. "Bewerken".
+- **Beschrijvingslijst** (`.beschrijvingslijst`): Label links (`9rem`,
+  `var(--ink-s)`), waarde rechts. Een lege waarde laat de cel leeg, nooit
+  een los streepje.
+- **Persoonlijke link** (`.overzicht-link-rij`): Alleen-lezen veld, daarna
+  "Kopieer" (`.btn-outline .btn-compact`) en "Openen" als tekstlink.
+- **Scanregel** (`.overzicht-scanregel`): Links Meting en Assessment, rechts
+  de statusbadge en de dropdown-knop "Acties".
+- **Melding in de modal** (`.overzicht-melding`): Groen na een geslaagde
+  actie, rood (`.fout`) bij een fout of overgeslagen scans.
+- **Acties** (`.overzicht-acties`): Compacte knoppen naast elkaar,
+  links uitgelijnd. Destructieve acties zijn `.btn-danger`.
+
+### Vervolgstappen
+
+Een actie die meer vraagt dan één klik (verplaatsen, samenvoegen,
+Lead-toegang beheren) vervangt de inhoud van dezelfde Overzichtsmodal door
+een korte stap, geen tweede modal erbovenop. Bovenaan "← Terug"
+(`.overzicht-stap-terug`), dan een kop, een korte uitleg, de keuzes en
+onderaan een `.btn-rij` met "Annuleren" (`.btn-outline`) en de
+bevestigknop. Een bevestiging die gegevens laat verdwijnen (een Respondent
+samenvoegen) krijgt `.btn-danger` en noemt in de tekst wat er verdwijnt.
+Een gewone verwijderactie gebruikt de bestaande bevestigingsmodal.
+
 ### Footer
 
 Op elk scherm, met dezelfde `.container`-breedte als de rest van de
-pagina. Twee links naast elkaar: "Beheer" (naar de inlogpagina) en
-"Privacy" (naar `privacy-pagina.md`). Geen logo (zie Open punten,
-Footer-logo, en Logo hierboven).
+pagina. Eén link: "Privacy" (naar `privacy-pagina.md`). Geen logo (zie
+Open punten, Footer-logo, en Logo hierboven).
+
+**Geen "Beheer"-link meer.** Vroeger stond die hier naast "Privacy",
+maar dat gaf een zichtbare stap van de respondent/lead-kant naar
+beheer, terwijl die twee kanten bewust gescheiden zijn (`datamodel.md`
+deel 2, Uitgangspunten). Weggehaald uit het ene gedeelde
+footer-component (CLAUDE.md, Globale layout: dezelfde footer op elk
+scherm), niet alleen op respondent/lead-schermen — dat voorkomt een
+uitzondering per schermtype in een component dat overal identiek moet
+zijn. Beheer blijft gewoon bereikbaar: rechtstreeks via de eigen URL,
+en het inlogscherm daar is hetzelfde scherm dat ook verschijnt na
+"Uitloggen" vanuit beheer zelf (`beheerpagina.md`, Accountmenu).
 
 ---
 
@@ -326,5 +559,11 @@ Eerder gebruikte categoriekleuren die niet (meer) gebruikt worden:
 
 ## Open punten
 
+- **Typografie van de display-maten**: De maten die in "Buiten deze schaal"
+  staan (inleidende regels, privacykoppen, bouwblokkoppen, de score in de
+  cirkel, grafiektekst) hebben nog geen eigen schaal. Nog te besluiten of
+  die er komt, en welke waarden.
+- **Citaten**: Source Serif 4 staat in de spec maar de app toont nog geen
+  citaat. Pas laden als er een komt.
 - Footer-logo: Vraagt een witte variant van het logo, nu geen prioriteit.
 - Focus- en error-states bij formuliervalidatie.

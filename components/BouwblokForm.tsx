@@ -43,10 +43,15 @@ export function BouwblokForm({
    * dezelfde bron als de publieke bouwstenen-pagina). De AI-scan
    * (bouwblok-id's "ai…") heeft dezelfde soort content uit
    * visie-ai-klantcontact.md (data/ai-domeinen-content.ts, dezelfde bron
-   * als de publieke AI-pagina). Zonder match (nog niet bestaande content)
-   * valt de overlay terug op `bouwblok.toelichting`.
+   * als de publieke AI-pagina). De Zorgscan (bouwblok-id's "zorg-…") is
+   * een sector-variant met exact dezelfde 15 bouwblokken/nummering
+   * (`datamodel.md`, Sector-varianten) en hergebruikt daarom bewust
+   * dezelfde bouwsteen-content, gematcht op `volgnummer` — nog niet
+   * sector-vertaald, zie het open punt bovenaan `content-zorgscan.md`.
+   * Zonder match (nog niet bestaande content) valt de overlay terug op
+   * `bouwblok.toelichting`.
    */
-  const bouwsteenInfo = bouwblok.id.startsWith("bb")
+  const bouwsteenInfo = bouwblok.id.startsWith("bb") || bouwblok.id.startsWith("zorg-")
     ? alleBouwstenen.find((b) => b.nummer === bouwblok.volgnummer)
     : undefined;
   const aiDomeinInfo = bouwblok.id.startsWith("ai")

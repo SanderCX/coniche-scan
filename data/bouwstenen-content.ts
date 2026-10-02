@@ -35,7 +35,7 @@ export const bouwstenenGroepen: BouwsteenGroep[] = [
       },
       {
         nummer: 2,
-        naam: "Klantcontactvisie & Strategie",
+        naam: "Klantcontact visie & strategie",
         beschrijving: [
           "De klantcontactstrategie vertaalt de doelen van de organisatie naar dienstverlening. Ze legt vast welke rol klantcontact speelt en verwijst daarbij expliciet naar de organisatiedoelen. Ze beschrijft ook welke klantgroepen er zijn en wat elke groep mag verwachten, inclusief het kanaal dat daarbij past.",
           "Servicewaarden krijgen pas betekenis als medewerkers ze kunnen toepassen. Daarom horen er concrete beslisregels bij, bijvoorbeeld voor compensatie, escalatie en uitzonderingen. De strategie heeft verder een route nodig: een roadmap voor de komende zes tot achttien maanden, met geprioriteerde initiatieven, eigenaren, planning en onderlinge afhankelijkheden.",
@@ -70,7 +70,7 @@ export const bouwstenenGroepen: BouwsteenGroep[] = [
       },
       {
         nummer: 5,
-        naam: "Financial Control",
+        naam: "Financial control",
         beschrijving: [
           "Keuzes over capaciteit, kanalen en investeringen vragen inzicht in wat klantcontact kost en wat verbeteringen opleveren. Dat begint bij een gespecificeerd budget voor mensen, tooling en leveranciers, waarvan de realisatie maandelijks wordt gevolgd. Daarnaast zijn de kosten per kanaal of per type contact bekend, desnoods berekend als volume maal kostprijs.",
           "Voor verbeterinitiatieven wordt vooraf een business case gemaakt met kosten, baten en risico's, en achteraf gekeken of die is waargemaakt. Een forecast voor capaciteit en kosten, die elk kwartaal wordt herijkt, laat zien wat er de komende periode nodig is.",
@@ -79,7 +79,7 @@ export const bouwstenenGroepen: BouwsteenGroep[] = [
       },
       {
         nummer: 6,
-        naam: "Positionering Klantcontact",
+        naam: "Positionering klantcontact",
         beschrijving: [
           "Klantcontact ziet vaak als eerste wat er misgaat in producten en processen. Of daar iets mee gebeurt, hangt af van de positie die klantcontact in de organisatie heeft.",
           "Die positie is op een paar punten zichtbaar. Klantcontact is structureel vertegenwoordigd in overleggen waar besluiten met klantimpact vallen, zoals een product- of change board. Er is een vast pad om problemen in de keten te escaleren naar eigenaren buiten klantcontact. Inzichten uit klantcontact worden regelmatig met de organisatie gedeeld en leiden tot acties. Verder is iemand eigenaar van de dienstverlening van begin tot eind, over teams heen, zodat de ervaring van de klant niet tussen afdelingen in valt.",

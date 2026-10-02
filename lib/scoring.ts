@@ -1,5 +1,5 @@
-import { Assessment, Bouwblok, Classificatie } from "./types";
-import { alleBouwblokkenMetGroep, alleVragen } from "./assessment-structuur";
+import { Assessment, Bouwblok, Classificatie, ScanInvulling } from "./types";
+import { alleBouwblokkenMetGroep, alleVragen, actieveVragen, isVlakkeAssessment } from "./assessment-structuur";
 
 function round1(n: number): number {
   return Number(n.toFixed(1));
@@ -47,7 +47,10 @@ export function voortgang(assessment: Assessment, antwoorden: Record<string, num
   totaal: number;
   percentage: number;
 } {
-  const vragen = alleVragen(assessment);
+  // Gearchiveerde vragen tellen hier niet mee (lib/assessment-structuur.ts,
+  // `actieveVragen`): een lopende invulling moet ze niet meer hoeven
+  // beantwoorden om op 100% te komen.
+  const vragen = actieveVragen(assessment);
   const beantwoord = vragen.filter((v) => typeof antwoorden[v.id] === "number").length;
   const totaal = vragen.length;
   return {
@@ -94,7 +97,7 @@ export function alleGroepResultaten(
   assessment: Assessment,
   bouwblokResultaten: BouwblokResultaat[]
 ): GroepResultaat[] {
-  const isVlak = assessment.categorieen === null || assessment.categorieen.length === 0;
+  const isVlak = isVlakkeAssessment(assessment);
 
   let resultaten: GroepResultaat[];
   if (isVlak) {
@@ -153,4 +156,29 @@ export function isVolledigIngevuld(
 ): boolean {
   const v = voortgang(assessment, antwoorden);
   return v.beantwoord === v.totaal;
+}
+
+/**
+ * Gemiddelde per vraag over alle afgeronde invullingen van één Meting
+ * (`datamodel.md`, Scoreberekening: één gedeelde functie, geen losse
+ * herimplementatie per plek). Gebruikt door zowel de beheer-Rapportage
+ * (`/beheer/rapportage/[scanUitvoeringId]`) als de Lead-resultatenpagina
+ * (`/s/[code]/resultaten/[scanUitvoeringId]`, beheerpagina.md punt 6a) —
+ * dezelfde uitkomst, ongeacht wie er kijkt.
+ */
+export function gemiddeldeAntwoordenVoorMeting(
+  assessment: Assessment,
+  invullingen: ScanInvulling[]
+): Record<string, number> {
+  const afgerond = invullingen.filter((i) => i.status === "afgerond");
+  const gemiddeldeAntwoorden: Record<string, number> = {};
+  for (const vraag of alleVragen(assessment)) {
+    const waarden = afgerond
+      .map((i) => i.antwoorden[vraag.id])
+      .filter((w): w is number => typeof w === "number");
+    if (waarden.length > 0) {
+      gemiddeldeAntwoorden[vraag.id] = waarden.reduce((a, b) => a + b, 0) / waarden.length;
+    }
+  }
+  return gemiddeldeAntwoorden;
 }

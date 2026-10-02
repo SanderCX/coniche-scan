@@ -36,7 +36,7 @@
 }
 
 .bar-row .bar-naam {
-  font-size: 0.88rem;
+  font-size: var(--fs-s);
   color: var(--ink);
   font-weight: 600;
 }
@@ -55,7 +55,7 @@
 }
 
 .bar-row .bar-waarde {
-  font-size: 0.85rem;
+  font-size: var(--fs-s);
   font-weight: 700;
   color: var(--ink);
   text-align: right;

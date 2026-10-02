@@ -6,16 +6,22 @@ import { useRouter } from "next/navigation";
 import { maakOrganisatie } from "@/lib/db";
 import { organisatieVelden } from "@/data/organisatie-velden";
 import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
+import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 
 export default function NieuweOrganisatiePage() {
   const router = useRouter();
+  const gebruiker = useIngelogdeGebruiker();
 
   const [naam, setNaam] = useState("");
   const [kenmerken, setKenmerken] = useState<Record<string, unknown>>({});
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const organisatie = maakOrganisatie({ naam, kenmerken });
+    if (!gebruiker) return;
+    // organisaties.aanmaken: alle (Admin) / ja (Consultant) — beide mogen
+    // (lib/rechten.ts, magOrganisatieAanmaken); de aanmaker bepaalt straks
+    // het bereik "aangemaakt" op deze organisatie.
+    const organisatie = maakOrganisatie({ naam, kenmerken, aangemaaktDoor: gebruiker.id });
     router.push(`/beheer/organisaties/${organisatie.id}`);
   }
 

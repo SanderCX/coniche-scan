@@ -88,7 +88,7 @@ function content2030Alineas(): string[] {
     kopAlinea("De machine customer: nieuwe combinaties"),
     ...machineCustomerIntro.map(alinea),
     alinea(machineCustomerEffectenIntro),
-    ...machineCustomerEffecten.map((e) => alinea(`— ${e}`)),
+    ...machineCustomerEffecten.map((e) => alinea(`— **${e.titel}.** ${e.tekst}`)),
     ...machineCustomerPunten.flatMap((item) => [kopAlinea(item.titel), ...meerdere(item.tekst).map(alinea)]),
     ...machineCustomerSlot.map(alinea),
     kopAlinea("Wat dit voor AI concreet betekent"),

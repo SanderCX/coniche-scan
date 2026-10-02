@@ -2,8 +2,8 @@ import { Assessment } from "@/lib/types";
 
 /**
  * Bestandsnaam van de PDF-export: "{bedrijfsnaam} {kortLabel} Report", dus
- * per scan-type een eigen naam (bijv. "Univé Volwassenheidsscan Report.pdf"
- * en "Univé AI-scan Report.pdf"). Valt terug op de volledige assessment-naam
+ * per scan-type een eigen naam (bijv. "<Organisatie> Volwassenheidsscan Report.pdf"
+ * en "<Organisatie> AI-scan Report.pdf"). Valt terug op de volledige assessment-naam
  * als een (oud opgeslagen) assessment nog geen kortLabel heeft.
  */
 export function pdfBestandsnaam(

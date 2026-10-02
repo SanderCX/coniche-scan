@@ -9,11 +9,16 @@ import Link from "next/link";
  */
 export function SiteHeader({
   badge,
+  badgeKleur,
   navRight,
   logoHref = "/",
 }: {
-  /** bijv. "Beheer" — de zwarte pil naast het logo. */
+  /** bijv. "Beheer" — zonder `badgeKleur` de vaste zwarte pil naast het logo. */
   badge?: string;
+  /** Met een kleur wordt dit de Rolbadge (stylesheet.md, "Rolbadge"): gevuld met
+   * deze kleur i.p.v. zwart, en met de vierkantere `.hero-tag`-vorm. Zie `ROL_KLEUR`
+   * (`lib/colors.ts`). */
+  badgeKleur?: string;
   /** Pagina-specifieke acties/links, rechts uitgelijnd. */
   navRight?: React.ReactNode;
   /** Binnen een persoonlijke respondent-link gaat het logo naar "Mijn metingen" i.p.v. de publieke homepage (CLAUDE.md sectie 3). */
@@ -31,7 +36,14 @@ export function SiteHeader({
           priority
         />
       </Link>
-      {badge && <span className="nav-badge">{badge}</span>}
+      {badge && (
+        <span
+          className={badgeKleur ? "nav-badge nav-badge-rol" : "nav-badge"}
+          style={badgeKleur ? { background: badgeKleur } : undefined}
+        >
+          {badge}
+        </span>
+      )}
       {navRight && <div className="nav-right">{navRight}</div>}
     </header>
   );

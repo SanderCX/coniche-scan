@@ -2,10 +2,10 @@
 
 **Status: Specificatie, klaar om te (her)bouwen.** Legt de kolommen van
 de bestaande "Als CSV"-optie in de Exporteren-dropdown voor het eerst
-volledig vast (resultatenpagina, één scan, en `admin-beheerpagina.md`
+volledig vast (resultatenpagina, één scan, en `beheerpagina.md`
 punt 7, Ingevulde scans, één of meerdere scans — zelfde kolomstructuur
 in beide gevallen, alleen het aantal rijen verschilt). Vergelijkbaar
-van opzet met de CSV die we importeren (`import-legacy-scans.md`),
+van opzet met de CSV die we importeren (`import-scans.md`),
 maar dan met onze eigen velden, correct volgens `datamodel.md`, en
 vollediger: Waar de import bewust een deel van de oude kolommen
 weglaat, geldt die terughoudendheid hier niet — dit is de laatste stap
@@ -15,7 +15,7 @@ risico op een tweede, afwijkende bron van waarheid.
 ## Waar dit een plek krijgt
 
 Bestaande "Als CSV"-optie in de Exporteren-dropdown: Resultatenpagina
-(één scan) en `admin-beheerpagina.md` punt 7, Ingevulde scans (één of
+(één scan) en `beheerpagina.md` punt 7, Ingevulde scans (één of
 meerdere geselecteerde scans). Zelfde exportfunctie, zelfde kolommen,
 of het nu 1 of N rijen oplevert.
 
@@ -29,13 +29,21 @@ InDesign-export.
 ## Bulk-export blijft binnen één organisatie
 
 **Geen bulk-CSV-export over meerdere organisaties heen, in verband met
-datavermenging.** Concreet: Bulk-export (meerdere geselecteerde scans
-in één CSV) is alleen mogelijk vanaf de organisatie-gefilterde
-"Ingevulde scans"-lijst op de organisatie-detailpagina
-(`admin-beheerpagina.md` punt 4), niet vanaf het globale overzicht
-over alle organisaties heen (punt 7). Op dat globale overzicht blijft
-alleen losse export per scan mogelijk (één rij tegelijk, dezelfde
-grain als PDF/InDesign), geen selectie/bulk-actie voor Exporteren.
+datavermenging.** Bulk-export (meerdere geselecteerde scans in één CSV)
+is gebouwd op twee plekken, allebei met dezelfde grens:
+
+- De organisatie-gefilterde "Ingevulde scans"-lijst op de
+  organisatie-detailpagina (`beheerpagina.md` punt 4) — hier per
+  definitie altijd al één organisatie.
+- Het globale overzicht over alle organisaties heen (punt 7): Bulk-
+  exporteren blijft hier beschikbaar, maar uitgeschakeld (met uitleg)
+  zodra de selectie meer dan één organisatie beslaat. Met het
+  organisatiefilter op dat scherm is een selectie binnen één organisatie
+  net zo snel te maken. **Afwijking van een eerdere versie van dit
+  document**: Die sloot bulk-export op het globale overzicht helemaal
+  uit; in plaats daarvan is gekozen voor uitschakelen-met-uitleg, omdat
+  dat dezelfde datavermenging voorkomt zonder de functionaliteit
+  helemaal weg te halen.
 
 ## Kolommen
 
@@ -85,7 +93,7 @@ identiek, dus geen zinvolle kolom op scanniveau.
 
 **Bewust één JSON-kolom, geen kolom per veld** (dus geen aparte
 `sector`, `subsector`, `nps`, etc.). Organisatievelden zijn nu vaste
-data, maar staan in `admin-beheerpagina.md` onder "Nog te bouwen": Zodra
+data, maar staan in `beheerpagina.md` onder "Nog te bouwen": Zodra
 die zelf beheerbaar worden, kan de set velden wijzigen zonder dat de
 app opnieuw gebouwd hoeft te worden. Een vaste kolom per huidig veld
 zou deze spec (en elke CSV die er al van bestaat) bij zo'n wijziging
@@ -113,7 +121,7 @@ Elk item in `antwoorden`:
 ```
 
 Zelfde soort vorm als de kolom die we importeren
-(`import-legacy-scans.md`, `answers`), met dezelfde reden: `vraagTekst`
+(`import-scans.md`, `answers`), met dezelfde reden: `vraagTekst`
 en `schaalLabel` erbij, niet alleen `vraagId` en `score`, zodat de CSV
 ook leesbaar is voor wie het datamodel niet kent — een consultant die
 'm in Excel opent, niet alleen Sander of de import-tool later.

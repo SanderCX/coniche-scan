@@ -1,5 +1,5 @@
 import { Assessment, ContentBron } from "@/lib/types";
-import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
+import { alleBouwblokkenMetGroep, isVlakkeAssessment } from "@/lib/assessment-structuur";
 import {
   alleBouwblokResultaten,
   alleGroepResultaten,
@@ -122,9 +122,15 @@ export function buildResultatenPdfHtml(payload: ExportPdfPayload, logoDataUri: s
         : "";
 
     // Titel + score-badge rechtsboven, altijd — met of zonder rijke
-    // toelichting (bouwstenen/AI-domeinen content). Zonder toelichting
-    // valt dit terug op de kale bouwblok-naam, geen los "bijlage"-kopje
-    // meer eronder (op verzoek van Sander: dat was een dubbele titel).
+    // toelichting (bouwstenen/AI-domeinen content). Zonder rijke content
+    // (nog geen match in `lib/bouwblok-info.ts`, bijv. de Zorgscan, zie
+    // v1-aanpassingen.md) valt dit terug op de kale bouwblok-naam plus
+    // `Bouwblok.toelichting` als platte uitleg-alinea — geen "CENTRALE
+    // VRAAG"-blok (dat bestaat alleen in de rijke content), maar wél de
+    // uitleg zelf: Die ontbrak eerder helemaal in dit fallback-pad, terwijl
+    // de toelichting-overlay in de doorloopflow (`components/BouwblokForm.tsx`)
+    // daar al wel naar terugvalt. Geen los "bijlage"-kopje eronder (op
+    // verzoek van Sander: dat was een dubbele titel).
     const uitlegHtml = toelichting
       ? `<div class="bouwsteen-uitleg">
           <div class="bouwsteen-kop">
@@ -145,6 +151,7 @@ export function buildResultatenPdfHtml(payload: ExportPdfPayload, logoDataUri: s
             <h3 class="bouwsteen-titel">${escapeHtml(bouwblok.naam)}</h3>
             ${scoreBadge}
           </div>
+          ${bouwblok.toelichting ? `<p>${escapeHtml(bouwblok.toelichting)}</p>` : ""}
         </div>`;
 
     const vraagRijen = bouwblok.vragen
@@ -276,27 +283,26 @@ export function buildResultatenPdfHtml(payload: ExportPdfPayload, logoDataUri: s
   .algemene-sectie ul { margin-bottom: 0.5em; }
   .algemene-sectie li { margin-bottom: 0.15em; }
   /* 2 bouwstenen per pagina: elk paar krijgt een eigen pagina-vullende
-     flex-kolom (zelfde techniek als pagina 1) — de restruimte verschijnt
-     zo als één ruime tussenruimte tussen de twee bouwstenen, in plaats
-     van als onbenutte witruimte onderaan de pagina. Elk bouwsteen-blok
-     blijft ongesplitst (page-break-inside: avoid). */
+     flex-kolom (zelfde techniek als pagina 1). De twee bouwstenen staan
+     top-aligned direct onder elkaar met de streep ertussen op een vaste,
+     kleine afstand (ca. 1 regel) — geen ruimteverdeling meer via
+     margin: auto op de streep (die liet 'm voorheen in het midden van de
+     vrije ruimte op de pagina zweven, met een veel grotere en per pagina
+     wisselende afstand tot gevolg, op verzoek van Sander teruggedraaid).
+     Onbenutte ruimte op een korter paar blijft nu gewoon onderaan de
+     pagina staan. Elk bouwsteen-blok blijft ongesplitst
+     (page-break-inside: avoid). */
   .bouwsteen-pagina { display: flex; flex-direction: column; min-height: 245mm; }
   .bouwsteen-pagina + .bouwsteen-pagina { page-break-before: always; }
   .bouwsteen-blok { page-break-inside: avoid; font-size: 8.3pt; line-height: 1.4; }
-  .bouwsteen-blok:first-child { padding-bottom: 7mm; }
+  .bouwsteen-blok:first-child { padding-bottom: 3mm; }
   .bouwsteen-blok:last-child { padding-bottom: 0; }
-  /* De oranje streep staat in het midden van de vrije ruimte (margin auto),
-     met 7mm padding aan beide kanten: de ruimte boven en onder de streep
-     is dus altijd even groot, op elke pagina. Verkleind t.o.v. de eerdere
-     9mm om ruimte vrij te maken voor een opmerking zonder dat een paar
-     bouwstenen over de pagina heen duwt (v1-aanpassingen.md, "bouwsteen 7
-     niet op dezelfde pagina als 8"). */
-  .streep { height: 2px; background: #ff671f; margin: auto 0; flex: none; }
-  .streep + .bouwsteen-blok { padding-top: 7mm; }
+  .streep { height: 2px; background: #ff671f; margin: 0; flex: none; }
+  .streep + .bouwsteen-blok { padding-top: 4mm; }
   .bouwsteen-blok p { margin-bottom: 0.5em; }
   .bouwsteen-pagina.compact .bouwsteen-blok { font-size: 8.2pt; line-height: 1.4; }
-  .bouwsteen-pagina.compact .bouwsteen-blok:first-child { padding-bottom: 6mm; }
-  .bouwsteen-pagina.compact .streep + .bouwsteen-blok { padding-top: 6mm; }
+  .bouwsteen-pagina.compact .bouwsteen-blok:first-child { padding-bottom: 2mm; }
+  .bouwsteen-pagina.compact .streep + .bouwsteen-blok { padding-top: 3mm; }
   .bouwsteen-pagina.compact .bouwsteen-blok p { margin-bottom: 0.4em; }
   .bouwsteen-pagina.compact .bouwsteen-uitleg { margin-bottom: 8px; }
   .bouwsteen-pagina.compact .centrale-vraag-blok { margin: 6px 0 8px; }
@@ -384,7 +390,11 @@ export function buildResultatenPdfHtml(payload: ExportPdfPayload, logoDataUri: s
 
       <div class="charts-grid">
         <div class="chart-blok"><h3>Alle ${escapeHtml(assessment.bouwblokEenheidMeervoud)}</h3>${radarSvg}</div>
-        <div class="chart-blok"><h3>Per categorie</h3>${barSvg}</div>
+        <div class="chart-blok"><h3>${
+          isVlakkeAssessment(assessment)
+            ? `Scores per ${escapeHtml(assessment.bouwblokEenheidEnkelvoud)}`
+            : "Per categorie"
+        }</h3>${barSvg}</div>
       </div>
     </div>
 

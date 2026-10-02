@@ -50,12 +50,43 @@ export const machineCustomerIntro: string[] = [
   "Dezelfde AI-technologie die organisaties zelf intern inzetten, komt ook beschikbaar voor klanten. In de toekomst neemt niet altijd de klant zelf contact op, maar een AI-assistent namens die klant: die leest documenten, verzamelt context en klantgegevens, formuleert vragen, start acties en levert complete dossiers aan. Dat is een verschuiving van \"uitleg en zoeken\" naar \"dossier en actie\".",
 ];
 
-export const machineCustomerEffecten: string[] = [
-  "Klanten met AI zijn beter voorbereid. Klant-AI bundelt vooraf bestelgegevens, facturen, screenshots en logbestanden tot een compleet dossier, met het verzoek \"los dit op\" in plaats van een losse vraag.",
-  "Verzoeken worden meer actiegericht. Niet \"waarom is mijn factuur hoog?\", maar \"corrigeer het bedrag en stuur een nieuwe factuur\".",
-  "Contactfrequentie stijgt, 24 uur per dag. Een klant kan met AI snel vragen formuleren en die doorlopend opvolgen, wat het contactvolume verhoogt en complexer maakt.",
-  "Verwachtingen verschuiven. De klant verwacht dat de organisatie zelf ook goede CX-AI heeft: gestandaardiseerde antwoorden, snelle responstijden en consistente afhandeling.",
-  "Nieuwe vragen over \"foute\" transacties. Een klant neemt contact op over iets dat zijn eigen AI, bewust of onbewust, onterecht heeft aangepast of opgezegd.",
+export interface EffectMetIcoon {
+  titel: string;
+  tekst: string;
+  /** Sleutel in MACHINE_CUSTOMER_ICONS, components/icons/MachineCustomerIcons.tsx. */
+  icoon: string;
+}
+
+export const machineCustomerEffecten: EffectMetIcoon[] = [
+  {
+    titel: "Klanten met AI zijn beter voorbereid",
+    tekst:
+      "Klant-AI bundelt vooraf bestelgegevens, facturen, screenshots en logbestanden tot een compleet dossier, met het verzoek \"los dit op\" in plaats van een losse vraag.",
+    icoon: "dossier",
+  },
+  {
+    titel: "Verzoeken worden meer actiegericht",
+    tekst: "Niet \"waarom is mijn factuur hoog?\", maar \"corrigeer het bedrag en stuur een nieuwe factuur\".",
+    icoon: "bolt",
+  },
+  {
+    titel: "Contactfrequentie stijgt, 24 uur per dag",
+    tekst:
+      "Een klant kan met AI snel vragen formuleren en die doorlopend opvolgen, wat het contactvolume verhoogt en complexer maakt.",
+    icoon: "clock",
+  },
+  {
+    titel: "Verwachtingen verschuiven",
+    tekst:
+      "De klant verwacht dat de organisatie zelf ook goede CX-AI heeft: gestandaardiseerde antwoorden, snelle responstijden en consistente afhandeling.",
+    icoon: "trendUp",
+  },
+  {
+    titel: "Nieuwe vragen over \"foute\" transacties",
+    tekst:
+      "Een klant neemt contact op over iets dat zijn eigen AI, bewust of onbewust, onterecht heeft aangepast of opgezegd.",
+    icoon: "alert",
+  },
 ];
 
 export const machineCustomerPunten: TitelTekst[] = [

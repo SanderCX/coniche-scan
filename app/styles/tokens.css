@@ -30,6 +30,17 @@
   --border: #e8e6e1;
   --border-d: #d4d1ca;
 
+  /* Lettergroottes voor interface-tekst (stylesheet.md, Typografie). Koppen
+     en lopende tekst hebben hun eigen maat in base.css. */
+  --fs-xs: 0.75rem;   /* labels, badges, tabelkoppen, kleine tekst */
+  --fs-s: 0.85rem;    /* tabellen, formulieren, nav, compacte knoppen */
+  --fs-m: 0.9rem;     /* standaardknoppen en invoer */
+  --fs-l: 1.15rem;    /* titel van modals en beheerblokken */
+
+  /* Eén hoogte voor velden en compacte knoppen die samen in een rij staan:
+     de hoogte van de dropdown (stylesheet.md, Formulieren). */
+  --control-h: 2.4rem;
+
   --r: 6px;
 
   /* Vaste nav-hoogte — nodig zodat .flow-sidebar (doorloopflow) hier sticky

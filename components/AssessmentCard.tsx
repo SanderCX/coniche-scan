@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Assessment } from "@/lib/types";
-import { alleBouwblokkenMetGroep, alleVragen } from "@/lib/assessment-structuur";
+import { actieveBouwblokkenMetGroep, actieveVragen } from "@/lib/assessment-structuur";
 import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
 
 export function AssessmentCard({ assessment }: { assessment: Assessment }) {
-  const totaalVragen = alleVragen(assessment).length;
+  const totaalVragen = actieveVragen(assessment).length;
   // Titel over twee regels: vóór " in " (AI-volwassenheid / in Klantcontact),
   // anders na het eerste woord (Klantcontact / Volwassenheid).
   const inIndex = assessment.naam.indexOf(" in ");
@@ -13,7 +13,7 @@ export function AssessmentCard({ assessment }: { assessment: Assessment }) {
     splitsAt === -1
       ? [assessment.naam, ""]
       : [assessment.naam.slice(0, splitsAt), assessment.naam.slice(splitsAt + 1)];
-  const totaalBouwblokken = alleBouwblokkenMetGroep(assessment).length;
+  const totaalBouwblokken = actieveBouwblokkenMetGroep(assessment).length;
 
   return (
     <Link

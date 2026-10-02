@@ -5,19 +5,20 @@ import { pdfBestandsnaam } from "@/lib/pdf/bestandsnaam";
 import { buildResultatenPdfHtml, ExportPdfPayload } from "@/lib/pdf/build-html";
 
 /**
- * PDF-export van één ingevulde scan (export-pdf.md). Zelfstandig: de client
- * stuurt alle benodigde data mee (het huidige Assessment zoals de
- * respondent het zag, plus de antwoorden/opmerkingen), zodat de server geen
- * toegang nodig heeft tot de localStorage-data van de browser — die bestaat
- * hier niet. Duidingscontent (visie/bouwstenen/2030/AI-domeinen) komt uit
- * dezelfde statische content-bestanden als de interactieve pagina's
- * (`lib/pdf/content-secties.ts`), niet uit de payload.
+ * PDF-export van één ingevulde scan (export-pdf-visual-volwassenheidsscan.md
+ * e.v.). Zelfstandig: de client stuurt alle benodigde data mee (het huidige
+ * Assessment zoals de respondent het zag, plus de antwoorden/opmerkingen),
+ * zodat de server geen toegang nodig heeft tot de localStorage-data van de
+ * browser — die bestaat hier niet. Duidingscontent (visie/bouwstenen/2030/
+ * AI-domeinen) komt uit dezelfde statische content-bestanden als de
+ * interactieve pagina's (`lib/pdf/content-secties.ts`), niet uit de payload.
  *
  * Rendering: een zelfstandige HTML-string (geen navigatie naar de live
  * app — die kent deze respondent niet, om dezelfde reden), geopend in een
- * headless Chromium-pagina en geprint naar PDF. `displayHeaderFooter` +
- * `footerTemplate` geven de native "Pagina X / Y" die platte
- * browser-print-to-PDF niet kan (zie export-pdf.md, "Technisch").
+ * headless Chromium-pagina en geprint naar PDF. De paginanummering ("Pagina
+ * X / Y") komt uit een CSS `@page`-marginbox in de HTML zelf, niet uit
+ * Puppeteer's `displayHeaderFooter`/`footerTemplate` (zie
+ * export-pdf-visual-volwassenheidsscan.md).
  */
 export async function POST(request: Request) {
   const payload = (await request.json()) as ExportPdfPayload;

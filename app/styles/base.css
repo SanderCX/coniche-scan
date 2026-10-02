@@ -18,6 +18,43 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Formulierelementen erven anders de `line-height: 1.78` van body,
+   maar `<select>` negeert dat als enige (UA-stylesheet zet er zelf een
+   line-height op, "normal") — dat gaf zichtbaar hogere `<input>`/
+   `<textarea>`/`<button>`-elementen dan `<select>` bij verder identieke
+   padding/font-size (bijv. de "Assessment-type"-select en het
+   "Label"-veld in de Metingen-rij, gemeten op resp. 38px en 47px hoog).
+   Terugzetten naar een compacte, UI-achtige line-height voor alle vier,
+   in plaats van de leesbare-lopende-tekst-waarde van body. */
+input,
+select,
+textarea,
+button {
+  line-height: normal;
+  /* Formulierelementen erven het lettertype niet vanzelf (de browser zet er
+     een systeemlettertype op): Epilogue overal, ook in velden buiten een
+     `.field`/`.admin-field`-wrapper. */
+  font-family: inherit;
+}
+
+/* Getalvelden zijn gewone invoervelden: Geen pijltjes om de waarde met 1
+   te verhogen of te verlagen (stylesheet.md, Formulieren). */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Geen monospace-lettertype in de interface: Ook `code` (bijv. een
+   persoonlijke link) is Epilogue. */
+code {
+  font-family: inherit;
+}
+
 img {
   max-width: 100%;
   display: block;
@@ -72,10 +109,6 @@ p {
   text-transform: uppercase;
   color: var(--or);
   margin-bottom: 0.8rem;
-}
-
-button {
-  font-family: inherit;
 }
 
 @media (max-width: 640px) {

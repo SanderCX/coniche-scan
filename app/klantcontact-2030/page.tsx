@@ -1,4 +1,6 @@
 import { PageWithChrome } from "@/components/PageWithChrome";
+import { MijnGegevensMenuVoorCode } from "@/components/MijnGegevensMenuVoorCode";
+import { MACHINE_CUSTOMER_ICONS } from "@/components/icons/MachineCustomerIcons";
 import {
   geenVastEindbeeld,
   vijfDingenOntwerpen,
@@ -32,7 +34,7 @@ function GenummerdeLijst({ items }: { items: { titel: string; tekst: string | st
               background: "var(--or-faint)",
               color: "var(--or)",
               fontWeight: 800,
-              fontSize: "0.9rem",
+              fontSize: "var(--fs-m)",
               flex: "none",
             }}
           >
@@ -56,6 +58,42 @@ function GenummerdeLijst({ items }: { items: { titel: string; tekst: string | st
   );
 }
 
+/** Compacte, randloze variant van GenummerdeLijst: icoon i.p.v. volgnummer, geen kaartkader — vervangt de kale bullets bij machineCustomerEffecten. */
+function IconLijst({ items }: { items: { titel: string; tekst: string; icoon: string }[] }) {
+  return (
+    <div style={{ marginTop: "1rem" }}>
+      {items.map((item) => {
+        const Icon = MACHINE_CUSTOMER_ICONS[item.icoon];
+        return (
+          <div key={item.titel} style={{ display: "flex", gap: "0.85rem", marginTop: "1rem" }}>
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "2rem",
+                height: "2rem",
+                borderRadius: "50%",
+                background: "var(--or-faint)",
+                color: "var(--or)",
+                flex: "none",
+              }}
+            >
+              {Icon && <Icon width={16} height={16} />}
+            </span>
+            <div>
+              <p className="font-semibold text-ink">{item.titel}</p>
+              <p className="text-sm" style={{ color: "var(--ink-m)", marginTop: "0.15rem" }}>
+                {item.tekst}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default async function Klantcontact2030Page({
   searchParams,
 }: {
@@ -63,7 +101,12 @@ export default async function Klantcontact2030Page({
 }) {
   const { code } = await searchParams;
   return (
-    <PageWithChrome logoHref={code ? `/s/${code}` : undefined} code={code} toonTerug>
+    <PageWithChrome
+      logoHref={code ? `/s/${code}` : undefined}
+      code={code}
+      toonTerug
+      identiteitMenu={code ? <MijnGegevensMenuVoorCode code={code} /> : undefined}
+    >
       <div style={{ background: "linear-gradient(180deg, var(--or-faint) 0%, var(--bg) 65%)" }}>
         <div className="container" style={{ padding: "4.5rem 2rem 0.5rem", textAlign: "center" }}>
           <span className="eyebrow">Coniche Scan</span>
@@ -72,6 +115,7 @@ export default async function Klantcontact2030Page({
       </div>
 
       <div className="container" style={{ maxWidth: "42rem", padding: "1rem 2rem 2.5rem" }}>
+        <h2>Geen vast eindbeeld</h2>
         {geenVastEindbeeld.map((tekst, i) => (
           <p key={i}>{tekst}</p>
         ))}
@@ -89,11 +133,7 @@ export default async function Klantcontact2030Page({
           <p key={i}>{tekst}</p>
         ))}
         <p style={{ marginTop: "1.5rem" }}>{machineCustomerEffectenIntro}</p>
-        <ul className="list-disc pl-5 space-y-1">
-          {machineCustomerEffecten.map((effect, i) => (
-            <li key={i}>{effect}</li>
-          ))}
-        </ul>
+        <IconLijst items={machineCustomerEffecten} />
         <GenummerdeLijst items={machineCustomerPunten} />
         {machineCustomerSlot.map((tekst, i) => (
           <p key={i} style={{ marginTop: i === 0 ? "1.5rem" : undefined }}>

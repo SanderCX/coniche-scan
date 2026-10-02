@@ -13,6 +13,7 @@ const testLid: OrganisatieLid = {
   team: "",
   notities: "",
   toegangscode: "k7m2p9xq4r",
+  leadMetingIds: [],
   aangemaaktOp: new Date().toISOString(),
 };
 
@@ -26,6 +27,7 @@ const testInvulling: ScanInvulling = {
   uitgenodigdOp: new Date().toISOString(),
   gestartOp: null,
   afgerondOp: null,
+  bewaarVerlengdTot: null,
 };
 
 const testScanUitvoering: ScanUitvoering = {
@@ -93,6 +95,11 @@ export const demoOrganisatie: Organisatie = {
   },
   leden: [testLid],
   scanUitvoeringen: [testScanUitvoering],
+  // Seed-data, geen echte aanmaker — zichtbaar voor Admin, niet voor een
+  // Consultant (bereik "eigen", lib/rechten.ts) totdat een Admin het
+  // eigenaarschap alsnog toekent of de organisatie toewijst.
+  aangemaaktDoor: null,
+  toegewezenAan: [],
   aangemaaktOp: new Date().toISOString(),
   gewijzigdOp: new Date().toISOString(),
 };

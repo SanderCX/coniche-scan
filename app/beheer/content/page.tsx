@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAssessments } from "@/lib/assessment-store";
-import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
+import { actieveBouwblokkenMetGroep } from "@/lib/assessment-structuur";
 import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
 
 export default function ContentOverzichtPage() {
@@ -29,9 +29,9 @@ export default function ContentOverzichtPage() {
                 </p>
                 <p className="admin-row-sub">
                   {a.categorieen
-                    ? `${a.categorieen.length} categorieën · `
+                    ? `${a.categorieen.filter((c) => !c.gearchiveerd).length} categorieën · `
                     : "Geen categorie-laag · "}
-                  {alleBouwblokkenMetGroep(a).length} {a.bouwblokEenheidMeervoud}
+                  {actieveBouwblokkenMetGroep(a).length} {a.bouwblokEenheidMeervoud}
                   {template && ` · Afgeleid van: ${template.naam}`}
                 </p>
               </div>

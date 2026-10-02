@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { useScanInvulling, voltooiIntake } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { PageWithChrome } from "@/components/PageWithChrome";
+import { RespondentGegevensVelden } from "@/components/RespondentGegevensVelden";
+import { ScanBezet } from "@/components/ScanBezet";
+import { useScanSlot } from "@/lib/scan-slot";
 
 export default function IntakePage({
   params,
@@ -16,6 +19,8 @@ export default function IntakePage({
   const gegevens = useScanInvulling(respondentId);
   const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
   const router = useRouter();
+  // Eén persoon tegelijk per scan (lib/scan-slot.ts): De eerste houdt het slot, een tweede ziet een melding.
+  const slot = useScanSlot(gegevens ? respondentId : null);
 
   useEffect(() => {
     if (!gegevens) return;
@@ -36,6 +41,17 @@ export default function IntakePage({
 
   if (gegevens.invulling.status !== "uitgenodigd") {
     return null;
+  }
+
+  if (slot.status === "bezet") {
+    return <ScanBezet toegangscode={gegevens.lid.toegangscode} onOpnieuw={slot.opnieuw} />;
+  }
+  if (slot.status === "controleren") {
+    return (
+      <PageWithChrome>
+        <div className="flex-1 px-6 py-16 text-center text-ink-m">Laden...</div>
+      </PageWithChrome>
+    );
   }
 
   const { lid } = gegevens;
@@ -63,26 +79,12 @@ export default function IntakePage({
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8">
-          <div className="field">
-            <label>Naam</label>
-            <input type="text" name="naam" required defaultValue={lid.naam ?? ""} />
-          </div>
-          <div className="field">
-            <label>Rol / functie</label>
-            <input type="text" name="functie" required defaultValue={lid.functie} />
-          </div>
-          <div className="field">
-            <label>
-              Team <span className="font-normal text-ink-s">(optioneel)</span>
-            </label>
-            <input type="text" name="team" defaultValue={lid.team} />
-          </div>
-          <div className="field">
-            <label>
-              Notities <span className="font-normal text-ink-s">(optioneel)</span>
-            </label>
-            <textarea name="notities" rows={3} defaultValue={lid.notities} />
-          </div>
+          <RespondentGegevensVelden
+            naam={lid.naam}
+            functie={lid.functie}
+            team={lid.team}
+            notities={lid.notities}
+          />
 
           <label
             className="text-sm"

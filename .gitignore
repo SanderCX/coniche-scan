@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# lokale, host-brede opslag (app/api/store/[key]/route.ts) — persoonlijke
+# ontwikkeldata, geen gedeelde content
+/.data/

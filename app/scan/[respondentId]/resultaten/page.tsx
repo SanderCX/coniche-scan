@@ -7,6 +7,7 @@ import { useScanInvulling } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { ResultsView } from "@/components/ResultsView";
 import { PageWithChrome } from "@/components/PageWithChrome";
+import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { pdfBestandsnaam } from "@/lib/pdf/bestandsnaam";
 import type { ExportPdfPayload } from "@/lib/pdf/build-html";
@@ -122,6 +123,7 @@ export default function ResultatenPage({
           />
         </>
       }
+      identiteitMenu={<MijnGegevensMenu lid={lid} />}
     >
       <div className="container section">
         <ResultsView

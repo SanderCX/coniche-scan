@@ -14,7 +14,6 @@
 
 @theme inline {
   --font-sans: var(--font-epilogue);
-  --font-mono: var(--font-geist-mono);
 }
 
 /*
@@ -25,6 +24,14 @@
  * daar aanpassen.
  */
 @theme {
+  /* Tailwind-tekstklassen volgen dezelfde schaal als de CSS (stylesheet.md,
+     Typografie): `text-xs`/`text-sm`/`text-base`/`text-lg` zijn
+     --fs-xs/s/m/l, geen eigen Tailwind-waarden. */
+  --text-xs: 0.75rem;
+  --text-sm: 0.85rem;
+  --text-base: 0.9rem;
+  --text-lg: 1.15rem;
+
   --color-ink: #1c1c1a;
   --color-ink-m: #4d4d49;
   --color-ink-s: #888884;

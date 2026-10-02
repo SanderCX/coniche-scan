@@ -28,7 +28,7 @@ officiële model.
   ontwikkelplannen voor de korte en lange termijn; visie op
   werkgeverschap.
 
-**Klantcontact Visie & Strategie**
+**Klantcontact visie & strategie**
 - Beschrijving: In hoeverre ondersteunt de klantcontactstrategie de
   organisatiestrategie? Welke servicewaarden zijn daarbij leidend?
 - Kernwoorden: Visie op klantcontact; servicewaarden; groei- en
@@ -62,7 +62,7 @@ officiële model.
   klanttevredenheid te verhogen. Klantsignaalmanagement is de kern van
   deze bouwsteen."
 
-**Financial Control**
+**Financial control**
 - Beschrijving: In hoeverre is de financiële huishouding van de
   klantcontactorganisatie inzichtelijk en op orde?
 - Kernwoorden: Inzicht in kosten en bijdragen van klantcontact;
