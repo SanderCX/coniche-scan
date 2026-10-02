@@ -1,5 +1,8 @@
 "use client";
 
+import { useRef } from "react";
+import { useFocusVal } from "@/lib/use-focus-val";
+
 /**
  * Vervangt `window.confirm()` voor destructieve acties in beheer. Niet
  * cosmetisch: Een native `confirm()`-dialoog wordt in sommige
@@ -23,6 +26,9 @@ export function BevestigModal({
   onBevestigen: () => void;
   onAnnuleren: () => void;
 }) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  useFocusVal(open, boxRef);
+
   if (!open) return null;
 
   return (
@@ -33,7 +39,7 @@ export function BevestigModal({
       aria-modal="true"
       aria-label={titel}
     >
-      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-box" ref={boxRef} tabIndex={-1} onClick={(e) => e.stopPropagation()}>
         <h2 className="mb-4 text-lg font-bold text-ink">{titel}</h2>
         <p className="text-sm leading-relaxed text-ink-m" style={{ marginBottom: "1.5rem" }}>
           {bericht}

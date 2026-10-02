@@ -435,6 +435,19 @@ De beheeromgeving gebruikt dezelfde nav en footer, met alleen een extra
 terug-link in de balk. Inklapbare bouwblok-kaarten (`.admin-bouwblok-card`
 met `<details>`) voor contentbeheer, tabelstijl uit `admin.css`.
 
+### Toetsenbord en focus
+
+- **Focus**: Elk bedienbaar element krijgt bij toetsenbordnavigatie een
+  oranje omtrek van `2px` (`:focus-visible`, `base.css`), niet bij een
+  muisklik. Invoervelden houden hun eigen focusstijl (oranje rand met ring).
+- **Modals** (`Modal`, `BevestigModal`, `OverzichtModal`): De focus gaat bij
+  het openen naar de modal, Tab en Shift+Tab blijven erin
+  (`lib/use-focus-val.ts`), en bij het sluiten keert de focus terug naar het
+  element waar je vandaan kwam. Staan er twee modals boven elkaar, dan houdt
+  alleen de bovenste de focus vast.
+- **Klikbare rijen** in een lijst hebben ook altijd een knop "Bekijk >>" in
+  de rij, zodat de rij ook zonder muis te openen is.
+
 ### Info-icoon
 
 Voor een korte uitleg bij een veld of knop, in plaats van een vaste tekst
@@ -566,4 +579,4 @@ Eerder gebruikte categoriekleuren die niet (meer) gebruikt worden:
 - **Citaten**: Source Serif 4 staat in de spec maar de app toont nog geen
   citaat. Pas laden als er een komt.
 - Footer-logo: Vraagt een witte variant van het logo, nu geen prioriteit.
-- Focus- en error-states bij formuliervalidatie.
+- Error-states bij formuliervalidatie (de focusstijl staat onder Toetsenbord en focus).

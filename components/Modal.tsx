@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useFocusVal } from "@/lib/use-focus-val";
 
 export function Modal({
   open,
@@ -19,6 +20,9 @@ export function Modal({
   accentColor?: string;
   children: React.ReactNode;
 }) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  useFocusVal(open, boxRef);
+
   useEffect(() => {
     if (!open) return;
     function onKeyDown(e: KeyboardEvent) {
@@ -38,7 +42,7 @@ export function Modal({
       aria-modal="true"
       aria-label={title}
     >
-      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-box" ref={boxRef} tabIndex={-1} onClick={(e) => e.stopPropagation()}>
         <button type="button" onClick={onClose} aria-label="Sluiten" className="modal-close">
           ✕
         </button>

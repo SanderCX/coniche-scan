@@ -9,11 +9,7 @@ import { ResultsView } from "@/components/ResultsView";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { DropdownKnop } from "@/components/DropdownKnop";
-import { pdfBestandsnaam } from "@/lib/pdf/bestandsnaam";
-import type { ExportPdfPayload } from "@/lib/pdf/build-html";
-import { csvBestandsnaamEnkel, downloadTekstBestand, genereerScansCsv } from "@/lib/csv-export";
-import { buildIndesignExport } from "@/lib/indesign/build-xml";
-import { downloadIndesignExport } from "@/lib/indesign/export";
+import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/scan-export";
 
 export default function ResultatenPage({
   params,
@@ -49,55 +45,13 @@ export default function ResultatenPage({
 
   const { organisatie, scanUitvoering, lid, invulling } = gegevens;
 
-  function handleExportCsv() {
-    const csv = genereerScansCsv([{ organisatie, scanUitvoering, lid, invulling, assessment: assessment! }]);
-    downloadTekstBestand(csv, csvBestandsnaamEnkel({ organisatie, scanUitvoering, lid, invulling, assessment: assessment! }), "text/csv;charset=utf-8");
-  }
-
-  function handleExportIndesign() {
-    const resultaat = buildIndesignExport({
-      assessment: assessment!,
-      antwoorden: invulling.antwoorden,
-      organisatieNaam: organisatie.naam,
-      organisatieKenmerken: organisatie.kenmerken,
-      respondentNaam: lid.naam ?? lid.email,
-      respondentFunctie: lid.functie,
-      respondentTeam: lid.team,
-      metingLabel: scanUitvoering.label,
-      afgerondOp: invulling.afgerondOp,
-    });
-    downloadIndesignExport(resultaat);
-  }
+  const context = { organisatie, scanUitvoering, lid, invulling, assessment };
 
   async function handleExportPdf() {
     setPdfBezig(true);
-    try {
-      const payload: ExportPdfPayload = {
-        assessment: assessment!,
-        antwoorden: invulling.antwoorden,
-        opmerkingenPerBouwblok: invulling.opmerkingenPerBouwblok,
-        organisatieNaam: organisatie.naam,
-        respondentNaam: lid.naam ?? lid.email,
-        afgerondOp: invulling.afgerondOp,
-      };
-      const response = await fetch("/api/export-pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok) throw new Error("export mislukt");
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = pdfBestandsnaam(assessment!, organisatie.naam);
-      link.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      window.alert("Het exporteren als PDF is mislukt. Probeer het opnieuw.");
-    } finally {
-      setPdfBezig(false);
-    }
+    const gelukt = await exporteerScanPdf(context);
+    setPdfBezig(false);
+    if (!gelukt) window.alert("Het exporteren als PDF is mislukt. Probeer het opnieuw.");
   }
 
   return (
@@ -117,8 +71,8 @@ export default function ResultatenPage({
                 disabled: pdfBezig,
                 title: pdfBezig ? "PDF wordt gemaakt…" : undefined,
               },
-              { label: "Als CSV", onClick: handleExportCsv },
-              { label: "Voor InDesign (XML)", onClick: handleExportIndesign },
+              { label: "Als CSV", onClick: () => exporteerScansCsv([context]) },
+              { label: "Voor InDesign (XML)", onClick: () => exporteerScanIndesign(context) },
             ]}
           />
         </>

@@ -13,7 +13,7 @@ import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { useBulkSelect } from "@/lib/useBulkSelect";
 import { useBeheerOverzicht } from "@/lib/beheer-url";
 import { CsvRijContext } from "@/lib/csv-export";
-import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/beheer-export";
+import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/scan-export";
 import { IndeterminateCheckbox } from "@/components/beheer/IndeterminateCheckbox";
 import { BulkToolbar } from "@/components/beheer/BulkToolbar";
 import { BevestigModal } from "@/components/beheer/BevestigModal";

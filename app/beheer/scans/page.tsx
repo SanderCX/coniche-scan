@@ -17,7 +17,7 @@ import { zichtbareOrganisaties } from "@/lib/rechten";
 import { useBeheerOverzicht, useUrlParams } from "@/lib/beheer-url";
 import { ScanInvulling } from "@/lib/types";
 import { CsvRijContext } from "@/lib/csv-export";
-import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/beheer-export";
+import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/scan-export";
 
 type Kolom = "naam" | "organisatie" | "assessment" | "scanLabel" | "rolTeam" | "status" | "voortgang" | "gestart";
 

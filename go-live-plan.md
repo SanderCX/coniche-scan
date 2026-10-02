@@ -58,10 +58,10 @@ verandert.
   framework voor wachtwoorden, sessies en 2FA (aanvulling).
 - [ ] **Hostingkeuze en domein (Sander).** Waar frontend en API draaien,
   op welk domein (bijvoorbeeld onder `app.coniche.nl`), EU-regio voor alle
-  onderdelen. De app draait nu lokaal met een eigen kleine server
-  (`server.ps1`). Controleren of de router met hash-routes (`#/`) blijft
-  of naar echte paden gaat, want de spec noemt persoonlijke links als
-  `/s/k7m2p9xq4r` en dat vraagt serverconfiguratie (aanvulling).
+  onderdelen. De app is een Next.js-project met echte paden (zoals
+  `/s/k7m2p9xq4r`) en draait nu lokaal met `npm run dev`. Het eerste
+  statische prototype met `server.ps1` en hash-routes staat in
+  `archief-prototype/` (aanvulling).
 - [ ] **Beslissen wat er met de oude data gebeurt (Joost).** Welke klanten
   en scans gaan mee, hoe lang het archief van de oude omgeving bewaard
   blijft, en of klanten worden geïnformeerd (zie fase 5 en 7).

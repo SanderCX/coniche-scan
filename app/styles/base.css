@@ -37,6 +37,19 @@ button {
   font-family: inherit;
 }
 
+/* Zichtbare focus voor wie met het toetsenbord navigeert (alleen bij
+   `:focus-visible`, dus niet bij een muisklik). Invoervelden hebben hun
+   eigen focusstijl (oranje rand met ring, `.field`/`.admin-field`). */
+:focus-visible {
+  outline: 2px solid var(--or);
+  outline-offset: 2px;
+}
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+}
+
 /* Getalvelden zijn gewone invoervelden: Geen pijltjes om de waarde met 1
    te verhogen of te verlagen (stylesheet.md, Formulieren). */
 input[type="number"] {

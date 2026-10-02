@@ -1,5 +1,23 @@
 # Coniche Scan — Changelog
 
+## 2026-10-02 — Scan-punten 1 t/m 8: beveiligingsmaatregelen, tests, opruiming, toegankelijkheid
+
+**Aanleiding**: Sander wil de eerste acht punten uit de scan van de oplossing doorvoeren.
+
+**Gedaan**: Zie `backlog.md`, "Gedaan (2 oktober 2026)". Next.js 16.3.8, `/api/mail` en
+`lib/mailer.ts` weg, `gebruikers` niet meer in Neon (en de rij met wachtwoorden verwijderd),
+grootte- en gelijktijdigheidslimieten op `/api/store` en `/api/export-pdf`, dev op `127.0.0.1`,
+vitest met 15 tests, `lib/db.ts` gesplitst in `lib/db/` (zelfde importpad `@/lib/db`),
+Content-pagina gesplitst (`lib/assessment-bewerken.ts`, `components/beheer/BouwblokEditor.tsx`),
+exportcode samengebracht in `lib/scan-export.ts`, oud prototype naar `archief-prototype/`,
+focusval in de modals (`lib/use-focus-val.ts`), `:focus-visible`, "Bekijk >>" in de lijst
+Respondenten. Twee checkpoint-commits.
+
+**Nog niet gedaan, bewust**: Echte server-side autorisatie en data per record
+(punt 1, 3 en 8) vragen een andere opzet van de respondentflow en staan als plan klaar ter
+goedkeuring. `gebruikers` leeft nu per browser: Een account dat in de ene browser is
+aangemaakt, bestaat niet in een andere.
+
 ## 2026-10-02 — Resterende uitlegteksten in beheer naar het Info-icoon
 
 Algemene teksten (toelichting bij het veld), Content (Icoon en Slotsectie voor de

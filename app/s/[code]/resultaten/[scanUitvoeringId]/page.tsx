@@ -8,8 +8,7 @@ import { ResultsView } from "@/components/ResultsView";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { DropdownKnop } from "@/components/DropdownKnop";
-import { pdfBestandsnaam } from "@/lib/pdf/bestandsnaam";
-import type { ExportPdfPayload } from "@/lib/pdf/build-html";
+import { downloadPdf } from "@/lib/scan-export";
 
 /**
  * Resultaten van één Meting, voor een Lead die er Lead-toegang toe heeft
@@ -68,33 +67,16 @@ export default function LeadResultatenPage({
   // omschrijvende naam in plaats van een respondentnaam.
   async function handleExportPdf() {
     setPdfBezig(true);
-    try {
-      const payload: ExportPdfPayload = {
-        assessment: assessment!,
-        antwoorden: gemiddeldeAntwoorden,
-        opmerkingenPerBouwblok: {},
-        organisatieNaam: gegevens!.organisatie.naam,
-        respondentNaam: `Gemiddelde van ${afgerond.length} ${afgerond.length === 1 ? "respondent" : "respondenten"}`,
-        afgerondOp: new Date().toISOString(),
-      };
-      const response = await fetch("/api/export-pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok) throw new Error("export mislukt");
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = pdfBestandsnaam(assessment!, gegevens!.organisatie.naam);
-      link.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      window.alert("Het exporteren als PDF is mislukt. Probeer het opnieuw.");
-    } finally {
-      setPdfBezig(false);
-    }
+    const gelukt = await downloadPdf({
+      assessment: assessment!,
+      antwoorden: gemiddeldeAntwoorden,
+      opmerkingenPerBouwblok: {},
+      organisatieNaam: gegevens!.organisatie.naam,
+      respondentNaam: `Gemiddelde van ${afgerond.length} ${afgerond.length === 1 ? "respondent" : "respondenten"}`,
+      afgerondOp: new Date().toISOString(),
+    });
+    setPdfBezig(false);
+    if (!gelukt) window.alert("Het exporteren als PDF is mislukt. Probeer het opnieuw.");
   }
 
   return (

@@ -1,0 +1,164 @@
+import { Organisatie, ScanInvulling, ScanUitvoering } from "../types";
+import { nieuwId } from "../id";
+import { normaliseerEmail } from "../email";
+import { GevalideerdeRij } from "../import-legacy";
+import { laadAlles, slaAlles } from "./store";
+import { genereerUniekeToegangscode } from "./respondenten";
+
+/** Import van scans uit een CSV (import-scans.md): schrijft rijen weg als Organisatie, Respondent, Meting en scan. */
+
+export interface LegacyImportKeuze {
+  rij: GevalideerdeRij;
+  assessmentId: string;
+  /**
+   * `null` = nieuwe organisatie aanmaken met `rij.organisatieNaam`. Geef,
+   * zodra bekend (een eerdere aanroep binnen dezelfde beheersessie heeft
+   * 'm al aangemaakt — `import-scans.md`, "Binnen één import"/"Meting"),
+   * het echte id door i.p.v. opnieuw `null`: anders ontstaat per aanroep
+   * een nieuwe organisatie met dezelfde naam, in plaats van één.
+   */
+  organisatieId: string | null;
+  /**
+   * Zelfde idee als `organisatieId`, maar voor de Meting: `null`/weggelaten
+   * = nieuwe Meting aanmaken. Binnen één aanroep worden rijen met
+   * dezelfde organisatie, Assessment en `rij.meetingLabel` altijd
+   * samengevoegd tot één Meting, ook als ze hier allemaal `null` krijgen
+   * (`import-scans.md`, Meting, "Binnen één import delen rijen één
+   * Meting"); geef het echte id door voor een latere, aparte aanroep die
+   * bij diezelfde combinatie moet aansluiten.
+   */
+  metingId?: string | null;
+}
+
+/** Per verwerkte rij, in dezelfde volgorde als de input: met welke organisatie/Meting hij uiteindelijk geschreven is — voor de aanroeper om te onthouden richting een latere, aparte aanroep (zie `LegacyImportKeuze`). */
+export interface LegacyImportRijResultaat {
+  organisatieId: string;
+  scanUitvoeringId: string;
+}
+
+/**
+ * Schrijft gevalideerde rijen (`lib/import-legacy.ts`) definitief weg
+ * (`import-scans.md`, Werkwijze in beheer, Meting, "Over rijen heen in
+ * één bestand"). Organisaties en Metingen die **binnen deze ene aanroep**
+ * voor het eerst voorkomen (nieuwe organisatienaam, of nieuwe combinatie
+ * organisatie/Assessment/label) worden maar één keer aangemaakt en
+ * daarna door latere rijen in dezelfde aanroep hergebruikt — rijen die
+ * expliciet al een `organisatieId`/`metingId` meekrijgen (van een eerdere
+ * aanroep in dezelfde beheersessie) tellen ook mee voor die hergebruik-
+ * groepering. Zie `LegacyImportKeuze` voor hoe de aanroeper dat tussen
+ * aparte aanroepen laat doorwerken.
+ *
+ * Een respondent die al bestaat (zelfde e-mailadres binnen de organisatie)
+ * wordt hergebruikt zonder zijn naam/functie/team/notities te overschrijven
+ * — dat is bewust een terughoudende keuze (niet in de spec expliciet
+ * vastgelegd): De import mag geen recentere, zelf ingevoerde gegevens van
+ * een bestaande respondent overschrijven met oudere importdata.
+ */
+export function voerLegacyImportUit(
+  keuzes: LegacyImportKeuze[],
+  aangemaaktDoor: string
+): { geimporteerd: number; rijResultaten: LegacyImportRijResultaat[] } {
+  const alles = laadAlles();
+  let geimporteerd = 0;
+  const rijResultaten: LegacyImportRijResultaat[] = [];
+
+  // Nieuw aangemaakt BINNEN deze aanroep, dus hergebruikbaar door een
+  // volgende rij in dezelfde `keuzes`-lijst (import-scans.md, "Organisatie,
+  // één keer per unieke naam" / "Binnen één import delen rijen één
+  // Meting"). Niet bedoeld om tussen aparte aanroepen heen te onthouden —
+  // dat doet de aanroeper zelf, via de teruggegeven `rijResultaten`.
+  const nieuweOrgPerNaam = new Map<string, Organisatie>();
+  const nieuweMetingPerSleutel = new Map<string, ScanUitvoering>();
+
+  for (const { rij, assessmentId, organisatieId, metingId } of keuzes) {
+    let organisatie =
+      (organisatieId ? alles.find((o) => o.id === organisatieId) : undefined) ??
+      nieuweOrgPerNaam.get(rij.organisatieNaam);
+    let nieuwAangemaakt = false;
+    if (!organisatie) {
+      const nu = new Date().toISOString();
+      organisatie = {
+        id: nieuwId(),
+        naam: rij.organisatieNaam,
+        kenmerken: {},
+        leden: [],
+        scanUitvoeringen: [],
+        aangemaaktDoor,
+        toegewezenAan: [],
+        aangemaaktOp: nu,
+        gewijzigdOp: nu,
+      };
+      alles.push(organisatie);
+      nieuweOrgPerNaam.set(rij.organisatieNaam, organisatie);
+      nieuwAangemaakt = true;
+    }
+
+    // "nieuw"-formaat: organisatie_kenmerken is al compleet, alleen toepassen bij een
+    // nieuw aangemaakte organisatie — bij hergebruik van een bestaande organisatie
+    // blijven haar eigen, mogelijk recentere kenmerken staan. Bij meerdere rijen voor
+    // dezelfde nieuwe organisatie (binnen of tussen aanroepen) geldt dit alleen op het
+    // moment van aanmaken, dus feitelijk de eerste rij in bestandsvolgorde
+    // (import-scans.md, "Kenmerken bij een nieuwe organisatie").
+    if (rij.organisatieKenmerken && nieuwAangemaakt) {
+      organisatie.kenmerken = { ...rij.organisatieKenmerken };
+    } else if ((rij.sectorTitel || rij.subsectorTitel) && !organisatie.kenmerken["sector-subsector"]) {
+      organisatie.kenmerken["sector-subsector"] = {
+        sector: rij.sectorTitel ?? "",
+        subsector: rij.subsectorTitel ?? "",
+      };
+    }
+
+    let lid = organisatie.leden.find((l) => l.email === normaliseerEmail(rij.respondentEmail));
+    if (!lid) {
+      lid = {
+        id: nieuwId(),
+        organisatieId: organisatie.id,
+        email: normaliseerEmail(rij.respondentEmail),
+        naam: rij.respondentNaam || null,
+        functie: rij.respondentFunctie,
+        team: rij.respondentTeam,
+        notities: rij.respondentNotities,
+        toegangscode: genereerUniekeToegangscode(alles),
+        leadMetingIds: [],
+        aangemaaktOp: new Date().toISOString(),
+      };
+      organisatie.leden.push(lid);
+    }
+
+    const metingSleutel = `${organisatie.id}::${assessmentId}::${rij.meetingLabel}`;
+    let scanUitvoering =
+      (metingId ? organisatie.scanUitvoeringen.find((s) => s.id === metingId) : undefined) ??
+      nieuweMetingPerSleutel.get(metingSleutel);
+    if (!scanUitvoering) {
+      scanUitvoering = {
+        id: nieuwId(),
+        organisatieId: organisatie.id,
+        assessmentId,
+        label: rij.meetingLabel,
+        aangemaaktOp: new Date().toISOString(),
+        invullingen: [],
+      };
+      organisatie.scanUitvoeringen.push(scanUitvoering);
+      nieuweMetingPerSleutel.set(metingSleutel, scanUitvoering);
+    }
+
+    const invulling: ScanInvulling = {
+      id: nieuwId(),
+      scanUitvoeringId: scanUitvoering.id,
+      organisatieLidId: lid.id,
+      status: rij.status,
+      antwoorden: rij.antwoorden,
+      opmerkingenPerBouwblok: rij.opmerkingenPerBouwblok,
+      uitgenodigdOp: rij.uitgenodigdOp,
+      gestartOp: rij.gestartOp,
+      afgerondOp: rij.afgerondOp,
+      bewaarVerlengdTot: null,
+    };
+    scanUitvoering.invullingen.push(invulling);
+    rijResultaten.push({ organisatieId: organisatie.id, scanUitvoeringId: scanUitvoering.id });
+    geimporteerd++;
+  }
+
+  slaAlles(alles);
+  return { geimporteerd, rijResultaten };
+}

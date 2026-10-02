@@ -18,17 +18,9 @@ export function exporteerScansCsv(rijen: CsvRijContext[]): void {
   downloadTekstBestand(csv, bestandsnaam, "text/csv;charset=utf-8");
 }
 
-/** PDF van precies één scan; `false` bij een mislukte export, de aanroeper meldt dat. */
-export async function exporteerScanPdf({ organisatie, lid, invulling, assessment }: CsvRijContext): Promise<boolean> {
+/** Vraagt de PDF aan bij de server en laat de browser hem downloaden; `false` bij een mislukte export, de aanroeper meldt dat. */
+export async function downloadPdf(payload: ExportPdfPayload): Promise<boolean> {
   try {
-    const payload: ExportPdfPayload = {
-      assessment,
-      antwoorden: invulling.antwoorden,
-      opmerkingenPerBouwblok: invulling.opmerkingenPerBouwblok,
-      organisatieNaam: organisatie.naam,
-      respondentNaam: lid.naam ?? lid.email,
-      afgerondOp: invulling.afgerondOp,
-    };
     const response = await fetch("/api/export-pdf", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -39,13 +31,25 @@ export async function exporteerScanPdf({ organisatie, lid, invulling, assessment
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = pdfBestandsnaam(assessment, organisatie.naam);
+    link.download = pdfBestandsnaam(payload.assessment, payload.organisatieNaam);
     link.click();
     URL.revokeObjectURL(url);
     return true;
   } catch {
     return false;
   }
+}
+
+/** PDF van precies één scan. */
+export function exporteerScanPdf({ organisatie, lid, invulling, assessment }: CsvRijContext): Promise<boolean> {
+  return downloadPdf({
+    assessment,
+    antwoorden: invulling.antwoorden,
+    opmerkingenPerBouwblok: invulling.opmerkingenPerBouwblok,
+    organisatieNaam: organisatie.naam,
+    respondentNaam: lid.naam ?? lid.email,
+    afgerondOp: invulling.afgerondOp,
+  });
 }
 
 /** InDesign-export (XML + charts) van precies één scan. */

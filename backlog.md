@@ -129,9 +129,27 @@ Bewust nog niet opgepakt. Geen prioritering.
 
 ## Uit de scan van 2 oktober 2026
 
-Gevonden bij een scan van de hele oplossing. De volgorde is bewust: Eerst
-alle functionaliteit afronden, dan de database en rollen en rechten, en
-daarna deployment, beveiliging en stabiliteit. Niets hieronder is opgepakt.
+Gevonden bij een scan van de hele oplossing. De volgorde: Eerst alle
+functionaliteit afronden, dan de database en rollen en rechten, en daarna
+deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
+"Gedaan" hieronder en `changelog.md`.
+
+### Gedaan (2 oktober 2026)
+
+- Next.js naar 16.3.8 (kritieke RCE), `npm audit` schoon.
+- `/api/mail` en `lib/mailer.ts` verwijderd (open mailrelay, ongebruikt).
+- De sleutel `gebruikers` gaat niet meer via `/api/store` en de rij met
+  wachtwoorden is uit Neon verwijderd. Gebruikers leven nu per browser.
+- `/api/store` begrenst de bodygrootte, `/api/export-pdf` begrenst grootte en
+  gelijktijdige headless browsers. Dev-server alleen op `127.0.0.1`.
+- Tests met vitest (`npm test`): scoring, importdetectie, verplaats- en
+  samenvoeglogica.
+- Opgeruimd: `lib/db.ts` gesplitst in `lib/db/`, de Content-pagina gesplitst,
+  exportcode in de respondentpagina's naar `lib/scan-export.ts`, het oude
+  prototype naar `archief-prototype/`.
+- Toegankelijkheid: Focusval en focus terug in de modals, zichtbare focus bij
+  toetsenbordnavigatie, een knop "Bekijk >>" in elke klikbare rij.
+- Gecommit (checkpoints), zodat teruggezette specs direct te zien zijn.
 
 ### Fase 1: Functioneel afronden
 
@@ -139,49 +157,33 @@ daarna deployment, beveiliging en stabiliteit. Niets hieronder is opgepakt.
   bij verplaatsen en samenvoegen te loggen, zoals de spec voorschrijft.
 - **Content-pagina's** beheerbaar maken (punt 11) en **Organisatievelden**
   zelf beheerbaar met de tab Organisatievelden (punt 3).
-- **Paginering** van de lijsten Respondenten en Ingevulde scans (en de
-  filters in de URL), zodra er meer data is.
+- **Paginering** van de lijsten Respondenten en Ingevulde scans.
 - **Spec en code gelijktrekken**: `Assessment.bouwblokLabel` in de spec
   tegenover `bouwblokEenheidEnkelvoud`/`Meervoud` in de code, en
-  `Bouwblok.centraleVraag` als echt veld tegenover de lookup-tabellen
-  (`datamodel.md`).
+  `Bouwblok.centraleVraag` als echt veld tegenover de lookup-tabellen.
 - **Import**: Twee uploads van dezelfde organisatie geven twee Metingen met
-  dezelfde naam ("Legacy-import 2026"). Bedenk een onderscheidend label of
-  toon de herkomst in de Meting-lijst.
-- **Toegankelijkheid**: Focusval en focus terug in de modals, en de rijen in
-  de lijst Respondenten bereikbaar met het toetsenbord (nu alleen met de muis).
-- **Tests** voor de scoring, de import en de verplaats-/samenvoeglogica in
-  `lib/db.ts`. Een scratch-test met de zes scenario's bestaat al en is het
-  startpunt.
-- **Opruimen**: `lib/db.ts` (1180 regels) en de pagina's voor Content en
-  Import opsplitsen, de exportcode in de twee respondent-resultatenpagina's
-  naar `lib/beheer-export.ts` brengen, en het oude prototype in de root
-  (`index.html`, `css/`, `js/`, `server.ps1`, `designer-preview-homepage.html`)
-  verwijderen.
-- **Versiebeheer**: De wijzigingen vaker committen, zodat teruggezette
-  spec-bestanden direct te zien zijn.
+  dezelfde naam ("Legacy-import 2026"). Bedenk een onderscheidend label.
+- **Opsplitsen** van de Import-pagina (590 regels).
+- **Meer tests**: Import (parsen en valideren van rijen), `scan-slot`, de
+  overige stores.
 
 ### Fase 2: Database en rollen en rechten
 
 - **Eén record per entiteit** in plaats van één JSON-blob per sleutel. Nu
   geldt "laatste schrijver wint" over alle organisaties heen: Twee
   beheerders of tabs overschrijven elkaar, en een pagina-load kan lokale,
-  nog niet gesynchroniseerde wijzigingen overschrijven. Minimaal een
-  versiecontrole (`updated_at`) bij het opslaan.
+  nog niet gesynchroniseerde wijzigingen overschrijven.
 - **Rechten server-side afdwingen**: Nu gebeurt dat alleen in de browser
   en is de sessie een id in `sessionStorage` (`datamodel.md` deel 2).
-- **Wachtwoorden gehasht** opslaan en de sleutel `gebruikers` pas naar de
-  database synchroniseren zodra dat zo is: Nu staan de wachtwoorden in
-  leesbare tekst in Neon.
+- **Wachtwoorden gehasht** en echte inlog met sessies en 2FA, waarna
+  `gebruikers` weer centraal kan.
+- **Respondenten krijgen alleen hun eigen gegevens**: Nu haalt elke browser
+  de volledige blob van alle organisaties op (ook bij een persoonlijke link).
 
 ### Fase 3: Deployment, beveiliging en stabiliteit
 
-- **API-routes beveiligen**: `/api/store/[key]` heeft geen enkele
-  beveiliging (iedereen die de server bereikt kan alles lezen en
-  overschrijven), `/api/mail` is een open mailrelay via het Gmail-account en
-  `/api/export-pdf` start zonder inlog een browser.
-- **Next.js** upgraden naar 16.3.8 (kritieke RCE in `next/og`, GHSA-vcvr-r3jv-pc5j).
-- **Dev-server** alleen op localhost (`next dev -H 127.0.0.1`).
+- **`/api/store` en `/api/export-pdf` beveiligen** met inlog of een
+  respondent-token: Ze zijn nu zonder autorisatie bereikbaar.
 - **PDF-export op serverless hosting**: `puppeteer` per verzoek is daar
   lastig (zie `go-live-plan.md`).
 - **Schrijfverkeer**: Elke wijziging stuurt de hele blob naar Neon. Op

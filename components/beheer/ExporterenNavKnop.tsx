@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useScanInvulling } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
-import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/beheer-export";
+import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/scan-export";
 import { DropdownKnop } from "@/components/DropdownKnop";
 
 /**

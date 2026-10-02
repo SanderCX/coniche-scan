@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useFocusVal } from "@/lib/use-focus-val";
 
 /**
  * Overzichtsmodal (`stylesheet.md`, Overzichtsmodal): dezelfde
@@ -21,6 +22,9 @@ export function OverzichtModal({
   escUitgeschakeld?: boolean;
   children: React.ReactNode;
 }) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  useFocusVal(true, boxRef);
+
   useEffect(() => {
     if (escUitgeschakeld) return;
     function onKeyDown(e: KeyboardEvent) {
@@ -32,7 +36,7 @@ export function OverzichtModal({
 
   return (
     <div className="modal-overlay" onClick={onSluit} role="dialog" aria-modal="true" aria-label={label}>
-      <div className="modal-box modal-box--breed" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-box modal-box--breed" ref={boxRef} tabIndex={-1} onClick={(e) => e.stopPropagation()}>
         <button type="button" onClick={onSluit} aria-label="Sluiten" className="modal-close">
           ✕
         </button>

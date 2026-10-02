@@ -208,6 +208,7 @@ function RespondentenPageInhoud() {
                     </th>
                   ))}
                   <th>Persoonlijke link</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -237,6 +238,11 @@ function RespondentenPageInhoud() {
                       <a href={r.link} target="_blank" rel="noreferrer" className="admin-sort-btn">
                         Openen
                       </a>
+                    </td>
+                    <td onClick={(e) => e.stopPropagation()}>
+                      <button type="button" className="admin-bekijk-knop" onClick={() => open("respondent", r.lidId)}>
+                        Bekijk &gt;&gt;
+                      </button>
                     </td>
                   </tr>
                 ))}

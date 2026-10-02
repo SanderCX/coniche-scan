@@ -10,7 +10,7 @@ import { bouwblokScore, classificatie, overallScore, voortgang } from "@/lib/sco
 import { scoreKleur } from "@/lib/colors";
 import { maakPubliekeLink } from "@/lib/uitnodiging-link";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
-import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/beheer-export";
+import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/scan-export";
 import { Assessment, Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering } from "@/lib/types";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
