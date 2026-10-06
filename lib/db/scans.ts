@@ -1,5 +1,7 @@
 import { Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering, ScanWeergave } from "../types";
 import { laadAlles, slaAlles, useOrganisaties } from "./store";
+import { logAudit, nieuweGroepId } from "../audit-store";
+import { metingContext } from "../audit-context";
 
 /** Ingevulde scans (`ScanInvulling`): opzoeken, bijwerken, intake, bewaartermijn, verwijderen en de integriteitscontrole. */
 
@@ -51,11 +53,23 @@ export function updateScanInvulling(
     for (const scanUitvoering of organisatie.scanUitvoeringen) {
       const index = scanUitvoering.invullingen.findIndex((i) => i.id === scanInvullingId);
       if (index !== -1) {
+        const eerderStatus = scanUitvoering.invullingen[index].status;
         scanUitvoering.invullingen[index] = updater(
           structuredClone(scanUitvoering.invullingen[index])
         );
         slaAlles(alles);
-        return scanUitvoering.invullingen[index];
+        const nu = scanUitvoering.invullingen[index];
+        if (eerderStatus !== "afgerond" && nu.status === "afgerond") {
+          // Door de Respondent zelf: Actor is alleen "Respondent", met de Organisatie in `details`.
+          logAudit({
+            actie: "scan.afgerond",
+            entiteitType: "scan",
+            entiteitId: nu.id,
+            actor: { type: "respondent", id: null, naam: "Respondent" },
+            details: metingContext(organisatie, scanUitvoering),
+          });
+        }
+        return nu;
       }
     }
   }
@@ -91,6 +105,13 @@ export function voltooiIntake(
     gestartOp: new Date().toISOString(),
   };
   slaAlles(alles);
+  logAudit({
+    actie: "scan.gestart",
+    entiteitType: "scan",
+    entiteitId: invulling.id,
+    actor: { type: "respondent", id: null, naam: "Respondent" },
+    details: metingContext(organisatie, scanUitvoering),
+  });
 }
 
 /**
@@ -105,6 +126,15 @@ export function verlengBewaartermijn(scanInvullingId: string, verlengTermijnDage
     nieuweDatum.setDate(nieuweDatum.getDate() + verlengTermijnDagen);
     return { ...invulling, bewaarVerlengdTot: nieuweDatum.toISOString() };
   });
+  const gevonden = zoekScanInvulling(laadAlles(), scanInvullingId);
+  if (gevonden) {
+    logAudit({
+      actie: "scan.bewaartermijnVerlengd",
+      entiteitType: "scan",
+      entiteitId: scanInvullingId,
+      details: { ...metingContext(gevonden.organisatie, gevonden.scanUitvoering), verlengTermijnDagen },
+    });
+  }
 }
 
 /**
@@ -117,36 +147,22 @@ export function verlengBewaartermijn(scanInvullingId: string, verlengTermijnDage
 export function verwijderScanInvullingen(scanInvullingIds: string[]): void {
   const ids = new Set(scanInvullingIds);
   const alles = laadAlles();
+  const gelogd: Parameters<typeof logAudit>[0] = [];
+  const groepId = scanInvullingIds.length > 1 ? nieuweGroepId() : null;
   for (const organisatie of alles) {
     for (const scanUitvoering of organisatie.scanUitvoeringen) {
+      for (const invulling of scanUitvoering.invullingen.filter((i) => ids.has(i.id))) {
+        gelogd.push({
+          actie: "scan.verwijderd",
+          entiteitType: "scan",
+          entiteitId: invulling.id,
+          groepId,
+          details: { ...metingContext(organisatie, scanUitvoering), status: invulling.status },
+        });
+      }
       scanUitvoering.invullingen = scanUitvoering.invullingen.filter((i) => !ids.has(i.id));
     }
   }
   slaAlles(alles);
-}
-
-/**
- * "Geen achterblijvende data na verwijderen" (v1-aanpassingen.md punt 14):
- * controleert of elke ScanInvulling nog naar een bestaand lid wijst.
- * Organisaties/scanuitvoeringen/invullingen kunnen zelf niet verweesd
- * raken (ze zitten genest in hun eigen ouder, dus verdwijnen automatisch
- * met die ouder) — dit is de enige plek waar dat WEL kan: `verwijderLeden`
- * moet cascaderen naar alle scanuitvoeringen van de organisatie. Lege
- * lijst = geen achterblijvende data gevonden.
- */
-export function controleerDataIntegriteit(): string[] {
-  const problemen: string[] = [];
-  for (const organisatie of laadAlles()) {
-    const ledenIds = new Set(organisatie.leden.map((l) => l.id));
-    for (const scanUitvoering of organisatie.scanUitvoeringen) {
-      for (const invulling of scanUitvoering.invullingen) {
-        if (!ledenIds.has(invulling.organisatieLidId)) {
-          problemen.push(
-            `Invulling ${invulling.id} (meting "${scanUitvoering.label}" bij organisatie "${organisatie.naam}") verwijst naar een niet-bestaand lid ${invulling.organisatieLidId}.`
-          );
-        }
-      }
-    }
-  }
-  return problemen;
+  logAudit(gelogd);
 }

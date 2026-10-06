@@ -8,14 +8,13 @@ import { useBulkSelect } from "@/lib/useBulkSelect";
 import { IndeterminateCheckbox } from "@/components/beheer/IndeterminateCheckbox";
 import { BulkToolbar } from "@/components/beheer/BulkToolbar";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
-import { InfoIcoon } from "@/components/InfoIcoon";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { isAdmin, isConsultant, zichtbareOrganisaties } from "@/lib/rechten";
 import { useGebruikers } from "@/lib/gebruikers-store";
 import { Assessment, Organisatie, ScanUitvoering } from "@/lib/types";
-import { alleBouwblokResultaten, gemiddeldeAntwoordenVoorMeting, overallScore } from "@/lib/scoring";
+import { gemiddeldeAntwoordenVoorMeting, overallScore } from "@/lib/scoring";
 import { scoreKleur } from "@/lib/colors";
-import { isOuderDanBewaartermijn, useInstellingen, zetInstellingen } from "@/lib/instellingen-store";
+import { isOuderDanBewaartermijn, useInstellingen } from "@/lib/instellingen-store";
 
 /**
  * Score en Voortgang op de Consultant-lijst (beheerpagina.md punt 4,
@@ -32,8 +31,7 @@ function meestRecenteMetingMetAfgerond(organisatie: Organisatie): ScanUitvoering
 
 function ScoreEnVoortgang({ meting, assessment }: { meting: ScanUitvoering; assessment: Assessment }) {
   const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMeting(assessment, meting.invullingen);
-  const bouwblokResultaten = alleBouwblokResultaten(assessment, gemiddeldeAntwoorden);
-  const score = overallScore(bouwblokResultaten.map((r) => r.score));
+  const score = overallScore(assessment, gemiddeldeAntwoorden);
   const afgerond = meting.invullingen.filter((i) => i.status === "afgerond").length;
   const totaal = meting.invullingen.length;
   const volledigAfgerond = afgerond === totaal;
@@ -81,27 +79,13 @@ interface VerlopenRij {
 function BewaartermijnBlok({
   organisaties,
   assessments,
-  magInstellingenWijzigen,
+  isAdminGebruiker,
 }: {
   organisaties: Organisatie[];
   assessments: Assessment[];
-  magInstellingenWijzigen: boolean;
+  isAdminGebruiker: boolean;
 }) {
   const instellingen = useInstellingen();
-  const [bewaarInput, setBewaarInput] = useState(String(instellingen.bewaarTermijnDagen ?? ""));
-  const [verlengInput, setVerlengInput] = useState(String(instellingen.verlengTermijnDagen ?? ""));
-  const [opgeslagen, setOpgeslagen] = useState(false);
-
-  function handleInstellingenOpslaan(e: React.FormEvent) {
-    e.preventDefault();
-    zetInstellingen({
-      bewaarTermijnDagen: bewaarInput.trim() ? Number(bewaarInput) : null,
-      verlengTermijnDagen: verlengInput.trim() ? Number(verlengInput) : null,
-    });
-    setOpgeslagen(true);
-    setTimeout(() => setOpgeslagen(false), 1600);
-  }
-
   const verlopenRijen: VerlopenRij[] = organisaties.flatMap((org) =>
     org.scanUitvoeringen.flatMap((meting) => {
       const assessment = assessments.find((a) => a.id === meting.assessmentId);
@@ -164,7 +148,7 @@ function BewaartermijnBlok({
   return (
     <details className="admin-bouwblok-card mt-10">
       <summary>
-        <span className="admin-bouwblok-titel">Bewaartermijn ingevulde scans</span>
+        <span className="admin-bouwblok-titel">Data ouder dan de bewaartermijn</span>
       </summary>
 
       <BevestigModal
@@ -177,46 +161,15 @@ function BewaartermijnBlok({
       />
 
       <div className="mt-3">
-        {magInstellingenWijzigen ? (
-          <form onSubmit={handleInstellingenOpslaan} className="flex flex-wrap items-end gap-3">
-            <div className="admin-field" style={{ marginBottom: 0, maxWidth: "12rem" }}>
-              <label>Bewaartermijn (dagen)</label>
-              <input
-                type="number"
-                min={1}
-                value={bewaarInput}
-                onChange={(e) => setBewaarInput(e.target.value)}
-                placeholder="Geen termijn ingesteld"
-              />
-            </div>
-            <div className="admin-field" style={{ marginBottom: 0, maxWidth: "12rem" }}>
-              <label>Verlenging (dagen)</label>
-              <input
-                type="number"
-                min={1}
-                value={verlengInput}
-                onChange={(e) => setVerlengInput(e.target.value)}
-                placeholder="Nog niet ingesteld"
-              />
-            </div>
-            <button type="submit" className="btn btn-or btn-compact">
-              Opslaan
-            </button>
-            <InfoIcoon naastVeld>
-              Zonder ingestelde bewaartermijn verschijnt hier nooit een scan: Er is geen automatische
-              verwijdering, alleen een melding zodra jij een termijn instelt.
-            </InfoIcoon>
-            {opgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
-          </form>
-        ) : (
-          <p className="text-sm text-ink-m">
-            Bewaartermijn: {instellingen.bewaarTermijnDagen ?? "niet ingesteld"} dagen ·
-            Verlenging: {instellingen.verlengTermijnDagen ?? "niet ingesteld"} dagen{" "}
-            <InfoIcoon>
-              Alleen een Admin kan deze instellingen wijzigen. Zonder ingestelde bewaartermijn
-              verschijnt hier nooit een scan: Er is geen automatische verwijdering, alleen een
-              melding zodra een Admin een termijn instelt.
-            </InfoIcoon>
+        {instellingen.bewaarTermijnDagen === null && (
+          <p className="admin-notice">
+            Er is nog geen bewaartermijn ingesteld, dus er verschijnt hier niets.
+            {isAdminGebruiker && (
+              <>
+                {" "}
+                <Link href="/beheer/instellingen">Stel de bewaartermijn in bij Instellingen →</Link>
+              </>
+            )}
           </p>
         )}
 
@@ -235,7 +188,6 @@ function BewaartermijnBlok({
                     <th>Respondent</th>
                     <th>Meting</th>
                     <th>Afgerond op</th>
-                    <th>Eerder verlengd tot</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -248,27 +200,21 @@ function BewaartermijnBlok({
                         {rij.metingLabel} — {rij.assessmentNaam}
                       </td>
                       <td>{new Date(rij.afgerondOp).toLocaleDateString("nl-NL")}</td>
-                      <td>{rij.verlengdTot ? new Date(rij.verlengdTot).toLocaleDateString("nl-NL") : ""}</td>
                       <td>
-                        <button
-                          type="button"
-                          className="admin-sort-btn"
-                          onClick={() => setTeVerwijderen(rij)}
-                        >
-                          Verwijderen
-                        </button>
-                        {instellingen.verlengTermijnDagen !== null && (
-                          <>
-                            {" · "}
+                        <div className="knoppenrij">
+                          <button type="button" className="btn btn-danger btn-compact" onClick={() => setTeVerwijderen(rij)}>
+                            Verwijderen
+                          </button>
+                          {instellingen.verlengTermijnDagen !== null && (
                             <button
                               type="button"
-                              className="admin-sort-btn"
+                              className="btn btn-outline btn-compact"
                               onClick={() => handleVerlengen(rij.scanInvullingId)}
                             >
                               Verlengen
                             </button>
-                          </>
-                        )}
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -431,7 +377,7 @@ export default function OrganisatiesPage() {
       <BewaartermijnBlok
         organisaties={organisaties}
         assessments={assessments}
-        magInstellingenWijzigen={isAdmin(gebruiker)}
+        isAdminGebruiker={isAdmin(gebruiker)}
       />
     </div>
   );

@@ -8,6 +8,7 @@ import { useBeheerOverzicht } from "@/lib/beheer-url";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { RespondentOverzicht } from "@/components/beheer/RespondentOverzicht";
 import { ScanOverzicht } from "@/components/beheer/ScanOverzicht";
+import { MetBewerkslot } from "@/components/beheer/MetBewerkslot";
 
 /**
  * Rendert het Respondent- of Scan-overzicht als `?respondent=<id>` of
@@ -29,13 +30,14 @@ export function BeheerOverzichten() {
     if (!organisatie || !lid) return <NietGevonden onSluit={sluit} wat="Respondent" />;
     if (!magOrganisatieToegang(ingelogd, organisatie)) return <GeenToegang onSluit={sluit} />;
     return (
-      <RespondentOverzicht
-        key={lid.id}
-        organisatie={organisatie}
-        lid={lid}
-        onSluit={sluit}
-        onOpenScan={(id) => vervang("scan", id)}
-      />
+      <MetBewerkslot key={lid.id} type="respondent" id={lid.id} wat="Respondent" onSluit={sluit}>
+        <RespondentOverzicht
+          organisatie={organisatie}
+          lid={lid}
+          onSluit={sluit}
+          onOpenScan={(id) => vervang("scan", id)}
+        />
+      </MetBewerkslot>
     );
   }
 

@@ -185,8 +185,7 @@ function RespondentenPageInhoud() {
               <button
                 type="button"
                 onClick={() => set({ organisatie: null, meting: null, status: null, q: null })}
-                className="text-sm text-ink-m hover:text-ink"
-                style={{ paddingBottom: "0.7rem" }}
+                className="btn btn-outline btn-compact"
               >
                 Filters wissen
               </button>
@@ -231,17 +230,18 @@ function RespondentenPageInhoud() {
                       <RespondentStatusBadge invullingen={r.invullingen} />
                     </td>
                     <td onClick={(e) => e.stopPropagation()}>
-                      <button type="button" className="admin-sort-btn" onClick={() => kopieer(r.lidId, r.link)}>
+                      <div className="knoppenrij">
+                        <button type="button" className="btn btn-outline btn-compact" onClick={() => kopieer(r.lidId, r.link)}>
                         {kopieerId?.id === r.lidId ? (kopieerId.gelukt ? "Gekopieerd!" : "Mislukt, opnieuw") : "Kopieer link"}
-                      </button>
-                      {" · "}
-                      <a href={r.link} target="_blank" rel="noreferrer" className="admin-sort-btn">
-                        Openen
-                      </a>
+                        </button>
+                        <a href={r.link} target="_blank" rel="noreferrer" className="btn btn-outline btn-compact">
+                          Openen
+                        </a>
+                      </div>
                     </td>
                     <td onClick={(e) => e.stopPropagation()}>
-                      <button type="button" className="admin-bekijk-knop" onClick={() => open("respondent", r.lidId)}>
-                        Bekijk &gt;&gt;
+                      <button type="button" className="btn btn-outline btn-compact" onClick={() => open("respondent", r.lidId)}>
+                        Bekijk
                       </button>
                     </td>
                   </tr>

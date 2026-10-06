@@ -5,16 +5,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
 import {
   bewerkRespondent,
-  nodigLidUit,
   useOrganisaties,
   verwijderLeden,
   vindRespondentConflict,
-  zetLeadMetingen,
 } from "@/lib/db";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magLeadToekennen, magRespondentVerwijderen, zichtbareOrganisaties } from "@/lib/rechten";
 import { maakPubliekeLink } from "@/lib/uitnodiging-link";
-import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { downloadAvgInzage } from "@/lib/avg-inzage";
 import { overzichtHref } from "@/lib/beheer-url";
 import { Organisatie, OrganisatieLid } from "@/lib/types";
@@ -24,6 +21,7 @@ import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { RespondentStatusBadge, STATUS_LABEL } from "@/components/beheer/overzicht-helpers";
+import { ToegangBlok } from "@/components/beheer/ToegangBlok";
 import {
   NaarAndereMetingStap,
   NaarAndereOrganisatieStap,
@@ -40,7 +38,6 @@ interface GegevensInput {
 }
 
 type Stap =
-  | { soort: "lead" }
   | { soort: "verplaatsen" }
   | { soort: "scan-meting"; invullingId: string }
   | { soort: "scan-org"; invullingId: string }
@@ -50,82 +47,6 @@ interface Melding {
   tekst: string;
   details?: string[];
   fout?: boolean;
-}
-
-/** Lead-acties van punt 6a achter één knop "Beheren": toegang per Meting, Vragenlijst sturen, link. */
-function LeadBeherenStap({
-  organisatie,
-  lid,
-  onTerug,
-}: {
-  organisatie: Organisatie;
-  lid: OrganisatieLid;
-  onTerug: () => void;
-}) {
-  const assessments = useAssessments();
-  const [kopieerGelukt, setKopieerGelukt] = useState<boolean | null>(null);
-  const link = maakPubliekeLink(window.location.origin, lid);
-
-  function toggle(metingId: string, aan: boolean) {
-    zetLeadMetingen(lid.id, aan ? [...lid.leadMetingIds, metingId] : lid.leadMetingIds.filter((id) => id !== metingId));
-  }
-
-  async function kopieer() {
-    setKopieerGelukt(await kopieerNaarKlembord(link));
-    setTimeout(() => setKopieerGelukt(null), 1600);
-  }
-
-  return (
-    <div>
-      <button type="button" className="overzicht-stap-terug" onClick={onTerug}>
-        ← Terug
-      </button>
-      <h2 className="mb-3 text-lg font-bold text-ink">Lead-toegang beheren</h2>
-      <p className="text-sm text-ink-m mb-3">
-        Een Lead ziet de resultaten van de Metingen die hier zijn aangevinkt en kan voor die Metingen respondenten
-        uitnodigen. Alles uitvinken trekt de Lead-rol in.
-      </p>
-      {organisatie.scanUitvoeringen.length === 0 ? (
-        <p className="overzicht-melding fout">Plan eerst een Meting voordat je Lead-toegang kunt geven.</p>
-      ) : (
-        organisatie.scanUitvoeringen.map((s) => {
-          const heeftInvulling = s.invullingen.some((i) => i.organisatieLidId === lid.id);
-          const assessmentNaam = assessments.find((a) => a.id === s.assessmentId)?.naam ?? "Onbekend type";
-          return (
-            <div key={s.id} className="overzicht-stap-rij" style={{ flexDirection: "row", alignItems: "center", gap: "0.8rem" }}>
-              <label className="flex flex-1 items-center gap-2">
-                <input type="checkbox" checked={lid.leadMetingIds.includes(s.id)} onChange={(e) => toggle(s.id, e.target.checked)} />
-                <span>
-                  {s.label} <span className="text-ink-s">— {assessmentNaam}</span>
-                </span>
-              </label>
-              {!heeftInvulling && (
-                <button type="button" className="admin-bekijk-knop" onClick={() => nodigLidUit(s.id, lid.email, true)}>
-                  Vragenlijst sturen
-                </button>
-              )}
-            </div>
-          );
-        })
-      )}
-      {lid.leadMetingIds.length > 0 && (
-        <div className="overzicht-link-rij" style={{ marginTop: "1rem" }}>
-          <input type="text" readOnly value={link} />
-          <button type="button" className="btn btn-outline btn-compact" onClick={kopieer}>
-            {kopieerGelukt === null ? "Kopieer" : kopieerGelukt ? "Gekopieerd!" : "Mislukt"}
-          </button>
-          <a href={link} target="_blank" rel="noreferrer" className="admin-bekijk-knop">
-            Openen
-          </a>
-        </div>
-      )}
-      <div className="btn-rij" style={{ marginTop: "1.2rem" }}>
-        <button type="button" className="btn btn-or" onClick={onTerug}>
-          Klaar
-        </button>
-      </div>
-    </div>
-  );
 }
 
 /**
@@ -162,7 +83,6 @@ export function RespondentOverzicht({
   });
   const [melding, setMelding] = useState<Melding | null>(null);
   const [verwijderenOpen, setVerwijderenOpen] = useState(false);
-  const [kopieerGelukt, setKopieerGelukt] = useState<boolean | null>(null);
 
   const scans = organisatie.scanUitvoeringen.flatMap((s) =>
     s.invullingen.filter((i) => i.organisatieLidId === lid.id).map((i) => ({ meting: s, invulling: i }))
@@ -172,11 +92,6 @@ export function RespondentOverzicht({
   const assessmentNaam = (id: string) => assessments.find((a) => a.id === id)?.naam ?? "Onbekend type";
   const magLead = magLeadToekennen(ingelogd, organisatie);
   const magVerwijderen = magRespondentVerwijderen(ingelogd, organisatie);
-
-  async function kopieer() {
-    setKopieerGelukt(await kopieerNaarKlembord(link));
-    setTimeout(() => setKopieerGelukt(null), 1600);
-  }
 
   function beschrijfOvergeslagen(overgeslagen: { metingLabel?: string; reden: string }[]): string[] {
     return overgeslagen.map((o) => (o.metingLabel ? `${o.metingLabel}: ${o.reden}` : o.reden));
@@ -235,9 +150,7 @@ export function RespondentOverzicht({
   const terug = () => setStap(null);
 
   let inhoud: React.ReactNode;
-  if (stap?.soort === "lead") {
-    inhoud = <LeadBeherenStap organisatie={organisatie} lid={lid} onTerug={terug} />;
-  } else if (stap?.soort === "scan-meting") {
+  if (stap?.soort === "scan-meting") {
     inhoud = (
       <NaarAndereMetingStap
         organisatie={organisatie}
@@ -381,10 +294,7 @@ export function RespondentOverzicht({
                 >
                   Annuleren
                 </button>
-                <InfoIcoon naastVeld>
-                  De persoonlijke link blijft ongewijzigd, ook na een nieuw e-mailadres. Een wijziging geldt voor
-                  alle scans van deze Respondent.
-                </InfoIcoon>
+                <InfoIcoon naastVeld sleutel="info.respondentBewerken" />
               </div>
             </form>
           ) : (
@@ -403,32 +313,13 @@ export function RespondentOverzicht({
           )}
         </section>
 
-        <section className="overzicht-blok">
-          <div className="overzicht-blok-kop">
-            <h3>Toegang</h3>
-          </div>
-          <div className="overzicht-link-rij">
-            <input type="text" readOnly value={link} aria-label="Persoonlijke link" />
-            <button type="button" className="btn btn-outline btn-compact" onClick={kopieer}>
-              {kopieerGelukt === null ? "Kopieer" : kopieerGelukt ? "Gekopieerd!" : "Mislukt"}
-            </button>
-            <a href={link} target="_blank" rel="noreferrer" className="admin-bekijk-knop">
-              Openen
-            </a>
-          </div>
-          <div className="overzicht-scanregel" style={{ borderBottom: "none", paddingBottom: 0 }}>
-            <span>
-              {lid.leadMetingIds.length === 0
-                ? "Geen Lead"
-                : `Lead voor ${lid.leadMetingIds.length} ${lid.leadMetingIds.length === 1 ? "Meting" : "Metingen"}`}
-            </span>
-            {magLead && (
-              <button type="button" className="btn btn-outline btn-compact" onClick={() => setStap({ soort: "lead" })}>
-                Beheren
-              </button>
-            )}
-          </div>
-        </section>
+        <ToegangBlok
+          organisatie={organisatie}
+          lid={lid}
+          link={link}
+          magLead={magLead}
+          onMelding={(tekst, fout) => setMelding({ tekst, fout })}
+        />
 
         <section className="overzicht-blok">
           <div className="overzicht-blok-kop">
@@ -441,7 +332,7 @@ export function RespondentOverzicht({
               <div key={invulling.id} className="overzicht-scanregel">
                 <button
                   type="button"
-                  className="admin-bekijk-knop"
+                  className="btn btn-outline btn-compact"
                   style={{ textAlign: "left", whiteSpace: "normal" }}
                   onClick={() => onOpenScan(invulling.id)}
                 >

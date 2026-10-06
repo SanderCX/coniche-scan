@@ -8,8 +8,10 @@ import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { BouwblokEditor } from "@/components/beheer/BouwblokEditor";
 import { addCategorie, patchCategorie, removeCategorie, herstelCategorie, addBouwblok, herstelBouwblok, schakelCategorieLaag, patchFeatureCard, addFeatureCard, removeFeatureCard } from "@/lib/assessment-bewerken";
 import { CATEGORIE_COLORS } from "@/lib/colors";
-import { AssessmentIcon, ASSESSMENT_ICONS } from "@/components/icons/AssessmentIcons";
+import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
 import { InfoIcoon } from "@/components/InfoIcoon";
+import { WegingBeheer } from "@/components/beheer/WegingBeheer";
+import { STANDAARD_WEGINGTEKST } from "@/lib/weging";
 
 /** Vaste lijst, zie lib/types.ts `ContentBron` en export-pdf-visual-volwassenheidsscan.md, "Slotsectie per scan-type". */
 const SLOTSECTIE_OPTIES: { bron: ContentBron; titel: string }[] = [
@@ -80,11 +82,7 @@ export default function ContentEditorPage({
                 placeholder="Een emoji, bijv. 🩺"
                 className="w-full rounded-lg border border-gray-200 p-2 text-sm"
               />
-              <InfoIcoon>
-                Een letterlijke emoji (datamodel.md, Assessment.icoon), bijv. 🩺. De sleutels{" "}
-                {Object.keys(ASSESSMENT_ICONS).map((k) => `“${k}”`).join(" en ")} geven in plaats daarvan
-                een eigen SVG-icoon.
-              </InfoIcoon>
+              <InfoIcoon sleutel="info.contentIcoon" />
             </div>
           </label>
           <label className="block text-sm sm:col-span-2">
@@ -170,6 +168,42 @@ export default function ContentEditorPage({
           </label>
         </div>
 
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label className="block text-sm">
+            <span className="mb-1 block text-ink">Bouwblok-label</span>
+            <div className="flex items-center gap-2">
+              <input
+                value={assessment.bouwblokLabel}
+                onChange={(e) => updateAssessment(assessmentId, (a) => ({ ...a, bouwblokLabel: e.target.value }))}
+                placeholder="Bouwsteen / AI-domein"
+                className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+              />
+              <InfoIcoon sleutel="info.contentBouwblokLabel" />
+            </div>
+          </label>
+          <label className="block text-sm">
+            <span className="mb-1 block text-ink">Titel wegingskaart</span>
+            <input
+              value={assessment.wegingTitel ?? ""}
+              onChange={(e) => updateAssessment(assessmentId, (a) => ({ ...a, wegingTitel: e.target.value || null }))}
+              placeholder="Gewogen scoring"
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+            />
+          </label>
+          <label className="block text-sm sm:col-span-2">
+            <span className="mb-1 block text-ink">Tekst wegingskaart</span>
+            <textarea
+              value={assessment.wegingToelichting ?? ""}
+              onChange={(e) =>
+                updateAssessment(assessmentId, (a) => ({ ...a, wegingToelichting: e.target.value || null }))
+              }
+              rows={2}
+              placeholder={STANDAARD_WEGINGTEKST}
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+            />
+          </label>
+        </div>
+
         <label className="mt-4 flex items-center gap-2 text-sm text-ink">
           <input
             type="checkbox"
@@ -234,10 +268,7 @@ export default function ContentEditorPage({
                 />
               </label>
             )}
-            <InfoIcoon>
-              Titel en bron uit een vaste lijst, zie export-pdf-visual-volwassenheidsscan.md, &quot;Slotsectie
-              per scan-type&quot;.
-            </InfoIcoon>
+            <InfoIcoon sleutel="info.contentSlotsectie" />
           </div>
         </div>
 
@@ -293,7 +324,7 @@ export default function ContentEditorPage({
               <button
                 type="button"
                 onClick={() => removeFeatureCard(assessmentId, i)}
-                className="text-sm text-red-600 hover:underline"
+                className="btn btn-outline btn-compact"
               >
                 Verwijderen
               </button>
@@ -361,26 +392,13 @@ export default function ContentEditorPage({
                         </option>
                       ))}
                     </select>
-                    <label className="flex items-center gap-1 text-xs text-ink-m" onClick={(e) => e.stopPropagation()}>
-                      Gewicht
-                      <input
-                        type="number"
-                        min={0}
-                        step={0.1}
-                        value={categorie.gewicht}
-                        onChange={(e) =>
-                          patchCategorie(assessmentId, categorie.id, { gewicht: Number(e.target.value) })
-                        }
-                        className="w-16 rounded-lg border border-gray-200 p-1 text-sm"
-                      />
-                    </label>
                     <button
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();
                         setCategorieArchiveren(categorie);
                       }}
-                      className="text-sm text-red-600 hover:underline"
+                      className="btn btn-outline btn-compact"
                     >
                       Archiveren
                     </button>
@@ -420,7 +438,7 @@ export default function ContentEditorPage({
                                 <button
                                   type="button"
                                   onClick={() => herstelBouwblok(assessmentId, categorie.id, bouwblok.id)}
-                                  className="text-ink-m underline hover:text-ink"
+                                  className="btn btn-outline btn-compact"
                                 >
                                   Herstellen
                                 </button>
@@ -448,7 +466,7 @@ export default function ContentEditorPage({
                         <button
                           type="button"
                           onClick={() => herstelCategorie(assessmentId, categorie.id)}
-                          className="text-ink-m underline hover:text-ink"
+                          className="btn btn-outline btn-compact"
                         >
                           Herstellen
                         </button>
@@ -486,7 +504,7 @@ export default function ContentEditorPage({
                         <button
                           type="button"
                           onClick={() => herstelBouwblok(assessmentId, null, bouwblok.id)}
-                          className="text-ink-m underline hover:text-ink"
+                          className="btn btn-outline btn-compact"
                         >
                           Herstellen
                         </button>
@@ -498,6 +516,8 @@ export default function ContentEditorPage({
           </div>
         )}
       </section>
+
+      <WegingBeheer assessment={assessment} />
 
       <BevestigModal
         open={categorieArchiveren !== null}

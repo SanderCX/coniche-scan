@@ -3,6 +3,7 @@ import { Assessment, Bouwblok, Vraag } from "./types";
 import { assessments as seedAssessments } from "@/data/assessments";
 import { nieuwId } from "./id";
 import { haalServerKopieOp, stuurNaarServer } from "./server-sync";
+import { verrijkAssessment } from "./assessment-migratie";
 
 const KEY = "coniche-scan:assessments";
 const SERVER_SLEUTEL = "assessments";
@@ -45,7 +46,7 @@ if (typeof window !== "undefined") {
 function parseSnapshot(snapshot: string): Assessment[] {
   if (snapshot === SERVER_SENTINEL) return seedAssessments;
   try {
-    return JSON.parse(snapshot) as Assessment[];
+    return (JSON.parse(snapshot) as Assessment[]).map(verrijkAssessment);
   } catch {
     return seedAssessments;
   }
@@ -94,6 +95,9 @@ export function createAssessment(input: { naam: string; kortLabel: string }): As
     doelgroep: "",
     icoon: "sparkle",
     geschatteDuur: "",
+    bouwblokLabel: "Bouwsteen",
+    wegingTitel: null,
+    wegingToelichting: null,
     kortLabel: input.kortLabel,
     pdfContentSecties: null,
     categorieen: null,

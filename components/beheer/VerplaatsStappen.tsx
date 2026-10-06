@@ -1,5 +1,6 @@
 "use client";
 
+import { openConflict } from "@/components/beheer/ConflictHost";
 import { useMemo, useState } from "react";
 import { useAssessments } from "@/lib/assessment-store";
 import {
@@ -22,7 +23,8 @@ import { Organisatie, OrganisatieLid, ScanUitvoering } from "@/lib/types";
 
 export interface ScanVerplaatsResultaat {
   verplaatst: number;
-  overgeslagen: { scanInvullingId: string; reden: string }[];
+  /** `conflict` is gezet als de reden is dat de Respondent in de doel-Meting al een scan heeft ("Conflict oplossen"). */
+  overgeslagen: { scanInvullingId: string; reden: string; conflict?: { doelMetingId: string } }[];
   doelLabel: string;
 }
 
@@ -108,8 +110,10 @@ export function NaarAndereMetingStap({
   const [keuze, setKeuze] = useState(opties[0]?.id ?? NIEUW);
   const [label, setLabel] = useState("");
   const [fout, setFout] = useState<string | null>(null);
+  const [conflict, setConflict] = useState<{ doelMetingId: string } | null>(null);
 
   function bevestig() {
+    setConflict(null);
     const doelId = keuze === NIEUW ? null : keuze;
     const doelLabel = doelId ? (opties.find((s) => s.id === doelId)?.label ?? "") : label.trim();
     if (!doelId && !label.trim()) {
@@ -120,6 +124,7 @@ export function NaarAndereMetingStap({
       const r = verplaatsResponsNaarMeting(invullingIds[0], doelId, label);
       if (!r.ok) {
         setFout(r.reden ?? "Verplaatsen is niet gelukt.");
+        setConflict(r.conflict ?? null);
         return;
       }
       onKlaar({ verplaatst: 1, overgeslagen: [], doelLabel });
@@ -140,6 +145,17 @@ export function NaarAndereMetingStap({
       </p>
       <MetingKeuze metingen={opties} waarde={keuze} onWaarde={setKeuze} label={label} onLabel={setLabel} />
       {fout && <p className="overzicht-melding fout">{fout}</p>}
+      {conflict && (
+        <div className="knoppenrij" style={{ marginTop: "0.6rem" }}>
+          <button
+            type="button"
+            className="btn btn-outline btn-compact"
+            onClick={() => openConflict({ organisatieId: organisatie.id, scanId: invullingIds[0], doelMetingId: conflict.doelMetingId })}
+          >
+            Conflict oplossen
+          </button>
+        </div>
+      )}
       <div className="btn-rij" style={{ marginTop: "1.2rem" }}>
         <button type="button" className="btn btn-outline" onClick={onTerug}>
           Annuleren

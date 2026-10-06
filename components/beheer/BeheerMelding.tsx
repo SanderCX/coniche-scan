@@ -7,6 +7,8 @@ import { usePathname } from "next/navigation";
 export interface BeheerMeldingInhoud {
   tekst: string;
   link?: { href: string; label: string };
+  /** Knoppen in de melding, bijv. "Conflict oplossen" bij een overgeslagen scan. */
+  acties?: { label: string; onClick: () => void }[];
 }
 
 let huidig: BeheerMeldingInhoud | null = null;
@@ -49,6 +51,15 @@ export function BeheerMeldingBalk() {
                 {melding.link.label}
               </Link>
             </>
+          )}
+          {melding.acties && melding.acties.length > 0 && (
+            <span className="knoppenrij" style={{ marginTop: "0.5rem" }}>
+              {melding.acties.map((a) => (
+                <button key={a.label} type="button" className="btn btn-outline btn-compact" onClick={a.onClick}>
+                  {a.label}
+                </button>
+              ))}
+            </span>
           )}
         </span>
         <button type="button" className="admin-sort-btn" onClick={() => zetBeheerMelding(null)} aria-label="Melding sluiten">

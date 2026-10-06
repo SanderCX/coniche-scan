@@ -1,5 +1,6 @@
-import { updateAssessment } from "@/lib/assessment-store";
-import { Assessment, Bouwblok, FeatureCard } from "@/lib/types";
+import { getAssessment, updateAssessment } from "@/lib/assessment-store";
+import { Assessment, Bouwblok, FeatureCard, Organisatie } from "@/lib/types";
+import { AuditInvoer, logAudit, nieuweGroepId } from "@/lib/audit-store";
 import { nieuwId } from "@/lib/id";
 
 /**
@@ -40,7 +41,6 @@ export function addCategorie(assessmentId: string) {
       naam: "Nieuwe categorie",
       kleur: "blauw",
       volgorde: categorieen.length + 1,
-      gewicht: 1,
       bouwblokken: [],
     });
     return { ...a, categorieen };
@@ -50,7 +50,7 @@ export function addCategorie(assessmentId: string) {
 export function patchCategorie(
   assessmentId: string,
   categorieId: string,
-  patch: Partial<{ naam: string; kleur: string; gewicht: number }>
+  patch: Partial<{ naam: string; kleur: string }>
 ) {
   updateAssessment(assessmentId, (a) => ({
     ...a,
@@ -208,7 +208,6 @@ export function schakelCategorieLaag(assessmentId: string, aanzetten: boolean) {
             naam: "Nieuwe categorie",
             kleur: "blauw",
             volgorde: 1,
-            gewicht: 1,
             bouwblokken: a.bouwblokken ?? [],
           },
         ],
@@ -242,4 +241,91 @@ export function removeFeatureCard(assessmentId: string, index: number) {
     ...a,
     featureCards: a.featureCards.filter((_, i) => i !== index),
   }));
+}
+
+export interface GewichtWijziging {
+  bouwblokId: string;
+  /** Nieuw gewicht, groter dan 0. */
+  gewicht: number;
+}
+
+/**
+ * Aantal scans (met minstens één antwoord in dit bouwblok) waarvan de score
+ * verandert als het gewicht van dit bouwblok wijzigt. Dat zijn alle scans
+ * van dit Assessment met een antwoord in het blok: Categorie-, overall- en
+ * Meting-scores rekenen allemaal mee met het gewicht.
+ */
+export function aantalScansMetAntwoordInBouwblok(
+  organisaties: Organisatie[],
+  assessmentId: string,
+  bouwblok: Bouwblok
+): number {
+  const vraagIds = new Set(bouwblok.vragen.map((v) => v.id));
+  let aantal = 0;
+  for (const organisatie of organisaties) {
+    const metingIds = new Set(
+      organisatie.scanUitvoeringen.filter((m) => m.assessmentId === assessmentId).map((m) => m.id)
+    );
+    for (const meting of organisatie.scanUitvoeringen) {
+      if (!metingIds.has(meting.id)) continue;
+      for (const invulling of meting.invullingen) {
+        if (Object.keys(invulling.antwoorden).some((id) => vraagIds.has(id))) aantal++;
+      }
+    }
+  }
+  return aantal;
+}
+
+/**
+ * Past één of meer gewichten in één opslagactie toe (`beheerpagina.md` punt 2,
+ * Weging per bouwblok) en logt per gewijzigd bouwblok één
+ * `bouwblok.gewichtGewijzigd` (`datamodel.md`, Audit, Gewichtswijziging).
+ * Zonder opgegeven `organisaties` wordt het aantal scans als 0 gelogd.
+ */
+export function pasGewichtenToe(
+  assessmentId: string,
+  wijzigingen: GewichtWijziging[],
+  organisaties: Organisatie[]
+): void {
+  const assessment = getAssessment(assessmentId);
+  if (!assessment) return;
+  const gewicht = new Map(wijzigingen.map((w) => [w.bouwblokId, w.gewicht]));
+  const alleBouwblokken = [
+    ...(assessment.categorieen ?? []).flatMap((c) => c.bouwblokken),
+    ...(assessment.bouwblokken ?? []),
+  ];
+  const gelogd: AuditInvoer[] = [];
+  const groepId = wijzigingen.length > 1 ? nieuweGroepId() : null;
+  for (const bouwblok of alleBouwblokken) {
+    const nieuw = gewicht.get(bouwblok.id);
+    if (nieuw === undefined || nieuw === bouwblok.gewicht) continue;
+    gelogd.push({
+      actie: "bouwblok.gewichtGewijzigd",
+      entiteitType: "bouwblok",
+      entiteitId: bouwblok.id,
+      entiteitNaam: bouwblok.naam,
+      groepId,
+      details: {
+        bouwblokNaam: bouwblok.naam,
+        volgnummer: bouwblok.volgnummer,
+        assessmentNaam: assessment.naam,
+        assessmentId: assessment.id,
+        oudGewicht: bouwblok.gewicht,
+        nieuwGewicht: nieuw,
+        aantalScans: aantalScansMetAntwoordInBouwblok(organisaties, assessmentId, bouwblok),
+      },
+    });
+  }
+  if (gelogd.length === 0) return;
+  updateAssessment(assessmentId, (a) => {
+    const pas = (b: Bouwblok): Bouwblok => (gewicht.has(b.id) ? { ...b, gewicht: gewicht.get(b.id)! } : b);
+    return {
+      ...a,
+      categorieen: a.categorieen
+        ? a.categorieen.map((c) => ({ ...c, bouwblokken: c.bouwblokken.map(pas) }))
+        : null,
+      bouwblokken: a.bouwblokken ? a.bouwblokken.map(pas) : null,
+    };
+  });
+  logAudit(gelogd);
 }

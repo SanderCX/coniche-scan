@@ -15,6 +15,7 @@ beforeAll(async () => {
       setItem: (k: string, v: string) => void opslag.set(k, v),
       removeItem: (k: string) => void opslag.delete(k),
     },
+    sessionStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
   });
   vi.stubGlobal("fetch", async () => ({ status: 204, text: async () => "" }));
   db = await import("./db");
@@ -39,6 +40,131 @@ const org = (id: string, leden: Rij[], scanUitvoeringen: Rij[]) => ({
 });
 const zet = (orgs: Rij[]) => opslag.set(KEY, JSON.stringify(orgs));
 const laad = () => JSON.parse(opslag.get(KEY)!) as ReturnType<typeof org>[];
+
+describe("data-integriteit", () => {
+  // Beschadigde data: O1 heeft een scan zonder Respondent, een scan zonder Meting, een Respondent en een Meting zonder Organisatie en een Lead met een onbestaande Meting.
+  const beschadigd = () =>
+    zet([
+      org("O1", [lid("L1", "O1", "a@x.nl", { leadMetingIds: ["M1", "WEG"] }), lid("L2", "GEENORG", "b@x.nl")], [
+        meting("M1", "O1", "Nulmeting", [inv("I1", "M1", "L1"), inv("I2", "M1", "NIEMAND"), { ...inv("I3", "M1", "L2"), scanUitvoeringId: "WEGMETING" }]),
+        meting("M2", "GEENORG", "Wees", []),
+      ]),
+    ]);
+  const aantallen = () => Object.fromEntries(db.controleerIntegriteit().map((c) => [c.id, c.vondsten.length]));
+
+  it("vindt per controle de verwijzingen naar een niet-bestaand record", () => {
+    beschadigd();
+    expect(aantallen()).toEqual({
+      "scan-zonder-respondent": 1,
+      "scan-zonder-meting": 1,
+      "respondent-zonder-organisatie": 1,
+      "meting-zonder-organisatie": 1,
+      "lead-zonder-meting": 1,
+    });
+    expect(db.totaalVondsten(db.controleerIntegriteit())).toBe(5);
+  });
+
+  it("gezonde data heeft geen vondsten", () => {
+    zet([org("O1", [lid("L1", "O1", "a@x.nl")], [meting("M1", "O1", "Nulmeting", [inv("I1", "M1", "L1")])])]);
+    expect(db.totaalVondsten(db.controleerIntegriteit())).toBe(0);
+  });
+
+  it("koppelen en verwijderen lossen elke vondst op, en loggen met 'vanuit Data-integriteit'", () => {
+    beschadigd();
+    expect(db.koppelWeesScanAanRespondent("I2", "L1").ok).toBe(false); // L1 heeft al een scan in M1
+    db.verwijderScanInvullingen(["I2"]);
+    expect(db.koppelWeesScanAanMeting("I3", "M1").ok).toBe(true);
+    expect(db.koppelWeesRespondentAanOrganisatie("L2", "O1").ok).toBe(true);
+    expect(db.koppelWeesMetingAanOrganisatie("M2", "O1").ok).toBe(true);
+    expect(db.verwijderLeadVerwijzing("L1", "WEG").ok).toBe(true);
+    expect(db.totaalVondsten(db.controleerIntegriteit())).toBe(0);
+    const log = JSON.parse(opslag.get("coniche-scan:audit") ?? "[]") as { actie: string; details: Record<string, unknown> | null }[];
+    expect(log.find((e) => e.actie === "respons.metingVerplaatst")?.details).toMatchObject({ vanuit: "Data-integriteit" });
+    expect(log.find((e) => e.actie === "respondent.leadVerwijzingVerwijderd")?.details).toMatchObject({ vanuit: "Data-integriteit" });
+  });
+});
+
+describe("conflict oplossen: scan aan een andere Respondent koppelen", () => {
+  const stel = () =>
+    zet([
+      org("O1", [lid("L1", "O1", "a@x.nl"), lid("L2", "O1", "b@x.nl")], [
+        meting("M1", "O1", "Nulmeting", [inv("I1", "M1", "L1")]),
+        meting("M2", "O1", "Vervolg", [inv("I2", "M2", "L1")]),
+      ]),
+    ]);
+
+  it("maakt een nieuwe Respondent met eigen e-mailadres en toegangscode, alleen die ene scan gaat mee", () => {
+    stel();
+    const r = db.koppelScanAanAndereRespondent("I2", { soort: "nieuw", invoer: { naam: "N", email: " Nieuw@X.nl ", functie: "", team: "", notities: "" } });
+    expect(r.ok).toBe(true);
+    const o = laad()[0];
+    expect(o.leden).toHaveLength(3);
+    const nieuw = o.leden.find((l) => l.email === "nieuw@x.nl")!;
+    expect(nieuw.toegangscode).toBeTruthy();
+    expect((o.scanUitvoeringen[1].invullingen as { organisatieLidId: string }[])[0].organisatieLidId).toBe(nieuw.id);
+    expect((o.scanUitvoeringen[0].invullingen as { organisatieLidId: string }[])[0].organisatieLidId).toBe("L1");
+  });
+
+  it("weigert een e-mailadres dat al bij een Respondent van de organisatie hoort, en een Respondent met al een scan in die Meting", () => {
+    stel();
+    expect(db.koppelScanAanAndereRespondent("I2", { soort: "nieuw", invoer: { naam: "", email: "b@x.nl", functie: "", team: "", notities: "" } }).ok).toBe(false);
+    expect(db.koppelScanAanAndereRespondent("I2", { soort: "nieuw", invoer: { naam: "", email: "", functie: "", team: "", notities: "" } }).ok).toBe(false);
+    expect(db.koppelScanAanAndereRespondent("I2", { soort: "bestaand", lidId: "L1" }).ok).toBe(false);
+  });
+
+  it("hangt de scan aan een bestaande Respondent en logt respons.respondentGewijzigd zonder persoonsgegevens", () => {
+    stel();
+    expect(db.koppelScanAanAndereRespondent("I2", { soort: "bestaand", lidId: "L2" }).ok).toBe(true);
+    expect((laad()[0].scanUitvoeringen[1].invullingen as { organisatieLidId: string }[])[0].organisatieLidId).toBe("L2");
+    const log = JSON.parse(opslag.get("coniche-scan:audit") ?? "[]");
+    expect(log.some((e: { actie: string }) => e.actie === "respons.respondentGewijzigd")).toBe(true);
+    expect(JSON.stringify(log)).not.toContain("b@x.nl");
+  });
+
+  it("een verplaatsing die op dit conflict stuit, meldt het doel-Meting-id", () => {
+    zet([
+      org("O1", [lid("L1", "O1", "a@x.nl")], [
+        meting("M1", "O1", "Nulmeting", [inv("I1", "M1", "L1")]),
+        meting("M2", "O1", "Vervolg", [inv("I2", "M2", "L1")]),
+      ]),
+    ]);
+    const r = db.verplaatsResponsNaarMeting("I2", "M1");
+    expect(r.ok).toBe(false);
+    expect(r.conflict).toEqual({ doelMetingId: "M1" });
+  });
+});
+
+describe("audit-log bij beheeracties", () => {
+  const AUDIT_KEY = "coniche-scan:audit";
+  const audit = () => JSON.parse(opslag.get(AUDIT_KEY) ?? "[]") as { actie: string; details: Record<string, unknown> | null }[];
+
+  it("verplaatsen logt de actie met organisatienamen en zonder persoonsgegevens", () => {
+    zet([
+      org("O1", [lid("L1", "O1", "geheim@x.nl")], [meting("M1", "O1", "Nulmeting", [inv("I1", "M1", "L1")])]),
+      org("O2", [], []),
+    ]);
+    db.verplaatsRespondentNaarOrganisatie("L1", "O2", []);
+    const events = audit();
+    const verplaatst = events.find((e) => e.actie === "respondent.verplaatst");
+    expect(verplaatst?.details).toMatchObject({ bronOrganisatieNaam: "O1", doelOrganisatieNaam: "O2", aantalScans: 1 });
+    expect(JSON.stringify(events)).not.toContain("geheim@x.nl");
+  });
+
+  it("een gewijzigde e-mail wordt gelogd als veldnaam, niet als waarde", () => {
+    zet([org("O1", [lid("L1", "O1", "oud@x.nl", { naam: "Jan" })], [])]);
+    db.bewerkRespondent("L1", { naam: "Jan", email: "nieuw@x.nl", functie: "", team: "", notities: "" });
+    const bewerkt = audit().find((e) => e.actie === "respondent.bewerkt");
+    expect(bewerkt?.details?.velden).toEqual(["e-mail"]);
+    expect(JSON.stringify(audit())).not.toContain("nieuw@x.nl");
+  });
+
+  it("organisatie verwijderen logt de naam en de aantallen", () => {
+    zet([org("O1", [lid("L1", "O1", "a@x.nl")], [meting("M1", "O1", "Nulmeting", [inv("I1", "M1", "L1")])])]);
+    db.verwijderOrganisaties(["O1"]);
+    const e = audit().find((x) => x.actie === "organisatie.verwijderd");
+    expect(e?.details).toMatchObject({ organisatieNaam: "O1", aantalRespondenten: 1, aantalMetingen: 1, aantalScans: 1 });
+  });
+});
 
 describe("hele respondent verplaatsen", () => {
   it("neemt alle scans mee, maakt een ontbrekende Meting aan en wist Lead-koppelingen", () => {

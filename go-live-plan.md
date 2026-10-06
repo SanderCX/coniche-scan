@@ -14,8 +14,9 @@ besluiten in fase 0.
 
 ## Waar we staan
 
-Functioneel is het prototype bijna klaar, maar alles draait nog in de
-localStorage van één browser. Een persoonlijke link werkt daardoor alleen
+Functioneel is het prototype bijna klaar, maar de data staat nog in de
+localStorage van de browser, met een Neon-database bij Sander als
+tijdelijke serveropslag. Een persoonlijke link werkt daardoor alleen
 op de plek waar de data staat (`CLAUDE.md`, Status). Database en backend
 zijn dus de kritieke route. Inloggen, e-mail, import, export en de
 privacy-afspraken hangen er allemaal aan.
@@ -24,6 +25,15 @@ Twee sporen kunnen direct starten en hoeven niet op de bouw te wachten. Dat
 zijn de inventarisatie van de oude omgeving (fase 5) en de juridische
 kant (fase 7). Ze hebben de langste doorlooptijd, omdat ze van anderen
 afhangen (leverancier, klanten, jurist).
+
+## Go/no-go-eis voor externe klanten
+
+Livegang voor externe klanten gebeurt alleen na een succesvolle
+onafhankelijke code review, een succesvolle penetratietest en een
+gevalideerde werking van de DDoS- en rate-limitmaatregelen. Zijn die drie
+niet gehaald, dan is het antwoord no-go, ook als de rest klaar is. De
+uitvoering staat in fase 2 (maatregelen) en fase 8 (validatie), de
+vastlegging in "Go-live documentatie" onderaan.
 
 ## Fase 0: Besluiten die de rest bepalen
 
@@ -46,9 +56,10 @@ verandert.
   en een beperkt aantal beheeraccounts. Vaststellen dat 2FA voor beheer
   verplicht is voordat er echte klantdata in staat (aanvulling).
 - [ ] **Open punten deel 2 beantwoorden (Joost).** De cellen "te
-  bevestigen" in de rechtenmatrix, duur van een ToegangsSessie en het
-  aantal mislukte pogingen voor een code ongeldig wordt, één Rol-tabel of
-  twee (`datamodel.md`, Open punten).
+  bevestigen" in de rechtenmatrix en één Rol-tabel of twee
+  (`datamodel.md`, Open punten). De duur van een ToegangsSessie (4 uur,
+  instelbaar) en het aantal mislukte pogingen voor een code ongeldig wordt
+  (3) liggen al vast in `datamodel.md`.
 - [ ] **Afwijking Toegangscode (Sander).** Nu een veld op `Respondent`,
   volgens het datamodel een aparte tabel. Beslissen vóórdat het schema in
   Postgres wordt vastgelegd, want daarna is het lastig om te wijzigen
@@ -58,10 +69,11 @@ verandert.
   framework voor wachtwoorden, sessies en 2FA (aanvulling).
 - [ ] **Hostingkeuze en domein (Sander).** Waar frontend en API draaien,
   op welk domein (bijvoorbeeld onder `app.coniche.nl`), EU-regio voor alle
-  onderdelen. De app is een Next.js-project met echte paden (zoals
-  `/s/k7m2p9xq4r`) en draait nu lokaal met `npm run dev`. Het eerste
-  statische prototype met `server.ps1` en hash-routes staat in
-  `archief-prototype/` (aanvulling).
+  onderdelen. De app is een Next.js-applicatie met echte paden,
+  zoals persoonlijke links als `/s/<code>`. Het oude prototype met een eigen
+  server en hash-routes staat in `archief-prototype/` en telt niet meer mee.
+  Wel vast te leggen is welk hostingplatform de Next.js-app draait en dat
+  dit in een EU-regio staat (aanvulling).
 - [ ] **Beslissen wat er met de oude data gebeurt (Joost).** Welke klanten
   en scans gaan mee, hoe lang het archief van de oude omgeving bewaard
   blijft, en of klanten worden geïnformeerd (zie fase 5 en 7).
@@ -99,14 +111,20 @@ verandert.
 - [ ] Geheimen (databasewachtwoord, mailgegevens, sleutels) buiten de
   repo houden en per omgeving instellen (aanvulling).
 - [ ] Repo klaarzetten voor twee omgevingen, met CI-build en een
-  deploy die Sander en Joost allebei kunnen volgen (aanvulling).
+  deploy die Sander en Joost allebei kunnen volgen. De werkwijze vastleggen,
+  bijvoorbeeld in Azure DevOps of GitHub, afhankelijk van de hostingkeuze
+  (aanvulling).
+- [ ] Back-up- en restoreproces documenteren: Wat wordt wanneer
+  teruggezet, door wie en hoe lang het mag duren (aanvulling).
+- [ ] Monitoring en incidentmanagement beschrijven: Wat wordt bewaakt, wie
+  krijgt een melding, en wat is de procedure bij een incident (aanvulling).
 
 ## Fase 2: Toegang en beveiliging
 
 - [ ] Inlog voor beheer met wachtwoord, hashing en sessies
   (`datamodel.md`, Gebruiker en Sessie).
 - [ ] 2FA voor beheer afdwingen (`tfaActief`, `beheerpagina.md`,
-  punt 9).
+  punt 9), en nagaan waar 2FA verder relevant is (aanvulling).
 - [ ] Rollen Admin en Consultant en de rechtenmatrix (`datamodel.md`
   deel 2), inclusief eigenaarschap van organisaties (`aangemaaktDoor`).
 - [ ] Beheerscherm Gebruikers volgens `beheerpagina.md` punt 9,
@@ -119,25 +137,41 @@ verandert.
 - [ ] Bij gekozen e-mailverificatie: VerificatieCode en ToegangsSessie,
   codes gehasht opgeslagen, 15 minuten geldig, eenmalig, met een grens op
   mislukte pogingen (`datamodel.md`, sectie 3).
-- [ ] Beperking van pogingen (rate limiting) op inloggen, code-invoer en
-  het scherm Toegang, zodat niet te achterhalen is welke e-mailadressen
-  bekend zijn (aanvulling).
+- [ ] Account lockout na een vast aantal mislukte inlogpogingen. Het aantal
+  en de duur van de blokkade stellen we vast bij de bouw (aanvulling).
+- [ ] Beperking van pogingen (rate limiting) per IP-adres op inloggen,
+  code-invoer en het scherm Toegang, zodat niet te achterhalen is welke
+  e-mailadressen bekend zijn (aanvulling).
 - [ ] AuditEvent vastleggen voor gevoelige acties zoals verwijderen,
   uitnodigen en rechten toekennen (`datamodel.md`, Audit).
+- [ ] Audit-log scherm bouwen (`beheerpagina.md`, punt 12): Importgroepen,
+  periodefilter, aantallen en CSV-export. Geen persoonsgegevens uit scans
+  in de log, en dezelfde bewaartermijn als ingevulde scans (aanvulling).
 - [ ] Standaard webbeveiliging: HTTPS overal, beveiligingsheaders,
-  CORS beperkt tot het eigen domein, invoer serverside valideren
+  CORS beperkt tot het eigen domein (aanvulling).
+- [ ] Inputvalidatie op URL-, formulier- en API-verkeer, serverside
   (aanvulling).
-- [ ] Onafhankelijke controle op beveiliging vóór livegang. Dat kan een
-  kort penetratietest-verzoek zijn of een gestructureerde review met
-  een checklist, afhankelijk van wat de klanten (Univé, DPG Media, KPN)
-  vragen (aanvulling).
+- [ ] Alle databasequeries volledig geparametriseerd, als preventie tegen
+  SQL-injectie (aanvulling).
+- [ ] DDoS-bescherming configureren, bijvoorbeeld via Azure Application
+  Gateway met WAF, afhankelijk van de hostingkeuze in fase 0 (aanvulling).
+- [ ] Security logging en monitoring inrichten, zodat mislukte inlogpogingen,
+  geblokkeerde accounts en verdachte verzoeken zichtbaar zijn (aanvulling).
+- [ ] De validatie vóór productie (code review, penetratietest, DDoS- en
+  belastingtest) staat in fase 8 en is onderdeel van de go/no-go-eis.
 
 ## Fase 3: E-mail
 
-- [ ] Coniche-mailserver of mailprovider kiezen, ter vervanging van de
-  Gmail-koppeling die alleen voor testen bedoeld is (`backlog.md`).
+- [ ] Coniche-mailserver of mailprovider kiezen (bijvoorbeeld SendGrid), ter
+  vervanging van de Gmail-koppeling die alleen voor testen bedoeld is
+  (`backlog.md`).
+- [ ] Een apart domein registreren voor scan- en surveyverkeer, zodat het
+  verzendgedrag van de scan los staat van het hoofddomein van Coniche
+  (aanvulling).
 - [ ] Afzenderadres en domein instellen, met SPF, DKIM en DMARC. Anders
   belanden uitnodigingen bij klanten in de spam (aanvulling).
+- [ ] Reminder-functionaliteit en verzendgedrag testen, inclusief aantallen
+  en tijdstippen van herinneringen (aanvulling).
 - [ ] Sjablonen schrijven en laten nalezen: Uitnodiging met persoonlijke
   link, verificatiecode, wachtwoord instellen voor nieuwe gebruikers,
   bevestigingstekst op het scherm Toegang.
@@ -163,16 +197,50 @@ verandert.
   release wordt aangepast.
 - [ ] Importfunctie voor historische scans (`beheerpagina.md`,
   punt 8 en `import-scans.md`). Zie fase 6.
+- [ ] Weging van bouwblokken bouwen (`datamodel.md`, Bouwblok en
+  Scoreberekening): `Bouwblok.gewicht` in de gedeelde scorefunctie
+  (gewogen categoriescore en overall), de wegingskaart bij de intake met
+  de tekst per Assessment, de factor naast bouwblokken met een gewicht
+  ongelijk aan 1 (flow, sidebar, resultaten, PDF), het veld "Weging" en
+  de wegingstekst in Content-beheer (`beheerpagina.md`, punt 2), het
+  audit-event `bouwblok.gewichtGewijzigd` en `gewicht` per bouwblok in de
+  CSV (`export-csv.md`). `Categorie.gewicht` uit het schema halen.
+  Zorgscan: Bouwblok 4, 10 en 11 op gewicht 2 zetten
+  (`content-zorgscan.md`).
+- [ ] Wegingstekst en factor in de PDF-specs opnemen
+  (`export-pdf-visual-*.md`, nu niet bijgewerkt), en beslissen of de
+  InDesign-XML het gewicht per bouwblok meekrijgt (`export-indesign.md`,
+  Open).
+- [ ] Respondentenlijst met overzicht (modal) bouwen (`beheerpagina.md`,
+  punt 6b): Alle acties op een Respondent staan daar, het
+  organisatie-detail toont alleen "Bekijk >>". Eén modal met meerdere
+  ingangen. Doe dit samen met de verplaatsfuncties hieronder, zodat die
+  niet eerst in het organisatie-detail worden gebouwd.
+- [ ] Scan-overzicht (modal) bouwen (`beheerpagina.md`, punt 7 en
+  Navigatie in beheer): Vervangt de huidige detailpagina per scan, met het
+  patroon Overzichtsmodal uit `stylesheet.md`. Alle lijsten met
+  Respondenten of scans krijgen een klikbare rij. Rol/Team toont geen los
+  streepje meer als een van beide leeg is, en de bouwerstekst bij de
+  persoonlijke link verdwijnt uit de interface.
+- [ ] Meting-overzicht bouwen (`beheerpagina.md`, punt 5): Eigen pagina
+  per Meting met kop, respondenten, resultaten, Leads en acties, met
+  "Bekijk >>" vanuit het organisatie-detail en een klikbaar Meting-label
+  in de lijst Respondenten.
 - [ ] Verplaatsfunctie voor respondenten en losse responsen
-  (`beheerpagina.md`, punt 4). Dit is het herstelmiddel als de
-  import een organisatie dubbel aanmaakt.
+  (`beheerpagina.md`, punt 6b). Dit is het herstelmiddel als de
+  import een organisatie dubbel aanmaakt. Een eerste versie is gebouwd in
+  het organisatie-detail; die verhuist naar het Respondent-overzicht en
+  krijgt de keuze per bron-Meting bij "hele respondent verplaatsen".
 - [ ] Verplaatsfunctie "Respons naar andere Meting" (`beheerpagina.md`,
-  punt 4 en punt 7), ook voor meerdere responsen tegelijk. De import zet
+  punt 6b en punt 7), ook voor meerdere responsen tegelijk. De import zet
   alles in nieuwe import-Metingen, dus deze functie moet af zijn vóór de
-  definitieve import (aanvulling).
-- [ ] Beheeractie "Respondent bewerken" (`beheerpagina.md`, punt 4). De
-  import koppelt de oude scans aan een neutrale Respondent per
-  organisatie, en de beheerder past die daarna aan (aanvulling).
+  definitieve import (aanvulling). Een eerste versie is gebouwd, los en
+  als bulkactie; de bulkactie verhuist naar het Meting-overzicht en de
+  scanlijst van een organisatie (punt 7).
+- [ ] Beheeractie "Respondent bewerken" (`beheerpagina.md`, punt 6b). De
+  import maakt per scan een Respondent uit de gegevens in het bestand,
+  en de beheerder past die daarna aan (aanvulling). Een
+  eerste versie is gebouwd; die verhuist naar het Respondent-overzicht.
 - [ ] Openstaande aanpassingen op de eerste versie afhandelen, inclusief
   navigatie op de resultatenpagina.
 - [ ] Open contentvragen beantwoorden: De cutoffs voor Basis op Orde,
@@ -190,8 +258,8 @@ verandert.
 - [ ] **Opruimen voor productie** (`backlog.md`, Voor productie):
   - [ ] Testknop (vragenlijst automatisch invullen) verwijderen
   - [ ] Seed-data met testorganisatie en testrespondent verwijderen
-  - [ ] Controlefunctie voor "niets blijft achter bij verwijderen"
-    verwijderen na gebruik
+  - [ ] Besluiten of de controlefunctie Data-integriteit in productie
+    blijft (`beheerpagina.md`, punt 13)
   - [ ] Hardcoded accounts, zoals `admin@coniche.nl`, en preview- of
     demodata uit de productiebuild halen (aanvulling)
 - [ ] Eenvoudige foutregistratie en beschikbaarheidsbewaking instellen,
@@ -241,9 +309,13 @@ Kan nu al starten.
   Alle bestanden komen in één map, zonder submappen; de import leest die
   map in één keer.
 - [ ] Controlegetallen vastleggen per map: Aantal bestanden, aantal rijen,
-  aantal scans per organisatie en de `overall_score` per scan. De import negeert die
-  score, maar hij is bruikbaar om na de import te controleren of de nieuwe
-  berekening hetzelfde geeft (aanvulling).
+  aantal scans per organisatie en de `overall_score` per scan. De import
+  negeert die score, maar hij is bruikbaar om na de import te controleren
+  of de nieuwe berekening hetzelfde geeft (aanvulling). Voor de import
+  klopt ook dat het aantal bestanden in de map gelijk is aan het aantal
+  bestanden met rijen plus het aantal overgeslagen bestanden uit de
+  samenvatting. Zo valt een verloren scan op voordat de oude omgeving
+  uitgaat.
 - [ ] Aparte volledige back-up van de oude omgeving als archief:
   Database-dump plus alles wat de tool zelf kan exporteren, inclusief de
   gegenereerde AI-samenvattingen en toestemmingsgegevens die niet worden
@@ -277,27 +349,29 @@ Vraagt een werkende database en de importfunctie uit fase 4.
   bestand, en met bewust foute varianten (ander aantal blokken, ander
   aantal vragen, tegenstrijdige `blockComment`, een bestand zonder
   `answers` zoals een batch-export). Ook testen: Een rij mislukt halverwege
-  een bulkimport en wordt daarna apart alsnog geïmporteerd.
-- [ ] Gedeeld e-mailadres kiezen voor de neutrale Respondent
-  "Coniche (historische scan)" en beslissen waar de herkomst per scan komt
-  (notities of een veld op `ScanInvulling`, `import-scans.md`, Open). Dit
-  moet vast liggen vóór de eerste import (aanvulling).
-- [ ] Importlogboek bijhouden met mapnaam of bestandsnaam, aantal
-  bestanden, datum, aantal rijen per organisatie en wie het deed. De spec
+  een import en wordt daarna met dezelfde knop alsnog geïmporteerd.
+- [ ] Importlogboek bijhouden in de audit-log (`beheerpagina.md`, punt
+  12) en de CSV-export van de importgroep bij de controlegetallen
+  bewaren, met mapnaam of bestandsnaam, aantal bestanden, datum, aantal
+  rijen per organisatie en wie het deed. De spec
   heeft bewust geen controle op dubbele import van dezelfde
   `assessment_id`, ook niet bij overlap tussen bestanden in een map. In
   productie is een dubbele import lastig recht te zetten, dus overwegen
   om dat besluit te herzien of het logboek strikt te volgen (aanvulling).
 - [ ] Definitieve import op productie, per map (of per bestand), met
-  voorbeeldweergave, organisatiekeuzes en bevestiging in bulk of per rij.
-  Rijen die niet lukken, importeer je daarna een voor een, zonder de map
-  opnieuw te kiezen.
-- [ ] Neutrale Respondenten nalopen en bewerken waar een echte
-  contactpersoon bekend is (`beheerpagina.md`, "Respondent bewerken")
-  (aanvulling).
+  voorbeeldweergave, organisatiekeuzes en goedkeuring van de
+  waarschuwingsrijen. Importeren gaat in één keer met de knop "N rijen
+  importeren". Rijen die niet lukken, los je op en importeer je daarna met
+  dezelfde knop, zonder de map opnieuw te kiezen.
+- [ ] Respondenten uit de import nalopen en bewerken waar een Coniche-medewerker
+  de Respondent is en de echte contactpersoon bekend is
+  (`beheerpagina.md`, "Respondent bewerken") (aanvulling).
 - [ ] Controle na import: Aantal organisaties, respondenten, metingen en
   scans tegen de controlegetallen uit fase 5, en de berekende score tegen
-  de oude `overall_score` (afronding kan een verschil van 0,1 geven).
+  de oude `overall_score`. Bij Klantcontact en AI kan alleen de afronding
+  een verschil van 0,1 geven. Bij de Zorgscan hoort de nieuwe overall af
+  te wijken, omdat de oude tool de weging niet toepaste (`import-scans.md`,
+  `weight`): Vergelijk daar met de ongewogen berekening.
   Steekproef van een paar scans volledig doorlopen in de resultatenpagina.
 - [ ] Import-Metingen ("Legacy-import {jaar}") nalopen en de responsen
   omhangen naar de juiste Meting per organisatie (`beheerpagina.md`,
@@ -324,8 +398,16 @@ Kan parallel aan de bouw. De doorlooptijd hangt van anderen af.
 - [ ] Verwerkersovereenkomsten met de eigen leveranciers (Neon, hosting,
   mailprovider) en hun namen in de privacypagina opnemen (aanvulling).
 - [ ] Bewaartermijn vaststellen en de melding voor data-ouderdom
-  bouwen of bewust uitstellen (`backlog.md`, Data-ouderdom). Dit bepaalt
-  ook hoe lang de gemigreerde oude scans blijven staan.
+  bouwen of bewust uitstellen. Dit bepaalt ook hoe lang de gemigreerde
+  oude scans blijven staan. De bewaartermijn moet per uitvraag instelbaar
+  zijn, en er hoort een notificatieproces bij voor aflopende bewaartermijnen
+  (`beheerpagina.md`, Bewaartermijn).
+- [ ] Procedure voor verlengen en verwijderen vastleggen: Wie beslist, hoe
+  vaak mag verlengd worden en wat er met de data gebeurt als niemand reageert
+  (aanvulling).
+- [ ] Back-upretentie afstemmen op het dataretentiebeleid, zodat verwijderde
+  data niet via een back-up langer blijft bestaan dan de bewaartermijn
+  (aanvulling).
 - [ ] Procedure voor verzoeken van betrokkenen (inzage, correctie,
   verwijdering) voor respondenten zonder account, via de contactpersoon
   bij hun organisatie of rechtstreeks bij Coniche (`privacy-pagina.md`,
@@ -346,6 +428,12 @@ Kan parallel aan de bouw. De doorlooptijd hangt van anderen af.
   respondent uitnodigen, mail ontvangen, link openen, verifiëren,
   intake, invullen, resultaten, export, verwijderen.
 - [ ] Beide scan-types doorlopen, met en zonder categorielaag.
+- [ ] Scorefunctie testen met vaste invoer: Een invulling met som 172 over
+  60 vragen geeft ongewogen 2,87 en bij de Zorgscan-weging (bouwblok 4,
+  10 en 11 op 2) 2,99, afgerond 3,0 (`datamodel.md`, Scoreberekening).
+  Daarnaast een gewicht van 1,5 en een wijziging van het gewicht op een
+  Assessment met ingevulde scans, waarbij alle scores in één keer
+  meebewegen.
 - [ ] Rechten testen per rol: Kan een Consultant niets zien wat hij niet
   zelf aanmaakte, komt een Lead niet bij een andere organisatie, werkt
   een verlopen of ingetrokken sessie niet meer.
@@ -363,6 +451,19 @@ Kan parallel aan de bouw. De doorlooptijd hangt van anderen af.
 - [ ] Herstel van een back-up daadwerkelijk uitproberen.
 - [ ] Een kleine belastingtest met het aantal respondenten van een grote
   klant tegelijk (aanvulling).
+
+**Security-validatie vóór productie.** Dit is onderdeel van de
+go/no-go-eis bovenaan.
+
+- [ ] Onafhankelijke code review uitvoeren (aanvulling).
+- [ ] Penetratietest uitvoeren op de productie-kandidaat. Vorm en omvang
+  afstemmen op wat de klanten (Univé, DPG Media, KPN) vragen (aanvulling).
+- [ ] DDoS- en belastingtest uitvoeren om het gedrag van het platform onder
+  piekbelasting te valideren, inclusief de rate-limitmaatregelen
+  (aanvulling).
+- [ ] Bevindingen verwerken en een hertest uitvoeren op alle kritieke
+  kwetsbaarheden. Afvinken pas bij nul openstaande kritieke bevindingen
+  (aanvulling).
 - [ ] Acceptatie door Joost op content en flow, door Sander op techniek.
   Lijst met blokkerende bevindingen bijhouden en pas afvinken bij nul.
 
@@ -371,6 +472,8 @@ Kan parallel aan de bouw. De doorlooptijd hangt van anderen af.
 Volgorde voor de dag zelf. Het idee is dat de oude omgeving in dit stuk
 bereikbaar blijft, zodat terugvallen kan.
 
+- [ ] Go/no-go-eis gehaald: Code review, penetratietest en validatie van de
+  DDoS- en rate-limitmaatregelen succesvol afgerond (zie bovenaan).
 - [ ] Livegang plannen op een moment dat er weinig lopende scans zijn en
   Sander en Joost allebei bereikbaar zijn.
 - [ ] Klanten met lopende scans van tevoren informeren.
@@ -423,6 +526,32 @@ gebeuren.
   afhankelijkheden en het nalopen van beheeraccounts (aanvulling).
 - [ ] Na vier tot zes weken een terugblik op gebruik, fouten en klachten.
 
+## Go-live documentatie
+
+Naast de checklist hoort er documentatie bij de livegang. Dit zijn de
+onderdelen per hoofdstuk, in te vullen naarmate de punten hierboven klaar
+zijn (aanvulling).
+
+**Security**
+- DDoS-mitigatie.
+- Rate limiting.
+- Account lockout.
+- 2FA.
+- Penetratietest uitgevoerd, met datum en resultaat.
+- Code review uitgevoerd.
+
+**Privacy**
+- Bewaartermijnen.
+- Verwijderprocedure.
+- Back-upretentie.
+- AVG-maatregelen.
+
+**Operations**
+- Mailprovider.
+- Verzenddomein.
+- Monitoring.
+- Incident- en herstelprocedure.
+
 ## Afhankelijkheden in het kort
 
 - Besluiten in fase 0 gaan vóór schema, inlog en planning.
@@ -431,6 +560,8 @@ gebeuren.
 - De importfunctie (fase 4) en een werkende productiedatabase (fase 1) gaan
   vóór de definitieve import in fase 6.
 - Fase 8 sluit af vóór fase 9, en fase 10 begint pas na fase 9.
+- Livegang voor externe klanten hangt af van de go/no-go-eis: Code review,
+  penetratietest en DDoS- en rate-limitvalidatie (fase 8).
 
 ## Vragen die ik nog nodig heb
 

@@ -11,10 +11,12 @@ export interface Bouwblok {
   volgnummer: number;
   naam: string;
   omschrijving: string;
-  /** Langere uitleg, getoond in een overlay naast de titel (zie v1-aanpassingen.md punt 3). */
-  toelichting: string;
+  /** Lopende tekst in de Toelichtingsmodal (`stylesheet.md`). Leeg: dat onderdeel ontbreekt. Alinea's gescheiden door een lege regel. */
+  toelichting: string | null;
+  /** Blok "CENTRALE VRAAG" in dezelfde modal. Leeg: het blok ontbreekt. `undefined`: nog niet gevuld, `lib/assessment-migratie.ts` vult het bij het laden. */
+  centraleVraag?: string | null;
   tags: string[];
-  /** Standaard 1 (geen effect op de score-berekening, die blijft nog een ongewogen gemiddelde). Zie datamodel.md, Bouwblok. */
+  /** Standaard 1; een getal groter dan 0, ook decimalen. Werkt door in categorie- en overallscore (`lib/scoring.ts`), niet in de bouwblokscore. Zie datamodel.md, Bouwblok. */
   gewicht: number;
   vragen: Vraag[];
   /**
@@ -36,8 +38,6 @@ export interface Categorie {
   naam: string;
   kleur: string;
   volgorde: number;
-  /** Standaard 1 (geen effect op de score-berekening, die blijft nog een ongewogen gemiddelde). Zie datamodel.md, Categorie. */
-  gewicht: number;
   bouwblokken: Bouwblok[];
   /** Zie `Bouwblok.gearchiveerd` hierboven — dezelfde reden, op categorieniveau. */
   gearchiveerd?: boolean;
@@ -121,6 +121,12 @@ export interface Assessment {
   bouwblokken: Bouwblok[] | null;
   /** AI-scan sorteert groepsscores op waarde, Klantcontact-scan houdt vaste volgorde aan. */
   scoresPerGroepGesorteerd: boolean;
+  /** Eyebrow in de Toelichtingsmodal, standaard "Bouwsteen" (Klantcontact, Zorg) of "AI-domein" (AI-scan). */
+  bouwblokLabel: string;
+  /** Kop van de wegingskaart op de intake (`CLAUDE.md`, scherm 4). Leeg: standaardtitel. */
+  wegingTitel?: string | null;
+  /** Tekst van de wegingskaart, per Assessment aanpasbaar. Leeg: standaardtekst. */
+  wegingToelichting?: string | null;
   /** UI-woord voor één bouwblok, bijv. "Bouwblok" of "Domein". */
   bouwblokEenheidEnkelvoud: string;
   /** UI-woord voor meerdere bouwblokken na een aantal, bijv. "bouwblokken" of "AI-domeinen". */

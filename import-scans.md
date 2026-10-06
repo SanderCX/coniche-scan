@@ -1,9 +1,9 @@
 # Coniche Scan: Import van scans (CSV)
 
 Beheerfunctie om ingevulde
-scans uit een CSV-bestand in het huidige datamodel te zetten. Twee
-bronformaten, automatisch herkend uit het bestand zelf, geen keuze
-vooraf (zie "Werkwijze in beheer"):
+scans uit CSV-bestanden in het huidige datamodel te zetten. Twee
+bronformaten, met een keuze vooraf in beheer (zie "Werkwijze in
+beheer"):
 
 - **"Oude tool"**: Export uit de oude (vibe-gecodeerde, stopgezette)
   tool, zodat historische klantdata niet verloren gaat. Gebaseerd op
@@ -21,12 +21,28 @@ vooraf (zie "Werkwijze in beheer"):
 **Gecombineerd bestand.** Bij beide formaten mag één CSV-bestand scans
 van meerdere organisaties en van meerdere Assessment-types bevatten, één
 rij per ingevulde scan. Een bestand heeft één bronformaat: Oude tool en
-eigen export worden niet in één upload gemengd, want de formaatkeuze
+eigen export worden niet in één upload gemengd, want het formaat
 bepaalt het scheidingsteken. Alles wat in de rest van dit document per
 rij wordt bepaald (organisatie, Assessment-type, Respondent) blijft per
 rij gelden. Wat over rijen heen moet kloppen (organisatie koppelen, Meting
 aanmaken, Respondent hergebruiken) staat onder "Over rijen heen in één
-bestand".
+bestand". Een map of een selectie van meerdere bestanden telt in dit
+document als één gecombineerd bestand: Alle rijen vormen samen één import,
+met dezelfde organisatie-, Respondent- en Meting-regels over alle
+bestanden heen.
+
+**Map met losse bestanden (alleen "Oude tool").** De batch-export van de
+oude tool bevat geen antwoorden per vraag. De bron is daarom een map met
+losse exports, één bestand per scan. In de uploadstap kies je bij "Oude
+tool" een map (losse bestanden kiezen kan ook). De tool leest alleen de
+`.csv`-bestanden die direct in die map staan; submappen en andere
+bestandstypes worden genegeerd en in de samenvatting genoemd. De rijen uit
+alle bestanden worden samengevoegd tot één verzameling, op volgorde van
+bestandsnaam (alfabetisch) en daarbinnen op rijvolgorde, en daarna
+verwerkt als één gecombineerd bestand. "Eerste rij in bestandsvolgorde"
+verwijst naar die samengevoegde volgorde. De "Coniche Scan (eigen
+export)" kent geen mapvariant: Die export is al één CSV met meerdere
+rijen.
 
 De rest van dit document beschrijft eerst het "oude" formaat in detail
 (kolommen, matching, edge cases), en sluit af met wat voor het "nieuwe"
@@ -44,12 +60,29 @@ de CSV bepaald, zie hieronder). Alleen voor Admin en Consultant
 Eén CSV-bestand met de export uit de oude tool, één rij per ingevulde
 scan (`assessment_id`). Een bestand kan de scans van één organisatie
 bevatten, maar ook van meerdere organisaties en van beide scantypes
-tegelijk, bijvoorbeeld door de losse exports samen te voegen. De volgorde
-van de rijen maakt niet uit voor het resultaat, behalve waar hieronder
-"eerste rij in bestandsvolgorde" staat. De bestandsnaam (bijv.
+tegelijk, bijvoorbeeld door de losse exports samen te voegen. In de praktijk is het
+een map met losse exports, één bestand per scan (zie de inleiding). De
+volgorde van de rijen maakt niet uit voor het resultaat, behalve waar
+hieronder "eerste rij in bestandsvolgorde" staat. De bestandsnaam (bijv.
 `assessment-<organisatie-slug>-2026-01-14.csv`) is informatief, niet
 leidend: De tool leest organisatie- en datumgegevens uit de kolommen, niet
-uit de bestandsnaam.
+uit de bestandsnaam. De voorbeeldweergave toont de bestandsnaam wel bij
+elke rij, zodat een probleemrij terug te vinden is in de map.
+
+**Bestanden die niet te importeren zijn.** Een bestand zonder kolom
+`answers`, of met een lege `answers`, wordt als geheel overgeslagen met de
+melding "Bevat geen antwoorden per vraag (mogelijk een batch-export)". Een
+bestand zonder kopregel of zonder rijen, en een bestand waarvan `answers`
+geen geldige JSON is, krijgt een eigen melding. Een overgeslagen bestand
+blokkeert de rest van de map niet, ook niet als het tussen andere
+bestanden staat. Is het het enige bestand, dan valt er niets te importeren
+en blijft alleen de melding over. Het gedrag is dus voor elke selectie
+gelijk. Een overgeslagen bestand wacht niet op een goedkeuring van de
+beheerder: Er is geen rij om goed te keuren, anders dan bij een 95%-match
+(een rij die wél te importeren is maar afwijkt). Omdat een overgeslagen
+bestand een scan kan kosten, is het wel zichtbaar op drie plekken: Bovenaan
+de bestandssamenvatting, op de bulkknop (zie "Werkwijze in beheer") en in
+de controlegetallen van `go-live-plan.md`.
 
 Kolommen, gegroepeerd naar wat ermee gebeurt:
 
@@ -59,9 +92,11 @@ Kolommen, gegroepeerd naar wat ermee gebeurt:
 |---|---|
 | `organization_name` | `Organisatie.naam` (matching, zie hieronder) |
 | `sector_name`, `subsector_name` | `Organisatie.kenmerken` (nieuwe velden, zie `datamodel.md`, Organisatievelden) |
-| `assessor_name`, `respondent_email`, `respondent_role` | `Respondent.naam`/`email`/`functie` |
+| `assessor_name` | `Respondent.naam` (zie "Wie de Respondent wordt") |
+| `respondent_email` | `Respondent.email`, genormaliseerd |
+| `respondent_role` | `Respondent.functie` |
 | `team_name` | `Respondent.team` |
-| `start_comment` | `Respondent.notities`, met een vaste prefix (zie hieronder) |
+| `start_comment` | `Respondent.notities` |
 | `created_at` | `ScanInvulling.gestartOp` |
 | `completed_at` | `ScanInvulling.afgerondOp` |
 | `status` | `ScanInvulling.status`: Altijd `"completed"` → `"afgerond"`. De export uit de oude tool is handmatig en gebeurt alleen voor scans die Coniche wil behouden, dus altijd afgerond; de tool importeert geen andere statuswaarde en meldt het als er onverwacht een andere waarde in een rij staat |
@@ -97,17 +132,22 @@ item, uit de daadwerkelijke CSV's:
   apart geïmporteerd: `ScanInvulling.antwoorden` slaat alleen het
   cijfer op, de labeltekst volgt al uit `datamodel.md` (SchaalLabel).
 - **`weight`**: Niet per antwoord geïmporteerd. Dit hoort inhoudelijk
-  bij de categorie-/bouwblok-definitie (`Categorie.gewicht` resp.
-  `Bouwblok.gewicht`, zie `datamodel.md`), niet bij de losse
-  invulling — en al helemaal niet bij de losse vraag, ook al staat
+  bij de bouwblok-definitie (`Bouwblok.gewicht`, zie `datamodel.md`),
+  niet bij de losse invulling — en al helemaal niet bij de losse vraag, ook al staat
   het in de CSV op elk vraag-item: Gecontroleerd over beide bestanden
   is deze waarde overal `1`, ook binnen elk blok, dus niets wijst
   erop dat er ooit per vraag gevarieerd werd. Bij beide huidige CSV's
   staat dit overal op `1`, gelijk aan de standaardwaarde, dus geen
   actie nodig. Wijkt dit in een toekomstige import af van het huidige
-  `Categorie.gewicht`/`Bouwblok.gewicht` (bijv. bij een sector-variant
-  met eigen gewichten), dan is dat een contentvraagstuk voor dat
-  moment, geen uitbreiding van deze import.
+  `Bouwblok.gewicht`, dan is dat een contentvraagstuk voor dat moment,
+  geen uitbreiding van deze import.
+
+  **Zorgscan**: Ook in de oude exports van de Zorgscan staat `weight`
+  overal op 1, terwijl de Zorgscan in de nieuwe tool gewogen is (bouwblok
+  4, 10 en 11 op 2, zie `content-zorgscan.md`). De oude tool paste de
+  weging dus nooit toe. Geïmporteerde Zorgscans worden met de nieuwe
+  weging berekend, zoals alle scans van dat Assessment. Hun overall wijkt
+  daardoor af van de oude `overall_score`, en dat is bedoeld.
 
 ### Bewust niet geïmporteerd
 
@@ -133,21 +173,40 @@ item, uit de daadwerkelijke CSV's:
 
 ## Wie de Respondent wordt
 
-**De Coniche-medewerker die de scan invulde** (`assessor_name`,
-`respondent_email`, `respondent_phone`, `respondent_role`) wordt de
-`Respondent`, niet de klantcontactpersoon uit `start_comment`. Dit is
-functioneel correct: Deze scans zijn destijds bewust namens de
-organisatie ingevuld, samen met een contactpersoon, niet zelfstandig
-door de klant. `start_comment` bevat die contactpersoon als vrije tekst
-(bijv. "Samen ingevuld met Kim Phan") en wordt overgenomen in
-`Respondent.notities`, met een vaste prefix zodat duidelijk blijft dat
-dit een geïmporteerde, geen zelf ingevoerde notitie is: **"Legacy-import
-uit de oude tool. Oorspronkelijke notitie: '{start_comment}'."**
+Geldt voor het formaat "Oude tool". Bij de eigen export komen de
+Respondenten uit de kolommen van de export zelf, op dezelfde manier.
 
-Bestaat er al een `Respondent` met dit e-mailadres binnen deze
-organisatie (bijv. Sander vulde al eerder een scan in voor dezelfde
-klant), dan wordt die hergebruikt — de bestaande regel uit
-`datamodel.md` (Respondent) geldt hier ongewijzigd, geen nieuwe logica.
+De Respondent komt uit de gegevens in het bestand. Dat is meestal de
+Coniche-medewerker die de scan destijds namens de organisatie invulde. Er
+is geen aparte neutrale Respondent. De beheerder kan de Respondent na de
+import bewerken, bijvoorbeeld naar de echte klantcontactpersoon
+(`beheerpagina.md`, punt 6b, "Respondent bewerken").
+
+| Kolom in het bestand | Veld op `Respondent` |
+|---|---|
+| `assessor_name` | `naam` |
+| `respondent_email` | `email`, genormaliseerd (getrimd, lowercase) |
+| `respondent_role` | `functie` |
+| `team_name` | `team` |
+| `start_comment` | `notities`, ongewijzigd en zonder opbouwtekst |
+
+- **Hergebruik**: De regel uit `datamodel.md` (Respondent) geldt
+  ongewijzigd. Hetzelfde genormaliseerde e-mailadres binnen een
+  organisatie is één Respondent, binnen één import en ook in latere
+  imports. De gegevens van een bestaande Respondent worden niet
+  overschreven. Heeft een latere scan een `start_comment` die nog niet in
+  de notities staat, dan komt die als nieuwe regel onder de bestaande
+  notities.
+- **Geen e-mailadres in de rij**: Het e-mailadres is verplicht, dus de rij
+  heeft een matchingprobleem en wordt niet geïmporteerd. De rij staat met
+  die reden in beeld.
+- **Telefoonnummer**: `respondent_phone` wordt niet overgenomen.
+- **Persoonlijke link**: Elke Respondent krijgt een Toegangscode zoals
+  altijd. Is de Respondent een Coniche-medewerker, dan hoort de beheerder
+  die link niet te delen. Bewerken naar de echte persoon kan achteraf.
+- **Daarna aanpassen**: Alle scans van een Respondent in die organisatie
+  gaan mee bij bewerken. Een losse respons aan een andere Respondent in
+  dezelfde organisatie hangen kan nog niet (`backlog.md`).
 
 ## Organisatie-matching
 
@@ -161,12 +220,12 @@ losse klanten samen laten vallen) is groter dan het gemak.
 Gaat dit een keer toch mis, bijvoorbeeld twee net iets anders gespelde
 namen blijken achteraf dezelfde klant en zijn als twee losse
 organisaties het systeem ingekomen, dan is dat achteraf te herstellen:
-`beheerpagina.md`, punt 4, "Respondent of losse respons naar een
+`beheerpagina.md`, punt 6b, "Respondent of losse respons naar een
 andere organisatie verplaatsen".
 
 **Eigenaarschap van een nieuw aangemaakte organisatie**: `aangemaaktDoor`
 wordt de beheerder die de import bevestigt (Werkwijze in beheer,
-"Bevestigen in bulk of per rij"), net als bij de handmatige "Aanmaken"-actie
+"Goedkeuren en importeren, op één plek"), net als bij de handmatige "Aanmaken"-actie
 (`beheerpagina.md`, punt 4). Bij een bestaande, hergebruikte organisatie
 verandert het eigenaarschap niet.
 
@@ -192,15 +251,13 @@ eerste rij in bestandsvolgorde over. Er is geen markering en geen keuze:
 Kenmerken zijn altijd bewerkbaar in het organisatiedetail
 (`beheerpagina.md`, punt 4), dus een afwijking is achteraf te corrigeren.
 
-**Respondent hergebruiken binnen het bestand.** De regel uit "Wie de
-Respondent wordt" geldt ook voor een Respondent die eerder in dezelfde
-import is aangemaakt. Hetzelfde (genormaliseerde) e-mailadres binnen
-dezelfde organisatie is dus één Respondent, ook als een eerdere rij uit
-dit bestand die heeft aangemaakt. Hetzelfde e-mailadres bij een andere
+**Respondent hergebruiken binnen het bestand.** De hergebruikregel uit
+`datamodel.md` (Respondent) geldt ook voor een Respondent die eerder in
+dezelfde import is aangemaakt. Hetzelfde (genormaliseerde) e-mailadres
+binnen dezelfde organisatie is dus één Respondent, ook als een eerdere rij
+die heeft aangemaakt (zie "Wie de Respondent wordt"). Hetzelfde e-mailadres bij een andere
 organisatie geeft een aparte Respondent, omdat een e-mailadres alleen
-binnen een organisatie uniek is (`datamodel.md`, Respondent). Bij de oude
-tool komt dezelfde Coniche-assessor daardoor bij elke klant als aparte
-Respondent terug.
+binnen een organisatie uniek is.
 
 **Meting.** Zie "Meting" hieronder.
 
@@ -242,11 +299,10 @@ Assessment-type.
   duidelijk de hoogste** (geen andere kandidaat binnen dezelfde marge):
   ook gedetecteerd, maar niet automatisch — de voorbeeldweergave per rij
   (zie "Werkwijze in beheer") toont het percentage en welke vragen
-  afwijken, en de beheerder bevestigt expliciet per rij vóór import.
-  Deze rijen tellen niet mee bij "in bulk bevestigen voor rijen zonder
-  gevonden probleem" (Werkwijze in beheer, punt 4): Het blijft een
-  afwijking die bewust bevestigd wordt, alleen kan het nu wél in plaats
-  van nooit.
+  afwijken, en de beheerder keurt de rij expliciet goed. Een niet
+  goedgekeurde rij telt niet mee op de knop "rijen importeren" (Werkwijze
+  in beheer, punt 6): Het blijft een afwijking die bewust goedgekeurd
+  wordt, alleen kan het nu wél in plaats van nooit.
 - **Geen enkele kandidaat op of boven 95%, of meerdere kandidaten op of
   boven 95%**: onbepaald, zoals hieronder.
 
@@ -256,8 +312,8 @@ vragen is al één volledig herschreven vraag een afwijking van 1/60 ≈
 1,7%, dus een drempel van 99% zou vrijwel elke praktische
 tekstcorrectie alsnog blokkeren. 95% laat een handvol kleine
 wijzigingen toe (spelling, woordvolgorde, een enkele herschreven vraag)
-zonder de garantie los te laten: Nog steeds altijd een losse,
-expliciete bevestiging per rij, nooit automatisch en nooit in bulk.
+zonder de garantie los te laten: Nog steeds altijd een expliciete
+goedkeuring per rij, nooit automatisch en nooit voor alle rijen tegelijk.
 Geldt alléén voor deze vraagtekst-tiebreak in stap 2 — stap 1
 (bouwblok-namen en -aantal) blijft 100% exact, geen tolerantie: Wijkt
 een bouwblok af, dan blijft dat gewoon "niet importeren en melden".
@@ -332,7 +388,7 @@ krijgt twee Metingen.
   komen samen in één Meting.
 
 "Binnen één import" betekent één geladen bestand in één beheersessie.
-Importeer je een rij later apart uit hetzelfde geladen bestand (zie
+Neem je een rij later alsnog mee met dezelfde knop (zie
 "Werkwijze in beheer"), dan komt die in de Meting die eerder in die
 sessie al voor die combinatie is aangemaakt. Een nieuwe upload, ook van
 hetzelfde bestand, begint met nieuwe Metingen.
@@ -340,7 +396,7 @@ hetzelfde bestand, begint met nieuwe Metingen.
 **Omhangen na de import.** Dit is een voorwaarde voor deze aanpak: De
 beheerder kan elke geïmporteerde respons naar een andere Meting van
 dezelfde organisatie en hetzelfde Assessment verplaatsen
-(`beheerpagina.md`, punt 4, "Respons naar andere Meting verplaatsen").
+(`beheerpagina.md`, punt 6b, "Respons naar andere Meting verplaatsen").
 Is de import-Meting daarna leeg, dan verwijdert de beheerder die met de
 bestaande verwijderfunctie (`beheerpagina.md`, Verwijderen). De import
 legt zelf geen koppeling vast met de Meting waar de respons uiteindelijk
@@ -348,32 +404,54 @@ hoort.
 
 ## Werkwijze in beheer
 
-1. **CSV('s) uploaden**, één of meerdere tegelijk. Geen aparte stap om
-   vooraf een bronformaat te kiezen: De tool bepaalt per bestand zelf,
-   uit de headerregel, of het "Oude tool" of "Coniche Scan (eigen
-   export)" is (`detecteerBronFormaat`, `lib/import-legacy.ts`) — dat
-   bepaalt welke kolommen verplicht zijn en welk scheidingsteken de CSV
-   gebruikt (komma resp. puntkomma, zie hieronder bij het nieuwe
-   formaat). Bestanden mogen onderling een ander bronformaat hebben.
-2. **Samenvatting van het bestand**: Aantal rijen, aantal organisaties
+1. **Bron kiezen**: Met "Map kiezen" een map, of met "Bestanden kiezen"
+   losse bestanden. Bij de eigen export is dat één CSV.
+2. **Bronformaat herkennen**: De app bepaalt zelf uit de kopregel of het
+   bestand "Oude tool" of "Coniche Scan (eigen export)" is. Dat bepaalt
+   welke kolommen verplicht zijn en welk scheidingsteken de CSV gebruikt
+   (komma resp. puntkomma, zie hieronder bij het nieuwe formaat). Herkent
+   de app geen van beide, dan volgt een duidelijke melding.
+3. **Samenvatting van het bestand of de map**: Bovenaan de overgeslagen
+   bestanden met hun reden (zie "Bestanden die niet te importeren zijn"),
+   vóór de organisatiekeuzes. Daarna het aantal bestanden, genegeerde
+   submappen en bestandstypes, aantal rijen, aantal organisaties
    (bestaand, nieuw, nog te kiezen), aantal rijen per Assessment-type en
    aantal rijen met een probleem.
-3. **Organisaties koppelen**: Per unieke organisatienaam één keuze
+4. **Organisaties koppelen**: Per unieke organisatienaam één keuze
    (koppelen, nieuw aanmaken of overslaan), zie "Over rijen heen in één
    bestand".
-4. **Voorbeeldweergave per rij** vóór het definitief importeren:
-   Gedetecteerd of opgegeven Assessment-type, gevonden of nieuwe
-   organisatie, gevonden of nieuwe respondent, aantal gematchte/niet-
+5. **Voorbeeldweergave per rij** vóór het definitief importeren:
+   Bestandsnaam, gedetecteerd of opgegeven Assessment-type, gevonden of
+   nieuwe organisatie, gevonden of nieuwe respondent, aantal gematchte/niet-
    gematchte blokken en vragen. Rijen met een matchingprobleem (waaronder
    een niet te bepalen Assessment-type) worden gemarkeerd en apart
    afgehandeld, ze blokkeren niet de import van de overige rijen in het
    bestand. **Bij een 95%+-vraagtekstmatch** (Assessment- en
    bouwblok-matching, stap 2): Het percentage en de afwijkende vraag/vragen
-   staan er ook bij, zodat de beheerder ziet wat hij bevestigt.
-5. Bevestigen in bulk voor de rijen zonder gevonden probleem, of per rij
-   met de knop "Importeer deze rij". Een 95%+-match is geen probleemloze
-   rij: Die bevestig je altijd los, nooit in bulk.
-6. Resultaat per rij: Nieuwe of hergebruikte `Organisatie` en
+   staan er ook bij, zodat de beheerder ziet wat hij goedkeurt.
+6. **Goedkeuren en importeren, op één plek.** Importeren gebeurt alleen
+   met de ene knop onder de lijst, "N rijen importeren". Daarmee geeft de
+   beheerder in één keer goedkeuring voor de hele set. Er is geen knop
+   "Importeer deze rij" meer. Wat in de set zit:
+   - **Rijen zonder probleem** ("Klaar om te importeren") zitten er
+     automatisch in.
+   - **Rijen met een waarschuwing**, een 95%+-match ("98,3% match,
+     goedkeuring nodig"), zitten er pas in na een expliciete goedkeuring
+     per rij, met de knop "Goedkeuren" in de rij. De rij toont dan de
+     badge "Goedgekeurd" en de knop "Goedkeuring intrekken". Elke
+     goedkeuring telt er één bij op de knop. Goedkeuren is alleen een
+     keuze om mee te nemen en schrijft niets weg.
+   - **Rijen met een matchingprobleem of een overgeslagen organisatie**
+     zitten er niet in en hebben geen knop. Lost de beheerder het probleem
+     op, bijvoorbeeld door de organisatie te koppelen, dan wordt het een
+     rij zonder probleem of met een waarschuwing.
+   De knop noemt het aantal rijen in de set en het aantal overgeslagen
+   bestanden (bijvoorbeeld "Importeer 37 rijen, 2 bestanden
+   overgeslagen"). Staan er waarschuwingsrijen die nog niet zijn
+   goedgekeurd, dan staat er naast de knop hoeveel dat er zijn. Een
+   gewijzigde organisatiekoppeling bij een goedgekeurde rij trekt de
+   goedkeuring in, omdat de rij opnieuw wordt beoordeeld.
+7. Resultaat per rij: Nieuwe of hergebruikte `Organisatie` en
    `Respondent`, `Meting` (zie "Meting"), nieuwe `ScanInvulling` (status:
    Zie per formaat hieronder).
 
@@ -382,21 +460,23 @@ hoort.
 - **Een rij slaagt of mislukt als geheel.** `Organisatie`, `Respondent`,
   `Meting` en `ScanInvulling` van één rij worden samen weggeschreven of
   helemaal niet. Er blijft geen halve rij achter.
-- **Na een bulkimport blijven alle rijen in beeld.** Geslaagde rijen
-  staan als "geïmporteerd" en zijn niet meer te selecteren. Rijen die niet
+- **Na het importeren blijven alle rijen in beeld.** Geslaagde rijen
+  staan als "geïmporteerd" en zijn niet meer goed te keuren. Rijen die niet
   zijn gelukt staan er met de reden, zoals een matchingprobleem of een
   overgeslagen organisatie.
-- **Niet-geïmporteerde rijen importeer je alsnog een voor een**, met
-  "Importeer deze rij", zonder het bestand opnieuw te uploaden. Dat kan
-  nadat het probleem is opgelost, bijvoorbeeld door de organisatie alsnog
-  te koppelen.
+- **Niet-geïmporteerde rijen importeer je alsnog met dezelfde knop.** Een
+  rij met een waarschuwing keur je dan alsnog goed, een rij met een
+  probleem eerst oplossen, bijvoorbeeld door de organisatie alsnog te
+  koppelen. De knop "N rijen importeren" telt dan alleen de rijen die nog
+  niet zijn geïmporteerd. Opnieuw de map of het bestand kiezen is niet
+  nodig.
 - **Geen downloadbestand met overgeslagen rijen.** De import geeft alleen
   aan wat er niet is gelukt.
-- **De markering "geïmporteerd" hoort bij het geladen bestand in deze
-  sessie.** Het is geen controle op dubbele scans, zie "Beslist". Sluit de
-  beheerder het scherm of laadt hij het bestand opnieuw, dan is de
-  markering weg.
-- **Annuleren vóór bevestigen schrijft niets weg.** Na bevestigen is er
+- **De markering "geïmporteerd" hoort bij de geladen map of het geladen
+  bestand in deze sessie.** Het is geen controle op dubbele scans, zie
+  "Beslist". Sluit de beheerder het scherm of kiest hij de map opnieuw, dan
+  is de markering weg.
+- **Annuleren vóór importeren schrijft niets weg.** Na importeren is er
   geen ongedaan maken van de hele import. Een rij die verkeerd is
   binnengekomen, ruim je op met de bestaande verwijderacties
   (`beheerpagina.md`, Verwijderen) of verplaats je met de acties in punt
@@ -426,12 +506,13 @@ formaat hierboven:
 - **`organisatie_kenmerken` wordt één-op-één overgenomen** (inclusief
   Sector/Subsector) bij het aanmaken van een nieuwe organisatie, van de
   eerste rij in bestandsvolgorde (zie "Over rijen heen in één bestand").
-  Wordt
-  een bestaande organisatie hergebruikt, dan blijven haar eigen
+  Wordt een bestaande organisatie hergebruikt, dan blijven haar eigen
   kenmerken staan — geen overschrijving met mogelijk oudere geëxporteerde
   data.
-- **Geen aparte notitie-prefix**: `Respondent.notities` wordt niet
-  aangepast (er is geen `start_comment`-achtig veld in onze eigen
+- **Respondenten uit de export zelf**: De
+  Respondent komt uit `respondent_naam`, `respondent_email`,
+  `respondent_functie` en `respondent_team`, en `Respondent.notities` wordt
+  niet aangepast (er is geen `start_comment`-achtig veld in onze eigen
   export om te bewaren).
 - **Meting**: Een nieuwe Meting met het label "Import {meting_label}",
   met het `meting_label` uit de export erin, niet het label "Legacy-import
@@ -440,8 +521,31 @@ formaat hierboven:
   Meting, zie "Meting" hierboven. Een bestaande Meting met dezelfde naam
   wordt niet hergebruikt.
 
+## Audit-log
+
+Elke import wordt als groep gelogd in de audit-log (`beheerpagina.md`,
+punt 12; `datamodel.md`, Audit). De groep begint bij de eerste
+keer dat de knop "rijen importeren" wordt gebruikt. Goedkeuren en
+annuleren vóór het importeren logt niets. Gelogd worden de start
+met de geladen bestanden en welke daarvan direct zijn overgeslagen (met
+reden), per geïmporteerde rij de scan en wat daarbij is aangemaakt
+(Organisatie, Respondent, Meting), bij een goedgekeurde 95%+-rij het
+percentage, en per mislukte rij de reden. Rijen die later alsnog worden
+geïmporteerd, komen bij dezelfde groep.
+
+De log bevat geen persoonsgegevens uit de scans. Er staan dus geen
+namen of e-mailadressen van Respondenten in, ook niet de herkomstregel
+uit de notities. Een scan staat erin met Organisatie, Assessment en
+Meting.
+
 ## Beslist
 
+- **Goedkeuren en importeren op één plek** (5 oktober 2026): Een rij met een
+  waarschuwing (95%+-match) wordt niet meer los geïmporteerd. De beheerder
+  keurt de rij goed, waarna ze meetelt op de knop "N rijen importeren".
+  Importeren gebeurt alleen met die ene knop, voor de hele set. Goedkeuren
+  blijft per rij, omdat een afwijking bewust bekeken moet worden. Een
+  "alles goedkeuren" voor de waarschuwingsrijen is er bewust niet.
 - **Telefoonnummer**: Bewust weggelaten, geen nieuw veld op
   `Respondent`.
 - **Andere statussen dan `"completed"`**: De export uit de oude tool
@@ -449,7 +553,8 @@ formaat hierboven:
   (`"completed"`) scans die behouden moeten blijven. Geen ondersteuning
   nodig voor onafgeronde of andere statuswaarden.
 - **Dubbele import van dezelfde scan**: Voor nu geen dedup-detectie op
-  `assessment_id`, ook niet binnen één gecombineerd bestand. Dit is een
+  `assessment_id`, ook niet binnen één gecombineerd bestand of bij overlap
+  tussen bestanden in één map. Dit is een
   eenmalige (of incidentele) actie met een beperkt aantal historische
   CSV's, geen doorlopend proces. Wordt het importeren van extern
   afgenomen scans structureel (bijv. vaker scans laten uitvoeren en
@@ -463,7 +568,20 @@ formaat hierboven:
   omhangt.
 - **Deels mislukte import**: Alleen aangeven wat niet is gelukt, geen
   downloadbestand met overgeslagen rijen. Rijen die niet zijn
-  geïmporteerd blijven in beeld en importeer je een voor een alsnog.
+  geïmporteerd blijven in beeld en importeer je alsnog met dezelfde knop.
+- **Map met losse bestanden** (1 oktober 2026): Alleen bij "Oude tool",
+  omdat de batch-export van de oude tool geen antwoorden per vraag
+  bevat. Alleen bestanden direct in de gekozen map, geen submappen. De
+  rijen worden samengevoegd en verder verwerkt als gecombineerd bestand.
+- **Respondent uit het bestand bij "Oude tool"** (5 oktober 2026): Elke
+  geïmporteerde scan krijgt een Respondent met de gegevens uit het bestand
+  (naam, e-mailadres, functie, team en notitie), in plaats van een
+  neutrale Respondent. Dat kan nu, omdat de beheerder een Respondent
+  achteraf kan bewerken. Dit vervangt de beslissing van 1 oktober 2026 over
+  de neutrale Respondent "Coniche (historische scan)".
+
+## Open
+
 - **Sector/subsector-opties**: Vastgelegd als de standaard
   SBI2025-indeling, alleen de bovenste twee niveaus (Secties,
   Afdelingen), zie `sbi-indeling.md`. Deze import mapt

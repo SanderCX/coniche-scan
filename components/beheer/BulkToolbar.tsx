@@ -1,4 +1,5 @@
 import { DropdownKnop } from "@/components/DropdownKnop";
+import { InfoIcoon } from "@/components/InfoIcoon";
 
 function TrashIcon() {
   return (
@@ -77,31 +78,30 @@ export function BulkToolbar({
         <DropdownKnop
           label={exportBezig ? "Bezig…" : "Exporteren"}
           className="btn btn-outline btn-compact"
+          disabled={Boolean(exporterenDisabledReden)}
           opties={[
             {
               label: "Als PDF",
               onClick: onExporterenPdf,
               disabled: !onExporterenPdf || Boolean(exportBezig),
-              title: !onExporterenPdf
-                ? "Beschikbaar bij precies één scan"
-                : exportBezig
-                  ? "PDF wordt gemaakt…"
-                  : undefined,
+              title: exportBezig ? "PDF wordt gemaakt…" : undefined,
+              infoSleutel: !onExporterenPdf ? "info.exportEenScan" : undefined,
             },
             {
               label: "Als CSV",
               onClick: onExporteren,
               disabled: !onExporteren || Boolean(exporterenDisabledReden),
-              title: !onExporteren ? "Binnenkort beschikbaar" : (exporterenDisabledReden ?? undefined),
+              title: !onExporteren ? "Binnenkort beschikbaar" : undefined,
             },
             {
               label: "Voor InDesign (XML)",
               onClick: onExporterenIndesign,
               disabled: !onExporterenIndesign,
-              title: !onExporterenIndesign ? "Beschikbaar bij precies één scan" : undefined,
+              infoSleutel: !onExporterenIndesign ? "info.exportEenScan" : undefined,
             },
           ]}
         />
+        {exporterenDisabledReden && <InfoIcoon naastVeld sleutel="info.bulkExportOrganisatie" />}
         <button
           type="button"
           disabled={Boolean(verwijderenDisabledReden)}

@@ -25,6 +25,14 @@ import { Assessment, Bouwblok } from "@/lib/types";
  * gecorrigeerd, met Sander/Joost te bespreken welke vragen dat precies
  * zijn.
  */
+/**
+ * Afwijkende gewichten in de Zorgscan, per `volgnummer` (`datamodel.md`, Bouwblok.gewicht).
+ * Voorlopig leeg: Alle bouwblokken staan op 1. `content-zorgscan.md` noemde 4 (Leren uit
+ * klantcontact), 10 (Kanaalmanagement) en 11 (Performance Management) op 2, maar het besluit
+ * daarover is open (`CLAUDE.md`, Open punten) en voor nu terug naar 1 gezet.
+ */
+const GEWICHT_PER_VOLGNUMMER: Record<number, number> = {};
+
 function bb(
   id: string,
   volgnummer: number,
@@ -41,7 +49,7 @@ function bb(
     omschrijving,
     toelichting,
     tags,
-    gewicht: 1,
+    gewicht: GEWICHT_PER_VOLGNUMMER[volgnummer] ?? 1,
     vragen: vragen.map((tekst, i) => ({
       id: `${id}-v${i + 1}`,
       volgnummer: i + 1,
@@ -384,6 +392,7 @@ export const zorgscan: Assessment = {
   pdfContentSecties: { titel: "Visie", bron: "visie-coniche.md-deel1" },
   bouwblokken: null,
   scoresPerGroepGesorteerd: false,
+  bouwblokLabel: "Bouwsteen",
   bouwblokEenheidEnkelvoud: "Bouwblok",
   bouwblokEenheidMeervoud: "bouwblokken",
   featureCards: [
@@ -414,7 +423,6 @@ export const zorgscan: Assessment = {
       naam: "Overkoepelend",
       kleur: "oranje",
       volgorde: 1,
-      gewicht: 1,
       bouwblokken: [bb1, bb2],
     },
     {
@@ -422,7 +430,6 @@ export const zorgscan: Assessment = {
       naam: "Organisatie",
       kleur: "blauw",
       volgorde: 2,
-      gewicht: 1,
       bouwblokken: [bb3, bb11, bb13, bb14],
     },
     {
@@ -430,7 +437,6 @@ export const zorgscan: Assessment = {
       naam: "Proces & Tech",
       kleur: "paars",
       volgorde: 3,
-      gewicht: 1,
       bouwblokken: [bb4, bb6, bb10, bb12],
     },
     {
@@ -438,7 +444,6 @@ export const zorgscan: Assessment = {
       naam: "Mens",
       kleur: "groen",
       volgorde: 4,
-      gewicht: 1,
       bouwblokken: [bb5, bb7, bb8, bb9],
     },
     {
@@ -446,7 +451,6 @@ export const zorgscan: Assessment = {
       naam: "Fundament",
       kleur: "antraciet",
       volgorde: 5,
-      gewicht: 1,
       bouwblokken: [bb15],
     },
   ],

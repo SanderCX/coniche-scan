@@ -3,6 +3,8 @@ import { nieuwId } from "../id";
 import { genereerToegangscode } from "../toegangscode";
 import { normaliseerEmail } from "../email";
 import { laadAlles, slaAlles, useOrganisaties } from "./store";
+import { logAudit } from "../audit-store";
+import { metingContext, organisatieContext } from "../audit-context";
 
 /** Respondenten (in de code `OrganisatieLid`): uitnodigen, Lead-toegang, gegevens, verwijderen en opzoeken via toegangscode. */
 
@@ -51,6 +53,7 @@ export function nodigLidUit(
     if (!scanUitvoering) continue;
 
     let lid = organisatie.leden.find((l) => l.email === normaliseerEmail(email));
+    const nieuwLid = !lid;
     if (!lid) {
       lid = {
         id: nieuwId(),
@@ -72,12 +75,23 @@ export function nodigLidUit(
     }
 
     let invulling = scanUitvoering.invullingen.find((i) => i.organisatieLidId === lid!.id);
+    const nieuweInvulling = !invulling;
     if (!invulling) {
       invulling = maakInvulling(scanUitvoeringId, lid.id);
       scanUitvoering.invullingen.push(invulling);
     }
 
     slaAlles(alles);
+    // Geen naam of e-mailadres van de Respondent in de log (datamodel.md, Audit).
+    const context = metingContext(organisatie, scanUitvoering);
+    logAudit([
+      ...(nieuwLid
+        ? [{ actie: "respondent.aangemaakt", entiteitType: "respondent", entiteitId: lid.id, details: context }]
+        : []),
+      ...(nieuweInvulling
+        ? [{ actie: "respondent.uitgenodigd", entiteitType: "scan", entiteitId: invulling.id, details: context }]
+        : []),
+    ]);
     return { lid, invulling };
   }
   return null;
@@ -100,6 +114,7 @@ export function voegLeadToe(
   if (!organisatie) return null;
 
   let lid = organisatie.leden.find((l) => l.email === normaliseerEmail(input.email));
+  const nieuwLid = !lid;
   if (!lid) {
     lid = {
       id: nieuwId(),
@@ -120,6 +135,21 @@ export function voegLeadToe(
     lid.leadMetingIds = [...lid.leadMetingIds, ...nieuweIds];
   }
   slaAlles(alles);
+  logAudit([
+    ...(nieuwLid
+      ? [{ actie: "respondent.aangemaakt", entiteitType: "respondent", entiteitId: lid.id, details: organisatieContext(organisatie) }]
+      : []),
+    ...(nieuweIds.length > 0
+      ? [
+          {
+            actie: "respondent.leadToegekend",
+            entiteitType: "respondent",
+            entiteitId: lid.id,
+            details: { ...organisatieContext(organisatie), aantalMetingen: nieuweIds.length },
+          },
+        ]
+      : []),
+  ]);
   return lid;
 }
 
@@ -134,8 +164,15 @@ export function zetLeadMetingen(lidId: string, metingIds: string[]): void {
   for (const organisatie of alles) {
     const lid = organisatie.leden.find((l) => l.id === lidId);
     if (!lid) continue;
+    const eerder = lid.leadMetingIds.length;
     lid.leadMetingIds = metingIds;
     slaAlles(alles);
+    logAudit({
+      actie: metingIds.length === 0 ? "respondent.leadIngetrokken" : "respondent.leadToegekend",
+      entiteitType: "respondent",
+      entiteitId: lid.id,
+      details: { ...organisatieContext(organisatie), aantalMetingenVoor: eerder, aantalMetingenNa: metingIds.length },
+    });
     return;
   }
 }
@@ -217,7 +254,22 @@ export function useRespondentPerToegangscode(code: string): RespondentContext | 
 export function verwijderLeden(ledIds: string[]): void {
   const ids = new Set(ledIds);
   const alles = laadAlles();
+  const gelogd: Parameters<typeof logAudit>[0] = [];
   for (const organisatie of alles) {
+    for (const lid of organisatie.leden.filter((l) => ids.has(l.id))) {
+      gelogd.push({
+        actie: "respondent.verwijderd",
+        entiteitType: "respondent",
+        entiteitId: lid.id,
+        details: {
+          ...organisatieContext(organisatie),
+          aantalScans: organisatie.scanUitvoeringen.reduce(
+            (n, m) => n + m.invullingen.filter((i) => i.organisatieLidId === lid.id).length,
+            0
+          ),
+        },
+      });
+    }
     organisatie.leden = organisatie.leden.filter((l) => !ids.has(l.id));
     for (const scanUitvoering of organisatie.scanUitvoeringen) {
       scanUitvoering.invullingen = scanUitvoering.invullingen.filter(
@@ -226,4 +278,5 @@ export function verwijderLeden(ledIds: string[]): void {
     }
   }
   slaAlles(alles);
+  logAudit(gelogd);
 }

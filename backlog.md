@@ -4,31 +4,59 @@ Bewust nog niet opgepakt. Geen prioritering.
 
 ## Techniek en infrastructuur
 
-- **Database**: Postgres op Neon, ter vervanging van localStorage. Pas
-  daarna werken links in elke browser en komen antwoorden van
-  respondenten centraal binnen.
+- **Database**: Vervanging van localStorage door een gedeelde database.
+  Sander gebruikt nu voorlopig Neon (Postgres). Welke database definitief
+  wordt en waar die draait, stemmen we nog af met IT. Pas daarna werken
+  links in elke browser en komen antwoorden van respondenten centraal
+  binnen.
 - **Rollen, rechten en inlog** (`datamodel.md` deel 2):
   Admin, Consultant, Lead, 2FA, audit. Met de database.
 - **E-mailverificatie bij het openen van de link**: Code per mail, 15
   minuten geldig (`datamodel.md`, Toegangscode). Met de database en de
   mailserver.
 - **Coniche-mailserver (SMTP)**: Voor uitnodigingen en verificatiecodes.
-  De bestaande Gmail-koppeling is alleen voor testen.
+  De bestaande Gmail-koppeling is alleen voor testen. Mailprovider kiezen
+  (bijvoorbeeld SendGrid), SPF, DKIM en DMARC configureren, een apart domein
+  registreren voor scan- en surveyverkeer, en de reminder-functionaliteit en
+  het verzendgedrag testen.
 - **Antwoorden als losse records**: Handig voor export en aggregatie
   zodra de database er is. Nu volstaat een lijst per ingevulde scan.
 - **Responsive**: De app is nu alleen voor desktop.
+- **Servicewindow voor beheer**: Een vast tijdvenster waarbinnen beheer
+  plaats kan vinden, zoals onderhoud, een update, een migratie of een grote
+  import of verplaatsactie, zonder dat iemand op dat moment met data bezig
+  is. Bedoeld gedrag:
+  - Een Admin plant een window met start, einde en reden.
+  - Vóór de start krijgen ingelogde gebruikers (beheer en respondenten) een
+    waarschuwing met aftelling dat ze worden uitgelogd, bijvoorbeeld 30, 10
+    en 5 minuten van tevoren.
+  - Bij de start worden alle sessies beëindigd. Een scan die nog in
+    invulling is, slaat eerst de antwoorden op, zodat er geen voortgang
+    verloren gaat, en het Bewerkslot (`datamodel.md`) wordt vrijgegeven.
+  - Tijdens het window kan niemand inloggen of een persoonlijke link
+    openen. Beide tonen een melding met het verwachte einde.
+  - De Admin ziet vóór de start wie er nog actief is en kan pas beginnen
+    als er niemand meer is ingelogd, of bewust doorzetten.
+  - Het begin en einde van het window worden gelogd (`AuditEvent`).
+  Nog open: De maximale duur, of een window ook direct (zonder plan) te
+  starten is, en de vorm van de waarschuwing. Hangt af van echte sessies en
+  het Bewerkslot, dus van fase 2 hieronder.
 
 ## Voor productie
 
+- **Privacy en retentie** (`privacy-pagina.md`, `go-live-plan.md` fase 7):
+  Bewaartermijn per uitvraag instelbaar, een notificatieproces voor
+  aflopende bewaartermijnen, een vastgelegde procedure voor verlengen en
+  verwijderen, en back-upretentie afgestemd op het dataretentiebeleid.
 - **Testknop** (vragenlijst automatisch invullen): Alleen tonen aan
   ingelogde beheerders, en voor productie verwijderen.
 - **Testdata**: Seed-data met een testorganisatie en testrespondent
   opruimen.
-- **Verificatie op "niets blijft achter" bij verwijderen**: Een
-  eenvoudige controlefunctie (bijv. een testknop voor beheerders) die
-  na een verwijderactie aantoont dat er niets meer verwijst naar het
-  verwijderde record (`datamodel.md`, Verwijderen en datakoppelingen).
-  Zelf ook weer opruimen voor productie, net als de testknop hierboven.
+- **Data-integriteit** (`beheerpagina.md`, punt 13): Controlefunctie die na
+  een verwijderactie aantoont dat er niets meer verwijst naar het
+  verwijderde record, zodat er geen wees-data achterblijft. Bestaat als
+  knop "Controleer nu". Uitwerking met modal per controle staat in de
+  spec. Nog te beslissen: Blijft hij in productie.
 - **Bronformaat "Oude tool" verwijderen bij Import** (`import-scans.md`):
   Zodra de historische migratie uit de oude, stopgezette
   tool voltooid is, kan dat bronformaat uit de CSV-import. "Coniche Scan
@@ -38,6 +66,11 @@ Bewust nog niet opgepakt. Geen prioritering.
 
 ## Functioneel
 
+- **Conflict oplossen bij omhangen naar een andere Meting**
+  (`beheerpagina.md`, punt 6b): Heeft de Respondent in de doel-Meting al een
+  scan, dan komt er naast de waarschuwing een modal met beide scans naast
+  elkaar, waarin één scan aan een andere of nieuwe Respondent wordt
+  gekoppeld. Spec is uitgeschreven. Nog te bouwen.
 - **Landingspagina als leadgenerator**: De assessment-landingspagina
   krijgt een knop "Toegang aanvragen" in plaats van de uitgeschakelde
   "Start assessment".
@@ -49,16 +82,6 @@ Bewust nog niet opgepakt. Geen prioritering.
   de geïmporteerde scans hebben ingevuld. Bedoelde uitwerking: Een rij
   in de lijst Respondenten aanvinken, waarna de knop "Toewijzen"
   verschijnt (`beheerpagina.md`, punt 6b).
-- **Weging per bouwblok** (eerst overleggen met Joost): Gewogen scoring
-  in plaats van de huidige ongewogen berekening, met Zorgscan-bouwblokken
-  4, 10 en 11 op gewicht 2. De volledige uitwerking staat al in de specs
-  maar is bewust **niet gebouwd**: `CLAUDE.md` (sectie 1 Scoringslogica,
-  intake-Wegingskaart, "2×"-chip in doorloopflow en resultaten) en
-  `beheerpagina.md` punt 1 en 2 (Weging per bouwblok, Wegingstekst per
-  Assessment, `Assessment.wegingTitel`/`wegingToelichting`, auditregel
-  `bouwblok.gewichtGewijzigd`). Raakt ook PDF, CSV (`gewicht` in
-  `groepsScores`), InDesign en de Organisatie-resultaten. Tot het besluit
-  valt rekent de app ongewogen en staat `gewicht` overal op 1.
 - **Opnieuw invullen door de respondent**: De respondent start zelf,
   vanuit de scan, een nieuwe poging. Beheer verwijdert alleen.
 - **Terugkomen bij eerdere scans**: Via de persoonlijke link naar een
@@ -188,7 +211,28 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   lastig (zie `go-live-plan.md`).
 - **Schrijfverkeer**: Elke wijziging stuurt de hele blob naar Neon. Op
   record-niveau (fase 2) verdwijnt dit vanzelf.
-- **Neon-back-ups** en een herstelprocedure, plus rate limiting op de routes.
+- **Neon-back-ups** en een herstelprocedure, plus rate limiting per IP-adres
+  op de routes.
+- **Account lockout** na een vast aantal mislukte inlogpogingen, en 2FA waar
+  relevant (`go-live-plan.md`, fase 2).
+- **Databasequeries volledig geparametriseerd** (preventie van SQL-injectie)
+  en **inputvalidatie** op URL-, formulier- en API-verkeer.
+- **DDoS-bescherming** configureren, bijvoorbeeld via Azure Application
+  Gateway met WAF, afhankelijk van de hostingkeuze.
+- **Security logging en monitoring** inrichten, plus incidentmanagement en
+  een back-up- en restoreproces beschreven.
+- **Werkwijze Azure DevOps of GitHub** vastleggen.
+
+### Security-validatie vóór productie
+
+Onderdeel van de go/no-go-eis in `go-live-plan.md`: Livegang voor externe
+klanten alleen na deze vier punten.
+
+- Onafhankelijke code review.
+- Penetratietest op de productie-kandidaat.
+- DDoS- en belastingtest om het platformgedrag onder piekbelasting te
+  valideren, inclusief rate limiting.
+- Bevindingen verwerken en een hertest op kritieke kwetsbaarheden.
 
 ## Content-onderhoud
 

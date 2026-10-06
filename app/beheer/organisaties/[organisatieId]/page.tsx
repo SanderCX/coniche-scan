@@ -17,6 +17,7 @@ import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magOrganisatieToegang, magOrganisatieToewijzen, magLeadToekennen } from "@/lib/rechten";
 import { useGebruikers } from "@/lib/gebruikers-store";
 import { useBeheerOverzicht } from "@/lib/beheer-url";
+import { MetBewerkslot } from "@/components/beheer/MetBewerkslot";
 
 /** Aantal rijen per lijst op de detailpagina (beheerpagina.md, punt 4, "Lange lijsten"). */
 const MAX_RIJEN = 5;
@@ -112,6 +113,19 @@ function LeadToevoegen({ organisatie }: { organisatie: Organisatie }) {
 
 export default function OrganisatieDetailPage({ params }: { params: Promise<{ organisatieId: string }> }) {
   const { organisatieId } = use(params);
+  const organisatie = useOrganisatie(organisatieId);
+  const ingelogdVoorSlot = useIngelogdeGebruiker();
+  // Het slot wordt alleen geclaimd door wie de organisatie ook mag bewerken: Anders zou iemand
+  // zonder toegang het slot van de eigenaar kunnen bezetten.
+  const slotId = organisatie && magOrganisatieToegang(ingelogdVoorSlot, organisatie) ? organisatieId : null;
+  return (
+    <MetBewerkslot type="organisatie" id={slotId} wat="Organisatie">
+      <OrganisatieDetailInhoud organisatieId={organisatieId} />
+    </MetBewerkslot>
+  );
+}
+
+function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
   const organisatie = useOrganisatie(organisatieId);
   const assessments = useAssessments();
   const ingelogd = useIngelogdeGebruiker();
@@ -249,8 +263,8 @@ export default function OrganisatieDetailPage({ params }: { params: Promise<{ or
                     {s.invullingen.length} respondent{s.invullingen.length === 1 ? "" : "en"}, {afgerond} afgerond
                   </td>
                   <td style={{ textAlign: "right" }}>
-                    <Link href={`/beheer/metingen/${s.id}`} className="admin-bekijk-knop" onClick={(e) => e.stopPropagation()}>
-                      Bekijk &gt;&gt;
+                    <Link href={`/beheer/metingen/${s.id}`} className="btn btn-outline btn-compact" onClick={(e) => e.stopPropagation()}>
+                      Bekijk
                     </Link>
                   </td>
                 </tr>
@@ -282,8 +296,8 @@ export default function OrganisatieDetailPage({ params }: { params: Promise<{ or
                       <RespondentStatusBadge invullingen={invullingen} />
                     </td>
                     <td style={{ textAlign: "right" }}>
-                      <button type="button" className="admin-bekijk-knop" onClick={() => open("respondent", lid.id)}>
-                        Bekijk &gt;&gt;
+                      <button type="button" className="btn btn-outline btn-compact" onClick={() => open("respondent", lid.id)}>
+                        Bekijk
                       </button>
                     </td>
                   </tr>
@@ -321,8 +335,8 @@ export default function OrganisatieDetailPage({ params }: { params: Promise<{ or
                     </td>
                     <td>{percentage}%</td>
                     <td style={{ textAlign: "right" }}>
-                      <button type="button" className="admin-bekijk-knop" onClick={() => open("scan", invulling.id)}>
-                        Bekijk &gt;&gt;
+                      <button type="button" className="btn btn-outline btn-compact" onClick={() => open("scan", invulling.id)}>
+                        Bekijk
                       </button>
                     </td>
                   </tr>

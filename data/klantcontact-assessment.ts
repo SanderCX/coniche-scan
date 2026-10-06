@@ -355,6 +355,7 @@ export const klantcontactVolwassenheid: Assessment = {
   pdfContentSecties: { titel: "Visie", bron: "visie-coniche.md-deel1" },
   bouwblokken: null,
   scoresPerGroepGesorteerd: false,
+  bouwblokLabel: "Bouwsteen",
   bouwblokEenheidEnkelvoud: "Bouwblok",
   bouwblokEenheidMeervoud: "bouwblokken",
   featureCards: [
@@ -385,7 +386,6 @@ export const klantcontactVolwassenheid: Assessment = {
       naam: "Overkoepelend",
       kleur: "oranje",
       volgorde: 1,
-      gewicht: 1,
       bouwblokken: [bb1, bb2],
     },
     {
@@ -393,7 +393,6 @@ export const klantcontactVolwassenheid: Assessment = {
       naam: "Organisatie",
       kleur: "blauw",
       volgorde: 2,
-      gewicht: 1,
       bouwblokken: [bb3, bb11, bb13, bb14],
     },
     {
@@ -401,7 +400,6 @@ export const klantcontactVolwassenheid: Assessment = {
       naam: "Proces & Tech",
       kleur: "paars",
       volgorde: 3,
-      gewicht: 1,
       bouwblokken: [bb4, bb6, bb10, bb12],
     },
     {
@@ -409,7 +407,6 @@ export const klantcontactVolwassenheid: Assessment = {
       naam: "Mens",
       kleur: "groen",
       volgorde: 4,
-      gewicht: 1,
       bouwblokken: [bb5, bb7, bb8, bb9],
     },
     {
@@ -417,7 +414,6 @@ export const klantcontactVolwassenheid: Assessment = {
       naam: "Fundament",
       kleur: "antraciet",
       volgorde: 5,
-      gewicht: 1,
       bouwblokken: [bb15],
     },
   ],

@@ -9,6 +9,7 @@ import {
   topSterktesEnVerbeterkansen,
   voortgang,
 } from "@/lib/scoring";
+import { gewichtMarkering } from "@/lib/weging";
 import { CLASSIFICATIE_INFO, CLASSIFICATIE_SCORES, SCORE_KLEUR, scoreKleur } from "@/lib/colors";
 import { ScoreCircle } from "./ScoreCircle";
 import { RadarChartView } from "./RadarChartView";
@@ -29,8 +30,8 @@ export function ResultsView({
   bouwblokHref?: (bouwblokId: string) => string;
 }) {
   const bouwblokResultaten = alleBouwblokResultaten(assessment, antwoorden);
-  const groepResultaten = alleGroepResultaten(assessment, bouwblokResultaten);
-  const overall = overallScore(bouwblokResultaten.map((r) => r.score));
+  const groepResultaten = alleGroepResultaten(assessment, bouwblokResultaten, antwoorden);
+  const overall = overallScore(assessment, antwoorden);
   const { beantwoord, totaal } = voortgang(assessment, antwoorden);
   const { sterktes, verbeterkansen } = topSterktesEnVerbeterkansen(bouwblokResultaten);
   const vlak = isVlakkeAssessment(assessment);
@@ -82,6 +83,11 @@ export function ResultsView({
                 ) : (
                   <span className="text-sm text-ink">{r.bouwblok.naam}</span>
                 )}
+                {gewichtMarkering(r.bouwblok) && (
+                  <span className="gewicht-chip" style={{ marginLeft: "0.4rem" }}>
+                    {gewichtMarkering(r.bouwblok)}
+                  </span>
+                )}
                 <span
                   className="score-pill"
                   style={{ ["--kleur" as string]: scoreKleur(r.score) } as React.CSSProperties}
@@ -103,6 +109,11 @@ export function ResultsView({
                   </Link>
                 ) : (
                   <span className="text-sm text-ink">{r.bouwblok.naam}</span>
+                )}
+                {gewichtMarkering(r.bouwblok) && (
+                  <span className="gewicht-chip" style={{ marginLeft: "0.4rem" }}>
+                    {gewichtMarkering(r.bouwblok)}
+                  </span>
                 )}
                 <span
                   className="score-pill"

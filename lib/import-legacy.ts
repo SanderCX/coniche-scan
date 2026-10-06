@@ -225,6 +225,41 @@ const SBI_SUBSECTOREN_ALLES = Object.values(SBI_SUBSECTOREN_PER_SECTOR).flat();
 
 export type ImportBronFormaat = "oud" | "nieuw";
 
+/**
+ * Bestanden die als geheel niet te importeren zijn (import-scans.md, "Bestanden die niet
+ * te importeren zijn"): Zonder kolom `answers` of met overal een lege `answers` (de
+ * batch-export van de oude tool bevat geen antwoorden per vraag), zonder kopregel,
+ * zonder rijen, of waarvan `answers` nergens geldige JSON is. Geeft de melding, of
+ * `null` als het bestand wél (verder) beoordeeld kan worden. Onze eigen export valt
+ * hier niet onder.
+ */
+export function bestandOverslaanReden(tekst: string): string | null {
+  const schoon = tekst.replace(/^﻿/, "");
+  if (schoon.trim() === "") return "Bevat geen kopregel.";
+  if (detecteerBronFormaat(tekst) === "nieuw") return null;
+  const tabel = parseCsv(schoon, ",");
+  if (tabel.length === 0) return "Bevat geen kopregel.";
+  const header = tabel[0].map((k) => k.trim());
+  const lijktOudeTool = header.includes("organization_name") && header.includes("respondent_email");
+  if (!lijktOudeTool) return null;
+  const BATCH = "Bevat geen antwoorden per vraag (mogelijk een batch-export).";
+  const answersIndex = header.indexOf("answers");
+  if (answersIndex === -1) return BATCH;
+  const rijen = tabel.slice(1).filter((cols) => cols.some((c) => c !== ""));
+  if (rijen.length === 0) return "Bevat geen rijen.";
+  const waarden = rijen.map((cols) => (cols[answersIndex] ?? "").trim());
+  if (waarden.every((w) => w === "")) return BATCH;
+  const geldig = (w: string) => {
+    try {
+      return Array.isArray(JSON.parse(w));
+    } catch {
+      return false;
+    }
+  };
+  if (!waarden.some(geldig)) return "De kolom answers bevat geen geldige JSON.";
+  return null;
+}
+
 export interface GevalideerdeRij {
   rijNummer: number;
   /** "oud": het `assessment_id` uit de externe tool. "nieuw": leeg, onze eigen export kent geen los rij-ID. */
@@ -267,7 +302,6 @@ export interface GevalideerdeRij {
   opmerkingenPerBouwblok: Record<string, string>;
 }
 
-const LEGACY_NOTITIE_PREFIX = "Legacy-import uit de oude tool. Oorspronkelijke notitie: ";
 
 /** Matcht de gegroepeerde blokken/vragen van één CSV-rij tegen de huidige content van het gekozen Assessment. */
 function matchAntwoorden(
@@ -462,7 +496,8 @@ export function valideerLegacyRijen(rijen: LegacyCsvRow[], assessments: Assessme
       respondentNaam: rij.assessor_name,
       respondentFunctie: rij.respondent_role,
       respondentTeam: rij.team_name,
-      respondentNotities: rij.start_comment ? `${LEGACY_NOTITIE_PREFIX}"${rij.start_comment}".` : "",
+      // `start_comment` ongewijzigd en zonder opbouwtekst (import-scans.md, "Wie de Respondent wordt").
+      respondentNotities: rij.start_comment ?? "",
       // De oude tool kent geen apart "uitgenodigd"-moment; created_at is het beste beschikbare bod.
       uitgenodigdOp: rij.created_at,
       gestartOp: rij.created_at,

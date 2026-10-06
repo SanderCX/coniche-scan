@@ -29,7 +29,7 @@ Assessment {
   subtitel: string
   beschrijving: string
   doelgroep: string
-  icoon: string                     // sleutel in ASSESSMENT_ICONS ("target", "sparkle", "heart") voor een eigen SVG, anders een letterlijke emoji (valt terug op platte tekst)
+  icoon: string                     // sleutel in ASSESSMENT_ICONS (eigen SVG's); valt terug op een letterlijke emoji als er geen SVG bij de sleutel is
   geschatteDuur: string             // bijv. "±30 minuten"
   categorieen: Categorie[] | null   // optioneel, zie hieronder
   bouwblokken: Bouwblok[] | null    // gebruikt als categorieen ontbreken
@@ -37,16 +37,11 @@ Assessment {
   schaal: SchaalLabel[5]            // per Assessment, zie hieronder
   pdfContentSecties: { titel: string, bron: ContentBron } | null // zie export-pdf-visual-volwassenheidsscan.md
   afgeleidVanAssessmentId: string | null // zie Sector-varianten hieronder
+  bouwblokLabel: string             // eyebrow in de Toelichtingsmodal; standaard "Bouwsteen" (Klantcontact, Zorg), "AI-domein" bij de AI-scan
+  wegingTitel: string | null        // kop van de wegingskaart, zie Bouwblok.gewicht; leeg = standaardtitel
+  wegingToelichting: string | null  // tekst van de wegingskaart, per Assessment aanpasbaar; leeg = standaardtekst
 }
 ```
-
-**Geen `organisatieVelden` meer op `Assessment`.** Stond hier eerder per
-Assessment-type, maar is platformbreed geworden: Eén vaste lijst in
-`data/organisatie-velden.ts`, gebruikt door elk Assessment-type. Reden:
-Een organisatie kan meerdere scan-types doen (`Meting` koppelt aan één
-Assessment, `Organisatie` niet), en de kenmerken (volume, techstack, FTE,
-KPI's, zie Organisatievelden hieronder) gaan over de organisatie als
-geheel, niet over één scan. Zie `data/organisatie-velden.ts`.
 
 Niet elk scan-type heeft een categorie-laag. De Klantcontact
 Volwassenheidsscan groepeert 15 bouwblokken in 5 categorieën, de
@@ -78,8 +73,8 @@ een sector-variant vanuit een template kopieert die actie alle
 Categorieën, Bouwblokken en Vragen naar nieuwe, losse content-records
 onder het nieuwe Assessment (nieuwe id's). Daarna zijn het gewone,
 onafhankelijke content-records: Wijzig je een vraagtekst of een
-`Categorie.gewicht`/`Bouwblok.gewicht` op de sector-variant, dan raakt
-dat alleen die variant. Een latere correctie op het template werkt dus
+`Bouwblok.gewicht` op de sector-variant, dan raakt dat alleen die
+variant. Een latere correctie op het template werkt dus
 niet automatisch door in bestaande sector-varianten — bewuste keuze,
 om dezelfde reden als "Content bewerken" hieronder: Een sector-scan
 die al ingevuld is, mag niet ongemerkt van betekenis veranderen omdat
@@ -89,7 +84,7 @@ variant apart worden doorgevoerd.
 
 Wat er bij het kopiëren verandert, komt met het aanmaken van de eerste
 sector-variant zelf aan bod (nog niet uitgewerkt): In elk geval de
-vraagteksten en de gewichten per categorie/bouwblok, mogelijk ook
+vraagteksten en de gewichten per bouwblok, mogelijk ook
 bouwbloktoelichtingen. De structuur (aantal bouwblokken, categorieën,
 volgorde) blijft ongewijzigd overnemen, tenzij expliciet aangepast.
 
@@ -101,7 +96,7 @@ Categorie {
   naam: string                      // "Overkoepelend", "Organisatie", "Proces & Tech", "Mens", "Fundament"
   kleur: string                     // categoriekleur, waarde in stylesheet.md
   volgorde: number
-  gewicht: number                   // standaard 1, zie toelichting bij Bouwblok.gewicht
+  gearchiveerd: boolean             // standaard false, zie Content bewerken
   bouwblokken: Bouwblok[]
 }
 ```
@@ -114,77 +109,40 @@ Bouwblok {
   volgnummer: number                // 1 t/m 15, volgens de nummering in visie-coniche.md
   naam: string
   omschrijving: string              // de vraagzin onder de titel
-  toelichting: string               // korte tekst, beheerbaar in het contentbeheerscherm — zie de kanttekening hieronder
+  toelichting: string | null        // lopende tekst in de Toelichtingsmodal, zie stylesheet.md; leeg = dat onderdeel ontbreekt
+  centraleVraag: string | null      // blok "CENTRALE VRAAG" in dezelfde modal, bron: visie-coniche.md deel 2 / visie-ai-klantcontact.md; leeg = het blok ontbreekt
   tags: string[]                    // variabel aantal
   gewicht: number                   // standaard 1, zie toelichting hieronder
+  gearchiveerd: boolean             // standaard false, zie Content bewerken
   vragen: Vraag[]                   // nu steeds 4 (AI-scan: 5), niet hardcoded aannemen
 }
 ```
 
-**Geen `centraleVraag`-veld op `Bouwblok`.** Het label "CENTRALE VRAAG"
-in de toelichting-overlay (CLAUDE.md sectie 3) en op de interactieve
-visuals (`bouwstenenmodel-visual.md`, `ai-domeinenmodel-visual.md`) komt
-niet uit een veld op `Bouwblok` zelf, maar uit een aparte, hand-
-geschreven lookup-tabel (`data/bouwstenen-content.ts` voor de Klantcontact-
-en Zorgscan-bouwblokken, `data/ai-domeinen-content.ts` voor de
-AI-domeinen), gekoppeld via `Bouwblok.volgnummer` en of `Bouwblok.id`
-begint met `"bb"`, `"zorg-"` of `"ai"` (`lib/bouwblok-info.ts`,
-`toelichtingVoor`). Diezelfde lookup levert ook de rijke beschrijving die
-in de overlay/visual getoond wordt — **niet** `Bouwblok.toelichting`: Dat
-veld is wél beheerbaar in het contentbeheerscherm, maar voor de drie
-bestaande Assessment-types (Klantcontact, AI, Zorg) heeft een wijziging
-daaraan **zichtbaar geen effect**, omdat de overlay/visual altijd de
-lookup-tabel gebruikt zodra die een match vindt. Twee gevolgen die nergens
-anders vastliggen:
-- Een nieuw, zelf aangemaakt bouwblok (via het contentbeheerscherm, met
-  een gegenereerde UUID als `id`) matcht nooit een `"bb"/"zorg-"/"ai"`-
-  prefix, en krijgt dus nooit een "CENTRALE VRAAG" of rijke beschrijving
-  te zien — alleen zijn eigen `toelichting`-tekst, die dan wél gewoon
-  gebruikt wordt (`components/BouwblokForm.tsx` valt terug op
-  `Bouwblok.toelichting` als `toelichtingVoor` niets teruggeeft).
-- Voor de drie bestaande Assessment-types is het "Toelichting"-veld in
-  het contentbeheerscherm dus feitelijk dode invoer. Dit is niet ergens
-  anders gedocumenteerd of met een waarschuwing in de UI gemeld — puur
-  hier vastgelegd zodat het niet als losstaande bug herontdekt hoeft te
-  worden.
+**`gewicht`** (alleen op `Bouwblok`, niet op `Categorie` en niet op
+`Vraag`): Bepaalt hoe zwaar een bouwblok meetelt in de scores. Standaard
+`1`. Een getal groter dan 0, ook decimalen (bijv. `1,5`). Het gewicht
+hangt aan het bouwblok en dus aan het bouwstenenmodel, inclusief de
+categorie waarin het blok zit. Bij een Assessment zonder categorielaag
+(AI-volwassenheid) werkt het hetzelfde.
 
-  **Sector-variant kopiëren (`lib/assessment-store.ts`,
-  `duplicateAssessmentAsVariant`) behoudt dit voorvoegsel bewust** bij het
-  genereren van het nieuwe bouwblok-id (`nieuwBouwblokId`): zonder die
-  fix verloor elke via "Aanmaken vanuit bestaand Assessment" gekopieerde
-  bouwsteen stilzwijgend haar CENTRALE VRAAG/beschrijving, omdat een kale
-  UUID geen van de drie voorvoegsels meer matcht. Dit loste een reëel
-  gemelde bug op zonder de lookup-architectuur zelf te vervangen — die
-  grotere stap (`centraleVraag`/rijke beschrijving echt op `Bouwblok`
-  zetten, content overzetten uit de twee lookup-bestanden) staat nog open.
+Het gewicht werkt door in de categoriescore en in de overall-score, niet
+in de bouwblokscore zelf (zie Scoreberekening). Een gewicht ongelijk aan
+1 is bewust zichtbaar voor de respondent: Zie CLAUDE.md, sectie 3
+(wegingskaart en factor per bouwblok). Een gewicht van 1 wordt nergens
+getoond, dat is de normale situatie.
 
-**`gewicht`** (op zowel `Categorie` als `Bouwblok`, niet op `Vraag`):
-Bepaalt hoe zwaar een groepering meetelt binnen de laag die
-rechtstreeks naar de overall-score oprolt. Welke laag dat is, hangt af
-van of het scan-type een categorielaag heeft (`Assessment.categorieen`
-hierboven):
+Bij Klantcontact Volwassenheid en AI-volwassenheid staat het overal op
+`1`. Bij de Zorgscan hebben drie bouwblokken gewicht `2`: 4 (Leren uit
+Klantcontact), 10 (Kanaalmanagement) en 11 (Performance Management), zie
+`content-zorgscan.md`. De bouwblok-nummers zijn de `volgnummer`s uit
+`visie-coniche.md`.
 
-- **Klantcontact Volwassenheid** (wel een categorielaag): De vijf
-  categorieën rollen rechtstreeks op naar de overall-score, dus
-  `Categorie.gewicht` is daar de relevante laag. `Bouwblok.gewicht`
-  bestaat ook hier (`Bouwblok` is één type, gebruikt door beide
-  scan-types), maar heeft voorlopig geen omschreven rol: Bouwblokken
-  binnen een categorie tellen ongewogen mee, tenzij daar later
-  alsnog behoefte aan blijkt.
-- **AI-volwassenheid** (geen categorielaag): De acht domeinen —
-  in dit datamodel gewoon `Bouwblok`, zie hierboven — rollen zelf
-  rechtstreeks op naar de overall-score, dus daar is
-  `Bouwblok.gewicht` de relevante laag.
-
-Bij beide huidige scan-types staat dit overal op `1` (geen effect op
-de score). Toegevoegd omdat het verschil tussen een sector-variant en
-zijn template (zie Sector-varianten hierboven) vooral in twee dingen
-zit: Andere vraagteksten (`Vraag.tekst`, al bestaand) en andere
-gewichten op categorie-/bouwblokniveau (nieuw). Hoe een afwijkend
-gewicht precies doorwerkt in de score-berekening (nu een ongewogen
-gemiddelde) is nog niet uitgewerkt — dat volgt zodra de eerste
-sector-variant zelf wordt opgepakt, deze velden liggen er alvast zodat
-historische data (`import-scans.md`) er niet opnieuw bij hoeft.
+**Wijzigen kan altijd**, ook als er al ingevulde scans zijn. Scores
+worden nooit opgeslagen maar altijd berekend uit `antwoorden` en het
+actuele gewicht, dus een wijziging werkt in één keer door in alle
+scans van dat Assessment: Resultatenpagina, PDF, InDesign, CSV en de
+Organisatie-resultaten per Meting. Dat is een bewuste verantwoordelijkheid van Coniche. De wijziging wordt gelogd (`bouwblok.gewichtGewijzigd`,
+zie Audit).
 
 ### Vraag
 
@@ -193,6 +151,7 @@ Vraag {
   id: string
   volgnummer: number                // binnen het bouwblok
   tekst: string
+  gearchiveerd: boolean             // standaard false, zie Content bewerken
 }
 ```
 
@@ -301,13 +260,66 @@ Status: `"uitgenodigd"` bij het uitnodigen, `"bezig"` zodra de intake is
 verzonden (ook al is de voortgang dan nog 0%), `"afgerond"` als alle
 vragen beantwoord zijn.
 
+### Bewerkslot
+
+Een record dat iemand bewerkt, kan niet tegelijk door een ander bewerkt
+worden. Het slot geldt voor een ingevulde scan (invullen en bewerken), een
+Respondent en een Organisatie. Later komt content erbij (Assessments,
+Content-pagina's).
+
+```
+Bewerkslot {
+  entiteitType: "scan" | "respondent" | "organisatie"   // later ook content
+  entiteitId: string
+  houder: string                    // wie het slot heeft
+  hartslagOp: datetime
+}
+```
+
+- **Eerste wint**: Wie als eerste een record opent om te bewerken, krijgt het
+  slot. Claimen is atomair: Twee gelijktijdige pogingen leveren één houder.
+- **Tweede persoon**: Krijgt een melding dat het record nu in gebruik is en
+  kan het op dat moment niet openen. In beheer staat in de melding wie het
+  slot heeft. Aan de respondentkant staat er geen naam in. De melding
+  verdwijnt en het record opent zodra het slot vrij is.
+- **Hartslag en vervallen**: De houder meldt zich elke 15 seconden. Zonder
+  hartslag vervalt het slot na 90 seconden, zodat een gesloten tabblad of
+  een crash geen blijvend slot achterlaat.
+- **Vrijgeven**: Bij sluiten, opslaan of weggaan van de pagina. Een
+  overgang naar een volgende pagina in hetzelfde tabblad (intake naar
+  vragenlijst) behoudt het slot.
+- **Zonder database**: Valt terug op localStorage, en geldt dan alleen
+  binnen die browser.
+
+Sander werkt de velden en de techniek uit. Dit legt vast hoe het
+gedrag moet zijn.
+
 ### Scoreberekening
 
 Eén gedeelde functie berekent de overall-score en de score per
-categorie/bouwblok uit `antwoorden`, ongeacht `Categorie.gewicht`/
-`Bouwblok.gewicht` (nu overal `1`, zie hierboven). Vier plekken
-gebruiken dezelfde uitkomst, geen van alle een eigen herimplementatie:
-De resultatenpagina, de PDF-export
+categorie/bouwblok uit `antwoorden` en `Bouwblok.gewicht`. Alle scores
+worden berekend en nooit opgeslagen. Met `g` het gewicht van een
+bouwblok en `n` het aantal vragen in dat blok:
+
+- **Bouwblokscore** = som van de antwoorden in het blok gedeeld door `n`.
+  Ongewogen.
+- **Categoriescore** = `Σ(g × bouwblokscore) / Σ g` over de bouwblokken
+  in die categorie. Een blok met gewicht 2 telt dus dubbel mee.
+- **Overall** = `Σ(g × som antwoorden per blok) / Σ(g × n)` over alle
+  bouwblokken. Bij gewicht `1` overal is dat de som van alle antwoorden
+  gedeeld door het aantal vragen (60 bij Klantcontact). De overall komt
+  uit de ruwe antwoorden en niet uit afgeronde bouwblokscores.
+- **Afronding** alleen op getoonde waarden: 1 decimaal, half-away-from-
+  zero (`toFixed(1)`). Classificatie en kleur volgen de afgeronde
+  waarde.
+
+Rekenvoorbeeld Zorgscan: Een invulling met som 172 over 60 vragen is
+ongewogen 2,87. Met de blokken 4, 10 en 11 op gewicht 2 komt de som op
+215 en de deler op 72, dus 2,99 (afgerond 3,0). Dit voorbeeld hoort in
+de test van de scorefunctie.
+
+Vier plekken gebruiken dezelfde uitkomst, geen van alle een eigen
+herimplementatie: De resultatenpagina, de PDF-export
 (`export-pdf-visual-volwassenheidsscan.md`), de InDesign-export
 (`export-indesign.md`, `groepsScores`) en de CSV-export
 (`export-csv.md`, `overall_score`/`groepsScores`). Wijkt de score op
@@ -350,39 +362,6 @@ meer "bootstrappen" (zie CLAUDE.md, Status). E-mailverificatie bij het
 openen van de link (code per mail, 15 minuten geldig) blijft het doel,
 maar volgt pas met backend en Coniche-mailserver (`backlog.md`).
 
-### Scanslot
-
-Voorkomt dat twee personen tegelijk dezelfde ingevulde scan bewerken
-(CLAUDE.md, scherm 5, "Eén persoon tegelijk per scan"). Tijdelijke data,
-geen onderdeel van de scan zelf:
-
-```
-Scanslot {
-  scanInvullingId: string
-  houder: string                    // willekeurige id per browsertabblad, geen persoonsgegeven
-  verlooptOp: datetime              // laatste hartslag + 90 seconden
-}
-```
-
-- **Claimen**: De intake- en vragenlijstpagina claimen het slot bij het
-  openen en vernieuwen het elke 15 seconden (hartslag). Dat is één atomaire
-  database-instructie: Alleen de huidige houder, of iemand bij een
-  verlopen slot, krijgt het slot. Wie het niet krijgt, ziet de melding.
-- **Vrijgeven**: Bij het verlaten van de pagina. Lukt dat niet (browser
-  gesloten, laptop in slaap), dan vervalt het slot vanzelf na 90 seconden:
-  Een scan kan dus nooit blijvend geblokkeerd raken.
-- **Houder is per tabblad**: Dezelfde persoon in twee tabbladen telt als
-  twee bewerkers. Een herlaadbeurt behoudt de houder (`sessionStorage`).
-- **Opslag**: Tabel `scan_sloten` in Neon (`scripts/maak-sloten-tabel.mjs`),
-  via `app/api/slot/[scanId]/route.ts`. Zonder database valt het terug op
-  een slot in `localStorage`, dat alleen tabbladen in dezelfde browser
-  beschermt.
-- **Verwijderen**: Een slot hoort bij een scan maar wordt niet apart
-  opgeruimd; het vervalt vanzelf.
-- **Beheer**: Is niet geblokkeerd en ziet (nog) niet dat een scan in gebruik
-  is. Opent een beheerder via "Openen" de persoonlijke link van een
-  respondent, dan houdt hij het slot zolang die pagina openstaat.
-
 ### Verwijderen en datakoppelingen
 
 Na elke verwijderactie blijft er geen data achter die naar iets
@@ -401,19 +380,13 @@ verwijst wat niet meer bestaat.
 
 ### Content bewerken
 
-Een categorie, bouwblok of vraag waar al antwoorden aan hangen, wordt
-niet verwijderd maar gearchiveerd (`gearchiveerd: boolean`, standaard
-`false`/afwezig). Anders verdwijnen scores uit eerdere invullingen: een
-gearchiveerd item blijft in `Assessment.categorieen`/`bouwblokken`/
-`vragen` staan, dus telt een bestaand antwoord er nog altijd in mee bij
-het herberekenen van een score. Voor een NIEUWE invulling telt het niet
-meer mee (doorloopflow, voortgangspercentage, de tellingen op de
-assessment-landingspagina) — `lib/assessment-structuur.ts` heeft daarvoor
-een eigen set functies (`actieveGroepen`/`actieveBouwblokkenMetGroep`/
-`actieveVragen`) naast de ongefilterde versies die scoring/exports op een
-bestaande invulling gebruiken. "Verwijderen" in het contentbeheerscherm
-archiveert dus; ernaast staat een "Gearchiveerd"-lijstje met een
-Herstellen-knop per item, geen aparte prullenbak-pagina.
+Een vraag of bouwblok waar al antwoorden aan hangen, wordt niet
+verwijderd maar gearchiveerd (`gearchiveerd: true` op Categorie,
+Bouwblok of Vraag). Anders verdwijnen scores uit eerdere invullingen.
+Nieuwe invullingen krijgen gearchiveerde content niet meer te zien.
+Scores en exports van bestaande invullingen rekenen nog wel met die
+content. In beheer is gearchiveerde content terug te zetten met
+"Herstellen".
 
 ### Algemene teksten
 
@@ -433,12 +406,15 @@ Eerste en enige nu: `mijnMetingenIntro` — de introtekst boven de lijst
 met scans op "Mijn metingen" (CLAUDE.md schermflow, scherm 4). Eén
 tekst voor iedereen, niet per Assessment of per organisatie: Die pagina
 toont immers alle scans van een respondent door elkaar, ongeacht
-scan-type. Beheerbaar bij `beheerpagina.md` punt 2, Content.
+scan-type. Beheerbaar bij `beheerpagina.md` punt 2a, Algemene teksten. Ook de
+teksten achter de Info-iconen zijn Algemene teksten, met sleutels als
+`info.bewaartermijn` (`beheerpagina.md`, punt 2a).
 
 ### Organisatievelden
 
 Instelbaar in beheer, nu als vaste data (JSON), zodat het beheerscherm er
-later overheen kan zonder de flow te herbouwen.
+later overheen kan zonder de flow te herbouwen. De lijst geldt voor het hele
+platform (`data/organisatie-velden.ts`) en verschilt dus niet per Assessment.
 
 ```
 VeldDefinitie {
@@ -491,7 +467,9 @@ Kennismanagement, LLM-oplossing en IT en deployment. Modelleer dit als
 
 ## Deel 2: Rollen, rechten en inlog (voorstel)
 
-**Status: Voorstel, wordt gebouwd samen met de database.**
+**Status: Voorstel.** De rollen Admin, Consultant, Lead en Respondent zijn
+nu ingericht als testhulp (prototype). De definitieve inrichting volgt
+samen met de backend en de database.
 
 ### Uitgangspunten
 
@@ -762,8 +740,8 @@ stilzwijgende verlenging.
 
 #### Bewaartermijn ingevulde scans
 
-Twee globale instellingen, in dagen, door een Admin te bepalen in beheer
-(`beheerpagina.md`, punt 4, samen met AVG-verzoek): `bewaarTermijnDagen`
+Twee globale instellingen, door een Admin te bepalen in beheer
+(`beheerpagina.md`, punt 10, Instellingen): `bewaarTermijnDagen`
 (vanaf `ScanInvulling.afgerondOp`, geen default) en
 `verlengTermijnDagen` (hoe lang een expliciete "Verlengen"-actie de
 melding uitstelt). Verstrijkt `bewaarTermijnDagen` (of, na een eerdere
@@ -772,7 +750,7 @@ een "Data ouder dan de bewaartermijn"-lijst in beheer. **Geen
 automatische verwijdering**: Zonder actie van een Admin/Consultant
 blijft de scan gewoon bestaan. Verwijderen gebruikt de bestaande
 verwijderactie (Verwijderen en datakoppelingen hieronder); Verlengen zet
-alleen `bewaarVerlengdTot`.
+`bewaarVerlengdTot` op het moment van de klik plus `verlengTermijnDagen`.
 
 ---
 
@@ -787,11 +765,72 @@ AuditEvent {
   entiteitType: string
   entiteitId: string
   tijdstip: datetime
-  details: json | null           // bijv. aantallen bij een verwijdering
+  groepId: string | null         // bijv. alle gebeurtenissen van één import, zie `beheerpagina.md` punt 12
+  details: json | null           // bijv. aantallen bij een verwijdering, en de naam van het record bij loggen
 }
 ```
 
 Ook uitnodigingen door een Lead worden gelogd.
+
+**Geen persoonsgegevens uit scans in de audittrail.** `details` en
+entiteitsnamen bevatten geen naam, e-mailadres, functie, team,
+notities of antwoorden van een Respondent. De audittrail gaat over wat
+gebruikers van de app deden, niet over de inhoud van een scan. Een scan
+is te herkennen aan Organisatie, Assessment en Meting.
+
+**Namen bij loggen.** Bij een gebeurtenis legt `details` de naam vast van
+Organisatie, Assessment en Meting zoals die op dat moment was, zodat het
+overzicht ook leesbaar blijft als het record later is verwijderd of van
+naam is veranderd.
+
+**Groepen.** `groepId` heeft bij een import één waarde voor alle
+gebeurtenissen van die import. Acties daarbij: `import.gestart` (legt vast
+welke bestanden zijn geladen, en welke direct zijn overgeslagen met
+reden), `scan.geimporteerd`, `import.rijMislukt` en de bestaande
+aanmaakacties (Organisatie, Respondent, Meting). Een groepsoverzicht is
+afgeleid uit deze gebeurtenissen en wordt niet apart opgeslagen. Een
+export van de audit-log is zelf een gebeurtenis (`auditlog.geexporteerd`).
+
+**Verplaatsen en bewerken.** De beheeracties uit `beheerpagina.md`,
+punt 6b (Respondent-overzicht), loggen elk een eigen gebeurtenis:
+
+- `respondent.verplaatst`: Hele Respondent naar een andere organisatie.
+  `details` bevat de bron- en doelorganisatie (met naam), het aantal
+  verplaatste scans, per bron-Meting de gekozen doel-Meting, en of er
+  een samenvoeging was.
+- `respons.verplaatst`: Eén respons naar een andere organisatie, met
+  bron- en doelorganisatie en Meting.
+- `respons.metingVerplaatst`: Eén of meer responsen naar een andere
+  Meting van dezelfde organisatie, met bron- en doel-Meting en het
+  aantal. Bij een bulkactie staat het aantal overgeslagen scans (met
+  reden) in `details`, en geldt één `groepId` voor de hele actie.
+- `respons.respondentGewijzigd`: Eén respons aan een andere Respondent
+  van dezelfde organisatie gehangen, bijvoorbeeld bij het oplossen van een
+  conflict bij "Respons naar andere Meting verplaatsen" (`beheerpagina.md`,
+  punt 6b). `details` bevat de Meting en of de Respondent nieuw is
+  aangemaakt, zonder persoonsgegevens.
+- `respondent.bewerkt`: Alleen welke velden zijn gewijzigd, bijvoorbeeld
+  `["naam", "e-mail"]`. De waarden (oud of nieuw) staan niet in de log,
+  wegens het verbod op persoonsgegevens uit scans hierboven.
+
+Een overgeslagen scan bij een samenvoeging of bulkverplaatsing wordt als
+onderdeel van `details` gelogd en niet als aparte actie.
+
+**Gewichtswijziging.** Een wijziging van `Bouwblok.gewicht` is een
+gebeurtenis (`bouwblok.gewichtGewijzigd`), omdat die terugwerkend de
+scores van alle scans van dat Assessment verandert. `details` bevat de
+naam en het volgnummer van het bouwblok, de naam van het Assessment, het
+oude en het nieuwe gewicht en het aantal scans dat daardoor anders
+doorrekent.
+
+**Bewaartermijn.** De bewaartermijn van ingevulde scans
+(`bewaarTermijnDagen`, zie Bewaartermijn ingevulde scans hierboven)
+geldt ook voor `AuditEvent`, gerekend vanaf `tijdstip`. Een afwijkende
+termijn volgt alleen als daar later een eigen spec voor komt. Net als bij
+scans is er geen automatische verwijdering: Na de termijn krijgt de Admin
+een melding en blijven de gebeurtenissen bestaan tot de Admin ze bewust
+opruimt. Dat opruimen is zelf een gebeurtenis (`auditlog.opgeruimd`, met
+periode en aantal).
 
 ---
 
@@ -803,7 +842,7 @@ Een streepje betekent geen toegang.
 |---|---|---|---|---|
 | `gebruikers.beheren` | alle | - | - | - |
 | `rollen.toekennen` | alle | - | - | - |
-| `content.beheren` | alle | - | - | - |
+| `content.beheren` (ook de definitie van organisatievelden) | alle | - | - | - |
 | `organisaties.aanmaken` | alle | ja | - | - |
 | `organisaties.toewijzen` (aan een Consultant) | alle | - | - | - |
 | `organisaties.bewerken` (incl. kenmerken) | alle | eigen | te bevestigen | - |

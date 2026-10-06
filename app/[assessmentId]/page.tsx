@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAssessment } from "@/lib/assessment-store";
 import { actieveVragen } from "@/lib/assessment-structuur";
 import { PageWithChrome } from "@/components/PageWithChrome";
+import { InfoIcoon } from "@/components/InfoIcoon";
 import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
 
 export default function AssessmentLandingPage({
@@ -74,14 +75,12 @@ export default function AssessmentLandingPage({
           </p>
 
           <div className="btn-rij" style={{ margin: "2.5rem auto 0", maxWidth: "26rem" }}>
-            <button
-              type="button"
-              disabled
-              title="Toegang verloopt via een persoonlijke link die Coniche met je deelt."
-              className="btn btn-or"
-            >
-              Start assessment
-            </button>
+            <div style={{ display: "flex", flex: 1, alignItems: "center", gap: "0.5rem" }}>
+              <button type="button" disabled className="btn btn-or">
+                Start assessment
+              </button>
+              <InfoIcoon sleutel="info.startAssessment" />
+            </div>
             <Link href={`/${assessment.id}/voorbeeld`} className="btn btn-outline">
               Bekijk wat je krijgt
             </Link>

@@ -167,7 +167,7 @@
   background: var(--or-faint);
 }
 
-.admin-table a {
+.admin-table a:not(.btn) {
   color: var(--or);
   font-weight: 600;
   text-decoration: none;
@@ -640,4 +640,32 @@
 
 .modal-box--breed h2 {
   margin: 0 2rem 0.7rem 0;
+}
+
+/* Meerdere compacte acties naast elkaar (stylesheet.md, Knoppen en links, Knoppenrij):
+   Tussenruimte 0,5rem, gelijke hoogte door .btn-compact, geen scheidingstekens. */
+.knoppenrij {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.overzicht-link-rij {
+  gap: 0.5rem;
+}
+.overzicht-acties {
+  gap: 0.5rem;
+}
+
+/* Compact invoerveld/keuzelijst in een rij met compacte knoppen (stylesheet.md, Knoppen en links, Knoppenrij):
+   Zelfde hoogte als `.btn-compact`, geen vol `select.field`. */
+.veld-compact {
+  height: var(--control-h);
+  padding: 0 0.7rem;
+  font-size: var(--fs-s);
+  border: 1px solid var(--border-d);
+  border-radius: var(--r);
+  background: var(--bg);
+  color: var(--ink);
+  min-width: 0;
 }

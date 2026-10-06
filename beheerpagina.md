@@ -4,12 +4,13 @@ De omgeving waarin Coniche scans, content en organisaties beheert.
 
 ## Toegang
 
-Beheer is alleen toegankelijk met een account. Nu met e-mail,
-wachtwoord én rol (zie Accountmenu hieronder); 2FA volgt zodra er een
-backend is. Rollen binnen beheer (Admin, Consultant) staan in
-`datamodel.md` deel 2 en zijn op prototype-niveau al gebouwd (geen
-backend, geen 2FA): Een Consultant ziet alleen zijn eigen organisaties en
-geen Applicatie/Assessments, zie Wat beheerbaar is.
+Beheer is alleen toegankelijk met een account. Nu met e-mail en
+wachtwoord; 2FA volgt zodra er een backend is. Rollen binnen beheer
+(Admin, Consultant) staan in `datamodel.md` deel 2. Ze zijn nu
+ingericht als testhulp (prototype), met een rolkeuze op het inlogscherm.
+De definitieve rollen en rechten volgen met de backend, en de rolkeuze
+verdwijnt dan. Admin-accounts hebben onderling dezelfde rechten, en meer
+dan een Consultant.
 
 Respondenten loggen niet in. Zij krijgen een persoonlijke link, zie
 `datamodel.md`, Toegangscode.
@@ -20,20 +21,24 @@ Dezelfde nav en footer als de rest van de app, met de beheerlinks in
 `.nav-right`. Componenten staan in `stylesheet.md`.
 
 **Rolbadge in plaats van de vaste badge "Beheer"**: Waar eerder altijd
-de tekst "Beheer" in zwart stond, staat nu de rol van de ingelogde
-gebruiker (Admin/Consultant), in de bijbehorende rolkleur
-(`stylesheet.md`, Rolkleuren). **Status: Gebouwd.** Het is de
-daadwerkelijke `rol` van de ingelogde `Gebruiker`, geen losse
-aanduiding meer.
-
-**Uitleg bij een veld of knop** staat in een Info-icoon (een klein oranje
-rondje met een uitroepteken naast het veld of de knop, `stylesheet.md`,
-Info-icoon) en niet als vaste tekst eronder. Een klik opent de uitleg in een
-afsluitbaar informatieveld. Dat geldt voor elk scherm in beheer.
-Meldingen over wat er is gebeurd en lege lijsten blijven gewone meldingen.
+de tekst "Beheer" in zwart stond, staat nu de rol van waaruit het scherm
+bekeken wordt (Admin/Consultant/Lead/Respondent), in de bijbehorende
+rolkleur (`stylesheet.md`, Rolkleuren). **Tijdelijke aanduiding**, geen
+onderdeel van de echte rollen/rechten uit `datamodel.md` deel 2 (nog niet
+gebouwd). De rol komt uit het ingelogde account (zie Toegang). Het is een
+testhulp, zodat tijdens het bouwen snel duidelijk is vanuit welk
+perspectief een scherm bekeken wordt.
 
 In de interface: "Respondenten" (niet "leden"), "Meting" en "Ingevulde
 scans". Zie CLAUDE.md, Terminologie.
+
+**Uitleg in een Info-icoon.** Uitleg bij een veld of knop staat in een
+Info-icoon (`stylesheet.md`, Info-icoon) en niet als vaste tekst eronder.
+Dat geldt ook voor de reden achter een uitgeschakelde knop, in plaats van
+een `title`-tooltip. Een Admin kan elke Info-icoon-tekst aanpassen op de
+plek zelf. Welke teksten er zijn en wat de initiële waarde is, staat bij
+punt 2a, Algemene teksten. Een standaardtekst bevat geen verwijzing naar
+een document of andere bouwerstekst.
 
 ### Accountmenu
 
@@ -141,28 +146,11 @@ Resultaten van de Meting.
 
 ## Status
 
-- **Gebouwd**:
-  - **Organisaties**: Lijst (met Score en Voortgang voor een Consultant),
-    aanmaken, detail met maximaal 5 rijen per lijst, Organisatie-toegang
-    toewijzen, Data ouder dan de bewaartermijn (bewaartermijn in dagen).
-  - **Metingen**: Plannen, label wijzigen, verwijderen en het eigen
-    Meting-overzicht met uitnodigen en Organisatie-resultaten.
-  - **Respondenten**: De lijst en het Respondent-overzicht (modal) met
-    bewerken, Lead-toegang, verplaatsen, samenvoegen, AVG-inzage en
-    verwijderen.
-  - **Ingevulde scans**: De lijst met filters in de URL, het Scan-overzicht
-    (modal), een scan naar een andere Meting of organisatie en
-    bulk-verplaatsen naar een andere Meting.
-  - **Navigatie**: Tabbalk, kruimelpad en het resultatenscherm in beheer.
-  - **Import** van CSV's (bestanden of een hele map).
-  - **Applicatie en Assessments**: Gebruikers (Admin en Consultant, met
-    tijdelijk wachtwoord), Instellingen, Algemene teksten, Assessment-types
-    en Content (archiveren i.p.v. verwijderen).
-- **Nog te bouwen**: Organisatievelden zelf beheerbaar (punt 3, met de tab
-  Organisatievelden), Content-pagina's (punt 11), Audit-log (punt 12:
-  verplaatsen, samenvoegen en overgeslagen scans worden dus nog niet
-  gelogd), Verificatie-blokkade opheffen (hangt aan e-mailverificatie),
-  paginering van de lijsten, 2FA. Weging staat op de backlog.
+- **Gebouwd**: Organisaties (lijst, aanmaken, detail), metingen per
+  organisatie, respondenten uitnodigen, Ingevulde scans met filters, Import,
+  Assessments, Content en Gebruikersbeheer (punt 9).
+- **Nog te bouwen**: Audit-log (punt 12) en Data-integriteit (punt 13). De
+  spec is leidend.
 
 ---
 
@@ -173,7 +161,7 @@ Drie hoofdonderdelen, elk een link in `.nav-right`: **Applicatie**,
 een Consultant ziet alleen **Organisaties** (bereik `eigen`) — de
 andere twee gaan over dingen die voor de hele omgeving gelden, niet
 over het eigen werk van één Consultant. "Overzicht" als apart
-dashboardscherm vervalt: er is geen 4e link meer, je landt direct op
+dashboardscherm vervalt: Er is geen 4e link meer, je landt direct op
 een van de drie.
 
 De nummering van de onderdelen hieronder (1 t/m 12) is ongewijzigd ten
@@ -184,7 +172,7 @@ onderdelen (2a, 11 en 12).
 
 | Link | Onderdelen |
 |---|---|
-| **Applicatie** (Admin-only) | 9. Gebruikers, 10. Instellingen, 2a. Algemene teksten, 11. Content-pagina's, 12. Audit-log |
+| **Applicatie** (Admin-only) | 9. Gebruikers, 10. Instellingen, 2a. Algemene teksten, 11. Content-pagina's, 12. Audit-log, 13. Data-integriteit |
 | **Assessments** (Admin-only) | 1. Assessment-types, 2. Content |
 | **Organisaties** (Admin: alle, Consultant: eigen) | 3. Organisatievelden, 4. Organisaties, 5. Metingen, 6. Respondenten uitnodigen, 6a. Lead-rol toekennen, 6b. Respondenten, 7. Ingevulde scans, 8. Import |
 
@@ -200,10 +188,9 @@ bereikbaar via de organisatie (punt 4), niet hier.
 
 - **Lijst**: Naam, e-mail, rol, status (actief/gedeactiveerd), laatst
   ingelogd.
-- **Aanmaken**: Naam, e-mail, rol en een tijdelijk wachtwoord dat de
-  Admin direct meegeeft (geen verificatielink, die volgt met de
-  mailserver, `backlog.md`). De nieuwe gebruiker kan hiermee meteen
-  inloggen; zelf het wachtwoord wijzigen is nog niet gebouwd.
+- **Aanmaken**: Naam, e-mail, rol. De Admin triggert het aanmaken en het
+  systeem genereert het wachtwoord. Een link waarmee de gebruiker zelf een
+  wachtwoord instelt volgt met de mailserver (`backlog.md`).
 - **Wijzigen**: Naam, e-mail, rol.
 - **Deactiveren, niet verwijderen**: Nooit hard verwijderd
   (`datamodel.md` deel 2). Actie heet "Deactiveren", `.btn-danger` met
@@ -268,6 +255,47 @@ Staat onder Applicatie, niet onder Assessments (punt 2, Content): Deze
 teksten horen niet bij één Assessment maar bij de applicatie als
 geheel.
 
+**Info-icoon-teksten.** Ook de teksten achter de Info-iconen
+(`stylesheet.md`, Info-icoon) zijn Algemene teksten, met een sleutel per
+plek, bijvoorbeeld `info.bewaartermijn`. De standaardtekst blijft in de
+code staan. Een lege of ontbrekende waarde betekent de standaardtekst, net
+als bij `wegingToelichting`.
+
+- **Aanpassen op de plek zelf**: Een Admin ziet in het open Info-icoon een
+  potlood links van het sluitkruisje, op elk scherm van de app waar hij is
+  ingelogd. Een klik opent een tekstvak met "Opslaan" en "Annuleren", en
+  een knop "Standaardtekst herstellen" zodra de tekst afwijkt. Een
+  Consultant, Lead of Respondent ziet geen potlood.
+- **Opmaak**: Platte tekst met regeleinden, maximaal 500 tekens, geen
+  links of HTML en geen variabelen.
+- **Overzicht**: Onder Algemene teksten staat een lijst met alle
+  Info-icoon-sleutels, de plek en de actuele tekst, zodat ze ook
+  gebundeld na te lopen zijn.
+- **Logging**: Een wijziging wordt gelogd als `algemeneTekst.gewijzigd`
+  met alleen de sleutel en niet de tekst (`datamodel.md`, Audit).
+- **Nieuw Info-icoon**: Elk nieuw Info-icoon krijgt hier een sleutel, een
+  plek en een initiële tekst.
+
+Register van de Info-iconen:
+
+| Sleutel | Plek | Initiële tekst |
+|---|---|---|
+| `info.bewaartermijn` | Organisaties, formulier Bewaartermijn ingevulde scans | Zoals nu in de app |
+| `info.importBestanden` | Import, bij "Bestanden kiezen" | Zoals nu in de app |
+| `info.importRijen` | Import, bij "rijen importeren" | Zoals nu in de app |
+| `info.respondentBewerken` | Respondent-overzicht, bewerkformulier | Zoals nu in de app |
+| `info.algemeneTeksten` | Algemene teksten, bij het tekstveld | Zoals nu in de app |
+| `info.contentIcoon` | Content, veld Icoon | Zoals nu in de app |
+| `info.contentSlotsectie` | Content, Slotsectie voor de PDF-export | Zoals nu in de app |
+| `info.dataIntegriteit` | Applicatie, Data-integriteit, naast "Controleer nu" | "Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen." |
+| `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | "Toegang tot een assessment loopt via een persoonlijke uitnodiging." |
+| `info.bulkExportOrganisatie` | Ingevulde scans, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | "Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie." |
+| `info.exportEenScan` | Ingevulde scans en organisatie-detail, achter de uitgeschakelde opties "Als PDF" en "Voor InDesign (XML)" | "Beschikbaar bij precies één scan." |
+
+Bij "Zoals nu in de app" levert Sander de huidige tekst aan, die wordt dan
+de initiële waarde. Een tekst met een verwijzing naar een document, zoals
+bij Data-integriteit, wordt daarbij herschreven.
+
 #### 11. Content-pagina's (Visie, Bouwstenen, AI, 2030)
 
 **Nieuw, nog niet gebouwd.** De 4 vaste content-links (CLAUDE.md,
@@ -324,8 +352,9 @@ Alleen-lezen overzicht, Admin-only (net als de rest van Applicatie):
   zijn gedaan). Uitklappen toont per bestand of rij wat er gebeurde, met
   de reden bij overgeslagen en mislukt, en bij een geïmporteerde rij wat
   is aangemaakt (Organisatie, Respondent, Meting, scan). De groep begint
-  bij de eerste bevestiging van de import; annuleren vóór bevestigen
-  logt niets. Rijen die later een voor een alsnog worden geïmporteerd,
+  bij de eerste keer dat de knop "N rijen importeren" wordt gebruikt;
+  goedkeuren en annuleren daarvoor logt niets. Rijen die later alsnog worden
+  geïmporteerd,
   komen als nieuwe gebeurtenissen bij dezelfde groep, waarna de aantallen
   meeschuiven. De groepsregel is een afgeleid overzicht en geen
   opgeslagen record; de losse gebeurtenissen blijven onveranderlijk. De
@@ -379,6 +408,60 @@ Alleen-lezen overzicht, Admin-only (net als de rest van Applicatie):
   dit is het overkoepelende overzicht voor wie/wat/wanneer, niet een
   tweede plek voor dingen die al een eigen scherm hebben.
 
+#### 13. Data-integriteit (Admin-only)
+
+Het onderdeel zorgt dat er geen wees-data in het systeem blijft zitten,
+bijvoorbeeld ingevulde scans die na een verwijderactie nog naar een
+niet-bestaande Respondent verwijzen. De pagina heeft een knop "Controleer
+nu" met een Info-icoon (`info.dataIntegriteit`). Of het onderdeel in
+productie blijft, is nog een besluit (`go-live-plan.md`).
+
+**Uitkomst van de controle.** Bovenaan een samenvatting ("4 verwijzingen
+naar een niet-bestaand record gevonden"), daaronder één regel per controle
+met het aantal vondsten:
+
+1. Ingevulde scans zonder bestaande Respondent.
+2. Ingevulde scans zonder bestaande Meting.
+3. Respondenten zonder bestaande Organisatie.
+4. Metingen zonder bestaande Organisatie.
+5. Leads met toegang tot een niet-bestaande Meting.
+
+Een regel met een aantal groter dan nul heeft de knop "Bekijken". Een
+regel met 0 heeft geen knop.
+
+**Modal per controle.** "Bekijken" opent een modal met de titel van de
+controle en het aantal, bijvoorbeeld "Respondenten zonder bestaande
+Organisatie (4)". De modal toont per vondst een rij met genoeg gegevens
+om het record te herkennen, en de acties. Persoonsgegevens zijn zichtbaar,
+want de pagina is alleen voor een Admin, en komen niet in de audit-log
+(`datamodel.md`, Audit). De modal blijft open na een actie, de rij
+verdwijnt en het aantal telt af. Bij 0 vondsten sluit de modal met de
+melding dat er niets meer te vinden is. Na het sluiten draait de controle
+opnieuw, zodat de pagina klopt.
+
+Een vondst heeft per controle deze gegevens en acties. Elke actie vraagt
+een bevestiging. Wat een verwijderactie meeneemt, volgt de bestaande
+verwijderfunctie (Verwijderen, onderaan deze pagina).
+
+| Controle | Rij toont | Acties |
+|---|---|---|
+| Scan zonder Respondent | Meting, Assessment, afgerond op, de ontbrekende Respondent-verwijzing | "Aan Respondent koppelen" (kiezen uit de Respondenten van dezelfde Organisatie als de Meting), "Verwijderen" |
+| Scan zonder Meting | Respondent, Organisatie, Assessment, afgerond op | "Aan Meting koppelen" (Metingen van dezelfde Organisatie en hetzelfde Assessment), "Verwijderen" |
+| Respondent zonder Organisatie | Naam, e-mail, aantal scans | "Aan Organisatie koppelen" (kiezen uit bestaande Organisaties, zoals "Hele respondent verplaatsen" in punt 6b), "Verwijderen" met het aantal scans dat meegaat |
+| Meting zonder Organisatie | Meting, Assessment, aantal scans | "Aan Organisatie koppelen", "Verwijderen" met het aantal scans dat meegaat |
+| Lead met niet-bestaande Meting | Respondent, Organisatie, de verwijzing | "Verwijzing verwijderen" (alleen de toegang, de Respondent blijft) |
+
+De acties werken per vondst. Er is geen bulkactie, omdat elke vondst een
+bewuste keuze vraagt (koppelen of verwijderen). Aan een Respondent of
+Meting zonder Organisatie wordt de Organisatie gekoppeld die de beheerder
+kiest, en het Bewerkslot (`datamodel.md`) geldt zoals bij andere
+bewerkingen.
+
+**Audit-log.** Acties vanuit deze pagina gebruiken de bestaande acties voor
+verplaatsen, omhangen en verwijderen (`datamodel.md`, Audit), met in
+`details` dat ze vanuit Data-integriteit zijn gedaan. De controle zelf
+(het klikken op "Controleer nu") wordt niet gelogd.
+
 ### Assessments (Admin-only)
 
 #### 1. Assessment-types
@@ -417,7 +500,7 @@ omschrijving, toelichting, centrale vraag, tags) en de vragen per bouwblok. Cont
 al antwoorden aan hangen wordt gearchiveerd, niet verwijderd
 (`datamodel.md`, Content bewerken).
 
-**Weging per bouwblok** (op de backlog, niet gebouwd, `backlog.md`). Bij elk bouwblok een veld "Weging" (getal groter
+**Weging per bouwblok.** Bij elk bouwblok een veld "Weging" (getal groter
 dan 0, ook decimalen zoals 1,5, standaard 1; `Bouwblok.gewicht`,
 `datamodel.md`). Bouwblokken met een weging ongelijk aan 1 krijgen in de
 lijst een chip met de factor ("2×"), bij weging 1 staat er niets. Het
@@ -433,7 +516,7 @@ Meerdere gewichten tegelijk wijzigen kan in één opslagactie, met één
 bevestiging en één logregel per bouwblok. Rechten: Als overige
 Content-beheer.
 
-**Wegingstekst per Assessment** (op de backlog, niet gebouwd). Twee velden bij het Assessment: "Titel
+**Wegingstekst per Assessment.** Twee velden bij het Assessment: "Titel
 wegingskaart" en "Tekst wegingskaart" (`wegingTitel`,
 `wegingToelichting`). Dit is de tekst op de kaart bij aanvang van de
 scan (CLAUDE.md, sectie 3, Wegingskaart). De velden mogen leeg blijven:
@@ -467,7 +550,7 @@ het antwoord daarom zelf kunnen vastleggen.
 
 - **Lijst**: Voor een Admin alle organisaties. Voor een Consultant
   alleen zijn **eigen** organisaties (`datamodel.md` deel 2,
-  Eigenaarschap en toegang van/tot organisaties): die hij zelf
+  Eigenaarschap en toegang van/tot organisaties): Die hij zelf
   aanmaakte, plus die een Admin expliciet aan hem toewees. Per rij de
   naam, het aantal respondenten, het aantal afgeronde scans, en
   **"Aangemaakt door"** (de naam van de eigenaar) — altijd zichtbaar,
@@ -525,13 +608,17 @@ het antwoord daarom zelf kunnen vastleggen.
     organisaties voor Consultant, zelfde bereik als de rest van dit
     scherm. Per rij twee acties, voor **beide** rollen: **"Verwijderen"**
     (bestaande verwijderactie op de ingevulde scan) of **"Verlengen"**
-    (zet `bewaarVerlengdTot` op nu + `verlengTermijnDagen`, scan
-    verdwijnt weer uit de lijst tot die nieuwe datum verstreken is).
+    (zet `bewaarVerlengdTot` op het moment van de klik plus
+    `verlengTermijnDagen`, dus vanaf nu en niet vanaf de oude einddatum.
+    De scan verdwijnt uit de lijst tot die nieuwe datum verstreken is).
     Zonder actie blijft de scan gewoon bestaan en in de lijst staan —
-    niets gebeurt vanzelf. De lijst heeft een kolom "Eerder verlengd tot"
-    voor een scan die al eens is verlengd en opnieuw verlopen is. Onder de
-    lijst staat "Verlengd, nog niet opnieuw te beoordelen": de scans waarvan
-    de melding op dit moment is uitgesteld, met de datum en tijd waartot.
+    niets gebeurt vanzelf.
+- **Verlengd, nog niet opnieuw te beoordelen**: Tweede lijst onder de eerste,
+  met tussen haakjes het aantal. Kolommen: Organisatie, Respondent,
+  Meting, Afgerond op en Verlengd tot (datum en tijd). Een scan staat
+  hier vanaf de klik op "Verlengen" tot `bewaarVerlengdTot` verstreken
+  is, en komt dan weer in de lijst hierboven. Zelfde bereik en rechten
+  als de lijst hierboven.
 - **Organisatie-resultaten**: Vanaf een Meting in het organisatie-detail
   een link "Naar resultaten →", naar het gemiddelde van alle afgeronde
   ingevulde scans binnen die Meting (dus per scanronde, niet over
@@ -632,26 +719,31 @@ minstens 1 verplicht.
   als bij "Respondenten uitnodigen" hierboven: de knoppen "Kopieer
   link" en "Openen" (nieuw tabblad), zodat de link direct zelf te
   testen is.
-- **Lead-toegang beheren op een bestaande respondent**: Eén actie in het
-  Respondent-overzicht (punt 6b), blok "Toegang" —
-  vervangt een los "toekennen"/"intrekken"-paar. Opent een
-  multi-select van de Metingen van deze organisatie: Aanvinken geeft
-  toegang, alles uitvinken trekt de Lead-rol in. Bij een respondent die
-  nog geen Lead is, kent het eerste vinkje de rol toe; ongeacht of die
-  respondent al `ScanInvullingen` heeft. Ook hier: "Kopieer link" en
-  "Openen" zodra de respondent Lead is.
+- **Lead-toegang beheren op een bestaande respondent**: Direct in het
+  blok "Toegang" van het Respondent-overzicht (punt 6b), zonder tweede
+  venster. Het blok heeft een selectievakje "Lead". Aanvinken klapt in
+  hetzelfde blok de lijst met Metingen van deze organisatie open, elk met
+  een selectievakje. Er moet minstens één Meting aan staan voordat de
+  keuze kan worden opgeslagen, want zonder Meting is er geen Lead.
+  Uitvinken van "Lead" trekt de rol in, na een bevestiging. Aanvinken geeft
+  ook toegang als de respondent al `ScanInvullingen` heeft. Bij meer dan
+  vijf Metingen scrolt de lijst. Onder het vakje staat als samenvatting
+  "Geen Lead" of "Lead voor 2 Metingen". "Kopieer link" en "Openen" staan
+  er zoals altijd.
 - **Vinkje "Ook Lead maken" bij het uitnodigen** (punt 6 hierboven):
   Snelkoppeling die in één stap zowel de `ScanInvulling` (uitnodiging
   voor de vragenlijst) als de Lead-rol aanmaakt, met toegang tot precies
   die ene Meting.
-- **Vanaf een bestaande Lead alsnog een vragenlijst sturen**: Actie
-  "Vragenlijst sturen" in datzelfde overzicht, op een respondent
-  met Lead-rol die (nog) geen `ScanInvulling` bij de gekozen Meting
-  heeft. Kiest een Meting van deze organisatie (of maakt er één aan,
-  zelfde patroon als punt 5), maakt de `ScanInvulling` aan zoals
-  "Respondenten uitnodigen" hierboven, én geeft deze Lead in dezelfde
-  stap toegang tot die Meting (voegt 'm toe aan `RespondentRolMeting`)
-  — geen aparte tweede actie nodig.
+- **Alsnog een vragenlijst sturen aan een bestaande Respondent**: Een eigen
+  deel in het Respondent-overzicht (punt 6b), onder het blok "Toegang" en
+  los van de Lead-rol. Het geldt voor elke Respondent, ook een gewone. Een
+  keuzelijst met de Metingen van deze organisatie (of "Nieuwe Meting", zelfde
+  patroon als punt 5) en daarnaast de knop "Vragenlijst sturen". Metingen
+  waarin de Respondent al een `ScanInvulling` heeft, zijn niet te kiezen.
+  De actie maakt de `ScanInvulling` aan zoals "Respondenten uitnodigen"
+  hierboven. Is de Respondent Lead, dan geeft dezelfde stap hem ook toegang
+  tot die Meting (voegt 'm toe aan `RespondentRolMeting`), zonder aparte
+  tweede actie.
 
 **Wie dit mag**: Admin en Consultant (bij de Consultant: bereik
 `eigen`, zelfde als de andere respondent-acties). Niet de Lead
@@ -682,23 +774,28 @@ opheffen, actie in het Respondent-overzicht (punt 6b). Analoog aan de
 **Valt een eigen Meting samen met een toegewezen Meting** (de Lead is
 zelf ook respondent binnen een Meting waar hij ook Lead-toegang toe
 heeft — het gebruikelijke geval): **Eén kaart voor die Meting, niet
-twee.** Naast elkaar twee knoppen in plaats van één:
+twee.** Op die kaart staan naast elkaar twee knoppen, waarvan de eerste
+afhangt van de status van zijn eigen `ScanInvulling`:
 
-- **"Bekijk jouw resultaten"** → zijn eigen `ScanInvulling` (zoals een
-  gewone respondent).
+- **Eigen scan, afhankelijk van de status** (de gewone knop uit de
+  status-routing van "Mijn metingen", CLAUDE.md, schermflow punt 4):
+  - `"uitgenodigd"`: "Start de intake".
+  - `"bezig"`: "Ga verder met de scan".
+  - `"afgerond"`: "Bekijk jouw resultaten" → zijn eigen `ScanInvulling`
+    (zoals een gewone respondent).
 - **"Bekijk de resultaten van de hele meting"** → de
   organisatie-resultaten van die Meting (het gemiddelde van alle
   afgeronde scans, zie Organisatie-resultaten hierboven).
 
-Heeft de Lead voor die Meting nog geen eigen `ScanInvulling` afgerond
-(bijv. status `"uitgenodigd"`/`"bezig"`, of geen `ScanInvulling` — puur
-toegewezen), dan vervalt "Bekijk jouw resultaten" gewoon en staat er
-alleen "Bekijk de resultaten van de hele meting" — net als bij elke
-andere toegewezen Meting.
+De eigen scan blijft dus altijd bereikbaar, ook als hij nog niet is
+afgerond. Alleen "Bekijk jouw resultaten" vervalt zolang de scan niet is
+afgerond. Heeft de Lead voor die Meting helemaal geen eigen
+`ScanInvulling` (puur toegewezen), dan staat er alleen "Bekijk de
+resultaten van de hele meting", net als bij elke andere toegewezen Meting.
 
 #### 6b. Respondenten (lijst en overzicht)
 
-**Gebouwd (2 oktober 2026).** Eén lijst van alle Respondenten, met per
+Eén lijst van alle Respondenten, met per
 Respondent een overzicht (modal) waarin alle acties op die Respondent
 staan. Dit vervangt de losse acties per rij in het organisatie-detail
 (punt 4), dat daardoor weer over de organisatie zelf gaat.
@@ -729,20 +826,20 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   een actie gebeurt staan bij Navigatie in beheer. De vormgeving staat in
   `stylesheet.md`, Overzichtsmodal. Opbouw, van boven naar beneden:
   1. **Kop**: Naam van de Respondent, daaronder de organisatie en de
-     status als badge. Rechtsboven het kruisje. Bij een neutrale
-     Respondent staat dat erbij ("Neutrale Respondent, uit import").
+     status als badge. Rechtsboven het kruisje.
   2. **Gegevens**: Naam, e-mail, functie, team en notities als
      beschrijvingslijst (label links, waarde rechts). Eén kleine knop
      "Bewerken" rechtsboven in het blok. Na klikken verandert het blok in
      een formulier met "Opslaan" en "Annuleren". De rest van de modal
      blijft dan staan.
   3. **Toegang**: De persoonlijke link in een alleen-lezen veld met de
-     knop "Kopieer" er direct achter, en ernaast "Openen" als
-     tekstlink. Daaronder één regel over de Lead-rol: "Geen Lead" of
-     "Lead voor 2 Metingen", met "Beheren" als kleine knop. Alle Lead-acties
-     van punt 6a (toegang beheren, Vragenlijst sturen, blokkade
-     opheffen) staan achter die ene knop en niet als losse knoppen in het
-     blok.
+     knop "Kopieer" er direct achter, en ernaast de knop "Openen". Daaronder het selectievakje "Lead" met de samenvatting
+     "Geen Lead" of "Lead voor 2 Metingen". Aanvinken toont in dit blok de
+     Metingen met selectievakjes, met "Opslaan" en "Annuleren" (punt 6a).
+     Er is geen aparte knop "Beheren" en geen tweede venster. "Blokkade
+     opheffen" staat alleen in het blok als de Respondent geblokkeerd is.
+     Onder het blok staat het deel "Vragenlijst sturen" (punt 6a), met een
+     keuzelijst met Metingen en de knop "Vragenlijst sturen".
   4. **Scans**: Eén regel per ingevulde scan, met links Meting en
      Assessment en rechts de status als badge en een menuknop "Acties"
      (dropdown-knop). Het menu bevat Bekijk resultaten, Naar andere
@@ -874,15 +971,59 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   per Meting één ingevulde scan. Bestaat die er al, dan wordt die ene
   respons niet verplaatst en krijgt de beheerder een melding met het
   aantal overgeslagen scans en de reden. De overige geselecteerde scans
-  gaan wel door, en elke overgeslagen scan staat in de audit-log.
+  gaan wel door, en elke overgeslagen scan staat in de audit-log. Bij elke
+  overgeslagen scan in de melding staat de knop "Conflict oplossen".
+
+  **Conflict oplossen (modal)**: Dit conflict ontstaat vooral na een
+  import, omdat de import een Respondent op e-mailadres hergebruikt
+  (`import-scans.md`, "Wie de Respondent wordt"). Dan hangen beide scans aan
+  dezelfde Respondent, vaak een Coniche-medewerker, en is het wijzigen van
+  naam of e-mail geen oplossing, want dat geldt voor beide scans. Er moet
+  één van de twee scans aan een andere Respondent hangen. De modal
+  "Twee scans van dezelfde Respondent" helpt daarbij:
+  - **Twee kolommen**: Links de scan die al in de doel-Meting staat,
+    rechts de scan die wordt verplaatst. Per kolom staan de gegevens van
+    de scan (Meting, afgerond op, voortgang en totaalscore) en daaronder
+    de gegevens van de Respondent (naam, e-mail, functie, team, notities).
+    De gegevens van de gedeelde Respondent zijn in beide kolommen gelijk.
+  - **Per kolom de knop "Andere Respondent koppelen"**: De knop zit onder
+    het Respondent-blok van die kolom. Na een klik wordt dat blok zelf
+    bewerkbaar, op de plek waar het staat. Er opent geen apart formulier
+    onder de modal. Bovenaan het blok staat een keuzelijst met "Nieuwe
+    Respondent" en de bestaande Respondenten van dezelfde organisatie.
+    - **Nieuwe Respondent**: De velden Naam, E-mail, Functie, Team en
+      Notities worden invoervelden in de rijen waar de waarden stonden,
+      vooraf ingevuld met de huidige gegevens. Het e-mailveld is leeg en
+      toont de hint "E-mailadres (eigen, nog niet gebruikt)", want een
+      nieuwe Respondent heeft een eigen adres nodig dat nog niet bij een
+      andere Respondent in de organisatie voorkomt. Het e-mailadres is de
+      sleutel (`datamodel.md`, Respondent). Is het echte adres nog niet
+      bekend, dan kan de beheerder een tijdelijk adres invullen en dat later
+      wijzigen met "Respondent bewerken".
+    - **Bestaande Respondent**: De velden tonen de gegevens van de gekozen
+      Respondent, alleen-lezen.
+    - **Opslaan en Annuleren**: Onder het blok, in dezelfde kolom. De
+      knop "Andere Respondent koppelen" maakt hier plaats voor. Annuleren
+      zet het blok terug zoals het was. De andere kolom blijft intact.
+  - **Effect van opslaan**: Alleen die ene scan gaat naar de gekozen
+    Respondent. De oorspronkelijke Respondent blijft bestaan met de andere
+    scan. Een nieuwe Respondent krijgt een nieuwe Toegangscode.
+  - **Daarna**: De modal biedt "Verplaatsen alsnog uitvoeren" voor de scan
+    die was overgeslagen. Bij een bulkactie lost de beheerder de conflicten
+    een voor een op, en de overige scans zijn dan al verplaatst.
+  - **Bewerkslot**: De betrokken Respondenten vallen onder het Bewerkslot
+    (`datamodel.md`), zolang de modal open staat.
+  - **Audit-log**: `respons.respondentGewijzigd`, en bij een nieuwe
+    Respondent ook de bestaande aanmaakactie (`datamodel.md`, Audit).
 
   **Lege Meting**: Blijft staan na het verplaatsen van de laatste respons.
   Opruimen is een aparte actie, via de bestaande verwijderfunctie
   (Verwijderen).
 - **Respondent bewerken** (1 oktober 2026): Actie in het Respondent-overzicht
-  (Admin: alle organisaties, Consultant: eigen). Bedoeld om de neutrale Respondent die
-  de import aanmaakt (`import-scans.md`, "Wie de Respondent wordt") later
-  aan een echte persoon te koppelen, maar bruikbaar voor elke Respondent.
+  (Admin: alle organisaties, Consultant: eigen). Bedoeld om een Respondent die de import
+  aanmaakt (`import-scans.md`, "Wie de Respondent wordt"), vaak een
+  Coniche-medewerker, later aan de echte persoon te koppelen, maar
+  bruikbaar voor elke Respondent.
   - **Velden**: Naam, e-mail, functie, team en notities. Dat zijn dezelfde
     gegevens als in de intake en in "Mijn gegevens" aan de
     respondentkant, aangevuld met het e-mailadres.
@@ -939,8 +1080,8 @@ ook niet hier op het globale overzicht.
      resultatenscherm), "Exporteren" als dropdown-knop (zelfde opties en
      rechten als op de resultatenpagina), "Naar andere Meting" (opent een
      vervolgstap, punt 6b) en apart onderaan "Verwijderen" (rood, opent een
-     vervolgstap met bevestiging). Daarnaast de tekstlink "Bekijk
-     Respondent" (navigatie naar het Respondent-overzicht). Verplaatsen
+     vervolgstap met bevestiging). Daarnaast de knop "Bekijk
+     Respondent" (opent het Respondent-overzicht). Verplaatsen
      naar een andere organisatie staat alleen in het Respondent-overzicht.
   Rechten per actie zijn gelijk aan die op deze lijst en het resultaten-
   en exportbereik uit `datamodel.md` deel 2, Rechtenmatrix.
@@ -976,9 +1117,15 @@ Bij "Oude tool" kies je een map met losse CSV's (één bestand per scan) of
 losse bestanden; een bestand mag ook scans van meerdere organisaties en
 beide scantypes bevatten. Elke import maakt nieuwe Metingen aan met
 "import" in het label; de beheerder hangt de responsen daarna om naar de
-juiste Meting (punt 6b, "Respons naar andere Meting verplaatsen"). De scans
-komen bij een neutrale Respondent per organisatie, die de beheerder
-daarna kan bewerken (punt 6b, "Respondent bewerken").
+juiste Meting (punt 6b, "Respons naar andere Meting verplaatsen"). Elke scan
+krijgt een Respondent met de gegevens uit het bestand (naam, e-mailadres,
+functie, team en notitie), die de beheerder daarna kan bewerken (punt 6b,
+"Respondent bewerken").
+
+Importeren gaat met één knop, "N rijen importeren", voor de hele set. Rijen
+met een waarschuwing (een 95%+-match) tellen pas mee na een expliciete
+goedkeuring per rij; er is geen import per rij (`import-scans.md`,
+Werkwijze in beheer, punt 6).
 
 ---
 

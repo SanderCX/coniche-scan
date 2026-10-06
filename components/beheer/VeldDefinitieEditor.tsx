@@ -50,7 +50,7 @@ function VeldRow({
         <button
           type="button"
           onClick={onRemove}
-          className="text-sm text-red-600 hover:underline"
+          className="btn btn-outline btn-compact"
         >
           Verwijderen
         </button>
@@ -103,7 +103,7 @@ function VeldRow({
                 ],
               })
             }
-            className="text-sm font-medium text-ink-m hover:text-ink"
+            className="btn btn-outline btn-compact"
           >
             + Subveld toevoegen
           </button>

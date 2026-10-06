@@ -139,7 +139,7 @@ function EigenEnLeadMetingKaart({
           // t.o.v. de gewone (niet-samengevoegde) kaart, die altijd naar
           // `volgendeUrl` linkt.
           <Link href={volgendeUrl(invulling.id, invulling.status)} className="btn btn-outline btn-compact">
-            {invulling.status === "bezig" ? "Ga verder met jouw scan" : "Start jouw scan"}
+            {invulling.status === "bezig" ? "Ga verder met de scan" : "Start de intake"}
           </Link>
         )}
         {afgerondInMeting > 0 && (

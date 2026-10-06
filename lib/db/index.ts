@@ -12,3 +12,5 @@ export * from "./respondenten";
 export * from "./verplaatsen";
 export * from "./scans";
 export * from "./import";
+export * from "./conflict";
+export * from "./integriteit";

@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { BouwblokResultaat } from "@/lib/scoring";
+import { gewichtMarkering } from "@/lib/weging";
 
 /**
  * Recharts draait de schaal-cijfers van PolarRadiusAxis standaard mee met
@@ -25,7 +26,7 @@ function LeesbareSchaalTick({ x, y, payload }: { x: number; y: number; payload: 
 
 export function RadarChartView({ resultaten }: { resultaten: BouwblokResultaat[] }) {
   const data = resultaten.map((r) => ({
-    naam: `${r.bouwblok.volgnummer}. ${r.bouwblok.naam}`,
+    naam: `${r.bouwblok.volgnummer}. ${r.bouwblok.naam}${gewichtMarkering(r.bouwblok) ? ` (${gewichtMarkering(r.bouwblok)})` : ""}`,
     score: r.score ?? 0,
   }));
 

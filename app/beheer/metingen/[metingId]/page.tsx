@@ -20,6 +20,7 @@ import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { NaarAndereMetingStap, ScanVerplaatsResultaat } from "@/components/beheer/VerplaatsStappen";
+import { conflictActies } from "@/components/beheer/ConflictHost";
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { STATUS_LABEL } from "@/components/beheer/overzicht-helpers";
 
@@ -134,6 +135,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
           : `${r.verplaatst} scan(s) verplaatst naar "${r.doelLabel}", ${r.overgeslagen.length} overgeslagen: ${[
               ...new Set(r.overgeslagen.map((o) => o.reden)),
             ].join(" ")}`,
+      acties: conflictActies(organisatie.id, r.overgeslagen),
     });
   }
 
@@ -199,7 +201,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
           {leads.map((l, i) => (
             <span key={l.id}>
               {i > 0 && ", "}
-              <button type="button" className="admin-bekijk-knop" onClick={() => open("respondent", l.id)}>
+              <button type="button" className="btn btn-outline btn-compact" onClick={() => open("respondent", l.id)}>
                 {l.naam || l.email}
               </button>
             </span>
@@ -314,17 +316,18 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
                     </td>
                     <td>{percentage}%</td>
                     <td onClick={(e) => e.stopPropagation()}>
-                      <button type="button" className="admin-sort-btn" onClick={() => kopieer(invulling.id, link)}>
+                      <div className="knoppenrij">
+                        <button type="button" className="btn btn-outline btn-compact" onClick={() => kopieer(invulling.id, link)}>
                         {kopieerStatus?.id === invulling.id ? (kopieerStatus.gelukt ? "Gekopieerd!" : "Mislukt, opnieuw") : "Kopieer link"}
-                      </button>
-                      {" · "}
-                      <a href={link} target="_blank" rel="noreferrer" className="admin-sort-btn">
-                        Openen
-                      </a>
+                        </button>
+                        <a href={link} target="_blank" rel="noreferrer" className="btn btn-outline btn-compact">
+                          Openen
+                        </a>
+                      </div>
                     </td>
                     <td>
-                      <button type="button" className="admin-bekijk-knop" onClick={() => open("respondent", lid.id)}>
-                        Bekijk &gt;&gt;
+                      <button type="button" className="btn btn-outline btn-compact" onClick={() => open("respondent", lid.id)}>
+                        Bekijk
                       </button>
                     </td>
                   </tr>

@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { BeheerRol, Gebruiker } from "./types";
 import { nieuwId } from "./id";
+import { logAudit } from "./audit-store";
 import { normaliseerEmail } from "./email";
 
 /**
@@ -83,6 +84,11 @@ function slaAlles(alles: Gebruiker[]): void {
   emitChange();
 }
 
+/** Buiten React om, bijv. voor de audit-log. */
+export function getGebruikers(): Gebruiker[] {
+  return laadAlles();
+}
+
 export function useGebruikers(): Gebruiker[] {
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   return parseSnapshot(snapshot);
@@ -96,17 +102,27 @@ export function aantalActieveAdmins(alles: Gebruiker[]): number {
   return alles.filter((g) => g.rol === "admin" && g.actief).length;
 }
 
+const WACHTWOORD_ALFABET = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+
+/** Een willekeurig wachtwoord van 12 tekens zonder verwarrende tekens (geen 0/O, 1/l/I), cryptografisch gegenereerd. */
+export function genereerWachtwoord(): string {
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => WACHTWOORD_ALFABET[b % WACHTWOORD_ALFABET.length]).join("");
+}
+
 export function maakGebruiker(input: {
   email: string;
   naam: string;
-  wachtwoord: string;
+  /** Weglaten: Het systeem genereert het wachtwoord (beheerpagina.md, punt 9). */
+  wachtwoord?: string;
   rol: Gebruiker["rol"];
 }): Gebruiker {
   const gebruiker: Gebruiker = {
     id: nieuwId(),
     email: normaliseerEmail(input.email),
     naam: input.naam.trim(),
-    wachtwoord: input.wachtwoord,
+    wachtwoord: input.wachtwoord ?? genereerWachtwoord(),
     rol: input.rol,
     actief: true,
     laatstIngelogdOp: null,
@@ -115,6 +131,13 @@ export function maakGebruiker(input: {
   const alles = laadAlles();
   alles.push(gebruiker);
   slaAlles(alles);
+  logAudit({
+    actie: "gebruiker.aangemaakt",
+    entiteitType: "gebruiker",
+    entiteitId: gebruiker.id,
+    entiteitNaam: gebruiker.naam,
+    details: { rol: gebruiker.rol },
+  });
   return gebruiker;
 }
 
@@ -150,11 +173,15 @@ export function deactiveerGebruiker(id: string): { ok: true } | { ok: false; red
   const check = kanDeactiveren(id);
   if (!check.ok) return check;
   updateGebruiker(id, (g) => ({ ...g, actief: false }));
+  const g = laadAlles().find((x) => x.id === id);
+  logAudit({ actie: "gebruiker.gedeactiveerd", entiteitType: "gebruiker", entiteitId: id, entiteitNaam: g?.naam ?? null, details: { rol: g?.rol ?? null } });
   return { ok: true };
 }
 
 export function heractiveerGebruiker(id: string): void {
   updateGebruiker(id, (g) => ({ ...g, actief: true }));
+  const g = laadAlles().find((x) => x.id === id);
+  logAudit({ actie: "gebruiker.geheractiveerd", entiteitType: "gebruiker", entiteitId: id, entiteitNaam: g?.naam ?? null, details: { rol: g?.rol ?? null } });
 }
 
 /** Voor de "eigenaarschap overzetten"-stap bij het deactiveren van een Consultant. */

@@ -5,10 +5,12 @@ import Link from "next/link";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties, voerLegacyImportUit, LegacyImportKeuze, LegacyImportRijResultaat } from "@/lib/db";
+import { logAudit, nieuweGroepId } from "@/lib/audit-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { zichtbareOrganisaties } from "@/lib/rechten";
 import {
   ImportBronFormaat,
+  bestandOverslaanReden,
   detecteerBronFormaat,
   parseLegacyCsv,
   parseNieuweExportCsv,
@@ -28,6 +30,16 @@ interface BestandStatus {
   bronFormaat: ImportBronFormaat | null;
   fout: string | null;
   ontbrekendeKolommen: string[];
+  /** Het bestand is als geheel niet te importeren (import-scans.md, "Bestanden die niet te importeren zijn"). */
+  overgeslagenReden?: string | null;
+}
+
+/** De reden waarom een bestand niet meedoet, of `null` als het wél rijen levert. Elk zo'n bestand telt als overgeslagen. */
+function bestandReden(b: BestandStatus): string | null {
+  if (b.overgeslagenReden) return b.overgeslagenReden;
+  if (b.fout) return b.fout;
+  if (b.ontbrekendeKolommen.length > 0) return `Mist verplichte kolommen: ${b.ontbrekendeKolommen.join(", ")}.`;
+  return null;
 }
 
 /** Een gevalideerde rij, met erbij uit welk bestand ze komt (meerdere bestanden tegelijk, zie hieronder). */
@@ -88,9 +100,15 @@ export default function ImportLegacyPage() {
   const [rijen, setRijen] = useState<RijMetBron[] | null>(null);
   const [orgKeuzePerNaam, setOrgKeuzePerNaam] = useState<Record<string, OrgKeuze>>({});
   const [geimporteerdeSleutels, setGeimporteerdeSleutels] = useState<Set<string>>(new Set());
+  // Goedgekeurde waarschuwingsrijen (95%+-match): Goedkeuren is alleen een keuze om mee te nemen en schrijft niets weg.
+  const [goedgekeurdeSleutels, setGoedgekeurdeSleutels] = useState<Set<string>>(new Set());
   const [orgIdPerNaam, setOrgIdPerNaam] = useState<Record<string, string>>({});
   const [metingIdPerSleutel, setMetingIdPerSleutel] = useState<Record<string, string>>({});
+  const [genegeerd, setGenegeerd] = useState<{ inSubmap: number; anderType: number }>({ inSubmap: 0, anderType: 0 });
   const [laatsteActie, setLaatsteActie] = useState<{ aantal: number } | null>(null);
+  // Audit-log: De groep begint bij de eerste bevestiging van deze import, annuleren daarvoor logt
+  // niets. Rijen die later één voor één alsnog worden geïmporteerd, komen bij dezelfde groep.
+  const groepIdRef = useRef<string | null>(null);
   const bestandInputRef = useRef<HTMLInputElement>(null);
   const mapInputRef = useRef<HTMLInputElement>(null);
 
@@ -117,6 +135,14 @@ export default function ImportLegacyPage() {
               : "Bestand lezen mislukt door een onverwachte fout.",
           ontbrekendeKolommen: [],
         },
+        rijen: [],
+      };
+    }
+
+    const overslaanReden = bestandOverslaanReden(tekst);
+    if (overslaanReden) {
+      return {
+        status: { naam: bestand.name, bronFormaat: null, fout: null, ontbrekendeKolommen: [], overgeslagenReden: overslaanReden },
         rijen: [],
       };
     }
@@ -182,13 +208,20 @@ export default function ImportLegacyPage() {
   // bestanden (bijv. macOS' `.DS_Store`) worden hier stil overgeslagen in
   // plaats van als foutief bestand getoond.
   async function handleBestand(e: React.ChangeEvent<HTMLInputElement>) {
-    const gekozen = Array.from(e.target.files ?? []).filter((bestand) =>
-      bestand.name.toLowerCase().endsWith(".csv")
-    );
+    const alleGekozen = Array.from(e.target.files ?? []);
+    // Alleen `.csv`-bestanden die direct in de gekozen map staan: Submappen en andere bestandstypes
+    // worden genegeerd en in de samenvatting genoemd (import-scans.md, "Map met losse bestanden").
+    const inSubmap = (b: File) => (b.webkitRelativePath ?? "").split("/").length > 2;
+    const gekozen = alleGekozen.filter((b) => b.name.toLowerCase().endsWith(".csv") && !inSubmap(b));
+    const aantalInSubmap = alleGekozen.filter((b) => b.name.toLowerCase().endsWith(".csv") && inSubmap(b)).length;
+    const aantalAnderType = alleGekozen.filter((b) => !b.name.toLowerCase().endsWith(".csv") && !inSubmap(b)).length;
     e.target.value = "";
-    if (gekozen.length === 0) return;
+    if (gekozen.length === 0 && aantalInSubmap === 0 && aantalAnderType === 0) return;
+    setGenegeerd({ inSubmap: aantalInSubmap, anderType: aantalAnderType });
     setLaatsteActie(null);
+    groepIdRef.current = null;
     setGeimporteerdeSleutels(new Set());
+    setGoedgekeurdeSleutels(new Set());
     setOrgIdPerNaam({});
     setMetingIdPerSleutel({});
 
@@ -214,6 +247,7 @@ export default function ImportLegacyPage() {
   }
 
   const meerdereBestanden = bestanden.length > 1;
+  const overgeslagenBestanden = bestanden.filter((b) => bestandReden(b) !== null);
 
   /** Organisaties, gegroepeerd op unieke naam, in bestandsvolgorde van eerste voorkomen — voor het keuzeblok en de samenvatting. */
   const uniekeOrganisatieNamen = useMemo(() => {
@@ -239,13 +273,14 @@ export default function ImportLegacyPage() {
     [geimporteerdeSleutels, keuzeVoorNaam]
   );
 
+  // De set achter de ene knop "N rijen importeren": Rijen zonder probleem, plus de waarschuwingsrijen die zijn goedgekeurd.
   const rijenKlaarVoorBulk = useMemo(
-    () => (rijen ?? []).filter((r) => isActioneerbaar(r) && !r.vereistBevestiging),
-    [rijen, isActioneerbaar]
+    () => (rijen ?? []).filter((r) => isActioneerbaar(r) && (!r.vereistBevestiging || goedgekeurdeSleutels.has(rijSleutel(r)))),
+    [rijen, isActioneerbaar, goedgekeurdeSleutels]
   );
-  const rijenVoorIndividueleBevestiging = useMemo(
-    () => (rijen ?? []).filter((r) => isActioneerbaar(r) && r.vereistBevestiging),
-    [rijen, isActioneerbaar]
+  const nogNietGoedgekeurd = useMemo(
+    () => (rijen ?? []).filter((r) => isActioneerbaar(r) && r.vereistBevestiging && !goedgekeurdeSleutels.has(rijSleutel(r))),
+    [rijen, isActioneerbaar, goedgekeurdeSleutels]
   );
   const probleemRijen = useMemo(() => (rijen ?? []).filter((r) => !r.ok), [rijen]);
   const overgeslagenRijen = useMemo(
@@ -291,23 +326,65 @@ export default function ImportLegacyPage() {
     setLaatsteActie({ aantal: resultaat.geimporteerd });
   }
 
+  /** Geeft het groep-id van deze import, en logt `import.gestart` en `import.rijMislukt` bij de eerste bevestiging. */
+  function zorgVoorImportGroep(): string {
+    if (groepIdRef.current) return groepIdRef.current;
+    const groepId = nieuweGroepId();
+    groepIdRef.current = groepId;
+    logAudit([
+      {
+        actie: "import.gestart",
+        entiteitType: "import",
+        entiteitId: groepId,
+        groepId,
+        details: {
+          aantalBestanden: bestanden.length,
+          bestanden: bestanden.map((b) => ({
+            naam: b.naam,
+            bronFormaat: b.bronFormaat,
+            overgeslagen: bestandReden(b) !== null,
+            reden: bestandReden(b),
+          })),
+          aantalRijen: rijen?.length ?? 0,
+        },
+      },
+      ...probleemRijen.map((r) => ({
+        actie: "import.rijMislukt",
+        entiteitType: "import",
+        entiteitId: groepId,
+        groepId,
+        details: { bestand: r.bestandsnaam, rijNummer: r.rijNummer, reden: r.probleem ?? null },
+      })),
+    ]);
+    return groepId;
+  }
+
   function handleBulkBevestigen() {
     if (rijenKlaarVoorBulk.length === 0 || !gebruiker) return;
     const keuzes = rijenKlaarVoorBulk.map(bouwKeuze);
     // Een nieuw aangemaakte organisatie krijgt de importerende gebruiker als
     // aanmaker (bereik "aangemaakt", lib/rechten.ts); een hergebruikte
     // organisatie behoudt haar eigen aangemaaktDoor.
-    const res = voerLegacyImportUit(keuzes, gebruiker.id);
+    const res = voerLegacyImportUit(keuzes, gebruiker.id, zorgVoorImportGroep());
     verwerkResultaat(rijenKlaarVoorBulk, res);
   }
 
-  function handleRijBevestigen(rij: RijMetBron) {
-    if (!gebruiker) return;
-    const res = voerLegacyImportUit([bouwKeuze(rij)], gebruiker.id);
-    verwerkResultaat([rij], res);
+  function zetGoedkeuring(rij: RijMetBron, goedgekeurd: boolean) {
+    setGoedgekeurdeSleutels((prev) => {
+      const nieuw = new Set(prev);
+      if (goedgekeurd) nieuw.add(rijSleutel(rij));
+      else nieuw.delete(rijSleutel(rij));
+      return nieuw;
+    });
   }
 
   const totaalRijen = rijen?.length ?? 0;
+  // "Importeer 37 rijen, 2 bestanden overgeslagen" (import-scans.md, Werkwijze in beheer, punt 6).
+  const importKnopTekst =
+    `Importeer ${rijenKlaarVoorBulk.length} rij${rijenKlaarVoorBulk.length === 1 ? "" : "en"}` +
+    (overgeslagenBestanden.length > 0
+      ? `, ${overgeslagenBestanden.length} bestand${overgeslagenBestanden.length === 1 ? "" : "en"} overgeslagen`
+      : "");
   const nogTeKiezenNamen = uniekeOrganisatieNamen.filter((naam) => !vindOrganisatieMatch(naam));
 
   return (
@@ -318,7 +395,7 @@ export default function ImportLegacyPage() {
       <h1>Import van scans</h1>
       <p className="text-sm text-ink-m">
         Ingevulde scans uit een CSV-bestand in het datamodel zetten, uit de oude, stopgezette
-        tool of uit onze eigen export. Volledige spec: <code>import-scans.md</code>.
+        tool of uit onze eigen export.
       </p>
 
       {laatsteActie && (
@@ -352,11 +429,7 @@ export default function ImportLegacyPage() {
               ? "Geen bestanden gekozen"
               : `${bestanden.length} bestand${bestanden.length === 1 ? "" : "en"} gekozen`}
           </span>
-          <InfoIcoon naastVeld>
-            Meerdere bestanden tegelijk mogen: Houd Cmd/Ctrl (of Shift voor een reeks) ingedrukt bij het
-            selecteren, of kies direct een hele map met losse CSV&apos;s. Elk bestand mag een ander bronformaat
-            hebben, dat wordt per bestand apart herkend.
-          </InfoIcoon>
+          <InfoIcoon naastVeld sleutel="info.importBestanden" />
         </div>
         <input
           ref={bestandInputRef}
@@ -383,23 +456,32 @@ export default function ImportLegacyPage() {
         />
       </div>
 
+      {/* Bovenaan de overgeslagen bestanden met hun reden, vóór de organisatiekeuzes (import-scans.md, Werkwijze in beheer, punt 3). */}
+      {overgeslagenBestanden.length > 0 && (
+        <div className="admin-notice" style={{ marginTop: "1rem", borderColor: "var(--stat-red)" }} role="alert">
+          <strong>
+            {overgeslagenBestanden.length} bestand{overgeslagenBestanden.length === 1 ? "" : "en"} overgeslagen
+          </strong>
+          <ul style={{ margin: "0.4rem 0 0", paddingLeft: "1.2rem" }}>
+            {overgeslagenBestanden.map((b) => (
+              <li key={b.naam}>
+                <strong>{b.naam}</strong>: {bestandReden(b)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {bestanden.length > 0 && (
         <ul className="text-sm text-ink-m mt-2" style={{ listStyle: "none", padding: 0 }}>
-          {bestanden.map((b) => (
-            <li key={b.naam} style={{ marginBottom: "0.3rem" }}>
-              <strong>{b.naam}</strong>
-              {b.bronFormaat && !b.fout && b.ontbrekendeKolommen.length === 0 && (
-                <> — gedetecteerd: {BRONFORMAAT_LABEL[b.bronFormaat]}</>
-              )}
-              {b.fout && <span style={{ color: "var(--stat-red)" }}> — {b.fout}</span>}
-              {b.ontbrekendeKolommen.length > 0 && (
-                <span style={{ color: "var(--stat-red)" }}>
-                  {" "}
-                  — mist verplichte kolommen: {b.ontbrekendeKolommen.join(", ")}
-                </span>
-              )}
-            </li>
-          ))}
+          {bestanden
+            .filter((b) => bestandReden(b) === null)
+            .map((b) => (
+              <li key={b.naam} style={{ marginBottom: "0.3rem" }}>
+                <strong>{b.naam}</strong>
+                {b.bronFormaat && <> — gedetecteerd: {BRONFORMAAT_LABEL[b.bronFormaat]}</>}
+              </li>
+            ))}
         </ul>
       )}
 
@@ -407,7 +489,10 @@ export default function ImportLegacyPage() {
         <>
           {/* Samenvatting van het bestand (import-scans.md, Werkwijze in beheer, punt 3). */}
           <div className="admin-notice" style={{ marginTop: "1rem" }}>
-            <strong>{totaalRijen}</strong> rij{totaalRijen === 1 ? "" : "en"}, waarvan{" "}
+            <strong>{bestanden.length}</strong> bestand{bestanden.length === 1 ? "" : "en"}
+            {genegeerd.inSubmap > 0 && <>, {genegeerd.inSubmap} CSV in submappen genegeerd</>}
+            {genegeerd.anderType > 0 && <>, {genegeerd.anderType} bestand{genegeerd.anderType === 1 ? "" : "en"} van een ander type genegeerd</>}
+            . <strong>{totaalRijen}</strong> rij{totaalRijen === 1 ? "" : "en"}, waarvan{" "}
             <strong>{uniekeOrganisatieNamen.length - nogTeKiezenNamen.length}</strong> bij een bestaande
             organisatie, <strong>{nogTeKiezenNamen.length}</strong> bij een nieuwe organisatie (nog te
             kiezen hieronder), en <strong>{probleemRijen.length}</strong> met een probleem.
@@ -460,6 +545,12 @@ export default function ImportLegacyPage() {
                             value={keuze.actie === "koppelen" ? keuze.organisatieId ?? "" : keuze.actie}
                             onChange={(e) => {
                               const waarde = e.target.value;
+                              // Een gewijzigde organisatiekoppeling trekt de goedkeuring van de rijen van deze organisatie in.
+                              setGoedgekeurdeSleutels((prev) => {
+                                const nieuw = new Set(prev);
+                                (rijen ?? []).filter((r) => r.organisatieNaam === naam).forEach((r) => nieuw.delete(rijSleutel(r)));
+                                return nieuw;
+                              });
                               setOrgKeuzePerNaam((prev) => ({
                                 ...prev,
                                 [naam]:
@@ -520,12 +611,14 @@ export default function ImportLegacyPage() {
                         </span>
                       ) : orgActie === "overslaan" ? (
                         <span className="admin-badge status-uitgenodigd">Organisatie overgeslagen</span>
+                      ) : rij.vereistBevestiging && goedgekeurdeSleutels.has(sleutel) ? (
+                        <span className="admin-badge status-afgerond">Goedgekeurd</span>
                       ) : rij.vereistBevestiging ? (
                         <span
                           className="admin-badge status-bezig"
                           title={`Afwijkende vragen: ${(rij.afwijkendeVragen ?? []).join("; ")}`}
                         >
-                          {rij.assessmentMatchPercentage}% match — bevestig los
+                          {String(rij.assessmentMatchPercentage).replace(".", ",")}% match, goedkeuring nodig
                         </span>
                       ) : (
                         <span className="admin-badge status-afgerond">Klaar om te importeren</span>
@@ -535,10 +628,10 @@ export default function ImportLegacyPage() {
                       {!geimporteerd && rij.ok && orgActie !== "overslaan" && rij.vereistBevestiging && (
                         <button
                           type="button"
-                          className="admin-sort-btn"
-                          onClick={() => handleRijBevestigen(rij)}
+                          className="btn btn-outline btn-compact"
+                          onClick={() => zetGoedkeuring(rij, !goedgekeurdeSleutels.has(sleutel))}
                         >
-                          Importeer deze rij
+                          {goedgekeurdeSleutels.has(sleutel) ? "Goedkeuring intrekken" : "Goedkeuren"}
                         </button>
                       )}
                     </td>
@@ -570,15 +663,16 @@ export default function ImportLegacyPage() {
               disabled={rijenKlaarVoorBulk.length === 0}
               onClick={handleBulkBevestigen}
             >
-              {rijenKlaarVoorBulk.length} rij{rijenKlaarVoorBulk.length === 1 ? "" : "en"} importeren
+              {importKnopTekst}
             </button>
-            {rijenVoorIndividueleBevestiging.length > 0 && (
-              <InfoIcoon>
-                {rijenVoorIndividueleBevestiging.length} rij
-                {rijenVoorIndividueleBevestiging.length === 1 ? "" : "en"} met een 95%+-vraagtekstmatch (niet
-                100%) telt hier niet in mee: Die bevestig je altijd los, met &quot;Importeer deze rij&quot; in
-                de tabel hierboven.
-              </InfoIcoon>
+            {nogNietGoedgekeurd.length > 0 && (
+              <>
+                <span className="text-sm text-ink-m">
+                  {nogNietGoedgekeurd.length} rij{nogNietGoedgekeurd.length === 1 ? "" : "en"} wacht
+                  {nogNietGoedgekeurd.length === 1 ? "" : "en"} op goedkeuring
+                </span>
+                <InfoIcoon sleutel="info.importRijen" />
+              </>
             )}
           </div>
         </>

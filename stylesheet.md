@@ -197,6 +197,8 @@ dezelfde waarden), dus `text-sm` en `var(--fs-s)` zijn altijd hetzelfde.
 dezelfde vaste hoogte: `--control-h` (`2.4rem`, 38,4px), in de CSS voor
 `.admin-field input`/`select` en `.btn.btn-compact`. Een knop in de nav
 (`.nav-right .btn`) is compacter en volgt dit niet.
+### Koppen en lopende tekst
+
 - **Koppen**: Font-weight 800 (h1/h2) of 700 (h3), line-height 1.1,
   licht negatieve letter-spacing, kleur `var(--ink)`.
   - h1: `clamp(2.5rem, 5vw, 4rem)`
@@ -349,25 +351,26 @@ ongebruikt voor rollen):
 | Lead | Paars | `--pu` |
 | Respondent | Groen | `--gr` |
 
-### Tekstlink-rij
+### Knoppen en links
 
-Nieuw, nog niet eerder gespecificeerd. Een set compacte, secundaire
-acties onder of naast een primaire knop/dropdown in een lijstrij, bijv.
-`beheerpagina.md`, punt 6a: "Vragenlijst sturen · Kopieer link ·
-Openen" onder de knop "Lead-toegang beheren". Losse tekstlinks, oranje
-(`var(--or)`), geen onderstreping behalve bij hover, gescheiden door
-"·" met een spatie aan weerszijden (het scheidingsteken zelf niet
-klikbaar, kleur `var(--ink-s)`). Geen knoppen — bedoeld voor lichte,
-secundaire acties naast iets zwaarders erboven, niet als vervanging
-van `.btn-compact` in een bulk-actiebalk.
+**Een actie is een knop, geen link.** Alles wat iets uitvoert of opent op een
+formulier, in een modal of in een lijstrij is een `.btn`, dus ook "Kopieer
+link", "Openen", "Vragenlijst sturen", "Standaardtekst herstellen" en
+"Bekijk Respondent". Secundaire acties gebruiken `.btn-outline
+.btn-compact`.
 
-Staat een `<select>` (bijv. de Meting-keuze) in dezelfde rij als deze
-tekstlinks, dan is dat een compacte variant, niet het volle
-`select.field` uit Formulieren hieronder — die is voor eigen
-formulierrijen (zoals de Assessment-type-dropdown bij een Meting
-aanmaken), niet voor een select die tussen tekstlinks in een tabelrij
-staat. Exacte maatvoering is aan Sander, zolang de select niet groter
-oogt dan de tekstlinks ernaast.
+**Een link is alleen voor navigatie.** Dat zijn het kruimelpad, de links in
+de header en de footer (inclusief de vaste content-links en de exit-actie
+"← Terug naar ...") en een verwijzing binnen lopende tekst naar een andere
+pagina, zoals de privacypagina in de toestemmingstekst. Een link is oranje
+(`var(--or)`) zonder onderstreping, met onderstreping bij hover.
+
+**Knoppenrij.** Meerdere compacte acties naast elkaar in een rij, bijvoorbeeld
+"Kopieer" en "Openen" achter de persoonlijke link, staan als `.btn-outline
+.btn-compact` met een tussenruimte van `0.5rem`. Ze zijn gelijk van hoogte
+(`var(--control-h)`) en er staan geen scheidingstekens tussen. Staat er een
+`<select>` in dezelfde rij, dan is dat een compacte variant van
+hetzelfde formaat, niet het volle `select.field` uit Formulieren hieronder.
 
 ### Kaarten
 
@@ -389,16 +392,11 @@ waarde, zonder de pijltjes om hem met 1 te verhogen of te verlagen
 (`base.css`). De waarde typ je in; het toetsenbordtype voor getallen blijft.
 
 **Gelijke hoogte voor elk formulier-element.** `.field` (tekstvelden),
-`select.field` (dropdowns) en knoppen (Knoppen hierboven) krijgen
-dezelfde hoogte zodra ze naast elkaar in één rij staan — bijv.
-Assessment-type-dropdown, Label-veld en "Meting plannen"-knop bij het
-aanmaken van een Meting. Nu niet het geval: Het tekstveld en de knop
-wijken zichtbaar af van de dropdown. **De Assessment-type-dropdown is
-het uitgangspunt** (visueel de fijnste van de drie): `.field` en de
-knoppen passen zich daaraan aan, niet andersom. Concreet gelijk:
-verticale padding, `border-radius`, randdikte/-kleur, `font-size`. De
-exacte waarden overnemen van de bestaande dropdown-CSS is aan Sander;
-deze regel legt vast dát ze moeten matchen, niet welk getal.
+`select.field` (dropdowns) en knoppen krijgen dezelfde hoogte zodra ze naast
+elkaar in één rij staan, bijvoorbeeld de Assessment-type-dropdown, het
+Label-veld en de knop "Meting plannen". De vaste waarde is `--control-h`
+(zie Typografie, Veldhoogte). Concreet gelijk: Verticale padding,
+`border-radius`, randdikte en -kleur en `font-size`.
 
 ### Doorloopflow
 
@@ -451,37 +449,54 @@ met `<details>`) voor contentbeheer, tabelstijl uit `admin.css`.
 ### Info-icoon
 
 Voor een korte uitleg bij een veld of knop, in plaats van een vaste tekst
-eronder (`components/InfoIcoon.tsx`, `.info-icoon`, `.info-veld`).
+eronder, en voor de reden achter een uitgeschakelde knop (in plaats van
+een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
+`.info-veld`.
 
 - **Icoon**: Een oranje rondje (`var(--or)`) van `1.25rem` met een wit
-  uitroepteken (`--fs-xs`, gewicht 800), hover `var(--or-l)`. Het staat naast
-  de knop of het veld waar het over gaat. In een rij met velden en knoppen
-  staat het gecentreerd op de veldhoogte (`--control-h`).
-- **Informatieveld**: Een klik op het icoon opent het veld direct eronder,
-  over de pagina heen (de layout verspringt niet): `var(--bg-warm)`, rand
-  `1px solid var(--border-d)` met links een `4px` oranje rand, `--fs-s`,
-  schaduw zoals de Dropdown-knop, maximaal `26rem` breed. Rechtsboven een
-  sluitkruisje.
-- **Openen**: Met de muis op het icoon (mouse-over) of met een klik.
-  Mouse-over toont het veld zolang de muis op het icoon of op het veld
-  staat, en het veld sluit zodra de muis ervan af gaat. Een klik zet het
-  veld vast, ook als mouse-over het al opende, zodat de muis weg kan.
-- **Sluiten**: Met het kruisje, Esc, een klik ernaast of nog een klik op het
-  icoon. Een veld dat alleen door mouse-over open staat, sluit vanzelf als de
-  muis weggaat.
-- **Wat erin hoort**: Uitleg bij een veld of instelling. Meldingen over wat
-  er is gebeurd of een lege lijst ("Geen scans gevonden") blijven gewone
-  `.admin-notice`s.
-- **Waar het nu staat**: Bij het formulier Bewaartermijn ingevulde scans
-  (Organisaties), bij "Bestanden kiezen" en bij "rijen importeren" op de
-  Import-pagina, bij het bewerkformulier in het Respondent-overzicht, bij het
-  veld op Algemene teksten, bij Icoon en Slotsectie voor de PDF-export in
-  Content en bij Data-integriteit onder Applicatie. Het icoon staat altijd
-  direct achter het invulveld of de knop waar het over gaat (rechts ervan, bij
-  een groot veld zoals een tekstvak op de hoogte van de eerste regel), niet achter
-  het label. Een
-  nieuwe uitleg bij een veld of knop gaat altijd in een Info-icoon en niet als
-  vaste tekst eronder.
+  uitroepteken (`--fs-xs`, gewicht 800), hover `var(--or-l)`. Het staat
+  direct achter de knop of het veld waar het over gaat (rechts ervan, bij
+  een groot veld zoals een tekstvak op de hoogte van de eerste regel),
+  niet achter het label. In een rij met velden en knoppen staat het
+  gecentreerd op de veldhoogte (`--control-h`).
+- **Informatieveld**: Een klik op het icoon toont het veld gecentreerd in
+  het zichtbare venster (`position: fixed`, horizontaal en verticaal in het
+  midden van de viewport), niet vanaf het icoon. Daardoor staat het nooit
+  half buiten beeld, ook niet als het icoon onderaan een lange pagina of
+  tegen de rand van een modal staat. De layout verspringt niet. Opmaak:
+  `var(--bg-warm)`, rand `1px solid var(--border-d)` met links een `4px`
+  oranje rand, `--fs-s`, schaduw zoals de Dropdown-knop, breedte maximaal
+  `26rem` en `calc(100vw - 2rem)` op een smal venster, en maximaal `80vh`
+  hoog met scrollen als de tekst langer is. Achter het veld staat een lichte
+  dimlaag (zoals `.modal-overlay`, maar zonder eigen kop), zodat duidelijk is
+  dat het veld bovenop de pagina ligt. Rechtsboven een sluitkruisje en, voor
+  een Admin, links daarvan een potlood.
+- **Staat het icoon in een modal**, bijvoorbeeld het Respondent-overzicht,
+  dan komt het veld boven die modal te staan (hogere `z-index`), nog steeds
+  gecentreerd in het venster. De modal eronder blijft staan en open.
+- **Openen en sluiten**: Alleen met een klik. Er is geen mouse-over, omdat
+  het veld ook een potlood en een kruisje heeft die bediend moeten worden.
+  Sluiten kan met het kruisje, Esc of een klik op de dimlaag. De focus gaat
+  bij het openen naar het veld en komt bij het sluiten terug op het icoon
+  (`role="dialog"`, zie Toetsenbord en focus).
+- **Bewerken (alleen een Admin)**: Het potlood heeft dezelfde grootte als
+  het kruisje, kleur `var(--ink-s)` en bij hover `var(--ink)`. Een klik
+  vervangt de tekst door een tekstvak van dezelfde breedte dat meegroeit,
+  met een teller voor maximaal 500 tekens. Eronder staan "Opslaan"
+  (`.btn-or .btn-compact`) en "Annuleren" (`.btn-outline .btn-compact`), en
+  een knop "Standaardtekst herstellen" (`.btn-outline .btn-compact`, naast
+  Annuleren) zodra de tekst afwijkt. Het is een knop en geen link, want het
+  voert een actie uit. In de
+  bewerkstand sluit een klik op de dimlaag het veld niet, zodat getypte tekst
+  niet verloren gaat. Esc annuleert het bewerken, een tweede Esc sluit het
+  veld. Na opslaan toont het veld direct de nieuwe tekst.
+- **Wat erin hoort**: Uitleg bij een veld of instelling, of de reden achter
+  een uitgeschakelde knop. Meldingen over wat er is gebeurd of een lege
+  lijst ("Geen scans gevonden") blijven gewone `.admin-notice`s.
+- **Waar het staat en wat erin staat**: Het register met sleutels, plekken
+  en initiële teksten staat in `beheerpagina.md`, punt 2a, Algemene
+  teksten. Een nieuwe uitleg bij een veld of knop gaat altijd in een
+  Info-icoon, met een nieuwe regel in dat register.
 
 ### Tabbalk en kruimelpad (beheer)
 
@@ -520,7 +535,7 @@ een klik naast de modal of de terugknop van de browser.
   `var(--ink-s)`), waarde rechts. Een lege waarde laat de cel leeg, nooit
   een los streepje.
 - **Persoonlijke link** (`.overzicht-link-rij`): Alleen-lezen veld, daarna
-  "Kopieer" (`.btn-outline .btn-compact`) en "Openen" als tekstlink.
+  "Kopieer" en "Openen" (beide `.btn-outline .btn-compact`).
 - **Scanregel** (`.overzicht-scanregel`): Links Meting en Assessment, rechts
   de statusbadge en de dropdown-knop "Acties".
 - **Melding in de modal** (`.overzicht-melding`): Groen na een geslaagde

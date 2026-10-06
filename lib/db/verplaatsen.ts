@@ -4,6 +4,8 @@ import { normaliseerEmail } from "../email";
 import { laadAlles, slaAlles } from "./store";
 import { zoekScanInvulling } from "./scans";
 import { genereerUniekeToegangscode } from "./respondenten";
+import { logAudit, nieuweGroepId } from "../audit-store";
+import { metingContext, organisatieContext } from "../audit-context";
 
 /** Respondenten en scans verplaatsen of samenvoegen: binnen een organisatie, tussen organisaties en bij een e-mailconflict (beheerpagina.md, punt 6b). */
 
@@ -82,6 +84,15 @@ export function bewerkRespondent(
     if (lidIndex === -1) continue;
 
     let resultaat: OverzetResultaat | null = null;
+    const voor = organisatie.leden[lidIndex];
+    // Alleen welke velden wijzigden, nooit de waarden (datamodel.md, Audit: geen persoonsgegevens uit scans).
+    const gewijzigdeVelden = [
+      voor.naam !== input.naam ? "naam" : null,
+      voor.email !== normaliseerEmail(input.email) ? "e-mail" : null,
+      voor.functie !== input.functie ? "functie" : null,
+      voor.team !== input.team ? "team" : null,
+      voor.notities !== input.notities ? "notities" : null,
+    ].filter((v): v is string => v !== null);
     if (samenvoegenMet) {
       // E-mailconflict, al bevestigd door de beheerder: scans mee naar de
       // bestaande respondent, deze (incl. toegangscode) verdwijnt. Naam/
@@ -101,6 +112,22 @@ export function bewerkRespondent(
       };
     }
     slaAlles(alles);
+    logAudit({
+      actie: "respondent.bewerkt",
+      entiteitType: "respondent",
+      entiteitId: lidId,
+      details: {
+        ...organisatieContext(organisatie),
+        velden: samenvoegenMet ? ["e-mail"] : gewijzigdeVelden,
+        ...(resultaat
+          ? {
+              samengevoegd: true,
+              aantalScansVerplaatst: resultaat.verplaatst,
+              aantalScansOvergeslagen: resultaat.overgeslagen.length,
+            }
+          : {}),
+      },
+    });
     return resultaat;
   }
   return null;
@@ -233,6 +260,33 @@ export function verplaatsRespondentNaarOrganisatie(
   }
 
   slaAlles(alles);
+  const metingNaam = (organisatie: Organisatie, id: string) =>
+    organisatie.scanUitvoeringen.find((s) => s.id === id)?.label ?? null;
+  logAudit({
+    actie: "respondent.verplaatst",
+    entiteitType: "respondent",
+    entiteitId: lidId,
+    details: {
+      bronOrganisatieId: bronOrganisatie.id,
+      bronOrganisatieNaam: bronOrganisatie.naam,
+      doelOrganisatieId: doelOrganisatie.id,
+      doelOrganisatieNaam: doelOrganisatie.naam,
+      aantalScans: resultaat.verplaatst,
+      aantalScansOvergeslagen: resultaat.overgeslagen.length,
+      samengevoegd: Boolean(doelLid),
+      perMeting: bronOrganisatie.scanUitvoeringen
+        .filter((m) => keuzes.some((k) => k.bronMetingId === m.id) || nieuwePerBronMeting.has(m.id))
+        .map((m) => {
+          const keuze = keuzes.find((k) => k.bronMetingId === m.id);
+          return {
+            bronMeting: m.label,
+            doelMeting: keuze?.doelMetingId
+              ? metingNaam(doelOrganisatie, keuze.doelMetingId)
+              : (nieuwePerBronMeting.get(m.id)?.label ?? null),
+          };
+        }),
+    },
+  });
   return resultaat;
 }
 
@@ -306,6 +360,20 @@ export function verplaatsResponsNaarOrganisatie(
   bronMeting.invullingen = bronMeting.invullingen.filter((i) => i.id !== scanInvullingId);
   doelMeting.invullingen.push({ ...invulling, organisatieLidId: doelLid.id });
   slaAlles(alles);
+  logAudit({
+    actie: "respons.verplaatst",
+    entiteitType: "scan",
+    entiteitId: scanInvullingId,
+    details: {
+      bronOrganisatieId: gevonden.organisatie.id,
+      bronOrganisatieNaam: gevonden.organisatie.naam,
+      bronMeting: bronMeting.label,
+      doelOrganisatieId: doelOrganisatie.id,
+      doelOrganisatieNaam: doelOrganisatie.naam,
+      doelMeting: doelMeting.label,
+      assessmentNaam: metingContext(doelOrganisatie, doelMeting).assessmentNaam,
+    },
+  });
   return { ok: true };
 }
 
@@ -318,11 +386,26 @@ export function verplaatsResponsNaarOrganisatie(
  * dezelfde organisatie en hetzelfde Assessment-type, of leeg om een
  * nieuwe aan te maken (dan is `nieuwMetingLabel` verplicht).
  */
-export function verplaatsResponsNaarMeting(
+/** Eén Meting waarin de Respondent al een scan heeft: Dit is het conflict dat "Conflict oplossen" kan oplossen. */
+export interface MetingConflict {
+  doelMetingId: string;
+}
+
+interface MetingVerplaatsing {
+  ok: boolean;
+  reden?: string;
+  conflict?: MetingConflict;
+  organisatie?: Organisatie;
+  bronMeting?: ScanUitvoeringRef;
+  doelMeting?: ScanUitvoeringRef;
+}
+type ScanUitvoeringRef = Pick<ScanUitvoering, "id" | "label" | "assessmentId">;
+
+function verplaatsNaarMeting(
   scanInvullingId: string,
   doelScanUitvoeringId: string | null,
   nieuwMetingLabel?: string
-): { ok: boolean; reden?: string } {
+): MetingVerplaatsing {
   const alles = laadAlles();
   const gevonden = zoekScanInvulling(alles, scanInvullingId);
   if (!gevonden) return { ok: false, reden: "Ingevulde scan niet gevonden." };
@@ -351,12 +434,43 @@ export function verplaatsResponsNaarMeting(
   }
 
   if (doelMeting.invullingen.some((i) => i.organisatieLidId === lid.id)) {
-    return { ok: false, reden: "Deze respondent heeft al een ingevulde scan in de doel-Meting." };
+    return {
+      ok: false,
+      reden: "Deze respondent heeft al een ingevulde scan in de doel-Meting.",
+      conflict: { doelMetingId: doelMeting.id },
+    };
   }
 
   bronMeting.invullingen = bronMeting.invullingen.filter((i) => i.id !== scanInvullingId);
   doelMeting.invullingen.push(invulling);
   slaAlles(alles);
+  return {
+    ok: true,
+    organisatie,
+    bronMeting: { id: bronMeting.id, label: bronMeting.label, assessmentId: bronMeting.assessmentId },
+    doelMeting: { id: doelMeting.id, label: doelMeting.label, assessmentId: doelMeting.assessmentId },
+  };
+}
+
+export function verplaatsResponsNaarMeting(
+  scanInvullingId: string,
+  doelScanUitvoeringId: string | null,
+  nieuwMetingLabel?: string
+): { ok: boolean; reden?: string; conflict?: MetingConflict } {
+  const r = verplaatsNaarMeting(scanInvullingId, doelScanUitvoeringId, nieuwMetingLabel);
+  if (!r.ok) return { ok: false, reden: r.reden, conflict: r.conflict };
+  logAudit({
+    actie: "respons.metingVerplaatst",
+    entiteitType: "scan",
+    entiteitId: scanInvullingId,
+    details: {
+      ...organisatieContext(r.organisatie!),
+      bronMeting: r.bronMeting!.label,
+      doelMeting: r.doelMeting!.label,
+      assessmentNaam: metingContext(r.organisatie!, { ...r.doelMeting!, organisatieId: r.organisatie!.id, aangemaaktOp: "", invullingen: [] }).assessmentNaam,
+      aantal: 1,
+    },
+  });
   return { ok: true };
 }
 
@@ -372,25 +486,53 @@ export function verplaatsResponsenNaarMeting(
   scanInvullingIds: string[],
   doelScanUitvoeringId: string | null,
   nieuwMetingLabel?: string
-): { verplaatst: number; overgeslagen: { scanInvullingId: string; reden: string }[] } {
+): { verplaatst: number; overgeslagen: { scanInvullingId: string; reden: string; conflict?: MetingConflict }[] } {
   let gedeeldDoelId = doelScanUitvoeringId;
-  const overgeslagen: { scanInvullingId: string; reden: string }[] = [];
+  const overgeslagen: { scanInvullingId: string; reden: string; conflict?: MetingConflict }[] = [];
   let verplaatst = 0;
+  // Per bron-Meting één gebeurtenis, alle met dezelfde groep (datamodel.md, Audit).
+  const perBron = new Map<string, { organisatie: Organisatie; bron: ScanUitvoeringRef; doel: ScanUitvoeringRef; aantal: number }>();
   for (const id of scanInvullingIds) {
-    const resultaat = verplaatsResponsNaarMeting(id, gedeeldDoelId, gedeeldDoelId ? undefined : nieuwMetingLabel);
+    const resultaat = verplaatsNaarMeting(id, gedeeldDoelId, gedeeldDoelId ? undefined : nieuwMetingLabel);
     if (resultaat.ok) {
       verplaatst++;
       if (!gedeeldDoelId) {
-        // Eerste rij maakte de nieuwe Meting aan: vind 'm terug zodat de
-        // overige rijen in dezelfde Meting komen i.p.v. elk hun eigen
-        // nieuwe Meting.
-        const alles = laadAlles();
-        const gevonden = zoekScanInvulling(alles, id);
-        if (gevonden) gedeeldDoelId = gevonden.scanUitvoering.id;
+        // Eerste rij maakte de nieuwe Meting aan: Gebruik die voor de overige rijen
+        // i.p.v. elk hun eigen nieuwe Meting.
+        gedeeldDoelId = resultaat.doelMeting!.id;
       }
+      const sleutel = resultaat.bronMeting!.id;
+      const huidig = perBron.get(sleutel);
+      if (huidig) huidig.aantal++;
+      else
+        perBron.set(sleutel, {
+          organisatie: resultaat.organisatie!,
+          bron: resultaat.bronMeting!,
+          doel: resultaat.doelMeting!,
+          aantal: 1,
+        });
     } else {
-      overgeslagen.push({ scanInvullingId: id, reden: resultaat.reden ?? "onbekende reden" });
+      overgeslagen.push({ scanInvullingId: id, reden: resultaat.reden ?? "onbekende reden", conflict: resultaat.conflict });
     }
   }
+  const groepId = nieuweGroepId();
+  logAudit(
+    [...perBron.values()].map((g) => ({
+      actie: "respons.metingVerplaatst",
+      entiteitType: "meting",
+      entiteitId: g.bron.id,
+      entiteitNaam: g.bron.label,
+      groepId,
+      details: {
+        ...organisatieContext(g.organisatie),
+        bronMeting: g.bron.label,
+        doelMeting: g.doel.label,
+        assessmentNaam: metingContext(g.organisatie, { ...g.doel, organisatieId: g.organisatie.id, aangemaaktOp: "", invullingen: [] }).assessmentNaam,
+        aantal: g.aantal,
+        aantalOvergeslagen: overgeslagen.length,
+        redenenOvergeslagen: [...new Set(overgeslagen.map((o) => o.reden))],
+      },
+    }))
+  );
   return { verplaatst, overgeslagen };
 }

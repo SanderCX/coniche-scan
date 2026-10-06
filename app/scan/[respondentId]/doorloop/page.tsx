@@ -12,7 +12,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { MobielVoortgang } from "@/components/MobielVoortgang";
 import { BouwblokForm } from "@/components/BouwblokForm";
 import { ScanBezet } from "@/components/ScanBezet";
-import { useScanSlot } from "@/lib/scan-slot";
+import { useBewerkslot } from "@/lib/bewerkslot";
 
 export default function DoorloopPage({
   params,
@@ -26,8 +26,8 @@ export default function DoorloopPage({
   const gegevens = useScanInvulling(respondentId);
   const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
   const router = useRouter();
-  // Eén persoon tegelijk per scan (lib/scan-slot.ts): De eerste houdt het slot, een tweede ziet een melding.
-  const slot = useScanSlot(gegevens ? respondentId : null);
+  // Eén persoon tegelijk per scan (lib/bewerkslot.ts): De eerste houdt het slot, een tweede ziet een melding.
+  const slot = useBewerkslot("scan", gegevens ? respondentId : null);
 
   // Gearchiveerde bouwblokken (datamodel.md, "Content bewerken") krijgt een
   // nieuwe invulling niet meer te zien.
@@ -205,6 +205,8 @@ export default function DoorloopPage({
           <BouwblokForm
             bouwblok={huidig.bouwblok}
             categorieKleur={huidig.groepKleur}
+            categorieNaam={huidig.groepNaam}
+            bouwblokLabel={assessment.bouwblokLabel}
             eenheid={assessment.bouwblokEenheidEnkelvoud}
             schaal={assessment.schaal}
             respondent={respondent}

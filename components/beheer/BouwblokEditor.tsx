@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Bouwblok } from "@/lib/types";
+import { formatGewicht } from "@/lib/format";
+import { InfoIcoon } from "@/components/InfoIcoon";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { patchBouwblok, removeBouwblok, addVraag, patchVraag, removeVraag, herstelVraag } from "@/lib/assessment-bewerken";
 
@@ -31,6 +33,7 @@ export function BouwblokEditor({
           onClick={(e) => e.stopPropagation()}
           className="flex-1 rounded-lg border border-gray-200 p-1.5 text-sm font-medium"
         />
+        {bouwblok.gewicht !== 1 && <span className="gewicht-chip">{formatGewicht(bouwblok.gewicht)}×</span>}
         <span className="text-xs text-ink-m">
           {bouwblok.vragen.filter((v) => !v.gearchiveerd).length} vragen
         </span>
@@ -40,7 +43,7 @@ export function BouwblokEditor({
             e.preventDefault();
             setArchiveren({ soort: "bouwblok" });
           }}
-          className="text-sm text-red-600 hover:underline"
+          className="btn btn-outline btn-compact"
         >
           Archiveren
         </button>
@@ -61,19 +64,33 @@ export function BouwblokEditor({
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block text-ink">
-            Toelichting <span className="font-normal text-ink-m">(overlay-tekst)</span>
-          </span>
+          <span className="mb-1 block text-ink">Centrale vraag</span>
           <textarea
-            value={bouwblok.toelichting}
+            value={bouwblok.centraleVraag ?? ""}
             onChange={(e) =>
               patchBouwblok(assessmentId, categorieId, bouwblok.id, {
-                toelichting: e.target.value,
+                centraleVraag: e.target.value || null,
               })
             }
-            rows={4}
+            rows={2}
             className="w-full rounded-lg border border-gray-200 p-2 text-sm"
           />
+        </label>
+        <label className="block text-sm">
+          <span className="mb-1 block text-ink">Toelichting</span>
+          <div className="flex items-start gap-2">
+            <textarea
+              value={bouwblok.toelichting ?? ""}
+              onChange={(e) =>
+                patchBouwblok(assessmentId, categorieId, bouwblok.id, {
+                  toelichting: e.target.value,
+                })
+              }
+              rows={4}
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+            />
+            <InfoIcoon sleutel="info.contentToelichting" />
+          </div>
         </label>
         <label className="block text-sm">
           <span className="mb-1 block text-ink">Tags (komma-gescheiden)</span>
@@ -90,24 +107,6 @@ export function BouwblokEditor({
             className="w-full rounded-lg border border-gray-200 p-2 text-sm"
           />
         </label>
-        <label className="block text-sm" style={{ maxWidth: "10rem" }}>
-          <span className="mb-1 block text-ink">
-            Gewicht <span className="font-normal text-ink-m">(standaard 1, nog geen effect op de score)</span>
-          </span>
-          <input
-            type="number"
-            min={0}
-            step={0.1}
-            value={bouwblok.gewicht}
-            onChange={(e) =>
-              patchBouwblok(assessmentId, categorieId, bouwblok.id, {
-                gewicht: Number(e.target.value),
-              })
-            }
-            className="w-full rounded-lg border border-gray-200 p-2 text-sm"
-          />
-        </label>
-
         <div>
           <p className="mb-2 text-sm font-medium text-ink">Vragen</p>
           <div className="space-y-2">
@@ -127,7 +126,7 @@ export function BouwblokEditor({
                   <button
                     type="button"
                     onClick={() => setArchiveren({ soort: "vraag", vraagId: vraag.id })}
-                    className="mt-2 text-xs text-red-600 hover:underline"
+                    className="btn btn-outline btn-compact mt-2"
                   >
                     Archiveer
                   </button>
@@ -137,7 +136,7 @@ export function BouwblokEditor({
           <button
             type="button"
             onClick={() => addVraag(assessmentId, categorieId, bouwblok.id)}
-            className="mt-2 text-sm font-medium text-ink-m hover:text-ink"
+            className="btn btn-outline btn-compact mt-2"
           >
             + Vraag toevoegen
           </button>
@@ -156,7 +155,7 @@ export function BouwblokEditor({
                       <button
                         type="button"
                         onClick={() => herstelVraag(assessmentId, categorieId, bouwblok.id, vraag.id)}
-                        className="text-ink-m underline hover:text-ink"
+                        className="btn btn-outline btn-compact"
                       >
                         Herstellen
                       </button>

@@ -32,6 +32,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `import-scans.md` | Import van scans (CSV): de oude, stopgezette tool, en onze eigen export teruglezen |
 | `sbi-indeling.md` | Vaste optielijst voor Sector/Subsector (SBI2025, top 2 niveaus) |
 | `backlog.md` | Bewust nog niet opgepakt |
+| `go-live-plan.md` | Actielijst naar productie |
 | `changelog.md` | Bouwlog van Sander: per datum wat er in de code veranderd is, waarom, en welke specs daarbij zijn bijgewerkt |
 
 ## Uitgangspunten
@@ -42,8 +43,15 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
   data bewerkt, geen nieuwe flow.
 - De app hoeft voorlopig niet responsive te zijn. Ontwerp en test voor
   desktop.
-- Uitleg bij een veld, knop of instelling staat in een Info-icoon
-  (`stylesheet.md`, Info-icoon), niet als vaste tekst eronder.
+- Uitleg bij een veld of knop staat in een Info-icoon en niet als vaste
+  tekst eronder (`stylesheet.md`, Info-icoon). Elke Info-icoon-tekst heeft
+  een initiële waarde en is door een Admin aan te passen op de plek zelf
+  (`beheerpagina.md`, punt 2a, Algemene teksten).
+- Een actie is een knop en geen link. Links zijn er alleen voor navigatie:
+  kruimelpad, header, footer en verwijzingen in lopende tekst
+  (`stylesheet.md`, Knoppen en links).
+- Een scan, Respondent of Organisatie die iemand bewerkt, kan niet
+  tegelijk door een ander bewerkt worden (`datamodel.md`, Bewerkslot).
 
 ## Status
 
@@ -52,11 +60,18 @@ Ingevulde scans) zijn gebouwd, met de content van de Klantcontact
 Volwassenheidsscan, de AI-volwassenheidsscan en de Zorgscan (sector-variant
 van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
 
-- **Opslag**: Alles staat nog in de localStorage van de browser. Een
-  Postgres-database (Neon) volgt later (`backlog.md`). Tot die tijd werkt
-  een link alleen in de browser waar de data staat.
-- **Inlog beheer**: E-mail en wachtwoord. 2FA en rollen volgen met de
-  backend (`datamodel.md` deel 2).
+- **Opslag**: Prototypefase. De data staat in de localStorage van de
+  browser. Sander werkt daarnaast met een Neon-database als tijdelijke
+  serveropslag. Welke database definitief wordt en waar die draait, volgt
+  na afstemming met IT (`backlog.md`). Zonder gedeelde opslag werkt een
+  link alleen in de browser waar de data staat.
+- **Inlog en rollen**: E-mail en wachtwoord voor beheer, met een rolkeuze
+  op het inlogscherm. De rollen Admin en Consultant aan de beheerkant en
+  Lead en Respondent aan de klantkant zijn nu ingericht als testhulp
+  (prototype). De definitieve rollen, rechten, 2FA en inlog volgen met de
+  backend (`datamodel.md` deel 2), en de rolkeuze op het inlogscherm
+  verdwijnt dan. Admin-accounts hebben onderling dezelfde rechten, en meer
+  dan een Consultant.
 - **Toegang respondenten**: Via een korte persoonlijke link (10-teken
   code, cryptografisch gegenereerd, zie `datamodel.md`, Toegangscode),
   zonder verificatiecode. E-mailverificatie volgt als er een backend en
@@ -92,14 +107,6 @@ datamodel. Wijzig je iets aan de vormgeving, dan de stylesheet.
 ---
 
 ## 1. Scoringslogica
-
-> **Status weging: op de backlog, niet gebouwd** (eerst overleggen met
-> Joost, `backlog.md`). Alles in deze spec over gewichten, de
-> Wegingskaart op de intake en de "2×"-markering is voorlopig
-> toekomstig. Tot het besluit valt rekent de app ongewogen (alle
-> gewichten 1) en geldt de formule uit de vorige versie: Gemiddelde van
-> de bouwblokscores per categorie, overall als som van alle antwoorden
-> gedeeld door het totaal aantal vragen.
 
 Elk bouwblok heeft een gewicht `g` (standaard 1, zie `datamodel.md`,
 `Bouwblok.gewicht`). Alleen de Zorgscan heeft nu bouwblokken met een
@@ -387,6 +394,12 @@ geen afwijking van de spec maar een gat erin.
    achter het bouwblok dezelfde marker. Bij gewicht 1 staat er niets. Op het laatste bouwblok wordt "Volgende" de knop "Bekijk
    resultaten".
 
+   **Eén persoon tegelijk per scan.** Een scan die iemand invult, is
+   voor anderen vergrendeld (`datamodel.md`, Bewerkslot). Opent een tweede
+   persoon dezelfde scan, dan krijgt die een melding dat de scan nu in
+   gebruik is en kan hij hem op dat moment niet openen. De scan opent
+   zodra het slot vrij is.
+
    **`.nav-right`**: "Naar resultaten →" als scherm-specifieke actie,
    uiterst links (met een pijl naar rechts, niet links: Dit is een
    voorwaartse actie, geen terug-actie. Alleen zichtbaar zodra deze
@@ -396,15 +409,6 @@ geen afwijking van de spec maar een gat erin.
    afgerond, dan begint `.nav-right` direct met de 4 vaste links, geen
    losse scheidingslijn. Dan de 4 vaste content-links, dan de
    scheidingslijn, dan "← Terug naar Mijn metingen".
-   **Eén persoon tegelijk per scan** (geldt voor de intake en de
-   doorloopflow): Wie de vragenlijst als eerste opent, houdt hem vast zolang
-   zijn pagina openstaat. Opent iemand anders in die periode dezelfde scan,
-   dan ziet die in plaats van de intake of vragenlijst de melding "Deze scan
-   wordt op dit moment al bewerkt", met uitleg dat er maar één persoon
-   tegelijk kan invullen, een knop "Opnieuw proberen" en een automatische
-   controle: Zodra de eerste klaar is of zijn pagina sluit, opent de
-   vragenlijst vanzelf. Het resultatenscherm is niet geblokkeerd. Zie
-   `datamodel.md`, Scanslot, voor het mechanisme.
 6. **Resultatenscherm**: Overall score met classificatiecirkel en
    voortgang, radar van alle bouwblokken, staafdiagram per categorie
    (kleur volgt de score), top 3 sterktes en verbeterkansen, legenda.
@@ -465,5 +469,8 @@ bouwblokken met naam, omschrijving, tags en vragen.
 - Aggregatie over meerdere respondenten: Het gemiddelde per Meting is
   gebouwd (`beheerpagina.md`, Organisatie-resultaten). Afwijking en
   spreiding daarbovenop zijn nog niet ontworpen (`backlog.md`).
+- Weging: De weging is gebouwd. Nog te besluiten of de gewichten van de
+  Zorgscan (bouwblok 4, 10 en 11 op 2) blijven staan of terug naar 1
+  gaan.
 - Rol/functie bij de respondent: Vrij tekstveld of vaste lijst.
 - Focus- en error-states in formulieren (zie `stylesheet.md`).

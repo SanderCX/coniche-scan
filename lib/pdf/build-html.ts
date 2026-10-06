@@ -1,4 +1,4 @@
-import { Assessment, ContentBron } from "@/lib/types";
+import { Assessment, Bouwblok, ContentBron } from "@/lib/types";
 import { alleBouwblokkenMetGroep, isVlakkeAssessment } from "@/lib/assessment-structuur";
 import {
   alleBouwblokResultaten,
@@ -11,6 +11,8 @@ import {
 } from "@/lib/scoring";
 import { scoreKleur, CLASSIFICATIE_INFO, CLASSIFICATIE_SCORES, SCORE_KLEUR, ANTWOORD_KLEUR } from "@/lib/colors";
 import { toelichtingVoor } from "@/lib/bouwblok-info";
+import { gewichtMarkering } from "@/lib/weging";
+import { formatGewicht } from "@/lib/format";
 import { contentVoorBron } from "./content-secties";
 import { radarChartSvg, barChartSvg } from "./charts";
 import { escapeHtml } from "./escape-html";
@@ -64,28 +66,42 @@ function cssTekst(t: string): string {
   return t.replace(/[\\"]/g, "\\$&").replace(/[\r\n]+/g, " ");
 }
 
+/** " (2×)" achter een bouwblok met een gewicht ongelijk aan 1, anders leeg. */
+function markeringTekst(bouwblok: Bouwblok): string {
+  const m = gewichtMarkering(bouwblok);
+  return m ? ` (${m})` : "";
+}
+
 export function buildResultatenPdfHtml(payload: ExportPdfPayload, logoDataUri: string): string {
   const { assessment, antwoorden, opmerkingenPerBouwblok, organisatieNaam, respondentNaam, afgerondOp } =
     payload;
 
   const bouwblokResultaten = alleBouwblokResultaten(assessment, antwoorden);
-  const groepResultaten = alleGroepResultaten(assessment, bouwblokResultaten);
-  const overall = overallScore(bouwblokResultaten.map((r) => r.score));
+  const groepResultaten = alleGroepResultaten(assessment, bouwblokResultaten, antwoorden);
+  const overall = overallScore(assessment, antwoorden);
   const overallKlasse = overall !== null ? classificatie(overall) : null;
   const overallKleur = overall !== null ? scoreKleur(overall) : "#888884";
   const { sterktes, verbeterkansen } = topSterktesEnVerbeterkansen(bouwblokResultaten);
   const { beantwoord, totaal } = voortgang(assessment, antwoorden);
 
   const radarSvg = radarChartSvg(
-    bouwblokResultaten.map((r) => ({ label: `${r.bouwblok.volgnummer}. ${r.bouwblok.naam}`, score: r.score }))
+    bouwblokResultaten.map((r) => ({
+      label: `${r.bouwblok.volgnummer}. ${r.bouwblok.naam}${markeringTekst(r.bouwblok)}`,
+      score: r.score,
+    }))
   );
-  const barSvg = barChartSvg(groepResultaten.map((r) => ({ label: r.groepNaam, score: r.score })));
+  const barSvg = barChartSvg(
+    groepResultaten.map((r) => ({
+      label: r.gewicht && r.gewicht !== 1 ? `${r.groepNaam} (${formatGewicht(r.gewicht)}×)` : r.groepNaam,
+      score: r.score,
+    }))
+  );
 
-  function top3Lijst(titel: string, items: { bouwblok: { naam: string }; score: number }[]): string {
+  function top3Lijst(titel: string, items: { bouwblok: Bouwblok; score: number }[]): string {
     const rijen = items
       .map(
         (r) =>
-          `<li><span class="score-badge klein" style="background:${scoreKleur(r.score)}">${r.score.toFixed(1)}</span>${escapeHtml(r.bouwblok.naam)}</li>`
+          `<li><span class="score-badge klein" style="background:${scoreKleur(r.score)}">${r.score.toFixed(1)}</span>${escapeHtml(r.bouwblok.naam)}${escapeHtml(markeringTekst(r.bouwblok))}</li>`
       )
       .join("");
     return `<div class="top3-kolom"><h3>${titel}</h3><ul class="top3-lijst">${rijen}</ul></div>`;
@@ -113,9 +129,13 @@ export function buildResultatenPdfHtml(payload: ExportPdfPayload, logoDataUri: s
   // "Slotsectie per scan-type").
   const slotsectie = assessment.pdfContentSecties;
 
-  const bouwsteenBlokken = alleBouwblokkenMetGroep(assessment).map(({ bouwblok }) => {
+  const bouwsteenBlokken = alleBouwblokkenMetGroep(assessment).map(({ bouwblok, groepNaam, groepKleur }) => {
     const score = bouwblokScore(bouwblok, antwoorden);
-    const toelichting = toelichtingVoor(bouwblok);
+    const toelichting = toelichtingVoor(bouwblok, {
+      bouwblokLabel: assessment.bouwblokLabel,
+      groepNaam,
+      groepKleur,
+    });
     const scoreBadge =
       score !== null
         ? `<span class="score-badge" style="background:${scoreKleur(score)}">${score.toFixed(1)}</span>`
@@ -136,19 +156,23 @@ export function buildResultatenPdfHtml(payload: ExportPdfPayload, logoDataUri: s
           <div class="bouwsteen-kop">
             <div>
               <p class="eyebrow" style="color:${toelichting.accentColor}">${escapeHtml(toelichting.eyebrow)}</p>
-              <h3 class="bouwsteen-titel">${escapeHtml(toelichting.titel)}</h3>
+              <h3 class="bouwsteen-titel">${escapeHtml(toelichting.titel)}${escapeHtml(markeringTekst(bouwblok))}</h3>
             </div>
             ${scoreBadge}
           </div>
-          <div class="centrale-vraag-blok" style="border-color:${toelichting.accentColor}">
+          ${
+            toelichting.centraleVraag
+              ? `<div class="centrale-vraag-blok" style="border-color:${toelichting.accentColor}">
             <p class="centrale-vraag-label" style="color:${toelichting.accentColor}">CENTRALE VRAAG</p>
             <p class="centrale-vraag-tekst">${escapeHtml(toelichting.centraleVraag)}</p>
-          </div>
+          </div>`
+              : ""
+          }
           ${toelichting.beschrijving.map((t) => `<p>${escapeHtml(t)}</p>`).join("")}
         </div>`
       : `<div class="bouwsteen-uitleg">
           <div class="bouwsteen-kop">
-            <h3 class="bouwsteen-titel">${escapeHtml(bouwblok.naam)}</h3>
+            <h3 class="bouwsteen-titel">${escapeHtml(bouwblok.naam)}${escapeHtml(markeringTekst(bouwblok))}</h3>
             ${scoreBadge}
           </div>
           ${bouwblok.toelichting ? `<p>${escapeHtml(bouwblok.toelichting)}</p>` : ""}

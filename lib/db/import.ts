@@ -4,6 +4,8 @@ import { normaliseerEmail } from "../email";
 import { GevalideerdeRij } from "../import-legacy";
 import { laadAlles, slaAlles } from "./store";
 import { genereerUniekeToegangscode } from "./respondenten";
+import { AuditInvoer, logAudit } from "../audit-store";
+import { metingContext, organisatieContext } from "../audit-context";
 
 /** Import van scans uit een CSV (import-scans.md): schrijft rijen weg als Organisatie, Respondent, Meting en scan. */
 
@@ -56,9 +58,13 @@ export interface LegacyImportRijResultaat {
  */
 export function voerLegacyImportUit(
   keuzes: LegacyImportKeuze[],
-  aangemaaktDoor: string
+  aangemaaktDoor: string,
+  /** Alle gebeurtenissen van één import delen dit id in de audit-log (`datamodel.md`, Audit, Groepen). */
+  groepId: string | null = null
 ): { geimporteerd: number; rijResultaten: LegacyImportRijResultaat[] } {
   const alles = laadAlles();
+  // Geen naam, e-mailadres of andere gegevens van de Respondent in de log (datamodel.md, Audit).
+  const gelogd: AuditInvoer[] = [];
   let geimporteerd = 0;
   const rijResultaten: LegacyImportRijResultaat[] = [];
 
@@ -91,6 +97,14 @@ export function voerLegacyImportUit(
       alles.push(organisatie);
       nieuweOrgPerNaam.set(rij.organisatieNaam, organisatie);
       nieuwAangemaakt = true;
+      gelogd.push({
+        actie: "organisatie.aangemaakt",
+        entiteitType: "organisatie",
+        entiteitId: organisatie.id,
+        entiteitNaam: organisatie.naam,
+        groepId,
+        details: organisatieContext(organisatie),
+      });
     }
 
     // "nieuw"-formaat: organisatie_kenmerken is al compleet, alleen toepassen bij een
@@ -109,6 +123,11 @@ export function voerLegacyImportUit(
     }
 
     let lid = organisatie.leden.find((l) => l.email === normaliseerEmail(rij.respondentEmail));
+    // Een bestaande Respondent wordt niet overschreven. Een `start_comment` die nog niet in de
+    // notities staat, komt als nieuwe regel onder de bestaande notities (import-scans.md).
+    if (lid && rij.respondentNotities && !lid.notities.includes(rij.respondentNotities)) {
+      lid.notities = lid.notities ? `${lid.notities}\n${rij.respondentNotities}` : rij.respondentNotities;
+    }
     if (!lid) {
       lid = {
         id: nieuwId(),
@@ -123,6 +142,13 @@ export function voerLegacyImportUit(
         aangemaaktOp: new Date().toISOString(),
       };
       organisatie.leden.push(lid);
+      gelogd.push({
+        actie: "respondent.aangemaakt",
+        entiteitType: "respondent",
+        entiteitId: lid.id,
+        groepId,
+        details: organisatieContext(organisatie),
+      });
     }
 
     const metingSleutel = `${organisatie.id}::${assessmentId}::${rij.meetingLabel}`;
@@ -140,6 +166,14 @@ export function voerLegacyImportUit(
       };
       organisatie.scanUitvoeringen.push(scanUitvoering);
       nieuweMetingPerSleutel.set(metingSleutel, scanUitvoering);
+      gelogd.push({
+        actie: "meting.aangemaakt",
+        entiteitType: "meting",
+        entiteitId: scanUitvoering.id,
+        entiteitNaam: scanUitvoering.label,
+        groepId,
+        details: metingContext(organisatie, scanUitvoering),
+      });
     }
 
     const invulling: ScanInvulling = {
@@ -155,10 +189,24 @@ export function voerLegacyImportUit(
       bewaarVerlengdTot: null,
     };
     scanUitvoering.invullingen.push(invulling);
+    gelogd.push({
+      actie: "scan.geimporteerd",
+      entiteitType: "scan",
+      entiteitId: invulling.id,
+      groepId,
+      details: {
+        ...metingContext(organisatie, scanUitvoering),
+        bestand: (rij as { bestandsnaam?: string }).bestandsnaam ?? null,
+        rijNummer: rij.rijNummer,
+        // Bij een goedgekeurde 95%+-rij het percentage (import-scans.md, Audit-log).
+        ...(rij.vereistBevestiging ? { vraagtekstMatchPercentage: rij.assessmentMatchPercentage } : {}),
+      },
+    });
     rijResultaten.push({ organisatieId: organisatie.id, scanUitvoeringId: scanUitvoering.id });
     geimporteerd++;
   }
 
   slaAlles(alles);
+  logAudit(gelogd);
   return { geimporteerd, rijResultaten };
 }

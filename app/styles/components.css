@@ -113,6 +113,7 @@
   padding-inline: 1rem;
   height: var(--control-h);
   font-size: var(--fs-s);
+  white-space: nowrap;
 }
 
 .nav-right .btn {
@@ -149,11 +150,30 @@
   border: 1px solid var(--border);
   border-radius: var(--r);
   box-shadow: 0 12px 28px rgba(28, 28, 26, 0.08);
-  overflow: hidden;
+  /* Zichtbaar zodat een Info-icoon in een optie zijn informatieveld buiten het menu kan tonen. */
+  overflow: visible;
+}
+
+.dropdown-menu-rij {
+  display: flex;
+  align-items: center;
+}
+.dropdown-menu-rij .info-icoon-wrap {
+  margin-right: 0.7rem;
+}
+.dropdown-menu-rij:first-child .dropdown-menu-item,
+.dropdown-menu-header + .dropdown-menu-rij .dropdown-menu-item {
+  border-top-left-radius: var(--r);
+  border-top-right-radius: var(--r);
+}
+.dropdown-menu-rij:last-child .dropdown-menu-item {
+  border-bottom-left-radius: var(--r);
+  border-bottom-right-radius: var(--r);
 }
 
 .dropdown-menu-item {
   display: block;
+  flex: 1;
   width: 100%;
   text-align: left;
   padding: 0.6rem 1rem;
@@ -304,6 +324,19 @@
   letter-spacing: 0.08em;
   padding: 0.3rem 0.8rem;
   border-radius: 3px;
+}
+
+.gewicht-chip {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border-radius: 100px;
+  background: var(--or-faint);
+  border: 1px solid var(--or-mid);
+  color: var(--or);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
 }
 
 .g-badge {
@@ -968,12 +1001,21 @@ button.card:hover,
 .info-icoon[aria-expanded="true"] {
   background: var(--or-l);
 }
+/* Dimlaag achter het informatieveld, zoals .modal-overlay maar lichter en zonder eigen kop. */
+.info-dim {
+  position: fixed;
+  inset: 0;
+  z-index: 300; /* boven .modal-overlay (200), zodat het veld ook boven een modal staat */
+  background: rgba(28, 28, 26, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
 .info-veld {
-  position: absolute;
-  top: calc(100% + 0.4rem);
-  left: -0.4rem;
-  z-index: 30;
-  width: min(26rem, 80vw);
+  width: min(26rem, calc(100vw - 2rem));
+  max-height: 80vh;
+  overflow-y: auto;
   display: flex;
   align-items: flex-start;
   gap: 0.8rem;
@@ -991,20 +1033,54 @@ button.card:hover,
   text-transform: none;
   letter-spacing: normal;
 }
-/* Overbrugt de ruimte tussen icoon en veld, zodat de muis er tijdens het
-   verplaatsen niet "buiten" komt en het veld sluit. */
-.info-veld::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -0.5rem;
-  height: 0.5rem;
-}
 .info-veld p {
   margin: 0;
   flex: 1;
+  white-space: pre-line;
 }
+.info-veld-actie {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ink-s);
+  cursor: pointer;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  height: 1em;
+  font-size: var(--fs-s);
+}
+.info-veld-actie:hover {
+  color: var(--ink);
+}
+.info-veld-bewerken {
+  flex: 1;
+  min-width: 0;
+}
+.info-veld-bewerken textarea {
+  width: 100%;
+  resize: none;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border-d);
+  border-radius: var(--r);
+  font-size: var(--fs-s);
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--ink);
+}
+.info-veld-teller {
+  text-align: right;
+  font-size: var(--fs-xs);
+  color: var(--ink-s);
+  margin: 0.2rem 0 0.5rem;
+}
+.info-veld-knoppen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 .info-veld-sluit {
   background: none;
   border: none;
@@ -1016,4 +1092,28 @@ button.card:hover,
 }
 .info-veld-sluit:hover {
   color: var(--ink);
+}
+
+/* Wegingskaart op de intake (CLAUDE.md, scherm 4). Opmaak volgt de Kaarten uit
+   stylesheet.md; een eigen Wegingskaart-sectie bestaat daar nog niet. */
+.weging-kaart {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin: 1.5rem 0 0;
+  padding: 1.2rem 1.4rem;
+}
+.weging-kaart h3 {
+  margin: 0 0 0.3rem;
+}
+.weging-icoon {
+  flex: none;
+  color: var(--or);
+  margin-top: 0.15rem;
+}
+.sidebar-bouwblok .gewicht-chip {
+  margin-left: 0.4rem;
+}
+.bouwblok-kop-titelrij .gewicht-chip {
+  align-self: center;
 }

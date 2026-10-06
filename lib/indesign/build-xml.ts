@@ -44,8 +44,8 @@ export function buildIndesignExport(payload: ExportIndesignPayload): IndesignExp
     payload;
 
   const bouwblokResultaten = alleBouwblokResultaten(assessment, antwoorden);
-  const groepResultaten = alleGroepResultaten(assessment, bouwblokResultaten);
-  const overall = overallScore(bouwblokResultaten.map((r) => r.score));
+  const groepResultaten = alleGroepResultaten(assessment, bouwblokResultaten, antwoorden);
+  const overall = overallScore(assessment, antwoorden);
   const overallKlasse = overall !== null ? classificatie(overall) : null;
   const { beantwoord, totaal } = voortgang(assessment, antwoorden);
   const { sterktes, verbeterkansen } = topSterktesEnVerbeterkansen(bouwblokResultaten);

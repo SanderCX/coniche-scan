@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { Bouwblok, ScanWeergave, SchaalLabel } from "@/lib/types";
 import { CATEGORIE_COLORS } from "@/lib/colors";
-import { alleBouwstenen } from "@/data/bouwstenen-content";
-import { aiDomeinen } from "@/data/ai-domeinen-content";
+import { toelichtingVoor } from "@/lib/bouwblok-info";
+import { gewichtMarkering } from "@/lib/weging";
 import { ScaleRadio } from "./ScaleRadio";
 import { Modal } from "./Modal";
 
 export function BouwblokForm({
   bouwblok,
   categorieKleur,
+  categorieNaam,
+  bouwblokLabel,
   eenheid,
   schaal,
   respondent,
@@ -19,6 +21,9 @@ export function BouwblokForm({
 }: {
   bouwblok: Bouwblok;
   categorieKleur: string | null;
+  categorieNaam: string | null;
+  /** Eyebrow in de Toelichtingsmodal (`Assessment.bouwblokLabel`). */
+  bouwblokLabel: string;
   /** UI-woord voor dit bouwblok, bijv. "Bouwblok" of "Domein". */
   eenheid: string;
   schaal: SchaalLabel[];
@@ -37,42 +42,11 @@ export function BouwblokForm({
   );
   const [toelichtingOpen, setToelichtingOpen] = useState(false);
 
-  /**
-   * Klantcontact Volwassenheidsscan (bouwblok-id's "bb…") heeft rijke
-   * bouwsteen-content uit visie-coniche.md (data/bouwstenen-content.ts,
-   * dezelfde bron als de publieke bouwstenen-pagina). De AI-scan
-   * (bouwblok-id's "ai…") heeft dezelfde soort content uit
-   * visie-ai-klantcontact.md (data/ai-domeinen-content.ts, dezelfde bron
-   * als de publieke AI-pagina). De Zorgscan (bouwblok-id's "zorg-…") is
-   * een sector-variant met exact dezelfde 15 bouwblokken/nummering
-   * (`datamodel.md`, Sector-varianten) en hergebruikt daarom bewust
-   * dezelfde bouwsteen-content, gematcht op `volgnummer` — nog niet
-   * sector-vertaald, zie het open punt bovenaan `content-zorgscan.md`.
-   * Zonder match (nog niet bestaande content) valt de overlay terug op
-   * `bouwblok.toelichting`.
-   */
-  const bouwsteenInfo = bouwblok.id.startsWith("bb") || bouwblok.id.startsWith("zorg-")
-    ? alleBouwstenen.find((b) => b.nummer === bouwblok.volgnummer)
-    : undefined;
-  const aiDomeinInfo = bouwblok.id.startsWith("ai")
-    ? aiDomeinen.find((d) => d.nummer === bouwblok.volgnummer)
-    : undefined;
-
-  const toelichtingInfo = bouwsteenInfo
-    ? {
-        eyebrow: `${bouwsteenInfo.groepNaam.toUpperCase()} · BOUWSTEEN ${bouwsteenInfo.nummer}`,
-        accentColor: CATEGORIE_COLORS[bouwsteenInfo.kleur]?.hex ?? "var(--or)",
-        centraleVraag: bouwsteenInfo.centraleVraag,
-        beschrijving: bouwsteenInfo.beschrijving,
-      }
-    : aiDomeinInfo
-      ? {
-          eyebrow: `AI-DOMEIN ${aiDomeinInfo.nummer}`,
-          accentColor: "var(--or)",
-          centraleVraag: aiDomeinInfo.centraleVraag,
-          beschrijving: aiDomeinInfo.beschrijving,
-        }
-      : undefined;
+  const toelichtingInfo = toelichtingVoor(bouwblok, {
+    bouwblokLabel,
+    groepNaam: categorieNaam,
+    groepKleur: categorieKleur,
+  });
 
   /** Scrollt na het kiezen van een antwoord naar de volgende vraag (of, bij
    * de laatste vraag, naar het opmerkingenveld/de knop) — een korte
@@ -100,6 +74,7 @@ export function BouwblokForm({
         </p>
         <div className="bouwblok-kop-titelrij">
           <h2>{bouwblok.naam}</h2>
+          {gewichtMarkering(bouwblok) && <span className="gewicht-chip">{gewichtMarkering(bouwblok)}</span>}
           <button
             type="button"
             onClick={() => setToelichtingOpen(true)}
@@ -128,34 +103,30 @@ export function BouwblokForm({
         eyebrow={toelichtingInfo?.eyebrow}
         accentColor={toelichtingInfo?.accentColor}
       >
-        {toelichtingInfo ? (
-          <>
-            <div
+        {toelichtingInfo?.centraleVraag && (
+          <div
+            style={{
+              borderLeft: `3px solid ${toelichtingInfo.accentColor}`,
+              paddingLeft: "0.9rem",
+              margin: "0 0 1.2rem",
+            }}
+          >
+            <p
+              className="text-xs font-bold"
               style={{
-                borderLeft: `3px solid ${toelichtingInfo.accentColor}`,
-                paddingLeft: "0.9rem",
-                margin: "0 0 1.2rem",
+                color: toelichtingInfo.accentColor,
+                letterSpacing: "0.08em",
+                marginBottom: "0.2rem",
               }}
             >
-              <p
-                className="text-xs font-bold"
-                style={{
-                  color: toelichtingInfo.accentColor,
-                  letterSpacing: "0.08em",
-                  marginBottom: "0.2rem",
-                }}
-              >
-                CENTRALE VRAAG
-              </p>
-              <p style={{ color: "var(--ink)", fontWeight: 600 }}>{toelichtingInfo.centraleVraag}</p>
-            </div>
-            {toelichtingInfo.beschrijving.map((tekst, i) => (
-              <p key={i}>{tekst}</p>
-            ))}
-          </>
-        ) : (
-          bouwblok.toelichting
+              CENTRALE VRAAG
+            </p>
+            <p style={{ color: "var(--ink)", fontWeight: 600 }}>{toelichtingInfo.centraleVraag}</p>
+          </div>
         )}
+        {toelichtingInfo?.beschrijving.map((tekst, i) => (
+          <p key={i}>{tekst}</p>
+        ))}
       </Modal>
 
       <div className="instructievlak">

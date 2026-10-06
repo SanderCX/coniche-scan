@@ -1,6 +1,8 @@
 import { Organisatie, ScanUitvoering } from "../types";
 import { nieuwId } from "../id";
 import { laadAlles, slaAlles, useOrganisaties } from "./store";
+import { logAudit } from "../audit-store";
+import { metingContext } from "../audit-context";
 
 /** Metingen (in de code `ScanUitvoering`): plannen, hernoemen, verwijderen en opzoeken. */
 
@@ -22,6 +24,13 @@ export function maakScanUitvoering(
   };
   organisatie.scanUitvoeringen.push(scanUitvoering);
   slaAlles(alles);
+  logAudit({
+    actie: "meting.aangemaakt",
+    entiteitType: "meting",
+    entiteitId: scanUitvoering.id,
+    entiteitNaam: scanUitvoering.label,
+    details: metingContext(organisatie, scanUitvoering),
+  });
   return scanUitvoering;
 }
 
@@ -35,8 +44,16 @@ export function hernoemMeting(scanUitvoeringId: string, label: string): void {
   const alles = laadAlles();
   const gevonden = zoekScanUitvoering(alles, scanUitvoeringId);
   if (!gevonden) return;
+  const oudLabel = gevonden.scanUitvoering.label;
   gevonden.scanUitvoering.label = label;
   slaAlles(alles);
+  logAudit({
+    actie: "meting.hernoemd",
+    entiteitType: "meting",
+    entiteitId: scanUitvoeringId,
+    entiteitNaam: label,
+    details: { ...metingContext(gevonden.organisatie, gevonden.scanUitvoering), oudLabel },
+  });
 }
 
 /**
@@ -50,8 +67,15 @@ export function verwijderMeting(scanUitvoeringId: string): void {
   for (const organisatie of alles) {
     const index = organisatie.scanUitvoeringen.findIndex((s) => s.id === scanUitvoeringId);
     if (index === -1) continue;
-    organisatie.scanUitvoeringen.splice(index, 1);
+    const [meting] = organisatie.scanUitvoeringen.splice(index, 1);
     slaAlles(alles);
+    logAudit({
+      actie: "meting.verwijderd",
+      entiteitType: "meting",
+      entiteitId: meting.id,
+      entiteitNaam: meting.label,
+      details: { ...metingContext(organisatie, meting), aantalScans: meting.invullingen.length },
+    });
     return;
   }
 }

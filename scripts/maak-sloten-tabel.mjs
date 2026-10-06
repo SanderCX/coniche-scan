@@ -1,7 +1,8 @@
-// Eenmalig te draaien: maakt de tabel "scan_sloten" aan in Neon (het slot dat
-// voorkomt dat twee personen tegelijk dezelfde scan invullen, zie
-// app/api/slot/[scanId]/route.ts en lib/scan-slot.ts). Idempotent: opnieuw
-// draaien doet niets als de tabel al bestaat.
+// Maakt de tabel "bewerk_sloten" aan in Neon (het Bewerkslot dat voorkomt dat twee
+// personen tegelijk dezelfde scan, Respondent of Organisatie bewerken, zie
+// app/api/slot/[type]/[id]/route.ts en lib/bewerkslot.ts). De route maakt de tabel
+// ook zelf aan bij het eerste gebruik; dit script is voor wie dat vooraf wil doen.
+// Idempotent: opnieuw draaien doet niets als de tabel al bestaat.
 //
 // Gebruik:
 //   node --env-file=.env.local scripts/maak-sloten-tabel.mjs
@@ -16,10 +17,13 @@ if (!process.env.DATABASE_URL) {
 const sql = neon(process.env.DATABASE_URL);
 
 await sql`
-  CREATE TABLE IF NOT EXISTS scan_sloten (
-    scan_id text PRIMARY KEY,
+  CREATE TABLE IF NOT EXISTS bewerk_sloten (
+    entiteit_type text NOT NULL,
+    entiteit_id text NOT NULL,
     houder text NOT NULL,
-    verloopt_op timestamptz NOT NULL
+    houder_naam text,
+    hartslag_op timestamptz NOT NULL,
+    PRIMARY KEY (entiteit_type, entiteit_id)
   )
 `;
-console.log("✓ scan_sloten bestaat.");
+console.log("✓ bewerk_sloten bestaat.");

@@ -132,3 +132,12 @@ p {
     padding: 3rem 0;
   }
 }
+
+/* Een link is alleen voor navigatie (stylesheet.md, Knoppen en links): oranje zonder onderstreping, met onderstreping bij hover. */
+.tekst-link {
+  color: var(--or);
+  text-decoration: none;
+}
+.tekst-link:hover {
+  text-decoration: underline;
+}

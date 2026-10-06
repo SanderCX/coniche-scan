@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { ScanInvulling } from "./types";
 import { haalServerKopieOp, stuurNaarServer } from "./server-sync";
+import { logAudit } from "./audit-store";
 
 /**
  * Globale instellingen (`beheerpagina.md` punt 4, `datamodel.md` deel 2,
@@ -78,6 +79,12 @@ export function zetInstellingen(patch: Partial<Instellingen>): void {
   window.localStorage.setItem(KEY, json);
   emitChange();
   stuurNaarServer(SERVER_SLEUTEL, json);
+  logAudit({
+    actie: "instellingen.gewijzigd",
+    entiteitType: "instellingen",
+    entiteitId: "instellingen",
+    details: { gewijzigd: Object.fromEntries(Object.entries(patch).map(([k, v]) => [k, { oud: (huidig as unknown as Record<string, unknown>)[k] ?? null, nieuw: v ?? null }])) },
+  });
 }
 
 /**

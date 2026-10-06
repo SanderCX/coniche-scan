@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { BeheerRol, Gebruiker } from "./types";
-import { useGebruikers, zoekGebruikerVoorLogin, zetLaatstIngelogd } from "./gebruikers-store";
+import { getGebruikers, useGebruikers, zoekGebruikerVoorLogin, zetLaatstIngelogd } from "./gebruikers-store";
 
 /**
  * PROTOTYPE-NIVEAU: Login tegen `lib/gebruikers-store.ts` (localStorage,
@@ -26,11 +26,36 @@ function subscribe(listener: Listener): () => void {
   return () => listeners.delete(listener);
 }
 
+/** Na handmatig uitloggen slaat de dev-autologin in dit tabblad over, anders is uitloggen onmogelijk. */
+const GEEN_AUTOLOGIN_KEY = "coniche-scan:geen-dev-autologin";
+
+/**
+ * Alleen tijdens ontwikkeling (`next dev`): Start beheer ingelogd als de eerste actieve
+ * Admin, zodat elk nieuw tabblad of elke herstart niet eerst door het inlogscherm hoeft.
+ * In een productiebuild is `NODE_ENV` niet "development", dus doet dit niets. Geen
+ * wachtwoord nodig of in de code: Het zet alleen de sessie van een bestaande Admin.
+ */
+export function devAutoLogin(): boolean {
+  if (process.env.NODE_ENV !== "development" || typeof window === "undefined") return false;
+  try {
+    if (window.sessionStorage.getItem(GEEN_AUTOLOGIN_KEY)) return false;
+    if (window.sessionStorage.getItem(KEY)) return false;
+    const admin = getGebruikers().find((g) => g.actief && g.rol === "admin");
+    if (!admin) return false;
+    window.sessionStorage.setItem(KEY, admin.id);
+    emitChange();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function login(email: string, wachtwoord: string, rol: BeheerRol): boolean {
   const gebruiker = zoekGebruikerVoorLogin(email, wachtwoord, rol);
   if (!gebruiker) return false;
   if (typeof window !== "undefined") {
     window.sessionStorage.setItem(KEY, gebruiker.id);
+    window.sessionStorage.removeItem(GEEN_AUTOLOGIN_KEY);
     emitChange();
   }
   zetLaatstIngelogd(gebruiker.id);
@@ -40,15 +65,26 @@ export function login(email: string, wachtwoord: string, rol: BeheerRol): boolea
 export function logout(): void {
   if (typeof window === "undefined") return;
   window.sessionStorage.removeItem(KEY);
+  window.sessionStorage.setItem(GEEN_AUTOLOGIN_KEY, "1");
   emitChange();
 }
 
 function getSnapshot(): string | null {
   if (typeof window === "undefined") return null;
-  return window.sessionStorage.getItem(KEY);
+  try {
+    return window.sessionStorage.getItem(KEY);
+  } catch {
+    // sessionStorage geblokkeerd of niet beschikbaar: Geen ingelogde gebruiker.
+    return null;
+  }
 }
 function getServerSnapshot(): string | null {
   return null;
+}
+
+/** Het id van de ingelogde Gebruiker buiten React om (bijv. voor de audit-log), of `null`. */
+export function getIngelogdeGebruikerId(): string | null {
+  return getSnapshot();
 }
 
 /** Alleen de ingelogde staat (boolean) — voor route-gating in `app/beheer/layout.tsx`. */

@@ -5,34 +5,74 @@ function round1(n: number): number {
   return Number(n.toFixed(1));
 }
 
-function gemiddelde(waarden: number[]): number | null {
-  if (waarden.length === 0) return null;
-  return round1(waarden.reduce((a, b) => a + b, 0) / waarden.length);
+/** Gewicht van een bouwblok: standaard 1, een ongeldige waarde telt als 1 (`datamodel.md`, Bouwblok.gewicht). */
+export function gewichtVan(bouwblok: Bouwblok): number {
+  return typeof bouwblok.gewicht === "number" && bouwblok.gewicht > 0 ? bouwblok.gewicht : 1;
 }
 
-/** Bouwblokscore = gemiddelde van de scores op de vragen binnen dat bouwblok. */
+function beantwoordeScores(bouwblok: Bouwblok, antwoorden: Record<string, number>): number[] {
+  return bouwblok.vragen
+    .map((v) => antwoorden[v.id])
+    .filter((s): s is number => typeof s === "number");
+}
+
+/** Bouwblokscore zonder afronding. Alleen voor verdere berekening; getoond wordt `bouwblokScore`. */
+function bouwblokScoreRuw(bouwblok: Bouwblok, antwoorden: Record<string, number>): number | null {
+  const scores = beantwoordeScores(bouwblok, antwoorden);
+  return scores.length === 0 ? null : scores.reduce((a, b) => a + b, 0) / scores.length;
+}
+
+/** Bouwblokscore = gemiddelde van de scores op de vragen binnen dat bouwblok. Ongewogen. */
 export function bouwblokScore(
   bouwblok: Bouwblok,
   antwoorden: Record<string, number>
 ): number | null {
-  const scores = bouwblok.vragen
-    .map((v) => antwoorden[v.id])
-    .filter((s): s is number => typeof s === "number");
-  return gemiddelde(scores);
-}
-
-/** Groepscore = gemiddelde van de bouwblokscores binnen die groep (categorie of, bij een platte assessment, het bouwblok zelf). */
-export function categorieScore(bouwblokScores: (number | null)[]): number | null {
-  return gemiddelde(bouwblokScores.filter((s): s is number => s !== null));
+  const ruw = bouwblokScoreRuw(bouwblok, antwoorden);
+  return ruw === null ? null : round1(ruw);
 }
 
 /**
- * Overall score = gemiddelde van ALLE bouwblokscores samen, niet het
- * gemiddelde van de groepscores (groepen hebben ongelijk veel bouwblokken,
- * dus zouden anders niet evenredig meewegen).
+ * Groepscore (categorie of, bij een platte assessment, het bouwblok zelf) =
+ * gewogen gemiddelde van de bouwblokscores: `Σ(g × score) / Σ g`
+ * (`datamodel.md`, Scoreberekening). Bouwblokken zonder antwoorden doen niet mee.
  */
-export function overallScore(alleBouwblokScores: (number | null)[]): number | null {
-  return gemiddelde(alleBouwblokScores.filter((s): s is number => s !== null));
+export function categorieScore(
+  bouwblokken: { bouwblok: Bouwblok }[],
+  antwoorden: Record<string, number>
+): number | null {
+  let som = 0;
+  let gewichten = 0;
+  for (const { bouwblok } of bouwblokken) {
+    const score = bouwblokScoreRuw(bouwblok, antwoorden);
+    if (score === null) continue;
+    const g = gewichtVan(bouwblok);
+    som += g * score;
+    gewichten += g;
+  }
+  return gewichten === 0 ? null : round1(som / gewichten);
+}
+
+/**
+ * Overall = `Σ(g × som antwoorden per blok) / Σ(g × aantal beantwoorde vragen
+ * per blok)`, uit de ruwe antwoorden en niet uit afgeronde bouwblokscores of
+ * categoriescores (`datamodel.md`, Scoreberekening). Bij een afgeronde scan is
+ * het aantal beantwoorde vragen gelijk aan het aantal vragen in het blok.
+ */
+export function overallScoreRuw(assessment: Assessment, antwoorden: Record<string, number>): number | null {
+  let teller = 0;
+  let noemer = 0;
+  for (const { bouwblok } of alleBouwblokkenMetGroep(assessment)) {
+    const scores = beantwoordeScores(bouwblok, antwoorden);
+    const g = gewichtVan(bouwblok);
+    teller += g * scores.reduce((a, b) => a + b, 0);
+    noemer += g * scores.length;
+  }
+  return noemer === 0 ? null : teller / noemer;
+}
+
+export function overallScore(assessment: Assessment, antwoorden: Record<string, number>): number | null {
+  const ruw = overallScoreRuw(assessment, antwoorden);
+  return ruw === null ? null : round1(ruw);
 }
 
 /** Bevestigd (zie CLAUDE.md sectie 3, geverifieerd met twee losse datasets). */
@@ -62,6 +102,8 @@ export function voortgang(assessment: Assessment, antwoorden: Record<string, num
 
 export interface BouwblokResultaat {
   bouwblok: Bouwblok;
+  /** Gewicht van het bouwblok (1 = normaal, wordt dan nergens getoond). */
+  gewicht: number;
   groepId: string;
   groepNaam: string | null;
   score: number | null;
@@ -75,6 +117,7 @@ export function alleBouwblokResultaten(
     bouwblok,
     groepId,
     groepNaam,
+    gewicht: gewichtVan(bouwblok),
     score: bouwblokScore(bouwblok, antwoorden),
   }));
 }
@@ -84,6 +127,8 @@ export interface GroepResultaat {
   groepNaam: string;
   kleur: string | null;
   score: number | null;
+  /** Alleen bij een platte assessment (de groep is het bouwblok): het gewicht, voor de factor bij de naam. */
+  gewicht?: number;
 }
 
 /**
@@ -95,7 +140,8 @@ export interface GroepResultaat {
  */
 export function alleGroepResultaten(
   assessment: Assessment,
-  bouwblokResultaten: BouwblokResultaat[]
+  bouwblokResultaten: BouwblokResultaat[],
+  antwoorden: Record<string, number>
 ): GroepResultaat[] {
   const isVlak = isVlakkeAssessment(assessment);
 
@@ -106,17 +152,16 @@ export function alleGroepResultaten(
       groepNaam: r.bouwblok.naam,
       kleur: null,
       score: r.score,
+      gewicht: r.gewicht,
     }));
   } else {
     resultaten = assessment.categorieen!.map((categorie) => {
-      const scores = bouwblokResultaten
-        .filter((r) => r.groepId === categorie.id)
-        .map((r) => r.score);
+      const bouwblokken = bouwblokResultaten.filter((r) => r.groepId === categorie.id);
       return {
         groepId: categorie.id,
         groepNaam: categorie.naam,
         kleur: categorie.kleur,
-        score: categorieScore(scores),
+        score: categorieScore(bouwblokken, antwoorden),
       };
     });
   }

@@ -1,6 +1,8 @@
 import { Organisatie } from "../types";
 import { nieuwId } from "../id";
 import { laadAlles, slaAlles, useOrganisaties } from "./store";
+import { logAudit, nieuweGroepId } from "../audit-store";
+import { organisatieContext } from "../audit-context";
 
 /** Organisaties: aanmaken, bijwerken, verwijderen en overzetten naar een andere eigenaar. */
 
@@ -29,13 +31,38 @@ export function maakOrganisatie(input: {
   const alles = laadAlles();
   alles.push(organisatie);
   slaAlles(alles);
+  logAudit({
+    actie: "organisatie.aangemaakt",
+    entiteitType: "organisatie",
+    entiteitId: organisatie.id,
+    entiteitNaam: organisatie.naam,
+    details: organisatieContext(organisatie),
+  });
   return organisatie;
 }
 
 /** Cascadeert naar alle leden, scanuitvoeringen en invullingen van elke organisatie. */
 export function verwijderOrganisaties(organisatieIds: string[]): void {
   const ids = new Set(organisatieIds);
-  slaAlles(laadAlles().filter((o) => !ids.has(o.id)));
+  const alles = laadAlles();
+  const weg = alles.filter((o) => ids.has(o.id));
+  const groepId = nieuweGroepId();
+  slaAlles(alles.filter((o) => !ids.has(o.id)));
+  logAudit(
+    weg.map((o) => ({
+      actie: "organisatie.verwijderd",
+      entiteitType: "organisatie",
+      entiteitId: o.id,
+      entiteitNaam: o.naam,
+      groepId: weg.length > 1 ? groepId : null,
+      details: {
+        ...organisatieContext(o),
+        aantalRespondenten: o.leden.length,
+        aantalMetingen: o.scanUitvoeringen.length,
+        aantalScans: o.scanUitvoeringen.reduce((n, m) => n + m.invullingen.length, 0),
+      },
+    }))
+  );
 }
 
 export function updateOrganisatie(
@@ -46,6 +73,7 @@ export function updateOrganisatie(
   const index = alles.findIndex((o) => o.id === organisatieId);
   if (index === -1) return;
   const { leden, scanUitvoeringen } = alles[index];
+  const voor = alles[index];
   alles[index] = {
     ...updater(structuredClone(alles[index])),
     leden,
@@ -53,6 +81,22 @@ export function updateOrganisatie(
     gewijzigdOp: new Date().toISOString(),
   };
   slaAlles(alles);
+  const na = alles[index];
+  const velden = [
+    voor.naam !== na.naam ? "naam" : null,
+    JSON.stringify(voor.kenmerken) !== JSON.stringify(na.kenmerken) ? "kenmerken" : null,
+    JSON.stringify(voor.toegewezenAan) !== JSON.stringify(na.toegewezenAan) ? "toegewezenAan" : null,
+    voor.aangemaaktDoor !== na.aangemaaktDoor ? "aangemaaktDoor" : null,
+  ].filter((v): v is string => v !== null);
+  if (velden.length > 0) {
+    logAudit({
+      actie: "organisatie.bewerkt",
+      entiteitType: "organisatie",
+      entiteitId: na.id,
+      entiteitNaam: na.naam,
+      details: { ...organisatieContext(na), velden, ...(voor.naam !== na.naam ? { oudeNaam: voor.naam } : {}) },
+    });
+  }
 }
 
 /**

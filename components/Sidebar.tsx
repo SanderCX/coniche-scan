@@ -2,6 +2,7 @@ import { Assessment, ScanWeergave } from "@/lib/types";
 import { bouwblokStatus, voortgang } from "@/lib/scoring";
 import { actieveGroepen } from "@/lib/assessment-structuur";
 import { CATEGORIE_COLORS } from "@/lib/colors";
+import { gewichtMarkering } from "@/lib/weging";
 
 export function Sidebar({
   assessment,
@@ -78,6 +79,9 @@ export function Sidebar({
                             )}
                           </span>
                           <span className="flex-1 truncate">{bouwblok.naam}</span>
+                          {gewichtMarkering(bouwblok) && (
+                            <span className="gewicht-chip">{gewichtMarkering(bouwblok)}</span>
+                          )}
                           {status === "bezig" && (
                             <span className="text-xs text-ink-s">
                               {bbBeantwoord}/{bbTotaal}

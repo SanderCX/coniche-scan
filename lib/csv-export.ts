@@ -62,10 +62,23 @@ function csvGetal(n: number): string {
  */
 function groepsScoresVeld(
   type: "categorie" | "bouwblok",
-  groepen: { groepNaam: string; score: number | null }[]
+  groepen: { groepNaam: string; score: number | null; gewicht?: number; bouwblokGewichten?: { naam: string; gewicht: number }[] }[]
 ): string {
+  // `gewicht` per bouwblok (CLAUDE.md, scherm 6, Weging in de resultaten): Bij type
+  // "bouwblok" op de groep zelf, bij "categorie" als lijst `bouwblokken` binnen de groep.
   const items = groepen
-    .map((g) => `{"naam":${JSON.stringify(g.groepNaam)},"score":${g.score !== null ? csvGetal(g.score) : "null"}}`)
+    .map((g) => {
+      const score = g.score !== null ? csvGetal(g.score) : "null";
+      const extra =
+        g.gewicht !== undefined
+          ? `,"gewicht":${g.gewicht}`
+          : g.bouwblokGewichten
+            ? `,"bouwblokken":[${g.bouwblokGewichten
+                .map((b) => `{"naam":${JSON.stringify(b.naam)},"gewicht":${b.gewicht}}`)
+                .join(",")}]`
+            : "";
+      return `{"naam":${JSON.stringify(g.groepNaam)},"score":${score}${extra}}`;
+    })
     .join(",");
   return `{"type":${JSON.stringify(type)},"groepen":[${items}]}`;
 }
@@ -84,13 +97,21 @@ function bouwRij(ctx: CsvRijContext): string[] {
   // "bezig" (`aantal_beantwoord` hierboven doet dat ook al).
   if (invulling.status === "afgerond") {
     const bouwblokResultaten = alleBouwblokResultaten(assessment, invulling.antwoorden);
-    const groepResultaten = alleGroepResultaten(assessment, bouwblokResultaten);
-    const overall = overallScore(bouwblokResultaten.map((r) => r.score));
+    const groepResultaten = alleGroepResultaten(assessment, bouwblokResultaten, invulling.antwoorden);
+    const overall = overallScore(assessment, invulling.antwoorden);
     overallVeld = overall !== null ? csvGetal(overall) : "";
 
     groepen = groepsScoresVeld(
       isVlakkeAssessment(assessment) ? "bouwblok" : "categorie",
-      groepResultaten.map((g) => ({ groepNaam: g.groepNaam, score: g.score }))
+      groepResultaten.map((g) => ({
+        groepNaam: g.groepNaam,
+        score: g.score,
+        gewicht: g.gewicht,
+        bouwblokGewichten:
+          g.gewicht === undefined
+            ? bouwblokResultaten.filter((r) => r.groepId === g.groepId).map((r) => ({ naam: r.bouwblok.naam, gewicht: r.gewicht }))
+            : undefined,
+      }))
     );
   }
 

@@ -8,7 +8,8 @@ import { useAssessment } from "@/lib/assessment-store";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { RespondentGegevensVelden } from "@/components/RespondentGegevensVelden";
 import { ScanBezet } from "@/components/ScanBezet";
-import { useScanSlot } from "@/lib/scan-slot";
+import { WegingKaart } from "@/components/WegingKaart";
+import { useBewerkslot } from "@/lib/bewerkslot";
 
 export default function IntakePage({
   params,
@@ -19,8 +20,8 @@ export default function IntakePage({
   const gegevens = useScanInvulling(respondentId);
   const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
   const router = useRouter();
-  // Eén persoon tegelijk per scan (lib/scan-slot.ts): De eerste houdt het slot, een tweede ziet een melding.
-  const slot = useScanSlot(gegevens ? respondentId : null);
+  // Eén persoon tegelijk per scan (lib/bewerkslot.ts): De eerste houdt het slot, een tweede ziet een melding.
+  const slot = useBewerkslot("scan", gegevens ? respondentId : null);
 
   useEffect(() => {
     if (!gegevens) return;
@@ -78,6 +79,8 @@ export default function IntakePage({
           nodig.
         </p>
 
+        <WegingKaart assessment={assessment} />
+
         <form onSubmit={handleSubmit} className="mt-8">
           <RespondentGegevensVelden
             naam={lid.naam}
@@ -94,7 +97,7 @@ export default function IntakePage({
             <span style={{ color: "var(--ink-m)" }}>
               Ik geef toestemming om mijn antwoorden (en eventueel ingevulde contactgegevens) te
               delen met Coniche voor analyse en advies. Zie{" "}
-              <Link href="/privacy" target="_blank" style={{ textDecoration: "underline" }}>
+              <Link href="/privacy" target="_blank" className="tekst-link">
                 privacy
               </Link>
               .

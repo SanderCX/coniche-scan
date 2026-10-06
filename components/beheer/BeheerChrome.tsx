@@ -12,6 +12,7 @@ import { magContentBeheren, magGebruikersBeheren } from "@/lib/rechten";
 import { ROL_KLEUR } from "@/lib/colors";
 import { BeheerMeldingBalk } from "@/components/beheer/BeheerMelding";
 import { BeheerOverzichten } from "@/components/beheer/BeheerOverzichten";
+import { ConflictHost } from "@/components/beheer/ConflictHost";
 
 /**
  * Beheer hergebruikt de publieke nav/footer (zelfde logo, zelfde balk),
@@ -42,7 +43,7 @@ import { BeheerOverzichten } from "@/components/beheer/BeheerOverzichten";
  * als bij elke andere scherm-specifieke actie.
  */
 const PAD_PER_SECTIE: { sectie: "applicatie" | "assessments" | "organisaties"; paden: string[] }[] = [
-  { sectie: "applicatie", paden: ["/beheer/applicatie", "/beheer/gebruikers", "/beheer/teksten"] },
+  { sectie: "applicatie", paden: ["/beheer/applicatie", "/beheer/gebruikers", "/beheer/teksten", "/beheer/audit", "/beheer/instellingen"] },
   { sectie: "assessments", paden: ["/beheer/assessments", "/beheer/content"] },
   {
     sectie: "organisaties",
@@ -142,6 +143,7 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
       <Suspense fallback={null}>
         <BeheerOverzichten />
       </Suspense>
+      <ConflictHost />
       <SiteFooter />
     </>
   );

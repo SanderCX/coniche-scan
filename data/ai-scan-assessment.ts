@@ -149,6 +149,7 @@ export const aiVolwassenheid: Assessment = {
   categorieen: null,
   bouwblokken: domeinen,
   scoresPerGroepGesorteerd: true,
+  bouwblokLabel: "AI-domein",
   bouwblokEenheidEnkelvoud: "Domein",
   bouwblokEenheidMeervoud: "AI-domeinen",
   featureCards: [

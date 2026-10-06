@@ -5,8 +5,7 @@ import Link from "next/link";
 import { verwijderScanInvullingen } from "@/lib/db";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magScanVerwijderen } from "@/lib/rechten";
-import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
-import { bouwblokScore, classificatie, overallScore, voortgang } from "@/lib/scoring";
+import { classificatie, overallScore, voortgang } from "@/lib/scoring";
 import { scoreKleur } from "@/lib/colors";
 import { maakPubliekeLink } from "@/lib/uitnodiging-link";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
@@ -55,7 +54,7 @@ export function ScanOverzicht({
   const afgerond = invulling.status === "afgerond";
   const { beantwoord, totaal, percentage } = voortgang(assessment, invulling.antwoorden);
   const score = afgerond
-    ? overallScore(alleBouwblokkenMetGroep(assessment).map((b) => bouwblokScore(b.bouwblok, invulling.antwoorden)))
+    ? overallScore(assessment, invulling.antwoorden)
     : null;
   const rolTeam = rolTeamTekst(lid);
   const context = { organisatie, scanUitvoering, lid, invulling, assessment };
@@ -155,7 +154,7 @@ export function ScanOverzicht({
                 <button type="button" className="btn btn-outline btn-compact" onClick={kopieer}>
                   {kopieerGelukt === null ? "Kopieer" : kopieerGelukt ? "Gekopieerd!" : "Mislukt"}
                 </button>
-                <a href={link} target="_blank" rel="noreferrer" className="admin-bekijk-knop">
+                <a href={link} target="_blank" rel="noreferrer" className="btn btn-outline btn-compact">
                   Openen
                 </a>
               </div>
@@ -182,7 +181,7 @@ export function ScanOverzicht({
                 <button type="button" className="btn btn-outline btn-compact" onClick={() => setNaarMeting(true)}>
                   Naar andere Meting
                 </button>
-                <button type="button" className="admin-bekijk-knop" onClick={onOpenRespondent}>
+                <button type="button" className="btn btn-outline btn-compact" onClick={onOpenRespondent}>
                   Bekijk Respondent
                 </button>
               </div>

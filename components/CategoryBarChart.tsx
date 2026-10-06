@@ -3,6 +3,7 @@
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { GroepResultaat } from "@/lib/scoring";
 import { scoreKleur } from "@/lib/colors";
+import { formatGewicht } from "@/lib/format";
 
 /**
  * `horizontaal` (CLAUDE.md sectie 3, scherm 6): Bij een Assessment zonder
@@ -19,7 +20,7 @@ export function CategoryBarChart({
   horizontaal?: boolean;
 }) {
   const data = resultaten.map((r) => ({
-    naam: r.groepNaam,
+    naam: r.gewicht && r.gewicht !== 1 ? `${r.groepNaam} (${formatGewicht(r.gewicht)}×)` : r.groepNaam,
     score: r.score ?? 0,
     kleur: r.score !== null ? scoreKleur(r.score) : "#e8e6e1",
   }));

@@ -11,8 +11,8 @@ volgens `datamodel.md`, niet als kopie van de oude tekst.
 
 ## Plek in de app
 
-- **Footer**: Link "Privacy" op elk scherm, naast de bestaande
-  "Beheer"-link (zie `stylesheet.md`, Componenten, Footer).
+- **Footer**: Link "Privacy" op elk scherm, als enige link in de footer
+  (zie `stylesheet.md`, Componenten, Footer).
 - **Route**: `/privacy`, publiek toegankelijk, geen inlog nodig.
 - **Ook te koppelen** vanaf het toestemmingsvakje op de respondent-
   intake (CLAUDE.md scherm 4: "Ik geef toestemming om mijn antwoorden

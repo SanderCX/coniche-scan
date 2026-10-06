@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { haalServerKopieOp, stuurNaarServer } from "./server-sync";
+import { logAudit } from "./audit-store";
 
 /**
  * Algemene teksten (`beheerpagina.md` punt 2a, `datamodel.md`,
@@ -70,12 +71,46 @@ export function useAlgemeneTekst(sleutel: AlgemeneTekstSleutel): string {
   return useAlgemeneTeksten()[sleutel];
 }
 
-export function zetAlgemeneTekst(sleutel: AlgemeneTekstSleutel, waarde: string): void {
+/**
+ * Alle opgeslagen teksten per sleutel, zonder de standaardwaarden erbij: Voor de
+ * Info-iconen (`info.*`) betekent een ontbrekende sleutel de standaardtekst uit
+ * `data/info-teksten.ts`.
+ */
+export function useOpgeslagenTeksten(): Record<string, string> {
+  const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  if (snapshot === SERVER_SENTINEL) return {};
+  try {
+    const waarden = JSON.parse(snapshot);
+    return waarden && typeof waarden === "object" ? (waarden as Record<string, string>) : {};
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Zet een tekst. Een lege waarde verwijdert de sleutel (de standaardtekst geldt dan).
+ * De wijziging wordt gelogd als `algemeneTekst.gewijzigd`, met alleen de sleutel en
+ * niet de tekst (`datamodel.md`, Audit).
+ */
+export function zetAlgemeneTekst(sleutel: string, waarde: string): void {
   if (typeof window === "undefined") return;
-  const huidig = parseSnapshot(getSnapshot());
-  huidig[sleutel] = waarde;
+  let huidig: Record<string, string>;
+  try {
+    huidig = JSON.parse(getSnapshot()) as Record<string, string>;
+  } catch {
+    huidig = {};
+  }
+  if (waarde.trim() === "") delete huidig[sleutel];
+  else huidig[sleutel] = waarde;
   const json = JSON.stringify(huidig);
   window.localStorage.setItem(KEY, json);
   emitChange();
   stuurNaarServer(SERVER_SLEUTEL, json);
+  logAudit({
+    actie: "algemeneTekst.gewijzigd",
+    entiteitType: "algemeneTekst",
+    entiteitId: sleutel,
+    entiteitNaam: sleutel,
+    details: { sleutel },
+  });
 }

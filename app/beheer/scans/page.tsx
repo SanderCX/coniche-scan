@@ -10,6 +10,7 @@ import { BulkToolbar } from "@/components/beheer/BulkToolbar";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { NaarAndereMetingStap, ScanVerplaatsResultaat } from "@/components/beheer/VerplaatsStappen";
+import { conflictActies } from "@/components/beheer/ConflictHost";
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { STATUS_LABEL, rolTeamTekst } from "@/components/beheer/overzicht-helpers";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
@@ -48,7 +49,7 @@ const KOLOMMEN: { key: Kolom; label: string }[] = [
 
 /**
  * Ingevulde scans (beheerpagina.md punt 7). Filters en sortering staan in de
- * adresbalk; een rij (of "Bekijk >>") opent het Scan-overzicht als modal
+ * adresbalk; een rij (of "Bekijk") opent het Scan-overzicht als modal
  * (`?scan=<id>`). Met het filter Organisatie is dit de organisatie-
  * gefilterde versie, waar ook "Naar andere Meting" en bulk-CSV mogelijk zijn.
  */
@@ -189,6 +190,7 @@ function IngevuldeScansPageInhoud() {
           : `${r.verplaatst} scan(s) verplaatst naar "${r.doelLabel}", ${r.overgeslagen.length} overgeslagen: ${[
               ...new Set(r.overgeslagen.map((o) => o.reden)),
             ].join(" ")}`,
+      acties: filterOrganisatieObject ? conflictActies(filterOrganisatieObject.id, r.overgeslagen) : undefined,
     });
   }
 
@@ -244,8 +246,7 @@ function IngevuldeScansPageInhoud() {
               <button
                 type="button"
                 onClick={() => set({ organisatie: null, assessment: null, status: null })}
-                className="text-sm text-ink-m hover:text-ink"
-                style={{ paddingBottom: "0.7rem" }}
+                className="btn btn-outline btn-compact"
               >
                 Filters wissen
               </button>
@@ -334,8 +335,8 @@ function IngevuldeScansPageInhoud() {
                       <td>{r.voortgang}%</td>
                       <td>{r.gestart ? new Date(r.gestart).toLocaleDateString("nl-NL") : ""}</td>
                       <td>
-                        <button type="button" className="admin-bekijk-knop" onClick={() => open("scan", r.invullingId)}>
-                          Bekijk &gt;&gt;
+                        <button type="button" className="btn btn-outline btn-compact" onClick={() => open("scan", r.invullingId)}>
+                          Bekijk
                         </button>
                       </td>
                     </tr>

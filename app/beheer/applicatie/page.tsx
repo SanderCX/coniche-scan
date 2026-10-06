@@ -1,9 +1,7 @@
 "use client";
 
-import { InfoIcoon } from "@/components/InfoIcoon";
-import { useState } from "react";
 import Link from "next/link";
-import { controleerDataIntegriteit } from "@/lib/db";
+import { DataIntegriteit } from "@/components/beheer/DataIntegriteit";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magGebruikersBeheren } from "@/lib/rechten";
 
@@ -15,7 +13,6 @@ import { magGebruikersBeheren } from "@/lib/rechten";
  */
 export default function ApplicatiePage() {
   const gebruiker = useIngelogdeGebruiker();
-  const [integriteitResultaat, setIntegriteitResultaat] = useState<string[] | null>(null);
 
   if (!magGebruikersBeheren(gebruiker)) {
     return (
@@ -47,12 +44,18 @@ export default function ApplicatiePage() {
             </p>
           </div>
         </Link>
-        <div className="admin-row" style={{ cursor: "default", opacity: 0.6 }}>
+        <Link href="/beheer/audit" className="admin-row">
+          <div>
+            <p className="admin-row-titel">Audit-log</p>
+            <p className="admin-row-sub">Wie wat deed, wanneer en op welk record. Imports als groep, export naar CSV.</p>
+          </div>
+        </Link>
+        <Link href="/beheer/instellingen" className="admin-row">
           <div>
             <p className="admin-row-titel">Instellingen</p>
-            <p className="admin-row-sub">Nog niet gebouwd — wacht op de backend (sessieduur respondenten/Leads).</p>
+            <p className="admin-row-sub">Bewaartermijn van ingevulde scans en de verlengtermijn.</p>
           </div>
-        </div>
+        </Link>
         <div className="admin-row" style={{ cursor: "default", opacity: 0.6 }}>
           <div>
             <p className="admin-row-titel">Content-pagina&apos;s (Visie, Bouwstenen, AI, 2030)</p>
@@ -61,37 +64,7 @@ export default function ApplicatiePage() {
         </div>
       </div>
 
-      <div className="admin-notice mt-10" style={{ maxWidth: "36rem" }}>
-        <p className="font-semibold text-ink">Data-integriteit</p>
-        <div className="mt-3 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setIntegriteitResultaat(controleerDataIntegriteit())}
-            className="btn btn-outline btn-compact"
-          >
-            Controleer nu
-          </button>
-          <InfoIcoon>
-            Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een
-            niet-bestaande respondent verwijzen (v1-aanpassingen.md punt 14).
-          </InfoIcoon>
-        </div>
-        {integriteitResultaat && (
-          <div className="mt-3">
-            {integriteitResultaat.length === 0 ? (
-              <p className="text-sm font-medium" style={{ color: "var(--stat-green)" }}>
-                ✓ Geen achterblijvende data gevonden.
-              </p>
-            ) : (
-              <ul className="text-sm" style={{ color: "var(--stat-red)" }}>
-                {integriteitResultaat.map((probleem, i) => (
-                  <li key={i}>{probleem}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
-      </div>
+      <DataIntegriteit />
     </div>
   );
 }
