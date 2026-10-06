@@ -13,6 +13,12 @@ export function SiteFooter() {
       <Link href="/privacy" className="footer-admin-link">
         Privacy
       </Link>
+      {/* TIJDELIJK (op verzoek van Sander): Link naar beheer op elke pagina. De spec heeft in de footer alleen
+          "Privacy" (stylesheet.md, Footer). Verwijderen zodra dit niet meer nodig is. */}
+      {" · "}
+      <Link href="/beheer" className="footer-admin-link">
+        Beheer
+      </Link>
     </footer>
   );
 }
