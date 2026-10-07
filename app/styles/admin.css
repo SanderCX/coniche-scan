@@ -669,3 +669,21 @@
   color: var(--ink);
   min-width: 0;
 }
+
+/* Knop in een lijstrij (stylesheet.md, Knop in een lijstrij): Eigen laatste kolom, rechts uitgelijnd en
+   verticaal gecentreerd, op elke rij op dezelfde plek. */
+.admin-table td.cel-knop {
+  text-align: right;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: 1%;
+}
+
+/* Knoppen onder elkaar (stylesheet.md, Gelijke breedte): Alle knoppen in de stapel zo breed als de breedste,
+   elke knop houdt zijn eigen variant. */
+.knoppenstapel {
+  display: grid;
+  justify-items: stretch;
+  gap: 0.5rem;
+  width: max-content;
+}

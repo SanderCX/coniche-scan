@@ -150,16 +150,8 @@ function IngevuldeScansPageInhoud() {
     setVerwijderenOpen(false);
   }
 
-  // Bulk-CSV-export mag geen data van meerdere organisaties samenvoegen
-  // (export-csv.md, "Bulk-export blijft binnen één organisatie").
-  const geselecteerdeOrganisatieIds = new Set(
-    [...bulk.selected].map((id) => exportContextPerInvulling.get(id)?.organisatie.id).filter(Boolean)
-  );
-  const exporterenDisabledReden =
-    geselecteerdeOrganisatieIds.size > 1
-      ? "Selecteer scans van één organisatie om samen te exporteren (filter op Organisatie hierboven)."
-      : undefined;
-
+  // Bulk-CSV-export alleen binnen één organisatie (export-csv.md): Geen datavermenging over organisaties heen. Ook op
+  // het globale overzicht werkt Exporteren zodra alle geselecteerde scans bij dezelfde organisatie horen.
   function handleExporteren() {
     const context = [...bulk.selected]
       .map((id) => exportContextPerInvulling.get(id))
@@ -167,6 +159,11 @@ function IngevuldeScansPageInhoud() {
     exporteerScansCsv(context);
     bulk.clear();
   }
+
+  const geselecteerdeOrganisaties = new Set(
+    [...bulk.selected].map((id) => exportContextPerInvulling.get(id)?.organisatie.id).filter(Boolean)
+  );
+  const selectieMeerdereOrganisaties = geselecteerdeOrganisaties.size > 1;
 
   // PDF/InDesign zijn "beschikbaar bij precies één scan".
   const enkeleSelectie = bulk.selected.size === 1 ? exportContextPerInvulling.get([...bulk.selected][0]) : undefined;
@@ -262,8 +259,8 @@ function IngevuldeScansPageInhoud() {
                 aantal={bulk.selected.size}
                 onVerwijderen={() => setVerwijderenOpen(true)}
                 verwijderLabel="Verwijderen"
-                onExporteren={handleExporteren}
-                exporterenDisabledReden={exporterenDisabledReden}
+                onExporteren={selectieMeerdereOrganisaties ? undefined : handleExporteren}
+                exporterenOverMeerdereOrganisaties={selectieMeerdereOrganisaties}
                 onExporterenPdf={enkeleSelectie ? handleExporterenPdf : undefined}
                 onExporterenIndesign={
                   enkeleSelectie
@@ -334,7 +331,7 @@ function IngevuldeScansPageInhoud() {
                       </td>
                       <td>{r.voortgang}%</td>
                       <td>{r.gestart ? new Date(r.gestart).toLocaleDateString("nl-NL") : ""}</td>
-                      <td>
+                      <td className="cel-knop">
                         <button type="button" className="btn btn-outline btn-compact" onClick={() => open("scan", r.invullingId)}>
                           Bekijk
                         </button>

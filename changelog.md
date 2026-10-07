@@ -1,5 +1,100 @@
 # Coniche Scan — Changelog
 
+## 2026-10-07 — Specwijzigingen van 7 oktober, lijstknoppen, AVG-inzage als CSV, Azure-plan
+
+**Aanleiding**: Sander liet de gewijzigde specs (`CLAUDE.md`, `beheerpagina.md`, `import-scans.md`,
+`stylesheet.md`, daarna `datamodel.md`, `export-csv.md`) per wijziging langslopen, met goedkeuring per punt.
+
+**Gedaan** (commit `56076bf` en daarna):
+- **Inlogscherm** zonder rolkeuze: De rol volgt uit het account (`login(email, wachtwoord)`).
+- **`.btn-outline`**: Witte vulling, `2px` oranje rand en tekst, hover `--bg-warm`.
+- **Info-icoon**: Wit rondje met `1px` oranje rand en een oranje "i", geen hover-staat.
+- **Import alleen voor een Admin** (`magImporteren`): Een Consultant ziet op de tab Import een melding
+  ("Vraag de beheerder om bestanden te importeren."), de route is dicht en `voerLegacyImportUit`
+  weigert een verzoek van een Consultant (`geweigerd`). Twee tests.
+- **Knop in een lijstrij**: "Bekijk" en "Meer" in een eigen laatste kolom (`td.cel-knop`), rechts uitgelijnd
+  en verticaal gecentreerd, ook in de audit-log.
+- **Gestapelde knoppen** (`.knoppenstapel`) met gelijke breedte: Verwijderen en Verlengen bij "Data ouder dan
+  de bewaartermijn".
+- **"+ Lead toevoegen"** als oranje knop onder de lijst Respondenten, het formulier opent pas na een klik.
+- **AVG-inzage als CSV** (`genereerInzageCsv`, `export-csv.md`, Inzage): Eén rij per scan, extra kolommen
+  `respondent_notities` en `respondent_aangemaakt_op`, geen organisatiekenmerken of toegangscode, bestandsnaam
+  `Inzage <Organisatie> - <Respondent> - <datum>.csv`, log `respondent.inzage` (met organisatienaam, naast het
+  aantal scans, een kleine uitbreiding op de spec).
+- **CSV `groepsScores`** met per bouwblok `nummer`, `naam`, `score` en `gewicht` (altijd aanwezig, komma bij
+  decimalen). Bij categorieën als lijst `bouwblokken` per groep, zonder categorieën direct op de groep.
+- **Bulk-CSV-export** werkt ook op het globale overzicht zodra alle geselecteerde scans bij dezelfde organisatie
+  horen (nieuwe spec van Joost, 7 oktober). Bij een selectie over meer dan één organisatie is Exporteren
+  uitgeschakeld, met het Info-icoon `info.bulkExportOrganisatie` ernaast (terug in het register).
+- **Tests**: 52 (CSV, import voor Admin, groepsScores, inzage).
+- `azure-plan.md`: Overzicht van de stappen om de app op Azure DevOps met een Microsoft SQL-database te
+  deployen en via `coniche-scan.nl` bereikbaar te maken. Alleen een plan, niets uitgevoerd.
+- `afbeeldingen/`: De drie assessment-iconen (doel, schittering, hart) als PNG en SVG, om te delen met Joost.
+
+**Nog niet gedaan, bewust**: Het Info-icoon-register in `beheerpagina.md` loopt achter op de code, zie
+`OverlegMetJoost.md`. De tijdelijke Beheer-link in de footer staat er nog (zie 6 oktober).
+
+## 2026-10-06 — Info-icoon als dialoog, knoppen en links, label "Bekijk", overleg met Joost
+
+**Gedaan**:
+- **Info-icoon** als gecentreerd dialoog met dimlaag (`createPortal`, `z-index` boven modals, Esc sluit alleen
+  het veld, focus erheen en terug), "Standaardtekst herstellen" als knop.
+- **Knoppen en links** (`stylesheet.md`): Alle acties zijn `.btn-outline .btn-compact` (Kopieer link, Openen,
+  Bekijk, Verlengen, Goedkeuren, Archiveren, Herstellen, Filters wissen), verwijderen `.btn-danger`, geen "·"
+  tussen acties (`.knoppenrij`). Gotcha: `.admin-table a` kleurde alle links oranje, ook knoppen
+  (nu `a:not(.btn)`). Privacylink in de toestemmingstekst als `.tekst-link`.
+- **Respondent-overzicht, blok Toegang**: Het selectievakje "Lead" met de Metingen in het blok zelf (geen stap
+  "Beheren" meer) en een eigen deel "Vragenlijst sturen" voor elke Respondent, met een Meting-keuze of
+  "Nieuwe Meting" (`components/beheer/ToegangBlok.tsx`).
+- **Mijn metingen voor een Lead**: Knoppen "Start de intake" en "Ga verder met de scan".
+- **Data-integriteit** (`components/beheer/DataIntegriteit.tsx`, `lib/db/integriteit.ts`): Vijf controles,
+  een modal per controle met koppelen of verwijderen per vondst, elk met een bevestiging, acties loggen
+  `vanuit: Data-integriteit` (`metExtraDetails`).
+- **Conflict oplossen** (`ConflictOplossen.tsx`, `ConflictHost.tsx`, `lib/db/conflict.ts`): Modal "Twee scans van
+  dezelfde Respondent" bij "Respons naar andere Meting", met `respons.respondentGewijzigd`.
+- **Gebruiker aanmaken** genereert het wachtwoord (12 tekens), eenmalig in beeld.
+- **Zorgscan-gewichten** in de seed terug naar 1 (open besluit, `CLAUDE.md`). Ook in de opgeslagen data teruggezet.
+- **Instellingen** (`/beheer/instellingen`, Applicatie): Bewaartermijn en verlengtermijn verhuisd uit
+  Organisaties, Admin-only. Organisaties toont alleen de lijsten "Data ouder dan de bewaartermijn" en
+  "Verlengd, nog niet opnieuw te beoordelen". De sessieduur volgt met de backend.
+- **Uitleg naar Info-icoon**: Audit-log, Algemene teksten, Content (Toelichting, Bouwblok-label) en Conflict
+  oplossen. Zes nieuwe sleutels in `data/info-teksten.ts`.
+- **"Bekijk >>" wordt "Bekijk"**, knoppen gelijk gemaakt. De spec noemt nog ">>".
+- **Dev-only autologin in beheer** (`devAutoLogin`, alleen `next dev`, blokkade na handmatig uitloggen).
+- **Tijdelijk: Beheer-link in de footer** naast Privacy, op verzoek, in strijd met `stylesheet.md`.
+- `OverlegMetJoost.md`: Punten voor Joost (Info-icoon-register, Content-pagina's Visie/Bouwstenen/AI/2030,
+  uiterlijk en label van "Bekijk").
+- Commits `e6cbdd8` en `9d52345`, gepusht naar `main`.
+
+**Nog niet gedaan, bewust**: Content-pagina's (punt 11): Wacht op overleg met Joost.
+
+## 2026-10-05 — Nieuwe specs verwerkt: Weging, Bewerkslot, Audit-log, Info-icoon, Import met goedkeuring
+
+**Aanleiding**: Sander liet de nieuwe `.md`'s (`CLAUDE.md`, `datamodel.md`, `beheerpagina.md`, `import-scans.md`,
+`stylesheet.md`, `backlog.md`, `go-live-plan.md`, `privacy-pagina.md`) per wijziging langslopen.
+
+**Gedaan**:
+- **Weging van bouwblokken**: `lib/scoring.ts` rekent gewogen (categoriescore `Σ(g × score)/Σ g`, overall
+  `Σ(g × som)/Σ(g × n)` uit de ruwe antwoorden), `Categorie.gewicht` weg, wegingskaart op de intake, "2×"-chips
+  in flow, sidebar, resultaten, radar en PDF, weging-editor in Content met bevestiging (`WegingBeheer`) en
+  `bouwblok.gewichtGewijzigd`, `Assessment.wegingTitel/wegingToelichting`. Rekenvoorbeeld uit de spec als test
+  (172 over 60 vragen: 2,87, gewogen 3,0).
+- **`Bouwblok.toelichting`/`centraleVraag` en `Assessment.bouwblokLabel`** als echte velden
+  (`lib/assessment-migratie.ts` vult bestaande data eenmalig uit de oude opzoektabellen).
+- **Bewerkslot** (`lib/bewerkslot.ts`, `app/api/slot/[type]/[id]`, tabel `bewerk_sloten`): Scan, Respondent en
+  Organisatie, met de naam van de houder in beheer. Vervangt het Scanslot.
+- **Audit-log** (`lib/audit-store.ts`, `/beheer/audit`): Logging van beheeracties zonder persoonsgegevens,
+  scherm met periodeknoppen, filters in de URL, importgroepen, CSV-export en opruimen na de bewaartermijn.
+  Staat nog alleen in de browser: De Neon-tabel `app_data` heeft een CHECK-constraint op de sleutels.
+- **Info-icoon**: Alleen klik, potlood voor een Admin om de tekst op de plek aan te passen, register met
+  sleutels (`data/info-teksten.ts`), overzicht onder Algemene teksten, `algemeneTekst.gewijzigd`.
+- **Import**: Goedkeuren per waarschuwingsrij en één knop "Importeer N rijen", overgeslagen bestanden,
+  genegeerde submappen, Respondent uit het bestand, `start_comment` ongewijzigd in de notities, importgroep in
+  de audit-log.
+- Tests van 15 naar 45.
+
+**Nog niet gedaan, bewust**: Specs voor Content-pagina's en de Neon-constraint voor de audit-log.
+
 ## 2026-10-02 — Scan-punten 1 t/m 8: beveiligingsmaatregelen, tests, opruiming, toegankelijkheid
 
 **Aanleiding**: Sander wil de eerste acht punten uit de scan van de oplossing doorvoeren.
