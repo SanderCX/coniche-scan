@@ -32,7 +32,7 @@ export function BulkToolbar({
   verwijderLabel = "Verwijderen",
   verwijderenDisabledReden,
   onExporteren,
-  exporterenDisabledReden,
+  exporterenOverMeerdereOrganisaties,
   onExporterenPdf,
   onExporterenIndesign,
   exportBezig,
@@ -43,10 +43,16 @@ export function BulkToolbar({
   verwijderLabel?: string;
   /** Reden waarom Verwijderen nu uitgeschakeld is (bijv. ontbrekend recht, `lib/rechten.ts`). */
   verwijderenDisabledReden?: string;
-  /** CSV-export, beschikbaar bij elke selectiegrootte. Weglaten houdt de knop uitgeschakeld. */
+  /**
+   * CSV-export, beschikbaar bij elke selectiegrootte zolang alle geselecteerde scans bij dezelfde organisatie horen
+   * (`export-csv.md`, Bulk-export blijft binnen één organisatie). Weglaten verbergt de hele knop Exporteren.
+   */
   onExporteren?: () => void;
-  /** Reden waarom Exporteren nu uitgeschakeld is, ook al is `onExporteren` gegeven (bijv. een selectie over meerdere organisaties). */
-  exporterenDisabledReden?: string;
+  /**
+   * De selectie bevat scans van meer dan één organisatie: De knop Exporteren is uitgeschakeld, met het Info-icoon
+   * `info.bulkExportOrganisatie` ernaast (`beheerpagina.md` punt 7).
+   */
+  exporterenOverMeerdereOrganisaties?: boolean;
   /**
    * PDF/InDesign, "beschikbaar bij precies één scan" (export-pdf-visual-
    * volwassenheidsscan.md / export-indesign.md) — de aanroeper geeft deze
@@ -75,33 +81,36 @@ export function BulkToolbar({
             Naar andere Meting
           </button>
         )}
-        <DropdownKnop
-          label={exportBezig ? "Bezig…" : "Exporteren"}
-          className="btn btn-outline btn-compact"
-          disabled={Boolean(exporterenDisabledReden)}
-          opties={[
-            {
-              label: "Als PDF",
-              onClick: onExporterenPdf,
-              disabled: !onExporterenPdf || Boolean(exportBezig),
-              title: exportBezig ? "PDF wordt gemaakt…" : undefined,
-              infoSleutel: !onExporterenPdf ? "info.exportEenScan" : undefined,
-            },
-            {
-              label: "Als CSV",
-              onClick: onExporteren,
-              disabled: !onExporteren || Boolean(exporterenDisabledReden),
-              title: !onExporteren ? "Binnenkort beschikbaar" : undefined,
-            },
-            {
-              label: "Voor InDesign (XML)",
-              onClick: onExporterenIndesign,
-              disabled: !onExporterenIndesign,
-              infoSleutel: !onExporterenIndesign ? "info.exportEenScan" : undefined,
-            },
-          ]}
-        />
-        {exporterenDisabledReden && <InfoIcoon naastVeld sleutel="info.bulkExportOrganisatie" />}
+        {(onExporteren || exporterenOverMeerdereOrganisaties) && (
+          <>
+            <DropdownKnop
+              label={exportBezig ? "Bezig…" : "Exporteren"}
+              className="btn btn-outline btn-compact"
+              disabled={exporterenOverMeerdereOrganisaties}
+              opties={[
+                {
+                  label: "Als PDF",
+                  onClick: onExporterenPdf,
+                  disabled: !onExporterenPdf || Boolean(exportBezig),
+                  title: exportBezig ? "PDF wordt gemaakt…" : undefined,
+                  infoSleutel: !onExporterenPdf ? "info.exportEenScan" : undefined,
+                },
+                {
+                  label: "Als CSV",
+                  onClick: onExporteren,
+                  disabled: !onExporteren,
+                },
+                {
+                  label: "Voor InDesign (XML)",
+                  onClick: onExporterenIndesign,
+                  disabled: !onExporterenIndesign,
+                  infoSleutel: !onExporterenIndesign ? "info.exportEenScan" : undefined,
+                },
+              ]}
+            />
+            {exporterenOverMeerdereOrganisaties && <InfoIcoon sleutel="info.bulkExportOrganisatie" naastVeld />}
+          </>
+        )}
         <button
           type="button"
           disabled={Boolean(verwijderenDisabledReden)}

@@ -201,7 +201,7 @@ function BewaartermijnBlok({
                       </td>
                       <td>{new Date(rij.afgerondOp).toLocaleDateString("nl-NL")}</td>
                       <td>
-                        <div className="knoppenrij">
+                        <div className="knoppenstapel">
                           <button type="button" className="btn btn-danger btn-compact" onClick={() => setTeVerwijderen(rij)}>
                             Verwijderen
                           </button>

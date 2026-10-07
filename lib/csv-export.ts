@@ -1,6 +1,7 @@
 import { Assessment, Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering } from "./types";
 import { alleBouwblokkenMetGroep, isVlakkeAssessment } from "./assessment-structuur";
 import { alleBouwblokResultaten, alleGroepResultaten, overallScore, voortgang } from "./scoring";
+import { formatGewicht } from "./format";
 
 /**
  * CSV-export van ingevulde scans (`export-csv.md`), vanaf de
@@ -53,37 +54,58 @@ function csvGetal(n: number): string {
   return n.toFixed(1).replace(".", ",");
 }
 
+/** Gewicht in de CSV: Nederlandse komma bij een decimaal (`1,5`), geen overbodige decimalen (`2`). */
+function csvGewicht(gewicht: number): string {
+  return formatGewicht(gewicht);
+}
+
+interface CsvBouwblokScore {
+  nummer: number;
+  naam: string;
+  score: number | null;
+  gewicht: number;
+}
+
+interface CsvGroepScore {
+  groepNaam: string;
+  score: number | null;
+  /** Bij type "bouwblok" is de groep zelf een bouwblok: `nummer` en `gewicht` staan dan direct op de groep. */
+  nummer?: number;
+  gewicht?: number;
+  /** Bij type "categorie": De bouwblokken binnen de groep, met het gewicht per bouwblok. */
+  bouwblokken?: CsvBouwblokScore[];
+}
+
+const csvScore = (score: number | null) => (score !== null ? csvGetal(score) : "null");
+
 /**
  * `groepsScores` met de hand opgebouwd (niet `JSON.stringify`): de spec
  * schrijft de score-decimalen met een komma (Excel-NL), wat van dit veld
  * strikt genomen geen valide JSON meer maakt. Dat is bewust — dit is de
  * laatste stap in de keten, niets leest de CSV terug in de app
- * (export-csv.md).
+ * (export-csv.md). Het gewicht staat er altijd, ook bij 1: Dit is machinedata,
+ * geen weergave.
  */
-function groepsScoresVeld(
-  type: "categorie" | "bouwblok",
-  groepen: { groepNaam: string; score: number | null; gewicht?: number; bouwblokGewichten?: { naam: string; gewicht: number }[] }[]
-): string {
-  // `gewicht` per bouwblok (CLAUDE.md, scherm 6, Weging in de resultaten): Bij type
-  // "bouwblok" op de groep zelf, bij "categorie" als lijst `bouwblokken` binnen de groep.
+function groepsScoresVeld(type: "categorie" | "bouwblok", groepen: CsvGroepScore[]): string {
   const items = groepen
     .map((g) => {
-      const score = g.score !== null ? csvGetal(g.score) : "null";
-      const extra =
-        g.gewicht !== undefined
-          ? `,"gewicht":${g.gewicht}`
-          : g.bouwblokGewichten
-            ? `,"bouwblokken":[${g.bouwblokGewichten
-                .map((b) => `{"naam":${JSON.stringify(b.naam)},"gewicht":${b.gewicht}}`)
-                .join(",")}]`
-            : "";
-      return `{"naam":${JSON.stringify(g.groepNaam)},"score":${score}${extra}}`;
+      const basis = `"naam":${JSON.stringify(g.groepNaam)},"score":${csvScore(g.score)}`;
+      if (g.bouwblokken) {
+        const blokken = g.bouwblokken
+          .map(
+            (b) =>
+              `{"nummer":${b.nummer},"naam":${JSON.stringify(b.naam)},"score":${csvScore(b.score)},"gewicht":${csvGewicht(b.gewicht)}}`
+          )
+          .join(",");
+        return `{${basis},"bouwblokken":[${blokken}]}`;
+      }
+      return `{${basis},"nummer":${g.nummer ?? 0},"gewicht":${csvGewicht(g.gewicht ?? 1)}}`;
     })
     .join(",");
   return `{"type":${JSON.stringify(type)},"groepen":[${items}]}`;
 }
 
-function bouwRij(ctx: CsvRijContext): string[] {
+function bouwRijRecord(ctx: CsvRijContext): Record<string, string> {
   const { organisatie, scanUitvoering, lid, invulling, assessment } = ctx;
   const { beantwoord, totaal } = voortgang(assessment, invulling.antwoorden);
 
@@ -101,17 +123,23 @@ function bouwRij(ctx: CsvRijContext): string[] {
     const overall = overallScore(assessment, invulling.antwoorden);
     overallVeld = overall !== null ? csvGetal(overall) : "";
 
+    const vlak = isVlakkeAssessment(assessment);
     groepen = groepsScoresVeld(
-      isVlakkeAssessment(assessment) ? "bouwblok" : "categorie",
-      groepResultaten.map((g) => ({
-        groepNaam: g.groepNaam,
-        score: g.score,
-        gewicht: g.gewicht,
-        bouwblokGewichten:
-          g.gewicht === undefined
-            ? bouwblokResultaten.filter((r) => r.groepId === g.groepId).map((r) => ({ naam: r.bouwblok.naam, gewicht: r.gewicht }))
-            : undefined,
-      }))
+      vlak ? "bouwblok" : "categorie",
+      groepResultaten.map((g) => {
+        if (vlak) {
+          // De groep is het bouwblok zelf.
+          const r = bouwblokResultaten.find((x) => x.bouwblok.id === g.groepId);
+          return { groepNaam: g.groepNaam, score: g.score, nummer: r?.bouwblok.volgnummer ?? 0, gewicht: r?.gewicht ?? 1 };
+        }
+        return {
+          groepNaam: g.groepNaam,
+          score: g.score,
+          bouwblokken: bouwblokResultaten
+            .filter((r) => r.groepId === g.groepId)
+            .map((r) => ({ nummer: r.bouwblok.volgnummer, naam: r.bouwblok.naam, score: r.score, gewicht: r.gewicht })),
+        };
+      })
     );
   }
 
@@ -138,26 +166,33 @@ function bouwRij(ctx: CsvRijContext): string[] {
   );
   const opmerkingenVeld = JSON.stringify(opmerkingenMetInhoud);
 
-  return [
-    organisatie.naam,
-    scanUitvoering.label,
-    assessment.naam,
-    lid.naam ?? "",
-    lid.email,
-    lid.functie,
-    lid.team,
-    invulling.status,
-    invulling.uitgenodigdOp,
-    invulling.gestartOp ?? "",
-    invulling.afgerondOp ?? "",
-    String(beantwoord),
-    String(totaal),
-    overallVeld,
-    groepen,
-    JSON.stringify(organisatie.kenmerken),
-    antwoordenVeld,
-    opmerkingenVeld,
-  ];
+  return {
+    organisatie_naam: organisatie.naam,
+    meting_label: scanUitvoering.label,
+    assessment_naam: assessment.naam,
+    respondent_naam: lid.naam ?? "",
+    respondent_email: lid.email,
+    respondent_functie: lid.functie,
+    respondent_team: lid.team,
+    respondent_notities: lid.notities,
+    respondent_aangemaakt_op: lid.aangemaaktOp,
+    status: invulling.status,
+    uitgenodigd_op: invulling.uitgenodigdOp,
+    gestart_op: invulling.gestartOp ?? "",
+    afgerond_op: invulling.afgerondOp ?? "",
+    aantal_beantwoord: String(beantwoord),
+    aantal_vragen_totaal: String(totaal),
+    overall_score: overallVeld,
+    groepsScores: groepen,
+    organisatie_kenmerken: JSON.stringify(organisatie.kenmerken),
+    antwoorden: antwoordenVeld,
+    opmerkingen_per_bouwblok: opmerkingenVeld,
+  };
+}
+
+function bouwRij(ctx: CsvRijContext): string[] {
+  const record = bouwRijRecord(ctx);
+  return KOLOMMEN.map((k) => record[k] ?? "");
 }
 
 /** UTF-8 met BOM, puntkomma-gescheiden, CRLF — Excel-NL opent dit zonder handmatige encoding-keuze (export-csv.md, "CSV-formaat"). */
@@ -166,8 +201,57 @@ export function genereerScansCsv(rijen: CsvRijContext[]): string {
   return "﻿" + regels.join("\r\n") + "\r\n";
 }
 
+/**
+ * Inzage (AVG), `export-csv.md`: Alle scans van één Respondent (ook `uitgenodigd` en `bezig`), één rij per scan, met
+ * dezelfde kolomstructuur als hierboven plus `respondent_notities` en `respondent_aangemaakt_op`, en zonder
+ * `organisatie_kenmerken`. Een Respondent zonder scans geeft één rij met alleen de persoonsgegevens.
+ */
+const INZAGE_KOLOMMEN = [
+  ...KOLOMMEN.slice(0, KOLOMMEN.indexOf("respondent_team") + 1),
+  "respondent_notities",
+  "respondent_aangemaakt_op",
+  ...KOLOMMEN.slice(KOLOMMEN.indexOf("respondent_team") + 1).filter((k) => k !== "organisatie_kenmerken"),
+];
+
+export function genereerInzageCsv(
+  organisatie: Organisatie,
+  lid: OrganisatieLid,
+  assessments: Assessment[]
+): { csv: string; aantalScans: number } {
+  const scans: CsvRijContext[] = organisatie.scanUitvoeringen.flatMap((scanUitvoering) =>
+    scanUitvoering.invullingen
+      .filter((i) => i.organisatieLidId === lid.id)
+      .flatMap((invulling) => {
+        const assessment = assessments.find((a) => a.id === scanUitvoering.assessmentId);
+        return assessment ? [{ organisatie, scanUitvoering, lid, invulling, assessment }] : [];
+      })
+  );
+  const records: Record<string, string>[] =
+    scans.length > 0
+      ? scans.map(bouwRijRecord)
+      : [
+          {
+            organisatie_naam: organisatie.naam,
+            respondent_naam: lid.naam ?? "",
+            respondent_email: lid.email,
+            respondent_functie: lid.functie,
+            respondent_team: lid.team,
+            respondent_notities: lid.notities,
+            respondent_aangemaakt_op: lid.aangemaaktOp,
+          },
+        ];
+  const regels = [INZAGE_KOLOMMEN.join(";"), ...records.map((r) => INZAGE_KOLOMMEN.map((k) => csvVeld(r[k] ?? "")).join(";"))];
+  return { csv: "\uFEFF" + regels.join("\r\n") + "\r\n", aantalScans: scans.length };
+}
+
+/** "Inzage <Organisatie> - <Respondent> - <datum>.csv"; Is de naam leeg, dan staat het e-mailadres op die plek. */
+export function inzageBestandsnaam(organisatie: Organisatie, lid: OrganisatieLid, datum = new Date()): string {
+  const iso = datum.toISOString().slice(0, 10);
+  return `${saneerBestandsnaam(`Inzage ${organisatie.naam} - ${lid.naam || lid.email} - ${iso}`)}.csv`;
+}
+
 function saneerBestandsnaam(naam: string): string {
-  return naam.replace(/[^\p{L}\p{N} ._-]/gu, "");
+  return naam.replace(/[^\p{L}\p{N} ._@-]/gu, "");
 }
 
 /** Eén scan (resultatenpagina): "<Organisatie> - <Respondent> - <Meting>.csv". */

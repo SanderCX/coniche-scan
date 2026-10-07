@@ -239,7 +239,7 @@ function RespondentenPageInhoud() {
                         </a>
                       </div>
                     </td>
-                    <td onClick={(e) => e.stopPropagation()}>
+                    <td className="cel-knop" onClick={(e) => e.stopPropagation()}>
                       <button type="button" className="btn btn-outline btn-compact" onClick={() => open("respondent", r.lidId)}>
                         Bekijk
                       </button>

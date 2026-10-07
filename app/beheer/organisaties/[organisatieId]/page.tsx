@@ -29,6 +29,7 @@ const MAX_RIJEN = 5;
  */
 function LeadToevoegen({ organisatie }: { organisatie: Organisatie }) {
   const assessments = useAssessments();
+  const [open, setOpen] = useState(false);
   const [naam, setNaam] = useState("");
   const [email, setEmail] = useState("");
   const [metingIds, setMetingIds] = useState<string[]>([]);
@@ -58,11 +59,14 @@ function LeadToevoegen({ organisatie }: { organisatie: Organisatie }) {
 
   if (organisatie.scanUitvoeringen.length === 0) return null;
 
+  // Een oranje knop direct onder de lijst Respondenten, links uitgelijnd (beheerpagina.md, punt 6a).
+  // Pas na een klik klapt het formulier eronder open.
   return (
-    <details className="admin-bouwblok-card" style={{ marginTop: "1rem" }}>
-      <summary>
-        <span className="admin-bouwblok-titel">+ Lead toevoegen</span>
-      </summary>
+    <div style={{ marginTop: "1rem" }}>
+      <button type="button" className="btn btn-or btn-compact" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        + Lead toevoegen
+      </button>
+      {open && (
       <form onSubmit={handleToevoegen} className="mt-3 flex flex-col gap-3" style={{ maxWidth: "28rem" }}>
         <div className="admin-field" style={{ marginBottom: 0 }}>
           <label>Naam</label>
@@ -93,6 +97,7 @@ function LeadToevoegen({ organisatie }: { organisatie: Organisatie }) {
           Lead toevoegen
         </button>
       </form>
+      )}
       {nieuweLink && (
         <div className="admin-notice mt-3">
           <p className="font-medium text-ink">Lead toegevoegd. Deel deze link handmatig:</p>
@@ -107,7 +112,7 @@ function LeadToevoegen({ organisatie }: { organisatie: Organisatie }) {
           </div>
         </div>
       )}
-    </details>
+    </div>
   );
 }
 
@@ -262,7 +267,7 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
                   <td>
                     {s.invullingen.length} respondent{s.invullingen.length === 1 ? "" : "en"}, {afgerond} afgerond
                   </td>
-                  <td style={{ textAlign: "right" }}>
+                  <td className="cel-knop">
                     <Link href={`/beheer/metingen/${s.id}`} className="btn btn-outline btn-compact" onClick={(e) => e.stopPropagation()}>
                       Bekijk
                     </Link>
@@ -295,7 +300,7 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
                     <td>
                       <RespondentStatusBadge invullingen={invullingen} />
                     </td>
-                    <td style={{ textAlign: "right" }}>
+                    <td className="cel-knop">
                       <button type="button" className="btn btn-outline btn-compact" onClick={() => open("respondent", lid.id)}>
                         Bekijk
                       </button>
@@ -334,7 +339,7 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
                       <span className={`admin-badge status-${invulling.status}`}>{STATUS_LABEL[invulling.status]}</span>
                     </td>
                     <td>{percentage}%</td>
-                    <td style={{ textAlign: "right" }}>
+                    <td className="cel-knop">
                       <button type="button" className="btn btn-outline btn-compact" onClick={() => open("scan", invulling.id)}>
                         Bekijk
                       </button>

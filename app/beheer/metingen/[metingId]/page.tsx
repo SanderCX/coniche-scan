@@ -325,7 +325,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
                         </a>
                       </div>
                     </td>
-                    <td>
+                    <td className="cel-knop">
                       <button type="button" className="btn btn-outline btn-compact" onClick={() => open("respondent", lid.id)}>
                         Bekijk
                       </button>

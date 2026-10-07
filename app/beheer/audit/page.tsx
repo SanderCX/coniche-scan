@@ -296,6 +296,7 @@ function AuditLogInhoud() {
                 <th>Actie</th>
                 <th>Entiteit</th>
                 <th>Details</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -379,8 +380,8 @@ function GebeurtenisRij({ event, open, onWissel }: { event: AuditEvent; open: bo
           <code>{event.actie}</code>
         </td>
         <td>{entiteitLabel(event)}</td>
-        <td>
-          {detailTekst(event)}{" "}
+        <td>{detailTekst(event)}</td>
+        <td className="cel-knop">
           <button type="button" className="btn btn-outline btn-compact" aria-expanded={open} onClick={onWissel}>
             {open ? "Minder" : "Meer"}
           </button>
@@ -388,7 +389,7 @@ function GebeurtenisRij({ event, open, onWissel }: { event: AuditEvent; open: bo
       </tr>
       {open && (
         <tr>
-          <td colSpan={5}>
+          <td colSpan={6}>
             <IdsEnJson event={event} />
           </td>
         </tr>
@@ -411,8 +412,8 @@ function ImportRij({ groep, open, onWissel }: { groep: ImportGroep; open: boolea
             {STATUS_LABEL[groep.status]}
           </span>
         </td>
-        <td>
-          {importGroepTekst(groep)}{" "}
+        <td>{importGroepTekst(groep)}</td>
+        <td className="cel-knop">
           <button type="button" className="btn btn-outline btn-compact" aria-expanded={open} onClick={onWissel}>
             {open ? "Inklappen" : "Uitklappen"}
           </button>
@@ -427,7 +428,7 @@ function ImportRij({ groep, open, onWissel }: { groep: ImportGroep; open: boolea
               <code>{e.actie}</code>
             </td>
             <td>{entiteitLabel(e)}</td>
-            <td>
+            <td colSpan={2}>
               {detailTekst(e)}
               <IdsEnJson event={e} />
             </td>
