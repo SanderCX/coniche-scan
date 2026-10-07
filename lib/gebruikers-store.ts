@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { BeheerRol, Gebruiker } from "./types";
+import { Gebruiker } from "./types";
 import { nieuwId } from "./id";
 import { logAudit } from "./audit-store";
 import { normaliseerEmail } from "./email";
@@ -190,26 +190,11 @@ export function actieveGebruikersMetRol(rol: Gebruiker["rol"] | Gebruiker["rol"]
   return laadAlles().filter((g) => g.actief && rollen.includes(g.rol));
 }
 
-/**
- * `rol` is hier een extra check naast e-mail/wachtwoord, geen aparte
- * inlogmethode: Klopt de combinatie van e-mail/wachtwoord, maar niet de
- * opgegeven rol (bijv. een Consultant die "Admin" kiest), dan mislukt het
- * inloggen alsnog — net zo goed als een verkeerd wachtwoord. Voorkomt dat
- * iemand zich per ongeluk (of expres) een andere rol toe-eigent dan zijn
- * account daadwerkelijk heeft.
- */
-export function zoekGebruikerVoorLogin(
-  email: string,
-  wachtwoord: string,
-  rol: BeheerRol
-): Gebruiker | undefined {
+/** E-mail en wachtwoord, geen rolkeuze: De rol volgt uit het account (`beheerpagina.md`, Toegang). */
+export function zoekGebruikerVoorLogin(email: string, wachtwoord: string): Gebruiker | undefined {
   const alles = laadAlles();
   return alles.find(
-    (g) =>
-      g.actief &&
-      g.email === normaliseerEmail(email) &&
-      g.wachtwoord === wachtwoord &&
-      g.rol === rol
+    (g) => g.actief && g.email === normaliseerEmail(email) && g.wachtwoord === wachtwoord
   );
 }
 

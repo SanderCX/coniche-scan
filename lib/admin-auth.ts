@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { BeheerRol, Gebruiker } from "./types";
+import { Gebruiker } from "./types";
 import { getGebruikers, useGebruikers, zoekGebruikerVoorLogin, zetLaatstIngelogd } from "./gebruikers-store";
 
 /**
@@ -50,8 +50,8 @@ export function devAutoLogin(): boolean {
   }
 }
 
-export function login(email: string, wachtwoord: string, rol: BeheerRol): boolean {
-  const gebruiker = zoekGebruikerVoorLogin(email, wachtwoord, rol);
+export function login(email: string, wachtwoord: string): boolean {
+  const gebruiker = zoekGebruikerVoorLogin(email, wachtwoord);
   if (!gebruiker) return false;
   if (typeof window !== "undefined") {
     window.sessionStorage.setItem(KEY, gebruiker.id);

@@ -65,13 +65,13 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   serveropslag. Welke database definitief wordt en waar die draait, volgt
   na afstemming met IT (`backlog.md`). Zonder gedeelde opslag werkt een
   link alleen in de browser waar de data staat.
-- **Inlog en rollen**: E-mail en wachtwoord voor beheer, met een rolkeuze
-  op het inlogscherm. De rollen Admin en Consultant aan de beheerkant en
-  Lead en Respondent aan de klantkant zijn nu ingericht als testhulp
+- **Inlog en rollen**: E-mail en wachtwoord voor beheer. Het inlogscherm
+  heeft geen rolkeuze: De rol volgt uit het account waarmee iemand
+  inlogt. De rollen Admin en Consultant aan de beheerkant en Lead en
+  Respondent aan de klantkant zijn nu ingericht als testhulp
   (prototype). De definitieve rollen, rechten, 2FA en inlog volgen met de
-  backend (`datamodel.md` deel 2), en de rolkeuze op het inlogscherm
-  verdwijnt dan. Admin-accounts hebben onderling dezelfde rechten, en meer
-  dan een Consultant.
+  backend (`datamodel.md` deel 2). Admin-accounts hebben onderling
+  dezelfde rechten, en meer dan een Consultant.
 - **Toegang respondenten**: Via een korte persoonlijke link (10-teken
   code, cryptografisch gegenereerd, zie `datamodel.md`, Toegangscode),
   zonder verificatiecode. E-mailverificatie volgt als er een backend en

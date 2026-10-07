@@ -276,12 +276,12 @@
 }
 
 .btn-outline {
-  background: transparent;
-  color: var(--ink);
-  border: 2px solid var(--border-d);
+  background: var(--bg);
+  color: var(--or);
+  border: 2px solid var(--or);
 }
 .btn-outline:hover {
-  border-color: var(--ink-s);
+  background: var(--bg-warm);
 }
 
 .btn-danger {
@@ -984,11 +984,12 @@ button.card:hover,
 .info-icoon {
   width: 1.25rem;
   height: 1.25rem;
+  box-sizing: border-box;
   border-radius: 50%;
-  border: none;
+  border: 1px solid var(--or);
   padding: 0;
-  background: var(--or);
-  color: #fff;
+  background: var(--bg);
+  color: var(--or);
   font-size: var(--fs-xs);
   font-weight: 800;
   line-height: 1;
@@ -997,10 +998,7 @@ button.card:hover,
   align-items: center;
   justify-content: center;
 }
-.info-icoon:hover,
-.info-icoon[aria-expanded="true"] {
-  background: var(--or-l);
-}
+
 /* Dimlaag achter het informatieveld, zoals .modal-overlay maar lichter en zonder eigen kop. */
 .info-dim {
   position: fixed;

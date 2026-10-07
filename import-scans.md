@@ -52,8 +52,11 @@ formaat anders is.
 
 Nieuw punt in `beheerpagina.md`, als losse actie (niet gekoppeld
 aan één specifieke organisatie vooraf: De organisatie wordt per rij in
-de CSV bepaald, zie hieronder). Alleen voor Admin en Consultant
-(zelfde toegang als de rest van beheer).
+de CSV bepaald, zie hieronder). Alleen voor een Admin. Een Consultant ziet
+alleen zijn eigen Organisaties en kan dus niet beoordelen of een
+Organisatie die de import nieuw aanmaakt zomaar toegevoegd mag worden. Hij
+krijgt op de tab Import een melding in plaats van de importfunctie
+(`beheerpagina.md`, punt 8).
 
 ## Bronformaat "oude tool"
 

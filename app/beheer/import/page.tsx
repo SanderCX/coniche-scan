@@ -7,7 +7,7 @@ import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties, voerLegacyImportUit, LegacyImportKeuze, LegacyImportRijResultaat } from "@/lib/db";
 import { logAudit, nieuweGroepId } from "@/lib/audit-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
-import { zichtbareOrganisaties } from "@/lib/rechten";
+import { magImporteren, zichtbareOrganisaties } from "@/lib/rechten";
 import {
   ImportBronFormaat,
   bestandOverslaanReden,
@@ -81,7 +81,26 @@ interface OrgKeuze {
  * `voerLegacyImportUit`-aanroep het echte id meekrijgt i.p.v. opnieuw een
  * nieuwe aan te maken (`lib/db.ts`, `LegacyImportKeuze`).
  */
-export default function ImportLegacyPage() {
+/**
+ * Import is alleen voor een Admin (`beheerpagina.md`, punt 8; `import-scans.md`): Een Consultant ziet
+ * alleen zijn eigen Organisaties en kan niet beoordelen of een Organisatie die de import nieuw
+ * aanmaakt zomaar toegevoegd mag worden. Hij krijgt hier een melding in plaats van de importfunctie,
+ * ook als hij de route rechtstreeks opent. De tekst staat vast in de code en hoort niet in het
+ * register van Algemene teksten.
+ */
+export default function ImportPagina() {
+  const gebruiker = useIngelogdeGebruiker();
+  if (!magImporteren(gebruiker)) {
+    return (
+      <div className="admin-main">
+        <p className="admin-notice">Vraag de beheerder om bestanden te importeren.</p>
+      </div>
+    );
+  }
+  return <ImportLegacyPage />;
+}
+
+function ImportLegacyPage() {
   const assessments = useAssessments();
   const alleOrganisaties = useOrganisaties();
   const gebruiker = useIngelogdeGebruiker();
@@ -366,6 +385,7 @@ export default function ImportLegacyPage() {
     // aanmaker (bereik "aangemaakt", lib/rechten.ts); een hergebruikte
     // organisatie behoudt haar eigen aangemaaktDoor.
     const res = voerLegacyImportUit(keuzes, gebruiker.id, zorgVoorImportGroep());
+    if (res.geweigerd) return;
     verwerkResultaat(rijenKlaarVoorBulk, res);
   }
 

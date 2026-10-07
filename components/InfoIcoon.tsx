@@ -155,7 +155,7 @@ export function InfoIcoon({
         aria-haspopup="dialog"
         onClick={() => (open ? sluit() : setOpen(true))}
       >
-        !
+        i
       </button>
       {open && createPortal(veld, document.body)}
     </span>

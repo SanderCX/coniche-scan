@@ -27,6 +27,11 @@ export function isConsultant(gebruiker: Gebruiker | null): boolean {
   return gebruiker?.rol === "consultant";
 }
 
+/** Import van scans (`beheerpagina.md`, punt 8): Alleen een Admin. */
+export function magImporteren(gebruiker: Gebruiker | null): boolean {
+  return isAdmin(gebruiker);
+}
+
 /** `gebruikers.beheren`/`rollen.toekennen`: alle (Admin) — Consultant heeft geen toegang. */
 export function magGebruikersBeheren(gebruiker: Gebruiker | null): boolean {
   return isAdmin(gebruiker);

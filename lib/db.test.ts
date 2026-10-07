@@ -41,6 +41,25 @@ const org = (id: string, leden: Rij[], scanUitvoeringen: Rij[]) => ({
 const zet = (orgs: Rij[]) => opslag.set(KEY, JSON.stringify(orgs));
 const laad = () => JSON.parse(opslag.get(KEY)!) as ReturnType<typeof org>[];
 
+describe("import alleen voor een Admin", () => {
+  const gebruiker = (id: string, rol: string) => ({ id, email: `${id}@x.nl`, naam: id, wachtwoord: "x", rol, actief: true, laatstIngelogdOp: null, aangemaaktOp: "x" });
+  const keuze = { rij: { organisatieNaam: "Nieuw", respondentEmail: "a@x.nl", respondentNaam: "", respondentFunctie: "", respondentTeam: "", respondentNotities: "", meetingLabel: "Legacy-import 2026", status: "afgerond", uitgenodigdOp: "x", gestartOp: null, afgerondOp: null, antwoorden: {}, opmerkingenPerBouwblok: {}, rijNummer: 1 }, assessmentId: "A", organisatieId: null };
+
+  it("weigert een importverzoek van een Consultant en schrijft niets weg", () => {
+    opslag.set("coniche-scan:gebruikers", JSON.stringify([gebruiker("c1", "consultant"), gebruiker("a1", "admin")]));
+    zet([]);
+    const r = db.voerLegacyImportUit([keuze as never], "c1");
+    expect(r).toMatchObject({ geimporteerd: 0, geweigerd: true });
+    expect(laad()).toHaveLength(0);
+  });
+
+  it("een Admin mag wel importeren", () => {
+    opslag.set("coniche-scan:gebruikers", JSON.stringify([gebruiker("a1", "admin")]));
+    zet([]);
+    expect(db.voerLegacyImportUit([keuze as never], "a1").geimporteerd).toBe(1);
+  });
+});
+
 describe("data-integriteit", () => {
   // Beschadigde data: O1 heeft een scan zonder Respondent, een scan zonder Meting, een Respondent en een Meting zonder Organisatie en een Lead met een onbestaande Meting.
   const beschadigd = () =>

@@ -5,6 +5,7 @@ import { GevalideerdeRij } from "../import-legacy";
 import { laadAlles, slaAlles } from "./store";
 import { genereerUniekeToegangscode } from "./respondenten";
 import { AuditInvoer, logAudit } from "../audit-store";
+import { getGebruikers } from "../gebruikers-store";
 import { metingContext, organisatieContext } from "../audit-context";
 
 /** Import van scans uit een CSV (import-scans.md): schrijft rijen weg als Organisatie, Respondent, Meting en scan. */
@@ -61,7 +62,10 @@ export function voerLegacyImportUit(
   aangemaaktDoor: string,
   /** Alle gebeurtenissen van één import delen dit id in de audit-log (`datamodel.md`, Audit, Groepen). */
   groepId: string | null = null
-): { geimporteerd: number; rijResultaten: LegacyImportRijResultaat[] } {
+): { geimporteerd: number; rijResultaten: LegacyImportRijResultaat[]; geweigerd?: boolean } {
+  // Alleen een Admin mag importeren (`beheerpagina.md`, punt 8): Een verzoek van een Consultant wordt geweigerd.
+  const actor = getGebruikers().find((g) => g.id === aangemaaktDoor);
+  if (actor?.rol !== "admin") return { geimporteerd: 0, rijResultaten: [], geweigerd: true };
   const alles = laadAlles();
   // Geen naam, e-mailadres of andere gegevens van de Respondent in de log (datamodel.md, Audit).
   const gelogd: AuditInvoer[] = [];

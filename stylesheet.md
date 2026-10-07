@@ -252,9 +252,13 @@ Standaardmaat: `border-radius: var(--r)`, `padding: .82rem 1.7rem`,
 
 - `.btn-or`: Primair. Gevuld `var(--or)`, witte tekst, hover `var(--or-l)`
   met lichte `translateY(-1px)`.
-- `.btn-outline`: Secundair op een lichte achtergrond. Transparant,
-  `2px solid var(--border-d)`, tekst `var(--ink)`. Bijv. "Annuleren" naast
-  "Opslaan".
+- `.btn-outline`: Secundair op een lichte achtergrond. Witte vulling
+  (`var(--bg)`), `2px solid var(--or)`, tekst `var(--or)`. Bijv.
+  "Annuleren" naast "Opslaan". Oranje rand en tekst maken de knop
+  herkenbaar als knop en onderscheiden hem van een invoerveld, dat een
+  grijze rand heeft. Hover: Vulling `var(--bg-warm)`, rand en tekst
+  ongewijzigd. De gevulde varianten (`.btn-or`, `.btn-danger`, `.btn-w`)
+  blijven ongewijzigd.
 - `.btn-outline-w`: Secundair op een donkere of foto-achtergrond. Witte
   rand (`2px solid rgba(255,255,255,.5)`), transparant.
 - `.btn-w`: Op een oranje achtergrond. Witte vulling, oranje tekst.
@@ -321,15 +325,14 @@ var(--bg-mid)`. Sluit bij een klik buiten het menu of op een optie.
 - `.admin-badge`: Status van een respondent. `.status-afgerond` groen,
   `.status-bezig` amber, `.status-uitgenodigd` blauw.
 - **Rolbadge** (vervangt de vaste, zwarte badge "Beheer" naast het logo):
-  Toont de rol van waaruit je het scherm bekijkt, gevuld met de
-  bijbehorende rolkleur (zie Rolkleuren hieronder), witte tekst, verder
-  zelfde vorm als `.hero-tag` (hoofdletters, `border-radius: 3px`).
-  **Tijdelijke aanduiding**, vooruitlopend op de echte rollen/rechten uit
-  `datamodel.md` deel 2 (nog niet gebouwd): Bedoeld om tijdens het bouwen
-  snel te zien vanuit welk perspectief (Admin/Consultant/Lead/Respondent)
-  een scherm bekeken wordt, niet als een gevalideerde inlogstatus. Hoe de
-  getoonde rol precies bepaald wordt zolang er geen echte rollen/rechten
-  zijn, is aan Sander.
+  Toont de rol van de ingelogde Gebruiker, dus alleen Admin of
+  Consultant. Die rol is bij het aanmaken van de Gebruiker gezet
+  (`beheerpagina.md`, punt 9). De badge staat alleen aan de beheerkant.
+  Gevuld met de bijbehorende rolkleur (zie Rolkleuren hieronder), witte
+  tekst, verder zelfde vorm als `.hero-tag` (hoofdletters,
+  `border-radius: 3px`). Lead en Respondent hebben geen Rolbadge, want ze
+  loggen niet in op beheer. Hun rol volgt uit de Organisatie (zie
+  Lead-badge hieronder).
 
 - **Lead-badge in een respondentenlijst** (bijv. `beheerpagina.md`,
   punt 6a: de chip "LEAD" naast de naam van een respondent met de
@@ -453,8 +456,10 @@ eronder, en voor de reden achter een uitgeschakelde knop (in plaats van
 een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
 `.info-veld`.
 
-- **Icoon**: Een oranje rondje (`var(--or)`) van `1.25rem` met een wit
-  uitroepteken (`--fs-xs`, gewicht 800), hover `var(--or-l)`. Het staat
+- **Icoon**: Een wit rondje (`var(--bg)`) van `1.25rem` met een `1px`
+  oranje rand (`var(--or)`) en een oranje kleine letter "i" (`var(--or)`,
+  `--fs-xs`, gewicht 800). Geen hover-staat: Het icoon reageert alleen op
+  een klik (zie Openen en sluiten). Het staat
   direct achter de knop of het veld waar het over gaat (rechts ervan, bij
   een groot veld zoals een tekstvak op de hoogte van de eerste regel),
   niet achter het label. In een rij met velden en knoppen staat het

@@ -7,10 +7,10 @@ De omgeving waarin Coniche scans, content en organisaties beheert.
 Beheer is alleen toegankelijk met een account. Nu met e-mail en
 wachtwoord; 2FA volgt zodra er een backend is. Rollen binnen beheer
 (Admin, Consultant) staan in `datamodel.md` deel 2. Ze zijn nu
-ingericht als testhulp (prototype), met een rolkeuze op het inlogscherm.
-De definitieve rollen en rechten volgen met de backend, en de rolkeuze
-verdwijnt dan. Admin-accounts hebben onderling dezelfde rechten, en meer
-dan een Consultant.
+ingericht als testhulp (prototype). Het inlogscherm heeft geen
+rolkeuze: De rol volgt uit het account waarmee iemand inlogt. De
+definitieve rollen en rechten volgen met de backend. Admin-accounts
+hebben onderling dezelfde rechten, en meer dan een Consultant.
 
 Respondenten loggen niet in. Zij krijgen een persoonlijke link, zie
 `datamodel.md`, Toegangscode.
@@ -21,13 +21,12 @@ Dezelfde nav en footer als de rest van de app, met de beheerlinks in
 `.nav-right`. Componenten staan in `stylesheet.md`.
 
 **Rolbadge in plaats van de vaste badge "Beheer"**: Waar eerder altijd
-de tekst "Beheer" in zwart stond, staat nu de rol van waaruit het scherm
-bekeken wordt (Admin/Consultant/Lead/Respondent), in de bijbehorende
-rolkleur (`stylesheet.md`, Rolkleuren). **Tijdelijke aanduiding**, geen
-onderdeel van de echte rollen/rechten uit `datamodel.md` deel 2 (nog niet
-gebouwd). De rol komt uit het ingelogde account (zie Toegang). Het is een
-testhulp, zodat tijdens het bouwen snel duidelijk is vanuit welk
-perspectief een scherm bekeken wordt.
+de tekst "Beheer" in zwart stond, staat nu de rol van de ingelogde
+Gebruiker (Admin of Consultant), in de bijbehorende rolkleur
+(`stylesheet.md`, Rolkleuren). De rol is gezet bij het aanmaken van de
+Gebruiker (punt 9, Gebruikers). Lead en Respondent hebben geen Rolbadge:
+Zij loggen niet in op beheer, en hun rol volgt uit de Organisatie (punt
+6a).
 
 In de interface: "Respondenten" (niet "leden"), "Meting" en "Ingevulde
 scans". Zie CLAUDE.md, Terminologie.
@@ -82,7 +81,8 @@ Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
 - **Onderdelen binnen een hoofdlink**: Onder de nav staat een tabbalk
   met de onderdelen van de gekozen hoofdlink. Bij Organisaties zijn dat
   Organisaties, Respondenten, Ingevulde scans en Import, voor een Admin
-  aangevuld met Organisatievelden. De tabbalk is zichtbaar op de
+  aangevuld met Organisatievelden. Een Consultant ziet de tab Import
+  wel, maar daar staat de importfunctie niet (punt 8). De tabbalk is zichtbaar op de
   lijstpagina's, niet op een detailpagina. Metingen en uitnodigen hebben
   geen tab: Die zitten in het organisatie-detail en het Meting-overzicht.
 - **Kruimelpad op detailpagina's**: Boven de paginatitel staat het pad
@@ -174,7 +174,7 @@ onderdelen (2a, 11 en 12).
 |---|---|
 | **Applicatie** (Admin-only) | 9. Gebruikers, 10. Instellingen, 2a. Algemene teksten, 11. Content-pagina's, 12. Audit-log, 13. Data-integriteit |
 | **Assessments** (Admin-only) | 1. Assessment-types, 2. Content |
-| **Organisaties** (Admin: alle, Consultant: eigen) | 3. Organisatievelden, 4. Organisaties, 5. Metingen, 6. Respondenten uitnodigen, 6a. Lead-rol toekennen, 6b. Respondenten, 7. Ingevulde scans, 8. Import |
+| **Organisaties** (Admin: alle, Consultant: eigen) | 3. Organisatievelden, 4. Organisaties, 5. Metingen, 6. Respondenten uitnodigen, 6a. Lead-rol toekennen, 6b. Respondenten, 7. Ingevulde scans, 8. Import (alleen voor een Admin, een Consultant ziet een melding) |
 
 ### Applicatie (Admin-only)
 
@@ -1112,6 +1112,19 @@ komt ook op de lijst van organisaties, de metingen en de respondenten.
 Eenmalige of periodieke import van ingevulde scans uit de oude,
 stopgezette tool, zodat historische klantdata behouden blijft. Volledige
 spec, inclusief veldmapping en matchingregels: `import-scans.md`.
+
+**Alleen voor een Admin.** Een Consultant kan geen scans importeren. Op
+de tab Import toont hij in plaats van de importfunctie een melding in
+dezelfde opmaak als de melding bij een lege lijst, zoals "Nog geen
+organisatie aangemaakt" (een `.admin-notice`, zie `stylesheet.md`), met de
+tekst: "Vraag de beheerder om bestanden te importeren." De tekst staat
+vast in de code en hoort niet in het register van Algemene teksten (punt
+2a). Reden: Een Consultant ziet alleen zijn eigen Organisaties, dus hij
+kan niet vaststellen of een Organisatie die een import nieuw aanmaakt al
+bestaat of door hem zomaar toegevoegd mag worden. De beperking geldt ook
+voor de route zelf en voor de actie "N rijen importeren": Een Consultant
+die de importpagina rechtstreeks opent, krijgt dezelfde melding, en een
+importverzoek van een Consultant wordt geweigerd.
 
 Bij "Oude tool" kies je een map met losse CSV's (één bestand per scan) of
 losse bestanden; een bestand mag ook scans van meerdere organisaties en
