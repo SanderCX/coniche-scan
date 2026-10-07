@@ -1,6 +1,6 @@
 # Coniche Scan: PDF Zorgscan, visuele opbouw
 
-**Status: Gebouwd (as-built).** Beschrijft hoe de PDF van één ingevulde
+Beschrijft hoe de PDF van één ingevulde
 Zorgscan eruitziet. De gedeelde regels (bron van de content,
 slotsectie-schema, bulk-export, techniek, gedeelde elementen als
 papier/marges/hero/footer) staan in

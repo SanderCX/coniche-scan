@@ -94,8 +94,8 @@ concrete termijn noemen.
 - Toegang voor respondenten via een niet-herleidbare link, geen
   wachtwoord (`datamodel.md`, Toegangscode).
 - Beheertoegang met wachtwoord, 2FA volgt met de backend.
-- Placeholder: Waar de data wordt gehost (met de Neon-database uit
-  `backlog.md`), en of dat binnen de EU is.
+- Placeholder: Waar de data wordt gehost (Azure SQL, regio West Europe,
+  `azure-plan.md`), en of dat binnen de EU is.
 
 ### 8. Rechten van betrokkenen
 

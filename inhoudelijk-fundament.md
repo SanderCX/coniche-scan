@@ -322,17 +322,13 @@ perspectief:
 
 ## 5. Relatie met de app (later uit te werken)
 
-- De bouwsteenbeschrijvingen uit `visie-coniche.md` zijn de tekst in de
-  toelichting-overlay per bouwblok, inclusief de centrale vraag (label
-  "CENTRALE VRAAG" onder de titel) — via `data/bouwstenen-content.ts`,
-  niet via een veld op `Bouwblok` zelf (zie `datamodel.md`, Bouwblok,
-  voor de precieze koppeling).
+- De bouwsteenbeschrijvingen uit `visie-coniche.md` worden de tekst voor
+  het veld `toelichting` (de overlay per bouwblok). Tot ze `akkoord` zijn,
+  blijft de huidige tekst in de app staan.
+- De centrale vraag heeft een plek in het datamodel: `Bouwblok.centraleVraag`
+  (`datamodel.md`). Al gebouwd en in gebruik in de toelichting-overlay,
+  zie het label "CENTRALE VRAAG" onder de titel.
 - De uitleg per schaalniveau (sectie 1) als hulptekst bij de vragen.
 
-**Afwijking van een eerdere versie van dit document**: Die stelde dat
-niets hiervan wordt doorgevoerd voordat de status per bouwsteen op
-`akkoord` staat. In de praktijk is de volledige `visie-coniche.md`-tekst
-al gebouwd en live (alle 15 bouwstenen staan hier nog op `Concept`, zie
-sectie 1) — die gate is dus nooit technisch afgedwongen. De statuskolom
-blijft een nuttige redactionele tracker (wat Sander nog wil nalopen),
-maar is geen blokkade voor wat al in de app staat.
+Geen van deze punten wordt doorgevoerd in de specs voordat dit document
+op het betreffende onderdeel `akkoord` is.

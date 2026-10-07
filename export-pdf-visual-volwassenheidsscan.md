@@ -1,6 +1,6 @@
 # Coniche Scan: PDF Klantcontact Volwassenheidsscan, visuele opbouw
 
-**Status: Gebouwd (as-built). Leidend document voor de PDF-export.**
+**Leidend document voor de PDF-export.**
 Beschrijft hoe de PDF van één ingevulde Klantcontact Volwassenheidsscan
 eruitziet, pagina voor pagina, én de inhoudelijke regels die voor de
 PDF-export van **beide** scan-types gelden (bron van de content,
@@ -16,8 +16,10 @@ Wie de PDF nabouwt of aanpast, vindt hier de maten en keuzes.
 ## Export van één scan, geen aggregatie
 
 Uitsluitend één scan per PDF: Geen geaggregeerde data over meerdere
-respondenten, dat is een apart, onbesloten punt (`backlog.md`,
-Aggregatie).
+respondenten. De aggregatieweergave zelf (gemiddelde per Meting op
+organisatieniveau) is er wel, zie `beheerpagina.md`,
+Organisatie-resultaten — alleen een PDF-export daarvan bestaat nog
+niet.
 
 **Bulk-export vanuit Ingevulde scans (`beheerpagina.md` punt 7)
 blijft beperkt tot CSV.** Geen bulk-PDF: Bij een CSV met meerdere rijen

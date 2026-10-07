@@ -33,6 +33,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `sbi-indeling.md` | Vaste optielijst voor Sector/Subsector (SBI2025, top 2 niveaus) |
 | `backlog.md` | Bewust nog niet opgepakt |
 | `go-live-plan.md` | Actielijst naar productie |
+| `azure-plan.md` | Aanvulling op `go-live-plan.md` met de stappen voor de Azure-omgeving (Azure DevOps, Azure SQL, `coniche-scan.nl`) |
 | `changelog.md` | Bouwlog van Sander: per datum wat er in de code veranderd is, waarom, en welke specs daarbij zijn bijgewerkt |
 
 ## Uitgangspunten
@@ -61,9 +62,9 @@ Volwassenheidsscan, de AI-volwassenheidsscan en de Zorgscan (sector-variant
 van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
 
 - **Opslag**: Prototypefase. De data staat in de localStorage van de
-  browser. Sander werkt daarnaast met een Neon-database als tijdelijke
-  serveropslag. Welke database definitief wordt en waar die draait, volgt
-  na afstemming met IT (`backlog.md`). Zonder gedeelde opslag werkt een
+  browser. Sander werkt daarnaast met een tijdelijke serveropslag (Neon),
+  die vervalt. De database wordt Azure SQL Database (`backlog.md`,
+  `azure-plan.md`). Zonder gedeelde opslag werkt een
   link alleen in de browser waar de data staat.
 - **Inlog en rollen**: E-mail en wachtwoord voor beheer. Het inlogscherm
   heeft geen rolkeuze: De rol volgt uit het account waarmee iemand
@@ -469,8 +470,8 @@ bouwblokken met naam, omschrijving, tags en vragen.
 - Aggregatie over meerdere respondenten: Het gemiddelde per Meting is
   gebouwd (`beheerpagina.md`, Organisatie-resultaten). Afwijking en
   spreiding daarbovenop zijn nog niet ontworpen (`backlog.md`).
-- Weging: De weging is gebouwd. Nog te besluiten of de gewichten van de
-  Zorgscan (bouwblok 4, 10 en 11 op 2) blijven staan of terug naar 1
-  gaan.
+- Weging: De weging is gebouwd. De gewichten van de Zorgscan (bouwblok 4, 10
+  en 11 op 2) zijn besloten: de spec is leidend. De seed en de opgeslagen
+  data moeten daarop staan.
 - Rol/functie bij de respondent: Vrij tekstveld of vaste lijst.
 - Focus- en error-states in formulieren (zie `stylesheet.md`).

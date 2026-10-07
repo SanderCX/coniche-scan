@@ -1,6 +1,6 @@
 # Coniche Scan: PDF AI-scan, visuele opbouw
 
-**Status: Gebouwd (as-built).** Beschrijft hoe de PDF van één ingevulde
+Beschrijft hoe de PDF van één ingevulde
 AI-volwassenheidsscan eruitziet, pagina voor pagina. De gedeelde regels
 (bron van de content, slotsectie-schema, bulk-export, techniek, gedeelde
 elementen als papier/marges/hero/footer) staan in

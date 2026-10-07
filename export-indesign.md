@@ -134,6 +134,7 @@ Geen nieuwe contentbron: Dezelfde velden als de PDF-export
   </assessment>
   <datum>2026-09-14</datum>
 
+  <!-- gewogen volgens datamodel.md, Scoreberekening -->
   <overallScore waarde="3.8" van="5" />
   <voortgang beantwoord="60" totaal="60" />
 
@@ -207,6 +208,14 @@ kunstmatige categorie ertussen, zelfde uitgangspunt als elders
 ("Maak geen kunstmatige categorieën met elk één bouwblok",
 `datamodel.md`).
 
+**Weging**: `overallScore` en de scores in `groepsScores` komen uit de
+gedeelde, gewogen scorefunctie (`datamodel.md`, Scoreberekening). In
+deze XML staat bewust nog geen gewicht per bouwblok: De `groep` is bij
+Klantcontact een categorie, en het sjabloon heeft vaste elementen die
+hier niet voor zijn ingericht. Dat is een open punt voor Joost (zie
+Open): Een factor bij de bouwblokken in InDesign vraagt een uitbreiding
+van de XML én van het sjabloon.
+
 **`contentSectie`**: Hergebruikt `Assessment.pdfContentSecties`
 (`titel` en `bron`, zie `export-pdf-visual-volwassenheidsscan.md`,
 Slotsectie per scan-type) — dus bij Klantcontact Volwassenheid de
@@ -277,3 +286,10 @@ voor het taggen, niet andersom.
   hierboven.
 - **`scoreAlgemeen` en `top3Sterktes`/`top3Verbeterkansen` als SVG, geen
   tekstelementen**: Zie toelichting hierboven.
+
+## Open
+
+- **Factor per bouwblok in InDesign**: Of de XML het gewicht per
+  bouwblok moet meegeven (bijvoorbeeld als genest element onder de
+  categorie-`groep`), en of het sjabloon een plek krijgt voor de factor.
+  Beslissing van Joost, zie Weging hierboven.
