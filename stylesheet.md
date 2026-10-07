@@ -241,6 +241,35 @@ dezelfde vaste hoogte: `--control-h` (`2.4rem`, 38,4px), in de CSS voor
   respondent binnen zijn persoonlijke link zit, gaat het logo naar "Mijn
   metingen" in plaats van naar de publieke homepage.
 
+### Browsericoon (favicon)
+
+Het icoontje in het browsertabblad, de bladwijzers en het beginscherm van een
+telefoon is het mini-icoon van Coniche, dus niet het volledige logo met tekst.
+
+- **Bronbestanden**: Staan klaar in `afbeeldingen/`, getraceerd uit de
+  Photoshop-versie `CON_C_Icon_DEF_Oranje.psd` (kleur `#ff671f`, gelijk aan
+  `--or`):
+  - `coniche-icoon.svg`: vierkant, met een marge van ongeveer 8% rondom, de
+    bron voor alle favicon-formaten.
+  - `coniche-logo-c.svg`: dezelfde vorm zonder marge, voor ander gebruik.
+  - `favicon.ico`, `apple-icon.png` en `icoon-512.png`: de afgeleide formaten.
+- **Bestanden in de app** (Next.js pakt deze namen vanzelf op en zet de
+  `<link>`-tags zelf):
+  - `app/icon.svg`: kopie van `coniche-icoon.svg`.
+  - `app/favicon.ico`: 48 × 48 px (met 32 en 16 erin) voor oudere browsers en
+    programma's die het vaste adres `/favicon.ico` opvragen.
+  - `app/apple-icon.png`: 180 × 180 px, voor iPhone en iPad, op een witte
+    achtergrond (`var(--bg)`) zonder transparantie. iOS maakt zelf de
+    afgeronde hoeken.
+- **Optioneel, later**: 192 × 192 en 512 × 512 px PNG met een
+  `manifest.webmanifest`, alleen als de app installeerbaar moet worden. Nu niet
+  nodig.
+- **Tabbladtitel**: Elke pagina heeft een titel in de vorm
+  `<Paginanaam> | Coniche Scan`. De titel hoort bij dit icoon en staat nu nergens
+  in de spec.
+- **Test**: Kijk in Chrome, Safari en Firefox. Browsers bewaren favicons lang;
+  ververs hard (Ctrl+F5) of open een privévenster voordat je oordeelt.
+
 ---
 
 ## Componenten
@@ -301,6 +330,13 @@ komen daardoor vanzelf op (vrijwel) dezelfde hoogte uit.
 dezelfde breedte (`display: flex` op de rij, `flex: 1` of een gedeelde
 `min-width` op elke knop). Dat geldt per rij, niet voor alle knoppen op
 een pagina.
+
+Knoppen die onder elkaar staan, bijvoorbeeld "Verwijderen" en "Verlengen"
+in de actiekolom van een lijst, krijgen ook dezelfde breedte: Die van de
+breedste knop in die stapel (bijv. een kolom met `display: grid` en
+`justify-items: stretch`, of een gedeelde `min-width`). Ook dat geldt
+per stapel, niet voor alle knoppen op een pagina. Elke knop houdt zijn
+eigen variant (een rode "Verwijderen" naast een outline-knop "Verlengen").
 
 ### Dropdown-knop
 
@@ -375,6 +411,43 @@ pagina, zoals de privacypagina in de toestemmingstekst. Een link is oranje
 `<select>` in dezelfde rij, dan is dat een compacte variant van
 hetzelfde formaat, niet het volle `select.field` uit Formulieren hieronder.
 
+**Knop in een lijstrij.** Een knop in een rij van een lijst of tabel
+("Bekijk", "Meer") staat in een eigen laatste kolom, rechts uitgelijnd en
+verticaal gecentreerd in de rij. De knop staat dus op elke rij op dezelfde
+plek, ongeacht hoe lang de tekst in de kolom ervoor is, en staat nooit
+direct achter die tekst. Dat geldt voor elke lijst, ook de audit-log.
+
+### Assessment-icoon
+
+Het icoon van een Assessment, getoond op de kaart bij "Kies jouw
+assessment" en op de landingspagina (`Assessment.icoon`, `datamodel.md`).
+De SVG's staan in de map `afbeeldingen/` naast de specs, met een
+overzichtsblad (`assessment-iconen.svg` en `.png`) en per icoon een
+bestand `assessment-icoon-<sleutel>.svg`. De code bewaart ze onder
+`ASSESSMENT_ICONS`.
+
+| Sleutel | Beeld | Assessment |
+|---|---|---|
+| `target` | Doel: twee ringen met een punt, lijntekening | Klantcontact Volwassenheid |
+| `sparkle` | Schittering: vierpuntige ster, gevuld | AI-volwassenheid |
+| `heart` | Hart, lijntekening | Zorgscan |
+
+- **Opbouw**: Een rond vlak in `var(--or-faint)` met daarin het icoon in
+  `var(--or)`. Lijntekeningen hebben een lijndikte van `1.75` op een
+  raster van 24 bij 24, met afgeronde uiteinden en hoeken. Dat raster is
+  tussen 60% en 67% van de diameter van het rondje, dus er blijft ruim
+  een rand rondom over.
+- **Grootte**: `2rem` voor het icoon zoals het in de lopende UI staat
+  (zie Typografie). De SVG's zijn schaalbaar en dus ook groter te
+  gebruiken.
+- **Achtergrond**: De losse SVG-bestanden in `afbeeldingen/` hebben een
+  witte rechthoek als achtergrond, bedoeld als voorbeeld. In de app
+  komen alleen het rondje en het icoon, zonder die rechthoek.
+- **Nieuw icoon**: Een nieuw Assessment krijgt een nieuwe sleutel met een
+  SVG in dezelfde stijl en kleuren, en een regel in de tabel hierboven.
+  Zonder SVG bij de sleutel valt de app terug op een letterlijke emoji
+  (`datamodel.md`).
+
 ### Kaarten
 
 Witte of `var(--bg-warm)` achtergrond, `1px solid var(--border)`,
@@ -446,7 +519,7 @@ met `<details>`) voor contentbeheer, tabelstijl uit `admin.css`.
   (`lib/use-focus-val.ts`), en bij het sluiten keert de focus terug naar het
   element waar je vandaan kwam. Staan er twee modals boven elkaar, dan houdt
   alleen de bovenste de focus vast.
-- **Klikbare rijen** in een lijst hebben ook altijd een knop "Bekijk >>" in
+- **Klikbare rijen** in een lijst hebben ook altijd een knop "Bekijk" in
   de rij, zodat de rij ook zonder muis te openen is.
 
 ### Info-icoon

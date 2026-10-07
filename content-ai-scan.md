@@ -2,7 +2,9 @@
 
 Vragen voor het `Assessment`-object "AI-Volwassenheid in Klantcontact": 8
 domeinen, 40 vragen (5 per domein), op dezelfde 1–5-schaal als de
-Klantcontact Volwassenheidsscan.
+Klantcontact Volwassenheidsscan. Beschrijving en centrale vraag per
+domein (`Bouwblok.toelichting` en `Bouwblok.centraleVraag`,
+`datamodel.md`): `visie-ai-klantcontact.md`.
 
 ## Verschillen met de Klantcontact Volwassenheidsscan
 
@@ -17,6 +19,9 @@ Klantcontact Volwassenheidsscan.
 
 - Naam: "AI-Volwassenheid in Klantcontact"
 - Subtitel: "±20 minuten. Helder inzicht. Direct vervolgstappen."
+- Bouwblok-label (`Assessment.bouwblokLabel`): "AI-domein". De eyebrow in
+  de Toelichtingsmodal wordt daarmee "AI-DOMEIN 2" (zonder categorienaam,
+  want er zijn geen categorieën).
 - Beschrijving: "Deze assessment geeft inzicht in hoe volwassen jouw
   organisatie is in het inzetten van AI binnen klantcontact. Je krijgt
   zicht op sterke punten, ontwikkelgebieden en waar gerichte

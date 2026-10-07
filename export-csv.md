@@ -1,7 +1,6 @@
 # Coniche Scan: Export naar CSV
 
-**Status: Specificatie, klaar om te (her)bouwen.** Legt de kolommen van
-de bestaande "Als CSV"-optie in de Exporteren-dropdown voor het eerst
+Legt de kolommen van de "Als CSV"-optie in de Exporteren-dropdown
 volledig vast (resultatenpagina, één scan, en `beheerpagina.md`
 punt 7, Ingevulde scans, één of meerdere scans — zelfde kolomstructuur
 in beide gevallen, alleen het aantal rijen verschilt). Vergelijkbaar
@@ -22,28 +21,23 @@ of het nu 1 of N rijen oplevert.
 ## Grain: één rij per ingevulde scan
 
 Zelfde niveau als de import: Eén `ScanInvulling` is één rij. Geen
-aggregatie over meerdere respondenten binnen een `Meting` — dat blijft
-een apart vraagstuk (`backlog.md`, Aggregatie), net als bij de PDF- en
-InDesign-export.
+aggregatie over meerdere respondenten binnen een `Meting` — de
+aggregatieweergave zelf bestaat wel (`beheerpagina.md`,
+Organisatie-resultaten), maar een CSV-export daarvan nog niet, net als
+bij de PDF- en InDesign-export.
 
 ## Bulk-export blijft binnen één organisatie
 
 **Geen bulk-CSV-export over meerdere organisaties heen, in verband met
-datavermenging.** Bulk-export (meerdere geselecteerde scans in één CSV)
-is gebouwd op twee plekken, allebei met dezelfde grens:
-
-- De organisatie-gefilterde "Ingevulde scans"-lijst op de
-  organisatie-detailpagina (`beheerpagina.md` punt 4) — hier per
-  definitie altijd al één organisatie.
-- Het globale overzicht over alle organisaties heen (punt 7): Bulk-
-  exporteren blijft hier beschikbaar, maar uitgeschakeld (met uitleg)
-  zodra de selectie meer dan één organisatie beslaat. Met het
-  organisatiefilter op dat scherm is een selectie binnen één organisatie
-  net zo snel te maken. **Afwijking van een eerdere versie van dit
-  document**: Die sloot bulk-export op het globale overzicht helemaal
-  uit; in plaats daarvan is gekozen voor uitschakelen-met-uitleg, omdat
-  dat dezelfde datavermenging voorkomt zonder de functionaliteit
-  helemaal weg te halen.
+datavermenging.** Concreet: Bulk-export (meerdere geselecteerde scans
+in één CSV) is mogelijk zodra alle geselecteerde scans bij dezelfde
+organisatie horen. Dat geldt zowel op de organisatie-gefilterde
+"Ingevulde scans"-lijst op de organisatie-detailpagina
+(`beheerpagina.md` punt 4) als op het globale overzicht (punt 7),
+ook als dat niet is gefilterd. Bevat de selectie scans van meer dan één
+organisatie, dan is "Exporteren" uitgeschakeld, met het Info-icoon
+`info.bulkExportOrganisatie` ernaast. Een export van één scan
+(één rij) kan altijd, ook op het globale overzicht.
 
 ## Kolommen
 
@@ -72,18 +66,24 @@ blijven deze kolommen leeg (geen score op een onvolledige invulling).
 
 | Kolom | Toelichting |
 |---|---|
-| `overall_score` | Gemiddelde van alle antwoorden, van 5, uit de gedeelde scoreberekening (`datamodel.md`, Scoreberekening) — zelfde functie als resultatenpagina, PDF- en InDesign-export |
-| `groepsScores` | JSON-kolom, zelfde vorm als `export-indesign.md`, `<groepsScores>`: `{"type": "categorie" of "bouwblok", "groepen": [{"naam": ..., "score": ...}, ...]}`. Zelfde regel: `type="categorie"` bij een scan mét categorielaag (Klantcontact Volwassenheid), `type="bouwblok"` zonder (AI-volwassenheid) |
+| `overall_score` | Gewogen gemiddelde van alle antwoorden, van 5, uit de gedeelde scoreberekening (`datamodel.md`, Scoreberekening, inclusief `Bouwblok.gewicht`); zelfde functie als resultatenpagina, PDF- en InDesign-export |
+| `groepsScores` | JSON-kolom, zelfde vorm als `export-indesign.md`, `<groepsScores>`: `{"type": "categorie" of "bouwblok", "groepen": [{"naam": ..., "score": ..., "bouwblokken": [{"nummer": ..., "naam": ..., "score": ..., "gewicht": ...}, ...]}, ...]}`. Zelfde regel: `type="categorie"` bij een scan mét categorielaag (Klantcontact Volwassenheid), `type="bouwblok"` zonder (AI-volwassenheid). Bij `type="categorie"` heeft elke groep een lijst `bouwblokken` met het gewicht per bouwblok; bij `type="bouwblok"` is de groep zelf een bouwblok en heeft hij direct `nummer` en `gewicht` (geen `bouwblokken`-lijst). Het gewicht staat er altijd, ook bij 1: Dit is machinedata, geen weergave |
 
 **Geen aparte top-3-kolommen.** Sterktes en verbeterkansen zijn triviaal
 af te leiden door `groepsScores` te sorteren; een aparte, dubbele
 representatie voegt niets toe en kan uit de pas gaan lopen met de
 brondata.
 
-**Geen `gewicht`-kolom.** `Categorie.gewicht`/`Bouwblok.gewicht`
-(`datamodel.md`) zijn content-eigenschappen van het Assessment, geen
-gegeven van déze ene scan — voor elke rij met hetzelfde Assessment
-identiek, dus geen zinvolle kolom op scanniveau.
+**Geen aparte `gewicht`-kolom.** `Bouwblok.gewicht` (`datamodel.md`) is
+een content-eigenschap van het Assessment, geen gegeven van déze ene
+scan, en voor elke rij met hetzelfde Assessment identiek. Het gewicht
+staat daarom per bouwblok in `groepsScores`. Daarmee is `overall_score`
+na te rekenen uit alleen de export: `Σ(gewicht × score van het
+bouwblok) / Σ gewicht` geeft de overall zolang alle bouwblokken evenveel
+vragen hebben (nu altijd 4 bij Klantcontact, 5 bij AI), met als
+afwijking de afronding van de bouwblokscores. Een eventueel gewicht
+wordt na een wijziging in één keer doorgerekend (`datamodel.md`), dus
+een oudere CSV-export kan afwijken van de actuele score.
 
 ### Organisatiekenmerken
 
@@ -126,6 +126,35 @@ en `schaalLabel` erbij, niet alleen `vraagId` en `score`, zodat de CSV
 ook leesbaar is voor wie het datamodel niet kent — een consultant die
 'm in Excel opent, niet alleen Sander of de import-tool later.
 
+## Inzage (AVG)
+
+De actie "AVG-inzage" in het Respondent-overzicht (`beheerpagina.md`,
+punt 6b) levert een CSV op met alle gegevens van één Respondent. Het is
+dezelfde exportfunctie en dezelfde kolomstructuur als hierboven, met
+deze afwijkingen:
+
+- **Selectie**: Alle `ScanInvulling`en van deze Respondent, ook die met
+  status `"uitgenodigd"` of `"bezig"`. Eén rij per scan. Een Respondent
+  zonder scans levert één rij op met alleen de persoonsgegevens, met de
+  scankolommen leeg, zodat de persoonsgegevens altijd in het bestand
+  staan. Een Respondent hoort bij één Organisatie, dus de regel "Bulk-
+  export blijft binnen één organisatie" geldt hier vanzelf.
+- **Extra kolommen** (Basisgegevens): `respondent_notities`
+  (`Respondent.notities`) en `respondent_aangemaakt_op`
+  (`Respondent.aangemaaktOp`).
+- **Weggelaten**: `organisatie_kenmerken`, want dat zijn gegevens van de
+  Organisatie en niet van de Respondent. De persoonlijke link en
+  toegangscode staan er ook niet in, want dat is een toegangsmiddel en
+  geen gegeven over de persoon.
+- **Rechten**: Admin voor alle Organisaties, Consultant voor zijn eigen
+  (`beheerpagina.md`, punt 6b).
+- **Bestandsnaam**: `Inzage <Organisatie> - <Respondent> - <datum>.csv`.
+  Is de naam van de Respondent leeg, dan staat het e-mailadres op die
+  plek, zoals in de beheeroverzichten.
+- **Logging**: Elke inzage wordt gelogd als `respondent.inzage`
+  (`datamodel.md`, Audit), met het aantal scans en de naam van de Organisatie in
+  `details`, en geen persoonsgegevens van de Respondent. Dat is het bewijs dat het verzoek is afgehandeld.
+
 ## Bestandsnaam
 
 - **Eén scan** (resultatenpagina): `<Organisatie> - <Respondent> -
@@ -140,6 +169,7 @@ ook leesbaar is voor wie het datamodel niet kent — een consultant die
   standaard een puntkomma-gescheiden CSV; met een komma-CSV opent
   Excel-NL alles in één kolom. Decimalen in `overall_score` en de
   scores binnen `groepsScores` dus met een komma (`3,8`), niet een punt.
+  Dit geldt ook voor `gewicht` bij een decimaal gewicht (`1,5`).
 - **UTF-8 met BOM**, zodat Excel-NL diakrieten (é, ü) en het
   euroteken correct toont zonder handmatige encoding-keuze bij het
   openen.
@@ -153,4 +183,5 @@ ook leesbaar is voor wie het datamodel niet kent — een consultant die
   Scoreberekening. Deze export implementeert `overall_score`/
   `groepsScores` niet apart.
 - **Bulk-export alleen binnen één organisatie**, in verband met
-  datavermenging. Zie hierboven.
+  datavermenging. Op het globale overzicht werkt dat ook zonder filter,
+  zolang de selectie bij één organisatie hoort. Zie hierboven.

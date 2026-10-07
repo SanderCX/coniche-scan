@@ -116,7 +116,7 @@ strategie vraagt.
 **Centrale vraag:** Is de strategie concreet genoeg, en wordt die actief
 gevolgd, om er keuzes in klantcontact op te baseren?
 
-### 2. Klantcontact visie & strategie
+### 2. Klantcontactvisie & Strategie
 
 De klantcontactstrategie vertaalt de doelen van de organisatie naar
 dienstverlening. Ze legt vast welke rol klantcontact speelt en verwijst
@@ -172,7 +172,7 @@ Van alle bouwstenen volgt deze de verbetercyclus het meest letterlijk.
 **Centrale vraag:** Leiden signalen uit klantcontact aantoonbaar tot
 verbeteringen in de organisatie?
 
-### 5. Financial control
+### 5. Financial Control
 
 Keuzes over capaciteit, kanalen en investeringen vragen inzicht in wat
 klantcontact kost en wat verbeteringen opleveren. Dat begint bij een
@@ -189,7 +189,7 @@ laat zien wat er de komende periode nodig is.
 **Centrale vraag:** Worden keuzes over de inzet van middelen onderbouwd
 met inzicht in kosten en effect?
 
-### 6. Positionering klantcontact
+### 6. Positionering Klantcontact
 
 Klantcontact ziet vaak als eerste wat er misgaat in producten en
 processen. Of daar iets mee gebeurt, hangt af van de positie die

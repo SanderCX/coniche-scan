@@ -5,7 +5,7 @@ Enige bron voor het datamodel.
 - **Deel 1: Gebouwd.** Content, organisatie, respondent, meting, ingevulde
   scan, toegangscode, organisatievelden, en de regels voor verwijderen.
 - **Deel 2: Voorstel.** Rollen, rechten, inlog en audit. Wordt gebouwd
-  samen met de Neon-database; clientside zou het alleen schijnveiligheid
+  samen met de Azure SQL-database; clientside zou het alleen schijnveiligheid
   opleveren.
 
 Termen (Meting, Respondent, Ingevulde scan) staan in CLAUDE.md onder
@@ -29,7 +29,7 @@ Assessment {
   subtitel: string
   beschrijving: string
   doelgroep: string
-  icoon: string                     // sleutel in ASSESSMENT_ICONS (eigen SVG's); valt terug op een letterlijke emoji als er geen SVG bij de sleutel is
+  icoon: string                     // sleutel in ASSESSMENT_ICONS (eigen SVG's, nu target, sparkle en heart, zie stylesheet.md, Assessment-icoon); valt terug op een letterlijke emoji als er geen SVG bij de sleutel is
   geschatteDuur: string             // bijv. "±30 minuten"
   categorieen: Categorie[] | null   // optioneel, zie hieronder
   bouwblokken: Bouwblok[] | null    // gebruikt als categorieen ontbreken
@@ -812,6 +812,9 @@ punt 6b (Respondent-overzicht), loggen elk een eigen gebeurtenis:
 - `respondent.bewerkt`: Alleen welke velden zijn gewijzigd, bijvoorbeeld
   `["naam", "e-mail"]`. De waarden (oud of nieuw) staan niet in de log,
   wegens het verbod op persoonsgegevens uit scans hierboven.
+- `respondent.inzage`: Een AVG-inzage van een Respondent (`export-csv.md`,
+  Inzage (AVG)). `details` bevat het aantal scans in het bestand en de
+  naam van de Organisatie, zonder persoonsgegevens van de Respondent.
 
 Een overgeslagen scan bij een samenvoeging of bulkverplaatsing wordt als
 onderdeel van `details` gelogd en niet als aparte actie.

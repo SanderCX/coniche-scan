@@ -5,8 +5,8 @@ Bewust nog niet opgepakt. Geen prioritering.
 ## Techniek en infrastructuur
 
 - **Database**: Vervanging van localStorage door een gedeelde database.
-  Sander gebruikt nu voorlopig Neon (Postgres). Welke database definitief
-  wordt en waar die draait, stemmen we nog af met IT. Pas daarna werken
+  De tijdelijke Neon-opslag vervalt. De database wordt Azure SQL
+  Database, uitgewerkt in `azure-plan.md`. Pas daarna werken
   links in elke browser en komen antwoorden van respondenten centraal
   binnen.
 - **Rollen, rechten en inlog** (`datamodel.md` deel 2):
@@ -171,7 +171,7 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   exportcode in de respondentpagina's naar `lib/scan-export.ts`, het oude
   prototype naar `archief-prototype/`.
 - Toegankelijkheid: Focusval en focus terug in de modals, zichtbare focus bij
-  toetsenbordnavigatie, een knop "Bekijk >>" in elke klikbare rij.
+  toetsenbordnavigatie, een knop "Bekijk" in elke klikbare rij.
 - Gecommit (checkpoints), zodat teruggezette specs direct te zien zijn.
 
 ### Fase 1: Functioneel afronden
@@ -209,9 +209,9 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   respondent-token: Ze zijn nu zonder autorisatie bereikbaar.
 - **PDF-export op serverless hosting**: `puppeteer` per verzoek is daar
   lastig (zie `go-live-plan.md`).
-- **Schrijfverkeer**: Elke wijziging stuurt de hele blob naar Neon. Op
+- **Schrijfverkeer**: Elke wijziging stuurt de hele blob naar de database. Op
   record-niveau (fase 2) verdwijnt dit vanzelf.
-- **Neon-back-ups** en een herstelprocedure, plus rate limiting per IP-adres
+- **Back-ups van Azure SQL** en een herstelprocedure, plus rate limiting per IP-adres
   op de routes.
 - **Account lockout** na een vast aantal mislukte inlogpogingen, en 2FA waar
   relevant (`go-live-plan.md`, fase 2).
@@ -233,6 +233,31 @@ klanten alleen na deze vier punten.
 - DDoS- en belastingtest om het platformgedrag onder piekbelasting te
   valideren, inclusief rate limiting.
 - Bevindingen verwerken en een hertest op kritieke kwetsbaarheden.
+
+## Openstaand na de changelog (7 oktober 2026)
+
+Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De rest van de changelog is gebouwd en staat in de specs.
+
+**Besloten, nog te bouwen of te verwerken**
+- **Zorgscan-gewichten**: Bouwblok 4, 10 en 11 staan op 2, de spec is leidend
+  (`CLAUDE.md`, Scoringslogica). Sander zet de seed en de opgeslagen data
+  terug op 2.
+- **Content-pagina's** (`beheerpagina.md`, punt 11): Beheerbaar maken is
+  gespecificeerd en de spec is leidend. Sander twijfelt nog over de beste
+  uitvoering. Pas als een nieuw overleg-document in de map staat, wordt er
+  iets mee gedaan.
+
+**Afstemmen met de build (Sander)**
+- **Bulk-CSV**: De build haalt Exporteren van het globale overzicht en het
+  Info-icoon `info.bulkExportOrganisatie` weg. De spec staat het toe binnen
+  één organisatie, ook op het globale overzicht, en schakelt het uit met het
+  Info-icoon bij meerdere organisaties (`export-csv.md`, `beheerpagina.md`
+  punt 7).
+- **Audit-log**: Staat alleen in de browser. Wordt een tabel in de database
+  (`azure-plan.md`).
+- **Sessieduur**: Volgt met de backend (`beheerpagina.md`, Instellingen).
+- **Opruimen voor livegang**: `devAutoLogin`, seed-accounts en de tijdelijke
+  Beheer-link in de footer (`go-live-plan.md`).
 
 ## Content-onderhoud
 

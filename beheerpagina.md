@@ -96,7 +96,7 @@ Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
   scans (de lijsten Respondenten en Ingevulde scans, het
   organisatie-detail en het Meting-overzicht) is de hele rij klikbaar en
   opent het overzicht (modal) van die Respondent of scan. Een rij met
-  een "Bekijk >>" heeft die als compacte knop erbij voor wie het zoekt,
+  een "Bekijk" heeft die als compacte knop erbij voor wie het zoekt,
   met dezelfde werking. Een selectievakje, "Kopieer link" of een
   Meting-label in de rij opent de modal niet maar doet alleen zijn eigen
   werk. Er bestaat geen aparte detailpagina meer per scan.
@@ -148,9 +148,11 @@ Resultaten van de Meting.
 
 - **Gebouwd**: Organisaties (lijst, aanmaken, detail), metingen per
   organisatie, respondenten uitnodigen, Ingevulde scans met filters, Import,
-  Assessments, Content en Gebruikersbeheer (punt 9).
-- **Nog te bouwen**: Audit-log (punt 12) en Data-integriteit (punt 13). De
-  spec is leidend.
+  Assessments, Content, Gebruikersbeheer (punt 9), Instellingen (punt 10),
+  Audit-log (punt 12) en Data-integriteit (punt 13). De audit-log staat nog
+  alleen in de browser, tot de database er is (`azure-plan.md`).
+- **Nog te bouwen**: Content-pagina's (punt 11), na overleg. De spec is
+  leidend.
 
 ---
 
@@ -189,7 +191,8 @@ bereikbaar via de organisatie (punt 4), niet hier.
 - **Lijst**: Naam, e-mail, rol, status (actief/gedeactiveerd), laatst
   ingelogd.
 - **Aanmaken**: Naam, e-mail, rol. De Admin triggert het aanmaken en het
-  systeem genereert het wachtwoord. Een link waarmee de gebruiker zelf een
+  systeem genereert het wachtwoord (12 tekens), dat de Admin eenmalig in
+  beeld krijgt en daarna niet meer kan terugzien. Een link waarmee de gebruiker zelf een
   wachtwoord instelt volgt met de mailserver (`backlog.md`).
 - **Wijzigen**: Naam, e-mail, rol.
 - **Deactiveren, niet verwijderen**: Nooit hard verwijderd
@@ -276,25 +279,32 @@ als bij `wegingToelichting`.
 - **Nieuw Info-icoon**: Elk nieuw Info-icoon krijgt hier een sleutel, een
   plek en een initiële tekst.
 
-Register van de Info-iconen:
+Register van de Info-iconen (overgenomen uit `data/info-teksten.ts`, de
+standaardteksten zoals ze nu in de app staan):
 
-| Sleutel | Plek | Initiële tekst |
+| Sleutel | Plek | Tekst |
 |---|---|---|
-| `info.bewaartermijn` | Organisaties, formulier Bewaartermijn ingevulde scans | Zoals nu in de app |
-| `info.importBestanden` | Import, bij "Bestanden kiezen" | Zoals nu in de app |
-| `info.importRijen` | Import, bij "rijen importeren" | Zoals nu in de app |
-| `info.respondentBewerken` | Respondent-overzicht, bewerkformulier | Zoals nu in de app |
-| `info.algemeneTeksten` | Algemene teksten, bij het tekstveld | Zoals nu in de app |
-| `info.contentIcoon` | Content, veld Icoon | Zoals nu in de app |
-| `info.contentSlotsectie` | Content, Slotsectie voor de PDF-export | Zoals nu in de app |
-| `info.dataIntegriteit` | Applicatie, Data-integriteit, naast "Controleer nu" | "Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen." |
-| `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | "Toegang tot een assessment loopt via een persoonlijke uitnodiging." |
-| `info.bulkExportOrganisatie` | Ingevulde scans, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | "Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie." |
-| `info.exportEenScan` | Ingevulde scans en organisatie-detail, achter de uitgeschakelde opties "Als PDF" en "Voor InDesign (XML)" | "Beschikbaar bij precies één scan." |
+| `info.bewaartermijn` | Applicatie, Instellingen, formulier Bewaartermijn ingevulde scans | Zonder ingestelde bewaartermijn verschijnt hier nooit een scan: Er is geen automatische verwijdering, alleen een melding zodra jij een termijn instelt. |
+| `info.importBestanden` | Import, bij "Bestanden kiezen" | Meerdere bestanden tegelijk mogen: Houd Cmd/Ctrl (of Shift voor een reeks) ingedrukt bij het selecteren, of kies direct een hele map met losse CSV's. Elk bestand mag een ander bronformaat hebben, dat wordt per bestand apart herkend. |
+| `info.importRijen` | Import, bij "rijen importeren" | Rijen met een 95%+-vraagtekstmatch (niet 100%) tellen pas mee na een expliciete goedkeuring per rij, met de knop "Goedkeuren" in de tabel hierboven. |
+| `info.respondentBewerken` | Respondent-overzicht, bewerkformulier | De persoonlijke link blijft ongewijzigd, ook na een nieuw e-mailadres. Een wijziging geldt voor alle scans van deze Respondent. |
+| `info.algemeneTeksten` | Algemene teksten, bij het tekstveld | Staat direct onder de titel op de persoonlijke link van elke respondent/Lead. |
+| `info.contentIcoon` | Content, veld Icoon | Een emoji die op de kaart van dit assessment staat, bijvoorbeeld 🩺. |
+| `info.contentSlotsectie` | Content, Slotsectie voor de PDF-export | Kies de titel en de bron van de slotsectie aan het eind van de PDF uit de vaste lijst. Zonder keuze krijgt de PDF geen slotsectie. |
+| `info.auditLog` | Audit-log, naast de paginatitel | Wie (of het Systeem) wat deed, wanneer en op welk record. Alleen-lezen. Geen persoonsgegevens uit scans. |
+| `info.algemeneTekstenPagina` | Algemene teksten, naast de paginatitel | Teksten los van één Assessment-type. Wijzigingen zijn direct zichtbaar, geen aparte publicatiestap. |
+| `info.algemeneTekstenInfoIconen` | Algemene teksten, naast de kop Info-iconen | Alle toelichtingen achter een Info-icoon, met de plek en de actuele tekst. Aanpassen kan op de plek zelf, met het potlood in het open Info-icoon. |
+| `info.contentToelichting` | Content, veld Toelichting van een bouwblok | Lopende tekst in de Toelichtingsmodal bij dit bouwblok. Een lege regel scheidt de alinea's. Laat je het veld leeg, dan ontbreekt dit onderdeel in de modal. |
+| `info.contentBouwblokLabel` | Content, veld Bouwblok-label | De kleine kop boven de titel in de Toelichtingsmodal, bijvoorbeeld "Bouwsteen" of "AI-domein", gevolgd door het nummer. |
+| `info.conflictOplossen` | Conflict oplossen, naast de titel van de modal | Een Respondent heeft per Meting één scan. Hang één van de twee scans aan een andere Respondent. Alleen die scan gaat mee, de oorspronkelijke Respondent blijft bestaan met de andere scan. |
+| `info.dataIntegriteit` | Applicatie, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
+| `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
+| `info.bulkExportOrganisatie` | Ingevulde scans, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie. |
+| `info.exportEenScan` | Ingevulde scans en organisatie-detail, achter de uitgeschakelde opties "Als PDF" en "Voor InDesign (XML)" | Beschikbaar bij precies één scan. |
 
-Bij "Zoals nu in de app" levert Sander de huidige tekst aan, die wordt dan
-de initiële waarde. Een tekst met een verwijzing naar een document, zoals
-bij Data-integriteit, wordt daarbij herschreven.
+Elk nieuw Info-icoon krijgt hier een regel en een regel in
+`data/info-teksten.ts`. Een standaardtekst bevat geen verwijzing naar een
+document of andere bouwerstekst.
 
 #### 11. Content-pagina's (Visie, Bouwstenen, AI, 2030)
 
@@ -323,7 +333,7 @@ implementatie ervan. Zie Open punten onderaan dit document.
 
 #### 12. Audit-log
 
-**Nieuw, nog niet gebouwd.** `AuditEvent` (`datamodel.md` deel 2,
+**Gebouwd.** `AuditEvent` (`datamodel.md` deel 2,
 Audit) wordt al gelogd: Wie (of "Systeem") wat deed, wanneer, op welk
 record. Er was nergens een scherm om die logging terug te zien.
 Alleen-lezen overzicht, Admin-only (net als de rest van Applicatie):
@@ -337,6 +347,10 @@ Alleen-lezen overzicht, Admin-only (net als de rest van Applicatie):
   Meting in plaats van ID's. ID's staan alleen bij uitklappen en in de
   export. Een verwijderd record toont de naam zoals die was bij het
   loggen; die naam wordt daarom bij het loggen in `details` vastgelegd.
+  De knop "Meer" (`.btn-outline .btn-compact`) staat niet achter de
+  detailtekst, maar in een eigen laatste kolom, rechts uitgelijnd, zodat
+  hij op elke rij op dezelfde plek staat, zoals de "Bekijk"-knoppen bij
+  Organisaties (`stylesheet.md`, Knop in een lijstrij).
 - **Geen persoonsgegevens uit scans**: De log gaat over wat gebruikers
   van de app deden, niet over de inhoud van een scan. Naam, e-mailadres,
   functie, team, notities en antwoorden van een Respondent staan niet in
@@ -493,6 +507,12 @@ niet door in de sector-variant.
 In de Assessment-lijst in beheer: Bij een afgeleid Assessment een
 regel "Afgeleid van: <naam template>", puur informatief.
 
+**Icoon in de Assessment-lijst.** Elke kaart in de lijst toont het icoon van
+het Assessment links van de naam, in dezelfde vormgeving als op de
+publieke kaart (`stylesheet.md`, Assessment-icoon): Een rond vlak in
+`var(--or-faint)` met het icoon in `var(--or)`. De grootte is hier `2rem`.
+Het icoon is dus niet zwart en niet los zonder rondje.
+
 #### 2. Content
 
 Per Assessment: Categorieën met kleur en volgorde, bouwblokken (naam,
@@ -584,9 +604,9 @@ het antwoord daarom zelf kunnen vastleggen.
   ook al vallen ze in de rechtenmatrix allebei onder hetzelfde bereik
   "eigen".
 - **Detail**: Kenmerken (altijd bewerkbaar), "Aangemaakt door" (zie
-  hierboven), de metingen van deze organisatie met "Bekijk >>" naar het
+  hierboven), de metingen van deze organisatie met "Bekijk" naar het
   Meting-overzicht (punt 5), en de respondenten met hun status, elk met
-  alleen "Bekijk >>" dat het Respondent-overzicht opent (punt 6b), en de
+  alleen "Bekijk" dat het Respondent-overzicht opent (punt 6b), en de
   ingevulde scans van de organisatie (punt 7).
   **Lange lijsten**: Respondenten en ingevulde scans tonen op de detailpagina
   maximaal 5 rijen. Zijn het er meer, dan staat onder de lijst een link
@@ -645,7 +665,7 @@ het antwoord daarom zelf kunnen vastleggen.
 - **Acties op een Respondent** (AVG-verzoek, verplaatsen naar een andere
   organisatie, responsen naar een andere Meting, bewerken): Staan in het
   Respondent-overzicht, zie punt 6b. Het organisatie-detail toont de
-  respondenten alleen als lijst met "Bekijk >>".
+  respondenten alleen als lijst met "Bekijk".
 
 #### 5. Metingen
 
@@ -659,7 +679,7 @@ wijzigen zou de al ingevulde antwoorden inconsistent maken met een
 ander scan-type; voor een ander scan-type maak je een nieuwe Meting
 aan.
 
-**Meting-overzicht** (eigen pagina, bereikbaar via "Bekijk >>" bij een
+**Meting-overzicht** (eigen pagina, bereikbaar via "Bekijk" bij een
 Meting in het organisatie-detail en via het Meting-label in de lijst
 Respondenten, punt 6b): Alles binnen één Meting op één plek. Een eigen
 pagina en geen modal, omdat er een lijst op staat die op zijn beurt het
@@ -670,7 +690,7 @@ alle Metingen, een Consultant die van zijn eigen organisaties.
 - **Kop**: Label, Assessment, de organisatie (met link terug naar het
   organisatie-detail) en voortgang ("x van y afgerond").
 - **Respondenten in deze Meting**: Lijst met Naam, Status, Voortgang en
-  de persoonlijke link ("Kopieer link", "Openen"), elk met "Bekijk >>"
+  de persoonlijke link ("Kopieer link", "Openen"), elk met "Bekijk"
   naar het Respondent-overzicht (punt 6b). Hier staat ook "Respondent
   uitnodigen" (punt 6).
 - **Resultaten**: De link "Naar resultaten →" (Organisatie-resultaten,
@@ -712,7 +732,13 @@ Meting toegekend (`RespondentRolMeting`, `datamodel.md` deel 2), met
 minstens 1 verplicht.
 
 - **Lead toevoegen** (nieuwe actie op organisatieniveau, niet per
-  Meting): Naam + e-mailadres invoeren, plus een **verplichte keuze
+  Meting): Een oranje knop "+ Lead toevoegen" (`.btn-or .btn-compact`,
+  zoals de andere +-knoppen, bijv. "+ Meting plannen"), geen
+  tekstlink en geen uitklapbox met driehoekje. De knop staat in het
+  blok Respondenten van het organisatie-detail, direct onder de lijst
+  met Respondenten, links uitgelijnd. Pas na een klik op de knop klapt
+  het formulier eronder open: Naam +
+  e-mailadres invoeren, plus een **verplichte keuze
   van 1 of meer Metingen** van deze organisatie waar de Lead toegang
   toe krijgt. Maakt een `Respondent` met Lead-rol aan, met meteen een
   werkende persoonlijke link/toegangscode, zonder `ScanInvulling`. Net
@@ -820,7 +846,7 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   e-mailadres. Zelfde patroon als bij Ingevulde scans (punt 7). Voor een
   Consultant bevat de Organisatie-keuze alleen zijn eigen organisaties.
 - **Overzicht (modal)**: Opent door op een rij te klikken. Eén modal,
-  die ook opent via "Bekijk >>" bij een Respondent in het
+  die ook opent via "Bekijk" bij een Respondent in het
   organisatie-detail (punt 4) en bij een Respondent in een Meting. Er is
   dus één overzicht met meerdere ingangen. Navigatie, sluiten en wat er na
   een actie gebeurt staan bij Navigatie in beheer. De vormgeving staat in
@@ -861,10 +887,12 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
 - **AVG-verzoek verwerken** (Admin: alle organisaties, Consultant:
   eigen): Actie in het blok "Hele Respondent" van het
   Respondent-overzicht. Twee opties:
-  - **Inzage**: Exporteert alle data van deze respondent —
+  - **Inzage**: Downloadt een CSV met alle data van deze respondent:
     persoonsgegevens (naam, e-mail, functie, team, notities) en zijn
-    scanresultaten (antwoorden per ingevulde scan). Bestandsformaat aan
-    Sander (bijv. CSV of PDF), inhoud staat hier vast.
+    scanresultaten (antwoorden per ingevulde scan). Kolommen,
+    bestandsnaam en regels staan in `export-csv.md`, Inzage (AVG).
+    De actie is een gewone knop en vraagt geen bevestiging, omdat ze
+    niets wijzigt.
   - **Verwijdering**: Hergebruikt de bestaande verwijderactie op de
     respondent (Verwijderen hieronder), geen nieuwe verwijderlogica.
   Beide acties worden gelogd (`datamodel.md` deel 2, Audit) — dat is
@@ -1054,7 +1082,7 @@ van organisaties waar hij geen eigenaar of toegewezen Consultant van is,
 ook niet hier op het globale overzicht.
 
 - **Kolommen**: Naam, Organisatie, Meting, Assessment, Rol/Team, Status,
-  Voortgang, Gestart, en "Bekijk >>" als compacte knop. De hele rij is
+  Voortgang, Gestart, en "Bekijk" als compacte knop. De hele rij is
   klikbaar en opent het Scan-overzicht (hieronder). Rol/Team toont alleen
   wat er is: Is de rol leeg, dan staat er alleen het team, is het team
   leeg alleen de rol, en zijn ze allebei leeg dan blijft de cel leeg.
@@ -1094,11 +1122,16 @@ ook niet hier op het globale overzicht.
 - **Export**: Eén gedeelde exportfunctie voor dit overzicht (meerdere
   scans) en de resultatenpagina (één scan), zie `export-csv.md` voor de
   exacte kolommen. **Bulk-CSV (meerdere scans in één export) alleen
-  vanaf de organisatie-gefilterde versie van dit overzicht (punt 4,
-  organisatie-detailpagina), niet hier op het globale overzicht over
-  alle organisaties heen** — in verband met datavermenging, zie
-  `export-csv.md`. Hier op het globale overzicht blijft dus alleen
-  losse export per scan mogelijk. PDF en de InDesign-export (XML) zijn
+  binnen één organisatie**, in verband met datavermenging, zie
+  `export-csv.md`. Dat geldt op het globale overzicht en op de
+  organisatie-gefilterde versie (punt 4, organisatie-detailpagina). Horen
+  alle geselecteerde scans bij dezelfde organisatie, dan werkt
+  "Exporteren" ook op het globale overzicht, zonder eerst te filteren.
+  Bevat de selectie scans van meer dan één organisatie, dan is
+  "Exporteren" uitgeschakeld, met een Info-icoon ernaast
+  (`info.bulkExportOrganisatie`, register in punt 2a). Een selectie
+  binnen één organisatie blijft dus toegestaan, ook als het overzicht niet
+  op die organisatie is gefilterd. PDF en de InDesign-export (XML) zijn
   sowieso alleen beschikbaar bij precies één scan (hier, org-gefilterd,
   of op de resultatenpagina), zie
   `export-pdf-visual-volwassenheidsscan.md`, Export van één scan, geen

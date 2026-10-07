@@ -12,11 +12,15 @@ Eigenaren zijn een eerste voorstel op basis van de taakverdeling tot nu toe.
 infrastructuur. Streefdata staan er bewust niet in, die volgen na de
 besluiten in fase 0.
 
+De stappen voor de Azure-omgeving (Azure DevOps, Azure SQL, het domein
+`coniche-scan.nl`) staan uitgewerkt in `azure-plan.md`. Dat document vult
+deze lijst aan. Deze checklist blijft leidend voor volgorde en go/no-go.
+
 ## Waar we staan
 
 Functioneel is het prototype bijna klaar, maar de data staat nog in de
-localStorage van de browser, met een Neon-database bij Sander als
-tijdelijke serveropslag. Een persoonlijke link werkt daardoor alleen
+localStorage van de browser, met een tijdelijke serveropslag bij Sander die
+vervalt zodra Azure SQL er is (`azure-plan.md`). Een persoonlijke link werkt daardoor alleen
 op de plek waar de data staat (`CLAUDE.md`, Status). Database en backend
 zijn dus de kritieke route. Inloggen, e-mail, import, export en de
 privacy-afspraken hangen er allemaal aan.
@@ -62,14 +66,16 @@ verandert.
   (3) liggen al vast in `datamodel.md`.
 - [ ] **Afwijking Toegangscode (Sander).** Nu een veld op `Respondent`,
   volgens het datamodel een aparte tabel. Beslissen vóórdat het schema in
-  Postgres wordt vastgelegd, want daarna is het lastig om te wijzigen
+  de database wordt vastgelegd, want daarna is het lastig om te wijzigen
   (`datamodel.md`).
 - [ ] **Keuze auth-framework (Sander).** Bestaand framework of zelf
   bouwen (`datamodel.md`, Open punt 4). Aanrader is een bestaand
   framework voor wachtwoorden, sessies en 2FA (aanvulling).
-- [ ] **Hostingkeuze en domein (Sander).** Waar frontend en API draaien,
-  op welk domein (bijvoorbeeld onder `app.coniche.nl`), EU-regio voor alle
-  onderdelen. De app is een Next.js-applicatie met echte paden,
+- [ ] **Hostingkeuze, database en domein (Sander).** Waar frontend en API
+  draaien, welke database, en op welk domein, met een EU-regio voor alle
+  onderdelen. Het voorstel in `azure-plan.md` is Azure (West Europe) met
+  Azure SQL Database en het domein `coniche-scan.nl`. Die keuze staat nog
+  open met IT (`backlog.md`). De app is een Next.js-applicatie met echte paden,
   zoals persoonlijke links als `/s/<code>`. Het oude prototype met een eigen
   server en hash-routes staat in `archief-prototype/` en telt niet meer mee.
   Wel vast te leggen is welk hostingplatform de Next.js-app draait en dat
@@ -83,8 +89,10 @@ verandert.
 
 ## Fase 1: Database en backend
 
-- [ ] Neon-project aanmaken in een EU-regio, met aparte omgevingen voor
-  test en productie (`backlog.md`, Techniek en infrastructuur).
+- [ ] Database aanmaken in een EU-regio, met aparte omgevingen voor
+  test en productie (`backlog.md`, Techniek en infrastructuur). De huidige
+  tijdelijke opslag vervalt. Het doel is Azure SQL Database
+  (`azure-plan.md`).
 - [ ] Schema opzetten vanuit `datamodel.md` deel 1: Assessment, Categorie,
   Bouwblok, Vraag, Organisatie, Respondent, Meting, ScanInvulling,
   Toegangscode, organisatievelden.
@@ -106,7 +114,7 @@ verandert.
   Scoreberekening).
 - [ ] Database-migraties onder versiebeheer, zodat test en productie
   hetzelfde schema krijgen (aanvulling).
-- [ ] Back-ups en herstel: Point-in-time herstel in Neon controleren en
+- [ ] Back-ups en herstel: Point-in-time herstel in de gekozen database controleren en
   één keer daadwerkelijk een herstel uitproberen (aanvulling).
 - [ ] Geheimen (databasewachtwoord, mailgegevens, sleutels) buiten de
   repo houden en per omgeving instellen (aanvulling).
@@ -190,7 +198,7 @@ verandert.
   in `beheerpagina.md` onder "Nog te bouwen".
 - [ ] Export bouwen of bevestigen: PDF (`export-pdf-visual-*.md`), CSV
   (`export-csv.md`) en InDesign-XML (`export-indesign.md`). Bulk-CSV
-  alleen vanaf de organisatie-gefilterde lijst.
+  alleen binnen één organisatie, ook op het globale overzicht.
 - [ ] Beheer van assessment-types, content en organisatievelden
   (`beheerpagina.md`, punt 1 tot en met 3). Beslissen of dat voor de
   livegang nodig is of dat content voorlopig via een bestand en een
@@ -213,7 +221,7 @@ verandert.
   Open).
 - [ ] Respondentenlijst met overzicht (modal) bouwen (`beheerpagina.md`,
   punt 6b): Alle acties op een Respondent staan daar, het
-  organisatie-detail toont alleen "Bekijk >>". Eén modal met meerdere
+  organisatie-detail toont alleen "Bekijk". Eén modal met meerdere
   ingangen. Doe dit samen met de verplaatsfuncties hieronder, zodat die
   niet eerst in het organisatie-detail worden gebouwd.
 - [ ] Scan-overzicht (modal) bouwen (`beheerpagina.md`, punt 7 en
@@ -224,7 +232,7 @@ verandert.
   persoonlijke link verdwijnt uit de interface.
 - [ ] Meting-overzicht bouwen (`beheerpagina.md`, punt 5): Eigen pagina
   per Meting met kop, respondenten, resultaten, Leads en acties, met
-  "Bekijk >>" vanuit het organisatie-detail en een klikbaar Meting-label
+  "Bekijk" vanuit het organisatie-detail en een klikbaar Meting-label
   in de lijst Respondenten.
 - [ ] Verplaatsfunctie voor respondenten en losse responsen
   (`beheerpagina.md`, punt 6b). Dit is het herstelmiddel als de
@@ -258,6 +266,10 @@ verandert.
 - [ ] **Opruimen voor productie** (`backlog.md`, Voor productie):
   - [ ] Testknop (vragenlijst automatisch invullen) verwijderen
   - [ ] Seed-data met testorganisatie en testrespondent verwijderen
+  - [ ] De dev-autologin in beheer (`devAutoLogin`) en de seed-accounts met
+    bekende wachtwoorden verwijderen (aanvulling)
+  - [ ] De tijdelijke link naar Beheer in de footer verwijderen, want die
+    strijdt met `stylesheet.md` (aanvulling)
   - [ ] Besluiten of de controlefunctie Data-integriteit in productie
     blijft (`beheerpagina.md`, punt 13)
   - [ ] Hardcoded accounts, zoals `admin@coniche.nl`, en preview- of
@@ -395,7 +407,7 @@ Kan parallel aan de bouw. De doorlooptijd hangt van anderen af.
 - [ ] Verwerkersovereenkomst tussen Coniche en de klantorganisaties, omdat
   Coniche verwerkt namens de klant (`privacy-pagina.md`, Open punten).
   Nagaan bij welke bestaande klanten die al is afgesloten.
-- [ ] Verwerkersovereenkomsten met de eigen leveranciers (Neon, hosting,
+- [ ] Verwerkersovereenkomsten met de eigen leveranciers (Microsoft voor Azure, hosting,
   mailprovider) en hun namen in de privacypagina opnemen (aanvulling).
 - [ ] Bewaartermijn vaststellen en de melding voor data-ouderdom
   bouwen of bewust uitstellen. Dit bepaalt ook hoe lang de gemigreerde

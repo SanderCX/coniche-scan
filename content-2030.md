@@ -1,18 +1,5 @@
 # Klantcontact richting 2030
 
-**Status: Concept.** Losstaand duidingsstuk, bereikbaar vanaf "Mijn
-metingen" (CLAUDE.md sectie 3). Bron: het interne Coniche-rapport "AI in
-klantcontact 2030" (juni 2026, vertrouwelijk), hier herschreven tot een
-zelfstandig leesbaar stuk voor respondenten, aangevuld met cijfers uit een
-presentatie van Digital Conversation (september 2026, bronnen: Stanford
-HAI/Human-Centered Artificial Intelligence, McKinsey & Company, Deloitte,
-Gartner). Staat los van de scanresultaten: Dit gaat over de markt, niet
-over de score van de eigen organisatie.
-
----
-
-## Geen vast eindbeeld
-
 Waar klantcontact naartoe gaat richting 2030 ligt niet vast. Organisaties
 bewegen niet dezelfde kant op: De ene zet vooral in op verdere
 digitalisering, de andere kiest bewust voor meer menselijk contact. Dat

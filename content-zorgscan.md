@@ -2,20 +2,16 @@
 
 Vragen en tags voor het `Assessment`-object "Klantcontact Volwassenheid –
 Zorg" (`id: "zorgscan"`, `kortLabel: "Volwassenheidsscan Zorg"`, `icoon:
-"heart"` — hartje-outline in dezelfde SVG-lijnstijl als "target"
-(Klantcontact Volwassenheid) en "sparkle" (AI-volwassenheid),
-`components/icons/AssessmentIcons.tsx`. **Afwijking van een eerdere
-versie van dit document**: Die noemde een stethoscoop-emoji ("🩺"),
-gekozen door Joost boven een hartje-outline; Sander heeft dat nadien
-alsnog teruggedraaid naar de hartje-outline, in lijn met de twee
-bestaande scan-iconen. Zie `export-pdf-visual-zorgscan.md`
+"🩺"` — stethoscoop, gekozen door Joost boven een hartje-outline, zie
+`datamodel.md`, `Assessment.icoon`; zie `export-pdf-visual-zorgscan.md`
 voor de PDF-bestandsnaam die daaruit volgt): 15 bouwblokken, 5
 categorieën, 60 vragen op de 1–5-schaal uit `datamodel.md`. Sector-variant
 van "Klantcontact Volwassenheid" (`afgeleidVanAssessmentId:
 "klantcontact-volwassenheid"`, zie `datamodel.md`, Sector-varianten): Zelfde
-structuur, bouwblokken, categorieën, volgorde en gewichten als het
-template, met vraagteksten die bedoeld zijn als herschreven naar
-patiënt-/cliëntcontact en naar medische/niet-medische contactredenen.
+structuur, bouwblokken, categorieën en volgorde als het template, met
+twee verschillen: De vraagteksten zijn herschreven naar patiënt-/
+cliëntcontact en naar medische/niet-medische contactredenen, en drie
+bouwblokken hebben een zwaarder gewicht (zie Weging hieronder).
 
 **Bron**: Joost, aangeleverd als PDF-export ("Volwassenheidsmodel
 Klantcontact – Resultaten") en CSV-export van een proefinvulling voor een
@@ -29,22 +25,8 @@ In de brontekst van Joost stond de expliciete notitie "LET OP: Terminologie
 in toelichtingenbalkje bovenaan de pagina nog wel aanpassen op zorg(taal)"
 — die sectorvertaling van de intro-/toelichtingteksten (en van de
 overlay-toelichting die een respondent opent via het icoon naast de titel)
-is dus bewust nog niet gemaakt.
-
-**Afwijking, ontdekt bij het doorlichten van alle specs (30-9-2026): de
-vraagteksten zijn NIET allemaal herschreven**, in tegenstelling tot wat
-hier en in `data/zorgscan-assessment.ts` eerder stond. Een letterlijke
-vergelijking met `data/klantcontact-assessment.ts` laat zien dat **29 van
-de 60 vragen woordelijk identiek zijn** aan het Klantcontact-template,
-dus generieke klantcontact-taal in plaats van patiënt-/cliëntcontact.
-Twee bouwblokken zijn zelfs voor geen enkele vraag herschreven: "Cultuur"
-(bouwblok 15, 4/4 identiek) en "Systemen & Tools" (bouwblok 7, 4/4
-identiek); de overige 21 overlappen komen verspreid voor in de andere 13
-bouwblokken. **Met Sander/Joost te bespreken**: Welke vragen dat precies
-zijn, is niet in dit document uitgeschreven (vraagt een woord-voor-woord
-her-controle van alle 60 tegen het template) — dit is dus geen
-uitputtende lijst, alleen een bevestigde constatering dat de eerdere
-"alle 60 zijn af"-status niet klopte.
+is dus bewust nog niet gemaakt, alleen de 60 vraagteksten zijn af en
+overgenomen.
 
 **Tijdelijk, tot die sectorvertaling er is**: De toelichting-overlay en de
 PDF-export tonen per bouwblok wél de volledige rijke content (eyebrow,
@@ -54,6 +36,33 @@ tekst als bij de Klantcontact Volwassenheidsscan, gematcht op
 hergebruik-stap ontbrak die content voor de Zorgscan volledig. Zodra er
 een zorg-versie van `visie-coniche.md` deel 2 komt, vervangt die dit
 hergebruik.
+
+**Weging.** Drie bouwblokken tellen in deze scan dubbel mee in de
+categoriescore en in de overall-score (`Bouwblok.gewicht = 2`, zie
+`datamodel.md`, Bouwblok en Scoreberekening). De nummers zijn de
+`volgnummer`s van de bouwblokken:
+
+- 4 Leren uit Klantcontact
+- 10 Kanaalmanagement
+- 11 Performance Management
+
+Alle andere bouwblokken hebben gewicht `1`. De Zorgscan was een beta; als
+een gewicht later verandert (bijvoorbeeld naar 1,3), dan rekent dat in
+één keer door in alle ingevulde scans, zie `datamodel.md`. De oude tool
+paste deze weging niet toe: Bij geïmporteerde Zorgscans staat daar overal
+gewicht 1, zie `import-scans.md`.
+
+De wegingskaart bij aanvang van de scan (CLAUDE.md, sectie 3) gebruikt
+voor deze scan de volgende tekst (`Assessment.wegingTitel` en
+`wegingToelichting`):
+
+- Titel: "Gewogen scoring voor de zorgsector"
+- Tekst: "Binnen dit assessment wegen niet alle bouwblokken even zwaar mee
+  in de totaalscore. Vanuit zorginhoudelijk perspectief zijn drie
+  bouwblokken extra bepalend voor kwaliteit, veiligheid en
+  schaalbaarheid van klant- en patiëntcontact:" gevolgd door de lijst met
+  bouwblokken en hun factor (de lijst volgt uit de gewichten, niet uit
+  deze tekst).
 
 ### Overkoepelend (oranje)
 
