@@ -157,7 +157,9 @@ Resultaten van de Meting.
 - **Nog te bouwen**: Organisatievelden (punt 3): De editor
   `VeldDefinitieEditor` staat klaar, maar geen pagina gebruikt hem. En
   Content-pagina's (punt 11), na overleg. De spec is leidend. Verder de
-  Benchmark (punt 14, `benchmark.md`), besproken en nog niet gebouwd.
+  Benchmark (punt 14, `benchmark.md`): Het niveau tussen organisaties is
+  gebouwd (PR 61). De niveaus binnen een organisatie en binnen een Meting zijn
+  besproken en nog niet gebouwd.
 
 ---
 
@@ -836,7 +838,7 @@ geen vragenlijst. Krijgt de Lead later alsnog een `ScanInvulling` (via
 item in dezelfde lijst, met de bestaande status-routing
 (uitgenodigd/bezig/afgerond).
 
-**Benchmarkview voor een Lead**: Heeft een Admin een benchmarkview aan de
+**Benchmarkview voor een Lead** (niveau 1): Heeft een Admin een benchmarkview aan de
 Lead toegewezen (punt 14), dan staat die op "Mijn metingen" naast de
 resultaten van zijn Metingen. Wat hij ziet en wanneer, staat in
 `benchmark.md`, Toewijzen aan een Lead.
@@ -1237,27 +1239,50 @@ Vierde hoofdlink in `.nav-right`, alleen zichtbaar voor een Admin
 ziet de link niet. Het gedrag staat in `benchmark.md`, de records in
 `datamodel.md` deel 3. Hier staan de schermen.
 
+Alle drie de niveaus staan op deze plek (`benchmark.md`, Wat het is). De
+schermen hieronder zijn gebouwd voor niveau 1 (tussen organisaties). Wat voor
+niveau 2 en 3 anders is, staat onder Niveau 2 en 3 aan het eind van dit punt
+en is voorstel.
+
 - **Lijst**: Alle benchmarks, per rij de naam, de Assessments, per
   Assessment het aantal organisaties als "X van Y" (`benchmark.md`, Teller)
-  en wanneer de benchmark is aangemaakt. Boven de lijst een oranje knop
+  en wanneer de benchmark is aangemaakt. Voorstel: Een kolom Niveau, zodra
+  er meer dan één niveau bestaat. Boven de lijst een oranje knop
   "+ Benchmark aanmaken" (`.btn-or .btn-compact`).
 - **Aanmaken en wijzigen**: Eerst de Assessments, daarna de organisaties
   met het optionele sectorfilter, en per organisatie de Meting per
   Assessment in dezelfde lijst (`benchmark.md`, Samenstellen). De Admin
   geeft de benchmark een naam. Wijzigen van de samenstelling kan altijd.
+  Organisaties met de vlag die niet in de lijst staan, komen onder de lijst
+  met de reden. De knop "Benchmark aanmaken" is uitgeschakeld tot de benchmark een naam,
+  een Assessment en een organisatie heeft, met de reden in
+  `info.benchmarkAanmaken`. Voorstel: Eerst een keuze voor het niveau.
 - **Detail**: Kruimelpad Benchmark › {naam}. Per Assessment een sectie met
   de teller "X van Y organisaties", de gemiddelden van de groep en per
   organisatie het aantal afgeronde scans. De Admin ziet hier de namen van
   de organisaties, ook van de organisaties die in een Assessment
-  ontbreken (`benchmark.md`, Weergave voor de Admin).
+  ontbreken (`benchmark.md`, Weergave voor de Admin). Is een lid
+  automatisch weggevallen, dan staat boven het detail een melding
+  (`Benchmark.meldingen`) die de Admin kan wegklikken. Onder de cijfers
+  staat de peildatum.
 - **View per organisatie**: Vanuit het detail opent de Admin voor elke
   deelnemende organisatie een view met die organisatie tegenover de rest
-  van de groep (`benchmark.md`, View per organisatie).
+  van de groep (`benchmark.md`, View per organisatie). Het groepsgemiddelde
+  staat in het staafdiagram als tweede, neutrale balk.
 - **Toewijzen**: Op de view van een organisatie kiest de Admin een
   bestaande Lead van die organisatie. Intrekken kan ook
   (`benchmark.md`, Toewijzen aan een Lead).
 - **Verwijderen**: Met een bevestiging die noemt hoeveel toewijzingen
   meegaan.
+
+**Niveau 2 en 3 (voorstel).** Niveau 2 gebruikt dezelfde schermen met een
+andere keuzelijst: Eerst één organisatie, dan de Metingen daarvan (minstens
+twee per Assessment, zonder vlag), en de view per Meting naast het gemiddelde
+van de overige Metingen, met de namen van de Metingen. Niveau 3 is een view
+op één Meting: De scan van een Respondent naast het gemiddelde van de andere
+scans in die Meting. De spreiding en de hoge en lage scores zijn nog niet
+ontworpen (`benchmark.md`, Niveau 3). Beide niveaus zijn voorlopig alleen
+voor een Admin.
 
 ---
 
