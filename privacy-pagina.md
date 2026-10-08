@@ -60,17 +60,42 @@ beheeraccount.
 - De scan zelf laten werken (toegang via de link, tonen van resultaten).
 - Resultaten en advies terugkoppelen aan de organisatie.
 - Intern bij Coniche: Analyse en advies aan de klant.
+- Geaggregeerd en anoniem in een benchmark, voor organisaties die daarmee
+  hebben ingestemd (sectie 3a).
 
 Expliciet niet: Individuele antwoorden herleiden naar een persoon
 buiten het doel van de scan, of gebruiken voor iets anders dan waarvoor
 de organisatie de scan heeft laten uitzetten.
+
+### 3a. Benchmark
+
+Voor organisaties die daarmee hebben ingestemd, kunnen de resultaten van
+een scan geaggregeerd en anoniem in een benchmark worden gebruikt
+(`benchmark.md`). Feitelijk geldt daarbij het volgende.
+
+- Alleen gemiddelden per organisatie komen in een benchmark. Antwoorden
+  van individuele respondenten verlaten hun organisatie niet.
+- Een organisatie wordt nooit met naam getoond aan een andere organisatie.
+- Een Lead ziet een vergelijking met anderen alleen bij een minimale
+  groepsgrootte (`benchmarkMinOrganisaties`, `beheerpagina.md`, punt 10).
+  Deze sectie noemt dezelfde waarde.
+- Een organisatie doet alleen mee nadat een Admin dat heeft vastgelegd
+  (`Organisatie.benchmarkToegestaan`, `datamodel.md` deel 3).
+- Verwijdert Coniche een scan, dan verdwijnt die ook uit de benchmark,
+  omdat de cijfers altijd uit de actuele gegevens worden berekend.
+
+Placeholder: De formulering van de disclaimer. Uitgangspunt is de tekst van
+Vlirdens, waarin deelname betekent dat geaggregeerde en anonieme gegevens
+in een benchmark mogen komen. Juridische toetsing volgt.
 
 ### 4. Toestemming
 
 Verwijst naar het toestemmingsvakje op scherm 4: "Ik geef toestemming
 om mijn antwoorden (en eventueel ingevulde contactgegevens) te delen
 met Coniche voor analyse en advies." Die tekst en deze pagina moeten
-inhoudelijk hetzelfde blijven zeggen.
+inhoudelijk hetzelfde blijven zeggen. De tekst van het vakje wordt
+uitgebreid voor de benchmark (sectie 3a), en ook dan moeten vakje en pagina
+hetzelfde zeggen.
 
 ### 5. Bewaartermijn
 
@@ -85,7 +110,9 @@ concrete termijn noemen.
 - Coniche-beheerders: Organisaties en respondenten die zij zelf
   beheren, of, met de rol Admin, alles (`datamodel.md` deel 2).
 - Een Lead (zodra gebouwd): Resultaten van de eigen organisatie
-  (`datamodel.md` deel 2).
+  (`datamodel.md` deel 2), en een vergelijking met de anonieme
+  gemiddelden van andere organisaties als een Admin die heeft toegewezen
+  (`benchmark.md`).
 - Geen derden, behalve waar dat nodig is voor de techniek zelf
   (hosting, e-mailverzending).
 
@@ -120,3 +147,5 @@ gebruikt buiten wat technisch noodzakelijk is voor de sessie.
   staat vast (`datamodel.md` deel 2, Bewaartermijn ingevulde scans;
   `beheerpagina.md`, punt 4), de waarde van `bewaarTermijnDagen` zelf
   nog niet.
+- De formulering van de benchmark-disclaimer (sectie 3a) en van het
+  toestemmingsvakje (sectie 4).

@@ -7,6 +7,8 @@ Enige bron voor het datamodel.
 - **Deel 2: Voorstel.** Rollen, rechten, inlog en audit. Wordt gebouwd
   samen met de Azure SQL-database; clientside zou het alleen schijnveiligheid
   opleveren.
+- **Deel 3: Voorstel.** Benchmark. Het gedrag staat in `benchmark.md`, hier
+  alleen de records en de uitbreiding op Organisatie.
 
 Termen (Meting, Respondent, Ingevulde scan) staan in CLAUDE.md onder
 Terminologie.
@@ -381,6 +383,13 @@ verwijst wat niet meer bestaat.
   toegangscodes, invullingen, antwoorden en opmerkingen. Het
   assessment-type en de content blijven staan.
 
+Een benchmark (deel 3) verwijst naar organisaties, metingen en Leads.
+Verdwijnt een van die records, dan verdwijnt ook de verwijzing. Een Meting
+weg haalt het lid uit de benchmark. Een Organisatie weg haalt haar leden en
+toewijzingen weg. Een Respondent met Lead-rol weg haalt zijn toewijzingen
+weg. Een verwijderde ingevulde scan haalt geen lid weg maar verandert wel
+de cijfers. De benchmark zelf blijft bestaan.
+
 ### Content bewerken
 
 Een vraag of bouwblok waar al antwoorden aan hangen, wordt niet
@@ -515,6 +524,9 @@ resultaten van elke Meting waar hij aan gekoppeld is, zodra daar
 minstens 1 scan binnen is afgerond, geen hoger minimum. Zelfde
 aggregatieweergave (gemiddelde per Meting) als de organisatie-resultaten
 in beheer, zie `beheerpagina.md`, Organisatie-resultaten.
+
+Daarnaast ziet een Lead de benchmarkviews die een Admin aan hem heeft
+toegewezen (`BenchmarkToewijzing`, deel 3).
 
 ---
 
@@ -659,7 +671,7 @@ Permissie {
 RolPermissie {
   rolId: string
   permissieId: string
-  bereik: "alle" | "eigen" | "toegewezen metingen" | "zelf"
+  bereik: "alle" | "eigen" | "toegewezen metingen" | "toegewezen benchmarkviews" | "zelf"
 }
 
 GebruikerRol {
@@ -689,6 +701,8 @@ Betekenis van `bereik`:
   toegang van/tot organisaties hierboven.
 - `toegewezen metingen`: Alleen de Metingen die via `RespondentRolMeting`
   expliciet aan deze Lead zijn gekoppeld (Lead).
+- `toegewezen benchmarkviews`: Alleen de views die een Admin via
+  `BenchmarkToewijzing` aan deze Lead heeft gekoppeld (Lead, deel 3).
 - `zelf`: Alleen de eigen ingevulde scans (respondent).
 
 Een respondent zonder RespondentRol is een gewone respondent.
@@ -829,6 +843,18 @@ naam en het volgnummer van het bouwblok, de naam van het Assessment, het
 oude en het nieuwe gewicht en het aantal scans dat daardoor anders
 doorrekent.
 
+**Benchmark.** De acties rond een benchmark (deel 3) loggen elk een
+gebeurtenis, zonder persoonsgegevens uit scans.
+
+- `benchmark.aangemaakt`, `benchmark.gewijzigd` en `benchmark.verwijderd`.
+  `details` bevat de naam van de benchmark en de namen van de Assessments
+  en organisaties zoals ze op dat moment waren.
+- `benchmark.toegewezen` en `benchmark.toewijzingIngetrokken`. `details`
+  bevat de benchmark en de organisatie, zonder naam of e-mailadres van de
+  Lead.
+- `organisatie.benchmarkVlagGewijzigd`. `details` bevat de naam van de
+  organisatie en de nieuwe stand van de vlag.
+
 **Bewaartermijn.** De bewaartermijn van ingevulde scans
 (`bewaarTermijnDagen`, zie Bewaartermijn ingevulde scans hierboven)
 geldt ook voor `AuditEvent`, gerekend vanaf `tijdstip`. Een afwijkende
@@ -861,6 +887,8 @@ Een streepje betekent geen toegang.
 | `scan.invullen` | - | - | zelf | zelf |
 | `resultaten.inzien` | alle | eigen | toegewezen metingen | zelf |
 | `export.uitvoeren` | alle | eigen | zelf, of toegewezen Metingen | zelf |
+| `benchmark.beheren` | alle | - | - | - |
+| `benchmark.inzien` | alle | - | toegewezen benchmarkviews | - |
 
 Een Lead die zelf invult, doet dat met het bereik `zelf`, net als elke
 respondent.
@@ -884,9 +912,76 @@ metingen en respondenten, niet de scaninhoud zelf.
 
 ---
 
+`benchmark.beheren` is Admin-only, zoals `content.beheren`. Een benchmark
+rekent over organisaties die een Consultant niet beheert, dus het bereik
+`eigen` past er niet bij. Een Consultant heeft er vooralsnog geen toegang
+toe. `benchmark.inzien` geldt voor een Lead alleen voor de views die een
+Admin aan hem heeft toegewezen (deel 3 en `benchmark.md`).
+
+---
+
 ### 6. Open punten
 
 1. Eén gedeelde Rol-tabel (zoals hier) of aparte tabellen voor beheer en
    organisatie.
 2. De cellen "te bevestigen" in de rechtenmatrix.
 3. Bestaand auth-framework of zelf bouwen (keuze voor de bouwer).
+
+---
+
+## Deel 3: Benchmark (voorstel)
+
+**Status: Voorstel.** Een benchmark zet de scores van een zelf gekozen
+groep organisaties naast elkaar. Het gedrag staat in `benchmark.md`, de
+schermen in `beheerpagina.md`, punt 14. Hier staan de records, de
+uitbreiding op Organisatie en de instellingen.
+
+Scores worden ook hier berekend en nooit opgeslagen (Scoreberekening in
+deel 1). Een benchmark slaat alleen de samenstelling op, dus welke
+organisaties met welke Meting meedoen.
+
+### Benchmark
+
+```
+Benchmark {
+  id: string
+  naam: string                      // vrije tekst, bepaalt de Admin
+  assessmentIds: string[]           // één of meer
+  leden: BenchmarkLid[]
+  aangemaaktOp: datetime
+  aangemaaktDoor: string            // Gebruiker
+}
+
+BenchmarkLid {
+  organisatieId: string
+  assessmentId: string              // een van assessmentIds
+  metingId: string                  // een Meting van deze organisatie en dit Assessment
+}
+
+BenchmarkToewijzing {
+  id: string
+  benchmarkId: string
+  organisatieId: string             // de organisatie waarvan de view is
+  respondentId: string              // de Lead
+  toegewezenDoor: string            // Admin
+  toegewezenOp: datetime
+}
+```
+
+Per benchmark heeft een organisatie per Assessment hoogstens één lid. Een
+toewijzing is uniek per combinatie van benchmark, organisatie en Lead. Het
+sectorfilter bij het samenstellen wordt niet opgeslagen.
+
+### Uitbreiding op Organisatie
+
+`Organisatie` krijgt `benchmarkToegestaan` (boolean, standaard false). Een
+Admin zet de vlag nadat dit met de organisatie is afgesproken. Alleen
+organisaties met de vlag kunnen in een benchmark worden opgenomen. Zie
+`benchmark.md`, Toestemming en privacy.
+
+### Instellingen
+
+Twee globale instellingen, door een Admin te bepalen in beheer
+(`beheerpagina.md`, punt 10), namelijk `benchmarkMinOrganisaties`
+(startwaarde 5) en `benchmarkMinScans` (startwaarde 3). De betekenis staat in `benchmark.md`,
+Drempels.

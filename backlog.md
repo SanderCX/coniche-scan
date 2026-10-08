@@ -96,10 +96,11 @@ Bewust nog niet opgepakt. Geen prioritering.
   één Meting. "Zijn we vooruitgegaan sinds de nulmeting" — twee of meer
   Metingen van dezelfde organisatie naast elkaar, per categorie/
   bouwblok — is nog geen ontwerp.
-- **Geanonimiseerd benchmark tussen organisaties/sectoren**: "Hoe
-  scoor ik tov vergelijkbare bedrijven." Vraagt eigen keuzes over
-  anonimisering en welke data samengevoegd mag worden — nog geen scope
-  of ontwerp.
+- **Benchmark tussen organisaties**: Besproken en uitgewerkt in
+  `benchmark.md`, nog te bouwen. Daarbij nog niet gedekt: Export (PDF, CSV,
+  InDesign) van een benchmark, rechten voor een Consultant, een vastgezette
+  versie voor de Lead in plaats van live cijfers, en ontwikkeling in de
+  tijd binnen een benchmark. Het berekenen moet op de server, zie Fase 2.
 - **Export van het organisatieresultaat**: De aggregatieweergave
   (`beheerpagina.md`, Organisatie-resultaten) is er, een PDF/CSV/
   InDesign-export ervan nog niet. De bestaande exports blijven per één
@@ -202,6 +203,10 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   `gebruikers` weer centraal kan.
 - **Respondenten krijgen alleen hun eigen gegevens**: Nu haalt elke browser
   de volledige blob van alle organisaties op (ook bij een persoonlijke link).
+- **Benchmark op de server berekenen**: Een Lead mag alleen het
+  geaggregeerde resultaat ontvangen en nooit de scans van andere
+  organisaties (`benchmark.md`). Dat kan pas als de berekening aan de
+  serverkant draait.
 
 ### Fase 3: Deployment, beveiliging en stabiliteit
 

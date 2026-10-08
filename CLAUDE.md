@@ -31,6 +31,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `beheerpagina.md` | De beheeromgeving |
 | `import-scans.md` | Import van scans (CSV): de oude, stopgezette tool, en onze eigen export teruglezen |
 | `sbi-indeling.md` | Vaste optielijst voor Sector/Subsector (SBI2025, top 2 niveaus) |
+| `benchmark.md` | Benchmark: Een zelf gekozen groep organisaties naast elkaar, geaggregeerd en anoniem, met een view per organisatie voor een Lead |
 | `backlog.md` | Bewust nog niet opgepakt |
 | `go-live-plan.md` | Actielijst naar productie |
 | `azure-plan.md` | Aanvulling op `go-live-plan.md` met de stappen voor de Azure-omgeving (Azure DevOps, Azure SQL, `coniche-scan.nl`) |
@@ -85,6 +86,8 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   als CSV (`export-csv.md`) en voor InDesign als XML (`export-indesign.md`)
   zijn alle drie gebouwd, vanuit dezelfde Exporteren-dropdown op de
   resultatenpagina en bij Ingevulde scans (`beheerpagina.md` punt 7).
+- **Benchmark**: Besproken en uitgewerkt in `benchmark.md`, nog niet
+  gebouwd.
 
 ## Terminologie
 
@@ -185,7 +188,7 @@ De nav heeft een vast deel links (logo) en een contextueel deel rechts
    "Naar resultaten →" op de doorloopflow zodra de scan afgerond is,
    "← Terug naar de scan" samen met "Exporteren" op de resultatenpagina,
    geen scheidingslijn tussen die twee onderling, in beheer:
-   "Applicatie", "Assessments" en "Organisaties" voor een Admin, alleen
+   "Applicatie", "Assessments", "Organisaties" en "Benchmark" voor een Admin, alleen
    "Organisaties" voor een Consultant, zie `beheerpagina.md`, Wat
    beheerbaar is). Geen
    apart concept meer voor een terug- versus een vooruit-actie binnen
@@ -269,7 +272,9 @@ geen afwijking van de spec maar een gat erin.
    toestemmingsvakje ("Ik geef toestemming om mijn antwoorden te delen
    met Coniche"), met een link naar `privacy-pagina.md`. Alleen
    client-side verplicht: Er wordt geen aparte toestemmingsstatus
-   opgeslagen, geen nieuw datamodel-veld.
+   opgeslagen, geen nieuw datamodel-veld. De tekst van het vakje wordt
+   uitgebreid voor de benchmark (`benchmark.md`, Toestemming en privacy),
+   de exacte formulering volgt.
 
    **Wegingskaart**: Heeft het Assessment minstens één bouwblok met een
    gewicht ongelijk aan 1, dan staat bovenaan de intake (boven het
@@ -298,7 +303,8 @@ geen afwijking van de spec maar een gat erin.
    **Bij een Lead-rol** (`datamodel.md` deel 2) komen hier ook de
    resultaten van en de uitnodigen-actie voor zijn toegewezen Metingen
    bij (niet de hele organisatie), ongeacht of de Lead zelf invullingen
-   heeft — zie `beheerpagina.md`, punt 6a.
+   heeft — zie `beheerpagina.md`, punt 6a. Ook de benchmarkviews die een
+   Admin aan hem heeft toegewezen staan hier (`benchmark.md`).
 
    **In de header van "Mijn metingen" staan de 4 vaste content-links**
    (zie de Globale layout hierboven, punt 1 van `.nav-right`), elk naar
@@ -472,6 +478,8 @@ bouwblokken met naam, omschrijving, tags en vragen.
 - Aggregatie over meerdere respondenten: Het gemiddelde per Meting is
   gebouwd (`beheerpagina.md`, Organisatie-resultaten). Afwijking en
   spreiding daarbovenop zijn nog niet ontworpen (`backlog.md`).
+- Benchmark: Uitgewerkt in `benchmark.md`, met de open punten onderaan dat
+  bestand.
 - Weging: De weging is gebouwd. De gewichten van de Zorgscan (bouwblok 4, 10
   en 11 op 2) zijn besloten: de spec is leidend. De seed en de opgeslagen
   data moeten daarop staan.
