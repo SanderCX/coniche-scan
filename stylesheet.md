@@ -351,6 +351,9 @@ menu direct eronder, links uitgelijnd met de knop: Witte achtergrond,
 `padding: .6rem 1rem`, tekst `var(--ink)`, hover `background:
 var(--bg-mid)`. Sluit bij een klik buiten het menu of op een optie.
 
+Het pijltje staat `.5rem` achter de tekst. De rechter padding van de knop
+is even groot als de linker.
+
 ### Badges
 
 - `.hero-tag`: Kop-label. Gevuld `var(--or)`, witte tekst, hoofdletters,
@@ -473,6 +476,15 @@ elkaar in één rij staan, bijvoorbeeld de Assessment-type-dropdown, het
 Label-veld en de knop "Meting plannen". De vaste waarde is `--control-h`
 (zie Typografie, Veldhoogte). Concreet gelijk: Verticale padding,
 `border-radius`, randdikte en -kleur en `font-size`.
+
+**Dropdowns (`select.field`, `.admin-field select` en de compacte select in
+een knoppenrij).** De pijl van de browser staat uit (`appearance: none`).
+In plaats daarvan staat er een eigen chevron als achtergrondafbeelding:
+`1rem` breed, kleur `var(--ink-m)`, `background-position: right .875rem
+center`. De chevron staat dus 14px van de rechterrand, even ver als de
+tekst aan de linkerkant van de rand af staat. Rechts is de `padding-right`
+`2.5rem`, zodat een lange optie niet onder de chevron doorloopt. Bij focus
+krijgt het veld dezelfde rand en ring als `.field`.
 
 ### Doorloopflow
 

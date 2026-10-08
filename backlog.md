@@ -248,11 +248,6 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   iets mee gedaan.
 
 **Afstemmen met de build (Sander)**
-- **Bulk-CSV**: De build haalt Exporteren van het globale overzicht en het
-  Info-icoon `info.bulkExportOrganisatie` weg. De spec staat het toe binnen
-  één organisatie, ook op het globale overzicht, en schakelt het uit met het
-  Info-icoon bij meerdere organisaties (`export-csv.md`, `beheerpagina.md`
-  punt 7).
 - **Audit-log**: Staat alleen in de browser. Wordt een tabel in de database
   (`azure-plan.md`).
 - **Sessieduur**: Volgt met de backend (`beheerpagina.md`, Instellingen).
