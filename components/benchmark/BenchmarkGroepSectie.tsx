@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BenchmarkSectie, resultatenVan } from "@/lib/benchmark";
+import { BenchmarkSectie, MIN_METINGEN_PER_ASSESSMENT, resultatenVan } from "@/lib/benchmark";
 import { alleBouwblokkenMetGroep, isVlakkeAssessment } from "@/lib/assessment-structuur";
 import { classificatie } from "@/lib/scoring";
 import { gewichtMarkering } from "@/lib/weging";
@@ -28,46 +28,49 @@ export function BenchmarkGroepSectie({
   sectie,
   benchmarkId,
   minOrganisaties,
+  niveau = "organisaties",
 }: {
   sectie: BenchmarkSectie;
   benchmarkId: string;
   minOrganisaties: number;
+  /** `metingen`: Binnen een organisatie (`benchmark.md`, Niveau 2): De leden zijn Metingen met hun label als naam. */
+  niveau?: "organisaties" | "metingen";
 }) {
   const { assessment, rijen, ontbrekend, teller } = sectie;
   const resultaten = resultatenVan(assessment, sectie.groepAntwoorden);
   const vlak = isVlakkeAssessment(assessment);
   const eenheid = assessment.bouwblokEenheidMeervoud;
-  const onderDrempel = rijen.length < minOrganisaties;
+  const binnen = niveau === "metingen";
+  const onderDrempel = rijen.length < (binnen ? MIN_METINGEN_PER_ASSESSMENT : minOrganisaties);
 
   return (
     <section className="benchmark-sectie" aria-label={assessment.naam}>
       <h2>{assessment.naam}</h2>
       <p className="benchmark-teller" data-onder-drempel={onderDrempel || undefined}>
-        <strong>
-          {teller.x} van {teller.y} organisaties
-        </strong>
-        {onderDrempel && (
+        <strong>{binnen ? `${teller.x} ${teller.x === 1 ? "Meting" : "Metingen"}` : `${teller.x} van ${teller.y} organisaties`}</strong>
+        {onderDrempel && !binnen && (
           <span>
             {" "}
             · onder de minimale groepsgrootte van {minOrganisaties}: Een Lead ziet dit Assessment niet
           </span>
         )}
+        {onderDrempel && binnen && <span> · een benchmark heeft minstens {MIN_METINGEN_PER_ASSESSMENT} Metingen per Assessment</span>}
       </p>
-      {ontbrekend.length > 0 && (
+      {!binnen && ontbrekend.length > 0 && (
         <p className="text-sm text-ink-m">
           Ontbreekt in dit Assessment: {ontbrekend.map((o) => o.naam).join(", ")}.
         </p>
       )}
 
       {rijen.length === 0 ? (
-        <p className="admin-notice">Nog geen organisaties in deze benchmark voor dit Assessment.</p>
+        <p className="admin-notice">{binnen ? "Nog geen Metingen in deze benchmark voor dit Assessment." : "Nog geen organisaties in deze benchmark voor dit Assessment."}</p>
       ) : (
         <>
           <table className="admin-table" style={{ marginBottom: "1.5rem" }}>
             <thead>
               <tr>
-                <th>Organisatie</th>
-                <th>Meting</th>
+                <th>{binnen ? "Meting" : "Organisatie"}</th>
+                {!binnen && <th>Meting</th>}
                 <th>Afgeronde scans</th>
                 <th>Overall</th>
                 <th></th>
@@ -75,16 +78,20 @@ export function BenchmarkGroepSectie({
             </thead>
             <tbody>
               {rijen.map((r) => (
-                <tr key={r.organisatie.id}>
-                  <td>{r.organisatie.naam}</td>
-                  <td>{r.meting.label}</td>
+                <tr key={binnen ? r.meting.id : r.organisatie.id}>
+                  <td>{binnen ? r.meting.label : r.organisatie.naam}</td>
+                  {!binnen && <td>{r.meting.label}</td>}
                   <td>{r.aantalAfgerond}</td>
                   <td>
                     <Score waarde={r.overall} />
                   </td>
                   <td className="cel-knop">
                     <Link
-                      href={`/beheer/benchmark/${benchmarkId}/organisatie/${r.organisatie.id}`}
+                      href={
+                        binnen
+                          ? `/beheer/benchmark/${benchmarkId}/meting/${r.meting.id}`
+                          : `/beheer/benchmark/${benchmarkId}/organisatie/${r.organisatie.id}`
+                      }
                       className="btn btn-outline btn-compact"
                     >
                       View
@@ -99,7 +106,7 @@ export function BenchmarkGroepSectie({
             {resultaten.overall !== null && (
               <ScoreCircle score={resultaten.overall} classificatie={classificatie(resultaten.overall)} />
             )}
-            <p className="mt-4 font-semibold text-ink-m">Gemiddelde van de groep</p>
+            <p className="mt-4 font-semibold text-ink-m">{binnen ? "Gemiddelde van de Metingen" : "Gemiddelde van de groep"}</p>
           </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">

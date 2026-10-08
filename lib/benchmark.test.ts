@@ -4,11 +4,18 @@ import { zorgscan } from "@/data/zorgscan-assessment";
 import { alleVragen } from "./assessment-structuur";
 import { overallScore } from "./scoring";
 import {
+  assessmentsVoorMetingenBenchmark,
   bouwBenchmarkSecties,
+  bouwMetingView,
   bouwOrganisatieView,
+  bouwScanSectie,
+  bouwScanView,
   kandidaatOrganisaties,
   middelAntwoorden,
   nietTeKiezenOrganisaties,
+  niveauVan,
+  organisatiesVoorMetingenBenchmark,
+  organisatiesVoorScansBenchmark,
   standaardMetingId,
   viewsVoorLead,
 } from "./benchmark";
@@ -131,5 +138,102 @@ describe("nietTeKiezenOrganisaties", () => {
     expect(uit.map((u) => u.organisatie.id)).toEqual(["G", "W"]);
     expect(uit.find((u) => u.organisatie.id === "W")!.redenen[0]).toBe("Zorgscan: hoogstens 2 afgeronde scans in één Meting, minimaal 3 nodig");
     expect(uit.find((u) => u.organisatie.id === "G")!.redenen[0]).toBe("geen Meting van Zorgscan");
+  });
+});
+
+/** Eén organisatie met meerdere Metingen van hetzelfde Assessment, voor niveau 2. */
+const orgMetMetingen = (aantalScansPerMeting: number[]): Organisatie => ({
+  id: "X", naam: "Org X", kenmerken: {}, leden: [], aangemaaktDoor: null, toegewezenAan: [], benchmarkToegestaan: false, aangemaaktOp: "x", gewijzigdOp: "x",
+  scanUitvoeringen: aantalScansPerMeting.map((n, i) => ({
+    id: `m${i}`, organisatieId: "X", assessmentId: assessment.id, label: `Onderdeel ${i + 1}`, aangemaaktOp: `2026-01-0${i + 1}`,
+    invullingen: Array.from({ length: n }, (_, k) => invulling(`x${i}-${k}`, i * 2 + k)),
+  })),
+});
+const metingenBenchmark = (ids: string[], niveau: Benchmark["niveau"] = "metingen"): Benchmark => ({
+  id: "b2", naam: "Binnen", niveau, assessmentIds: [assessment.id], meldingen: [], aangemaaktOp: "x", aangemaaktDoor: "a",
+  leden: ids.map((metingId) => ({ organisatieId: "X", assessmentId: assessment.id, metingId })),
+});
+
+describe("niveau 2: binnen een organisatie", () => {
+  it("een benchmark zonder niveau is een benchmark tussen organisaties", () => {
+    expect(niveauVan({})).toBe("organisaties");
+    expect(niveauVan({ niveau: "metingen" })).toBe("metingen");
+  });
+
+  it("de keuzelijst vraagt geen vlag en minstens twee Metingen met genoeg afgeronde scans per Assessment", () => {
+    const genoeg = orgMetMetingen([3, 4, 1]); // De derde heeft te weinig scans.
+    expect(assessmentsVoorMetingenBenchmark(genoeg, 3)[0].metingen.map((m) => m.meting.id)).toEqual(["m1", "m0"]);
+    expect(organisatiesVoorMetingenBenchmark([genoeg], 3)).toHaveLength(1);
+    expect(organisatiesVoorMetingenBenchmark([orgMetMetingen([3, 2])], 3)).toEqual([]);
+    expect(genoeg.benchmarkToegestaan).toBe(false);
+  });
+
+  it("elke Meting telt even zwaar, ongeacht het aantal scans, en de teller kent geen Y", () => {
+    const o = orgMetMetingen([2, 7, 3]);
+    const [sectie] = bouwBenchmarkSecties(metingenBenchmark(["m0", "m1", "m2"]), [assessment], [o]);
+    expect(sectie.rijen.map((r) => r.meting.id)).toEqual(["m0", "m1", "m2"]);
+    expect(sectie.teller).toEqual({ x: 3, y: 3 });
+    expect(sectie.ontbrekend).toEqual([]);
+    const vraag = alleVragen(assessment)[0].id;
+    const verwacht = sectie.rijen.reduce((s, r) => s + r.antwoorden[vraag], 0) / 3;
+    expect(sectie.groepAntwoorden[vraag]).toBeCloseTo(verwacht, 10);
+  });
+
+  it("de view van een Meting zet haar naast de overige Metingen zonder zichzelf, met een ondergrens van twee Metingen", () => {
+    const o = orgMetMetingen([3, 3, 3]);
+    const [sectie] = bouwBenchmarkSecties(metingenBenchmark(["m0", "m1", "m2"]), [assessment], [o]);
+    const view = bouwMetingView(sectie, "m1")!;
+    expect(view.aantalAnderen).toBe(2);
+    const zonderM1 = middelAntwoorden(sectie.rijen.filter((r) => r.meting.id !== "m1").map((r) => r.antwoorden), assessment);
+    expect(view.rest!.overall).toBe(overallScore(assessment, zonderM1));
+    expect(view.voldoetAanDrempel).toBe(true);
+    expect(bouwMetingView(sectie, "ONBEKEND")).toBeNull();
+    const [klein] = bouwBenchmarkSecties(metingenBenchmark(["m0"]), [assessment], [o]);
+    expect(bouwMetingView(klein, "m0")!.voldoetAanDrempel).toBe(false);
+  });
+});
+
+describe("niveau 3: binnen een Meting", () => {
+  const metRespondenten = (aantal: number): Organisatie => {
+    const o = orgMetMetingen([aantal]);
+    o.leden = o.scanUitvoeringen[0].invullingen.map((i, k) => ({
+      id: `l${k}`, organisatieId: "X", email: `r${k}@x.nl`, naam: k === 0 ? null : `Respondent ${k}`, functie: "", team: "", notities: "", toegangscode: `c${k}`, leadMetingIds: [], aangemaaktOp: "x",
+    }));
+    o.scanUitvoeringen[0].invullingen.forEach((i, k) => (i.organisatieLidId = `l${k}`));
+    return o;
+  };
+  const scansBenchmark = (): Benchmark => metingenBenchmark(["m0"], "scans");
+
+  it("de keuzelijst toont organisaties met minstens één Meting van minimaal het aantal afgeronde scans", () => {
+    expect(organisatiesVoorScansBenchmark([metRespondenten(3), orgMetMetingen([2])], 3).map((o) => o.id)).toEqual(["X"]);
+    expect(organisatiesVoorScansBenchmark([orgMetMetingen([2])], 3)).toEqual([]);
+  });
+
+  it("de sectie heeft één Meting met de afgeronde scans, met de naam van de Respondent of het e-mailadres", () => {
+    const o = metRespondenten(4);
+    o.scanUitvoeringen[0].invullingen[3].status = "bezig"; // Telt niet mee.
+    const sectie = bouwScanSectie(scansBenchmark(), [assessment], [o])!;
+    expect(sectie.scans).toHaveLength(3);
+    expect(sectie.scans.map((s) => s.naam)).toEqual(["r0@x.nl", "Respondent 1", "Respondent 2"]);
+    expect(bouwScanSectie({ ...scansBenchmark(), leden: [] }, [assessment], [o])).toBeNull();
+    expect(bouwScanSectie(scansBenchmark(), [assessment], [])).toBeNull();
+  });
+
+  it("een scan staat naast het gemiddelde van de andere scans, zonder zichzelf, en elke scan telt even zwaar", () => {
+    const sectie = bouwScanSectie(scansBenchmark(), [assessment], [metRespondenten(5)])!;
+    const eerste = sectie.scans[0];
+    const view = bouwScanView(sectie, eerste.invulling.id, 3)!;
+    expect(view.aantalAnderen).toBe(4);
+    expect(view.aantalInGroep).toBe(5);
+    const anderen = sectie.scans.filter((s) => s !== eerste).map((s) => s.antwoorden);
+    expect(view.rest!.overall).toBe(overallScore(assessment, middelAntwoorden(anderen, assessment)));
+    expect(view.organisatie.overall).toBe(eerste.overall);
+    expect(bouwScanView(sectie, "ONBEKEND", 3)).toBeNull();
+  });
+
+  it("de ondergrens telt de scan zelf mee: Bij minder scans dan het minimum is de vergelijking niet toegestaan", () => {
+    const sectie = bouwScanSectie(scansBenchmark(), [assessment], [metRespondenten(3)])!;
+    expect(bouwScanView(sectie, sectie.scans[0].invulling.id, 3)!.voldoetAanDrempel).toBe(true);
+    expect(bouwScanView(sectie, sectie.scans[0].invulling.id, 4)!.voldoetAanDrempel).toBe(false);
   });
 });

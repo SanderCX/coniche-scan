@@ -14,7 +14,7 @@ import { InfoIcoon } from "@/components/InfoIcoon";
  */
 export function BenchmarkVlag({ organisatie }: { organisatie: Organisatie }) {
   const [bevestigOpen, setBevestigOpen] = useState(false);
-  const aantal = aantalBenchmarksMetOrganisatie(organisatie.id);
+  const aantal = aantalBenchmarksMetOrganisatie(organisatie.id, true);
 
   function wissel(aan: boolean) {
     if (aan) zetBenchmarkVlag(organisatie.id, true);

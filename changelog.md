@@ -70,6 +70,29 @@
     zijn niet aangepast: De formulering volgt volgens de spec nog.
   - 15 nieuwe tests (56 → 71 totaal): De berekening, de keuzelijst, de view, de drempel, de Lead-regels en de
     opruimregels.
+- **Benchmark niveau 2 en 3 gebouwd** (`benchmark.md`, Niveau 2 en 3; spec van Joost, 8 oktober, daar nog "voorstel"):
+  - **Niveau**: `Benchmark.niveau` (`organisaties` | `metingen` | `scans`, ontbreekt = `organisaties`). Bij aanmaken kiest de
+    Admin eerst het niveau; het niveau staat vast na het aanmaken. De lijst heeft een kolom Niveau.
+  - **Niveau 2, binnen een organisatie** (`MetingenBenchmarkForm`): Eerst één organisatie (zonder vlag), dan de Assessments
+    en per Assessment minstens twee Metingen met minimaal `benchmarkMinScans` afgeronde scans. Meerdere leden per
+    Assessment, een Meting hoogstens één keer. De teller is "N Metingen" (geen Y), de sectie toont het gemiddelde van
+    de Metingen met per Meting haar eigen score, en de view per Meting (`/beheer/benchmark/[id]/meting/[metingId]`) zet
+    de Meting naast de overige Metingen zonder zichzelf, met de labels als namen.
+  - **Niveau 3, binnen een Meting** (`ScanBenchmarkForm`): Eén organisatie, Assessment en Meting. De sectie toont de
+    afgeronde scans met de naam van de Respondent en de overall score, en de view per scan
+    (`/beheer/benchmark/[id]/scan/[invullingId]`) zet de scan naast het gemiddelde van de andere scans in de Meting,
+    elke scan even zwaar. De ondergrens is `benchmarkMinScans` inclusief de scan zelf (voorstel in de spec): Eronder
+    staat een waarschuwing. Opgeslagen als benchmark met niveau `scans` en één lid, de Meting.
+  - **Rekenen**: Dezelfde gedeelde rekenregel voor alle niveaus (`maakVergelijking` in `lib/benchmark.ts`), de view per
+    lid is `VergelijkingsView`. `BenchmarkOrganisatieView` heeft teksten per niveau (overige Metingen, overige scans).
+  - **Vlag en opruimen**: De vlag `benchmarkToegestaan` geldt alleen voor niveau 1: Uitzetten haalt de organisatie alleen uit
+    de benchmarks tussen organisaties en de bevestiging telt alleen die. Een Meting of Organisatie verwijderen haalt het
+    lid uit elk niveau. Audit-events bevatten het niveau en bij niveau 2 en 3 de labels van de Metingen. Geen
+    toewijzen aan een Lead en geen Lead-view op niveau 2 en 3 (open punt in de spec).
+  - **Niet gebouwd**: De spreiding per bouwblok en het zichtbaar maken van hoge en lage scores op niveau 3 (nog niet
+    ontworpen), een samengestelde Meting, en export. Twee nieuwe Info-iconen
+    (`info.benchmarkAanmakenMetingen`, `info.benchmarkAanmakenScans`), ook in het register.
+  - 12 nieuwe tests (72 → 84 totaal).
 - **Eén kop op de Organisatie-resultaten** (`beheerpagina.md`, punt 4; spec van Joost, 8 oktober): Bovenaan het
   Meting-label als eyebrow, dan de naam van het Assessment als titel, dan "Gemiddelde over N afgeronde
   respondenten". `ResultsView` heeft een prop `toonKop` (standaard aan): Uit laat hij de tweede titel en de

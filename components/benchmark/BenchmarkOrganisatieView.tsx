@@ -1,4 +1,5 @@
-import { OrganisatieView } from "@/lib/benchmark";
+import { VergelijkingsView } from "@/lib/benchmark";
+import { BenchmarkNiveau } from "@/lib/types";
 import { isVlakkeAssessment } from "@/lib/assessment-structuur";
 import { classificatie } from "@/lib/scoring";
 import { gewichtMarkering } from "@/lib/weging";
@@ -30,22 +31,48 @@ function verschilTekst(verschil: number | null): string {
  * categorie met het groepsgemiddelde ernaast, en het verschil per bouwblok. Nooit de namen van andere organisaties.
  * Dezelfde component voor de Admin (die de view eerst zelf bekijkt) en voor de Lead aan wie hij is toegewezen.
  */
+const TEKSTEN: Record<BenchmarkNiveau, { rest: string; restKort: string; voetnoot: (n: number) => string; geenAnderen: string }> = {
+  organisaties: {
+    rest: "Rest van de groep",
+    restKort: "groep zonder",
+    voetnoot: (n) => `Vergelijkgroep van ${n} ${n === 1 ? "organisatie" : "organisaties"}, samengesteld door Coniche`,
+    geenAnderen: "Er zijn nog geen andere organisaties om mee te vergelijken.",
+  },
+  metingen: {
+    rest: "Overige Metingen",
+    restKort: "overige Metingen zonder",
+    voetnoot: (n) => `Vergelijking met ${n} andere ${n === 1 ? "Meting" : "Metingen"} van deze organisatie`,
+    geenAnderen: "Er zijn geen andere Metingen om mee te vergelijken.",
+  },
+  scans: {
+    rest: "Overige scans",
+    restKort: "overige scans zonder",
+    voetnoot: (n) => `Vergelijking met ${n} andere ${n === 1 ? "scan" : "scans"} in deze Meting`,
+    geenAnderen: "Er zijn geen andere scans om mee te vergelijken.",
+  },
+};
+
 export function BenchmarkOrganisatieView({
   view,
   organisatieNaam,
   peildatum,
+  niveau = "organisaties",
 }: {
-  view: OrganisatieView;
+  view: VergelijkingsView;
+  /** De naam van het lid: De organisatie, de Meting of de Respondent. */
   organisatieNaam: string;
   peildatum: Date;
+  /** Bepaalt de teksten: Rest van de groep, overige Metingen of overige scans. */
+  niveau?: BenchmarkNiveau;
 }) {
+  const tekst = TEKSTEN[niveau];
   const { assessment, organisatie, rest } = view;
   const vlak = isVlakkeAssessment(assessment);
   if (!rest) {
     return (
       <section className="benchmark-sectie" aria-label={assessment.naam}>
         <h2>{assessment.naam}</h2>
-        <p className="admin-notice">Er zijn nog geen andere organisaties om mee te vergelijken.</p>
+        <p className="admin-notice">{tekst.geenAnderen}</p>
       </section>
     );
   }
@@ -58,14 +85,14 @@ export function BenchmarkOrganisatieView({
         )}
         <p className="mt-4 font-semibold text-ink-m">
           Overall score van {organisatieNaam}
-          {rest.overall !== null && <> · groep zonder {organisatieNaam}: {rest.overall.toFixed(1)}</>}
+          {rest.overall !== null && <> · {tekst.restKort} {organisatieNaam}: {rest.overall.toFixed(1)}</>}
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <div className="chart-block">
           <h3>Alle {assessment.bouwblokEenheidMeervoud}</h3>
-          <RadarChartView resultaten={organisatie.bouwblokken} vergelijking={rest.bouwblokken} naam={organisatieNaam} vergelijkingNaam="Rest van de groep" />
+          <RadarChartView resultaten={organisatie.bouwblokken} vergelijking={rest.bouwblokken} naam={organisatieNaam} vergelijkingNaam={tekst.rest} />
         </div>
         <div className="chart-block">
           <h3>{vlak ? `Scores per ${assessment.bouwblokEenheidEnkelvoud}` : "Per categorie"}</h3>
@@ -74,7 +101,7 @@ export function BenchmarkOrganisatieView({
             vergelijking={rest.groepen}
             horizontaal={vlak}
             naam={organisatieNaam}
-            vergelijkingNaam="Rest van de groep"
+            vergelijkingNaam={tekst.rest}
           />
         </div>
       </div>
@@ -85,7 +112,7 @@ export function BenchmarkOrganisatieView({
           <tr>
             <th>{assessment.bouwblokLabel}</th>
             <th>{organisatieNaam}</th>
-            <th>Rest van de groep</th>
+            <th>{tekst.rest}</th>
             <th>Verschil</th>
           </tr>
         </thead>
@@ -115,8 +142,7 @@ export function BenchmarkOrganisatieView({
       </table>
 
       <p className="benchmark-voetnoot">
-        Vergelijkgroep van {view.aantalAnderen} {view.aantalAnderen === 1 ? "organisatie" : "organisaties"}, samengesteld door Coniche ·
-        peildatum {datumFormat.format(peildatum)}
+        {tekst.voetnoot(view.aantalAnderen)} · peildatum {datumFormat.format(peildatum)}
       </p>
     </section>
   );

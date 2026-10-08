@@ -9,7 +9,7 @@ import {
   useBenchmarkToewijzingen,
   wijsBenchmarkToe,
 } from "@/lib/benchmark-store";
-import { bouwBenchmarkSecties, bouwOrganisatieView } from "@/lib/benchmark";
+import { bouwBenchmarkSecties, bouwOrganisatieView, niveauVan } from "@/lib/benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
@@ -45,7 +45,7 @@ export default function BenchmarkOrganisatiePage({
     );
   }
   const organisatie = organisaties.find((o) => o.id === organisatieId);
-  if (!benchmark || !organisatie) {
+  if (!benchmark || !organisatie || niveauVan(benchmark) !== "organisaties") {
     return (
       <div className="admin-main">
         <p className="text-sm text-ink-m">Benchmark of organisatie niet gevonden.</p>

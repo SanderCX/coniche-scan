@@ -114,3 +114,61 @@ describe("benchmark-opslag", () => {
     expect(JSON.stringify(toegewezen?.details)).not.toMatch(/L1|@x\.nl/);
   });
 });
+
+describe("benchmark-opslag per niveau", () => {
+  /** Eén organisatie met twee Metingen, in een benchmark binnen een organisatie (niveau 2) en binnen een Meting (niveau 3). */
+  function opzetBinnen() {
+    zet([org("O1", [lid("L1", "O1")], [meting("M1", "O1"), meting("M2", "O1")], true)]);
+    const n2 = store.maakBenchmark(
+      { naam: "Binnen", niveau: "metingen", assessmentIds: ["A"], aangemaaktDoor: "g1", leden: [
+        { organisatieId: "O1", assessmentId: "A", metingId: "M1" },
+        { organisatieId: "O1", assessmentId: "A", metingId: "M2" },
+      ] },
+      { ...namen, metingLabels: ["M1", "M2"] }
+    );
+    const n3 = store.maakBenchmark(
+      { naam: "Scans", niveau: "scans", assessmentIds: ["A"], aangemaaktDoor: "g1", leden: [{ organisatieId: "O1", assessmentId: "A", metingId: "M1" }] },
+      { ...namen, metingLabels: ["M1"] }
+    );
+    return { n2, n3 };
+  }
+  const byNaam = (naam: string) => store.getBenchmarks().find((b) => b.naam === naam)!;
+
+  it("een nieuwe benchmark krijgt standaard het niveau organisaties, en het niveau komt in het audit-log", () => {
+    zet([org("O1", [], [meting("M1", "O1")])]);
+    const b = store.maakBenchmark({ naam: "X", assessmentIds: ["A"], aangemaaktDoor: "g1", leden: [] }, namen);
+    expect(b.niveau).toBe("organisaties");
+    const log = JSON.parse(opslag.get("coniche-scan:audit")!) as { actie: string; details: Record<string, unknown> }[];
+    expect(log.find((e) => e.actie === "benchmark.aangemaakt")?.details.niveau).toBe("organisaties");
+  });
+
+  it("de vlag uitzetten raakt alleen de benchmark tussen organisaties: De niveaus binnen een organisatie kennen de vlag niet", () => {
+    opzetBinnen();
+    const tussen = store.maakBenchmark(
+      { naam: "Tussen", niveau: "organisaties", assessmentIds: ["A"], aangemaaktDoor: "g1", leden: [{ organisatieId: "O1", assessmentId: "A", metingId: "M1" }] },
+      namen
+    );
+    expect(store.aantalBenchmarksMetOrganisatie("O1")).toBe(3);
+    expect(store.aantalBenchmarksMetOrganisatie("O1", true)).toBe(1);
+    db.zetBenchmarkVlag("O1", false);
+    expect(byNaam("Tussen").leden).toHaveLength(0);
+    expect(byNaam("Binnen").leden).toHaveLength(2);
+    expect(byNaam("Scans").leden).toHaveLength(1);
+    expect(tussen.id).toBe(byNaam("Tussen").id);
+  });
+
+  it("een Meting verwijderen haalt het lid uit elke benchmark, ook op niveau 2 en 3", () => {
+    opzetBinnen();
+    db.verwijderMeting("M1");
+    expect(byNaam("Binnen").leden.map((l) => l.metingId)).toEqual(["M2"]);
+    expect(byNaam("Scans").leden).toHaveLength(0);
+    expect(byNaam("Scans").meldingen).toHaveLength(1);
+  });
+
+  it("een Organisatie verwijderen haalt haar leden uit alle niveaus", () => {
+    opzetBinnen();
+    db.verwijderOrganisaties(["O1"]);
+    expect(store.getBenchmarks().map((b) => b.leden.length)).toEqual([0, 0]);
+  });
+});
+
