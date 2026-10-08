@@ -174,6 +174,26 @@ export function duplicateAssessmentAsVariant(
   return assessment;
 }
 
+/**
+ * Haalt het Assessment uit de opslag en zet bij elk Assessment dat ervan is afgeleid `afgeleidVanAssessmentId` op `null`
+ * (alleen herkomstinformatie, `datamodel.md`, Sector-varianten). De controle of er Metingen van zijn, staat in
+ * `lib/assessment-verwijderen.ts`: Gebruik deze functie niet los. Geeft de namen van de afgeleide Assessments terug.
+ */
+export function verwijderAssessmentRecord(id: string): { afgeleid: string[] } | null {
+  const alles = laadAlles();
+  if (!alles.some((a) => a.id === id)) return null;
+  const afgeleid: string[] = [];
+  const rest = alles
+    .filter((a) => a.id !== id)
+    .map((a) => {
+      if (a.afgeleidVanAssessmentId !== id) return a;
+      afgeleid.push(a.naam);
+      return { ...a, afgeleidVanAssessmentId: null };
+    });
+  slaAlles(rest);
+  return { afgeleid };
+}
+
 export function resetAssessments(): void {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(KEY);

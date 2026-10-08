@@ -172,17 +172,19 @@ export default function DoorloopPage({
           style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}
         >
           Gemiddelde score
-          <input
-            type="number"
-            min={2}
-            max={4}
-            step={1}
+          {/* Een keuzelijst met de toegestane waarden, geen invulveld: Er is niets anders dan 2, 3 of 4 te kiezen. */}
+          <select
+            className="veld-compact"
             value={testGemiddelde}
-            onChange={(e) =>
-              setTestGemiddelde(Math.min(4, Math.max(2, Number(e.target.value) || 3)))
-            }
-            style={{ width: "4rem" }}
-          />
+            onChange={(e) => setTestGemiddelde(Number(e.target.value))}
+            aria-label="Gemiddelde score"
+          >
+            {[2, 3, 4].map((waarde) => (
+              <option key={waarde} value={waarde}>
+                {waarde}
+              </option>
+            ))}
+          </select>
         </label>
         <button
           type="button"

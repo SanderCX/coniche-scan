@@ -108,7 +108,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     sleutel: "info.benchmarkInstellingen",
     plek: "Applicatie, Instellingen, formulier Benchmark",
     tekst:
-      "De minimale groepsgrootte is het aantal organisaties per Assessment, inclusief de organisatie van de view, dat nodig is voordat een Lead de vergelijking ziet. Het minimale aantal scans is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden.",
+      "Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden.",
   },
   {
     sleutel: "info.benchmarkVlag",
@@ -120,7 +120,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     sleutel: "info.benchmarkToewijzen",
     plek: "Benchmark, view per organisatie, achter de uitgeschakelde knop \"Toewijzen\"",
     tekst:
-      "Toewijzen kan pas als de organisatie een Lead heeft en minstens één Assessment aan de minimale groepsgrootte voldoet. Anders zou een Lead een vergelijking zien met te weinig andere organisaties om anoniem te blijven.",
+      "Toewijzen kan pas als er een Lead is en de groep aan de drempel van dit niveau voldoet. Anders zou een Lead een vergelijking zien met te weinig anderen om anoniem te blijven.",
   },
   {
     sleutel: "info.benchmarkAanmaken",

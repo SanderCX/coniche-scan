@@ -4,7 +4,7 @@ import { use, useState } from "react";
 import Link from "next/link";
 import { useRespondentPerToegangscode, nodigLidUit, useOrganisaties } from "@/lib/db";
 import { useBenchmarks, useBenchmarkToewijzingen } from "@/lib/benchmark-store";
-import { bouwBenchmarkSecties, viewsVoorLead } from "@/lib/benchmark";
+import { leadViewVoorToewijzing } from "@/lib/benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useAssessments } from "@/lib/assessment-store";
 import { useAlgemeneTekst } from "@/lib/algemene-teksten-store";
@@ -27,12 +27,25 @@ function BenchmarkKaarten({ code, lid }: { code: string; lid: OrganisatieLid }) 
   const assessments = useAssessments();
   const instellingen = useInstellingen();
   if (lid.leadMetingIds.length === 0) return null;
+  const drempels = {
+    minOrganisaties: instellingen.benchmarkMinOrganisaties,
+    minMetingen: instellingen.benchmarkMinMetingen,
+    minRespondenten: instellingen.benchmarkMinRespondenten,
+  };
   const kaarten = toewijzingen.flatMap((t) => {
     const benchmark = benchmarks.find((b) => b.id === t.benchmarkId);
     if (!benchmark) return [];
-    const secties = bouwBenchmarkSecties(benchmark, assessments, organisaties);
-    const views = viewsVoorLead(secties, t.organisatieId, lid.leadMetingIds, instellingen.benchmarkMinOrganisaties);
-    return views.length > 0 ? [{ toewijzing: t, assessmentNamen: views.map((v) => v.assessment.naam) }] : [];
+    const resultaat = leadViewVoorToewijzing(t, benchmark, assessments, organisaties, lid.leadMetingIds, drempels);
+    if (!resultaat || resultaat.views.length === 0) return [];
+    // Per niveau wat de kaart zegt: Nooit de naam van een ander lid, wel zijn eigen Meting of de Respondent van de scan.
+    const assessmentNamen = resultaat.views.map((v) => v.assessment.naam).join(" · ");
+    const regel =
+      resultaat.niveau === "organisaties"
+        ? assessmentNamen
+        : resultaat.niveau === "metingen"
+          ? `${assessmentNamen} · ${resultaat.metingLabel}`
+          : `${assessmentNamen} · ${resultaat.metingLabel} · scan van ${resultaat.eigenNaam}`;
+    return [{ toewijzing: t, regel }];
   });
   if (kaarten.length === 0) return null;
   return (
@@ -42,10 +55,10 @@ function BenchmarkKaarten({ code, lid }: { code: string; lid: OrganisatieLid }) 
       </span>
       <h2>Jouw organisatie tegenover de groep</h2>
       <div className="grid grid-cols-1 gap-4 mt-4">
-        {kaarten.map(({ toewijzing, assessmentNamen }) => (
+        {kaarten.map(({ toewijzing, regel }) => (
           <Link key={toewijzing.id} href={`/s/${code}/benchmark/${toewijzing.id}`} className="card" style={{ display: "block" }}>
             <p className="font-semibold text-ink">Benchmark</p>
-            <p className="text-sm text-ink-m mt-1">{assessmentNamen.join(" · ")}</p>
+            <p className="text-sm text-ink-m mt-1">{regel}</p>
           </Link>
         ))}
       </div>

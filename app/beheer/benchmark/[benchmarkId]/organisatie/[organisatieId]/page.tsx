@@ -1,20 +1,15 @@
 "use client";
 
-import { use, useState } from "react";
+import { use } from "react";
 import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties } from "@/lib/db";
-import {
-  trekBenchmarkToewijzingIn,
-  useBenchmark,
-  useBenchmarkToewijzingen,
-  wijsBenchmarkToe,
-} from "@/lib/benchmark-store";
+import { useBenchmark } from "@/lib/benchmark-store";
 import { bouwBenchmarkSecties, bouwOrganisatieView, niveauVan } from "@/lib/benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
-import { InfoIcoon } from "@/components/InfoIcoon";
+import { ToewijzenBlok } from "@/components/benchmark/ToewijzenBlok";
 import { BenchmarkOrganisatieView } from "@/components/benchmark/BenchmarkOrganisatieView";
 
 /**
@@ -31,11 +26,9 @@ export default function BenchmarkOrganisatiePage({
   const { benchmarkId, organisatieId } = use(params);
   const gebruiker = useIngelogdeGebruiker();
   const benchmark = useBenchmark(benchmarkId);
-  const toewijzingen = useBenchmarkToewijzingen();
   const organisaties = useOrganisaties();
   const assessments = useAssessments();
   const instellingen = useInstellingen();
-  const [leadId, setLeadId] = useState("");
 
   if (!magBenchmarkBeheren(gebruiker)) {
     return (
@@ -60,12 +53,6 @@ export default function BenchmarkOrganisatiePage({
   const peildatum = new Date();
   const voldoet = views.some((v) => v.voldoetAanDrempel);
 
-  const leads = organisatie.leden.filter((l) => l.leadMetingIds.length > 0);
-  const eigenToewijzingen = toewijzingen.filter((t) => t.benchmarkId === benchmark.id && t.organisatieId === organisatie.id);
-  const nogToeTeWijzen = leads.filter((l) => !eigenToewijzingen.some((t) => t.respondentId === l.id));
-  const gekozenLead = leadId || nogToeTeWijzen[0]?.id || "";
-  const kanToewijzen = voldoet && nogToeTeWijzen.length > 0;
-  const namen = { benchmarkNaam: benchmark.naam, organisatieNaam: organisatie.naam };
 
   return (
     <div className="admin-main admin-main--breed">
@@ -82,66 +69,12 @@ export default function BenchmarkOrganisatiePage({
         van andere organisaties.
       </p>
 
-      <h2>Toewijzen aan een Lead</h2>
-      {eigenToewijzingen.length > 0 && (
-        <table className="admin-table" style={{ marginBottom: "1rem" }}>
-          <thead>
-            <tr>
-              <th>Lead</th>
-              <th>Toegewezen op</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {eigenToewijzingen.map((t) => {
-              const lead = organisatie.leden.find((l) => l.id === t.respondentId);
-              return (
-                <tr key={t.id}>
-                  <td>{lead ? lead.naam || lead.email : "Onbekende Lead"}</td>
-                  <td>{new Date(t.toegewezenOp).toLocaleDateString("nl-NL")}</td>
-                  <td className="cel-knop">
-                    <button type="button" className="btn btn-outline btn-compact" onClick={() => trekBenchmarkToewijzingIn(t.id, namen)}>
-                      Intrekken
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      )}
-      {leads.length === 0 ? (
-        <p className="admin-notice">Deze organisatie heeft nog geen Lead. Maak eerst een Lead aan bij de organisatie.</p>
-      ) : (
-        <div className="filter-rij flex flex-wrap items-end gap-3">
-          <div className="admin-field" style={{ marginBottom: 0, minWidth: "16rem" }}>
-            <label>Lead</label>
-            <select value={gekozenLead} disabled={nogToeTeWijzen.length === 0} onChange={(e) => setLeadId(e.target.value)}>
-              {nogToeTeWijzen.length === 0 && <option value="">Alle Leads hebben deze view al</option>}
-              {nogToeTeWijzen.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.naam || l.email}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button
-            type="button"
-            className="btn btn-or btn-compact"
-            disabled={!kanToewijzen || !gekozenLead}
-            onClick={() => {
-              wijsBenchmarkToe(
-                { benchmarkId: benchmark.id, organisatieId: organisatie.id, respondentId: gekozenLead, toegewezenDoor: gebruiker!.id },
-                namen
-              );
-              setLeadId("");
-            }}
-          >
-            Toewijzen
-          </button>
-          {!voldoet && <InfoIcoon naastVeld sleutel="info.benchmarkToewijzen" />}
-        </div>
-      )}
+      <ToewijzenBlok
+        benchmark={benchmark}
+        onderwerp={{ organisatie }}
+        voldoetAanDrempel={voldoet}
+        gebruikerId={gebruiker!.id}
+      />
 
       {views.length === 0 ? (
         <p className="admin-notice" style={{ marginTop: "1.5rem" }}>

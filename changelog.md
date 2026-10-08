@@ -70,6 +70,35 @@
     zijn niet aangepast: De formulering volgt volgens de spec nog.
   - 15 nieuwe tests (56 → 71 totaal): De berekening, de keuzelijst, de view, de drempel, de Lead-regels en de
     opruimregels.
+- **Toewijzen op alle benchmarkniveaus, drempels per niveau en Assessment verwijderen** (specs van Joost, 8 oktober,
+  PR 65):
+  - **Toewijzen aan een Lead op niveau 2 en 3**: Het blok "Toewijzen aan een Lead" (`ToewijzenBlok`) staat nu op elke view en is
+    gelijk op alle niveaus: De Leads aan wie de view is toegewezen met de datum en "Bekijk" en "Intrekken", en een
+    keuzelijst met de Leads die in aanmerking komen. Niveau 1 een Lead van de organisatie, niveau 2 en 3 een Lead op de
+    Meting (`leadMetingIds`). "Bekijk" opent het Respondent-overzicht van de Lead over de pagina heen (ook op niveau 1,
+    daar was het nog niet gebouwd). Zonder Lead staat er "Geen Lead beschikbaar" met de reden en een uitgeschakelde knop
+    (`info.benchmarkToewijzen`). Op niveau 3 noemt het blok dat de Lead de scores van deze Respondent ziet.
+  - **Opslag**: `BenchmarkToewijzing.metingId` en `onderwerpRespondentId`, uniek per benchmark, onderwerp en Lead. Het audit-log
+    noemt het niveau en het label van de Meting, nooit de Respondent of de Lead.
+  - **Vervallen**: Een toewijzing vervalt als de Meting uit de benchmark valt of wordt verwijderd, als de scan of de
+    Respondent van de view wordt verwijderd, als de Lead wordt verwijderd of de Lead-rol op de Meting verliest (niveau 2 en
+    3), of als de benchmark zo wordt gewijzigd dat het lid niet meer meedoet.
+  - **Lead-view op alle niveaus** (`leadViewVoorToewijzing`): De Lead moet de Meting mogen inzien en de groep moet aan de drempel
+    van het niveau voldoen, anders staat er niets. De view bevat alleen het lid zelf en aggregaten, nooit een ander lid
+    (geen rij met organisatie en Metingen). Op niveau 3 staat de naam van de Respondent van de scan erbij.
+  - **Drempels per niveau** (Instellingen): `benchmarkMinMetingen` (niveau 2, 3) en `benchmarkMinRespondenten` (niveau 3,
+    5). De waarschuwing onder de ondergrens op niveau 3 gebruikt nu de laatste in plaats van `benchmarkMinScans`.
+  - **Assessment verwijderen** (`lib/assessment-verwijderen.ts`, `AssessmentVerwijderen`): Alleen als er geen enkele Meting van is, bij
+    welke organisatie dan ook. De controle staat in de gegevenslaag en wordt bij bevestigen herhaald. De knop is
+    uitgeschakeld met een Info-icoon en "3 Metingen bij 1 organisatie". De bevestiging noemt de aantallen categorieën,
+    bouwblokken en vragen, de benchmarks waaruit het wordt gehaald (met een melding daar) en de afgeleide Assessments,
+    waarvan alleen `afgeleidVanAssessmentId` op `null` gaat. Gelogd als `assessment.verwijderd`. De kaart in de lijst
+    staat nu in een rij met de knop ernaast, omdat een knop niet in de link zelf mag.
+  - **Testknop**: "Gemiddelde score" is een keuzelijst met 2, 3 en 4 in plaats van een invulveld.
+  - **Knoppen in het blok Toewijzen**: "Bekijk" en "Intrekken" staan naast elkaar in `.knoppen-gelijk`, even breed (de breedste)
+    en rechts in de laatste kolom, in plaats van onder elkaar. `.knoppen-gelijk` heeft nu `width: max-content`, anders
+    blijft elke knop in een smalle tabelkolom op zijn eigen breedte.
+  - 13 nieuwe tests (84 → 97 totaal).
 - **Benchmark niveau 2 en 3 gebouwd** (`benchmark.md`, Niveau 2 en 3; spec van Joost, 8 oktober, daar nog "voorstel"):
   - **Niveau**: `Benchmark.niveau` (`organisaties` | `metingen` | `scans`, ontbreekt = `organisaties`). Bij aanmaken kiest de
     Admin eerst het niveau; het niveau staat vast na het aanmaken. De lijst heeft een kolom Niveau.

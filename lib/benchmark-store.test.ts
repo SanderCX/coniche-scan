@@ -172,3 +172,79 @@ describe("benchmark-opslag per niveau", () => {
   });
 });
 
+describe("toewijzen op niveau 2 en 3", () => {
+  const lidMetScans = (id: string, extra: Rij = {}) => lid(id, "O1", extra);
+  const metingMetScans = (id: string, respondenten: string[]) => ({
+    ...meting(id, "O1"),
+    invullingen: respondenten.map((r) => ({ id: `i-${id}-${r}`, scanUitvoeringId: id, organisatieLidId: r, status: "afgerond", antwoorden: {}, opmerkingenPerBouwblok: {}, aangemaaktOp: "x", uitgenodigdOp: "x", gestartOp: null, afgerondOp: null, bewaarVerlengdTot: null })),
+  });
+  /** Een Lead (L1) op M1, een Respondent (R1) met een scan in M1, een benchmark binnen een organisatie en een binnen een Meting. */
+  function opzet() {
+    zet([org("O1", [lidMetScans("L1", { leadMetingIds: ["M1"] }), lidMetScans("R1")], [metingMetScans("M1", ["R1"]), metingMetScans("M2", ["R1"])])]);
+    const n2 = store.maakBenchmark(
+      { naam: "Binnen", niveau: "metingen", assessmentIds: ["A"], aangemaaktDoor: "g1", leden: [
+        { organisatieId: "O1", assessmentId: "A", metingId: "M1" },
+        { organisatieId: "O1", assessmentId: "A", metingId: "M2" },
+      ] },
+      namen
+    );
+    const n3 = store.maakBenchmark(
+      { naam: "Scans", niveau: "scans", assessmentIds: ["A"], aangemaaktDoor: "g1", leden: [{ organisatieId: "O1", assessmentId: "A", metingId: "M1" }] },
+      namen
+    );
+    const t2 = store.wijsBenchmarkToe({ benchmarkId: n2.id, organisatieId: "O1", metingId: "M1", respondentId: "L1", toegewezenDoor: "g1" }, { benchmarkNaam: "Binnen", organisatieNaam: "Org O1", niveau: "metingen", metingLabel: "M1" });
+    const t3 = store.wijsBenchmarkToe({ benchmarkId: n3.id, organisatieId: "O1", metingId: "M1", onderwerpRespondentId: "R1", respondentId: "L1", toegewezenDoor: "g1" }, { benchmarkNaam: "Scans", organisatieNaam: "Org O1", niveau: "scans", metingLabel: "M1" });
+    return { n2, n3, t2: t2!, t3: t3! };
+  }
+
+  it("een toewijzing is uniek per benchmark, onderwerp en Lead: Dezelfde Lead mag meerdere Metingen of scans krijgen", () => {
+    const { n2 } = opzet();
+    expect(toewijzingen()).toHaveLength(2);
+    store.wijsBenchmarkToe({ benchmarkId: n2.id, organisatieId: "O1", metingId: "M1", respondentId: "L1", toegewezenDoor: "g1" }, { benchmarkNaam: "Binnen", organisatieNaam: "Org O1" });
+    expect(toewijzingen()).toHaveLength(2);
+    store.wijsBenchmarkToe({ benchmarkId: n2.id, organisatieId: "O1", metingId: "M2", respondentId: "L1", toegewezenDoor: "g1" }, { benchmarkNaam: "Binnen", organisatieNaam: "Org O1" });
+    expect(toewijzingen()).toHaveLength(3);
+  });
+
+  it("het audit-log noemt het niveau en de Meting, bij niveau 3 geen Respondentnaam en nooit de Lead", () => {
+    opzet();
+    const log = JSON.parse(opslag.get("coniche-scan:audit")!) as { actie: string; details: Record<string, unknown> }[];
+    const regels = log.filter((e) => e.actie === "benchmark.toegewezen");
+    expect(regels.map((e) => e.details.niveau)).toEqual(["metingen", "scans"]);
+    expect(regels[1].details.metingLabel).toBe("M1");
+    expect(JSON.stringify(regels)).not.toMatch(/L1|R1|@x\.nl/);
+  });
+
+  it("een Meting verwijderen haalt de toewijzingen van die Meting weg, niveau 2 en 3", () => {
+    opzet();
+    db.verwijderMeting("M1");
+    expect(toewijzingen()).toHaveLength(0);
+  });
+
+  it("de Respondent van een niveau-3-view verwijderen, of zijn scan, haalt die toewijzing weg", () => {
+    opzet();
+    db.verwijderScanInvullingen(["i-M1-R1"]);
+    expect(toewijzingen()).toHaveLength(1); // Alleen de toewijzing van niveau 2 blijft.
+    opslag.clear();
+    opzet();
+    db.verwijderLeden(["R1"]);
+    expect(toewijzingen()).toHaveLength(1);
+  });
+
+  it("de Lead verwijderen, of zijn Lead-rol op de Meting verliezen, haalt zijn toewijzingen weg", () => {
+    opzet();
+    db.zetLeadMetingen("L1", ["M2"]);
+    expect(toewijzingen()).toHaveLength(0);
+    opslag.clear();
+    opzet();
+    db.verwijderLeden(["L1"]);
+    expect(toewijzingen()).toHaveLength(0);
+  });
+
+  it("een benchmark wijzigen zodat een Meting niet meer meedoet haalt de toewijzing van die Meting weg", () => {
+    const { n2 } = opzet();
+    store.wijzigBenchmark(n2.id, { naam: "Binnen", assessmentIds: ["A"], leden: [{ organisatieId: "O1", assessmentId: "A", metingId: "M2" }] }, namen);
+    expect(toewijzingen()).toHaveLength(1); // Alleen de toewijzing van niveau 3 blijft.
+  });
+});
+

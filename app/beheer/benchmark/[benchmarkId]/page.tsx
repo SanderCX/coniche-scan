@@ -91,7 +91,7 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
 
       {niveau === "scans" ? (
         scanSectie ? (
-          <BenchmarkScanSectie sectie={scanSectie} benchmarkId={benchmark.id} minScans={instellingen.benchmarkMinScans} />
+          <BenchmarkScanSectie sectie={scanSectie} benchmarkId={benchmark.id} minScans={instellingen.benchmarkMinRespondenten} />
         ) : (
           <p className="admin-notice" style={{ marginTop: "1.5rem" }}>
             De Meting van deze benchmark bestaat niet meer.

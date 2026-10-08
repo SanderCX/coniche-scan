@@ -4,7 +4,7 @@ import { use } from "react";
 import { useRespondentPerToegangscode, useOrganisaties } from "@/lib/db";
 import { useAssessments } from "@/lib/assessment-store";
 import { useBenchmarks, useBenchmarkToewijzingen } from "@/lib/benchmark-store";
-import { bouwBenchmarkSecties, viewsVoorLead } from "@/lib/benchmark";
+import { leadViewVoorToewijzing } from "@/lib/benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
@@ -37,20 +37,34 @@ export default function LeadBenchmarkPage({ params }: { params: Promise<{ code: 
     );
   }
 
-  const organisatie = organisaties.find((o) => o.id === toewijzing.organisatieId);
-  const secties = bouwBenchmarkSecties(benchmark, assessments, organisaties);
-  const views = viewsVoorLead(secties, toewijzing.organisatieId, gegevens.lid.leadMetingIds, instellingen.benchmarkMinOrganisaties);
+  const resultaat = leadViewVoorToewijzing(toewijzing, benchmark, assessments, organisaties, gegevens.lid.leadMetingIds, {
+    minOrganisaties: instellingen.benchmarkMinOrganisaties,
+    minMetingen: instellingen.benchmarkMinMetingen,
+    minRespondenten: instellingen.benchmarkMinRespondenten,
+  });
+  const koppen = {
+    organisaties: "Jouw organisatie tegenover de groep",
+    metingen: "Jouw Meting tegenover de overige Metingen",
+    scans: "Een scan tegenover de overige scans",
+  } as const;
+  const views = resultaat?.views ?? [];
 
   return (
     <PageWithChrome logoHref={`/s/${code}`} code={code} toonTerug identiteitMenu={<MijnGegevensMenu lid={gegevens.lid} />}>
       <div className="container section" style={{ maxWidth: "64rem" }}>
         <span className="eyebrow">Benchmark</span>
-        <h1>Jouw organisatie tegenover de groep</h1>
-        {views.length === 0 || !organisatie ? (
+        <h1>{koppen[resultaat?.niveau ?? "organisaties"]}</h1>
+        {!resultaat || views.length === 0 ? (
           <p className="mt-4">Er is op dit moment geen vergelijking beschikbaar.</p>
         ) : (
           views.map((v) => (
-            <BenchmarkOrganisatieView key={v.assessment.id} view={v} organisatieNaam={organisatie.naam} peildatum={new Date()} />
+            <BenchmarkOrganisatieView
+              key={v.assessment.id}
+              view={v}
+              organisatieNaam={resultaat.eigenNaam}
+              peildatum={new Date()}
+              niveau={resultaat.niveau}
+            />
           ))
         )}
       </div>

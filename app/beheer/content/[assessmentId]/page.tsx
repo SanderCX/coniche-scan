@@ -10,6 +10,8 @@ import { addCategorie, patchCategorie, removeCategorie, herstelCategorie, addBou
 import { CATEGORIE_COLORS } from "@/lib/colors";
 import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
 import { InfoIcoon } from "@/components/InfoIcoon";
+import { AssessmentVerwijderen } from "@/components/beheer/AssessmentVerwijderen";
+import { useRouter } from "next/navigation";
 import { WegingBeheer } from "@/components/beheer/WegingBeheer";
 import { STANDAARD_WEGINGTEKST } from "@/lib/weging";
 
@@ -27,6 +29,7 @@ export default function ContentEditorPage({
   const { assessmentId } = use(params);
   const assessment = useAssessment(assessmentId);
   const alleAssessments = useAssessments();
+  const router = useRouter();
   const [categorieArchiveren, setCategorieArchiveren] = useState<Categorie | null>(null);
 
   if (!assessment) {
@@ -52,6 +55,9 @@ export default function ContentEditorPage({
             Afgeleid van: {template ? template.naam : "(verwijderd Assessment)"}
           </p>
         )}
+        <div className="mt-3">
+          <AssessmentVerwijderen assessment={assessment} naVerwijderen={() => router.push("/beheer/content")} />
+        </div>
       </div>
 
       <section className="rounded-2xl border border-gray-200 bg-white p-6">

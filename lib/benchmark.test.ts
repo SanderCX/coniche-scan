@@ -5,6 +5,7 @@ import { alleVragen } from "./assessment-structuur";
 import { overallScore } from "./scoring";
 import {
   assessmentsVoorMetingenBenchmark,
+  leadViewVoorToewijzing,
   bouwBenchmarkSecties,
   bouwMetingView,
   bouwOrganisatieView,
@@ -237,3 +238,39 @@ describe("niveau 3: binnen een Meting", () => {
     expect(bouwScanView(sectie, sectie.scans[0].invulling.id, 4)!.voldoetAanDrempel).toBe(false);
   });
 });
+
+describe("de view van een Lead op alle niveaus", () => {
+  const drempels = { minOrganisaties: 5, minMetingen: 3, minRespondenten: 5 };
+  const o = orgMetMetingen([3, 3, 3]);
+  o.leden = [0, 1, 2, 3, 4].map((k) => ({ id: `l${k}`, organisatieId: "X", email: `r${k}@x.nl`, naam: `R${k}`, functie: "", team: "", notities: "", toegangscode: `c${k}`, leadMetingIds: [], aangemaaktOp: "x" }));
+  o.scanUitvoeringen.forEach((m, mi) => m.invullingen.forEach((i, k) => (i.organisatieLidId = `l${k + mi}`)));
+  const t2 = { organisatieId: "X", metingId: "m0" };
+
+  it("niveau 2: Alleen met de Lead-rol op de Meting en boven de drempel van Metingen, zonder de naam van een andere Meting", () => {
+    const b = metingenBenchmark(["m0", "m1", "m2"]);
+    const r = leadViewVoorToewijzing(t2, b, [assessment], [o], ["m0"], drempels)!;
+    expect(r.views).toHaveLength(1);
+    expect(r.eigenNaam).toBe("Onderdeel 1");
+    expect(r.views[0].aantalAnderen).toBe(2);
+    expect(leadViewVoorToewijzing(t2, b, [assessment], [o], ["m1"], drempels)).toBeNull();
+    expect(leadViewVoorToewijzing(t2, b, [assessment], [o], ["m0"], { ...drempels, minMetingen: 4 })!.views).toHaveLength(0);
+    expect(JSON.stringify(r.views)).not.toContain("Onderdeel 2");
+  });
+
+  it("niveau 3: De scan van de Respondent naast de andere scans, boven de drempel van scans, met alleen zijn eigen naam", () => {
+    const o5 = orgMetMetingen([5]);
+    o5.leden = [0, 1, 2, 3, 4].map((k) => ({ id: `l${k}`, organisatieId: "X", email: `r${k}@x.nl`, naam: `Respondent ${k}`, functie: "", team: "", notities: "", toegangscode: `c${k}`, leadMetingIds: [], aangemaaktOp: "x" }));
+    o5.scanUitvoeringen[0].invullingen.forEach((i, k) => (i.organisatieLidId = `l${k}`));
+    const b = metingenBenchmark(["m0"], "scans");
+    const t3 = { organisatieId: "X", metingId: "m0", onderwerpRespondentId: "l2" };
+    const r = leadViewVoorToewijzing(t3, b, [assessment], [o5], ["m0"], drempels)!;
+    expect(r.eigenNaam).toBe("Respondent 2");
+    expect(r.views).toHaveLength(1);
+    expect(r.views[0].aantalAnderen).toBe(4);
+    expect(JSON.stringify(r.views)).not.toMatch(/Respondent [013 4]/);
+    expect(leadViewVoorToewijzing(t3, b, [assessment], [o5], ["m0"], { ...drempels, minRespondenten: 6 })!.views).toHaveLength(0);
+    expect(leadViewVoorToewijzing(t3, b, [assessment], [o5], [], drempels)).toBeNull();
+    expect(leadViewVoorToewijzing({ ...t3, onderwerpRespondentId: "ONBEKEND" }, b, [assessment], [o5], ["m0"], drempels)).toBeNull();
+  });
+});
+

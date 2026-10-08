@@ -772,6 +772,9 @@ body:has(.admin-main) {
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
   gap: 0.5rem;
+  /* `max-content`: In een smalle tabelkolom (`td.cel-knop`) krijgt het grid anders te weinig ruimte om de kolommen gelijk te
+     trekken en blijft elke knop op zijn eigen breedte. */
+  width: max-content;
   max-width: 100%;
 }
 .knoppen-gelijk > .btn {
@@ -903,4 +906,15 @@ body:has(.admin-main) {
   flex-wrap: wrap;
   gap: 1rem;
   margin: 0.8rem 0 0.2rem 1.7rem;
+}
+
+/* Een kaart in de Assessment-lijst met een actie ernaast (de knop Verwijderen mag niet in de link zelf staan). */
+.admin-row-groep {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.assessment-verwijderen {
+  flex: none;
+  min-width: 9rem;
 }
