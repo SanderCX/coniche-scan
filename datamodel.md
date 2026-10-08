@@ -244,6 +244,7 @@ ScanInvulling {
   metingId: string
   respondentId: string
   status: "uitgenodigd" | "bezig" | "afgerond"
+  aangemaaktOp: datetime            // moment waarop de regel in de app is aangemaakt; bij een import het importmoment
   uitgenodigdOp: datetime
   gestartOp: datetime | null        // gezet bij het verzenden van de intake
   afgerondOp: datetime | null

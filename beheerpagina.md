@@ -344,12 +344,14 @@ Alleen-lezen overzicht, Admin-only (net als de rest van Applicatie):
   "Systeem". Entiteit toont het type en een herkenbare naam, bijv. de
   organisatienaam in plaats van kaal een `entiteitId`. Details staat
   leesbaar, niet als ruwe JSON, met namen van Organisatie, Assessment en
-  Meting in plaats van ID's. ID's staan alleen bij uitklappen en in de
+  Meting in plaats van ID's. ID's staan niet in de app maar alleen in de
   export. Een verwijderd record toont de naam zoals die was bij het
   loggen; die naam wordt daarom bij het loggen in `details` vastgelegd.
-  De knop "Meer" (`.btn-outline .btn-compact`) staat niet achter de
-  detailtekst, maar in een eigen laatste kolom, rechts uitgelijnd, zodat
-  hij op elke rij op dezelfde plek staat, zoals de "Bekijk"-knoppen bij
+  De knop "Meer" (`.btn-outline .btn-compact`) staat alleen op
+  importgroepen (zie "Een import als groep"), want alleen daar valt iets
+  uit te klappen. Gewone rijen hebben geen knop en geen uitklapblok, ook
+  geen ruwe JSON. De knop staat niet achter de detailtekst, maar in een
+  eigen laatste kolom, rechts uitgelijnd, zoals de "Bekijk"-knoppen bij
   Organisaties (`stylesheet.md`, Knop in een lijstrij).
 - **Geen persoonsgegevens uit scans**: De log gaat over wat gebruikers
   van de app deden, niet over de inhoud van een scan. Naam, e-mailadres,
@@ -363,9 +365,17 @@ Alleen-lezen overzicht, Admin-only (net als de rest van Applicatie):
   bijv. "Import oude tool: 10 bestanden, 6 geïmporteerd, 3 overgeslagen, 1
   mislukt". De groep kent vier statussen: Geïmporteerd, overgeslagen,
   mislukt en nog niet geïmporteerd (rijen die in beeld bleven en nog niet
-  zijn gedaan). Uitklappen toont per bestand of rij wat er gebeurde, met
-  de reden bij overgeslagen en mislukt, en bij een geïmporteerde rij wat
-  is aangemaakt (Organisatie, Respondent, Meting, scan). De groep begint
+  zijn gedaan). Uitklappen toont een tabel met één regel per bestand of
+  rij, in dezelfde opmaak als de Voorbeeldweergave in de importinterface
+  (`import-scans.md`, punt 5): Bestand, Rij, Assessment, Organisatie,
+  Respondent en Status. De status is een badge en zegt duidelijk of de
+  rij wel of niet is geïmporteerd (Geïmporteerd, Overgeslagen, Mislukt of
+  Nog niet geïmporteerd), met de reden bij overgeslagen en mislukt. Er
+  staan geen knoppen in (goedkeuren kan alleen in de importinterface zelf).
+  Er staat nooit ruwe JSON, een ID of een lange lijst bestandsnamen in
+  een tekstregel. De groepsregel zelf houdt de korte samenvatting met
+  aantallen. De losse gebeurtenis "import.gestart" toont geen eigen
+  detailtekst met bestandslijst: de tabel vervangt die. De groep begint
   bij de eerste keer dat de knop "N rijen importeren" wordt gebruikt;
   goedkeuren en annuleren daarvoor logt niets. Rijen die later alsnog worden
   geïmporteerd,
@@ -382,8 +392,10 @@ Alleen-lezen overzicht, Admin-only (net als de rest van Applicatie):
   en Aangepast, standaard 7 dagen. Een knop vult Vanaf en Tot met dat
   bereik; een datum aanpassen zet de keuze op Aangepast. De gekozen
   periode staat zichtbaar boven de lijst. Is er niets in de periode, dan
-  staat er een melding met een knop voor het eerstvolgende grotere
-  bereik. Een groep verschijnt zodra een van zijn gebeurtenissen in de
+  staat er geen aparte melding en geen knop: de regel met de aantallen
+  ("0 gebeurtenissen (van 0 in totaal)") zegt dat al, en de
+  periodeknoppen bovenaan het formulier zijn de enige plek om het bereik
+  te wijzigen. De lijst eronder blijft leeg. Een groep verschijnt zodra een van zijn gebeurtenissen in de
   periode valt.
 - **Lijst en filters**: 50 gebeurtenissen per pagina, nieuwste eerst. De
   filters staan in de URL, zodat een gefilterd overzicht te delen is.
@@ -1082,7 +1094,9 @@ van organisaties waar hij geen eigenaar of toegewezen Consultant van is,
 ook niet hier op het globale overzicht.
 
 - **Kolommen**: Naam, Organisatie, Meting, Assessment, Rol/Team, Status,
-  Voortgang, Gestart, en "Bekijk" als compacte knop. De hele rij is
+  Voortgang, Gestart, Aangemaakt (`ScanInvulling.aangemaaktOp`, bij een
+  import het importmoment, zodat je geïmporteerde scans kunt terugvinden
+  en groeperen), en "Bekijk" als compacte knop. De hele rij is
   klikbaar en opent het Scan-overzicht (hieronder). Rol/Team toont alleen
   wat er is: Is de rol leeg, dan staat er alleen het team, is het team
   leeg alleen de rol, en zijn ze allebei leeg dan blijft de cel leeg.
