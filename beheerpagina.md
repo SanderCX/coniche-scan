@@ -49,7 +49,7 @@ Helemaal uiterst rechts: Punt 7 van de nav-volgorderegel in CLAUDE.md,
 Globale layout. Conventie: Een account-/profielmenu staat vrijwel altijd
 als allerlaatste element in een nav. Volgorde in `.nav-right`, van links
 naar rechts: Scherm-specifieke acties ("Applicatie"/"Assessments"/
-"Organisaties" voor een Admin, alleen "Organisaties" voor een Consultant
+"Organisaties"/"Benchmark" voor een Admin, alleen "Organisaties" voor een Consultant
 — zie Wat beheerbaar is hieronder) → scheidingslijn → Accountmenu.
 
 **Geen "← Terug naar site" in beheer.** Voegt niets toe en verwart met
@@ -74,7 +74,7 @@ losse elementen naast elkaar.
 ### Navigatie in beheer
 
 Beheer heeft drie niveaus: De hoofdlinks in de nav (Applicatie,
-Assessments, Organisaties), daaronder de onderdelen van die link, en
+Assessments, Organisaties, Benchmark), daaronder de onderdelen van die link, en
 daaronder de detailpagina's van één organisatie, Meting of Respondent.
 Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
 
@@ -156,31 +156,33 @@ Resultaten van de Meting.
   tot de database er is (`azure-plan.md`).
 - **Nog te bouwen**: Organisatievelden (punt 3): De editor
   `VeldDefinitieEditor` staat klaar, maar geen pagina gebruikt hem. En
-  Content-pagina's (punt 11), na overleg. De spec is leidend.
+  Content-pagina's (punt 11), na overleg. De spec is leidend. Verder de
+  Benchmark (punt 14, `benchmark.md`), besproken en nog niet gebouwd.
 
 ---
 
 ## Wat beheerbaar is
 
-Drie hoofdonderdelen, elk een link in `.nav-right`: **Applicatie**,
-**Assessments**, **Organisaties**. Voor een Admin alle drie zichtbaar;
-een Consultant ziet alleen **Organisaties** (bereik `eigen`) — de
-andere twee gaan over dingen die voor de hele omgeving gelden, niet
-over het eigen werk van één Consultant. "Overzicht" als apart
-dashboardscherm vervalt: Er is geen 4e link meer, je landt direct op
-een van de drie.
+Vier hoofdonderdelen, elk een link in `.nav-right`: **Applicatie**,
+**Assessments**, **Organisaties** en **Benchmark**. Voor een Admin alle
+vier zichtbaar; een Consultant ziet alleen **Organisaties** (bereik
+`eigen`) — de andere drie gaan over dingen die voor de hele omgeving
+gelden, niet over het eigen werk van één Consultant. "Overzicht" als apart
+dashboardscherm vervalt: Er is geen aparte dashboardlink, je landt direct
+op een van de hoofdlinks.
 
 De nummering van de onderdelen hieronder (1 t/m 12) is ongewijzigd ten
 opzichte van eerdere versies van dit document waar al naar "punt X"
 verwezen wordt elders (`datamodel.md`, `CLAUDE.md`) — alleen de
 indeling in drie navigatielinks hieronder is nieuw, met drie nieuwe
-onderdelen (2a, 11 en 12).
+onderdelen (2a, 11 en 12). Benchmark is nummer 14.
 
 | Link | Onderdelen |
 |---|---|
 | **Applicatie** (Admin-only) | 9. Gebruikers, 10. Instellingen, 2a. Algemene teksten, 11. Content-pagina's, 12. Audit-log, 13. Data-integriteit |
 | **Assessments** (Admin-only) | 1. Assessment-types, 2. Content |
 | **Organisaties** (Admin: alle, Consultant: eigen) | 3. Organisatievelden, 4. Organisaties, 5. Metingen, 6. Respondenten uitnodigen, 6a. Lead-rol toekennen, 6b. Respondenten, 7. Ingevulde scans, 8. Import (alleen voor een Admin, een Consultant ziet een melding) |
+| **Benchmark** (Admin-only) | 14. Benchmark |
 
 ### Applicatie (Admin-only)
 
@@ -248,6 +250,16 @@ Klein, groeit later mee. Instellingen nu:
 - **Verlengtermijn** (`verlengTermijnDagen`): Met hoeveel dagen de
   lijst "Data ouder dan de bewaartermijn" een scan uitstelt bij
   "Verlengen" (punt 4).
+- **Minimale groepsgrootte benchmark** (`benchmarkMinOrganisaties`,
+  startwaarde 5): Het minimale aantal organisaties per Assessment in een
+  benchmark, inclusief de organisatie van de view, om die view aan een Lead
+  te mogen toewijzen. Eén getal voor de hele omgeving. De betekenis staat in
+  `benchmark.md`, Drempels. Het privacy statement noemt dezelfde waarde
+  (`privacy-pagina.md`, sectie 3a).
+- **Minimaal aantal scans per Meting in een benchmark**
+  (`benchmarkMinScans`, startwaarde 3): Het minimale aantal afgeronde
+  scans dat een Meting moet hebben om in een benchmark gekozen te kunnen
+  worden.
 
 #### 2a. Algemene teksten
 
@@ -405,7 +417,7 @@ Alleen-lezen overzicht, Admin-only (net als de rest van Applicatie):
   filters staan in de URL, zodat een gefilterd overzicht te delen is.
   Naast de periode zijn er een Actor-keuzelijst en een keuzelijst voor
   het type (het deel van de actie vóór de punt, bijv. Import,
-  Organisatie, Meting, Respondent, Scan, Gebruiker), in plaats van het
+  Organisatie, Meting, Respondent, Scan, Gebruiker, Benchmark), in plaats van het
   tekstveld "Actietype bevat". Voor imports komt een statusfilter bij
   (voltooid, deels, mislukt).
 - **Export naar CSV**: Knop "Exporteren als CSV" boven de lijst. Het
@@ -619,6 +631,15 @@ het antwoord daarom zelf kunnen vastleggen.
   toegewezen is — die twee blijven zichtbaar als apart onderscheid,
   ook al vallen ze in de rechtenmatrix allebei onder hetzelfde bereik
   "eigen".
+- **Benchmark-vlag** (Admin-only): Op het organisatie-detail, naast
+  Kenmerken, een schakelaar "Doet mee aan benchmark"
+  (`Organisatie.benchmarkToegestaan`, `datamodel.md` deel 3). Hij staat
+  uit bij een nieuwe organisatie. Een Admin zet hem aan nadat dit met de
+  organisatie is afgesproken, bijvoorbeeld via contract of mail. Uitzetten
+  gaat na een bevestiging die noemt in hoeveel benchmarks de organisatie
+  meedoet. De leden van de organisatie vallen dan uit die benchmarks.
+  Wijzigen wordt gelogd (`organisatie.benchmarkVlagGewijzigd`). Zie
+  `benchmark.md`, Toestemming en privacy.
 - **Detail**: Kenmerken (altijd bewerkbaar), "Aangemaakt door" (zie
   hierboven), de metingen van deze organisatie met "Bekijk" naar het
   Meting-overzicht (punt 5), en de respondenten met hun status, elk met
@@ -810,6 +831,11 @@ geen vragenlijst. Krijgt de Lead later alsnog een `ScanInvulling` (via
 "Vragenlijst sturen" hierboven), dan verschijnt die gewoon als extra
 item in dezelfde lijst, met de bestaande status-routing
 (uitgenodigd/bezig/afgerond).
+
+**Benchmarkview voor een Lead**: Heeft een Admin een benchmarkview aan de
+Lead toegewezen (punt 14), dan staat die op "Mijn metingen" naast de
+resultaten van zijn Metingen. Wat hij ziet en wanneer, staat in
+`benchmark.md`, Toewijzen aan een Lead.
 
 **Verificatie-blokkade opheffen**: Na 3 mislukte pogingen op een
 verificatiecode raakt die geblokkeerd (`datamodel.md` deel 2, Toegang
@@ -1198,6 +1224,37 @@ met een waarschuwing (een 95%+-match) tellen pas mee na een expliciete
 goedkeuring per rij; er is geen import per rij (`import-scans.md`,
 Werkwijze in beheer, punt 6).
 
+### Benchmark (Admin-only)
+
+#### 14. Benchmark
+
+Vierde hoofdlink in `.nav-right`, alleen zichtbaar voor een Admin
+(`benchmark.beheren`, `datamodel.md` deel 2, Rechtenmatrix). Een Consultant
+ziet de link niet. Het gedrag staat in `benchmark.md`, de records in
+`datamodel.md` deel 3. Hier staan de schermen.
+
+- **Lijst**: Alle benchmarks, per rij de naam, de Assessments, per
+  Assessment het aantal organisaties als "X van Y" (`benchmark.md`, Teller)
+  en wanneer de benchmark is aangemaakt. Boven de lijst een oranje knop
+  "+ Benchmark aanmaken" (`.btn-or .btn-compact`).
+- **Aanmaken en wijzigen**: Eerst de Assessments, daarna de organisaties
+  met het optionele sectorfilter, en per organisatie de Meting per
+  Assessment in dezelfde lijst (`benchmark.md`, Samenstellen). De Admin
+  geeft de benchmark een naam. Wijzigen van de samenstelling kan altijd.
+- **Detail**: Kruimelpad Benchmark › {naam}. Per Assessment een sectie met
+  de teller "X van Y organisaties", de gemiddelden van de groep en per
+  organisatie het aantal afgeronde scans. De Admin ziet hier de namen van
+  de organisaties, ook van de organisaties die in een Assessment
+  ontbreken (`benchmark.md`, Weergave voor de Admin).
+- **View per organisatie**: Vanuit het detail opent de Admin voor elke
+  deelnemende organisatie een view met die organisatie tegenover de rest
+  van de groep (`benchmark.md`, View per organisatie).
+- **Toewijzen**: Op de view van een organisatie kiest de Admin een
+  bestaande Lead van die organisatie. Intrekken kan ook
+  (`benchmark.md`, Toewijzen aan een Lead).
+- **Verwijderen**: Met een bevestiging die noemt hoeveel toewijzingen
+  meegaan.
+
 ---
 
 ## Verwijderen
@@ -1210,6 +1267,12 @@ Wat er precies wordt verwijderd, staat in `datamodel.md` onder
 - **Respondent**: De persoon met al zijn ingevulde scans.
 - **Meting**: De meting met alle ingevulde scans daarin.
 - **Organisatie**: Alles wat eronder hangt.
+- **Benchmark**: De benchmark met zijn toewijzingen. Organisaties,
+  Metingen en scans blijven bestaan.
+
+Zit een Meting of Organisatie in een benchmark, dan noemt de bevestiging
+dat ook, omdat het lid dan uit die benchmark verdwijnt (`datamodel.md`,
+Verwijderen en datakoppelingen).
 
 Elke verwijderactie vraagt een bevestiging die noemt wat er mee
 verdwijnt, bij een organisatie met aantallen. Na verwijderen blijft er
