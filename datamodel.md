@@ -38,6 +38,8 @@ Assessment {
   pdfContentSecties: { titel: string, bron: ContentBron } | null // zie export-pdf-visual-volwassenheidsscan.md
   afgeleidVanAssessmentId: string | null // zie Sector-varianten hieronder
   bouwblokLabel: string             // eyebrow in de Toelichtingsmodal; standaard "Bouwsteen" (Klantcontact, Zorg), "AI-domein" bij de AI-scan
+  bouwblokEenheidEnkelvoud: string  // enkelvoud van de eenheid in lopende tekst, bijv. "bouwsteen" of "domein"
+  bouwblokEenheidMeervoud: string   // meervoud, bijv. "bouwstenen" of "domeinen"
   wegingTitel: string | null        // kop van de wegingskaart, zie Bouwblok.gewicht; leeg = standaardtitel
   wegingToelichting: string | null  // tekst van de wegingskaart, per Assessment aanpasbaar; leeg = standaardtekst
 }

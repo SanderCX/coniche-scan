@@ -242,6 +242,13 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
 - **Zorgscan-gewichten**: Bouwblok 4, 10 en 11 staan op 2, de spec is leidend
   (`CLAUDE.md`, Scoringslogica). Sander zet de seed en de opgeslagen data
   terug op 2.
+- **Organisatievelden** (`beheerpagina.md`, punt 3): De tab bestaat nog
+  niet. `VeldDefinitieEditor` staat klaar en moet in een pagina onder
+  Applicatie of bij Organisaties worden gebruikt, zoals de spec vraagt.
+- **Losse bestanden in de repo opruimen**: `v1-aanpassingen.md`,
+  `datamodel-rbac-voorstel.md`, `coniche_bouwstenen.md` en
+  `OverlegMetJoost.md` mogen weg (Joost akkoord, 8 oktober). Sander
+  verwijdert ze via een PR.
 - **Content-pagina's** (`beheerpagina.md`, punt 11): Beheerbaar maken is
   gespecificeerd en de spec is leidend. Sander twijfelt nog over de beste
   uitvoering. Pas als een nieuw overleg-document in de map staat, wordt er
