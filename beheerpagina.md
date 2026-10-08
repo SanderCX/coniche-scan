@@ -149,10 +149,14 @@ Resultaten van de Meting.
 - **Gebouwd**: Organisaties (lijst, aanmaken, detail), metingen per
   organisatie, respondenten uitnodigen, Ingevulde scans met filters, Import,
   Assessments, Content, Gebruikersbeheer (punt 9), Instellingen (punt 10),
-  Audit-log (punt 12) en Data-integriteit (punt 13). De audit-log staat nog
-  alleen in de browser, tot de database er is (`azure-plan.md`).
-- **Nog te bouwen**: Content-pagina's (punt 11), na overleg. De spec is
-  leidend.
+  Audit-log (punt 12) en Data-integriteit (punt 13). Ook gebouwd zijn de
+  resultatenpagina's in beheer: de Organisatie-resultaten per Meting
+  (punt 4) en de resultaten van één scan, met het kruimelpad hierboven en
+  de dropdown "Exporteren". De audit-log staat nog alleen in de browser,
+  tot de database er is (`azure-plan.md`).
+- **Nog te bouwen**: Organisatievelden (punt 3): De editor
+  `VeldDefinitieEditor` staat klaar, maar geen pagina gebruikt hem. En
+  Content-pagina's (punt 11), na overleg. De spec is leidend.
 
 ---
 

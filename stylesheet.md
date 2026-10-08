@@ -178,6 +178,11 @@ dezelfde waarden), dus `text-sm` en `var(--fs-s)` zijn altijd hetzelfde.
 | `--fs-m` | `.9rem` (14,4px) | Standaardknoppen en invoervelden |
 | `--fs-l` | `1.15rem` (18,4px) | Titel van modals en beheerblokken, `.admin-main h2` |
 
+- **Uitzondering in beheer**: In de beheeromgeving zijn `--fs-s` en
+  `--fs-m` allebei `.875rem` (14px). Eén tekstmaat voor alle tabeltekst,
+  formuliertekst, knoppen en invoervelden, zodat er geen verschil van een
+  halve pixel tussen besturingselementen zit. Buiten beheer (de scan zelf
+  en de resultaten) blijven de maten hierboven gelden.
 - **Beheer-paginatitel** (`.admin-main h1`): `1.9rem`.
 - **Modaltitel**: Altijd `--fs-l`, ongeacht waar de modal staat
   (`.modal-overlay .modal-box h2`).

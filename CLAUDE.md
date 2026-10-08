@@ -34,6 +34,8 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `backlog.md` | Bewust nog niet opgepakt |
 | `go-live-plan.md` | Actielijst naar productie |
 | `azure-plan.md` | Aanvulling op `go-live-plan.md` met de stappen voor de Azure-omgeving (Azure DevOps, Azure SQL, `coniche-scan.nl`) |
+| `AGENTS.md` | Instructies voor AI-agents in de repo |
+| `README.md` | Korte uitleg van de repo en hoe je de app lokaal draait |
 | `changelog.md` | Bouwlog van Sander: per datum wat er in de code veranderd is, waarom, en welke specs daarbij zijn bijgewerkt |
 
 ## Uitgangspunten
