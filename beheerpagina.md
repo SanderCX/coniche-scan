@@ -670,6 +670,13 @@ het antwoord daarom zelf kunnen vastleggen.
   weergave gebruikt de Lead-rol op zijn eigen pagina (`datamodel.md`
   deel 2, Rollen).
 
+  **Eén kop.** De pagina heeft één kop. Bovenaan staat het Meting-label als
+  eyebrow ("Nulmeting"), daaronder de naam van het Assessment als titel, en
+  daaronder "Gemiddelde over N afgeronde respondenten" (bij 1 in het
+  enkelvoud). Het resultaatonderdeel toont op deze pagina zelf geen titel en
+  geen voortgangsregel ("60 van 60 vragen beantwoord"). Die staan alleen op
+  het resultatenscherm van één scan.
+
   **Nog niet gedekt**: Export (PDF/CSV/InDesign) van dit
   organisatieresultaat. De bestaande exports blijven per één scan, zie
   `export-pdf-visual-volwassenheidsscan.md`, "Export van één scan, geen
