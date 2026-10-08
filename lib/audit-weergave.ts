@@ -18,6 +18,7 @@ const TYPE_LABEL: Record<string, string> = {
   instellingen: "Instellingen",
   auditlog: "Audit-log",
   benchmark: "Benchmark",
+  assessment: "Assessment",
 };
 
 /** Het deel van de actie vóór de punt, bijv. "organisatie" bij "organisatie.verwijderd". */
@@ -47,6 +48,11 @@ export function entiteitLabel(e: AuditEvent): string {
 const DETAIL_LABEL: Record<string, string> = {
   organisatieNaam: "Organisatie",
   benchmarkNaam: "Benchmark",
+  kortLabel: "Kort label",
+  aantalCategorieen: "Categorieën",
+  aantalBouwblokken: "Bouwblokken",
+  aantalVragen: "Vragen",
+  benchmarkNamen: "Uit benchmarks gehaald",
   niveau: "Niveau",
   metingLabels: "Metingen",
   assessmentNamen: "Assessments",

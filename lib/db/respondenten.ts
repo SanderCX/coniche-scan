@@ -3,7 +3,7 @@ import { nieuwId } from "../id";
 import { genereerToegangscode } from "../toegangscode";
 import { normaliseerEmail } from "../email";
 import { laadAlles, slaAlles, useOrganisaties } from "./store";
-import { verwijderToewijzingenVanRespondenten } from "../benchmark-store";
+import { verwijderToewijzingenVanRespondenten, verwijderToewijzingenVoorVerlorenLeadMetingen } from "../benchmark-store";
 import { logAudit } from "../audit-store";
 import { metingContext, organisatieContext } from "../audit-context";
 
@@ -170,6 +170,8 @@ export function zetLeadMetingen(lidId: string, metingIds: string[]): void {
     const eerder = lid.leadMetingIds.length;
     lid.leadMetingIds = metingIds;
     slaAlles(alles);
+    // Verliest de Lead de rol op een Meting, dan vervalt zijn toewijzing van een view van die Meting (`datamodel.md`).
+    verwijderToewijzingenVoorVerlorenLeadMetingen(lid.id, metingIds);
     logAudit({
       actie: metingIds.length === 0 ? "respondent.leadIngetrokken" : "respondent.leadToegekend",
       entiteitType: "respondent",

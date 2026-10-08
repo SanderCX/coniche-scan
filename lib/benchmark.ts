@@ -272,13 +272,17 @@ export function bouwOrganisatieView(
   };
 }
 
-/** Niveau 2: De view van één Meting naast het gemiddelde van de overige Metingen, zonder die Meting zelf (`benchmark.md`, Niveau 2). */
-export function bouwMetingView(sectie: BenchmarkSectie, metingId: string): OrganisatieView | null {
+/**
+ * Niveau 2: De view van één Meting naast het gemiddelde van de overige Metingen, zonder die Meting zelf (`benchmark.md`,
+ * Niveau 2). `minMetingen` is de drempel om de view aan een Lead te mogen toewijzen (`benchmarkMinMetingen`, inclusief de
+ * Meting zelf).
+ */
+export function bouwMetingView(sectie: BenchmarkSectie, metingId: string, minMetingen: number = MIN_METINGEN_PER_ASSESSMENT): OrganisatieView | null {
   const rij = sectie.rijen.find((r) => r.meting.id === metingId);
   if (!rij) return null;
   const anderen = sectie.rijen.filter((r) => r.meting.id !== metingId);
   return {
-    ...maakVergelijking(sectie.assessment, rij.antwoorden, anderen.map((r) => r.antwoorden), sectie.rijen.length, MIN_METINGEN_PER_ASSESSMENT),
+    ...maakVergelijking(sectie.assessment, rij.antwoorden, anderen.map((r) => r.antwoorden), sectie.rijen.length, minMetingen),
     rij,
   };
 }
@@ -432,5 +436,71 @@ export function bouwScanView(sectie: ScanSectie, invullingId: string, minScans: 
   if (!scan) return null;
   const anderen = sectie.scans.filter((s) => s.invulling.id !== invullingId);
   return maakVergelijking(sectie.assessment, scan.antwoorden, anderen.map((s) => s.antwoorden), sectie.scans.length, minScans);
+}
+
+/* ---------- De view van een Lead, op alle niveaus ---------- */
+
+/** De drempels per niveau (`beheerpagina.md`, punt 10, Instellingen). */
+export interface BenchmarkDrempels {
+  /** Niveau 1: `benchmarkMinOrganisaties`. */
+  minOrganisaties: number;
+  /** Niveau 2: `benchmarkMinMetingen`. */
+  minMetingen: number;
+  /** Niveau 3: `benchmarkMinRespondenten`. */
+  minRespondenten: number;
+}
+
+/** De view zonder de rij met de organisatie en Meting erachter: Een Lead krijgt alleen het lid zelf en aggregaten. */
+function zonderRij(view: OrganisatieView): VergelijkingsView {
+  const { rij, ...schoon } = view;
+  void rij;
+  return schoon;
+}
+
+export interface LeadBenchmarkView {
+  niveau: BenchmarkNiveau;
+  /** De naam van het lid van de view, voor de Lead zelf: Zijn organisatie, zijn Meting of de Respondent van de scan. Nooit een ander lid. */
+  eigenNaam: string;
+  /** Het label van de Meting bij niveau 2 en 3. */
+  metingLabel: string | null;
+  views: VergelijkingsView[];
+}
+
+/**
+ * Wat een Lead ziet van een toegewezen view (`benchmark.md`, Toewijzen aan een Lead op alle niveaus). Op elk niveau geldt: De
+ * Lead mag de Meting van de view inzien (`leadMetingIds`) en de groep voldoet aan de drempel van dat niveau. Anders staat
+ * er niets, ook geen kaart. Nooit de namen van andere leden: Alleen het lid zelf en aggregaten.
+ */
+export function leadViewVoorToewijzing(
+  toewijzing: { organisatieId: string; metingId?: string; onderwerpRespondentId?: string },
+  benchmark: Benchmark,
+  assessments: Assessment[],
+  organisaties: Organisatie[],
+  leadMetingIds: string[],
+  drempels: BenchmarkDrempels
+): LeadBenchmarkView | null {
+  const niveau = niveauVan(benchmark);
+  if (niveau === "organisaties") {
+    const organisatie = organisaties.find((o) => o.id === toewijzing.organisatieId);
+    if (!organisatie) return null;
+    const secties = bouwBenchmarkSecties(benchmark, assessments, organisaties);
+    const views = viewsVoorLead(secties, toewijzing.organisatieId, leadMetingIds, drempels.minOrganisaties);
+    return { niveau, eigenNaam: organisatie.naam, metingLabel: null, views: views.map(zonderRij) };
+  }
+  if (!toewijzing.metingId || !leadMetingIds.includes(toewijzing.metingId)) return null;
+  if (niveau === "metingen") {
+    const secties = bouwBenchmarkSecties(benchmark, assessments, organisaties);
+    const sectie = secties.find((s) => s.rijen.some((r) => r.meting.id === toewijzing.metingId));
+    const view = sectie ? bouwMetingView(sectie, toewijzing.metingId, drempels.minMetingen) : null;
+    if (!sectie || !view) return null;
+    const label = sectie.rijen.find((r) => r.meting.id === toewijzing.metingId)!.meting.label;
+    return { niveau, eigenNaam: label, metingLabel: label, views: view.voldoetAanDrempel ? [zonderRij(view)] : [] };
+  }
+  const sectie = bouwScanSectie(benchmark, assessments, organisaties);
+  if (!sectie || sectie.meting.id !== toewijzing.metingId) return null;
+  const scan = sectie.scans.find((s) => s.lid.id === toewijzing.onderwerpRespondentId);
+  const view = scan ? bouwScanView(sectie, scan.invulling.id, drempels.minRespondenten) : null;
+  if (!scan || !view) return null;
+  return { niveau, eigenNaam: scan.naam, metingLabel: sectie.meting.label, views: view.voldoetAanDrempel ? [view] : [] };
 }
 

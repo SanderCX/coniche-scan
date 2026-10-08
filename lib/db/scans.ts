@@ -2,6 +2,7 @@ import { Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering, ScanWeergav
 import { laadAlles, slaAlles, useOrganisaties } from "./store";
 import { logAudit, nieuweGroepId } from "../audit-store";
 import { metingContext } from "../audit-context";
+import { verwijderToewijzingenVanScans } from "../benchmark-store";
 
 /** Ingevulde scans (`ScanInvulling`): opzoeken, bijwerken, intake, bewaartermijn, verwijderen en de integriteitscontrole. */
 
@@ -149,9 +150,11 @@ export function verwijderScanInvullingen(scanInvullingIds: string[]): void {
   const alles = laadAlles();
   const gelogd: Parameters<typeof logAudit>[0] = [];
   const groepId = scanInvullingIds.length > 1 ? nieuweGroepId() : null;
+  const verwijderdeScans: { metingId: string; respondentId: string }[] = [];
   for (const organisatie of alles) {
     for (const scanUitvoering of organisatie.scanUitvoeringen) {
       for (const invulling of scanUitvoering.invullingen.filter((i) => ids.has(i.id))) {
+        verwijderdeScans.push({ metingId: scanUitvoering.id, respondentId: invulling.organisatieLidId });
         gelogd.push({
           actie: "scan.verwijderd",
           entiteitType: "scan",
@@ -165,4 +168,6 @@ export function verwijderScanInvullingen(scanInvullingIds: string[]): void {
   }
   slaAlles(alles);
   logAudit(gelogd);
+  // Niveau 3: De toewijzingen met de Respondent van een verwijderde scan als onderwerp vervallen (`datamodel.md`).
+  verwijderToewijzingenVanScans(verwijderdeScans);
 }

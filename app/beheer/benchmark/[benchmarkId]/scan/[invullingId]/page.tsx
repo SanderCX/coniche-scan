@@ -10,11 +10,12 @@ import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { BenchmarkOrganisatieView } from "@/components/benchmark/BenchmarkOrganisatieView";
+import { ToewijzenBlok } from "@/components/benchmark/ToewijzenBlok";
 
 /**
  * Benchmark binnen een Meting, de view van één scan (`benchmark.md`, Niveau 3): De scan van een Respondent naast het gemiddelde
  * van de andere afgeronde scans in dezelfde Meting, zonder de scan zelf. Alleen een Admin, die de namen van de
- * Respondenten al ziet. Onder `benchmarkMinScans` (inclusief de scan zelf) staat een waarschuwing: De vergelijking is dan te
+ * Respondenten al ziet. Onder `benchmarkMinRespondenten` (inclusief de scan zelf) staat een waarschuwing: De vergelijking is dan te
  * herleiden naar personen.
  */
 export default function BenchmarkScanPage({ params }: { params: Promise<{ benchmarkId: string; invullingId: string }> }) {
@@ -42,7 +43,7 @@ export default function BenchmarkScanPage({ params }: { params: Promise<{ benchm
 
   const sectie = bouwScanSectie(benchmark, assessments, organisaties);
   const scan = sectie?.scans.find((s) => s.invulling.id === invullingId);
-  const view = sectie ? bouwScanView(sectie, invullingId, instellingen.benchmarkMinScans) : null;
+  const view = sectie ? bouwScanView(sectie, invullingId, instellingen.benchmarkMinRespondenten) : null;
   if (!sectie || !scan || !view) {
     return (
       <div className="admin-main">
@@ -67,9 +68,15 @@ export default function BenchmarkScanPage({ params }: { params: Promise<{ benchm
       {!view.voldoetAanDrempel && (
         <p className="admin-notice" style={{ marginTop: "1.5rem" }}>
           De Meting heeft {view.aantalInGroep} {view.aantalInGroep === 1 ? "afgeronde scan" : "afgeronde scans"}, onder de ondergrens van{" "}
-          {instellingen.benchmarkMinScans}: Een vergelijking is dan te herleiden naar personen.
+          {instellingen.benchmarkMinRespondenten}: Een vergelijking is dan te herleiden naar personen. Jij ziet deze view, een Lead niet.
         </p>
       )}
+      <ToewijzenBlok
+        benchmark={benchmark}
+        onderwerp={{ organisatie: sectie.organisatie, meting: sectie.meting, respondent: scan.lid }}
+        voldoetAanDrempel={view.voldoetAanDrempel}
+        gebruikerId={gebruiker!.id}
+      />
       <BenchmarkOrganisatieView view={view} organisatieNaam={scan.naam} peildatum={new Date()} niveau="scans" />
     </div>
   );

@@ -354,8 +354,12 @@ export interface BenchmarkLid {
 export interface BenchmarkToewijzing {
   id: string;
   benchmarkId: string;
-  /** De organisatie waarvan de view is. */
+  /** De organisatie waarvan de view is (bij niveau 2 en 3: de organisatie van de Meting). */
   organisatieId: string;
+  /** Niveau 2 en 3: De Meting van de view (`benchmark.md`, Toewijzen aan een Lead op alle niveaus). */
+  metingId?: string;
+  /** Niveau 3: De Respondent van wie de scan de view is. */
+  onderwerpRespondentId?: string;
   /** `OrganisatieLid.id` van de Lead. */
   respondentId: string;
   /** `Gebruiker.id` van de Admin. */
