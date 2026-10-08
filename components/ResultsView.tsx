@@ -21,6 +21,7 @@ export function ResultsView({
   respondentNaam,
   isPreview = false,
   bouwblokHref,
+  toonKop = true,
 }: {
   assessment: Assessment;
   antwoorden: Record<string, number>;
@@ -28,6 +29,12 @@ export function ResultsView({
   isPreview?: boolean;
   /** Als gezet: bouwblokken in de top 3-lijsten linken hiernaartoe om het antwoord aan te passen. */
   bouwblokHref?: (bouwblokId: string) => string;
+  /**
+   * Titel (de naam van het Assessment) en voortgangsregel ("60 van 60 vragen beantwoord") boven de score. Uit op de
+   * Organisatie-resultaten: Daar heeft de pagina zelf al één kop met het Meting-label, het Assessment en het aantal
+   * respondenten (`beheerpagina.md`, punt 4, Eén kop). Die twee staan alleen op het resultatenscherm van één scan.
+   */
+  toonKop?: boolean;
 }) {
   const bouwblokResultaten = alleBouwblokResultaten(assessment, antwoorden);
   const groepResultaten = alleGroepResultaten(assessment, bouwblokResultaten, antwoorden);
@@ -53,10 +60,14 @@ export function ResultsView({
         <p className="mt-4 font-semibold text-ink-m">
           {respondentNaam ? `Resultaat voor ${respondentNaam}` : "Overall score"}
         </p>
-        <h1 className="mt-1">{assessment.naam}</h1>
-        <p className="resultaten-voortgang">
-          {beantwoord} van {totaal} vragen beantwoord
-        </p>
+        {toonKop && (
+          <>
+            <h1 className="mt-1">{assessment.naam}</h1>
+            <p className="resultaten-voortgang">
+              {beantwoord} van {totaal} vragen beantwoord
+            </p>
+          </>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">

@@ -31,6 +31,12 @@
     audit-log). Oudere groepen zonder rijenlijst tonen alleen wat er gebeurde. De melding en de knop "Toon 30
     dagen" bij een lege periode zijn weg.
   - 4 nieuwe tests (52 → 56): `aangemaakt_op` in de CSV, `importRegels` (twee) en `aangemaaktOp` bij een import.
+- **Eén kop op de Organisatie-resultaten** (`beheerpagina.md`, punt 4; spec van Joost, 8 oktober): Bovenaan het
+  Meting-label als eyebrow, dan de naam van het Assessment als titel, dan "Gemiddelde over N afgeronde
+  respondenten". `ResultsView` heeft een prop `toonKop` (standaard aan): Uit laat hij de tweede titel en de
+  voortgangsregel ("60 van 60 vragen beantwoord") weg. Beide staan alleen nog op het resultatenscherm van één scan
+  (beheer en respondent) en in de voorbeeld-output. Ook de resultatenpagina van een Lead (`/s/[code]/resultaten/…`)
+  gebruikt dezelfde weergave en had dezelfde dubbele kop, dus die is meegenomen.
 - **Zorgscan-gewichten weer op 2** (branch `code/zorgscan-gewichten-8-okt` van Joost, gemerged): Bouwblok 4, 10 en
   11 in `data/zorgscan-assessment.ts`, conform de spec. De seed geldt alleen voor een lege opslag: Een al opgeslagen
   Zorgscan (localStorage en Neon) houdt zijn gewichten tot een Admin ze aanpast bij Content (wordt gelogd als

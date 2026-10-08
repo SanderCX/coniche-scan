@@ -62,7 +62,8 @@ export default function RapportagePage({
             { label: "Resultaten van de Meting" },
           ]}
         />
-        <h1>Resultaten van de Meting</h1>
+        <span className="eyebrow">{scanUitvoering.label}</span>
+        <h1>{assessment.naam}</h1>
         <p className="admin-notice">
           Nog geen afgeronde scans voor {scanUitvoering.label} — {assessment.naam}.
         </p>
@@ -82,14 +83,14 @@ export default function RapportagePage({
           { label: "Resultaten van de Meting" },
         ]}
       />
-      <h1>Resultaten van de Meting</h1>
+      <span className="eyebrow">{scanUitvoering.label}</span>
+      <h1>{assessment.naam}</h1>
       <p className="text-sm text-ink-m">
-        {scanUitvoering.label} — {assessment.naam} · gemiddelde over {afgerond.length}{" "}
-        {afgerond.length === 1 ? "afgeronde respondent" : "afgeronde respondenten"}
+        Gemiddelde over {afgerond.length} {afgerond.length === 1 ? "afgeronde respondent" : "afgeronde respondenten"}
       </p>
 
       <div className="mt-8">
-        <ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} />
+        <ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />
       </div>
     </div>
   );
