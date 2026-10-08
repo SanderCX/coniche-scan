@@ -284,6 +284,25 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
 - **Zorgscan-gewichten**: Bouwblok 4, 10 en 11 staan op 2, de spec is leidend
   (`CLAUDE.md`, Scoringslogica). De seed staat op 2. Nog te controleren: De
   opgeslagen data in de database en in bestaande browsers.
+- **Fout: Omgehangen scans verschijnen in de data-integriteitscontrole**
+  (8 oktober 2026): Bij elke verplaatsing van een scan (naar een andere
+  organisatie of Meting, hele Respondent of losse respons) werkt de code
+  `organisatieLidId` bij maar niet `scanUitvoeringId`. De scan staat dan in de
+  doel-Meting, maar verwijst nog naar de oude Meting. Bij een andere
+  organisatie meldt de controle "Ingevulde scans zonder bestaande Meting",
+  terwijl er niets mis is. Binnen één organisatie blijft de verwijzing
+  onopgemerkt onjuist. Herstel: Beide verwijzingen bijwerken in alle
+  verplaatsfuncties (`lib/db/verplaatsen.ts`), en een eenmalige reparatie
+  voor scans die al verplaatst zijn (de Meting waarin ze staan is de
+  juiste). Scans die in de controle zijn verwijderd, zijn niet terug te
+  halen zonder back-up.
+- **Import: Eén Meting per bronnaam** (`import-scans.md`, Meting): Worden
+  meerdere bronnamen uit het bestand aan één organisatie gekoppeld, dan krijgt
+  elke bronnaam een eigen Meting, met de bronnaam achter het label. Komt
+  dezelfde Respondent twee keer in dezelfde Meting voor, dan krijgt de tweede
+  scan een eigen Meting met de datum in het label. Gespecificeerd op 8 oktober
+  2026, nog niet gebouwd (nu groepeert `lib/db/import.ts` op organisatie,
+  Assessment en label).
 - **Assessment verwijderen** (`beheerpagina.md`, punt 1, `datamodel.md`,
   Verwijderen en datakoppelingen): Gespecificeerd, nog niet gebouwd. Alleen
   mogelijk als er geen Meting van het Assessment bestaat, met een
