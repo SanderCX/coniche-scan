@@ -31,6 +31,11 @@
     audit-log). Oudere groepen zonder rijenlijst tonen alleen wat er gebeurde. De melding en de knop "Toon 30
     dagen" bij een lege periode zijn weg.
   - 4 nieuwe tests (52 → 56): `aangemaakt_op` in de CSV, `importRegels` (twee) en `aangemaaktOp` bij een import.
+- **Zorgscan-gewichten weer op 2** (branch `code/zorgscan-gewichten-8-okt` van Joost, gemerged): Bouwblok 4, 10 en
+  11 in `data/zorgscan-assessment.ts`, conform de spec. De seed geldt alleen voor een lege opslag: Een al opgeslagen
+  Zorgscan (localStorage en Neon) houdt zijn gewichten tot een Admin ze aanpast bij Content (wordt gelogd als
+  `bouwblok.gewichtGewijzigd`). `lib/weging.test.tsx` verwacht nu dat alleen de Zorgscan-seed afwijkende gewichten
+  heeft.
 - **Dropdowns** (`stylesheet.md`, Formulieren, Dropdowns, en Dropdown-knop; specs van Joost, 8 oktober): Eén
   gevulde chevron overal (`.65rem` breed, driehoek met de punt naar beneden). In de Dropdown-knop is het een
   CSS-vorm met `currentColor` (`.dropdown-pijl`, oranje in een outline-knop), in `select.field`,
