@@ -94,7 +94,7 @@ De view toont nooit de namen van andere organisaties. De Admin bekijkt de view e
 
 ### Toewijzen aan een Lead
 
-**Gebouwd.** De Admin kan de view van organisatie X toewijzen aan een bestaande Lead van die organisatie (`BenchmarkToewijzing`). De Lead ziet de view naast zijn eigen resultaten op zijn pagina. Intrekken kan ook, door een Admin. Wat de Lead ziet:
+**Gebouwd.** De Admin kan de view van organisatie X toewijzen aan een bestaande Lead van die organisatie (`BenchmarkToewijzing`). De Lead ziet de view naast zijn eigen resultaten op zijn pagina. Intrekken kan ook, door een Admin. De Admin ziet bij de toewijzingen per Lead een knop "Bekijk" en "Intrekken" (zie Toewijzen aan een Lead op alle niveaus). Wat de Lead ziet:
 
 - Geen automatische toegang. De Lead krijgt de view alleen als een Admin die toewijst, per benchmark en per organisatie.
 - Een sectie alleen voor Assessments waarvan hij de Meting van zijn organisatie mag inzien (`leadMetingIds`, afgeleid van `RespondentRolMeting`). Anders ziet hij een vergelijking met resultaten die hij zelf niet mag openen.
@@ -134,7 +134,7 @@ Het privacy statement belooft een minimale groepsgrootte. Die belofte moet overe
 - **Berekening.** Zie Gedeelde regels. Elke Meting telt even zwaar mee, ongeacht het aantal respondenten.
 - **Teller.** "N Metingen" per Assessment. Er is geen Y, want de Admin kiest de Metingen zelf.
 - **Weergave.** Per Assessment een sectie met het gemiddelde van alle gekozen Metingen en per Meting haar eigen scores ernaast. Daarnaast een view per Meting, met de Meting X naast het gemiddelde van de overige Metingen, zonder X, in dezelfde opbouw als de view per organisatie. Binnen één organisatie is anonimiteit geen probleem voor de Admin, dus de namen van de Metingen staan erbij.
-- **Toewijzen aan een Lead.** Eerst alleen Admin. Of en hoe een Lead de view van zijn Meting ziet, is een open punt.
+- **Toewijzen aan een Lead.** Een Admin kan de view van een Meting toewijzen aan een Lead op die Meting (zie Toewijzen aan een Lead op alle niveaus).
 - **Verwijderen.** Valt een Meting weg, dan verdwijnt het lid, zoals op niveau 1. Een benchmark met minder dan twee leden per Assessment geeft een melding.
 
 ## Niveau 3: Binnen een Meting
@@ -143,10 +143,38 @@ Het privacy statement belooft een minimale groepsgrootte. Die belofte moet overe
 
 - **Lid.** Een afgeronde scan. De vergelijkgroep van een scan is alle andere afgeronde scans in dezelfde Meting, zonder de scan zelf. Dat is dezelfde reden als op niveau 1.
 - **Berekening.** Elke scan telt even zwaar mee. Per vraag het gemiddelde antwoord van de andere scans, daarop de gedeelde scorefunctie.
-- **Ondergrens.** Bij weinig scans is de vergelijking te herleiden naar personen. Er is een ondergrens nodig voor het aantal scans in de Meting. Voorstel. Dezelfde waarde als `benchmarkMinScans`, inclusief de scan zelf. Te bevestigen.
-- **Wie ziet het.** Eerst alleen de Admin, die de namen van de Respondenten al ziet. Of een Lead of Respondent zijn eigen scan tegenover de rest ziet, is een open punt, met dezelfde privacyafweging als op niveau 1.
-- **Opslag.** Voor de Admin is geen record nodig, het is een afgeleide weergave van een Meting. Wordt het toewijsbaar, dan past het op dezelfde manier als de andere niveaus, met een `Benchmark` met niveau "scans" en één lid, de Meting.
+- **Ondergrens.** Bij weinig scans is de vergelijking te herleiden naar personen. Daarom geldt een eigen instelling voor niveau 3, `benchmarkMinRespondenten` (voorstel, startwaarde 5): Het minimale aantal afgeronde scans in de Meting, inclusief de scan van de view. Een Admin past hem aan in Instellingen. Te bevestigen.
+- **Wie ziet het.** De Admin, die de namen van de Respondenten al ziet, en een Lead aan wie de Admin de view heeft toegewezen (zie Toewijzen aan een Lead op alle niveaus).
+- **Opslag.** Omdat een view toewijsbaar is, is er een `Benchmark` met niveau "scans" en één lid, de Meting. De scan waar de view over gaat, staat op de toewijzing (`BenchmarkToewijzing.onderwerpRespondentId`).
 - **Nog te ontwerpen.** Spreiding per bouwblok (bijvoorbeeld de verdeling van de antwoorden of de laagste tot hoogste score), de plek van een scan in die spreiding, en het zichtbaar maken van hoge en lage scores. Zie `backlog.md`.
+
+## Toewijzen aan een Lead op alle niveaus
+
+**Besloten.** Op elk niveau kan een Admin een view toewijzen aan een Lead. Een view is steeds één lid tegenover de rest van de groep, zonder dat lid zelf (zie View per organisatie). Op niveau 1 is dit gebouwd. Niveau 2 en 3 zijn voorstel.
+
+| Niveau | De view gaat over | De Lead is | Vergelijkt met |
+|---|---|---|---|
+| 1 | Organisatie X | Een Lead van X, die de Meting van X mag inzien | De overige organisaties |
+| 2 | Meting M | Een Lead op M (`RespondentRolMeting`) | De overige Metingen in de benchmark |
+| 3 | De scan van Respondent R in Meting M | Een Lead op M | De overige scans in M |
+
+**Voorstel.** De regels van niveau 1 gelden op alle niveaus.
+
+- Er is geen automatische toegang. De Lead krijgt de view alleen als een Admin die toewijst, per benchmark en per onderwerp (organisatie, Meting of scan).
+- De Lead ziet nooit de namen van andere leden. Op niveau 2 staan dus geen namen van andere Metingen in zijn view, ook al ziet de Admin ze wel.
+- Een Lead ziet een sectie alleen voor een Assessment waarvan hij de Meting mag inzien, en alleen als de groep aan de drempel voldoet.
+- **Drempels.** Elk niveau heeft een eigen instelling, door een Admin aan te passen in Instellingen. Niveau 1: `benchmarkMinOrganisaties` (gebouwd, startwaarde 5). Niveau 2: `benchmarkMinMetingen` (voorstel, startwaarde 3): Het minimale aantal Metingen in de groep per Assessment, inclusief de Meting van de view. Niveau 3: `benchmarkMinRespondenten` (voorstel, startwaarde 5, zie Niveau 3). De startwaarden van niveau 2 en 3 moeten nog worden bevestigd. Een view kan alleen worden toegewezen als de groep aan de drempel van zijn niveau voldoet. De Admin ziet de benchmark altijd, ook onder de drempel.
+- **Niveau 3 en privacy.** Een view van de scan van R laat de scores van die ene Respondent zien. Een Lead ziet standaard alleen geaggregeerde resultaten (`beheerpagina.md`, punt 6a), en dat blijft zo. De toewijzing is het expliciete besluit van een Admin om één Lead deze view te geven, op één Respondent. Daar is geen extra bevestiging voor nodig. De knop "Toewijzen" noemt wel dat de Lead hiermee de scores van deze Respondent ziet. Hoge en lage scores en spreiding komen later in deze view.
+
+**Het scherm.** Op elke view staat een blok "Toewijzen aan een Lead", gelijk op alle niveaus.
+
+- Een lijst van de Leads aan wie de view is toegewezen, met de datum en twee knoppen: "Bekijk" en "Intrekken".
+- "Bekijk" opent het Respondent-overzicht (modal) van die Lead (`beheerpagina.md`, punt 6b), over de benchmarkpagina heen. De Admin ziet daarin het blok Toegang en de Metingen waarop de Lead Lead is, en kan er de persoonlijke link kopiëren. Sluiten brengt de Admin terug op de view. Op niveau 1 is de knop "Bekijk" nog niet gebouwd.
+- Onder de lijst een keuzelijst met de Leads die in aanmerking komen en de view nog niet hebben, met de knop "Toewijzen". Zijn er geen Leads meer, dan staat er "Alle Leads hebben deze view al". Heeft het onderwerp geen enkele Lead, dan staat er "Geen Lead beschikbaar" met de reden (de organisatie of Meting heeft nog geen Lead), en de knop is uitgeschakeld (`info.benchmarkToewijzen`).
+
+**Verwijderen en intrekken.** Een toewijzing vervalt als de Meting wordt verwijderd, als de Respondent van de view of de Lead wordt verwijderd, als de scan wordt verwijderd, of als de Lead de Lead-rol op de Meting verliest. Een organisatie of Meting die uit de benchmark valt, haalt haar toewijzingen weg (`datamodel.md`, Verwijderen en datakoppelingen).
+
+**Audit.** Dezelfde events als nu (`benchmark.toegewezen`, `benchmark.toewijzingIngetrokken`), met in `details` het niveau en het onderwerp (organisatie of Meting, bij niveau 3 de Meting en geen Respondentnaam). Een Bekijk-actie is geen aparte gebeurtenis.
 
 ## Audit en verwijderen
 
@@ -169,7 +197,6 @@ De gebeurtenissen staan in `datamodel.md`, Audit, onder Benchmark. Wat een verwi
 - Bevestigen van de startwaarden 5 en 3.
 - Of de tab Benchmark op het hoogste niveau blijft staan.
 - De exacte tekst van de disclaimer en het toestemmingsvakje.
-- Niveau 2: Of en hoe een Lead de view van zijn Meting ziet, en of daarvoor een eigen drempel voor het aantal Metingen nodig is.
+- Niveau 2 en 3: De startwaarden van `benchmarkMinMetingen` (3) en `benchmarkMinRespondenten` (5).
 - Niveau 2: Of voor het privacy statement iets nodig is, nu de gegevens binnen de organisatie blijven.
-- Niveau 3: Wie de vergelijking ziet, en de ondergrens voor het aantal scans.
 - Niveau 3: Het ontwerp van de spreiding en de hoge en lage scores.

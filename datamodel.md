@@ -72,7 +72,9 @@ bestaande model.
 deze variant is afgeleid (`null` bij een op zichzelf staand
 Assessment, zoals nu de Klantcontact- en AI-volwassenheidsscan). Puur
 herkomstinformatie voor beheer (bijv. "afgeleid van Klantcontact
-Volwassenheid" tonen in de lijst) — geen lopende koppeling.
+Volwassenheid" tonen in de lijst) — geen lopende koppeling. Wordt het
+template verwijderd, dan wordt het veld `null` en verdwijnt de regel
+"Afgeleid van" (zie Verwijderen en datakoppelingen).
 
 **Aanmaken = kopiëren, geen levende overerving.** Bij het aanmaken van
 een sector-variant vanuit een template kopieert die actie alle
@@ -399,12 +401,32 @@ verwijst wat niet meer bestaat.
 - **Organisatie**: Alles wat eronder hangt: Metingen, respondenten,
   toegangscodes, invullingen, antwoorden en opmerkingen. Het
   assessment-type en de content blijven staan.
+- **Assessment**: Alleen als er geen enkele Meting van dit Assessment
+  bestaat, bij welke organisatie dan ook (ook geen Meting zonder scans).
+  Bestaat er wel een Meting, dan kan het Assessment niet worden verwijderd,
+  ook niet door een Admin. Er is geen tussenvorm waarin de Metingen
+  meegaan. De Admin verwijdert eerst zelf alle Metingen van dit Assessment
+  (en zo nodig de Organisaties), en kan het Assessment daarna verwijderen.
+  Zonder Metingen bestaan er geen scans, antwoorden of benchmarkleden van
+  dit Assessment, dus er verdwijnt alleen de definitie: Het Assessment, zijn
+  Categorieën, Bouwblokken, Vragen en Schaallabels, ook de gearchiveerde.
+  Dit kan niet ongedaan worden gemaakt, en de bevestiging zegt dat.
+
+Verwijzingen naar een verwijderd Assessment worden opgeruimd. Bij een ander
+Assessment dat ervan is afgeleid, wordt `afgeleidVanAssessmentId` `null` (het
+is alleen herkomstinformatie, zie Sector-varianten). Staat het Assessment in
+`Benchmark.assessmentIds`, dan valt het daar weg en meldt de benchmark dat
+(`Benchmark.meldingen`). De kaart op de publieke keuzepagina en de
+landingspagina van het Assessment verdwijnen.
 
 Een benchmark (deel 3) verwijst naar organisaties, metingen en Leads.
 Verdwijnt een van die records, dan verdwijnt ook de verwijzing. Een Meting
 weg haalt het lid uit de benchmark. Een Organisatie weg haalt haar leden en
 toewijzingen weg. Een Respondent met Lead-rol weg haalt zijn toewijzingen
-weg. Een verwijderde ingevulde scan haalt geen lid weg maar verandert wel
+weg. Bij niveau 2 en 3 haalt een Meting weg ook de toewijzingen van die
+Meting weg, en een verwijderde Respondent of scan de toewijzingen met die
+Respondent als onderwerp. Verliest een Lead de rol op een Meting, dan
+vervalt zijn toewijzing voor die Meting. Een verwijderde ingevulde scan haalt geen lid weg maar verandert wel
 de cijfers. De benchmark zelf blijft bestaan.
 
 ### Content bewerken
@@ -853,6 +875,12 @@ punt 6b (Respondent-overzicht), loggen elk een eigen gebeurtenis:
 Een overgeslagen scan bij een samenvoeging of bulkverplaatsing wordt als
 onderdeel van `details` gelogd en niet als aparte actie.
 
+**Assessment verwijderd.** Het verwijderen van een Assessment is een
+gebeurtenis (`assessment.verwijderd`). `details` bevat de naam en het kort
+label van het Assessment, het aantal Categorieën, Bouwblokken en Vragen dat
+meeging, en de namen van de benchmarks waaruit het is gehaald. Er zijn
+geen scans of persoonsgegevens bij betrokken.
+
 **Gewichtswijziging.** Een wijziging van `Bouwblok.gewicht` is een
 gebeurtenis (`bouwblok.gewichtGewijzigd`), omdat die terugwerkend de
 scores van alle scans van dat Assessment verandert. `details` bevat de
@@ -867,8 +895,9 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   `details` bevat de naam van de benchmark en de namen van de Assessments
   en organisaties zoals ze op dat moment waren.
 - `benchmark.toegewezen` en `benchmark.toewijzingIngetrokken`. `details`
-  bevat de benchmark en de organisatie, zonder naam of e-mailadres van de
-  Lead.
+  bevat de benchmark en de organisatie (bij niveau 2 en 3 het niveau en de
+  Meting, bij niveau 3 zonder naam van de Respondent), zonder naam of
+  e-mailadres van de Lead.
 - `organisatie.benchmarkVlagGewijzigd`. `details` bevat de naam van de
   organisatie en de nieuwe stand van de vlag.
 
@@ -988,7 +1017,9 @@ BenchmarkLid {
 BenchmarkToewijzing {
   id: string
   benchmarkId: string
-  organisatieId: string             // de organisatie waarvan de view is
+  organisatieId: string             // de organisatie waarvan de view is (bij niveau 2 en 3: de organisatie van de Meting)
+  metingId?: string                 // voorstel: niveau 2 en 3, de Meting van de view
+  onderwerpRespondentId?: string    // voorstel: niveau 3, de Respondent van wie de scan de view is
   respondentId: string              // de Lead
   toegewezenDoor: string            // Admin
   toegewezenOp: datetime
@@ -997,7 +1028,8 @@ BenchmarkToewijzing {
 
 Op niveau "organisaties" heeft een organisatie per benchmark per Assessment
 hoogstens één lid. Een toewijzing is uniek per combinatie van benchmark,
-organisatie en Lead. Het sectorfilter bij het samenstellen wordt niet
+onderwerp (organisatie, bij niveau 2 en 3 ook de Meting en bij niveau 3 de
+Respondent) en Lead. Het sectorfilter bij het samenstellen wordt niet
 opgeslagen.
 
 **`meldingen`** (gebouwd) is wel opgeslagen, maar geen inhoud van de
@@ -1027,7 +1059,10 @@ organisaties met de vlag kunnen in een benchmark worden opgenomen. Zie
 
 ### Instellingen
 
-Twee globale instellingen, door een Admin te bepalen in beheer
-(`beheerpagina.md`, punt 10), namelijk `benchmarkMinOrganisaties`
-(startwaarde 5) en `benchmarkMinScans` (startwaarde 3). De betekenis staat in `benchmark.md`,
-Drempels.
+Globale instellingen, door een Admin te bepalen in beheer
+(`beheerpagina.md`, punt 10). `benchmarkMinOrganisaties` (startwaarde 5,
+niveau 1) en `benchmarkMinScans` (startwaarde 3) zijn gebouwd. Voorstel: Per
+niveau een eigen drempel voor het toewijzen van een view aan een Lead,
+`benchmarkMinMetingen` (niveau 2, startwaarde 3) en `benchmarkMinRespondenten`
+(niveau 3, startwaarde 5). De betekenis staat in `benchmark.md`, Drempels en
+Toewijzen aan een Lead op alle niveaus.

@@ -156,7 +156,8 @@ Resultaten van de Meting.
   tot de database er is (`azure-plan.md`).
 - **Nog te bouwen**: Organisatievelden (punt 3): De editor
   `VeldDefinitieEditor` staat klaar, maar geen pagina gebruikt hem. En
-  Content-pagina's (punt 11), na overleg. De spec is leidend. Verder de
+  Het verwijderen van een Assessment (punt 1), gespecificeerd op 8 oktober
+  2026. En Content-pagina's (punt 11), na overleg. De spec is leidend. Verder de
   Benchmark (punt 14, `benchmark.md`): Het niveau tussen organisaties is
   gebouwd (PR 61). De niveaus binnen een organisatie en binnen een Meting zijn
   besproken en nog niet gebouwd.
@@ -255,13 +256,21 @@ Klein, groeit later mee. Instellingen nu:
 - **Minimale groepsgrootte benchmark** (`benchmarkMinOrganisaties`,
   startwaarde 5): Het minimale aantal organisaties per Assessment in een
   benchmark, inclusief de organisatie van de view, om die view aan een Lead
-  te mogen toewijzen. Eén getal voor de hele omgeving. De betekenis staat in
-  `benchmark.md`, Drempels. Het privacy statement noemt dezelfde waarde
-  (`privacy-pagina.md`, sectie 3a).
+  te mogen toewijzen. Eén getal voor deze drempel van niveau 1. De betekenis
+  staat in `benchmark.md`, Drempels. Het privacy statement noemt dezelfde
+  waarde (`privacy-pagina.md`, sectie 3a).
 - **Minimaal aantal scans per Meting in een benchmark**
   (`benchmarkMinScans`, startwaarde 3): Het minimale aantal afgeronde
   scans dat een Meting moet hebben om in een benchmark gekozen te kunnen
   worden.
+- **Minimale groepsgrootte niveau 2** (`benchmarkMinMetingen`, voorstel,
+  startwaarde 3): Het minimale aantal Metingen per Assessment in een
+  benchmark binnen een organisatie, inclusief de Meting van de view, om die
+  view aan een Lead te mogen toewijzen.
+- **Minimaal aantal scans niveau 3** (`benchmarkMinRespondenten`, voorstel,
+  startwaarde 5): Het minimale aantal afgeronde scans in de Meting,
+  inclusief de scan van de view, om die view aan een Lead te mogen
+  toewijzen.
 
 #### 2a. Algemene teksten
 
@@ -318,6 +327,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.dataIntegriteit` | Applicatie, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
 | `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
 | `info.bulkExportOrganisatie` | Ingevulde scans, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie. |
+| `info.assessmentVerwijderen` | Assessments, op de kaart en het detail, naast de uitgeschakelde knop "Verwijderen" | Een Assessment kan alleen worden verwijderd als er geen Meting van is. Verwijder eerst alle Metingen van dit Assessment, bij alle organisaties. |
 | `info.benchmarkInstellingen` | Applicatie, Instellingen, formulier Benchmark | De minimale groepsgrootte is het aantal organisaties per Assessment, inclusief de organisatie van de view, dat nodig is voordat een Lead de vergelijking ziet. Het minimale aantal scans is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. |
 | `info.benchmarkVlag` | Organisatie-detail, bij de schakelaar "Doet mee aan benchmark" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks. |
 | `info.benchmarkToewijzen` | Benchmark, view per organisatie, achter de uitgeschakelde knop "Toewijzen" | Toewijzen kan pas als de organisatie een Lead heeft en minstens één Assessment aan de minimale groepsgrootte voldoet. Anders zou een Lead een vergelijking zien met te weinig andere organisaties om anoniem te blijven. |
@@ -548,6 +558,37 @@ het Assessment links van de naam, in dezelfde vormgeving als op de
 publieke kaart (`stylesheet.md`, Assessment-icoon): Een rond vlak in
 `var(--or-faint)` met het icoon in `var(--or)`. De grootte is hier `2rem`.
 Het icoon is dus niet zwart en niet los zonder rondje.
+
+**Assessment verwijderen.** Een Assessment kan alleen worden verwijderd als
+er geen enkele Meting van is, bij welke organisatie dan ook. Zodra er een
+Meting is, kan het niet meer, ook niet door een Admin. Wil de Admin het
+toch weg, dan verwijdert hij eerst alle Metingen van dit Assessment
+(punt 4 en 6) en daarna het Assessment. Er is geen optie waarmee de
+Metingen meegaan. De regels staan in `datamodel.md`, Verwijderen en
+datakoppelingen.
+
+- **Knop**: Op de kaart in de Assessment-lijst en op het detail, een
+  "Verwijderen" in de stijl van de andere verwijderacties
+  (`.btn-outline .btn-compact`, destructief in de bevestiging).
+- **Uitgeschakeld**: Zolang er Metingen zijn, is de knop uitgeschakeld. Ernaast
+  staat een Info-icoon (`info.assessmentVerwijderen`) en een regel met het
+  aantal, bijvoorbeeld "3 Metingen bij 2 organisaties". Zo ziet de Admin wat
+  er eerst weg moet.
+- **Bevestiging**: Een modal met de titel "Assessment verwijderen?" en de
+  tekst "Weet je zeker dat je {naam} wilt verwijderen? Dit kan niet ongedaan
+  worden gemaakt." Daaronder wat er verdwijnt: Het Assessment met zijn
+  Categorieën, Bouwblokken en Vragen (met aantallen), de benchmarks waaruit
+  het wordt gehaald, en de Assessments die ervan zijn afgeleid (die houden
+  hun inhoud, alleen de regel "Afgeleid van" vervalt). Knoppen
+  "Annuleren" en een destructieve "Verwijderen".
+- **Controle bij bevestigen**: Op het moment van bevestigen wordt opnieuw
+  gecontroleerd of er Metingen zijn. Is er in de tussentijd een Meting
+  bijgekomen, dan gebeurt er niets en meldt het scherm dat het Assessment
+  nu Metingen heeft. De regel hoort bij de gegevenslaag, niet alleen bij de
+  uitgeschakelde knop. Met de database wordt dit een verwijzing die het
+  verwijderen weigert zolang er Metingen zijn.
+- **Gelogd**: `assessment.verwijderd` (`datamodel.md`, Audit). Recht:
+  `content.beheren`, dus Admin-only.
 
 #### 2. Content
 
@@ -1272,8 +1313,11 @@ en is voorstel.
   van de groep (`benchmark.md`, View per organisatie). Het groepsgemiddelde
   staat in het staafdiagram als tweede, neutrale balk.
 - **Toewijzen**: Op de view van een organisatie kiest de Admin een
-  bestaande Lead van die organisatie. Intrekken kan ook
-  (`benchmark.md`, Toewijzen aan een Lead).
+  bestaande Lead van die organisatie. Per toegewezen Lead staan een rij met de
+  datum en de knoppen "Bekijk" (nog niet gebouwd) en "Intrekken". "Bekijk"
+  opent het Respondent-overzicht van die Lead (punt 6b) over de pagina heen.
+  Hetzelfde blok staat op elk niveau (`benchmark.md`, Toewijzen aan een Lead
+  op alle niveaus).
 - **Verwijderen**: Met een bevestiging die noemt hoeveel toewijzingen
   meegaan.
 
@@ -1283,8 +1327,9 @@ twee per Assessment, zonder vlag), en de view per Meting naast het gemiddelde
 van de overige Metingen, met de namen van de Metingen. Niveau 3 is een view
 op één Meting: De scan van een Respondent naast het gemiddelde van de andere
 scans in die Meting. De spreiding en de hoge en lage scores zijn nog niet
-ontworpen (`benchmark.md`, Niveau 3). Beide niveaus zijn voorlopig alleen
-voor een Admin.
+ontworpen (`benchmark.md`, Niveau 3). De view van een Meting (niveau 2) en van
+een scan (niveau 3) kan, net als die van een organisatie, aan een Lead op die
+Meting worden toegewezen, met hetzelfde blok "Toewijzen aan een Lead".
 
 ---
 
