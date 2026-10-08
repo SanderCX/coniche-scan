@@ -70,6 +70,25 @@
     zijn niet aangepast: De formulering volgt volgens de spec nog.
   - 15 nieuwe tests (56 → 71 totaal): De berekening, de keuzelijst, de view, de drempel, de Lead-regels en de
     opruimregels.
+- **Verplaatste scans en import per bronnaam** (specs van Joost, 8 oktober, PR 67):
+  - **Fout hersteld**: Een scan heeft twee verwijzingen, naar zijn Respondent (`organisatieLidId`) en naar zijn Meting
+    (`scanUitvoeringId`). Elke verplaatsing in `lib/db/verplaatsen.ts` (hele Respondent, losse respons naar een andere
+    organisatie en naar een andere Meting) werkte alleen de eerste bij. Nu beide. Daardoor meldde de
+    data-integriteitscontrole een correct verplaatste scan als "zonder Meting", en kon een scan via die controle worden
+    verwijderd.
+  - **Bestaande data hersteld bij het laden** (`normaliseerOrganisatie`): De Meting waarin een scan staat is de juiste, dus
+    `scanUitvoeringId` wordt daarop gezet, ook in de kopie die uit Neon komt. Gevolg: De controle "Ingevulde scans zonder
+    bestaande Meting" kan niet meer voorkomen, want een scan die in een Meting staat, heeft die Meting. De controle
+    blijft staan. Scans die al via die controle zijn verwijderd, komen hierdoor niet terug.
+  - **Import, een Meting per bronnaam** (`import-scans.md`, Meting): Rijen delen een Meting als doelorganisatie, Assessment,
+    bronnaam (de organisatienaam uit het bestand, getrimd) en label overeenkomen. Zijn er twee of meer bronnamen aan
+    dezelfde organisatie gekoppeld, dan krijgt het label de bronnaam erachter ("Legacy-import 2026 Onderdeel A"); bij
+    één bronnaam blijft het label zoals het was. De importpagina bepaalt dat over de hele import
+    (`bronnamenPerDoel`), de import zelf krijgt `bronnaam`, `bronnaamInLabel` en `bekendeMetingen` mee.
+  - **Eén scan per Respondent per Meting**: Heeft een Respondent in de gevonden Meting al een scan, dan krijgt de scan een eigen
+    Meting met de datum erachter ("... (14-01-2026)"), en bij dezelfde datum een volgnummer ("(2)"). De datum komt van
+    `created_at` (`gestartOp`). Een latere, aparte aanroep sluit aan via de labels die de import terugmeldt.
+  - 7 nieuwe tests (97 → 104 totaal), en een aangepaste verwachting in de integriteitstest.
 - **Toewijzen op alle benchmarkniveaus, drempels per niveau en Assessment verwijderen** (specs van Joost, 8 oktober,
   PR 65):
   - **Toewijzen aan een Lead op niveau 2 en 3**: Het blok "Toewijzen aan een Lead" (`ToewijzenBlok`) staat nu op elke view en is

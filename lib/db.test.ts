@@ -87,14 +87,16 @@ describe("data-integriteit", () => {
 
   it("vindt per controle de verwijzingen naar een niet-bestaand record", () => {
     beschadigd();
+    // "Scan zonder Meting" komt hier niet meer voor: De Meting waarin een scan staat is de juiste, en een verwijzing naar een
+    // andere Meting wordt bij het laden hersteld (zie "scanverwijzingen" hieronder).
     expect(aantallen()).toEqual({
       "scan-zonder-respondent": 1,
-      "scan-zonder-meting": 1,
+      "scan-zonder-meting": 0,
       "respondent-zonder-organisatie": 1,
       "meting-zonder-organisatie": 1,
       "lead-zonder-meting": 1,
     });
-    expect(db.totaalVondsten(db.controleerIntegriteit())).toBe(5);
+    expect(db.totaalVondsten(db.controleerIntegriteit())).toBe(4);
   });
 
   it("gezonde data heeft geen vondsten", () => {
@@ -302,3 +304,104 @@ describe("respons naar andere Meting", () => {
     expect(db.verplaatsResponsNaarMeting("I1", null, "Nieuw")).toEqual({ ok: true });
   });
 });
+
+describe("scanverwijzingen na verplaatsen", () => {
+  const scanVan = (orgId: string, scanId: string) => {
+    for (const m of laad().find((o) => o.id === orgId)!.scanUitvoeringen as unknown as { id: string; invullingen: { id: string; scanUitvoeringId: string }[] }[]) {
+      const i = m.invullingen.find((x) => x.id === scanId);
+      if (i) return { metingId: m.id, verwijstNaar: i.scanUitvoeringId };
+    }
+    return null;
+  };
+
+  it("een scan naar een andere Meting verplaatsen werkt beide verwijzingen bij", () => {
+    zet([org("O1", [lid("L1", "O1", "a@x.nl")], [meting("M1", "O1", "Een", [inv("I1", "M1", "L1")]), meting("M2", "O1", "Twee", [])])]);
+    expect(db.verplaatsResponsNaarMeting("I1", "M2")).toMatchObject({ ok: true });
+    expect(scanVan("O1", "I1")).toEqual({ metingId: "M2", verwijstNaar: "M2" });
+    expect(db.totaalVondsten(db.controleerIntegriteit())).toBe(0);
+  });
+
+  it("een scan naar een andere organisatie verplaatsen werkt beide verwijzingen bij, ook in een nieuwe Meting", () => {
+    zet([
+      org("O1", [lid("L1", "O1", "a@x.nl")], [meting("M1", "O1", "Een", [inv("I1", "M1", "L1")])]),
+      org("O2", [], []),
+    ]);
+    expect(db.verplaatsResponsNaarOrganisatie("I1", "O2", null, "Nieuw")).toMatchObject({ ok: true });
+    const na = scanVan("O2", "I1")!;
+    expect(na.verwijstNaar).toBe(na.metingId);
+    expect(db.totaalVondsten(db.controleerIntegriteit())).toBe(0);
+  });
+
+  it("bestaande data met een scan die naar een andere Meting verwijst wordt bij het laden hersteld", () => {
+    zet([org("O1", [lid("L1", "O1", "a@x.nl")], [meting("M1", "O1", "Een", [{ ...inv("I1", "M1", "L1"), scanUitvoeringId: "OUDE-METING" }])])]);
+    expect(db.totaalVondsten(db.controleerIntegriteit())).toBe(0);
+    expect(db.getScanInvulling("I1")?.scanUitvoering.id).toBe("M1");
+  });
+});
+
+describe("import: een Meting per bronnaam en één scan per Respondent per Meting", () => {
+  const gebruiker = { id: "a1", email: "a1@x.nl", naam: "a1", wachtwoord: "x", rol: "admin", actief: true, laatstIngelogdOp: null, aangemaaktOp: "x" };
+  const rij = (bronnaam: string, email: string, extra: Rij = {}) => ({
+    organisatieNaam: bronnaam, respondentEmail: email, respondentNaam: "", respondentFunctie: "", respondentTeam: "", respondentNotities: "",
+    meetingLabel: "Legacy-import 2026", status: "afgerond", uitgenodigdOp: "2026-01-14T10:00:00.000Z", gestartOp: "2026-01-14T10:00:00.000Z",
+    afgerondOp: null, antwoorden: {}, opmerkingenPerBouwblok: {}, rijNummer: 1, ...extra,
+  });
+  const keuze = (r: Rij, extra: Rij = {}) => ({ rij: r, assessmentId: "A", organisatieId: "O1", ...extra });
+  const labels = () => (laad()[0].scanUitvoeringen as unknown as { label: string; invullingen: unknown[] }[]).map((m) => `${m.label} (${m.invullingen.length})`);
+  const opzet = () => {
+    opslag.set("coniche-scan:gebruikers", JSON.stringify([gebruiker]));
+    zet([org("O1", [], [])]);
+  };
+
+  it("twee bronnamen in één organisatie krijgen elk een eigen Meting, met de bronnaam achter het label", () => {
+    opzet();
+    db.voerLegacyImportUit(
+      [
+        keuze(rij("Onderdeel A", "a@x.nl"), { bronnaam: "Onderdeel A", bronnaamInLabel: true }),
+        keuze(rij("Onderdeel B", "b@x.nl"), { bronnaam: "Onderdeel B", bronnaamInLabel: true }),
+        keuze(rij("Onderdeel A", "c@x.nl"), { bronnaam: "Onderdeel A", bronnaamInLabel: true }),
+      ] as never,
+      "a1"
+    );
+    expect(labels().sort()).toEqual(["Legacy-import 2026 Onderdeel A (2)", "Legacy-import 2026 Onderdeel B (1)"]);
+  });
+
+  it("bij één bronnaam blijft het label zoals het was", () => {
+    opzet();
+    db.voerLegacyImportUit([keuze(rij("Onderdeel A", "a@x.nl"), { bronnaam: "Onderdeel A", bronnaamInLabel: false }), keuze(rij("Onderdeel A", "b@x.nl"), { bronnaam: "Onderdeel A" })] as never, "a1");
+    expect(labels()).toEqual(["Legacy-import 2026 (2)"]);
+  });
+
+  it("dezelfde Respondent twee keer in dezelfde Meting: De tweede scan krijgt een eigen Meting met de datum, en bij dezelfde datum een volgnummer", () => {
+    opzet();
+    db.voerLegacyImportUit(
+      [keuze(rij("Org", "a@x.nl")), keuze(rij("Org", "A@X.nl ")), keuze(rij("Org", "a@x.nl")), keuze(rij("Org", "b@x.nl"))] as never,
+      "a1"
+    );
+    expect(labels().sort()).toEqual([
+      "Legacy-import 2026 (14-01-2026) (2) (1)",
+      "Legacy-import 2026 (14-01-2026) (1)",
+      "Legacy-import 2026 (2)",
+    ].sort());
+    // Nooit twee scans van dezelfde Respondent in één Meting.
+    for (const m of laad()[0].scanUitvoeringen as unknown as { invullingen: { organisatieLidId: string }[] }[]) {
+      const ids = m.invullingen.map((i) => i.organisatieLidId);
+      expect(new Set(ids).size).toBe(ids.length);
+    }
+  });
+
+  it("een latere, aparte aanroep sluit aan bij de Metingen die de import eerder aanmaakte, ook bij een variant met datum", () => {
+    opzet();
+    const eerste = db.voerLegacyImportUit([keuze(rij("Org", "a@x.nl")), keuze(rij("Org", "a@x.nl"))] as never, "a1");
+    const bekend: Record<string, string> = {};
+    eerste.rijResultaten.forEach((r) => (bekend[r.label] = r.scanUitvoeringId));
+    db.voerLegacyImportUit([keuze(rij("Org", "b@x.nl"), { bekendeMetingen: bekend }), keuze(rij("Org", "a@x.nl"), { bekendeMetingen: bekend })] as never, "a1");
+    // b@x.nl komt in de eerste Meting, a@x.nl heeft in beide al een scan en krijgt een derde Meting met een volgnummer.
+    expect(labels().sort()).toEqual([
+      "Legacy-import 2026 (14-01-2026) (1)",
+      "Legacy-import 2026 (14-01-2026) (2) (1)",
+      "Legacy-import 2026 (2)",
+    ].sort());
+  });
+});
+
