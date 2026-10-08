@@ -107,7 +107,7 @@ export default function LeadResultatenPage({
           {afgerond.length === 1 ? "afgeronde respondent" : "afgeronde respondenten"}
         </p>
         <div className="mt-8">
-          <ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} />
+          <ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />
         </div>
       </div>
     </PageWithChrome>
