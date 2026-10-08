@@ -245,7 +245,8 @@ export function verplaatsRespondentNaarOrganisatie(
     }
 
     bronMeting.invullingen = bronMeting.invullingen.filter((i) => i.id !== invulling.id);
-    doelMeting.invullingen.push({ ...invulling, organisatieLidId: ontvanger.id });
+    // Een scan heeft twee verwijzingen: Naar zijn Respondent en naar zijn Meting. Een verplaatsing werkt beide bij.
+    doelMeting.invullingen.push({ ...invulling, organisatieLidId: ontvanger.id, scanUitvoeringId: doelMeting.id });
     resultaat.verplaatst++;
   }
 
@@ -362,7 +363,8 @@ export function verplaatsResponsNaarOrganisatie(
   }
 
   bronMeting.invullingen = bronMeting.invullingen.filter((i) => i.id !== scanInvullingId);
-  doelMeting.invullingen.push({ ...invulling, organisatieLidId: doelLid.id });
+  // Beide verwijzingen bijwerken: De Respondent en de Meting (zie `verplaatsRespondentNaarOrganisatie`).
+  doelMeting.invullingen.push({ ...invulling, organisatieLidId: doelLid.id, scanUitvoeringId: doelMeting.id });
   slaAlles(alles);
   logAudit({
     actie: "respons.verplaatst",
@@ -446,6 +448,8 @@ function verplaatsNaarMeting(
   }
 
   bronMeting.invullingen = bronMeting.invullingen.filter((i) => i.id !== scanInvullingId);
+  // Een scan heeft twee verwijzingen: Naar zijn Respondent en naar zijn Meting. Een verplaatsing werkt beide bij.
+  invulling.scanUitvoeringId = doelMeting.id;
   doelMeting.invullingen.push(invulling);
   slaAlles(alles);
   return {

@@ -31,12 +31,49 @@ export interface LegacyImportKeuze {
    * bij diezelfde combinatie moet aansluiten.
    */
   metingId?: string | null;
+  /**
+   * De organisatienaam zoals die in het bestand staat (getrimd), `import-scans.md`, Meting. Standaard `rij.organisatieNaam`.
+   * Rijen delen alleen een Meting als doelorganisatie, Assessment, bronnaam en label overeenkomen.
+   */
+  bronnaam?: string;
+  /**
+   * Zijn er twee of meer bronnamen aan dezelfde organisatie gekoppeld, dan krijgt het label de bronnaam erachter, bijvoorbeeld
+   * "Legacy-import 2026 Onderdeel A". Bij maar één bronnaam zegt die niets extra's en blijft het label zoals het is. De
+   * aanroeper weet dat over de hele import, deze aanroep ziet maar een deel van de rijen.
+   */
+  bronnaamInLabel?: boolean;
+  /**
+   * Metingen die deze import eerder aanmaakte voor dezelfde organisatie, Assessment en bronnaam, per label. Zo sluiten ook de
+   * varianten met een datum (zie hieronder) aan bij een latere, aparte aanroep.
+   */
+  bekendeMetingen?: Record<string, string>;
 }
 
 /** Per verwerkte rij, in dezelfde volgorde als de input: met welke organisatie/Meting hij uiteindelijk geschreven is — voor de aanroeper om te onthouden richting een latere, aparte aanroep (zie `LegacyImportKeuze`). */
 export interface LegacyImportRijResultaat {
   organisatieId: string;
   scanUitvoeringId: string;
+  /** Het uiteindelijke label van de Meting, voor de aanroeper om te onthouden (zie `LegacyImportKeuze.bekendeMetingen`). */
+  label: string;
+  bronnaam: string;
+}
+
+/**
+ * Het label van de poging om een Meting te vinden of aan te maken (`import-scans.md`, Eén scan per Respondent per Meting): Eerst
+ * het gewone label, heeft de Respondent daar al een scan in, dan met de datum van `created_at` erachter ("Legacy-import
+ * 2026 Onderdeel A (14-01-2026)"), en bij dezelfde datum met een volgnummer ("(2)", "(3)").
+ */
+export function importMetingLabel(basis: string, datum: string, poging: number): string {
+  if (poging === 0) return basis;
+  if (poging === 1) return `${basis} (${datum})`;
+  return `${basis} (${datum}) (${poging})`;
+}
+
+/** De datum van een scan voor het label, zoals in de beheerweergave: 14-01-2026. */
+function labelDatum(iso: string | null | undefined): string {
+  const datum = iso ? new Date(iso) : null;
+  if (!datum || Number.isNaN(datum.getTime())) return "onbekende datum";
+  return datum.toLocaleDateString("nl-NL", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
 /**
@@ -82,7 +119,7 @@ export function voerLegacyImportUit(
   const nieuweOrgPerNaam = new Map<string, Organisatie>();
   const nieuweMetingPerSleutel = new Map<string, ScanUitvoering>();
 
-  for (const { rij, assessmentId, organisatieId, metingId } of keuzes) {
+  for (const { rij, assessmentId, organisatieId, metingId, bronnaam: bronnaamKeuze, bronnaamInLabel, bekendeMetingen } of keuzes) {
     let organisatie =
       (organisatieId ? alles.find((o) => o.id === organisatieId) : undefined) ??
       nieuweOrgPerNaam.get(rij.organisatieNaam);
@@ -159,29 +196,41 @@ export function voerLegacyImportUit(
       });
     }
 
-    const metingSleutel = `${organisatie.id}::${assessmentId}::${rij.meetingLabel}`;
-    let scanUitvoering =
-      (metingId ? organisatie.scanUitvoeringen.find((s) => s.id === metingId) : undefined) ??
-      nieuweMetingPerSleutel.get(metingSleutel);
-    if (!scanUitvoering) {
-      scanUitvoering = {
-        id: nieuwId(),
-        organisatieId: organisatie.id,
-        assessmentId,
-        label: rij.meetingLabel,
-        aangemaaktOp: new Date().toISOString(),
-        invullingen: [],
-      };
-      organisatie.scanUitvoeringen.push(scanUitvoering);
-      nieuweMetingPerSleutel.set(metingSleutel, scanUitvoering);
-      gelogd.push({
-        actie: "meting.aangemaakt",
-        entiteitType: "meting",
-        entiteitId: scanUitvoering.id,
-        entiteitNaam: scanUitvoering.label,
-        groepId,
-        details: metingContext(organisatie, scanUitvoering),
-      });
+    // Eén Meting per doelorganisatie, Assessment, bronnaam en label, en hooguit één scan per Respondent per Meting
+    // (`import-scans.md`, Meting en Eén scan per Respondent per Meting). Heeft de Respondent in de gevonden Meting al een scan,
+    // dan krijgt de scan een eigen Meting met een label met de datum erachter.
+    const bronnaam = (bronnaamKeuze ?? rij.organisatieNaam).trim();
+    const basisLabel = bronnaamInLabel ? `${rij.meetingLabel} ${bronnaam}` : rij.meetingLabel;
+    const bekend: Record<string, string> = { ...(bekendeMetingen ?? {}), ...(metingId ? { [basisLabel]: metingId } : {}) };
+    const datumTekst = labelDatum(rij.gestartOp ?? rij.uitgenodigdOp);
+    let scanUitvoering: ScanUitvoering | undefined;
+    for (let poging = 0; !scanUitvoering; poging++) {
+      const label = importMetingLabel(basisLabel, datumTekst, poging);
+      const metingSleutel = `${organisatie.id}::${assessmentId}::${bronnaam}::${label}`;
+      let meting =
+        (bekend[label] ? organisatie.scanUitvoeringen.find((s) => s.id === bekend[label]) : undefined) ??
+        nieuweMetingPerSleutel.get(metingSleutel);
+      if (!meting) {
+        meting = {
+          id: nieuwId(),
+          organisatieId: organisatie.id,
+          assessmentId,
+          label,
+          aangemaaktOp: new Date().toISOString(),
+          invullingen: [],
+        };
+        organisatie.scanUitvoeringen.push(meting);
+        nieuweMetingPerSleutel.set(metingSleutel, meting);
+        gelogd.push({
+          actie: "meting.aangemaakt",
+          entiteitType: "meting",
+          entiteitId: meting.id,
+          entiteitNaam: meting.label,
+          groepId,
+          details: metingContext(organisatie, meting),
+        });
+      }
+      if (!meting.invullingen.some((i) => i.organisatieLidId === lid!.id)) scanUitvoering = meting;
     }
 
     const invulling: ScanInvulling = {
@@ -213,7 +262,7 @@ export function voerLegacyImportUit(
         ...(rij.vereistBevestiging ? { vraagtekstMatchPercentage: rij.assessmentMatchPercentage } : {}),
       },
     });
-    rijResultaten.push({ organisatieId: organisatie.id, scanUitvoeringId: scanUitvoering.id });
+    rijResultaten.push({ organisatieId: organisatie.id, scanUitvoeringId: scanUitvoering.id, label: scanUitvoering.label, bronnaam });
     geimporteerd++;
   }
 

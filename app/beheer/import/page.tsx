@@ -122,7 +122,8 @@ function ImportLegacyPage() {
   // Goedgekeurde waarschuwingsrijen (95%+-match): Goedkeuren is alleen een keuze om mee te nemen en schrijft niets weg.
   const [goedgekeurdeSleutels, setGoedgekeurdeSleutels] = useState<Set<string>>(new Set());
   const [orgIdPerNaam, setOrgIdPerNaam] = useState<Record<string, string>>({});
-  const [metingIdPerSleutel, setMetingIdPerSleutel] = useState<Record<string, string>>({});
+  // Per doelorganisatie, Assessment en bronnaam de Metingen die deze import al aanmaakte, per label (`LegacyImportKeuze.bekendeMetingen`).
+  const [metingIdPerSleutel, setMetingIdPerSleutel] = useState<Record<string, Record<string, string>>>({});
   const [genegeerd, setGenegeerd] = useState<{ inSubmap: number; anderType: number }>({ inSubmap: 0, anderType: 0 });
   const [laatsteActie, setLaatsteActie] = useState<{ aantal: number } | null>(null);
   // Audit-log: De groep begint bij de eerste bevestiging van deze import, annuleren daarvoor logt
@@ -307,14 +308,40 @@ function ImportLegacyPage() {
     [rijen, keuzeVoorNaam]
   );
 
+  /** De doelorganisatie van een bronnaam: Het echte id als dat al bekend is, anders de gekozen organisatie, anders een eigen (nieuwe) organisatie per naam. */
+  const doelVan = useCallback(
+    (naam: string): string => {
+      const keuze = keuzeVoorNaam(naam);
+      return orgIdPerNaam[naam] ?? (keuze.actie === "koppelen" && keuze.organisatieId ? keuze.organisatieId : `nieuw::${naam}`);
+    },
+    [keuzeVoorNaam, orgIdPerNaam]
+  );
+
+  /**
+   * Hoeveel verschillende bronnamen aan dezelfde organisatie zijn gekoppeld, over de hele import (`import-scans.md`, Meting): Bij twee
+   * of meer krijgt elke bronnaam zijn eigen Meting, met de bronnaam achter het label. Bij maar één zegt de bronnaam niets extra's.
+   */
+  const bronnamenPerDoel = useMemo(() => {
+    const perDoel = new Map<string, Set<string>>();
+    for (const r of rijen ?? []) {
+      if (!r.ok || keuzeVoorNaam(r.organisatieNaam).actie === "overslaan") continue;
+      const doel = doelVan(r.organisatieNaam);
+      const set = perDoel.get(doel) ?? new Set<string>();
+      set.add(r.organisatieNaam.trim());
+      perDoel.set(doel, set);
+    }
+    return perDoel;
+  }, [rijen, keuzeVoorNaam, doelVan]);
+
   /** Resolve't het organisatie-/Meting-id voor één rij, vóór het bouwen van een `LegacyImportKeuze` (zie de uitleg bij de Provider hierboven). */
   function bouwKeuze(rij: RijMetBron): LegacyImportKeuze {
     const keuze = keuzeVoorNaam(rij.organisatieNaam);
     const organisatieId =
       orgIdPerNaam[rij.organisatieNaam] ?? (keuze.actie === "koppelen" ? keuze.organisatieId ?? null : null);
-    const metingSleutel = organisatieId ? `${organisatieId}::${rij.assessmentId}::${rij.meetingLabel}` : null;
-    const metingId = metingSleutel ? metingIdPerSleutel[metingSleutel] : undefined;
-    return { rij, assessmentId: rij.assessmentId!, organisatieId, metingId };
+    const bronnaam = rij.organisatieNaam.trim();
+    const bekendeMetingen = organisatieId ? metingIdPerSleutel[`${organisatieId}::${rij.assessmentId}::${bronnaam}`] : undefined;
+    const bronnaamInLabel = (bronnamenPerDoel.get(doelVan(rij.organisatieNaam))?.size ?? 0) >= 2;
+    return { rij, assessmentId: rij.assessmentId!, organisatieId, bronnaam, bronnaamInLabel, bekendeMetingen };
   }
 
   /** Na een geslaagde `voerLegacyImportUit`-aanroep: de org/Meting-geheugens bijwerken en de rijen als "geïmporteerd" markeren. */
@@ -332,8 +359,9 @@ function ImportLegacyPage() {
     setMetingIdPerSleutel((prev) => {
       const nieuw = { ...prev };
       verwerkteRijen.forEach((rij, i) => {
-        const { organisatieId, scanUitvoeringId } = resultaat.rijResultaten[i];
-        nieuw[`${organisatieId}::${rij.assessmentId}::${rij.meetingLabel}`] = scanUitvoeringId;
+        const { organisatieId, scanUitvoeringId, label, bronnaam } = resultaat.rijResultaten[i];
+        const sleutel = `${organisatieId}::${rij.assessmentId}::${bronnaam}`;
+        nieuw[sleutel] = { ...(nieuw[sleutel] ?? {}), [label]: scanUitvoeringId };
       });
       return nieuw;
     });

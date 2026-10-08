@@ -77,6 +77,10 @@ function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
           invullingen: Array.isArray(s.invullingen)
             ? s.invullingen.map((i) => ({
                 ...i,
+                // De Meting waarin een scan staat is de juiste: Een verplaatsing werkte vroeger alleen `organisatieLidId` bij en liet
+                // `scanUitvoeringId` naar de oude Meting wijzen (`backlog.md`, Omgehangen scans). Dit herstelt bestaande data
+                // bij elke keer laden, zonder aparte migratiestap.
+                scanUitvoeringId: s.id,
                 bewaarVerlengdTot: i.bewaarVerlengdTot ?? null,
                 // Ontbreekt bij data van vóór dit veld: Het uitnodigmoment is dan de beste schatting.
                 aangemaaktOp: i.aangemaaktOp ?? i.uitgenodigdOp,
