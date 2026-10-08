@@ -232,7 +232,7 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
       )}
 
       <h2>Metingen</h2>
-      <form onSubmit={handleNieuweScan} className="flex flex-wrap items-end gap-3 mb-4">
+      <form onSubmit={handleNieuweScan} className="filter-rij flex flex-wrap items-end gap-3 mb-4">
         <div className="admin-field" style={{ marginBottom: 0 }}>
           <label>Assessment-type</label>
           <select value={assessmentIdVoorForm} onChange={(e) => setNieuweScanAssessmentId(e.target.value)}>

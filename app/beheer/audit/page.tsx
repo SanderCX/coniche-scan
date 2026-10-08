@@ -168,7 +168,7 @@ function AuditLogInhoud() {
 
   return (
     <div className="admin-main admin-main--breed">
-      <div className="flex items-center gap-2">
+      <div className="titel-rij">
         <h1>Audit-log</h1>
         <InfoIcoon sleutel="info.auditLog" />
       </div>
@@ -197,7 +197,7 @@ function AuditLogInhoud() {
         ))}
       </div>
 
-      <div className="mt-4 mb-5 flex flex-wrap items-end gap-3">
+      <div className="filter-rij mt-4 mb-5 flex flex-wrap items-end gap-3">
         <div className="admin-field" style={{ marginBottom: 0 }}>
           <label>Vanaf</label>
           <input
