@@ -1,5 +1,20 @@
 # Coniche Scan — Changelog
 
+## 2026-10-08 — Tabbladtitel, Inloggen op elke publieke pagina, Coniche-favicon, Content-iconen
+
+**Gedaan**:
+- **Tabbladtitel** `<Paginanaam> | Coniche Scan` (`stylesheet.md`, Browsericoon): Eén lijst met routes en namen
+  (`data/pagina-titels.ts`) en één component in de root-layout (`components/PaginaTitel.tsx`), omdat bijna alle
+  pagina's client-componenten zijn en geen `metadata` kunnen exporteren. Next zet bij een verse laadbeurt zijn
+  eigen titel er na de hydratie overheen, dus het component zet de titel terug zodra die afwijkt.
+- **"Inloggen" rechtsboven** (`CLAUDE.md`, Globale layout, punt 7): Stond alleen op scherm 1. Nu zet
+  `PageWithChrome` het standaard in het identiteitsmenu-slot zodra er geen menu en geen `code` is, dus ook op de
+  4 content-pagina's zonder sessie, de privacypagina, de landingspagina en Toegang.
+- **Coniche-favicon**: `app/favicon.ico`, `app/icon.svg` en `app/apple-icon.png` uit `afbeeldingen/`.
+- **Content-lijst**: Assessment-icoon in een oranje rondje (`.assessment-icoon-rond`, `stylesheet.md`,
+  Assessment-icoon).
+- **Bulk-export** volgens de specs van 7 oktober (zie hieronder bij 7 oktober).
+
 ## 2026-10-07 — Specwijzigingen van 7 oktober, lijstknoppen, AVG-inzage als CSV, Azure-plan
 
 **Aanleiding**: Sander liet de gewijzigde specs (`CLAUDE.md`, `beheerpagina.md`, `import-scans.md`,

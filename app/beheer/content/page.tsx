@@ -22,18 +22,20 @@ export default function ContentOverzichtPage() {
           const template = assessments.find((t) => t.id === a.afgeleidVanAssessmentId);
           return (
             <Link key={a.id} href={`/beheer/content/${a.id}`} className="admin-row">
-              <div>
-                <p className="admin-row-titel flex items-center gap-2">
-                  <AssessmentIcon name={a.icoon} style={{ width: "1.1rem", height: "1.1rem" }} />
-                  {a.naam}
-                </p>
-                <p className="admin-row-sub">
-                  {a.categorieen
-                    ? `${a.categorieen.filter((c) => !c.gearchiveerd).length} categorieën · `
-                    : "Geen categorie-laag · "}
-                  {actieveBouwblokkenMetGroep(a).length} {a.bouwblokEenheidMeervoud}
-                  {template && ` · Afgeleid van: ${template.naam}`}
-                </p>
+              <div className="flex items-center gap-4">
+                <span className="assessment-icoon-rond" aria-hidden="true">
+                  <AssessmentIcon name={a.icoon} style={{ width: "2rem", height: "2rem" }} />
+                </span>
+                <div>
+                  <p className="admin-row-titel">{a.naam}</p>
+                  <p className="admin-row-sub">
+                    {a.categorieen
+                      ? `${a.categorieen.filter((c) => !c.gearchiveerd).length} categorieën · `
+                      : "Geen categorie-laag · "}
+                    {actieveBouwblokkenMetGroep(a).length} {a.bouwblokEenheidMeervoud}
+                    {template && ` · Afgeleid van: ${template.naam}`}
+                  </p>
+                </div>
               </div>
             </Link>
           );
