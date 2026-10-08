@@ -17,6 +17,7 @@ export function genereerUniekeToegangscode(alles: Organisatie[]): string {
 }
 
 export function maakInvulling(scanUitvoeringId: string, organisatieLidId: string): ScanInvulling {
+  const nu = new Date().toISOString();
   return {
     id: nieuwId(),
     scanUitvoeringId,
@@ -24,7 +25,8 @@ export function maakInvulling(scanUitvoeringId: string, organisatieLidId: string
     status: "uitgenodigd",
     antwoorden: {},
     opmerkingenPerBouwblok: {},
-    uitgenodigdOp: new Date().toISOString(),
+    aangemaaktOp: nu,
+    uitgenodigdOp: nu,
     gestartOp: null,
     afgerondOp: null,
     bewaarVerlengdTot: null,

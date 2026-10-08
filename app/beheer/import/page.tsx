@@ -365,6 +365,14 @@ function ImportLegacyPage() {
             reden: bestandReden(b),
           })),
           aantalRijen: rijen?.length ?? 0,
+          // Per rij wat de beheerder vooraf zag (geen gegevens van de Respondent), zodat de groep in de Audit-log
+          // ook de rijen toont die nog niet zijn geïmporteerd (`beheerpagina.md`, punt 12).
+          rijen: (rijen ?? []).map((r) => ({
+            bestand: r.bestandsnaam,
+            rijNummer: r.rijNummer,
+            assessmentNaam: r.assessmentNaam ?? null,
+            organisatieNaam: r.organisatieNaam,
+          })),
         },
       },
       ...probleemRijen.map((r) => ({
@@ -372,7 +380,13 @@ function ImportLegacyPage() {
         entiteitType: "import",
         entiteitId: groepId,
         groepId,
-        details: { bestand: r.bestandsnaam, rijNummer: r.rijNummer, reden: r.probleem ?? null },
+        details: {
+          bestand: r.bestandsnaam,
+          rijNummer: r.rijNummer,
+          assessmentNaam: r.assessmentNaam ?? null,
+          organisatieNaam: r.organisatieNaam,
+          reden: r.probleem ?? null,
+        },
       })),
     ]);
     return groepId;

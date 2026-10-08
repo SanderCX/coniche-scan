@@ -281,6 +281,8 @@ export interface ScanInvulling {
   status: ScanInvullingStatus;
   antwoorden: Record<string, number>;
   opmerkingenPerBouwblok: Record<string, string>;
+  /** Moment waarop de regel in de app is aangemaakt (`datamodel.md`, ScanInvulling). Bij een import het importmoment, niet de datum uit het bestand. */
+  aangemaaktOp: string;
   /** Moment van uitnodigen — blijft staan, ook na een reset van de invulling. */
   uitgenodigdOp: string;
   /** Moment dat de respondent scherm 4 (intake) indiende, null zolang status "uitgenodigd" is. */

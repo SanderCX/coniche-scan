@@ -67,6 +67,8 @@ export function voerLegacyImportUit(
   const actor = getGebruikers().find((g) => g.id === aangemaaktDoor);
   if (actor?.rol !== "admin") return { geimporteerd: 0, rijResultaten: [], geweigerd: true };
   const alles = laadAlles();
+  // Het importmoment: Eén waarde voor alle scans van deze import (`ScanInvulling.aangemaaktOp`).
+  const importMoment = new Date().toISOString();
   // Geen naam, e-mailadres of andere gegevens van de Respondent in de log (datamodel.md, Audit).
   const gelogd: AuditInvoer[] = [];
   let geimporteerd = 0;
@@ -132,6 +134,7 @@ export function voerLegacyImportUit(
     if (lid && rij.respondentNotities && !lid.notities.includes(rij.respondentNotities)) {
       lid.notities = lid.notities ? `${lid.notities}\n${rij.respondentNotities}` : rij.respondentNotities;
     }
+    const respondentNieuw = !lid;
     if (!lid) {
       lid = {
         id: nieuwId(),
@@ -187,6 +190,7 @@ export function voerLegacyImportUit(
       status: rij.status,
       antwoorden: rij.antwoorden,
       opmerkingenPerBouwblok: rij.opmerkingenPerBouwblok,
+      aangemaaktOp: importMoment,
       uitgenodigdOp: rij.uitgenodigdOp,
       gestartOp: rij.gestartOp,
       afgerondOp: rij.afgerondOp,
@@ -202,6 +206,8 @@ export function voerLegacyImportUit(
         ...metingContext(organisatie, scanUitvoering),
         bestand: (rij as { bestandsnaam?: string }).bestandsnaam ?? null,
         rijNummer: rij.rijNummer,
+        // Alleen of de Respondent nieuw was, geen gegevens van de Respondent zelf (datamodel.md, Audit).
+        respondentNieuw,
         // Bij een goedgekeurde 95%+-rij het percentage (import-scans.md, Audit-log).
         ...(rij.vereistBevestiging ? { vraagtekstMatchPercentage: rij.assessmentMatchPercentage } : {}),
       },

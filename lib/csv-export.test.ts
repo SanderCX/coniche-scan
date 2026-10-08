@@ -10,7 +10,7 @@ const lid: OrganisatieLid = {
   toegangscode: "abc", leadMetingIds: [], aangemaaktOp: "2026-01-01T00:00:00.000Z",
 };
 const scan = (assessment: Assessment, status: ScanInvulling["status"] = "afgerond"): ScanInvulling => ({
-  id: "I1", scanUitvoeringId: "M1", organisatieLidId: "L1", status, uitgenodigdOp: "2026-01-01", gestartOp: "2026-01-02",
+  id: "I1", scanUitvoeringId: "M1", organisatieLidId: "L1", status, aangemaaktOp: "2026-02-01T10:00:00.000Z", uitgenodigdOp: "2026-01-01", gestartOp: "2026-01-02",
   afgerondOp: status === "afgerond" ? "2026-01-03" : null,
   antwoorden: Object.fromEntries(alleVragen(assessment).map((v) => [v.id, 4])), opmerkingenPerBouwblok: {}, bewaarVerlengdTot: null,
 });
@@ -84,5 +84,16 @@ describe("Inzage (AVG)", () => {
     const o = organisatie(aiVolwassenheid, []);
     expect(inzageBestandsnaam(o, lid, new Date("2026-10-07T10:00:00Z"))).toBe("Inzage Acme - Jan - 2026-10-07.csv");
     expect(inzageBestandsnaam(o, { ...lid, naam: null }, new Date("2026-10-07T10:00:00Z"))).toBe("Inzage Acme - jan@x.nl - 2026-10-07.csv");
+  });
+});
+
+describe("CSV aangemaakt_op", () => {
+  it("staat direct na status en vóór uitgenodigd_op, met het moment waarop de scan in de app is aangemaakt", () => {
+    const o = organisatie(zorgscan, [scan(zorgscan)]);
+    const csv = genereerScansCsv([{ organisatie: o, scanUitvoering: o.scanUitvoeringen[0], lid, invulling: scan(zorgscan), assessment: zorgscan }]);
+    const kop = csv.replace(/^﻿/, "").split("\r\n")[0].split(";");
+    expect(kop.indexOf("aangemaakt_op")).toBe(kop.indexOf("status") + 1);
+    expect(kop.indexOf("uitgenodigd_op")).toBe(kop.indexOf("aangemaakt_op") + 1);
+    expect(kolom(csv, "aangemaakt_op")).toBe("2026-02-01T10:00:00.000Z");
   });
 });

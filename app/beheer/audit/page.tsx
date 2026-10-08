@@ -8,7 +8,9 @@ import { logAudit, ruimAuditOp, useAuditEvents, AuditEvent } from "@/lib/audit-s
 import { useInstellingen } from "@/lib/instellingen-store";
 import { downloadTekstBestand } from "@/lib/csv-export";
 import {
+  IMPORT_REGEL_STATUS_LABEL,
   ImportGroep,
+  ImportRegelStatus,
   ImportStatus,
   PERIODE_LABEL,
   PERIODE_VOLGORDE,
@@ -19,6 +21,7 @@ import {
   detailTekst,
   entiteitLabel,
   importGroepTekst,
+  importRegels,
   inPeriode,
   periodeBereik,
   typeLabel,
@@ -128,11 +131,6 @@ function AuditLogInhoud() {
     set({ periode: p, van: p === "aangepast" ? bereik.van : b.van || null, tot: p === "aangepast" ? bereik.tot : b.tot || null, pagina: null });
   }
 
-  function volgendeGroteresBereik(): Periode | null {
-    const i = PERIODE_VOLGORDE.indexOf(periode);
-    return i >= 0 && i < PERIODE_VOLGORDE.length - 1 ? PERIODE_VOLGORDE[i + 1] : periode === "aangepast" ? "alles" : null;
-  }
-
   function periodeTekst(): string {
     if (periode === "alles") return "Alle gebeurtenissen";
     if (periode === "vandaag") return "Vandaag";
@@ -164,8 +162,6 @@ function AuditLogInhoud() {
     });
   }
 
-  const groterBereik = volgendeGroteresBereik();
-
   return (
     <div className="admin-main admin-main--breed">
       <div className="titel-rij">
@@ -183,7 +179,7 @@ function AuditLogInhoud() {
         </div>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center gap-2" role="group" aria-label="Periode">
+      <div className="knoppen-gelijk mt-6" role="group" aria-label="Periode">
         {([...PERIODE_VOLGORDE, "aangepast"] as Periode[]).map((p) => (
           <button
             key={p}
@@ -277,16 +273,7 @@ function AuditLogInhoud() {
         </button>
       </div>
 
-      {gefilterd.rijen.length === 0 ? (
-        <p className="admin-notice">
-          Geen gebeurtenissen in deze periode.{" "}
-          {groterBereik && (
-            <button type="button" className="btn btn-outline btn-compact" onClick={() => kiesPeriode(groterBereik)}>
-              Toon {PERIODE_LABEL[groterBereik].toLowerCase()}
-            </button>
-          )}
-        </p>
-      ) : (
+      {gefilterd.rijen.length === 0 ? null : (
         <>
           <table className="admin-table">
             <thead>
@@ -308,11 +295,7 @@ function AuditLogInhoud() {
                     <ImportRij key={g.groepId} groep={g} open={open} onWissel={() => wissel(g.groepId)} />
                   );
                 }
-                const e = rij.event;
-                const open = uitgeklapt.has(e.id);
-                return (
-                  <GebeurtenisRij key={e.id} event={e} open={open} onWissel={() => wissel(e.id)} />
-                );
+                return <GebeurtenisRij key={rij.event.id} event={rij.event} />;
               })}
             </tbody>
           </table>
@@ -360,43 +343,29 @@ function AuditLogInhoud() {
   );
 }
 
-function IdsEnJson({ event }: { event: AuditEvent }) {
+function GebeurtenisRij({ event }: { event: AuditEvent }) {
+  // Geen knop en geen uitklapblok: Een gewone rij toont alleen leesbare tekst, nooit een ID of ruwe JSON
+  // (`beheerpagina.md`, punt 12). ID's staan alleen in de export.
   return (
-    <div className="text-xs text-ink-m" style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
-      <div>entiteit_id: {event.entiteitId}</div>
-      {event.groepId && <div>groep_id: {event.groepId}</div>}
-      {event.details && <div>details_json: {JSON.stringify(event.details, null, 1)}</div>}
-    </div>
+    <tr>
+      <td style={{ whiteSpace: "nowrap" }}>{tijdFormat.format(new Date(event.tijdstip))}</td>
+      <td>{actorLabel(event)}</td>
+      <td>
+        <code>{event.actie}</code>
+      </td>
+      <td>{entiteitLabel(event)}</td>
+      <td>{detailTekst(event)}</td>
+      <td className="cel-knop"></td>
+    </tr>
   );
 }
 
-function GebeurtenisRij({ event, open, onWissel }: { event: AuditEvent; open: boolean; onWissel: () => void }) {
-  return (
-    <>
-      <tr>
-        <td style={{ whiteSpace: "nowrap" }}>{tijdFormat.format(new Date(event.tijdstip))}</td>
-        <td>{actorLabel(event)}</td>
-        <td>
-          <code>{event.actie}</code>
-        </td>
-        <td>{entiteitLabel(event)}</td>
-        <td>{detailTekst(event)}</td>
-        <td className="cel-knop">
-          <button type="button" className="btn btn-outline btn-compact" aria-expanded={open} onClick={onWissel}>
-            {open ? "Minder" : "Meer"}
-          </button>
-        </td>
-      </tr>
-      {open && (
-        <tr>
-          <td colSpan={6}>
-            <IdsEnJson event={event} />
-          </td>
-        </tr>
-      )}
-    </>
-  );
-}
+const REGEL_BADGE: Record<ImportRegelStatus, string> = {
+  geimporteerd: "status-afgerond",
+  overgeslagen: "status-uitgenodigd",
+  mislukt: "status-gedeactiveerd",
+  nogNiet: "status-bezig",
+};
 
 function ImportRij({ groep, open, onWissel }: { groep: ImportGroep; open: boolean; onWissel: () => void }) {
   return (
@@ -419,22 +388,55 @@ function ImportRij({ groep, open, onWissel }: { groep: ImportGroep; open: boolea
           </button>
         </td>
       </tr>
-      {open &&
-        groep.gebeurtenissen.map((e) => (
-          <tr key={e.id}>
-            <td style={{ whiteSpace: "nowrap", paddingLeft: "1.5rem" }}>{tijdFormat.format(new Date(e.tijdstip))}</td>
-            <td>{actorLabel(e)}</td>
+      {open && (
+        <tr>
+          <td colSpan={6}>
+            <ImportTabel groep={groep} />
+          </td>
+        </tr>
+      )}
+    </>
+  );
+}
+
+/**
+ * Uitgeklapte importgroep (`beheerpagina.md`, punt 12): Eén regel per bestand of rij, in dezelfde opmaak als de
+ * Voorbeeldweergave in de importinterface. Geen knoppen (goedkeuren kan alleen in de importinterface) en nooit ruwe
+ * JSON, een ID of een lange lijst bestandsnamen. De Respondent is "Nieuw" of "Gevonden", geen naam of e-mailadres.
+ */
+function ImportTabel({ groep }: { groep: ImportGroep }) {
+  const regels = importRegels(groep);
+  if (regels.length === 0) return <p className="admin-notice">Geen regels om te tonen.</p>;
+  return (
+    <table className="admin-table">
+      <thead>
+        <tr>
+          <th>Bestand</th>
+          <th>Rij</th>
+          <th>Assessment</th>
+          <th>Organisatie</th>
+          <th>Respondent</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {regels.map((r, i) => (
+          <tr key={`${r.bestand}::${r.rij ?? "bestand"}::${i}`}>
+            <td>{r.bestand}</td>
+            <td>{r.rij ?? ""}</td>
+            <td>{r.assessment}</td>
+            <td>{r.organisatie}</td>
+            <td>{r.respondent}</td>
             <td>
-              <code>{e.actie}</code>
-            </td>
-            <td>{entiteitLabel(e)}</td>
-            <td colSpan={2}>
-              {detailTekst(e)}
-              <IdsEnJson event={e} />
+              <span className={`admin-badge ${REGEL_BADGE[r.status]}`} title={r.reden || undefined}>
+                {IMPORT_REGEL_STATUS_LABEL[r.status]}
+              </span>
+              {r.reden && <span className="admin-tabel-reden"> {r.reden}</span>}
             </td>
           </tr>
         ))}
-    </>
+      </tbody>
+    </table>
   );
 }
 

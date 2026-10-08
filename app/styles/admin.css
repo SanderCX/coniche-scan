@@ -763,3 +763,22 @@ body:has(.admin-main) {
 :where(.admin-main) p {
   font-size: var(--fs-m);
 }
+
+/* Knoppen in één rij even breed (stylesheet.md, Knoppen, Gelijke breedte): Elke kolom is zo breed als de breedste
+   knop, de tekst staat gecentreerd en elke knop houdt zijn eigen variant. Op een smal scherm breekt de rij af, dan is
+   de breedste knop per regel leidend. */
+.knoppen-gelijk {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.5rem;
+  max-width: 100%;
+}
+.knoppen-gelijk > .btn {
+  text-align: center;
+  justify-content: center;
+}
+
+.admin-tabel-reden {
+  color: var(--ink-m);
+}

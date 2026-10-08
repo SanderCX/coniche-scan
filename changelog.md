@@ -14,6 +14,23 @@
 - **Content-lijst**: Assessment-icoon in een oranje rondje (`.assessment-icoon-rond`, `stylesheet.md`,
   Assessment-icoon).
 - **Bulk-export** volgens de specs van 7 oktober (zie hieronder bij 7 oktober).
+- **Specs van Joost, 8 oktober (PR 49)**:
+  - **`ScanInvulling.aangemaaktOp`** (`datamodel.md`): Het moment waarop de regel in de app is aangemaakt, bij een
+    import het importmoment (één waarde per import, niet de datum uit het bestand). Gezet bij uitnodigen
+    (`maakInvulling`), bij een import en in de demodata. Bestaande data zonder het veld valt terug op
+    `uitgenodigdOp` (`normaliseerOrganisatie`). Nieuwe kolom "Aangemaakt" in Ingevulde scans (sorteerbaar) en
+    `aangemaakt_op` in de CSV, tussen `status` en `uitgenodigd_op`. De import leest de kolom niet in.
+  - **Periodeknoppen even breed** (`.knoppen-gelijk`, `stylesheet.md`, Gelijke breedte): `inline-grid` met
+    `grid-auto-columns: 1fr`, alle zes de knoppen 113px.
+  - **Audit-log**: Een gewone rij heeft geen "Meer"-knop en geen uitklapblok meer, dus geen ID's of ruwe JSON in de
+    app (die staan alleen in de export). Een uitgeklapte importgroep toont een tabel (Bestand, Rij, Assessment,
+    Organisatie, Respondent, Status-badge), afgeleid door `importRegels` in `lib/audit-weergave.ts`. Voor die tabel
+    logt `import.gestart` nu ook een lijst `rijen` (bestand, rij, assessment, organisatie) en `scan.geimporteerd`
+    of de Respondent nieuw was (`respondentNieuw`), en `import.rijMislukt` ook assessment en organisatie. De
+    Respondent-kolom toont "Nieuw" of "Gevonden", nooit een naam of e-mailadres (geen persoonsgegevens in de
+    audit-log). Oudere groepen zonder rijenlijst tonen alleen wat er gebeurde. De melding en de knop "Toon 30
+    dagen" bij een lege periode zijn weg.
+  - 4 nieuwe tests (52 → 56): `aangemaakt_op` in de CSV, `importRegels` (twee) en `aangemaaktOp` bij een import.
 - **Dropdowns** (`stylesheet.md`, Formulieren, Dropdowns, en Dropdown-knop; specs van Joost, 8 oktober): Eén
   gevulde chevron overal (`.65rem` breed, driehoek met de punt naar beneden). In de Dropdown-knop is het een
   CSS-vorm met `currentColor` (`.dropdown-pijl`, oranje in een outline-knop), in `select.field`,
