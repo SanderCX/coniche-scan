@@ -19,6 +19,7 @@ const PAGINA_TITELS: { route: string; titel: string }[] = [
   // Respondentkant
   { route: "/s/[code]", titel: "Mijn metingen" },
   { route: "/s/[code]/resultaten/[scanUitvoeringId]", titel: "Resultaten van de Meting" },
+  { route: "/s/[code]/benchmark/[toewijzingId]", titel: "Benchmark" },
   { route: "/scan/[respondentId]/intake", titel: "Intake" },
   { route: "/scan/[respondentId]/doorloop", titel: "Vragenlijst" },
   { route: "/scan/[respondentId]/resultaten", titel: "Resultaten" },
@@ -44,6 +45,11 @@ const PAGINA_TITELS: { route: string; titel: string }[] = [
   { route: "/beheer/rapportage/[scanUitvoeringId]", titel: "Resultaten van de Meting" },
   { route: "/beheer/resultaten/[scanInvullingId]", titel: "Resultaten" },
   { route: "/beheer/import", titel: "Import van scans" },
+  { route: "/beheer/benchmark", titel: "Benchmark" },
+  { route: "/beheer/benchmark/nieuw", titel: "Nieuwe benchmark" },
+  { route: "/beheer/benchmark/[benchmarkId]", titel: "Benchmark" },
+  { route: "/beheer/benchmark/[benchmarkId]/bewerken", titel: "Benchmark wijzigen" },
+  { route: "/beheer/benchmark/[benchmarkId]/organisatie/[organisatieId]", titel: "Benchmark per organisatie" },
 ];
 
 function past(route: string, pad: string): boolean {

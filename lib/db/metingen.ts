@@ -3,6 +3,7 @@ import { nieuwId } from "../id";
 import { laadAlles, slaAlles, useOrganisaties } from "./store";
 import { logAudit } from "../audit-store";
 import { metingContext } from "../audit-context";
+import { haalMetingenUitBenchmarks } from "../benchmark-store";
 
 /** Metingen (in de code `ScanUitvoering`): plannen, hernoemen, verwijderen en opzoeken. */
 
@@ -69,6 +70,8 @@ export function verwijderMeting(scanUitvoeringId: string): void {
     if (index === -1) continue;
     const [meting] = organisatie.scanUitvoeringen.splice(index, 1);
     slaAlles(alles);
+    // Het lid met deze Meting verdwijnt uit elke benchmark waarin het meedoet (`datamodel.md`).
+    haalMetingenUitBenchmarks([{ metingId: meting.id, organisatieNaam: organisatie.naam }]);
     logAudit({
       actie: "meting.verwijderd",
       entiteitType: "meting",

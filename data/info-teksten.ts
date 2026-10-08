@@ -105,6 +105,30 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     tekst: "Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie.",
   },
   {
+    sleutel: "info.benchmarkInstellingen",
+    plek: "Applicatie, Instellingen, formulier Benchmark",
+    tekst:
+      "De minimale groepsgrootte is het aantal organisaties per Assessment, inclusief de organisatie van de view, dat nodig is voordat een Lead de vergelijking ziet. Het minimale aantal scans is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden.",
+  },
+  {
+    sleutel: "info.benchmarkVlag",
+    plek: "Organisatie-detail, bij de schakelaar \"Doet mee aan benchmark\"",
+    tekst:
+      "Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks.",
+  },
+  {
+    sleutel: "info.benchmarkToewijzen",
+    plek: "Benchmark, view per organisatie, achter de uitgeschakelde knop \"Toewijzen\"",
+    tekst:
+      "Toewijzen kan pas als de organisatie een Lead heeft en minstens één Assessment aan de minimale groepsgrootte voldoet. Anders zou een Lead een vergelijking zien met te weinig andere organisaties om anoniem te blijven.",
+  },
+  {
+    sleutel: "info.benchmarkAanmaken",
+    plek: "Benchmark aanmaken of wijzigen, achter de uitgeschakelde knop",
+    tekst:
+      "Een benchmark heeft een naam nodig, minstens één Assessment en minstens één organisatie die je hebt aangevinkt. Een organisatie staat alleen in de lijst als ze meedoet aan benchmarks en een Meting heeft van een gekozen Assessment met genoeg afgeronde scans.",
+  },
+  {
     sleutel: "info.exportEenScan",
     plek: "Ingevulde scans en organisatie-detail, achter de uitgeschakelde opties \"Als PDF\" en \"Voor InDesign (XML)\"",
     tekst: "Beschikbaar bij precies één scan.",

@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { BeheerNavActionsProvider, useBeheerNavActionsValue } from "@/components/beheer/BeheerNavActions";
 import { logout, useIngelogdeGebruiker } from "@/lib/admin-auth";
-import { magContentBeheren, magGebruikersBeheren } from "@/lib/rechten";
+import { magBenchmarkBeheren, magContentBeheren, magGebruikersBeheren } from "@/lib/rechten";
 import { ROL_KLEUR } from "@/lib/colors";
 import { BeheerMeldingBalk } from "@/components/beheer/BeheerMelding";
 import { BeheerOverzichten } from "@/components/beheer/BeheerOverzichten";
@@ -42,9 +42,10 @@ import { ConflictHost } from "@/components/beheer/ConflictHost";
  * voor het scherm, dus in `.nav-right`, met een scheidingslijn erna net
  * als bij elke andere scherm-specifieke actie.
  */
-const PAD_PER_SECTIE: { sectie: "applicatie" | "assessments" | "organisaties"; paden: string[] }[] = [
+const PAD_PER_SECTIE: { sectie: "applicatie" | "assessments" | "organisaties" | "benchmark"; paden: string[] }[] = [
   { sectie: "applicatie", paden: ["/beheer/applicatie", "/beheer/gebruikers", "/beheer/teksten", "/beheer/audit", "/beheer/instellingen"] },
   { sectie: "assessments", paden: ["/beheer/assessments", "/beheer/content"] },
+  { sectie: "benchmark", paden: ["/beheer/benchmark"] },
   {
     sectie: "organisaties",
     paden: [
@@ -93,6 +94,9 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
       ? [{ sectie: "assessments" as const, href: "/beheer/content", label: "Assessments" }]
       : []),
     { sectie: "organisaties" as const, href: "/beheer/organisaties", label: "Organisaties" },
+    ...(magBenchmarkBeheren(gebruiker)
+      ? [{ sectie: "benchmark" as const, href: "/beheer/benchmark", label: "Benchmark" }]
+      : []),
   ];
 
   const rolInfo = gebruiker ? ROL_KLEUR[gebruiker.rol] : undefined;

@@ -6,6 +6,7 @@ import { zoekScanInvulling } from "./scans";
 import { genereerUniekeToegangscode } from "./respondenten";
 import { logAudit, nieuweGroepId } from "../audit-store";
 import { metingContext, organisatieContext } from "../audit-context";
+import { verwijderToewijzingenVanRespondenten } from "../benchmark-store";
 
 /** Respondenten en scans verplaatsen of samenvoegen: binnen een organisatie, tussen organisaties en bij een e-mailconflict (beheerpagina.md, punt 6b). */
 
@@ -260,6 +261,9 @@ export function verplaatsRespondentNaarOrganisatie(
   }
 
   slaAlles(alles);
+  // Een verplaatste of samengevoegde Respondent verliest zijn Lead-rol bij de bronorganisatie, dus ook zijn
+  // benchmarktoewijzingen daar (`datamodel.md`, Verwijderen en datakoppelingen).
+  if (resultaat.respondentVerwijderd || resultaat.ok) verwijderToewijzingenVanRespondenten([lidId]);
   const metingNaam = (organisatie: Organisatie, id: string) =>
     organisatie.scanUitvoeringen.find((s) => s.id === id)?.label ?? null;
   logAudit({

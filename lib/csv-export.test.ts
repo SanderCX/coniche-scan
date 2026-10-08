@@ -17,7 +17,7 @@ const scan = (assessment: Assessment, status: ScanInvulling["status"] = "afgeron
 const organisatie = (assessment: Assessment, invullingen: ScanInvulling[]): Organisatie => ({
   id: "O1", naam: "Acme", kenmerken: { sector: "x" }, leden: [lid],
   scanUitvoeringen: [{ id: "M1", organisatieId: "O1", assessmentId: assessment.id, label: "Nulmeting", aangemaaktOp: "x", invullingen }],
-  aangemaaktDoor: null, toegewezenAan: [], aangemaaktOp: "x", gewijzigdOp: "x",
+  aangemaaktDoor: null, toegewezenAan: [], benchmarkToegestaan: false, aangemaaktOp: "x", gewijzigdOp: "x",
 });
 
 // Zorgscan met een gewicht van 1,5 op bouwblok 4 en 2 op bouwblok 10.

@@ -102,5 +102,6 @@ export const demoOrganisatie: Organisatie = {
   aangemaaktDoor: null,
   toegewezenAan: [],
   aangemaaktOp: new Date().toISOString(),
+  benchmarkToegestaan: false,
   gewijzigdOp: new Date().toISOString(),
 };

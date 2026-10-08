@@ -97,6 +97,7 @@ export function voerLegacyImportUit(
         scanUitvoeringen: [],
         aangemaaktDoor,
         toegewezenAan: [],
+        benchmarkToegestaan: false,
         aangemaaktOp: nu,
         gewijzigdOp: nu,
       };

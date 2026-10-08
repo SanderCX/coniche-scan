@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Legend,
   PolarAngleAxis,
   PolarGrid,
   PolarRadiusAxis,
@@ -24,10 +25,25 @@ function LeesbareSchaalTick({ x, y, payload }: { x: number; y: number; payload: 
   );
 }
 
-export function RadarChartView({ resultaten }: { resultaten: BouwblokResultaat[] }) {
-  const data = resultaten.map((r) => ({
+/**
+ * `vergelijking`: Een tweede reeks, bijvoorbeeld de rest van de groep in een benchmark (`benchmark.md`, View per
+ * organisatie). De namen geven de legenda; zonder `vergelijking` is dit het gewone radardiagram met één reeks.
+ */
+export function RadarChartView({
+  resultaten,
+  vergelijking,
+  naam = "Score",
+  vergelijkingNaam = "Vergelijking",
+}: {
+  resultaten: BouwblokResultaat[];
+  vergelijking?: BouwblokResultaat[];
+  naam?: string;
+  vergelijkingNaam?: string;
+}) {
+  const data = resultaten.map((r, i) => ({
     naam: `${r.bouwblok.volgnummer}. ${r.bouwblok.naam}${gewichtMarkering(r.bouwblok) ? ` (${gewichtMarkering(r.bouwblok)})` : ""}`,
     score: r.score ?? 0,
+    vergelijking: vergelijking?.[i]?.score ?? 0,
   }));
 
   return (
@@ -40,13 +56,24 @@ export function RadarChartView({ resultaten }: { resultaten: BouwblokResultaat[]
             tick={{ fontSize: 10, fill: "#4d4d49" }}
           />
           <PolarRadiusAxis domain={[0, 5]} tickCount={6} tick={<LeesbareSchaalTick x={0} y={0} payload={{ value: 0 }} />} />
+          {vergelijking && (
+            <Radar
+              name={vergelijkingNaam}
+              dataKey="vergelijking"
+              stroke="#4d4d49"
+              fill="#4d4d49"
+              fillOpacity={0.12}
+              strokeDasharray="4 3"
+            />
+          )}
           <Radar
-            name="Score"
+            name={naam}
             dataKey="score"
             stroke="#ff671f"
             fill="#ff671f"
             fillOpacity={0.25}
           />
+          {vergelijking && <Legend wrapperStyle={{ fontSize: 12 }} />}
         </RadarChart>
       </ResponsiveContainer>
     </div>
