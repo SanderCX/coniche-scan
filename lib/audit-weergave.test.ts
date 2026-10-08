@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { AuditEvent } from "./audit-store";
-import { actorLabel, auditCsv, bouwImportGroepen, detailTekst, importGroepTekst, inPeriode, periodeBereik, typeVan } from "./audit-weergave";
+import { actorLabel, auditCsv, bouwImportGroepen, detailTekst, importGroepTekst, importRegels, inPeriode, periodeBereik, typeVan } from "./audit-weergave";
 
 const event = (extra: Partial<AuditEvent>): AuditEvent => ({
   id: "e1",
@@ -85,5 +85,45 @@ describe("audit-weergave", () => {
     expect(periodeBereik("alles", nu)).toEqual({ van: "", tot: "" });
     expect(inPeriode("2026-10-05T23:30:00", "2026-10-05", "2026-10-05")).toBe(true);
     expect(inPeriode("2026-10-04T23:30:00", "2026-10-05", "")).toBe(false);
+  });
+
+  it("importRegels: één regel per bestand of rij met status, zonder persoonsgegevens", () => {
+    const g = "g-2";
+    const events = [
+      event({
+        id: "a", actie: "import.gestart", groepId: g, entiteitType: "import",
+        details: {
+          aantalBestanden: 2, aantalRijen: 3,
+          bestanden: [{ naam: "a.csv", bronFormaat: "oud", overgeslagen: false }, { naam: "b.csv", bronFormaat: null, overgeslagen: true, reden: "geen antwoorden" }],
+          rijen: [
+            { bestand: "a.csv", rijNummer: 1, assessmentNaam: "Klantcontact", organisatieNaam: "Acme" },
+            { bestand: "a.csv", rijNummer: 2, assessmentNaam: null, organisatieNaam: "Acme" },
+            { bestand: "a.csv", rijNummer: 3, assessmentNaam: "AI", organisatieNaam: "Beta" },
+          ],
+        },
+      }),
+      event({ id: "b", actie: "scan.geimporteerd", groepId: g, entiteitType: "scan", details: { bestand: "a.csv", rijNummer: 1, assessmentNaam: "Klantcontact", organisatieNaam: "Acme", respondentNieuw: true } }),
+      event({ id: "c", actie: "import.rijMislukt", groepId: g, entiteitType: "import", details: { bestand: "a.csv", rijNummer: 2, assessmentNaam: null, organisatieNaam: "Acme", reden: "Assessment niet te bepalen" } }),
+    ];
+    const regels = importRegels(bouwImportGroepen(events)[0]);
+    expect(regels.map((r) => [r.bestand, r.rij, r.status])).toEqual([
+      ["b.csv", null, "overgeslagen"],
+      ["a.csv", 1, "geimporteerd"],
+      ["a.csv", 2, "mislukt"],
+      ["a.csv", 3, "nogNiet"],
+    ]);
+    expect(regels[0].reden).toBe("geen antwoorden");
+    expect(regels[1]).toMatchObject({ assessment: "Klantcontact", organisatie: "Acme", respondent: "Nieuw" });
+    expect(regels[2].reden).toBe("Assessment niet te bepalen");
+    expect(regels[3]).toMatchObject({ respondent: "", organisatie: "Beta" });
+  });
+
+  it("importRegels bij een oudere groep zonder rijenlijst toont alleen wat er gebeurde, en detailTekst laat de rijenlijst weg", () => {
+    const g = "g-3";
+    const gestart = event({ id: "a", actie: "import.gestart", groepId: g, entiteitType: "import", details: { aantalBestanden: 1, aantalRijen: 2, bestanden: [{ naam: "a.csv", bronFormaat: "oud", overgeslagen: false }], rijen: [{ bestand: "a.csv", rijNummer: 1 }] } });
+    const events = [gestart, event({ id: "b", actie: "scan.geimporteerd", groepId: g, entiteitType: "scan", details: { bestand: "a.csv", rijNummer: 5, respondentNieuw: false } })];
+    const regels = importRegels(bouwImportGroepen(events)[0]);
+    expect(regels.find((r) => r.rij === 5)).toMatchObject({ status: "geimporteerd", respondent: "Gevonden" });
+    expect(detailTekst(gestart)).not.toContain("rijNummer");
   });
 });

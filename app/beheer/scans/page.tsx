@@ -20,7 +20,16 @@ import { ScanInvulling } from "@/lib/types";
 import { CsvRijContext } from "@/lib/csv-export";
 import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/scan-export";
 
-type Kolom = "naam" | "organisatie" | "assessment" | "scanLabel" | "rolTeam" | "status" | "voortgang" | "gestart";
+type Kolom =
+  | "naam"
+  | "organisatie"
+  | "assessment"
+  | "scanLabel"
+  | "rolTeam"
+  | "status"
+  | "voortgang"
+  | "gestart"
+  | "aangemaakt";
 
 interface Rij {
   invullingId: string;
@@ -34,6 +43,7 @@ interface Rij {
   status: ScanInvulling["status"];
   voortgang: number;
   gestart: number;
+  aangemaakt: number;
 }
 
 const KOLOMMEN: { key: Kolom; label: string }[] = [
@@ -45,6 +55,7 @@ const KOLOMMEN: { key: Kolom; label: string }[] = [
   { key: "status", label: "Status" },
   { key: "voortgang", label: "Voortgang" },
   { key: "gestart", label: "Gestart" },
+  { key: "aangemaakt", label: "Aangemaakt" },
 ];
 
 /**
@@ -87,6 +98,7 @@ function IngevuldeScansPageInhoud() {
               status: invulling.status,
               voortgang: percentage,
               gestart: invulling.gestartOp ? new Date(invulling.gestartOp).getTime() : 0,
+              aangemaakt: new Date(invulling.aangemaaktOp).getTime(),
             },
           ];
         });
@@ -331,6 +343,7 @@ function IngevuldeScansPageInhoud() {
                       </td>
                       <td>{r.voortgang}%</td>
                       <td>{r.gestart ? new Date(r.gestart).toLocaleDateString("nl-NL") : ""}</td>
+                      <td>{new Date(r.aangemaakt).toLocaleDateString("nl-NL")}</td>
                       <td className="cel-knop">
                         <button type="button" className="btn btn-outline btn-compact" onClick={() => open("scan", r.invullingId)}>
                           Bekijk

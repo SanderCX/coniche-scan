@@ -24,6 +24,7 @@ const testInvulling: ScanInvulling = {
   status: "uitgenodigd",
   antwoorden: {},
   opmerkingenPerBouwblok: {},
+  aangemaaktOp: new Date().toISOString(),
   uitgenodigdOp: new Date().toISOString(),
   gestartOp: null,
   afgerondOp: null,

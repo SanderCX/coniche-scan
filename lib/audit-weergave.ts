@@ -126,6 +126,8 @@ export function detailTekst(e: AuditEvent): string {
   }
   for (const [sleutel, waarde] of Object.entries(details)) {
     if (ID_SLEUTEL.test(sleutel)) continue;
+    // De rijenlijst van `import.gestart` staat als tabel in de uitgeklapte groep, niet als lange tekstregel.
+    if (sleutel === "rijen") continue;
     if (e.actie === "bouwblok.gewichtGewijzigd" && (sleutel === "bouwblokNaam" || sleutel === "volgnummer")) continue;
     const tekst = waardeTekst(sleutel, waarde);
     if (tekst === "") continue;
@@ -207,6 +209,95 @@ export function bouwImportGroepen(events: AuditEvent[]): ImportGroep[] {
     });
   }
   return groepen;
+}
+
+export type ImportRegelStatus = "geimporteerd" | "overgeslagen" | "mislukt" | "nogNiet";
+
+/** Eén regel in de uitgeklapte importgroep (`beheerpagina.md`, punt 12, Een import als groep). */
+export interface ImportRegel {
+  bestand: string;
+  /** Leeg bij een overgeslagen bestand: Dan is er geen rij. */
+  rij: number | null;
+  assessment: string;
+  organisatie: string;
+  /** "Nieuw" of "Gevonden", nooit een naam of e-mailadres (geen persoonsgegevens uit scans in de audit-log). Leeg als de rij niet is geïmporteerd. */
+  respondent: string;
+  status: ImportRegelStatus;
+  /** De reden bij overgeslagen en mislukt. */
+  reden: string;
+}
+
+export const IMPORT_REGEL_STATUS_LABEL: Record<ImportRegelStatus, string> = {
+  geimporteerd: "Geïmporteerd",
+  overgeslagen: "Overgeslagen",
+  mislukt: "Mislukt",
+  nogNiet: "Nog niet geïmporteerd",
+};
+
+const tekstOf = (v: unknown): string => (typeof v === "string" ? v : "");
+
+/**
+ * De regels van een importgroep, één per bestand of rij, afgeleid uit de gebeurtenissen van de groep (nooit apart
+ * opgeslagen). Bronnen: De bestanden en rijen uit `import.gestart` (rijen alleen bij imports vanaf het moment dat die
+ * lijst wordt gelogd), `scan.geimporteerd` en `import.rijMislukt`. Een rij zonder een van de twee laatste is "nog niet
+ * geïmporteerd". Een oudere groep zonder rijenlijst toont alleen wat er daadwerkelijk gebeurde.
+ */
+export function importRegels(groep: ImportGroep): ImportRegel[] {
+  const start = groep.gebeurtenissen.find((e) => e.actie === "import.gestart");
+  const details = start?.details ?? {};
+  const sleutel = (bestand: string, rij: number) => `${bestand}::${rij}`;
+  const regels = new Map<string, ImportRegel>();
+  const overgeslagen: ImportRegel[] = [];
+
+  for (const b of (Array.isArray(details.bestanden) ? details.bestanden : []) as {
+    naam?: string;
+    overgeslagen?: boolean;
+    reden?: string | null;
+  }[]) {
+    if (b.overgeslagen) {
+      overgeslagen.push({
+        bestand: tekstOf(b.naam),
+        rij: null,
+        assessment: "",
+        organisatie: "",
+        respondent: "",
+        status: "overgeslagen",
+        reden: tekstOf(b.reden),
+      });
+    }
+  }
+  for (const r of (Array.isArray(details.rijen) ? details.rijen : []) as Record<string, unknown>[]) {
+    const bestand = tekstOf(r.bestand);
+    const rij = Number(r.rijNummer);
+    regels.set(sleutel(bestand, rij), {
+      bestand,
+      rij,
+      assessment: tekstOf(r.assessmentNaam),
+      organisatie: tekstOf(r.organisatieNaam),
+      respondent: "",
+      status: "nogNiet",
+      reden: "",
+    });
+  }
+  for (const e of groep.gebeurtenissen) {
+    if (e.actie !== "scan.geimporteerd" && e.actie !== "import.rijMislukt") continue;
+    const d = e.details ?? {};
+    const bestand = tekstOf(d.bestand);
+    const rij = Number(d.rijNummer);
+    const bestaand = regels.get(sleutel(bestand, rij));
+    const regel: ImportRegel = {
+      bestand,
+      rij,
+      assessment: tekstOf(d.assessmentNaam) || bestaand?.assessment || "",
+      organisatie: tekstOf(d.organisatieNaam) || bestaand?.organisatie || "",
+      respondent: e.actie === "scan.geimporteerd" ? (d.respondentNieuw ? "Nieuw" : d.respondentNieuw === false ? "Gevonden" : "") : "",
+      status: e.actie === "scan.geimporteerd" ? "geimporteerd" : "mislukt",
+      reden: e.actie === "import.rijMislukt" ? tekstOf(d.reden) : "",
+    };
+    regels.set(sleutel(bestand, rij), regel);
+  }
+  const rijRegels = [...regels.values()].sort((a, b) => a.bestand.localeCompare(b.bestand, "nl") || (a.rij ?? 0) - (b.rij ?? 0));
+  return [...overgeslagen.sort((a, b) => a.bestand.localeCompare(b.bestand, "nl")), ...rijRegels];
 }
 
 export function importGroepTekst(g: ImportGroep): string {

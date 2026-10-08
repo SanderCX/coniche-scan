@@ -58,6 +58,20 @@ describe("import alleen voor een Admin", () => {
     zet([]);
     expect(db.voerLegacyImportUit([keuze as never], "a1").geimporteerd).toBe(1);
   });
+
+  it("zet aangemaaktOp op het importmoment en niet op de datum uit het bestand, en logt of de Respondent nieuw was", () => {
+    opslag.set("coniche-scan:gebruikers", JSON.stringify([gebruiker("a1", "admin")]));
+    zet([]);
+    const voor = Date.now();
+    db.voerLegacyImportUit([{ ...keuze, rij: { ...keuze.rij, uitgenodigdOp: "2020-01-01T00:00:00.000Z" } } as never], "a1", "g-1");
+    const invulling = (laad() as unknown as { scanUitvoeringen: { invullingen: { uitgenodigdOp: string; aangemaaktOp: string }[] }[] }[])[0].scanUitvoeringen[0].invullingen[0];
+    expect(invulling.uitgenodigdOp).toBe("2020-01-01T00:00:00.000Z");
+    expect(new Date(invulling.aangemaaktOp).getTime()).toBeGreaterThanOrEqual(voor);
+    const log = JSON.parse((opslag.get("coniche-scan:audit") as string | undefined) ?? "[]") as { actie: string; details: Record<string, unknown> | null }[];
+    const geimporteerd = log.find((e) => e.actie === "scan.geimporteerd");
+    expect(geimporteerd?.details?.respondentNieuw).toBe(true);
+    expect(JSON.stringify(geimporteerd?.details)).not.toContain("a@x.nl");
+  });
 });
 
 describe("data-integriteit", () => {

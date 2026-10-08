@@ -78,6 +78,8 @@ function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
             ? s.invullingen.map((i) => ({
                 ...i,
                 bewaarVerlengdTot: i.bewaarVerlengdTot ?? null,
+                // Ontbreekt bij data van vóór dit veld: Het uitnodigmoment is dan de beste schatting.
+                aangemaaktOp: i.aangemaaktOp ?? i.uitgenodigdOp,
               }))
             : [],
         }))
