@@ -101,6 +101,7 @@ Kolommen, gegroepeerd naar wat ermee gebeurt:
 | `team_name` | `Respondent.team` |
 | `start_comment` | `Respondent.notities` |
 | `created_at` | `ScanInvulling.gestartOp` |
+| (geen kolom) | `ScanInvulling.aangemaaktOp`: Het moment van importeren, niet de datum uit het bestand |
 | `completed_at` | `ScanInvulling.afgerondOp` |
 | `status` | `ScanInvulling.status`: Altijd `"completed"` → `"afgerond"`. De export uit de oude tool is handmatig en gebeurt alleen voor scans die Coniche wil behouden, dus altijd afgerond; de tool importeert geen andere statuswaarde en meldt het als er onverwacht een andere waarde in een rij staat |
 | `answers` (JSON) | `ScanInvulling.antwoorden`, per vraag (mapping hieronder) |

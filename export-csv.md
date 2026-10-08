@@ -53,6 +53,7 @@ organisatie, dan is "Exporteren" uitgeschakeld, met het Info-icoon
 | `respondent_functie` | `Respondent.functie` | |
 | `respondent_team` | `Respondent.team` | |
 | `status` | `ScanInvulling.status` | `"uitgenodigd"` / `"bezig"` / `"afgerond"` |
+| `aangemaakt_op` | `ScanInvulling.aangemaaktOp` | bij een geïmporteerde scan het importmoment |
 | `uitgenodigd_op` | `ScanInvulling.uitgenodigdOp` | |
 | `gestart_op` | `ScanInvulling.gestartOp` | leeg zolang niet gestart |
 | `afgerond_op` | `ScanInvulling.afgerondOp` | leeg zolang niet afgerond |

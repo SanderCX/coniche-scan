@@ -344,10 +344,20 @@ verschillende hoogtes gaf. Vaste `line-height: normal` op alle vier in
 `base.css` regelt dat: Een `.admin-field select` en het `input` ernaast
 komen daardoor vanzelf op (vrijwel) dezelfde hoogte uit.
 
-**Gelijke breedte**: Knoppen die samen in één actierij staan, krijgen
-dezelfde breedte (`display: flex` op de rij, `flex: 1` of een gedeelde
-`min-width` op elke knop). Dat geldt per rij, niet voor alle knoppen op
-een pagina.
+**Gelijke breedte**: Knoppen die samen in één rij staan, krijgen allemaal
+de breedte van de breedste knop in die rij. Dat geldt voor actierijen en
+ook voor filterknoppen zoals de periodekeuze in het Audit-log (Vandaag,
+7 dagen, 30 dagen, 90 dagen, Alles, Aangepast). Knoppen op eigen
+tekstbreedte plus padding geven een onrustig beeld.
+
+- Rij: `display: inline-grid; grid-auto-flow: column;
+  grid-auto-columns: 1fr; gap: .5rem`. Alle kolommen worden zo even breed
+  als de breedste inhoud.
+- De tekst staat gecentreerd. Elke knop houdt zijn eigen variant (de
+  actieve periode blijft gevuld, de rest `.btn-outline`).
+- Het geldt per rij, niet voor alle knoppen op een pagina. Breekt de rij
+  op smalle schermen af naar meerdere regels, dan is de breedste knop per
+  regel leidend.
 
 Knoppen die onder elkaar staan, bijvoorbeeld "Verwijderen" en "Verlengen"
 in de actiekolom van een lijst, krijgen ook dezelfde breedte: Die van de
