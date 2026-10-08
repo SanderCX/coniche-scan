@@ -5,8 +5,9 @@ import { bouwblokkenMetAfwijkendGewicht, gewichtMarkering } from "./weging";
 import { zorgscan as zorgscanSeed } from "@/data/zorgscan-assessment";
 import type { Assessment } from "./types";
 import { klantcontactVolwassenheid } from "@/data/klantcontact-assessment";
+import { aiVolwassenheid } from "@/data/ai-scan-assessment";
 
-// De seed heeft overal gewicht 1; dit test de weging met de gewichten uit het Zorgscan-voorbeeld (4, 10, 11 op 2).
+// De Zorgscan-seed heeft de gewichten 4, 10 en 11 op 2 (de spec is leidend); deze kopie zet ze er expliciet op, onafhankelijk van de seed.
 const zorgscan: Assessment = {
   ...zorgscanSeed,
   categorieen: zorgscanSeed.categorieen!.map((c) => ({
@@ -16,14 +17,19 @@ const zorgscan: Assessment = {
 };
 
 describe("weging", () => {
-  it("bouwblokken met een afwijkend gewicht worden gevonden, de seed-assessments hebben er geen", () => {
+  it("bouwblokken met een afwijkend gewicht worden gevonden: Alleen de Zorgscan-seed heeft er, en wel 4, 10 en 11 op 2", () => {
     expect(bouwblokkenMetAfwijkendGewicht(zorgscan).map((b) => [b.volgnummer, b.gewicht])).toEqual([
       [4, 2],
       [10, 2],
       [11, 2],
     ]);
     expect(bouwblokkenMetAfwijkendGewicht(klantcontactVolwassenheid)).toEqual([]);
-    expect(bouwblokkenMetAfwijkendGewicht(zorgscanSeed)).toEqual([]);
+    expect(bouwblokkenMetAfwijkendGewicht(zorgscanSeed).map((b) => [b.volgnummer, b.gewicht])).toEqual([
+      [4, 2],
+      [10, 2],
+      [11, 2],
+    ]);
+    expect(bouwblokkenMetAfwijkendGewicht(aiVolwassenheid)).toEqual([]);
   });
 
   it("de factor staat alleen bij een gewicht ongelijk aan 1", () => {
