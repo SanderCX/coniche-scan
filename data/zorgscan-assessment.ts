@@ -27,11 +27,11 @@ import { Assessment, Bouwblok } from "@/lib/types";
  */
 /**
  * Afwijkende gewichten in de Zorgscan, per `volgnummer` (`datamodel.md`, Bouwblok.gewicht).
- * Voorlopig leeg: Alle bouwblokken staan op 1. `content-zorgscan.md` noemde 4 (Leren uit
- * klantcontact), 10 (Kanaalmanagement) en 11 (Performance Management) op 2, maar het besluit
- * daarover is open (`CLAUDE.md`, Open punten) en voor nu terug naar 1 gezet.
+ * Bouwblok 4 (Leren uit klantcontact), 10 (Kanaalmanagement) en 11 (Performance Management)
+ * wegen 2, alle andere 1. Besloten: de spec is leidend (`CLAUDE.md`, Open punten;
+ * `content-zorgscan.md`, Weging).
  */
-const GEWICHT_PER_VOLGNUMMER: Record<number, number> = {};
+const GEWICHT_PER_VOLGNUMMER: Record<number, number> = { 4: 2, 10: 2, 11: 2 };
 
 function bb(
   id: string,
