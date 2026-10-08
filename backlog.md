@@ -49,7 +49,9 @@ Bewust nog niet opgepakt. Geen prioritering.
   aflopende bewaartermijnen, een vastgelegde procedure voor verlengen en
   verwijderen, en back-upretentie afgestemd op het dataretentiebeleid.
 - **Testknop** (vragenlijst automatisch invullen): Alleen tonen aan
-  ingelogde beheerders, en voor productie verwijderen.
+  ingelogde beheerders, en voor productie verwijderen. De keuze "Gemiddelde
+  score" is een keuzelijst (combobox) met de waarden 2, 3 en 4, geen half
+  invulveld. De werking van de knop blijft zoals nu.
 - **Testdata**: Seed-data met een testorganisatie en testrespondent
   opruimen.
 - **Data-integriteit** (`beheerpagina.md`, punt 13): Controlefunctie die na
@@ -282,6 +284,10 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
 - **Zorgscan-gewichten**: Bouwblok 4, 10 en 11 staan op 2, de spec is leidend
   (`CLAUDE.md`, Scoringslogica). De seed staat op 2. Nog te controleren: De
   opgeslagen data in de database en in bestaande browsers.
+- **Assessment verwijderen** (`beheerpagina.md`, punt 1, `datamodel.md`,
+  Verwijderen en datakoppelingen): Gespecificeerd, nog niet gebouwd. Alleen
+  mogelijk als er geen Meting van het Assessment bestaat, met een
+  bevestiging dat het niet ongedaan kan worden gemaakt.
 - **Organisatievelden** (`beheerpagina.md`, punt 3): De tab bestaat nog
   niet. `VeldDefinitieEditor` staat klaar en moet in een pagina onder
   Applicatie of bij Organisaties worden gebruikt, zoals de spec vraagt.
