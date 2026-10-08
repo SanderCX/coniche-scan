@@ -1062,6 +1062,12 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   oorspronkelijke organisatie, want een Meting hoort bij precies één
   organisatie.
 
+  **Twee verwijzingen per scan**: Een ScanInvulling heeft een verwijzing naar
+  zijn Respondent (`organisatieLidId`) en naar zijn Meting
+  (`scanUitvoeringId`). Elke verplaatsing werkt beide bij, ook "Respons naar
+  andere Meting verplaatsen". Anders meldt de data-integriteitscontrole
+  (punt 13) een correct verplaatste scan als zonder Meting.
+
   **Leeggeraakte respondent**: Verplaatst een losse respons de laatste
   ScanInvulling van een respondent weg, dan blijft die respondent zonder
   scans, maar mét zijn toegangscode, gewoon staan in de oorspronkelijke

@@ -378,18 +378,42 @@ deze Metingen later en kan hij de responsen omhangen naar de echte Meting
 Meting, ook niet een Meting uit een eerdere import van dezelfde
 organisatie.
 
-Binnen één import delen rijen één Meting als organisatie, Assessment en
-label overeenkomen. Een Meting hoort bij precies één Assessment
+Binnen één import delen rijen één Meting als doelorganisatie, Assessment,
+bronnaam en label overeenkomen. De bronnaam is de organisatienaam zoals die
+in het bestand staat (`organization_name`, bij de eigen export
+`organisatie_naam`), getrimd. Een Meting hoort bij precies één Assessment
 (`datamodel.md`), dus een organisatie met beide scantypes in het bestand
 krijgt twee Metingen.
 
+**Meerdere bronnamen in één organisatie.** Koppelt de beheerder in de
+voorbeeldweergave twee of meer bronnamen aan dezelfde organisatie (bestaand of
+nieuw), bijvoorbeeld een organisatie met meerdere onderdelen die in de oude
+tool los stonden, dan blijft het onderscheid tussen die bronnamen behouden:
+Elke bronnaam krijgt zijn eigen Meting. Het label krijgt dan de bronnaam
+erachter, bijvoorbeeld "Legacy-import 2026 Onderdeel A" of "Import
+Nulmeting 2026 Onderdeel A". De beheerder hernoemt die Metingen achteraf naar
+wat ze zijn. Wordt maar één bronnaam aan de organisatie gekoppeld, dan komt de
+bronnaam niet in het label, want die zegt dan niets extra's.
+
+**Eén scan per Respondent per Meting.** Een Respondent heeft in een Meting
+hooguit één scan (`datamodel.md`). Komt dezelfde Respondent (hetzelfde
+genormaliseerde e-mailadres) binnen dezelfde Meting-sleutel nog een keer
+voor, bijvoorbeeld omdat dezelfde Coniche-medewerker meerdere scans namens de
+organisatie invulde, dan krijgt die scan een eigen Meting. Het label krijgt
+de datum van `created_at` erachter, bijvoorbeeld "Legacy-import 2026 Onderdeel A
+(14-01-2026)", en bij dezelfde datum een volgnummer "(2)". De scans en de
+Respondent zelf blijven zoals ze zijn. De beheerder hernoemt of verplaatst ze
+achteraf (zie "Omhangen na de import").
+
 - **Oude tool**: Label **"Legacy-import {jaar van `created_at`}"** (bijv.
-  "Legacy-import 2026"). Rijen van dezelfde organisatie en hetzelfde
-  Assessment uit hetzelfde jaar komen samen in één Meting.
+  "Legacy-import 2026"). Rijen van dezelfde organisatie, dezelfde bronnaam en
+  hetzelfde Assessment uit hetzelfde jaar komen samen in één Meting, tenzij
+  een Respondent er al een scan in heeft (zie hierboven).
 - **Eigen export**: Label **"Import {meting_label}"**, met het
   `meting_label` uit de export (bijv. "Import Nulmeting 2026"). Rijen met
-  dezelfde organisatie, hetzelfde Assessment en hetzelfde `meting_label`
-  komen samen in één Meting.
+  dezelfde organisatie, dezelfde bronnaam, hetzelfde Assessment en hetzelfde
+  `meting_label` komen samen in één Meting, tenzij een Respondent er al een
+  scan in heeft (zie hierboven).
 
 "Binnen één import" betekent één geladen bestand in één beheersessie.
 Neem je een rij later alsnog mee met dezelfde knop (zie
@@ -521,8 +545,8 @@ formaat hierboven:
 - **Meting**: Een nieuwe Meting met het label "Import {meting_label}",
   met het `meting_label` uit de export erin, niet het label "Legacy-import
   {jaar}" (dit is geen import uit een externe tool). Rijen met dezelfde
-  organisatie, hetzelfde Assessment en hetzelfde `meting_label` delen één
-  Meting, zie "Meting" hierboven. Een bestaande Meting met dezelfde naam
+  organisatie, dezelfde bronnaam, hetzelfde Assessment en hetzelfde
+  `meting_label` delen één Meting, zie "Meting" hierboven. Een bestaande Meting met dezelfde naam
   wordt niet hergebruikt.
 
 ## Audit-log
