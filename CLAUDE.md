@@ -31,7 +31,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `beheerpagina.md` | De beheeromgeving |
 | `import-scans.md` | Import van scans (CSV): de oude, stopgezette tool, en onze eigen export teruglezen |
 | `sbi-indeling.md` | Vaste optielijst voor Sector/Subsector (SBI2025, top 2 niveaus) |
-| `benchmark.md` | Benchmark: Een zelf gekozen groep organisaties naast elkaar, geaggregeerd en anoniem, met een view per organisatie voor een Lead |
+| `benchmark.md` | Benchmark op drie niveaus: Tussen organisaties (gebouwd, geaggregeerd en anoniem, met een view per organisatie voor een Lead), binnen een organisatie tussen Metingen, en binnen een Meting (beide voorstel) |
 | `backlog.md` | Bewust nog niet opgepakt |
 | `go-live-plan.md` | Actielijst naar productie |
 | `azure-plan.md` | Aanvulling op `go-live-plan.md` met de stappen voor de Azure-omgeving (Azure DevOps, Azure SQL, `coniche-scan.nl`) |
@@ -86,8 +86,9 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   als CSV (`export-csv.md`) en voor InDesign als XML (`export-indesign.md`)
   zijn alle drie gebouwd, vanuit dezelfde Exporteren-dropdown op de
   resultatenpagina en bij Ingevulde scans (`beheerpagina.md` punt 7).
-- **Benchmark**: Besproken en uitgewerkt in `benchmark.md`, nog niet
-  gebouwd.
+- **Benchmark**: Het niveau tussen organisaties is gebouwd (PR 61,
+  `benchmark.md`). De niveaus binnen een organisatie en binnen een Meting
+  zijn besproken en nog niet gebouwd.
 
 ## Terminologie
 
@@ -478,10 +479,10 @@ bouwblokken met naam, omschrijving, tags en vragen.
 - Aggregatie over meerdere respondenten: Het gemiddelde per Meting is
   gebouwd (`beheerpagina.md`, Organisatie-resultaten). Afwijking en
   spreiding daarbovenop zijn nog niet ontworpen (`backlog.md`).
-- Benchmark: Uitgewerkt in `benchmark.md`, met de open punten onderaan dat
-  bestand.
+- Benchmark: Niveau 1 is gebouwd. Niveau 2 en 3 zijn uitgewerkt in
+  `benchmark.md`, met de open punten onderaan dat bestand.
 - Weging: De weging is gebouwd. De gewichten van de Zorgscan (bouwblok 4, 10
-  en 11 op 2) zijn besloten: de spec is leidend. De seed en de opgeslagen
-  data moeten daarop staan.
+  en 11 op 2) zijn besloten: de spec is leidend. De seed staat op 2. De
+  opgeslagen data moeten daarop staan.
 - Rol/functie bij de respondent: Vrij tekstveld of vaste lijst.
 - Focus- en error-states in formulieren (zie `stylesheet.md`).

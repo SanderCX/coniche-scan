@@ -83,6 +83,10 @@ een scan geaggregeerd en anoniem in een benchmark worden gebruikt
   (`Organisatie.benchmarkToegestaan`, `datamodel.md` deel 3).
 - Verwijdert Coniche een scan, dan verdwijnt die ook uit de benchmark,
   omdat de cijfers altijd uit de actuele gegevens worden berekend.
+- Een vergelijking binnen één organisatie (tussen haar Metingen of binnen
+  een Meting) gebruikt alleen gegevens van die organisatie. Voor die
+  niveaus is geen vlag nodig. Of hiervoor een aparte vermelding nodig is, moet
+  nog worden bevestigd (`benchmark.md`, Open punten).
 
 Placeholder: De formulering van de disclaimer. Uitgangspunt is de tekst van
 Vlirdens, waarin deelname betekent dat geaggregeerde en anonieme gegevens

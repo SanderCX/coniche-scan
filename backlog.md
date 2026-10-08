@@ -96,11 +96,45 @@ Bewust nog niet opgepakt. Geen prioritering.
   één Meting. "Zijn we vooruitgegaan sinds de nulmeting" — twee of meer
   Metingen van dezelfde organisatie naast elkaar, per categorie/
   bouwblok — is nog geen ontwerp.
-- **Benchmark tussen organisaties**: Besproken en uitgewerkt in
-  `benchmark.md`, nog te bouwen. Daarbij nog niet gedekt: Export (PDF, CSV,
-  InDesign) van een benchmark, rechten voor een Consultant, een vastgezette
-  versie voor de Lead in plaats van live cijfers, en ontwikkeling in de
-  tijd binnen een benchmark. Het berekenen moet op de server, zie Fase 2.
+- **Benchmark, niveau 1 (tussen organisaties)**: Gebouwd (PR 61,
+  `benchmark.md`). Daarbij nog niet gedekt: Export (PDF, CSV, InDesign) van
+  een benchmark, rechten voor een Consultant, een vastgezette versie voor de
+  Lead in plaats van live cijfers, de range van de groep als band, de tekst in
+  de publieke privacypagina en in het toestemmingsvakje van de intake, en
+  ontwikkeling in de tijd binnen een benchmark. Het berekenen moet op de
+  server, zie Fase 2.
+- **Benchmark, niveau 2 (binnen een organisatie, tussen Metingen)**:
+  Besproken en uitgewerkt als voorstel in `benchmark.md`, nog te bouwen. Een
+  Meting per bedrijfsonderdeel van één organisatie naast elkaar, op dezelfde
+  plek als niveau 1, met `Benchmark.niveau`. Eerst alleen voor een Admin.
+  Open: Of een Lead de view van zijn Meting ziet, en met welke drempel.
+- **Benchmark, niveau 3 (binnen een Meting)**: Hoe scoort een scan ten
+  opzichte van de andere scans in dezelfde Meting. Het kader staat in
+  `benchmark.md`. Het ontwerp van de spreiding (verdeling per bouwblok,
+  laagste tot hoogste score, de plek van een scan daarin) en van de hoge en
+  lage scores moet nog worden bedacht. Houd rekening met herleidbaarheid bij
+  weinig scans. Sluit aan op "Afwijking en spreiding bovenop de aggregatie"
+  hierboven.
+- **Benchmark of gemiddelde opslaan als samengestelde Meting**: Een
+  gemiddelde over meerdere Metingen van één organisatie (zie niveau 2)
+  vastleggen als eigen Meting, zodat een organisatie met meerdere delen als
+  één deelnemer meedoet aan een benchmark tussen organisaties. De
+  samengestelde Meting verwijst naar de Metingen waaruit ze bestaat en
+  kopieert geen antwoorden. Ze staat in de lijst Metingen met een badge
+  "Gemiddelde", heeft geen respondenten en is niet invulbaar. Een Lead kan Lead
+  worden op een samengestelde Meting (`RespondentRolMeting`) en ziet dan alleen
+  het gemiddelde, niet de onderliggende Metingen. Nog te beslissen: Wat er
+  gebeurt als een onderliggende Meting wordt verwijderd. Blokkeren kan niet,
+  want verwijderen moet altijd kunnen (bewaartermijn, AVG-verzoek). Voorstel:
+  De Meting valt uit de samenstelling, de bevestiging noemt de samengestelde
+  Metingen waarin ze zit en dat het gemiddelde daardoor verandert, en een
+  samengestelde Meting zonder leden verdwijnt. Het alternatief is bij het
+  opslaan de gemiddelde antwoorden per vraag vast te leggen. Dan verandert het
+  gemiddelde niet, maar het botst met het principe dat scores worden berekend
+  en moet nog worden getoetst aan de bewaartermijn. De eerder voorbereide
+  weergave van een gemiddelde over een selectie van Metingen met
+  selectievakjes in de lijst Metingen is vervallen. Niveau 2 van de benchmark
+  komt in de plaats.
 - **Export van het organisatieresultaat**: De aggregatieweergave
   (`beheerpagina.md`, Organisatie-resultaten) is er, een PDF/CSV/
   InDesign-export ervan nog niet. De bestaande exports blijven per één
@@ -206,7 +240,8 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
 - **Benchmark op de server berekenen**: Een Lead mag alleen het
   geaggregeerde resultaat ontvangen en nooit de scans van andere
   organisaties (`benchmark.md`). Dat kan pas als de berekening aan de
-  serverkant draait.
+  serverkant draait. Dat geldt sterker voor de niveaus binnen een organisatie
+  en binnen een Meting.
 
 ### Fase 3: Deployment, beveiliging en stabiliteit
 
@@ -245,15 +280,16 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
 
 **Besloten, nog te bouwen of te verwerken**
 - **Zorgscan-gewichten**: Bouwblok 4, 10 en 11 staan op 2, de spec is leidend
-  (`CLAUDE.md`, Scoringslogica). Sander zet de seed en de opgeslagen data
-  terug op 2.
+  (`CLAUDE.md`, Scoringslogica). De seed staat op 2. Nog te controleren: De
+  opgeslagen data in de database en in bestaande browsers.
 - **Organisatievelden** (`beheerpagina.md`, punt 3): De tab bestaat nog
   niet. `VeldDefinitieEditor` staat klaar en moet in een pagina onder
   Applicatie of bij Organisaties worden gebruikt, zoals de spec vraagt.
 - **Losse bestanden in de repo opruimen**: `v1-aanpassingen.md`,
   `datamodel-rbac-voorstel.md`, `coniche_bouwstenen.md` en
   `OverlegMetJoost.md` mogen weg (Joost akkoord, 8 oktober). Sander
-  verwijdert ze via een PR.
+  verwijdert ze via een PR. De open vragen die alleen daarin staan, zijn
+  hieronder vastgelegd, onder "Open vragen uit de losse bestanden".
 - **Content-pagina's** (`beheerpagina.md`, punt 11): Beheerbaar maken is
   gespecificeerd en de spec is leidend. Sander twijfelt nog over de beste
   uitvoering. Pas als een nieuw overleg-document in de map staat, wordt er
@@ -265,6 +301,34 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
 - **Sessieduur**: Volgt met de backend (`beheerpagina.md`, Instellingen).
 - **Opruimen voor livegang**: `devAutoLogin`, seed-accounts en de tijdelijke
   Beheer-link in de footer (`go-live-plan.md`).
+
+**Open vragen uit de losse bestanden (voor het verwijderen)**
+- **Content-pagina's, opmaak (Visie en 2030)**: Eén tekstveld per pagina, per
+  tekstblok bewerken, of hybride met vaste kaarten en cyclus in de code. De
+  pagina's bevatten checklistkaarten, een verbetercyclus van vijf stappen,
+  genummerde kaarten en iconen. Per tekstblok verliest niets, één tekstveld
+  volgt de spec letterlijk maar maakt de pagina's plat. Nog geen keuze.
+- **Content-pagina's, velden (Bouwstenen en AI)**: Naam, omschrijving en
+  centrale vraag bewerkbaar, de visual zelf vast. Open: Is er één bron met de
+  velden `Bouwblok.toelichting` en `Bouwblok.centraleVraag` van het Assessment
+  (een aanpassing in Content wijzigt dan ook de publieke pagina), of mogen ze
+  uit elkaar lopen. Nu gebruiken `/bouwstenen` en `/ai-scan` nog hun eigen
+  statische content.
+- **Content-pagina's, opslag**: Voorstel is zoals bij Algemene teksten: Een
+  gewijzigde tekst gaat voor op de standaardtekst, met "Standaardtekst
+  herstellen", zonder versiebeheer, archiveren of publicatiestap, en met een
+  auditregel met alleen de sleutel. Nog te bevestigen, evenals Admin-only.
+- **Knop "Bekijk" in lijstrijen**: Het label is "Bekijk" zonder pijltjes (in de
+  code gedaan). Het uiterlijk is nog open. Er zijn drie opties: grijze rand en donkere tekst zoals
+  alle compacte knoppen (nu), oranje tekst met grijze rand, of een oranje rand
+  bij hover voor alle `.btn-outline` knoppen. Ook de kleur van de aangewezen
+  rij hoort daarbij. Volgt in `stylesheet.md`.
+- **Eigenaarschap van een organisatie zonder aanmaker**: Voor een organisatie
+  met `aangemaaktDoor: null` bestaat "Organisatie-toegang toewijzen". Open: Is
+  dat voldoende, of is een losse actie "eigenaarschap overzetten" nodig.
+- **Zorgscan-inhoud**: 29 van de 60 vragen zijn nog gelijk aan de
+  Klantcontact-scan, dus niet sector-vertaald. Inhoudelijke input van Joost en
+  Sander nodig (`content-zorgscan.md`).
 
 ## Content-onderhoud
 

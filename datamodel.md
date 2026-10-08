@@ -7,8 +7,10 @@ Enige bron voor het datamodel.
 - **Deel 2: Voorstel.** Rollen, rechten, inlog en audit. Wordt gebouwd
   samen met de Azure SQL-database; clientside zou het alleen schijnveiligheid
   opleveren.
-- **Deel 3: Voorstel.** Benchmark. Het gedrag staat in `benchmark.md`, hier
-  alleen de records en de uitbreiding op Organisatie.
+- **Deel 3: Gebouwd en voorstel.** Benchmark. Het niveau tussen organisaties
+  is gebouwd, de niveaus binnen een organisatie en binnen een Meting zijn
+  voorstel. Het gedrag staat in `benchmark.md`, hier alleen de records en de
+  uitbreiding op Organisatie.
 
 Termen (Meting, Respondent, Ingevulde scan) staan in CLAUDE.md onder
 Terminologie.
@@ -330,6 +332,21 @@ herimplementatie: De resultatenpagina, de PDF-export
 (`export-csv.md`, `overall_score`/`groepsScores`). Wijkt de score op
 één van die plekken af van de andere, dan is dat per definitie een
 bug in die ene plek, niet een tweede, losstaande berekening.
+
+**Gemiddelde over een groep leden (benchmark).** Voor een gemiddelde over een
+groep telt elk lid even zwaar, ongeacht het aantal respondenten daaronder. Dit
+geldt voor de benchmark op alle niveaus (`benchmark.md`). Een lid is een
+organisatie met haar Meting (niveau 1), een Meting (niveau 2) of een afgeronde
+scan (niveau 3).
+
+- Per lid wordt eerst het gemiddelde antwoord per vraag genomen over de
+  afgeronde scans, en daarna het gemiddelde van die waarden over de leden.
+- Op die gemiddelden werkt dezelfde scorefunctie als hierboven, met
+  `Bouwblok.gewicht`. Omdat de berekening lineair is, geeft dit hetzelfde
+  als het gemiddelde van de scores van de leden. Er komt dus geen
+  tweede rekenmethode bij.
+- De leden horen bij hetzelfde Assessment. Een lid zonder afgeronde scan
+  telt niet mee.
 
 ### Toegangscode
 
@@ -916,7 +933,11 @@ metingen en respondenten, niet de scaninhoud zelf.
 rekent over organisaties die een Consultant niet beheert, dus het bereik
 `eigen` past er niet bij. Een Consultant heeft er vooralsnog geen toegang
 toe. `benchmark.inzien` geldt voor een Lead alleen voor de views die een
-Admin aan hem heeft toegewezen (deel 3 en `benchmark.md`).
+Admin aan hem heeft toegewezen (deel 3 en `benchmark.md`). Het prototype kent
+`benchmark.inzien` nog niet als aparte regel in `lib/rechten.ts`: Daar loopt de
+toegang van de Lead via de toewijzing en de Metingen waarop hij Lead is
+(`leadMetingIds`), net als bij `export.uitvoeren`. De regel in de matrix is
+het doel voor de rolrechten die met de database komen.
 
 ---
 
@@ -929,16 +950,18 @@ Admin aan hem heeft toegewezen (deel 3 en `benchmark.md`).
 
 ---
 
-## Deel 3: Benchmark (voorstel)
+## Deel 3: Benchmark (gebouwd en voorstel)
 
-**Status: Voorstel.** Een benchmark zet de scores van een zelf gekozen
-groep organisaties naast elkaar. Het gedrag staat in `benchmark.md`, de
+**Status.** Het niveau tussen organisaties is gebouwd (PR 61). De niveaus binnen
+een organisatie en binnen een Meting zijn voorstel en staan hieronder als
+zodanig aangegeven. Een benchmark zet de
+scores van een zelf gekozen groep naast elkaar. Het gedrag staat in `benchmark.md`, de
 schermen in `beheerpagina.md`, punt 14. Hier staan de records, de
 uitbreiding op Organisatie en de instellingen.
 
 Scores worden ook hier berekend en nooit opgeslagen (Scoreberekening in
-deel 1). Een benchmark slaat alleen de samenstelling op, dus welke
-organisaties met welke Meting meedoen.
+deel 1). Een benchmark slaat alleen de samenstelling op, dus welke leden
+(organisaties met een Meting, of Metingen) meedoen.
 
 ### Benchmark
 
@@ -948,6 +971,10 @@ Benchmark {
   naam: string                      // vrije tekst, bepaalt de Admin
   assessmentIds: string[]           // één of meer
   leden: BenchmarkLid[]
+  meldingen: { tekst: string, op: datetime }[]
+                                    // gebouwd: schermmeldingen, zie hieronder
+  niveau?: "organisaties" | "metingen" | "scans"
+                                    // voorstel, ontbreekt = "organisaties"
   aangemaaktOp: datetime
   aangemaaktDoor: string            // Gebruiker
 }
@@ -968,9 +995,28 @@ BenchmarkToewijzing {
 }
 ```
 
-Per benchmark heeft een organisatie per Assessment hoogstens één lid. Een
-toewijzing is uniek per combinatie van benchmark, organisatie en Lead. Het
-sectorfilter bij het samenstellen wordt niet opgeslagen.
+Op niveau "organisaties" heeft een organisatie per benchmark per Assessment
+hoogstens één lid. Een toewijzing is uniek per combinatie van benchmark,
+organisatie en Lead. Het sectorfilter bij het samenstellen wordt niet
+opgeslagen.
+
+**`meldingen`** (gebouwd) is wel opgeslagen, maar geen inhoud van de
+benchmark. Het zijn korte teksten voor de beheerweergave, bijvoorbeeld "{naam}
+is uit de benchmark gehaald: de Meting is verwijderd". Ze ontstaan als een lid
+automatisch wegvalt (zie Verwijderen en datakoppelingen). Een Admin klikt ze
+weg, en een wijziging van de samenstelling wist ze. Ze bevatten alleen namen
+van organisaties, geen scores of persoonsgegevens, en ze blijven alleen
+bestaan zolang de benchmark bestaat.
+
+**`niveau`** (voorstel) bepaalt wat een lid is, zie `benchmark.md`.
+
+- `organisaties`: Een lid is een organisatie met een Meting per Assessment.
+  Dit is de waarde als het veld ontbreekt, dus bestaande benchmarks hoeven
+  niet te worden aangepast.
+- `metingen`: Alle leden hebben dezelfde `organisatieId`. Per Assessment zijn
+  er meerdere leden, elk met een andere Meting.
+- `scans`: Eén lid, de Meting waarin de scans worden vergeleken. De scans
+  zelf zijn geen leden, want ze volgen uit de Meting.
 
 ### Uitbreiding op Organisatie
 
