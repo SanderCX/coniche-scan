@@ -122,11 +122,18 @@
   font-size: var(--fs-s);
 }
 
-/* Het pijltje komt uit een ander lettertype met een hogere regelhoogte dan
-   de knoptekst: Zonder dit is een dropdown-knop 2,5px hoger dan de knoppen
-   naast hem. */
+/* Het pijltje van een Dropdown-knop (stylesheet.md, Dropdown-knop, Eén pijltje overal): Een gevulde, kleine
+   chevron, `.65rem` breed, een driehoek met de punt naar beneden. Het is een vorm en geen tekstteken, dus er is geen
+   lettertype of regelhoogte die de knop hoger maakt. De kleur is `currentColor`: Oranje in een outline-knop, de
+   tekstkleur van de knop in andere varianten. Staat `.5rem` achter de tekst. */
 .dropdown-pijl {
-  line-height: 0;
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.4rem;
+  margin-left: 0.5rem;
+  background: currentColor;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  vertical-align: middle;
 }
 
 /* Dropdown-knop (stylesheet.md, "Dropdown-knop") — voor acties met
@@ -180,7 +187,9 @@
   color: var(--ink);
   background: none;
   border: none;
+  font-family: inherit;
   font-size: var(--fs-s);
+  font-weight: 400;
   cursor: pointer;
 }
 
@@ -456,6 +465,25 @@ button.card:hover,
 .field input[type="email"],
 .field input[type="password"],
 .field input[type="number"],
+/* Basisvorm van `select.field`: Gelijk aan de tekstvelden in een `.field`, op de hoogte van `--control-h`. */
+select.field {
+  width: 100%;
+  height: var(--control-h);
+  font-size: var(--fs-m);
+  padding-block: 0;
+  padding-left: 0.9rem;
+  border: 1px solid var(--border-d);
+  border-radius: var(--r);
+  color: var(--ink);
+}
+
+select.field:focus,
+select.veld-compact:focus {
+  outline: none;
+  border-color: var(--or);
+  box-shadow: 0 0 0 3px var(--or-faint);
+}
+
 .field textarea {
   width: 100%;
   font-family: inherit;

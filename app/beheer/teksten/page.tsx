@@ -37,7 +37,7 @@ export default function AlgemeneTekstenPage() {
 
   return (
     <div className="admin-main">
-      <div className="flex items-center gap-2">
+      <div className="titel-rij">
         <h1>Algemene teksten</h1>
         <InfoIcoon sleutel="info.algemeneTekstenPagina" />
       </div>

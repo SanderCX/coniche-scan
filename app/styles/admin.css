@@ -210,6 +210,7 @@
 .admin-field input[type="text"],
 .admin-field input[type="number"],
 .admin-field input[type="email"],
+.admin-field input[type="date"],
 .admin-field select,
 .admin-field textarea {
   width: 100%;
@@ -228,6 +229,7 @@
 .admin-field input[type="text"],
 .admin-field input[type="number"],
 .admin-field input[type="email"],
+.admin-field input[type="date"],
 .admin-field select {
   height: var(--control-h);
 }
@@ -686,4 +688,78 @@
   justify-items: stretch;
   gap: 0.5rem;
   width: max-content;
+}
+
+/* Staat bewust onderaan: `.admin-field select` en `.veld-compact` zetten hierboven zelf `padding` en `background`, en een
+   latere regel met gelijke specificiteit wint. */
+/* Dropdowns (stylesheet.md, Formulieren, Dropdowns): De pijl van de browser staat uit, in plaats daarvan staat er een
+   eigen chevron als achtergrondafbeelding, dezelfde gevulde chevron als in de Dropdown-knop (`.65rem` breed, `--ink-m`) (de hexwaarde staat hier vast, want een
+   CSS-variabele werkt niet in een data-URI), `.875rem` van de rechterrand, even ver als de tekst links van de rand af
+   staat. `padding-right: 2.5rem` houdt een lange optie uit de buurt van de chevron. Geldt voor `select.field`,
+   `.admin-field select` en de compacte select in een knoppenrij (`.veld-compact`). */
+select.field,
+.admin-field select,
+select.veld-compact {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M0 0h10L5 6z' fill='%234d4d49'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.875rem center;
+  background-size: 0.65rem 0.39rem;
+  padding-right: 2.5rem;
+  text-overflow: ellipsis;
+}
+
+/* Tekst in besturingselementen (stylesheet.md, Typografie, Tekst in besturingselementen): In een tabel, een filter- of
+   actierij en de bulk-actiebalk is alles `--fs-s`: De knop, de Dropdown-knop, de opties in het menu, de `select` en
+   het invoerveld. Wat een waarde toont (select, invoerveld, optie) heeft gewicht 400. `--fs-m` blijft voor losse
+   formulieren buiten een tabel of rij. */
+.filter-rij .admin-field input,
+.filter-rij .admin-field select,
+.admin-table select,
+.admin-table input:not([type="checkbox"]):not([type="radio"]),
+.veld-compact {
+  font-size: var(--fs-s);
+  font-weight: 400;
+}
+
+/* Datumveld (stylesheet.md, Formulieren, Datumvelden): Zelfde hoogte en maat als een dropdown. Zonder
+   `box-sizing: border-box` en `line-height: normal` maakt het kalendericoon van de browser het veld hoger. */
+.admin-field input[type="date"] {
+  box-sizing: border-box;
+  line-height: normal;
+  font-size: var(--fs-s);
+  font-weight: 400;
+  min-width: 9.5rem;
+}
+
+/* Info-icoon naast een paginatitel (stylesheet.md, Info-icoon, Naast een titel): Titel en icoon staan in één
+   flex-rij, het icoon gecentreerd op de titel. De onderrand van de `h1` staat op de rij, anders telt hij mee bij het
+   centreren en staat het icoon te laag. */
+.titel-rij {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.14rem;
+}
+.titel-rij h1 {
+  margin: 0;
+}
+
+/* Eén maat voor alle interface-tekst in beheer: `--fs-s` en `--fs-m` zijn hier beide 14px (`.875rem`). Staat op
+   `body` en niet op `.admin-main`, zodat ook de modals en Info-velden meekomen, die buiten de pagina worden
+   gerenderd. `--text-sm` en `--text-base` zijn de Tailwind-varianten van dezelfde tokens (`app/globals.css`).
+   Alleen in beheer: De respondentkant houdt `--fs-s` (.85rem) en `--fs-m` (.9rem). */
+body:has(.admin-main) {
+  --fs-s: 0.875rem;
+  --fs-m: 0.875rem;
+  --text-sm: 0.875rem;
+  --text-base: 0.875rem;
+}
+
+/* Gewone tekst in beheer, zoals de introregel onder een paginatitel, is interface-tekst en geen leestekst: `--fs-m`.
+   `:where()` houdt de specificiteit op nul, zodat een `p` met een eigen klasse zijn eigen maat houdt. */
+:where(.admin-main) p {
+  font-size: var(--fs-m);
 }

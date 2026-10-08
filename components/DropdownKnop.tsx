@@ -49,7 +49,7 @@ export function DropdownKnop({
   return (
     <div className="dropdown-knop" ref={containerRef}>
       <button type="button" disabled={disabled} onClick={() => setOpen((o) => !o)} className={className}>
-        {label} <span className="dropdown-pijl" aria-hidden="true">▾</span>
+        {label}<span className="dropdown-pijl" aria-hidden="true" />
       </button>
       {open && (
         <div className="dropdown-menu">

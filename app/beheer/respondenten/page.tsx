@@ -145,7 +145,7 @@ function RespondentenPageInhoud() {
         <p className="admin-notice">Nog geen respondenten.</p>
       ) : (
         <>
-          <div className="mb-5 flex flex-wrap items-end gap-3">
+          <div className="filter-rij mb-5 flex flex-wrap items-end gap-3">
             <div className="admin-field" style={{ marginBottom: 0, minWidth: "12rem" }}>
               <label>Organisatie</label>
               <select value={filterOrganisatie} onChange={(e) => set({ organisatie: e.target.value, meting: null })}>

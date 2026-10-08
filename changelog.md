@@ -14,6 +14,26 @@
 - **Content-lijst**: Assessment-icoon in een oranje rondje (`.assessment-icoon-rond`, `stylesheet.md`,
   Assessment-icoon).
 - **Bulk-export** volgens de specs van 7 oktober (zie hieronder bij 7 oktober).
+- **Dropdowns** (`stylesheet.md`, Formulieren, Dropdowns, en Dropdown-knop; specs van Joost, 8 oktober): Eén
+  gevulde chevron overal (`.65rem` breed, driehoek met de punt naar beneden). In de Dropdown-knop is het een
+  CSS-vorm met `currentColor` (`.dropdown-pijl`, oranje in een outline-knop), in `select.field`,
+  `.admin-field select` en `select.veld-compact` een achtergrondafbeelding in `--ink-m` (`appearance: none`,
+  `.875rem` van de rechterrand, `padding-right: 2.5rem`, focusrand zoals `.field`). Het blok staat onderaan
+  `admin.css`, omdat `.admin-field select` daar zelf `padding` en `background` zet. Het pijltje staat `.5rem`
+  achter de tekst.
+- **Tekst in besturingselementen** (`stylesheet.md`, Typografie): In filterrijen (`.filter-rij`, op Ingevulde
+  scans, Respondenten, Audit-log en de Meting-plannen-rij) en in tabellen zijn `select` en invoerveld `--fs-s`,
+  gewicht 400. Menu-opties zijn gewicht 400 in Epilogue.
+- **14px in beheer** (Sander, 8 oktober): In de beheeromgeving zijn `--fs-s` en `--fs-m` beide `.875rem`
+  (`body:has(.admin-main)` in `admin.css`, ook voor de Tailwind-varianten `--text-sm` en `--text-base`), en gewone
+  `p`-tekst, zoals de introregel onder een titel, is `--fs-m` in plaats van de 16px van de browser. Op `body`
+  zodat modals en Info-velden meekomen. De respondentkant houdt `.85rem` en `.9rem`. **De spec zegt dit nog niet**:
+  `stylesheet.md` noemt twee maten (13,6 en 14,4px) en geen beheer-uitzondering.
+- **Datumveld**: `input[type="date"]` heeft dezelfde hoogte, rand en padding als een dropdown (`--control-h`,
+  `box-sizing: border-box`, `--fs-s`). In de Audit-log staan de labels en velden op dezelfde bovenrand.
+- **Info-icoon naast een titel** (`.titel-rij`, Audit-log en Algemene teksten): Het icoon staat gecentreerd op de
+  titel. De onderrand van de `h1` telde mee bij het centreren (18px) en zette het icoon 9px te laag, dus staat die
+  nu op de rij.
 
 ## 2026-10-07 — Specwijzigingen van 7 oktober, lijstknoppen, AVG-inzage als CSV, Azure-plan
 
