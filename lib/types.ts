@@ -217,6 +217,11 @@ export interface Organisatie {
    * `scanUitvoeringen` hierboven, praktisch voor een localStorage-blob.
    */
   toegewezenAan: string[];
+  /**
+   * Of deze organisatie in een benchmark mag worden opgenomen (`datamodel.md` deel 3, `benchmark.md`, Toestemming en
+   * privacy). Een Admin zet de vlag nadat dit met de organisatie is afgesproken. Standaard `false`.
+   */
+  benchmarkToegestaan: boolean;
   aangemaaktOp: string;
   gewijzigdOp: string;
 }
@@ -305,3 +310,47 @@ export interface ScanWeergave {
 }
 
 export type Classificatie = "rood" | "oranje" | "groen";
+
+/**
+ * Een benchmark (`datamodel.md` deel 3, `benchmark.md`): De samenstelling van een zelf gekozen groep organisaties.
+ * Scores staan hier niet: Die worden altijd berekend uit de scans (`lib/benchmark.ts`).
+ */
+export interface Benchmark {
+  id: string;
+  naam: string;
+  /** Eén of meer Assessments. Elk heeft in de weergave een eigen sectie, scores van verschillende Assessments worden niet samengevoegd. */
+  assessmentIds: string[];
+  /** Per organisatie hoogstens één lid per Assessment. */
+  leden: BenchmarkLid[];
+  /**
+   * Meldingen voor de beheerweergave, bijvoorbeeld "Organisatie X is uit de benchmark gehaald omdat de Meting is
+   * verwijderd" (`benchmark.md`, Samenstellen: Valt een lid weg, dan meldt de beheerweergave dat). Niet in het
+   * datamodel: Een hulp voor het scherm, door een Admin weg te klikken.
+   */
+  meldingen: { tekst: string; op: string }[];
+  aangemaaktOp: string;
+  /** `Gebruiker.id` van de Admin. */
+  aangemaaktDoor: string;
+}
+
+/** Eén organisatie met één Assessment en één Meting in een benchmark. */
+export interface BenchmarkLid {
+  organisatieId: string;
+  /** Een van `Benchmark.assessmentIds`. */
+  assessmentId: string;
+  /** Een Meting van deze organisatie en dit Assessment. */
+  metingId: string;
+}
+
+/** Een view van een benchmark voor een Lead van de organisatie waarvan de view is. */
+export interface BenchmarkToewijzing {
+  id: string;
+  benchmarkId: string;
+  /** De organisatie waarvan de view is. */
+  organisatieId: string;
+  /** `OrganisatieLid.id` van de Lead. */
+  respondentId: string;
+  /** `Gebruiker.id` van de Admin. */
+  toegewezenDoor: string;
+  toegewezenOp: string;
+}

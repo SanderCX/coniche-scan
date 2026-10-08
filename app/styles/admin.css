@@ -782,3 +782,125 @@ body:has(.admin-main) {
 .admin-tabel-reden {
   color: var(--ink-m);
 }
+
+/* Benchmark (`benchmark.md`): Een sectie per Assessment, de teller en de uitklapbare bouwblokken. */
+.benchmark-sectie {
+  margin: 2.5rem 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.benchmark-sectie h2 {
+  margin-top: 0;
+}
+.benchmark-teller[data-onder-drempel] strong {
+  color: var(--stat-amber);
+}
+.benchmark-bouwblok {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  margin-bottom: 0.5rem;
+  background: var(--bg);
+}
+.benchmark-bouwblok summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  list-style: none;
+  color: var(--ink);
+  font-weight: 600;
+}
+.benchmark-bouwblok summary::-webkit-details-marker {
+  display: none;
+}
+.benchmark-bouwblok .admin-table {
+  margin: 0;
+}
+.benchmark-voetnoot {
+  margin-top: 1.5rem;
+  color: var(--ink-s);
+  font-size: var(--fs-xs);
+}
+
+/* Benchmark samenstellen (`benchmark.md`, Samenstellen). */
+.benchmark-keuzes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.benchmark-keuze {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.benchmark-filter {
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--bg-warm);
+}
+.benchmark-filter summary {
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink);
+}
+.benchmark-filter-inhoud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  padding: 0 1rem 1rem;
+}
+.benchmark-filter-inhoud fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.benchmark-filter-inhoud legend {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--ink-s);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
+}
+.benchmark-filter-inhoud label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.benchmark-organisaties {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.benchmark-organisatie {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--bg);
+  padding: 0.7rem 1rem;
+}
+.benchmark-organisatie[data-gekozen] {
+  border-color: var(--or);
+  background: var(--or-faint);
+}
+.benchmark-organisatie-kop {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+.benchmark-metingen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0.8rem 0 0.2rem 1.7rem;
+}

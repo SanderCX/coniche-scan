@@ -43,6 +43,15 @@ export function magContentBeheren(gebruiker: Gebruiker | null): boolean {
 }
 
 /**
+ * `benchmark.beheren`: alle (Admin). Een benchmark rekent over organisaties die een Consultant niet beheert, dus het
+ * bereik "eigen" past er niet bij en een Consultant heeft er vooralsnog geen toegang toe (`datamodel.md` deel 2,
+ * Rechtenmatrix).
+ */
+export function magBenchmarkBeheren(gebruiker: Gebruiker | null): boolean {
+  return isAdmin(gebruiker);
+}
+
+/**
  * Bereik "eigen" (`datamodel.md` deel 2, Eigenaarschap en toegang van/tot
  * organisaties): Admin altijd, Consultant alleen als hij de organisatie
  * aanmaakte (`aangemaaktDoor`) óf een Admin hem die expliciet toewees

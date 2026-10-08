@@ -2,14 +2,56 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
-import { useRespondentPerToegangscode, nodigLidUit } from "@/lib/db";
+import { useRespondentPerToegangscode, nodigLidUit, useOrganisaties } from "@/lib/db";
+import { useBenchmarks, useBenchmarkToewijzingen } from "@/lib/benchmark-store";
+import { bouwBenchmarkSecties, viewsVoorLead } from "@/lib/benchmark";
+import { useInstellingen } from "@/lib/instellingen-store";
 import { useAssessments } from "@/lib/assessment-store";
 import { useAlgemeneTekst } from "@/lib/algemene-teksten-store";
 import { voortgang } from "@/lib/scoring";
 import { volgendeUrl } from "@/lib/scan-routing";
-import { ScanInvulling, ScanInvullingStatus, ScanUitvoering } from "@/lib/types";
+import { OrganisatieLid, ScanInvulling, ScanInvullingStatus, ScanUitvoering } from "@/lib/types";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
+
+/**
+ * De benchmarkviews die een Admin aan deze Lead heeft toegewezen (`benchmark.md`, Toewijzen aan een Lead; `beheerpagina.md`,
+ * punt 6a): Een kaart per toewijzing, alleen als er minstens één sectie te zien is. Een sectie is voor een Lead alleen
+ * zichtbaar voor Assessments waarvan hij de Meting mag inzien en waarvan de groep aan de minimale groepsgrootte voldoet.
+ * Zonder zichtbare sectie staat er niets, ook geen kaart.
+ */
+function BenchmarkKaarten({ code, lid }: { code: string; lid: OrganisatieLid }) {
+  const toewijzingen = useBenchmarkToewijzingen().filter((t) => t.respondentId === lid.id);
+  const benchmarks = useBenchmarks();
+  const organisaties = useOrganisaties();
+  const assessments = useAssessments();
+  const instellingen = useInstellingen();
+  if (lid.leadMetingIds.length === 0) return null;
+  const kaarten = toewijzingen.flatMap((t) => {
+    const benchmark = benchmarks.find((b) => b.id === t.benchmarkId);
+    if (!benchmark) return [];
+    const secties = bouwBenchmarkSecties(benchmark, assessments, organisaties);
+    const views = viewsVoorLead(secties, t.organisatieId, lid.leadMetingIds, instellingen.benchmarkMinOrganisaties);
+    return views.length > 0 ? [{ toewijzing: t, assessmentNamen: views.map((v) => v.assessment.naam) }] : [];
+  });
+  if (kaarten.length === 0) return null;
+  return (
+    <>
+      <span className="eyebrow mt-10" style={{ display: "block" }}>
+        Benchmark
+      </span>
+      <h2>Jouw organisatie tegenover de groep</h2>
+      <div className="grid grid-cols-1 gap-4 mt-4">
+        {kaarten.map(({ toewijzing, assessmentNamen }) => (
+          <Link key={toewijzing.id} href={`/s/${code}/benchmark/${toewijzing.id}`} className="card" style={{ display: "block" }}>
+            <p className="font-semibold text-ink">Benchmark</p>
+            <p className="text-sm text-ink-m mt-1">{assessmentNamen.join(" · ")}</p>
+          </Link>
+        ))}
+      </div>
+    </>
+  );
+}
 
 /**
  * Eén Meting waar de ingelogde Lead toegang toe heeft (beheerpagina.md
@@ -246,6 +288,8 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
             </div>
           </>
         )}
+
+        <BenchmarkKaarten code={code} lid={lid} />
       </div>
     </PageWithChrome>
   );

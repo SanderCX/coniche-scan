@@ -10,11 +10,12 @@ import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { voortgang } from "@/lib/scoring";
 import { organisatieVelden } from "@/data/organisatie-velden";
 import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
+import { BenchmarkVlag } from "@/components/beheer/BenchmarkVlag";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { RespondentStatusBadge, STATUS_LABEL } from "@/components/beheer/overzicht-helpers";
 import { Organisatie, ScanUitvoering } from "@/lib/types";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
-import { magOrganisatieToegang, magOrganisatieToewijzen, magLeadToekennen } from "@/lib/rechten";
+import { magBenchmarkBeheren, magOrganisatieToegang, magOrganisatieToewijzen, magLeadToekennen } from "@/lib/rechten";
 import { useGebruikers } from "@/lib/gebruikers-store";
 import { useBeheerOverzicht } from "@/lib/beheer-url";
 import { MetBewerkslot } from "@/components/beheer/MetBewerkslot";
@@ -358,6 +359,7 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
       )}
 
       <h2>Organisatiekenmerken</h2>
+      {magBenchmarkBeheren(ingelogd) && <BenchmarkVlag organisatie={organisatie} />}
       {organisatieVelden.length === 0 ? (
         <p className="admin-notice">Geen organisatievelden gedefinieerd.</p>
       ) : (

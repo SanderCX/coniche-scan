@@ -15,6 +15,7 @@ import { Assessment, Organisatie, ScanUitvoering } from "@/lib/types";
 import { gemiddeldeAntwoordenVoorMeting, overallScore } from "@/lib/scoring";
 import { scoreKleur } from "@/lib/colors";
 import { isOuderDanBewaartermijn, useInstellingen } from "@/lib/instellingen-store";
+import { aantalBenchmarksMetOrganisatie } from "@/lib/benchmark-store";
 
 /**
  * Score en Voortgang op de Consultant-lijst (beheerpagina.md punt 4,
@@ -274,10 +275,18 @@ export default function OrganisatiesPage() {
   const ledenAantal = organisaties
     .filter((o) => bulk.selected.has(o.id))
     .reduce((sum, o) => sum + o.leden.length, 0);
+  // Een organisatie in een benchmark valt daar bij verwijderen uit, met haar toewijzingen (`datamodel.md`, Verwijderen).
+  const benchmarkAantal = new Set(
+    organisaties.filter((o) => bulk.selected.has(o.id)).flatMap((o) => (aantalBenchmarksMetOrganisatie(o.id) > 0 ? [o.id] : []))
+  ).size;
+  const benchmarkZin =
+    benchmarkAantal > 0
+      ? ` ${benchmarkAantal === 1 ? "Een van deze organisaties zit" : `${benchmarkAantal} van deze organisaties zitten`} in een benchmark en valt daar bij verwijderen uit, met de toewijzingen aan Leads.`
+      : "";
   const verwijderMelding =
     ledenAantal > 0
-      ? `${bulk.selected.size} organisatie(s) verwijderen? Dit verwijdert ook ${ledenAantal} respondent(en) en hun ingevulde antwoorden. Dit kan niet ongedaan gemaakt worden.`
-      : `${bulk.selected.size} organisatie(s) verwijderen? Dit kan niet ongedaan gemaakt worden.`;
+      ? `${bulk.selected.size} organisatie(s) verwijderen? Dit verwijdert ook ${ledenAantal} respondent(en) en hun ingevulde antwoorden.${benchmarkZin} Dit kan niet ongedaan gemaakt worden.`
+      : `${bulk.selected.size} organisatie(s) verwijderen?${benchmarkZin} Dit kan niet ongedaan gemaakt worden.`;
 
   function handleVerwijderenBevestigd() {
     verwijderOrganisaties([...bulk.selected]);

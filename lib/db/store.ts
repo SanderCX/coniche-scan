@@ -89,6 +89,8 @@ function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
     // lib/types.ts: alleen voor Admin zichtbaar, nooit voor een Consultant.
     aangemaaktDoor: ruw.aangemaaktDoor ?? null,
     toegewezenAan: Array.isArray(ruw.toegewezenAan) ? ruw.toegewezenAan : [],
+    // Ontbreekt bij data van vóór de benchmark: Geen toestemming vastgelegd, dus niet toegestaan.
+    benchmarkToegestaan: ruw.benchmarkToegestaan === true,
   };
 }
 

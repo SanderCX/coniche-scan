@@ -3,6 +3,7 @@ import { nieuwId } from "../id";
 import { laadAlles, slaAlles, useOrganisaties } from "./store";
 import { logAudit, nieuweGroepId } from "../audit-store";
 import { organisatieContext } from "../audit-context";
+import { haalOrganisatiesUitBenchmarks } from "../benchmark-store";
 
 /** Organisaties: aanmaken, bijwerken, verwijderen en overzetten naar een andere eigenaar. */
 
@@ -25,6 +26,7 @@ export function maakOrganisatie(input: {
     scanUitvoeringen: [],
     aangemaaktDoor: input.aangemaaktDoor,
     toegewezenAan: [],
+    benchmarkToegestaan: false,
     aangemaaktOp: nu,
     gewijzigdOp: nu,
   };
@@ -48,6 +50,11 @@ export function verwijderOrganisaties(organisatieIds: string[]): void {
   const weg = alles.filter((o) => ids.has(o.id));
   const groepId = nieuweGroepId();
   slaAlles(alles.filter((o) => !ids.has(o.id)));
+  // Een organisatie weg haalt haar leden en toewijzingen uit de benchmarks (`datamodel.md`).
+  haalOrganisatiesUitBenchmarks(
+    weg.map((o) => ({ organisatieId: o.id, organisatieNaam: o.naam })),
+    "de organisatie is verwijderd"
+  );
   logAudit(
     weg.map((o) => ({
       actie: "organisatie.verwijderd",
@@ -116,4 +123,31 @@ export function zetOrganisatiesOver(vanGebruikerId: string, naarGebruikerId: str
   }
   if (aantal > 0) slaAlles(alles);
   return aantal;
+}
+
+/**
+ * De benchmark-vlag (`beheerpagina.md`, punt 4, Benchmark-vlag; `datamodel.md` deel 3): Een Admin zet hem aan nadat dit
+ * met de organisatie is afgesproken. Uitzetten haalt de leden van de organisatie uit alle benchmarks. Wijzigen wordt
+ * gelogd (`organisatie.benchmarkVlagGewijzigd`).
+ */
+export function zetBenchmarkVlag(organisatieId: string, toegestaan: boolean): void {
+  const alles = laadAlles();
+  const organisatie = alles.find((o) => o.id === organisatieId);
+  if (!organisatie || organisatie.benchmarkToegestaan === toegestaan) return;
+  organisatie.benchmarkToegestaan = toegestaan;
+  organisatie.gewijzigdOp = new Date().toISOString();
+  slaAlles(alles);
+  if (!toegestaan) {
+    haalOrganisatiesUitBenchmarks(
+      [{ organisatieId: organisatie.id, organisatieNaam: organisatie.naam }],
+      "de organisatie doet niet meer mee aan benchmarks"
+    );
+  }
+  logAudit({
+    actie: "organisatie.benchmarkVlagGewijzigd",
+    entiteitType: "organisatie",
+    entiteitId: organisatie.id,
+    entiteitNaam: organisatie.naam,
+    details: { ...organisatieContext(organisatie), benchmarkToegestaan: toegestaan },
+  });
 }

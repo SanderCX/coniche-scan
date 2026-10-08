@@ -31,6 +31,45 @@
     audit-log). Oudere groepen zonder rijenlijst tonen alleen wat er gebeurde. De melding en de knop "Toon 30
     dagen" bij een lege periode zijn weg.
   - 4 nieuwe tests (52 → 56): `aangemaakt_op` in de CSV, `importRegels` (twee) en `aangemaaktOp` bij een import.
+- **Benchmark gebouwd** (`benchmark.md`, `datamodel.md` deel 3, `beheerpagina.md` punt 14; spec van Joost, 8 oktober,
+  status daar nog "Voorstel"):
+  - **Records en opslag**: `Benchmark`, `BenchmarkLid` en `BenchmarkToewijzing` in `lib/types.ts`, opslag in
+    `lib/benchmark-store.ts` (localStorage-sleutel `coniche-scan:benchmarks`, alleen in deze browser: de Neon-tabel kent
+    de sleutel niet, net als bij de audit-log). `Organisatie.benchmarkToegestaan` (standaard `false`) en de instellingen
+    `benchmarkMinOrganisaties` (5) en `benchmarkMinScans` (3).
+  - **Berekening** (`lib/benchmark.ts`, pure functies, gedeelde scorefunctie): Per organisatie het gemiddelde per vraag
+    over de afgeronde scans van de gekozen Meting, daarna het gemiddelde over de organisaties, dus elke organisatie telt
+    even zwaar. De view van organisatie X zet haar naast de rest van de groep zonder X zelf. De teller is "X van Y
+    organisaties".
+  - **Admin** (Admin-only, `magBenchmarkBeheren`, vierde link in de nav): Lijst, aanmaken en wijzigen (Assessments, dan
+    organisaties met sectorfilter en de Meting per Assessment, met de teller die oranje wordt onder de drempel), detail
+    met een sectie per Assessment (gemiddelden per categorie, bouwblok en vraag), de view per organisatie, en toewijzen
+    aan en intrekken bij een Lead. Verwijderen noemt het aantal toewijzingen.
+  - **Lead**: Op "Mijn metingen" een kaart per toegewezen view, alleen als er een sectie te zien is: Het Assessment moet aan
+    de drempel voldoen en de Lead moet de Meting van zijn organisatie mogen inzien. De Lead-pagina toont nooit namen
+    van andere organisaties en ook niet de naam van de benchmark (vrije tekst van een Admin).
+  - **Vlag** op het organisatie-detail (alleen Admin, `BenchmarkVlag`), met een bevestiging die het aantal benchmarks noemt.
+  - **Opruimen** (`datamodel.md`, Verwijderen en datakoppelingen): Een Meting weg haalt het lid uit de benchmark, een
+    Organisatie weg haalt leden en toewijzingen weg, een Respondent met Lead-rol weg of verplaatst haalt zijn toewijzingen
+    weg, de vlag uitzetten haalt de organisatie uit alle benchmarks. De beheerweergave meldt dat (`Benchmark.meldingen`,
+    een hulp voor het scherm, niet in het datamodel). De bevestigingen bij het verwijderen van een Meting en Organisatie
+    noemen het.
+  - **Audit**: `benchmark.aangemaakt`, `.gewijzigd` (ook automatisch, met reden), `.verwijderd`, `.toegewezen`,
+    `.toewijzingIngetrokken` en `organisatie.benchmarkVlagGewijzigd`, zonder gegevens van de Lead. Drie Info-iconen
+    (`info.benchmarkInstellingen`, `.benchmarkVlag`, `.benchmarkToewijzen`), ook in het register in `beheerpagina.md`.
+  - **Waarom een organisatie ontbreekt**: Het formulier toont onder de lijst per organisatie met de vlag die niet te kiezen
+    is de reden (geen Meting van het Assessment, of te weinig afgeronde scans in één Meting, `nietTeKiezenOrganisaties`).
+    De teller verschijnt pas zodra er een organisatie gekozen is. Achter de uitgeschakelde knop "Benchmark aanmaken" staat
+    een Info-icoon (`info.benchmarkAanmaken`) met wat er nodig is: Een naam, een Assessment en een aangevinkte organisatie.
+  - **Niet gebouwd** (staat ook zo in `benchmark.md`): Export van een benchmark, rechten voor een Consultant, een
+    vastgezette versie in plaats van live cijfers, de range van de groep als band, en berekenen op de server. Zolang de
+    berekening in de browser draait, staan de gegevens van alle organisaties in de browser van een Lead: Dat is een
+    prototype-beperking (`backlog.md`, Benchmark op de server berekenen).
+  - **Afwijking van de spec**: Het groepsgemiddelde staat in de staafdiagrammen als tweede, neutrale balk naast die van de
+    organisatie, niet als markering. De toestemmingstekst in de intake en de disclaimer in `privacy-pagina.md` (sectie 3a)
+    zijn niet aangepast: De formulering volgt volgens de spec nog.
+  - 15 nieuwe tests (56 → 71 totaal): De berekening, de keuzelijst, de view, de drempel, de Lead-regels en de
+    opruimregels.
 - **Eén kop op de Organisatie-resultaten** (`beheerpagina.md`, punt 4; spec van Joost, 8 oktober): Bovenaan het
   Meting-label als eyebrow, dan de naam van het Assessment als titel, dan "Gemiddelde over N afgeronde
   respondenten". `ResultsView` heeft een prop `toonKop` (standaard aan): Uit laat hij de tweede titel en de

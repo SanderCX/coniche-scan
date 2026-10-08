@@ -20,6 +20,9 @@ export default function InstellingenPage() {
   const [bewaarInput, setBewaarInput] = useState<string | null>(null);
   const [verlengInput, setVerlengInput] = useState<string | null>(null);
   const [opgeslagen, setOpgeslagen] = useState(false);
+  const [minOrgInput, setMinOrgInput] = useState<string | null>(null);
+  const [minScansInput, setMinScansInput] = useState<string | null>(null);
+  const [benchmarkOpgeslagen, setBenchmarkOpgeslagen] = useState(false);
 
   if (!magGebruikersBeheren(gebruiker)) {
     return (
@@ -31,6 +34,21 @@ export default function InstellingenPage() {
 
   const bewaar = bewaarInput ?? String(instellingen.bewaarTermijnDagen ?? "");
   const verleng = verlengInput ?? String(instellingen.verlengTermijnDagen ?? "");
+
+  const minOrg = minOrgInput ?? String(instellingen.benchmarkMinOrganisaties);
+  const minScans = minScansInput ?? String(instellingen.benchmarkMinScans);
+  const benchmarkGeldig =
+    Number.isInteger(Number(minOrg)) && Number(minOrg) >= 1 && Number.isInteger(Number(minScans)) && Number(minScans) >= 1;
+
+  function handleBenchmarkOpslaan(e: React.FormEvent) {
+    e.preventDefault();
+    if (!benchmarkGeldig) return;
+    zetInstellingen({ benchmarkMinOrganisaties: Number(minOrg), benchmarkMinScans: Number(minScans) });
+    setMinOrgInput(null);
+    setMinScansInput(null);
+    setBenchmarkOpgeslagen(true);
+    setTimeout(() => setBenchmarkOpgeslagen(false), 1600);
+  }
 
   function handleOpslaan(e: React.FormEvent) {
     e.preventDefault();
@@ -85,6 +103,23 @@ export default function InstellingenPage() {
         </button>
         <InfoIcoon naastVeld sleutel="info.bewaartermijn" />
         {opgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
+      </form>
+
+      <h2 style={{ marginTop: "2rem" }}>Benchmark</h2>
+      <form onSubmit={handleBenchmarkOpslaan} className="flex flex-wrap items-end gap-3">
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem" }}>
+          <label>Minimale groepsgrootte</label>
+          <input type="number" min={1} step={1} value={minOrg} onChange={(e) => setMinOrgInput(e.target.value)} />
+        </div>
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem" }}>
+          <label>Minimaal aantal scans</label>
+          <input type="number" min={1} step={1} value={minScans} onChange={(e) => setMinScansInput(e.target.value)} />
+        </div>
+        <button type="submit" className="btn btn-or btn-compact" disabled={!benchmarkGeldig}>
+          Opslaan
+        </button>
+        <InfoIcoon naastVeld sleutel="info.benchmarkInstellingen" />
+        {benchmarkOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
       </form>
     </div>
   );

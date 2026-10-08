@@ -3,6 +3,7 @@ import { nieuwId } from "../id";
 import { genereerToegangscode } from "../toegangscode";
 import { normaliseerEmail } from "../email";
 import { laadAlles, slaAlles, useOrganisaties } from "./store";
+import { verwijderToewijzingenVanRespondenten } from "../benchmark-store";
 import { logAudit } from "../audit-store";
 import { metingContext, organisatieContext } from "../audit-context";
 
@@ -281,4 +282,6 @@ export function verwijderLeden(ledIds: string[]): void {
   }
   slaAlles(alles);
   logAudit(gelogd);
+  // Een Respondent met Lead-rol weg haalt zijn benchmarktoewijzingen weg (`datamodel.md`).
+  verwijderToewijzingenVanRespondenten(ledIds);
 }

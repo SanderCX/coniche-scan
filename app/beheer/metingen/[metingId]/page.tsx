@@ -7,6 +7,7 @@ import { useAssessment } from "@/lib/assessment-store";
 import { hernoemMeting, nodigLidUit, useScanUitvoering, verwijderLeden, verwijderMeting } from "@/lib/db";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magOrganisatieToegang } from "@/lib/rechten";
+import { aantalBenchmarksMetMeting } from "@/lib/benchmark-store";
 import { voortgang } from "@/lib/scoring";
 import { maakPubliekeLink } from "@/lib/uitnodiging-link";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
@@ -72,6 +73,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
 
   const afgerond = invullingen.filter((i) => i.status === "afgerond").length;
   const leads = organisatie.leden.filter((l) => l.leadMetingIds.includes(scanUitvoering.id));
+  const benchmarksMetMeting = aantalBenchmarksMetMeting(scanUitvoering.id);
 
   async function kopieer(id: string, url: string) {
     const gelukt = await kopieerNaarKlembord(url);
@@ -341,7 +343,11 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
       <BevestigModal
         open={metingVerwijderenOpen}
         titel="Meting verwijderen"
-        bericht={`"${scanUitvoering.label}" en alle ${invullingen.length} scan(s) daarbinnen definitief verwijderen? De respondenten zelf en hun eventuele andere Metingen blijven bestaan. Dit kan niet ongedaan gemaakt worden.`}
+        bericht={`"${scanUitvoering.label}" en alle ${invullingen.length} scan(s) daarbinnen definitief verwijderen? De respondenten zelf en hun eventuele andere Metingen blijven bestaan.${
+          benchmarksMetMeting > 0
+            ? ` Deze Meting zit in ${benchmarksMetMeting} benchmark${benchmarksMetMeting === 1 ? "" : "s"}: De organisatie valt dan uit ${benchmarksMetMeting === 1 ? "die benchmark" : "die benchmarks"}.`
+            : ""
+        } Dit kan niet ongedaan gemaakt worden.`}
         bevestigLabel="Meting verwijderen"
         onBevestigen={handleMetingVerwijderd}
         onAnnuleren={() => setMetingVerwijderenOpen(false)}

@@ -14,11 +14,20 @@ export interface Instellingen {
   bewaarTermijnDagen: number | null;
   /** Met hoeveel dagen een "Verlengen"-actie de melding uitstelt. */
   verlengTermijnDagen: number | null;
+  /**
+   * Minimale groepsgrootte per Assessment in een benchmark, inclusief de organisatie van de view, om die view aan een
+   * Lead te mogen toewijzen (`benchmark.md`, Drempels). Startwaarde 5.
+   */
+  benchmarkMinOrganisaties: number;
+  /** Minimaal aantal afgeronde scans dat een Meting moet hebben om in een benchmark gekozen te worden. Startwaarde 3. */
+  benchmarkMinScans: number;
 }
 
 const STANDAARDWAARDEN: Instellingen = {
   bewaarTermijnDagen: null,
   verlengTermijnDagen: null,
+  benchmarkMinOrganisaties: 5,
+  benchmarkMinScans: 3,
 };
 
 const KEY = "coniche-scan:instellingen";
