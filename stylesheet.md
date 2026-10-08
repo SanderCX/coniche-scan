@@ -197,6 +197,24 @@ dezelfde waarden), dus `text-sm` en `var(--fs-s)` zijn altijd hetzelfde.
 dezelfde vaste hoogte: `--control-h` (`2.4rem`, 38,4px), in de CSS voor
 `.admin-field input`/`select` en `.btn.btn-compact`. Een knop in de nav
 (`.nav-right .btn`) is compacter en volgt dit niet.
+### Tekst in besturingselementen
+
+Knoppen, dropdowns, invoervelden en de opties in een dropdown-menu hebben
+binnen één rij of één tabel dezelfde lettermaat. De vaste regel:
+
+- **Lettertype**: Epilogue voor alles (`font-family: inherit` op `button`,
+  `input`, `select`, `textarea` en op de opties in een menu).
+- **Maat**: In een tabel (`.admin-table`), in een filter- of actierij en in
+  de bulk-actiebalk is alles `--fs-s`: de knop, de Dropdown-knop, de
+  opties in het menu, de `select` en het invoerveld. `--fs-m` blijft voor
+  losse formulieren buiten een tabel of rij, zoals de intake en een modal.
+- **Gewicht**: Knoppen (ook de Dropdown-knop) 700. Wat een waarde toont, dus
+  de tekst in een `select`, een invoerveld en de opties in een menu, 400. Het
+  label boven een veld is `--fs-xs`, gewicht 700, in hoofdletters.
+- **Geen afwijking per scherm.** Een knop in een tabelrij heeft dezelfde maat
+  als een knop in een filterrij. Een afwijkende `font-size`, `font-weight`
+  of regelhoogte op één scherm geldt als een fout, niet als een variant.
+
 ### Koppen en lopende tekst
 
 - **Koppen**: Font-weight 800 (h1/h2) of 700 (h3), line-height 1.1,
@@ -351,8 +369,13 @@ menu direct eronder, links uitgelijnd met de knop: Witte achtergrond,
 `padding: .6rem 1rem`, tekst `var(--ink)`, hover `background:
 var(--bg-mid)`. Sluit bij een klik buiten het menu of op een optie.
 
-Het pijltje staat `.5rem` achter de tekst. De rechter padding van de knop
-is even groot als de linker.
+**Eén pijltje overal.** Het pijltje is een gevulde, kleine chevron
+(een driehoek met de punt naar beneden, `.65rem` breed), niet een dunne
+lijn-chevron. Dezelfde chevron staat in de Dropdown-knop en in elke
+`select` (zie Formulieren, Dropdowns). Kleur: de kleur van de tekst ernaast,
+dus `var(--or)` in een outline-knop en `var(--ink-m)` in een select. Het
+pijltje staat `.5rem` achter de tekst. De rechter padding van de knop is
+even groot als de linker.
 
 ### Badges
 
@@ -477,10 +500,22 @@ Label-veld en de knop "Meting plannen". De vaste waarde is `--control-h`
 (zie Typografie, Veldhoogte). Concreet gelijk: Verticale padding,
 `border-radius`, randdikte en -kleur en `font-size`.
 
+**Datumvelden.** Een `input[type="date"]` heeft dezelfde hoogte als een
+dropdown (`--control-h`), met `box-sizing: border-box` en `line-height:
+normal`, zodat het kalendericoon van de browser het veld niet hoger maakt.
+Randdikte, -kleur, `border-radius`, padding en `font-size` (`--fs-s`) zijn
+gelijk aan die van een `select`. Staat een datumveld naast een dropdown in een
+filterrij (bijvoorbeeld in de Audit-log), dan staan de labels erboven op
+dezelfde hoogte en beginnen de velden op dezelfde bovenrand (`align-items:
+flex-start` op de rij, elk veld met label in een eigen kolom). Alleen met
+gelijke veldhoogte en gelijke labelhoogte lijnen de titels van beide
+elementen boven netjes uit.
+
 **Dropdowns (`select.field`, `.admin-field select` en de compacte select in
 een knoppenrij).** De pijl van de browser staat uit (`appearance: none`).
-In plaats daarvan staat er een eigen chevron als achtergrondafbeelding:
-`1rem` breed, kleur `var(--ink-m)`, `background-position: right .875rem
+In plaats daarvan staat er een eigen chevron als achtergrondafbeelding,
+dezelfde gevulde chevron als in de Dropdown-knop (zie Knoppen, Dropdown-knop):
+`.65rem` breed, kleur `var(--ink-m)`, `background-position: right .875rem
 center`. De chevron staat dus 14px van de rechterrand, even ver als de
 tekst aan de linkerkant van de rand af staat. Rechts is de `padding-right`
 `2.5rem`, zodat een lange optie niet onder de chevron doorloopt. Bij focus
@@ -549,6 +584,12 @@ een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
   een groot veld zoals een tekstvak op de hoogte van de eerste regel),
   niet achter het label. In een rij met velden en knoppen staat het
   gecentreerd op de veldhoogte (`--control-h`).
+- **Naast een titel**: Staat het icoon achter een paginatitel of kop (bijvoorbeeld
+  "Audit-log"), dan staan titel en icoon in één rij (`display: flex;
+  align-items: center; gap: .5rem`), zodat het icoon verticaal gecentreerd
+  op de titel staat. Het staat niet hoger (superscript), niet lager en niet
+  op de basislijn. Bij een titel die op twee regels afbreekt, staat het icoon
+  achter de laatste regel.
 - **Informatieveld**: Een klik op het icoon toont het veld gecentreerd in
   het zichtbare venster (`position: fixed`, horizontaal en verticaal in het
   midden van de viewport), niet vanaf het icoon. Daardoor staat het nooit
