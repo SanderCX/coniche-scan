@@ -315,9 +315,17 @@ export type Classificatie = "rood" | "oranje" | "groen";
  * Een benchmark (`datamodel.md` deel 3, `benchmark.md`): De samenstelling van een zelf gekozen groep organisaties.
  * Scores staan hier niet: Die worden altijd berekend uit de scans (`lib/benchmark.ts`).
  */
+export type BenchmarkNiveau = "organisaties" | "metingen" | "scans";
+
 export interface Benchmark {
   id: string;
   naam: string;
+  /**
+   * Wat een lid is (`benchmark.md`, Wat het is): `organisaties` is een organisatie met een Meting per Assessment (tussen
+   * organisaties, met de vlag `benchmarkToegestaan`), `metingen` een Meting van één organisatie (binnen een organisatie),
+   * `scans` één Meting waarin de afgeronde scans worden vergeleken. Ontbreekt het veld, dan is het `organisaties`.
+   */
+  niveau?: BenchmarkNiveau;
   /** Eén of meer Assessments. Elk heeft in de weergave een eigen sectie, scores van verschillende Assessments worden niet samengevoegd. */
   assessmentIds: string[];
   /** Per organisatie hoogstens één lid per Assessment. */

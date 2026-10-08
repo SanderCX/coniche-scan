@@ -6,15 +6,18 @@ import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties } from "@/lib/db";
 import { sluitBenchmarkMeldingen, useBenchmark, useBenchmarkToewijzingen, verwijderBenchmark } from "@/lib/benchmark-store";
-import { benchmarkNamen, bouwBenchmarkSecties } from "@/lib/benchmark";
+import { benchmarkNamen, bouwBenchmarkSecties, bouwScanSectie, niveauVan } from "@/lib/benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { BenchmarkGroepSectie } from "@/components/benchmark/BenchmarkGroepSectie";
+import { BenchmarkScanSectie } from "@/components/benchmark/BenchmarkScanSectie";
 
 const datumFormat = new Intl.DateTimeFormat("nl-NL", { dateStyle: "long" });
+
+const NIVEAU_TEKST = { organisaties: "Tussen organisaties", metingen: "Binnen een organisatie", scans: "Binnen een Meting" } as const;
 
 /**
  * Benchmark, het detail (`beheerpagina.md`, punt 14): Per Assessment een sectie met de teller "X van Y organisaties", de
@@ -48,7 +51,9 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
     );
   }
 
-  const secties = bouwBenchmarkSecties(benchmark, assessments, organisaties);
+  const niveau = niveauVan(benchmark);
+  const secties = niveau === "scans" ? [] : bouwBenchmarkSecties(benchmark, assessments, organisaties);
+  const scanSectie = niveau === "scans" ? bouwScanSectie(benchmark, assessments, organisaties) : null;
   const aantalToewijzingen = toewijzingen.filter((t) => t.benchmarkId === benchmark.id).length;
 
   return (
@@ -56,7 +61,8 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
       <Kruimelpad delen={[{ label: "Benchmark", href: "/beheer/benchmark" }, { label: benchmark.naam }]} />
       <h1>{benchmark.naam}</h1>
       <p className="text-sm text-ink-m">
-        Aangemaakt op {datumFormat.format(new Date(benchmark.aangemaaktOp))} · cijfers berekend op {datumFormat.format(new Date())}
+        {NIVEAU_TEKST[niveau]} · aangemaakt op {datumFormat.format(new Date(benchmark.aangemaaktOp))} · cijfers berekend op{" "}
+        {datumFormat.format(new Date())}
       </p>
 
       {benchmark.meldingen.length > 0 && (
@@ -83,7 +89,15 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
         </button>
       </div>
 
-      {secties.length === 0 ? (
+      {niveau === "scans" ? (
+        scanSectie ? (
+          <BenchmarkScanSectie sectie={scanSectie} benchmarkId={benchmark.id} minScans={instellingen.benchmarkMinScans} />
+        ) : (
+          <p className="admin-notice" style={{ marginTop: "1.5rem" }}>
+            De Meting van deze benchmark bestaat niet meer.
+          </p>
+        )
+      ) : secties.length === 0 ? (
         <p className="admin-notice" style={{ marginTop: "1.5rem" }}>
           Deze benchmark heeft geen Assessments meer.
         </p>
@@ -94,6 +108,7 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
             sectie={s}
             benchmarkId={benchmark.id}
             minOrganisaties={instellingen.benchmarkMinOrganisaties}
+            niveau={niveau === "metingen" ? "metingen" : "organisaties"}
           />
         ))
       )}
@@ -107,7 +122,7 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
             : ""
         }Organisaties, Metingen en scans blijven bestaan. Dit kan niet ongedaan gemaakt worden.`}
         onBevestigen={() => {
-          verwijderBenchmark(benchmark.id, benchmarkNamen(benchmark.assessmentIds, benchmark.leden, organisaties, assessments));
+          verwijderBenchmark(benchmark.id, benchmarkNamen(benchmark.assessmentIds, benchmark.leden, organisaties, assessments, niveau));
           router.push("/beheer/benchmark");
         }}
         onAnnuleren={() => setVerwijderenOpen(false)}

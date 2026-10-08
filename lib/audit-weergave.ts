@@ -47,6 +47,8 @@ export function entiteitLabel(e: AuditEvent): string {
 const DETAIL_LABEL: Record<string, string> = {
   organisatieNaam: "Organisatie",
   benchmarkNaam: "Benchmark",
+  niveau: "Niveau",
+  metingLabels: "Metingen",
   assessmentNamen: "Assessments",
   organisatieNamen: "Organisaties",
   benchmarkToegestaan: "Doet mee aan benchmark",

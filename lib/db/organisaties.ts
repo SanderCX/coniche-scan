@@ -140,7 +140,8 @@ export function zetBenchmarkVlag(organisatieId: string, toegestaan: boolean): vo
   if (!toegestaan) {
     haalOrganisatiesUitBenchmarks(
       [{ organisatieId: organisatie.id, organisatieNaam: organisatie.naam }],
-      "de organisatie doet niet meer mee aan benchmarks"
+      "de organisatie doet niet meer mee aan benchmarks",
+      true
     );
   }
   logAudit({

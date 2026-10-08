@@ -129,6 +129,18 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Een benchmark heeft een naam nodig, minstens één Assessment en minstens één organisatie die je hebt aangevinkt. Een organisatie staat alleen in de lijst als ze meedoet aan benchmarks en een Meting heeft van een gekozen Assessment met genoeg afgeronde scans.",
   },
   {
+    sleutel: "info.benchmarkAanmakenMetingen",
+    plek: "Benchmark binnen een organisatie aanmaken of wijzigen, achter de uitgeschakelde knop",
+    tekst:
+      "Een benchmark binnen een organisatie heeft een naam nodig, een organisatie en minstens één Assessment waarvoor je minstens twee Metingen hebt aangevinkt. Een Meting is alleen te kiezen met genoeg afgeronde scans.",
+  },
+  {
+    sleutel: "info.benchmarkAanmakenScans",
+    plek: "Benchmark binnen een Meting aanmaken of wijzigen, achter de uitgeschakelde knop",
+    tekst:
+      "Een benchmark binnen een Meting heeft een naam nodig, een organisatie, een Assessment en een Meting. Een Meting is alleen te kiezen met genoeg afgeronde scans.",
+  },
+  {
     sleutel: "info.exportEenScan",
     plek: "Ingevulde scans en organisatie-detail, achter de uitgeschakelde opties \"Als PDF\" en \"Voor InDesign (XML)\"",
     tekst: "Beschikbaar bij precies één scan.",

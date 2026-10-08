@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { Benchmark, BenchmarkLid, BenchmarkToewijzing } from "./types";
+import { Benchmark, BenchmarkLid, BenchmarkNiveau, BenchmarkToewijzing } from "./types";
 import { nieuwId } from "./id";
 import { logAudit } from "./audit-store";
 
@@ -96,16 +96,19 @@ export function getBenchmarks(): Benchmark[] {
 export interface BenchmarkNamen {
   assessmentNamen: string[];
   organisatieNamen: string[];
+  /** Alleen op de niveaus binnen een organisatie, waar een Meting het lid is. */
+  metingLabels?: string[];
 }
 
 export function maakBenchmark(
-  input: { naam: string; assessmentIds: string[]; leden: BenchmarkLid[]; aangemaaktDoor: string },
+  input: { naam: string; niveau?: BenchmarkNiveau; assessmentIds: string[]; leden: BenchmarkLid[]; aangemaaktDoor: string },
   namen: BenchmarkNamen
 ): Benchmark {
   const opslag = laad();
   const benchmark: Benchmark = {
     id: nieuwId(),
     naam: input.naam,
+    niveau: input.niveau ?? "organisaties",
     assessmentIds: input.assessmentIds,
     leden: input.leden,
     meldingen: [],
@@ -119,7 +122,7 @@ export function maakBenchmark(
     entiteitType: "benchmark",
     entiteitId: benchmark.id,
     entiteitNaam: benchmark.naam,
-    details: { benchmarkNaam: benchmark.naam, ...namen },
+    details: { benchmarkNaam: benchmark.naam, niveau: benchmark.niveau, ...namen },
   });
   return benchmark;
 }
@@ -146,7 +149,7 @@ export function wijzigBenchmark(
     entiteitType: "benchmark",
     entiteitId: id,
     entiteitNaam: benchmark.naam,
-    details: { benchmarkNaam: benchmark.naam, ...namen },
+    details: { benchmarkNaam: benchmark.naam, niveau: benchmark.niveau ?? "organisaties", ...namen },
   });
 }
 
@@ -172,7 +175,7 @@ export function verwijderBenchmark(id: string, namen: BenchmarkNamen): void {
     entiteitType: "benchmark",
     entiteitId: id,
     entiteitNaam: benchmark.naam,
-    details: { benchmarkNaam: benchmark.naam, ...namen, aantalToewijzingen },
+    details: { benchmarkNaam: benchmark.naam, niveau: benchmark.niveau ?? "organisaties", ...namen, aantalToewijzingen },
   });
 }
 
@@ -218,9 +221,17 @@ export function trekBenchmarkToewijzingIn(toewijzingId: string, namen: { benchma
 
 /* ---------- Opruimen bij verwijderen en intrekken (datamodel.md, Verwijderen en datakoppelingen) ---------- */
 
-/** Aantal benchmarks waarin een organisatie meedoet, voor de bevestiging bij het uitzetten van de vlag of verwijderen. */
-export function aantalBenchmarksMetOrganisatie(organisatieId: string): number {
-  return getBenchmarks().filter((b) => b.leden.some((l) => l.organisatieId === organisatieId)).length;
+const isTussenOrganisaties = (b: Benchmark): boolean => (b.niveau ?? "organisaties") === "organisaties";
+
+/**
+ * Aantal benchmarks waarin een organisatie meedoet, voor de bevestiging bij het uitzetten van de vlag of verwijderen. De
+ * vlag geldt alleen voor de benchmark tussen organisaties: Op de niveaus binnen een organisatie verlaten de gegevens de
+ * organisatie niet (`benchmark.md`, Niveau 2). Bij `alleenTussenOrganisaties` telt dus alleen niveau 1.
+ */
+export function aantalBenchmarksMetOrganisatie(organisatieId: string, alleenTussenOrganisaties = false): number {
+  return getBenchmarks().filter(
+    (b) => b.leden.some((l) => l.organisatieId === organisatieId) && (!alleenTussenOrganisaties || isTussenOrganisaties(b))
+  ).length;
 }
 
 /** Aantal benchmarks waarin een Meting meedoet. */
@@ -231,11 +242,13 @@ export function aantalBenchmarksMetMeting(metingId: string): number {
 function haalLedenWeg(
   welke: (lid: BenchmarkLid) => boolean,
   reden: string,
-  naamVan: (lid: BenchmarkLid) => string
+  naamVan: (lid: BenchmarkLid) => string,
+  alleenTussenOrganisaties = false
 ): void {
   const opslag = laad();
   let gewijzigd = false;
   for (const benchmark of opslag.benchmarks) {
+    if (alleenTussenOrganisaties && !isTussenOrganisaties(benchmark)) continue;
     const weg = benchmark.leden.filter(welke);
     if (weg.length === 0) continue;
     gewijzigd = true;
@@ -264,9 +277,14 @@ export function haalMetingenUitBenchmarks(metingen: { metingId: string; organisa
 }
 
 /** Organisaties zijn verwijderd of hebben de vlag verloren: Hun leden en toewijzingen verdwijnen uit de benchmarks. */
-export function haalOrganisatiesUitBenchmarks(organisaties: { organisatieId: string; organisatieNaam: string }[], reden: string): void {
+export function haalOrganisatiesUitBenchmarks(
+  organisaties: { organisatieId: string; organisatieNaam: string }[],
+  reden: string,
+  /** Bij het intrekken van de vlag: Alleen de benchmarks tussen organisaties, want de andere niveaus kennen de vlag niet. */
+  alleenTussenOrganisaties = false
+): void {
   const naam = new Map(organisaties.map((o) => [o.organisatieId, o.organisatieNaam]));
-  haalLedenWeg((l) => naam.has(l.organisatieId), reden, (l) => naam.get(l.organisatieId) ?? "Een organisatie");
+  haalLedenWeg((l) => naam.has(l.organisatieId), reden, (l) => naam.get(l.organisatieId) ?? "Een organisatie", alleenTussenOrganisaties);
   // Ook een toewijzing zonder lid (bijv. alle leden al weg) gaat mee.
   const opslag = laad();
   const voor = opslag.toewijzingen.length;

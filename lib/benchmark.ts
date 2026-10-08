@@ -1,4 +1,4 @@
-import { Assessment, Benchmark, BenchmarkLid, Organisatie, ScanUitvoering } from "./types";
+import { Assessment, Benchmark, BenchmarkLid, BenchmarkNiveau, Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering } from "./types";
 import { alleVragen } from "./assessment-structuur";
 import {
   alleBouwblokResultaten,
@@ -17,6 +17,14 @@ import {
  *
  * Elke organisatie telt per Assessment even zwaar mee, ongeacht het aantal respondenten.
  */
+
+/** Het niveau van een benchmark: Ontbreekt het veld, dan is het een benchmark tussen organisaties (`datamodel.md`, deel 3). */
+export function niveauVan(benchmark: Pick<Benchmark, "niveau">): BenchmarkNiveau {
+  return benchmark.niveau ?? "organisaties";
+}
+
+/** Minimaal aantal leden per Assessment op niveau 2: Een benchmark binnen een organisatie heeft minstens twee Metingen (`benchmark.md`, Niveau 2). */
+export const MIN_METINGEN_PER_ASSESSMENT = 2;
 
 export function aantalAfgerond(meting: ScanUitvoering): number {
   return meting.invullingen.filter((i) => i.status === "afgerond").length;
@@ -148,17 +156,24 @@ export function bouwBenchmarkSecties(
   for (const assessmentId of benchmark.assessmentIds) {
     const assessment = assessments.find((a) => a.id === assessmentId);
     if (!assessment) continue;
+    const binnenOrganisatie = niveauVan(benchmark) === "metingen";
     const rijen = benchmark.leden
       .filter((l) => l.assessmentId === assessmentId)
       .map((l) => bouwRij(l, assessment, organisaties))
       .filter((r): r is BenchmarkRij => r !== null)
-      .sort((a, b) => a.organisatie.naam.localeCompare(b.organisatie.naam, "nl"));
+      // Tussen organisaties op naam van de organisatie, binnen een organisatie op de Meting (de naam is het label).
+      .sort((a, b) =>
+        binnenOrganisatie
+          ? a.meting.label.localeCompare(b.meting.label, "nl") || a.meting.aangemaaktOp.localeCompare(b.meting.aangemaaktOp)
+          : a.organisatie.naam.localeCompare(b.organisatie.naam, "nl")
+      );
     const metLid = new Set(rijen.map((r) => r.organisatie.id));
     secties.push({
       assessment,
       rijen,
-      ontbrekend: alleOrganisaties.filter((o) => !metLid.has(o.id)),
-      teller: { x: rijen.length, y: alleOrganisaties.length },
+      // Binnen een organisatie is er maar één organisatie en kiest de Admin de Metingen zelf: Geen ontbrekende en geen Y.
+      ontbrekend: binnenOrganisatie ? [] : alleOrganisaties.filter((o) => !metLid.has(o.id)),
+      teller: { x: rijen.length, y: binnenOrganisatie ? rijen.length : alleOrganisaties.length },
       groepAntwoorden: middelAntwoorden(
         rijen.map((r) => r.antwoorden),
         assessment
@@ -188,20 +203,58 @@ export function resultatenVan(assessment: Assessment, antwoorden: Record<string,
 
 /* ---------- View per organisatie ---------- */
 
-export interface OrganisatieView {
+/**
+ * Een lid naast de rest van de groep, zonder het lid zelf (`benchmark.md`, View per organisatie): Zou het lid meetellen, dan trekt
+ * het het gemiddelde naar zichzelf toe en kan het bij een kleine groep de scores van de anderen terugrekenen. Hetzelfde
+ * op alle niveaus: Een organisatie, een Meting of een scan.
+ */
+export interface VergelijkingsView {
   assessment: Assessment;
-  rij: BenchmarkRij;
-  /** Aantal organisaties in de rest van de groep, zonder de organisatie zelf. */
+  /** Aantal leden in de rest van de groep, zonder het lid zelf. */
   aantalAnderen: number;
-  /** Aantal organisaties in de groep voor dit Assessment, inclusief de organisatie zelf. */
+  /** Aantal leden in de groep voor dit Assessment, inclusief het lid zelf. */
   aantalInGroep: number;
   organisatie: BenchmarkResultaten;
-  /** De rest van de groep, zonder de organisatie zelf: Anders trekt ze het gemiddelde naar zichzelf toe (`benchmark.md`). */
+  /** De rest van de groep, zonder het lid zelf. */
   rest: BenchmarkResultaten | null;
-  /** Verschil per bouwblok (organisatie min rest), op volgnummer. */
+  /** Verschil per bouwblok (lid min rest), op volgnummer. */
   verschillen: { bouwblok: BouwblokResultaat["bouwblok"]; score: number | null; rest: number | null; verschil: number | null }[];
-  /** De groep is groot genoeg voor een Lead (`benchmarkMinOrganisaties`, inclusief de organisatie zelf). */
+  /** De groep is groot genoeg (`benchmarkMinOrganisaties` op niveau 1, twee Metingen op niveau 2, `benchmarkMinScans` op niveau 3). */
   voldoetAanDrempel: boolean;
+}
+
+export interface OrganisatieView extends VergelijkingsView {
+  rij: BenchmarkRij;
+}
+
+/** Het lid naast de rest, uit hun antwoorden. De gedeelde scorefunctie, dus geen tweede rekenmethode. */
+function maakVergelijking(
+  assessment: Assessment,
+  eigen: Record<string, number>,
+  anderen: Record<string, number>[],
+  aantalInGroep: number,
+  drempel: number
+): VergelijkingsView {
+  const organisatie = resultatenVan(assessment, eigen);
+  const rest = anderen.length > 0 ? resultatenVan(assessment, middelAntwoorden(anderen, assessment)) : null;
+  const verschillen = organisatie.bouwblokken.map((b, i) => {
+    const restScore = rest?.bouwblokken[i]?.score ?? null;
+    return {
+      bouwblok: b.bouwblok,
+      score: b.score,
+      rest: restScore,
+      verschil: b.score !== null && restScore !== null ? Number((b.score - restScore).toFixed(1)) : null,
+    };
+  });
+  return {
+    assessment,
+    aantalAnderen: anderen.length,
+    aantalInGroep,
+    organisatie,
+    rest,
+    verschillen,
+    voldoetAanDrempel: aantalInGroep >= drempel && anderen.length > 0,
+  };
 }
 
 /** De view van één organisatie in één sectie: Haar Meting naast het gemiddelde van de rest van de groep. `null` als ze geen lid is. */
@@ -213,26 +266,20 @@ export function bouwOrganisatieView(
   const rij = sectie.rijen.find((r) => r.organisatie.id === organisatieId);
   if (!rij) return null;
   const anderen = sectie.rijen.filter((r) => r.organisatie.id !== organisatieId);
-  const organisatie = resultatenVan(sectie.assessment, rij.antwoorden);
-  const rest = anderen.length > 0 ? resultatenVan(sectie.assessment, middelAntwoorden(anderen.map((r) => r.antwoorden), sectie.assessment)) : null;
-  const verschillen = organisatie.bouwblokken.map((b, i) => {
-    const restScore = rest?.bouwblokken[i]?.score ?? null;
-    return {
-      bouwblok: b.bouwblok,
-      score: b.score,
-      rest: restScore,
-      verschil: b.score !== null && restScore !== null ? Number((b.score - restScore).toFixed(1)) : null,
-    };
-  });
   return {
-    assessment: sectie.assessment,
+    ...maakVergelijking(sectie.assessment, rij.antwoorden, anderen.map((r) => r.antwoorden), sectie.rijen.length, minOrganisaties),
     rij,
-    aantalAnderen: anderen.length,
-    aantalInGroep: sectie.rijen.length,
-    organisatie,
-    rest,
-    verschillen,
-    voldoetAanDrempel: sectie.rijen.length >= minOrganisaties && anderen.length > 0,
+  };
+}
+
+/** Niveau 2: De view van één Meting naast het gemiddelde van de overige Metingen, zonder die Meting zelf (`benchmark.md`, Niveau 2). */
+export function bouwMetingView(sectie: BenchmarkSectie, metingId: string): OrganisatieView | null {
+  const rij = sectie.rijen.find((r) => r.meting.id === metingId);
+  if (!rij) return null;
+  const anderen = sectie.rijen.filter((r) => r.meting.id !== metingId);
+  return {
+    ...maakVergelijking(sectie.assessment, rij.antwoorden, anderen.map((r) => r.antwoorden), sectie.rijen.length, MIN_METINGEN_PER_ASSESSMENT),
+    rij,
   };
 }
 
@@ -267,12 +314,123 @@ export function benchmarkNamen(
   assessmentIds: string[],
   leden: BenchmarkLid[],
   organisaties: Organisatie[],
-  assessments: Assessment[]
-): { assessmentNamen: string[]; organisatieNamen: string[] } {
-  return {
+  assessments: Assessment[],
+  niveau: BenchmarkNiveau = "organisaties"
+): { assessmentNamen: string[]; organisatieNamen: string[]; metingLabels?: string[] } {
+  const namen = {
     assessmentNamen: assessmentIds.map((id) => assessments.find((a) => a.id === id)?.naam ?? "Onbekend Assessment"),
     organisatieNamen: [...new Set(leden.map((l) => l.organisatieId))].map(
       (id) => organisaties.find((o) => o.id === id)?.naam ?? "Onbekende organisatie"
     ),
   };
+  if (niveau === "organisaties") return namen;
+  // Op de niveaus binnen een organisatie zijn de Metingen de leden: Hun labels zoals ze op dat moment waren.
+  return {
+    ...namen,
+    metingLabels: leden.map(
+      (l) => organisaties.find((o) => o.id === l.organisatieId)?.scanUitvoeringen.find((m) => m.id === l.metingId)?.label ?? "Onbekende Meting"
+    ),
+  };
 }
+
+/* ---------- Niveau 2: Binnen een organisatie ---------- */
+
+/** De Metingen van één organisatie in één Assessment met genoeg afgeronde scans, meest recente eerst. Geen vlag nodig (`benchmark.md`, Niveau 2). */
+export function kandidaatMetingen(organisatie: Organisatie, assessmentId: string, minScans: number): KandidaatMeting[] {
+  return organisatie.scanUitvoeringen
+    .filter((m) => m.assessmentId === assessmentId && aantalAfgerond(m) >= minScans)
+    .map((meting) => ({ meting, aantalAfgerond: aantalAfgerond(meting) }))
+    .sort((a, b) => b.meting.aangemaaktOp.localeCompare(a.meting.aangemaaktOp));
+}
+
+/**
+ * De Assessments van een organisatie waarvoor ze genoeg Metingen heeft voor een benchmark binnen een organisatie: Minstens
+ * twee Metingen met minimaal `minScans` afgeronde scans (`benchmark.md`, Niveau 2, Samenstellen).
+ */
+export function assessmentsVoorMetingenBenchmark(
+  organisatie: Organisatie,
+  minScans: number
+): { assessmentId: string; metingen: KandidaatMeting[] }[] {
+  const assessmentIds = [...new Set(organisatie.scanUitvoeringen.map((m) => m.assessmentId))];
+  return assessmentIds
+    .map((assessmentId) => ({ assessmentId, metingen: kandidaatMetingen(organisatie, assessmentId, minScans) }))
+    .filter((p) => p.metingen.length >= MIN_METINGEN_PER_ASSESSMENT);
+}
+
+/** De organisaties in de keuzelijst van niveau 2: Minstens één Assessment met twee bruikbare Metingen. */
+export function organisatiesVoorMetingenBenchmark(organisaties: Organisatie[], minScans: number): Organisatie[] {
+  return organisaties
+    .filter((o) => assessmentsVoorMetingenBenchmark(o, minScans).length > 0)
+    .sort((a, b) => a.naam.localeCompare(b.naam, "nl"));
+}
+
+/* ---------- Niveau 3: Binnen een Meting ---------- */
+
+/** De organisaties in de keuzelijst van niveau 3: Minstens één Meting met minimaal `minScans` afgeronde scans. */
+export function organisatiesVoorScansBenchmark(organisaties: Organisatie[], minScans: number): Organisatie[] {
+  return organisaties
+    .filter((o) => o.scanUitvoeringen.some((m) => aantalAfgerond(m) >= minScans))
+    .sort((a, b) => a.naam.localeCompare(b.naam, "nl"));
+}
+
+/** Eén afgeronde scan in een Meting, voor de Admin met de naam van de Respondent. */
+export interface ScanRij {
+  invulling: ScanInvulling;
+  lid: OrganisatieLid;
+  /** Naam van de Respondent, of het e-mailadres zolang de naam leeg is (zoals in de beheeroverzichten). */
+  naam: string;
+  antwoorden: Record<string, number>;
+  overall: number | null;
+}
+
+export interface ScanSectie {
+  assessment: Assessment;
+  organisatie: Organisatie;
+  meting: ScanUitvoering;
+  /** De afgeronde scans in de Meting, op naam. */
+  scans: ScanRij[];
+}
+
+/**
+ * De sectie van een benchmark binnen een Meting (`benchmark.md`, Niveau 3): Eén lid, de Meting waarin de scans worden
+ * vergeleken. `null` als de Meting, de organisatie of het Assessment niet meer bestaat. De scans zelf zijn geen leden: Ze volgen
+ * uit de Meting.
+ */
+export function bouwScanSectie(benchmark: Benchmark, assessments: Assessment[], organisaties: Organisatie[]): ScanSectie | null {
+  const lid = benchmark.leden[0];
+  if (!lid) return null;
+  const assessment = assessments.find((a) => a.id === lid.assessmentId);
+  const organisatie = organisaties.find((o) => o.id === lid.organisatieId);
+  const meting = organisatie?.scanUitvoeringen.find((m) => m.id === lid.metingId);
+  if (!assessment || !organisatie || !meting || meting.assessmentId !== assessment.id) return null;
+  const scans = meting.invullingen
+    .filter((i) => i.status === "afgerond")
+    .flatMap((invulling): ScanRij[] => {
+      const respondent = organisatie.leden.find((l) => l.id === invulling.organisatieLidId);
+      if (!respondent) return [];
+      return [
+        {
+          invulling,
+          lid: respondent,
+          naam: respondent.naam || respondent.email,
+          antwoorden: invulling.antwoorden,
+          overall: overallScore(assessment, invulling.antwoorden),
+        },
+      ];
+    })
+    .sort((a, b) => a.naam.localeCompare(b.naam, "nl"));
+  return { assessment, organisatie, meting, scans };
+}
+
+/**
+ * Niveau 3: Eén scan naast het gemiddelde van de andere afgeronde scans in dezelfde Meting, zonder de scan zelf. Elke scan telt
+ * even zwaar mee. De ondergrens is `benchmarkMinScans`, inclusief de scan zelf (voorstel in `benchmark.md`, te bevestigen):
+ * Bij weinig scans is de vergelijking te herleiden naar personen.
+ */
+export function bouwScanView(sectie: ScanSectie, invullingId: string, minScans: number): VergelijkingsView | null {
+  const scan = sectie.scans.find((s) => s.invulling.id === invullingId);
+  if (!scan) return null;
+  const anderen = sectie.scans.filter((s) => s.invulling.id !== invullingId);
+  return maakVergelijking(sectie.assessment, scan.antwoorden, anderen.map((s) => s.antwoorden), sectie.scans.length, minScans);
+}
+
