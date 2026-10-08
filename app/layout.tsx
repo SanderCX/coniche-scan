@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Epilogue } from "next/font/google";
 import "./globals.css";
+import { PaginaTitel } from "@/components/PaginaTitel";
 
 const epilogue = Epilogue({
   variable: "--font-epilogue",
@@ -19,7 +20,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="nl"
       className={`${epilogue.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-bg text-ink">{children}</body>
+      <body className="min-h-full flex flex-col bg-bg text-ink">
+        <PaginaTitel />
+        {children}
+      </body>
     </html>
   );
 }

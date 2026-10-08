@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useAssessments } from "@/lib/assessment-store";
 import { AssessmentCard } from "@/components/AssessmentCard";
 import { PageWithChrome } from "@/components/PageWithChrome";
@@ -9,7 +8,7 @@ export default function Home() {
   const assessments = useAssessments();
 
   return (
-    <PageWithChrome identiteitMenu={<Link href="/toegang">Inloggen</Link>}>
+    <PageWithChrome>
       <div style={{ background: "linear-gradient(180deg, var(--or-faint) 0%, var(--bg) 65%)" }}>
         <div className="container" style={{ padding: "4.5rem 2rem 3.5rem", textAlign: "center" }}>
           <span className="eyebrow">Coniche Scan</span>

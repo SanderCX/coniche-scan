@@ -36,6 +36,9 @@ export function PageWithChrome({
    */
   identiteitMenu?: React.ReactNode;
 }) {
+  // Het slot is nooit leeg: Zonder herkende gebruiker (geen menu en geen code) staat er "Inloggen", de uitgelogde
+  // variant van datzelfde slot (CLAUDE.md, Globale layout, punt 7).
+  const identiteit = identiteitMenu ?? (code ? undefined : <Link href="/toegang">Inloggen</Link>);
   return (
     <>
       <SiteHeader
@@ -51,10 +54,10 @@ export function PageWithChrome({
                 <Link href={`/s/${code}`}>← Terug naar Mijn metingen</Link>
               </>
             )}
-            {identiteitMenu && (
+            {identiteit && (
               <>
                 <span className="nav-divider" />
-                {identiteitMenu}
+                {identiteit}
               </>
             )}
           </>

@@ -413,6 +413,20 @@ button.card:hover,
   font-size: 2rem;
 }
 
+/* Assessment-icoon (stylesheet.md, Assessment-icoon): Oranje icoon in een rond vlak van --or-faint. Het raster van het
+   icoon (2rem) is 62,5% van de diameter (3.2rem), dus er blijft ruim een rand rondom over. */
+.assessment-icoon-rond {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  background: var(--or-faint);
+  color: var(--or);
+}
+
 .assessment-card .duur {
   color: var(--ink-s);
   font-size: var(--fs-s);
