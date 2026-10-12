@@ -92,12 +92,15 @@ Bewust nog niet opgepakt. Geen prioritering.
 - **Afwijking en spreiding bovenop de aggregatie**: Het gemiddelde per
   Meting op organisatieniveau is gebouwd (`beheerpagina.md`,
   Organisatie-resultaten). Een maat voor afwijking/spreiding tussen
-  respondenten daarbovenop is nog geen ontwerpkeuze.
+  respondenten daarbovenop is ontworpen (besloten op 12 oktober 2026, nog te
+  bouwen): `visualisatie-scores.md`, onderdeel A en B.
 - **Trend tussen Metingen van dezelfde organisatie**: De aggregatie
   (`beheerpagina.md`, Organisatie-resultaten) werkt nu alleen bínnen
   één Meting. "Zijn we vooruitgegaan sinds de nulmeting" — twee of meer
   Metingen van dezelfde organisatie naast elkaar, per categorie/
-  bouwblok — is nog geen ontwerp.
+  bouwblok — is ontworpen voor twee Metingen (besloten op 12 oktober 2026,
+  nog te bouwen): `visualisatie-scores.md`, onderdeel C. Voor drie of meer
+  Metingen is er nog geen ontwerp.
 - **Benchmark, niveau 1 (tussen organisaties)**: Gebouwd (PR 61,
   `benchmark.md`). Daarbij nog niet gedekt: Export (PDF, CSV, InDesign) van
   een benchmark, rechten voor een Consultant, een vastgezette versie voor de
@@ -112,11 +115,11 @@ Bewust nog niet opgepakt. Geen prioritering.
   Open: Of een Lead de view van zijn Meting ziet, en met welke drempel.
 - **Benchmark, niveau 3 (binnen een Meting)**: Hoe scoort een scan ten
   opzichte van de andere scans in dezelfde Meting. Het kader staat in
-  `benchmark.md`. Het ontwerp van de spreiding (verdeling per bouwblok,
-  laagste tot hoogste score, de plek van een scan daarin) en van de hoge en
-  lage scores moet nog worden bedacht. Houd rekening met herleidbaarheid bij
-  weinig scans. Sluit aan op "Afwijking en spreiding bovenop de aggregatie"
-  hierboven.
+  `benchmark.md`. Het ontwerp van de spreiding (een stip per scan, gemiddelde,
+  de plek van een scan daarin) en van de hoge en lage scores staat in
+  `visualisatie-scores.md`, onderdeel B (besloten op 12 oktober 2026, nog te
+  bouwen). Houd rekening met herleidbaarheid bij weinig scans, zie de drempel
+  `benchmarkMinRespondenten`.
 - **Benchmark of gemiddelde opslaan als samengestelde Meting**: Een
   gemiddelde over meerdere Metingen van één organisatie (zie niveau 2)
   vastleggen als eigen Meting, zodat een organisatie met meerdere delen als

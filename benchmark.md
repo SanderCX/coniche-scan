@@ -88,7 +88,7 @@ Opbouw van de view:
 - Het verschil per bouwblok (X min de rest, op één decimaal).
 - Onder de view de tekst "Vergelijkgroep van n organisaties, samengesteld door Coniche", met de peildatum.
 
-**Voorstel.** Eventueel de range van de groep (laagste tot hoogste score) als band, zonder namen. Dit is nog te besluiten.
+**Besloten, nog niet gebouwd.** De range van de groep (laagste tot hoogste score) komt als band in de view, zonder namen, samen met de middelste helft van de groep en een label voor de positie. Het verschil per bouwblok (hierboven) gaat op in die weergave. De uitwerking staat in `visualisatie-scores.md`, onderdeel D. Open: Of de band een eigen drempel krijgt.
 
 De view toont nooit de namen van andere organisaties. De Admin bekijkt de view eerst zelf.
 
@@ -133,20 +133,20 @@ Het privacy statement belooft een minimale groepsgrootte. Die belofte moet overe
 - **Leden.** Een lid is een Meting (`BenchmarkLid`, met overal dezelfde `organisatieId`). In tegenstelling tot niveau 1 mag een organisatie meerdere leden per Assessment hebben, maar een Meting hoogstens één keer.
 - **Berekening.** Zie Gedeelde regels. Elke Meting telt even zwaar mee, ongeacht het aantal respondenten.
 - **Teller.** "N Metingen" per Assessment. Er is geen Y, want de Admin kiest de Metingen zelf.
-- **Weergave.** Per Assessment een sectie met het gemiddelde van alle gekozen Metingen en per Meting haar eigen scores ernaast. Daarnaast een view per Meting, met de Meting X naast het gemiddelde van de overige Metingen, zonder X, in dezelfde opbouw als de view per organisatie. Binnen één organisatie is anonimiteit geen probleem voor de Admin, dus de namen van de Metingen staan erbij.
+- **Weergave.** Per Assessment een sectie met het gemiddelde van alle gekozen Metingen en per Meting haar eigen scores ernaast. Daarnaast een view per Meting, met de Meting X naast het gemiddelde van de overige Metingen, zonder X, in dezelfde opbouw als de view per organisatie. Binnen één organisatie is anonimiteit geen probleem voor de Admin, dus de namen van de Metingen staan erbij. **Besloten, nog niet gebouwd.** Het overzicht van alle gekozen Metingen is een matrix met de bouwblokken als rijen en de Metingen als kolommen, de view per Meting heeft de opbouw van de view per organisatie. Zie `visualisatie-scores.md`, onderdeel E en D.
 - **Toewijzen aan een Lead.** Een Admin kan de view van een Meting toewijzen aan een Lead op die Meting (zie Toewijzen aan een Lead op alle niveaus).
 - **Verwijderen.** Valt een Meting weg, dan verdwijnt het lid, zoals op niveau 1. Een benchmark met minder dan twee leden per Assessment geeft een melding.
 
 ## Niveau 3: Binnen een Meting
 
-**Voorstel, ontwerp volgt.** De vraag is hoe een scan scoort ten opzichte van alle andere scans in dezelfde Meting. Het ontwerp van de spreiding en van hoge en lage scores volgt later. Wat nu vastligt:
+**Voorstel, ontwerp besloten.** De vraag is hoe een scan scoort ten opzichte van alle andere scans in dezelfde Meting. Het ontwerp van de spreiding en van hoge en lage scores staat in `visualisatie-scores.md`, onderdeel B (besloten op 12 oktober 2026, nog niet gebouwd). Wat daarnaast vastligt:
 
 - **Lid.** Een afgeronde scan. De vergelijkgroep van een scan is alle andere afgeronde scans in dezelfde Meting, zonder de scan zelf. Dat is dezelfde reden als op niveau 1.
 - **Berekening.** Elke scan telt even zwaar mee. Per vraag het gemiddelde antwoord van de andere scans, daarop de gedeelde scorefunctie.
 - **Ondergrens.** Bij weinig scans is de vergelijking te herleiden naar personen. Daarom geldt een eigen instelling voor niveau 3, `benchmarkMinRespondenten` (voorstel, startwaarde 5): Het minimale aantal afgeronde scans in de Meting, inclusief de scan van de view. Een Admin past hem aan in Instellingen. Te bevestigen.
 - **Wie ziet het.** De Admin, die de namen van de Respondenten al ziet, en een Lead aan wie de Admin de view heeft toegewezen (zie Toewijzen aan een Lead op alle niveaus).
 - **Opslag.** Omdat een view toewijsbaar is, is er een `Benchmark` met niveau "scans" en één lid, de Meting. De scan waar de view over gaat, staat op de toewijzing (`BenchmarkToewijzing.onderwerpRespondentId`).
-- **Nog te ontwerpen.** Spreiding per bouwblok (bijvoorbeeld de verdeling van de antwoorden of de laagste tot hoogste score), de plek van een scan in die spreiding, en het zichtbaar maken van hoge en lage scores. Zie `backlog.md`.
+- **Weergave.** Per bouwblok een stip per scan, een streep op het gemiddelde van de andere scans, een ring op de scan van de view en een label voor de spreiding (Eensgezind, Wisselend, Verdeeld). Zie `visualisatie-scores.md`, onderdeel B.
 
 ## Bereik van een Lead
 
@@ -196,11 +196,11 @@ De gebeurtenissen staan in `datamodel.md`, Audit, onder Benchmark. Wat een verwi
 - Export (PDF, CSV, InDesign) van een benchmark. Dat is een derde soort naast de export van één scan en van een organisatieresultaat.
 - Rechten van een Consultant op de benchmark.
 - Een vastgezette versie in plaats van live cijfers.
-- De range van de groep als band in de view.
+- De range van de groep als band in de view: Ontworpen, zie `visualisatie-scores.md`, onderdeel D. Nog te bouwen.
 - De berekening op de server (`backlog.md`, Fase 2). Nu draait ze in de browser, dus de privacyregels voor een Lead worden alleen in de schermen bewaakt.
 - Een samengestelde Meting, zodat een organisatie met meerdere delen als één deelnemer meedoet aan niveau 1 (`backlog.md`).
 - Ontwikkeling in de tijd binnen een benchmark.
-- De spreiding en de hoge en lage scores op niveau 2 en 3.
+- De spreiding en de hoge en lage scores op niveau 2 en 3: Ontworpen, zie `visualisatie-scores.md`, onderdeel B en E. Nog te bouwen.
 - De privacytekst en het toestemmingsvakje in de intake in de code.
 
 ## Open punten
@@ -210,4 +210,5 @@ De gebeurtenissen staan in `datamodel.md`, Audit, onder Benchmark. Wat een verwi
 - De exacte tekst van de disclaimer en het toestemmingsvakje.
 - Niveau 2 en 3: De startwaarden van `benchmarkMinMetingen` (3) en `benchmarkMinRespondenten` (5).
 - Niveau 2: Of voor het privacy statement iets nodig is, nu de gegevens binnen de organisatie blijven.
-- Niveau 3: Het ontwerp van de spreiding en de hoge en lage scores.
+- Niveau 3: De grenzen van het spreidingslabel en de vraag of een Admin bij een stip de naam kan zien (`visualisatie-scores.md`, Open punten).
+- Niveau 1: Of de band en de kwartielen van de groep een eigen drempel krijgen.
