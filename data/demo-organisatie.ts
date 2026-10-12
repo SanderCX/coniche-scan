@@ -43,29 +43,24 @@ const testScanUitvoering: ScanUitvoering = {
 const techstack: Record<string, TechstackItem> = {
   "techstack-contact-center": {
     categorie: "Contact center",
-    leverancier: "Genesys",
-    ondersteuning: "extern",
+    leverancier: "Genesys Cloud",
+    ondersteuner: "Sabio",
   },
   "techstack-conversational-ai": {
     categorie: "Conversational AI",
     leverancier: "Cognigy",
-    ondersteuning: "extern",
+    ondersteuner: "Seamly",
   },
-  "techstack-crm": { categorie: "CRM", leverancier: "Salesforce", ondersteuning: "zelf" },
+  "techstack-crm": { categorie: "CRM", leverancier: "Salesforce Service Cloud", ondersteuner: "Geen ondersteuning" },
   "techstack-kennismanagement": {
     categorie: "Kennismanagement",
     leverancier: "Confluence",
-    ondersteuning: "zelf",
+    ondersteuner: "Geen ondersteuning",
   },
   "techstack-llm-oplossing": {
     categorie: "LLM-oplossing",
     leverancier: "Claude (Anthropic)",
     ondersteuning: "extern",
-  },
-  "techstack-it-en-deployment": {
-    categorie: "IT en deployment",
-    leverancier: "AWS",
-    ondersteuning: "zelf",
   },
 };
 

@@ -477,7 +477,8 @@ VeldDefinitie {
   type: "tekst" | "getal" | "select" | "select-afhankelijk" | "select-met-verdeling" | "percentage" | "groep"
   opties?: string[]                 // vaste antwoordcategorieën
   eigenOptie?: boolean              // alleen "select": naast `opties` ook "Anders…" met een invoerveld, zie Techstack
-  toonAlsBroer?: { veld: string, waarde: string } // alleen tonen als dit broer-veld die waarde heeft; wijzigt het, dan wordt dit veld gewist
+  voorop?: string[]                 // alleen "select" met `eigenOptie`: opties die bovenaan staan, in deze volgorde (bijv. "Geen ondersteuning")
+  eigenOptiePlaceholder?: string    // alleen "select" met `eigenOptie`: hint in het invoerveld bij "Anders…"
   afhankelijkVan?: string           // alleen "select-afhankelijk": id van het broer-veld waarvan de keuze de lijst hier bepaalt
   optiesPerWaarde?: { [waarde: string]: string[] } // alleen "select-afhankelijk"
   subvelden?: VeldDefinitie[]       // voor herhalende structuren
@@ -506,11 +507,21 @@ VeldDefinitie {
 - Percentage 2026 (getal)
 - Ambitie 2030 (getal)
 
-**Techstack**, zeven keer dezelfde structuur (leverancier, zelf/extern
-ondersteund) voor Contact center, WFM, Conversational AI, CRM,
-Kennismanagement, LLM-oplossing en IT en deployment. Modelleer dit als
-één herbruikbaar `TechstackItem { categorie, leverancier, ondersteuning:
-"zelf" | "extern" }`.
+**Techstack**, zes categorieën, in deze volgorde in het formulier: Contact
+center, WFM, CRM, Kennismanagement, Conversational AI en LLM-oplossing. Er is geen aparte categorie "IT en
+deployment" meer: Deploymentmodel en Cloudleverancier staan als velden bij
+de categorieën. Modelleer dit als één herbruikbaar `TechstackItem
+{ categorie, leverancier, ondersteuner, deploymentmodel, cloudleverancier,
+toegangsroute }`.
+
+- **Contact center, WFM, Conversational AI, CRM en Kennismanagement**:
+  `leverancier` (Oplossing), `ondersteuner` ("Geen ondersteuning" of een
+  partij), `deploymentmodel` en `cloudleverancier`. Zelf of extern
+  (`ondersteuning`) volgt uit `ondersteuner` en wordt alleen voor de exports
+  afgeleid.
+- **LLM-oplossing**: alleen `leverancier` (de modelfamilie) en
+  `toegangsroute`. Geen Ondersteund door, Deploymentmodel en
+  Cloudleverancier.
 
 **Oplossing bij Contact center, Conversational AI, CRM, Kennismanagement en WFM** is een keuzelijst
 (`select` met `eigenOptie`) met vaste opties:
@@ -549,20 +560,28 @@ andere hoofdletter) en staat daarna in de lijst van alle organisaties,
 per categorie. Er is geen aparte lijst met toegevoegde opties: De lijst is
 de vaste lijst plus wat organisaties daar hebben ingevuld. Gebruikt geen
 enkele organisatie de waarde nog, dan verdwijnt hij weer uit de lijst. De
-andere twee categorieën (LLM-oplossing en IT en deployment) blijven een
-vrij tekstveld.
+LLM-oplossing heeft zijn eigen lijsten (zie hieronder).
 
-WFM is als zevende categorie toegevoegd en staat in het formulier direct
-onder Contact center. De InDesign-export krijgt daarvoor het element
+WFM is als categorie toegevoegd en staat in het formulier direct onder
+Contact center, gevolgd door CRM, Kennismanagement, Conversational AI en
+LLM-oplossing. De InDesign-export krijgt daarvoor het element
 `techstackWfm` (`export-indesign.md`).
 
-**Ondersteund door.** Bij een techstack-categorie met een lijst staat onder
-"Zelf / extern ondersteund" een tweede keuzelijst "Ondersteund door", alleen
-zichtbaar bij "extern" (`toonAlsBroer`). Wordt het veld teruggezet naar
-"zelf" of leeg, dan wordt de gekozen partij gewist. De waarde staat als
-`ondersteuner` naast `leverancier` en `ondersteuning`. Dezelfde regels als
-bij Oplossing: Op alfabet, "Anders…" onderaan, eigen invoer komt in de lijst
-van die categorie. De lijsten:
+**Ondersteund door.** Bij een techstack-categorie met een lijst partijen
+is er één keuzelijst "Ondersteund door", in plaats van "Zelf / extern
+ondersteund". De eerste keuze is altijd "Geen ondersteuning": De
+organisatie ondersteunt de oplossing zelf. Daarna volgen de partijen op
+alfabet en onderaan "Anders…". De waarde staat als `ondersteuner` naast
+`leverancier`. Dezelfde regels als bij Oplossing: Eigen invoer komt in de
+lijst van die categorie, en het invoerveld vraagt "Naam van de partij".
+
+`ondersteuning` ("zelf" of "extern") wordt niet meer ingevuld maar
+afgeleid: "Geen ondersteuning" geeft `zelf`, een partij geeft `extern`,
+zonder keuze is het leeg. De InDesign-export (`export-indesign.md`) houdt
+daarmee zijn attribuut `ondersteuning`. Bestaande data wordt bij het laden
+omgezet: `zelf` wordt "Geen ondersteuning". Een oude waarde `extern`
+zonder bekende partij blijft staan tot er een partij wordt gekozen, en de
+export gebruikt dan de oude waarde. De lijsten:
 
 - Contact center: Accenture, Avanade, Axians, Bright Contact, Capgemini,
   Cegeka, Cloudoe, Computacenter, Concentrix, Coniche, Conscia, Eviden,
@@ -578,20 +597,52 @@ van die categorie. De lijsten:
   ilionx, Incentro, KPN, Macaw, Neople, Odido Business, Sabio, Seamly,
   Sopra Steria, Studio Winegum, Teleperformance, VodafoneZiggo Zakelijk,
   Wortell en Yource.
-- CRM: Accenture, Avanade, Bright Contact, Capgemini, Cegeka, Cloudoe,
-  Concentrix, Conclusion, Coniche, Deloitte Digital, Devoteam, Frontline,
-  HSO, ilionx, KPN, Macaw, NTT Data Business Solutions, Odido Business,
-  Plat4mation, PwC, Sopra Steria, Teleperformance, Valtech,
-  VodafoneZiggo Zakelijk en Yource.
+- CRM: Accenture, Avanade, Bright Contact, BusinessBase, Capgemini,
+  Cegeka, Cloudoe, Conclusion, Coniche, Deloitte Digital, Devoteam,
+  Frontline, HSO, ilionx, KPN, Macaw, NTT Data Business Solutions, Odido
+  Business, Plat4mation, PwC, Sopra Steria, Valtech en VodafoneZiggo
+  Zakelijk.
 - Kennismanagement: Accenture, Avanade, Bright Contact, Capgemini, Cegeka,
   Cloudoe, Concentrix, Conclusion, Coniche, Deloitte Digital, Devoteam,
   Frontline, HSO, ilionx, KPN, Macaw, Neople, Odido Business, Plat4mation,
   Sabio, Sopra Steria, Teleperformance, TKC The Knowledge Company,
   VodafoneZiggo Zakelijk en Yource.
 
-LLM-oplossing en IT en deployment hebben geen lijst en houden alleen
-zelf/extern. De InDesign-export neemt `ondersteuner` nog niet mee
-(`export-indesign.md`).
+De InDesign-export neemt de gekozen partij (`ondersteuner`) nog niet mee.
+
+**Deploymentmodel en Cloudleverancier.** Elke techstack-categorie behalve
+LLM-oplossing heeft er twee keuzelijsten bij, op dezelfde regel als Oplossing en Ondersteund door,
+in die volgorde: Oplossing, Ondersteund door, Deploymentmodel,
+Cloudleverancier. Beide hebben "Anders…" onderaan en eigen invoer komt in de
+lijst van die categorie. De volgorde is die van de aanlevering en niet
+alfabetisch (`voorop`), met eigen invoer daarna op alfabet. Opgeslagen als
+`deploymentmodel` en `cloudleverancier`, als gewone tekst. De exports nemen
+ze nog niet mee, behalve de CSV in de JSON-kolom met de kenmerken.
+
+- Deploymentmodel: Public Cloud (SaaS, multi-tenant), Dedicated Cloud
+  (single-tenant), Private Cloud, Sovereign Cloud, Hosted bij provider,
+  Hosted bij partner/integrator, On-premises, Hybride, Multicloud.
+- Cloudleverancier: Microsoft Azure, Amazon Web Services, Google Cloud,
+  Oracle Cloud, IBM Cloud, Vendor eigen cloud, VMware, OpenStack, OVHcloud,
+  STACKIT, Scaleway, IONOS, Leaseweb, Previder, Cyso, KPN, VodafoneZiggo,
+  Odido, Rijkscloud / ODC, Eigen datacenter.
+
+**LLM-oplossing.** Wijkt af van de andere categorieën: Geen "Ondersteund
+door", Deploymentmodel of Cloudleverancier, maar twee keuzelijsten op
+dezelfde regel. Beide hebben "Anders…" onderaan, eigen invoer komt in de
+lijst en de volgorde is die van de aanlevering (`voorop`), met eigen invoer
+daarna op alfabet. `ondersteuning` bestaat hier niet meer, dus de
+InDesign-export geeft voor het attribuut `ondersteuning` altijd "n.v.t.". De
+toegangsroute zit nog niet in de InDesign-export.
+
+- LLM (modelfamilie), opgeslagen als `leverancier`: OpenAI GPT, Anthropic
+  Claude, Google Gemini, Meta Llama, Mistral, Cohere Command, xAI Grok,
+  DeepSeek, Alibaba Qwen, Amazon Nova, Microsoft Phi, IBM Granite, NVIDIA
+  Nemotron, GPT-NL, Vendor eigen model, Onbekend / niet openbaar.
+- LLM-toegangsroute, opgeslagen als `toegangsroute`: Direct via
+  modelleverancier (API), Azure AI Foundry / Azure OpenAI, AWS Bedrock,
+  Google Vertex AI, Ingebouwd in vendorplatform, Self-hosted (open-weight
+  model), EU-gehost / sovereign.
 
 **FTE**
 - Klantcontactmedewerkers (getal, met inhouse/BPO-verdeling)

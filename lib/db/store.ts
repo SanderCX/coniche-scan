@@ -3,6 +3,8 @@ import { Organisatie } from "../types";
 import { normaliseerEmail } from "../email";
 import { demoOrganisatie } from "@/data/demo-organisatie";
 import { haalServerKopieOp, stuurNaarServer } from "../server-sync";
+import { migreerTechstackOndersteuning } from "@/lib/techstack";
+import { techstackCategorieIdsMetLijst } from "@/data/organisatie-velden";
 
 const KEY = "coniche-scan:organisaties";
 const SERVER_SLEUTEL = "organisaties";
@@ -59,7 +61,11 @@ if (typeof window !== "undefined") {
 function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
   return {
     ...ruw,
-    kenmerken: ruw.kenmerken && typeof ruw.kenmerken === "object" ? ruw.kenmerken : {},
+    // Het oude veld zelf/extern wordt "Ondersteund door" bij de techstack-categorieën met een lijst (`lib/techstack.ts`).
+    kenmerken: migreerTechstackOndersteuning(
+      ruw.kenmerken && typeof ruw.kenmerken === "object" ? ruw.kenmerken : {},
+      techstackCategorieIdsMetLijst
+    ),
     // `email` genormaliseerd (getrimd, lowercase) voor data van vóór die
     // regel bestond (datamodel.md, Respondent) — anders herkent
     // `nodigLidUit`/`voegLeadToe` een bestaand lid met afwijkende casing

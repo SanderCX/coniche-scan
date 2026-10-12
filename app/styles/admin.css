@@ -924,3 +924,19 @@ body:has(.admin-main) {
 .assessment-verwijderen {
   flex: none;
 }
+/* De knop en een vaste kolom voor het Info-icoon (beheerpagina.md, punt 1, Assessment verwijderen): 1.25rem, de breedte
+   van het icoon, met .5rem ruimte ervoor. De kolom staat er ook als er geen icoon is, zodat de knop op elke kaart op
+   dezelfde afstand van de rechterrand eindigt. */
+.assessment-verwijderen-rij {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.assessment-verwijderen-icoonplek {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: var(--control-h);
+}
