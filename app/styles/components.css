@@ -1097,6 +1097,11 @@ select.veld-compact:focus {
   flex: 1;
   min-width: 0;
 }
+.info-veld-voorloop {
+  margin: 0 0 0.5rem;
+  font-size: var(--fs-s);
+  color: var(--ink-m);
+}
 .info-veld-bewerken textarea {
   width: 100%;
   resize: none;

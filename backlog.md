@@ -355,6 +355,46 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   Klantcontact-scan, dus niet sector-vertaald. Inhoudelijke input van Joost en
   Sander nodig (`content-zorgscan.md`).
 
+**Te bespreken met Joost: Look & feel** (9 oktober 2026)
+
+Suggesties uit een doorloop van de specs en de code, nog niet getoetst aan
+screenshots van de draaiende app. Niets is besloten of gebouwd.
+
+- **Contrast, merkbesluit**: Wit op `--or` (`#ff671f`) is ongeveer 3:1, onder
+  WCAG AA voor tekst van 14px. Dat geldt voor `.btn-or` en voor oranje
+  links op wit. Opties: Knoptekst in `--pu`, een iets donkerder oranje voor
+  knoppen, of grotere en dikkere tekst. Het is merkkleur, dus dit is aan
+  Coniche.
+- **Contrast, scorekleuren**: Witte tekst op `--score-2` (`#e8871e`) is
+  ongeveer 2,6:1. Donkere tekst werkt daar beter (`stylesheet.md`,
+  Scorekleuren).
+- **Contrast, `--ink-s`**: `#888884` is ongeveer 3,5:1 voor hints en labels.
+  Een tint donkerder (rond `#6f6f6b`) lost dat op.
+- **Grafiektekst**: 10 tot 11px is erg klein, 12px (`--fs-xs`) is haalbaar.
+- **Foutstaten in formulieren**: Rode rand met een korte melding onder het
+  veld. Staat al als open punt in `stylesheet.md`.
+- **Lege, laad- en opgeslagen-staten**: Een vaste lege staat met uitleg en
+  een knop naar de volgende stap, en één vaste terugkoppeling na opslaan
+  (toast of `.beheer-melding`).
+- **Display-maten en spacing**: `1.1rem`, `1.3rem`, `1.5rem`, `1.6rem` en
+  `2.4rem` staan los van de `--fs-*`-tokens (open punt in `stylesheet.md`).
+  Dezelfde vraag voor marges en gaps: een schaal van vijf of zes stappen.
+  Inline styles (bijv. `app/page.tsx`) naar klassen.
+- **Vragenlijst en resultaten**: Duidelijkere actieve staat op de gekozen
+  schaalwaarde, de hele antwoordrij klikbaar, een zichtbare
+  "opgeslagen"-indicator en een korte uitleg boven de grafieken.
+- **Beheertabellen**: Duidelijkere rijhover of zebra-strepen, sticky
+  tabelkoppen bij lange lijsten, en filters en sortering onthouden bij
+  Ingevulde scans en Respondenten.
+- **Merkafwerking**: Footer-logo (witte variant) en Source Serif 4 voor een
+  citaat, beide al open punt in `stylesheet.md`. Daarnaast iconen of
+  illustraties op lege pagina's in de stijl van de Assessment-iconen.
+- **Donkere modus**: Niet nodig.
+
+Voorgestelde volgorde als het wordt opgepakt: Foutstaten, de contrastwijzigingen
+(`--ink-s`, scoretekst) en de display-schaal. Het oranje knopcontrast eerst
+als merkbesluit bespreken.
+
 ## Content-onderhoud
 
 - **Periodieke check op `content-2030.md`**: Elke 2 maanden een seintje

@@ -473,6 +473,8 @@ VeldDefinitie {
   label: string
   type: "tekst" | "getal" | "select" | "select-afhankelijk" | "select-met-verdeling" | "percentage" | "groep"
   opties?: string[]                 // vaste antwoordcategorieën
+  eigenOptie?: boolean              // alleen "select": naast `opties` ook "Anders…" met een invoerveld, zie Techstack
+  toonAlsBroer?: { veld: string, waarde: string } // alleen tonen als dit broer-veld die waarde heeft; wijzigt het, dan wordt dit veld gewist
   afhankelijkVan?: string           // alleen "select-afhankelijk": id van het broer-veld waarvan de keuze de lijst hier bepaalt
   optiesPerWaarde?: { [waarde: string]: string[] } // alleen "select-afhankelijk"
   subvelden?: VeldDefinitie[]       // voor herhalende structuren
@@ -501,11 +503,92 @@ VeldDefinitie {
 - Percentage 2026 (getal)
 - Ambitie 2030 (getal)
 
-**Techstack**, zes keer dezelfde structuur (leverancier, zelf/extern
-ondersteund) voor Contact center, Conversational AI, CRM,
+**Techstack**, zeven keer dezelfde structuur (leverancier, zelf/extern
+ondersteund) voor Contact center, WFM, Conversational AI, CRM,
 Kennismanagement, LLM-oplossing en IT en deployment. Modelleer dit als
 één herbruikbaar `TechstackItem { categorie, leverancier, ondersteuning:
 "zelf" | "extern" }`.
+
+**Oplossing bij Contact center, Conversational AI, CRM, Kennismanagement en WFM** is een keuzelijst
+(`select` met `eigenOptie`) met vaste opties:
+
+- Contact center: Amazon Connect, Anywhere 365, Avaya Experience
+  Platform, Cisco Webex Contact Center, Enreach Contact Center, Five9,
+  Freshdesk Contact Center, Genesys Cloud, Microsoft 365 Contact Center,
+  Mitel Contact Center, NICE CXone, Odigo, Puzzel, RingCentral Contact
+  Center, Salesforce Service Cloud Voice, Sprinklr, Storm CX, Talkdesk en
+  Zendesk.
+- Conversational AI: Amazon Lex, Chatlayer, CM.com Conversational AI
+  Cloud, Cognigy, Genesys Cloud Digital & Voice Bots, Google Dialogflow
+  CX, IBM Watson Assistant, Kore.ai, Microsoft Copilot Studio, Parloa,
+  Rasa, Seamly, Watermelon en Zendesk AI Agents.
+- CRM: AFAS CRM, Freshdesk, HubSpot Service Hub, Intercom, Microsoft
+  Dynamics 365 Customer Service, Oracle CX Service, Oracle Siebel CRM,
+  Pega Customer Service, Salesforce Service Cloud, SAP Service Cloud,
+  ServiceNow Customer Service Management, SugarCRM, SuperOffice, TOPdesk,
+  Trengo, Zendesk en Zoho Desk.
+- Kennismanagement: CM.com Knowledge, Confluence, eGain Knowledge,
+  Freshdesk Knowledge Base, Guru, KnowledgePlaza, Microsoft Dynamics 365
+  Knowledge Management, NICE CXone Expert, Salesforce Knowledge,
+  ServiceNow Knowledge Management, SharePoint, TOPdesk Kennisbank,
+  Verint Knowledge Management en Zendesk Guide.
+- WFM: Alvaria Workforce, Assembled, Calabrio WFM, Five9 WFM, GMT
+  Planet, Genesys Cloud WEM, Injixo, Inplanning, Intradiem, Monet WFM,
+  NICE WFM, ORTEC Workforce Scheduling, Pipkins Merlang, Planday,
+  Playvox, Puzzel WFM, Talkdesk WFM, Verint Workforce Management, Zendesk
+  WFM en Zoom Workforce Management.
+
+De lijst staat op alfabet, met "Anders…" altijd onderaan. Staat de
+oplossing er niet bij, dan kiest de gebruiker "Anders…" en typt de naam
+in een invoerveld. De ingevulde tekst wordt als gewone waarde bij de
+organisatie opgeslagen (spelling van een bestaande optie wint bij een
+andere hoofdletter) en staat daarna in de lijst van alle organisaties,
+per categorie. Er is geen aparte lijst met toegevoegde opties: De lijst is
+de vaste lijst plus wat organisaties daar hebben ingevuld. Gebruikt geen
+enkele organisatie de waarde nog, dan verdwijnt hij weer uit de lijst. De
+andere twee categorieën (LLM-oplossing en IT en deployment) blijven een
+vrij tekstveld.
+
+WFM is als zevende categorie toegevoegd en staat in het formulier direct
+onder Contact center. De InDesign-export krijgt daarvoor het element
+`techstackWfm` (`export-indesign.md`).
+
+**Ondersteund door.** Bij een techstack-categorie met een lijst staat onder
+"Zelf / extern ondersteund" een tweede keuzelijst "Ondersteund door", alleen
+zichtbaar bij "extern" (`toonAlsBroer`). Wordt het veld teruggezet naar
+"zelf" of leeg, dan wordt de gekozen partij gewist. De waarde staat als
+`ondersteuner` naast `leverancier` en `ondersteuning`. Dezelfde regels als
+bij Oplossing: Op alfabet, "Anders…" onderaan, eigen invoer komt in de lijst
+van die categorie. De lijsten:
+
+- Contact center: Accenture, Avanade, Axians, Bright Contact, Capgemini,
+  Cegeka, Cloudoe, Computacenter, Concentrix, Coniche, Conscia, Eviden,
+  Frontline, Inetum, KPN, NTT Data, Odido Business, Proximus NXT, Sabio,
+  Sopra Steria, SPIE ICS, Teleperformance, VodafoneZiggo Zakelijk, Wortell
+  en Yource.
+- WFM: Accenture, Avanade, Axians, Bright Contact, Capgemini, Cegeka,
+  Cloudoe, Computacenter, Concentrix, Coniche, Conscia, Deloitte, Eviden,
+  Frontline, HSO, KPN, NTT Data, Odido Business, Proximus NXT, Sabio, Sopra
+  Steria, Teleperformance, Vlirdens, VodafoneZiggo Zakelijk en Yource.
+- Conversational AI: Accenture, Avanade, Bright Contact, Capgemini,
+  Cloudoe, Concentrix, Coniche, Conclusion, Deloitte, Devoteam, Frontline,
+  ilionx, Incentro, KPN, Macaw, Neople, Odido Business, Sabio, Seamly,
+  Sopra Steria, Studio Winegum, Teleperformance, VodafoneZiggo Zakelijk,
+  Wortell en Yource.
+- CRM: Accenture, Avanade, Bright Contact, Capgemini, Cegeka, Cloudoe,
+  Concentrix, Conclusion, Coniche, Deloitte Digital, Devoteam, Frontline,
+  HSO, ilionx, KPN, Macaw, NTT Data Business Solutions, Odido Business,
+  Plat4mation, PwC, Sopra Steria, Teleperformance, Valtech,
+  VodafoneZiggo Zakelijk en Yource.
+- Kennismanagement: Accenture, Avanade, Bright Contact, Capgemini, Cegeka,
+  Cloudoe, Concentrix, Conclusion, Coniche, Deloitte Digital, Devoteam,
+  Frontline, HSO, ilionx, KPN, Macaw, Neople, Odido Business, Plat4mation,
+  Sabio, Sopra Steria, Teleperformance, TKC The Knowledge Company,
+  VodafoneZiggo Zakelijk en Yource.
+
+LLM-oplossing en IT en deployment hebben geen lijst en houden alleen
+zelf/extern. De InDesign-export neemt `ondersteuner` nog niet mee
+(`export-indesign.md`).
 
 **FTE**
 - Klantcontactmedewerkers (getal, met inhouse/BPO-verdeling)

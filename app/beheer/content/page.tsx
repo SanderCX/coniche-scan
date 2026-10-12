@@ -22,8 +22,8 @@ export default function ContentOverzichtPage() {
         {assessments.map((a) => {
           const template = assessments.find((t) => t.id === a.afgeleidVanAssessmentId);
           return (
-            <div key={a.id} className="admin-row-groep">
-              <Link href={`/beheer/content/${a.id}`} className="admin-row" style={{ flex: 1 }}>
+            <div key={a.id} className="admin-row admin-row-groep">
+              <Link href={`/beheer/content/${a.id}`} className="admin-row-link">
                 <div className="flex items-center gap-4">
                   <span className="assessment-icoon-rond" aria-hidden="true">
                     <AssessmentIcon name={a.icoon} style={{ width: "2rem", height: "2rem" }} />

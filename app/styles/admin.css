@@ -908,13 +908,19 @@ body:has(.admin-main) {
   margin: 0.8rem 0 0.2rem 1.7rem;
 }
 
-/* Een kaart in de Assessment-lijst met een actie ernaast (de knop Verwijderen mag niet in de link zelf staan). */
+/* Een kaart in de Assessment-lijst met een actie erin (beheerpagina.md, punt 1, Assessment verwijderen). De kaart is
+   de wrapper en loopt over de volle breedte van de lijst. De link vult de kaart, de knop staat in een eigen laatste
+   kolom, rechts uitgelijnd en verticaal gecentreerd. De knop staat niet in de link zelf (een knop in een <a> is ongeldig). */
 .admin-row-groep {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
+  padding: 0 1.2rem 0 0;
+}
+.admin-row-link {
+  flex: 1;
+  min-width: 0;
+  padding: 1rem 1.2rem;
+  text-decoration: none;
+  color: inherit;
 }
 .assessment-verwijderen {
   flex: none;
-  min-width: 9rem;
 }

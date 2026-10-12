@@ -161,8 +161,146 @@ export const sbiSubsectorenPerSector: Record<string, string[]> = {
   ],
 };
 
+/**
+ * Vaste keuzes voor de Oplossing per techstack-categorie. Een categorie in deze lijst krijgt een keuzelijst met
+ * "Anders…" (`eigenOptie`), de andere categorieën houden een vrij tekstveld. De volgorde hier maakt niet uit: De app
+ * toont de lijst op alfabet.
+ */
+const techstackOplossingen: Record<string, string[]> = {
+  "Contact center": [
+    "Genesys Cloud",
+    "NICE CXone",
+    "Microsoft 365 Contact Center",
+    "Anywhere 365",
+    "Enreach Contact Center",
+    "Cisco Webex Contact Center",
+    "Avaya Experience Platform",
+    "Salesforce Service Cloud Voice",
+    "Amazon Connect",
+    "Odigo",
+    "RingCentral Contact Center",
+    "Mitel Contact Center",
+    "Freshdesk Contact Center",
+    "Puzzel",
+    "Zendesk",
+    "Five9",
+    "Talkdesk",
+    "Storm CX",
+    "Sprinklr",
+  ],
+  "Conversational AI": [
+    "Google Dialogflow CX",
+    "Microsoft Copilot Studio",
+    "CM.com Conversational AI Cloud",
+    "Seamly",
+    "Cognigy",
+    "Genesys Cloud Digital & Voice Bots",
+    "Zendesk AI Agents",
+    "Watermelon",
+    "IBM Watson Assistant",
+    "Chatlayer",
+    "Kore.ai",
+    "Amazon Lex",
+    "Rasa",
+    "Parloa",
+  ],
+  CRM: [
+    "Salesforce Service Cloud",
+    "Microsoft Dynamics 365 Customer Service",
+    "ServiceNow Customer Service Management",
+    "SAP Service Cloud",
+    "Pega Customer Service",
+    "Oracle CX Service",
+    "Zendesk",
+    "Freshdesk",
+    "HubSpot Service Hub",
+    "Trengo",
+    "Intercom",
+    "SuperOffice",
+    "Zoho Desk",
+    "TOPdesk",
+    "AFAS CRM",
+    "Oracle Siebel CRM",
+    "SugarCRM",
+  ],
+  Kennismanagement: [
+    "Salesforce Knowledge",
+    "ServiceNow Knowledge Management",
+    "Microsoft Dynamics 365 Knowledge Management",
+    "Zendesk Guide",
+    "NICE CXone Expert",
+    "eGain Knowledge",
+    "Verint Knowledge Management",
+    "CM.com Knowledge",
+    "Confluence",
+    "SharePoint",
+    "TOPdesk Kennisbank",
+    "Freshdesk Knowledge Base",
+    "KnowledgePlaza",
+    "Guru",
+  ],
+  WFM: [
+    "NICE WFM",
+    "Verint Workforce Management",
+    "Calabrio WFM",
+    "Genesys Cloud WEM",
+    "Injixo",
+    "Alvaria Workforce",
+    "Playvox",
+    "Assembled",
+    "Zendesk WFM",
+    "Puzzel WFM",
+    "Talkdesk WFM",
+    "Five9 WFM",
+    "Pipkins Merlang",
+    "Monet WFM",
+    "ORTEC Workforce Scheduling",
+    "Inplanning",
+    "Intradiem",
+    "GMT Planet",
+    "Zoom Workforce Management",
+    "Planday",
+  ],
+};
+
+/**
+ * Partijen die een techstack-categorie extern ondersteunen, voor "Ondersteund door" (alleen zichtbaar als
+ * `ondersteuning` = "extern"). Per categorie een eigen lijst, op alfabet getoond, met "Anders…" onderaan. Een
+ * categorie zonder lijst hier (LLM-oplossing, IT en deployment) heeft alleen zelf/extern.
+ */
+const techstackOndersteuners: Record<string, string[]> = {
+  "Contact center": [
+    "Sabio", "Coniche", "Frontline", "Cloudoe", "Bright Contact", "Axians", "NTT Data", "Proximus NXT", "KPN",
+    "VodafoneZiggo Zakelijk", "Odido Business", "Concentrix", "Teleperformance", "Yource", "Conscia", "SPIE ICS",
+    "Computacenter", "Eviden", "Accenture", "Capgemini", "Cegeka", "Wortell", "Avanade", "Sopra Steria", "Inetum",
+  ],
+  WFM: [
+    "Sabio", "Coniche", "Frontline", "Cloudoe", "Bright Contact", "NTT Data", "Teleperformance", "Concentrix",
+    "Yource", "Axians", "Proximus NXT", "Conscia", "KPN", "VodafoneZiggo Zakelijk", "Odido Business", "Accenture",
+    "Capgemini", "Avanade", "HSO", "Cegeka", "Sopra Steria", "Eviden", "Computacenter", "Deloitte", "Vlirdens",
+  ],
+  Kennismanagement: [
+    "TKC The Knowledge Company", "Neople", "Coniche", "Frontline", "Cloudoe", "Bright Contact", "Plat4mation",
+    "Devoteam", "Avanade", "Macaw", "ilionx", "HSO", "Conclusion", "Cegeka", "Sopra Steria", "Capgemini",
+    "Accenture", "Deloitte Digital", "Sabio", "Concentrix", "Teleperformance", "Yource", "KPN",
+    "VodafoneZiggo Zakelijk", "Odido Business",
+  ],
+  CRM: [
+    "Accenture", "Deloitte Digital", "Capgemini", "Coniche", "Frontline", "Cloudoe", "Bright Contact", "PwC",
+    "Sopra Steria", "Avanade", "HSO", "Macaw", "ilionx", "Conclusion", "Plat4mation", "Devoteam",
+    "NTT Data Business Solutions", "Valtech", "Cegeka", "Concentrix", "Teleperformance", "Yource", "KPN",
+    "VodafoneZiggo Zakelijk", "Odido Business",
+  ],
+  "Conversational AI": [
+    "Sabio", "Coniche", "Frontline", "Cloudoe", "Bright Contact", "Studio Winegum", "Seamly", "Neople", "Incentro",
+    "Devoteam", "Accenture", "Capgemini", "Deloitte", "Conclusion", "Avanade", "Macaw", "Wortell", "ilionx",
+    "Sopra Steria", "Concentrix", "Teleperformance", "Yource", "KPN", "VodafoneZiggo Zakelijk", "Odido Business",
+  ],
+};
+
 const techstackCategorieen = [
   "Contact center",
+  "WFM",
   "Conversational AI",
   "CRM",
   "Kennismanagement",
@@ -236,13 +374,33 @@ export const organisatieVelden: VeldDefinitie[] = [
       label: categorie,
       type: "groep" as const,
       subvelden: [
-        { id: "leverancier", label: "Oplossing", type: "tekst" as const },
+        techstackOplossingen[categorie]
+          ? {
+              id: "leverancier",
+              label: "Oplossing",
+              type: "select" as const,
+              opties: techstackOplossingen[categorie],
+              eigenOptie: true,
+            }
+          : { id: "leverancier", label: "Oplossing", type: "tekst" as const },
         {
           id: "ondersteuning",
           label: "Zelf / extern ondersteund",
           type: "select" as const,
           opties: ["zelf", "extern"],
         },
+        ...(techstackOndersteuners[categorie]
+          ? [
+              {
+                id: "ondersteuner",
+                label: "Ondersteund door",
+                type: "select" as const,
+                opties: techstackOndersteuners[categorie],
+                eigenOptie: true,
+                toonAlsBroer: { veld: "ondersteuning", waarde: "extern" },
+              },
+            ]
+          : []),
       ],
     })),
   },
