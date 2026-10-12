@@ -15,7 +15,8 @@ import { InfoIcoon } from "@/components/InfoIcoon";
  * De knop "Verwijderen" van een Assessment, op de kaart in de Assessment-lijst en op het detail (`beheerpagina.md`, punt 1,
  * Assessment verwijderen). Uitgeschakeld zolang er Metingen van zijn, met een Info-icoon (`info.assessmentVerwijderen`) dat met
  * een zin van de app begint ("Dit Assessment kan niet worden verwijderd, want er zijn nog 3 Metingen bij 2 organisaties.").
- * Onder de knop staat geen tekst. De bevestiging zegt
+ * Onder de knop staat geen tekst. Naast de knop is een vaste plek voor het icoon, ook als er geen icoon
+ * staat (`beheerpagina.md`, punt 1). De bevestiging zegt
  * wat er verdwijnt. Bij bevestigen wordt opnieuw gecontroleerd (`lib/assessment-verwijderen.ts`). Recht: `content.beheren`,
  * dus alleen een Admin.
  */
@@ -51,11 +52,14 @@ export function AssessmentVerwijderen({ assessment, naVerwijderen }: { assessmen
 
   return (
     <div className="assessment-verwijderen">
-      <div className="flex items-center gap-2">
+      <div className="assessment-verwijderen-rij">
         <button type="button" className="btn btn-outline btn-compact" disabled={geblokkeerd} onClick={() => setOpen(true)}>
           Verwijderen
         </button>
-        {geblokkeerd && <InfoIcoon naastVeld sleutel="info.assessmentVerwijderen" voorloop={blokkadeZin} />}
+        {/* De plek van het icoon is op elke kaart gereserveerd, ook zonder icoon: Zo eindigt de knop overal op dezelfde plek. */}
+        <span className="assessment-verwijderen-icoonplek">
+          {geblokkeerd && <InfoIcoon naastVeld sleutel="info.assessmentVerwijderen" voorloop={blokkadeZin} />}
+        </span>
       </div>
       {melding && (
         <p className="admin-notice" role="status" style={{ margin: "0.5rem 0 0" }}>

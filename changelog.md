@@ -65,6 +65,9 @@
   `admin.css`): De kaart is nu de wrapper over de volle breedte van de lijst, met de link als vulling en de knop
   "Verwijderen" in een eigen laatste kolom, rechts uitgelijnd en verticaal gecentreerd. Eerder stond de knop naast de
   kaart en was die even breed als de inhoud. Gemeten: 3 kaarten van 896px, knop op elke rij op dezelfde plek.
+- **Vaste plek voor het Info-icoon** (spec van Joost, PR 72): Naast de knop staat een kolom van `1.25rem` met `0.5rem`
+  ruimte ervoor (`.assessment-verwijderen-icoonplek`), ook als er geen icoon is. Gemeten: Actieve en uitgeschakelde
+  knop zijn allebei 121,9 × 38,4px en eindigen op 48,2px van de kaartrand, met of zonder icoon.
 - **Telregel onder de knop weg** (`components/beheer/AssessmentVerwijderen.tsx`). De zin komt nu uit de app zelf als
   eerste zin van het Info-icoon: "Dit Assessment kan niet worden verwijderd, want er zijn nog {n} Metingen bij {m}
   organisaties." (enkelvoud: "er is nog 1 Meting bij 1 organisatie"). `InfoIcoon` kreeg daarvoor een prop `voorloop`:
