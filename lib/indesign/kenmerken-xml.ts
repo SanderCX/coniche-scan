@@ -1,11 +1,12 @@
 /**
  * Zet `Organisatie.kenmerken` (genest, `data/organisatie-velden.ts`) om naar
- * de 27 losse, benoemde XML-elementen uit `export-indesign.md` — geen
+ * de 26 losse, benoemde XML-elementen uit `export-indesign.md` — geen
  * JSON-blob zoals bij de CSV-export, elk kenmerk krijgt zijn eigen taggable
  * elementnaam. Ontbreekt een waarde, dan is die "n.v.t.", nooit een leeg
  * element (zie de spec, "kenmerken").
  */
 import { escapeXml } from "./xml-utils";
+import { ondersteuningVan } from "../techstack";
 
 const NVT = "n.v.t.";
 
@@ -63,31 +64,28 @@ export function kenmerkenXml(kenmerken: Record<string, unknown>): string {
     el("digitaliseringAmbitie2030", { percentage: pad(digitalisering, "ambitie-2030") }),
     el("techstackContactCenter", {
       leverancier: pad(techstack, "techstack-contact-center", "leverancier"),
-      ondersteuning: pad(techstack, "techstack-contact-center", "ondersteuning"),
+      ondersteuning: ondersteuningVan(pad(techstack, "techstack-contact-center")),
     }),
     el("techstackConversationalAi", {
       leverancier: pad(techstack, "techstack-conversational-ai", "leverancier"),
-      ondersteuning: pad(techstack, "techstack-conversational-ai", "ondersteuning"),
+      ondersteuning: ondersteuningVan(pad(techstack, "techstack-conversational-ai")),
     }),
     el("techstackCrm", {
       leverancier: pad(techstack, "techstack-crm", "leverancier"),
-      ondersteuning: pad(techstack, "techstack-crm", "ondersteuning"),
+      ondersteuning: ondersteuningVan(pad(techstack, "techstack-crm")),
     }),
     el("techstackKennismanagement", {
       leverancier: pad(techstack, "techstack-kennismanagement", "leverancier"),
-      ondersteuning: pad(techstack, "techstack-kennismanagement", "ondersteuning"),
+      ondersteuning: ondersteuningVan(pad(techstack, "techstack-kennismanagement")),
     }),
     el("techstackLlmOplossing", {
       leverancier: pad(techstack, "techstack-llm-oplossing", "leverancier"),
-      ondersteuning: pad(techstack, "techstack-llm-oplossing", "ondersteuning"),
-    }),
-    el("techstackItDeployment", {
-      leverancier: pad(techstack, "techstack-it-en-deployment", "leverancier"),
-      ondersteuning: pad(techstack, "techstack-it-en-deployment", "ondersteuning"),
+      // Geen "Ondersteund door" bij LLM-oplossing: Het attribuut blijft staan voor het sjabloon, maar is altijd "n.v.t.".
+      ondersteuning: undefined,
     }),
     el("techstackWfm", {
       leverancier: pad(techstack, "techstack-wfm", "leverancier"),
-      ondersteuning: pad(techstack, "techstack-wfm", "ondersteuning"),
+      ondersteuning: ondersteuningVan(pad(techstack, "techstack-wfm")),
     }),
     el("fteKlantcontactmedewerkers", {
       waarde: pad(fte, "fte-klantcontact", "aantal"),

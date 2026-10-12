@@ -12,22 +12,48 @@
   WFM (20)**
   (`data/organisatie-velden.ts`, `techstackOplossingen`) is een keuzelijst op alfabet met "Anders…" onderaan. Bij
   "Anders…" verschijnt een invoerveld (`Naam van de oplossing`) dat bij Enter of bij het verlaten van het veld wordt
-  bewaard. LLM-oplossing en IT en deployment blijven een vrij tekstveld. Een nieuwe lijst voor een categorie is
-  één regel in `techstackOplossingen`.
+  bewaard. Een nieuwe lijst voor een categorie is één regel in `techstackOplossingen`.
 - **Nieuw veldtype-vlag** `VeldDefinitie.eigenOptie` (`lib/types.ts`) en component `SelectMetEigenOptie` in
   `components/beheer/KenmerkenForm.tsx`. Elk `select`-veld kan er nu mee worden ingericht.
 - **Eigen invoer komt in de lijst** zonder aparte opslag (`lib/kenmerken-opties.ts`): De lijst is de vaste lijst plus
   alles wat organisaties op dat veld hebben ingevuld. Getrimd, zonder dubbelen op hoofdletters (de spelling van de
   vaste optie wint). Bestaande vrije tekst, bijvoorbeeld "Genesys" in de demo-organisatie, verschijnt zo vanzelf als
   keuze. Gevolg: Gebruikt geen enkele organisatie een eigen waarde meer, dan verdwijnt hij uit de lijst.
-- **"Ondersteund door"** bij Zelf / extern ondersteund: Per categorie een keuzelijst met 25 partijen (Sabio,
-  Coniche, Frontline, Accenture, KPN enz.) en "Anders…", alleen zichtbaar bij "extern". Nieuw veld
-  `ondersteuner` naast `leverancier` en `ondersteuning`, en een nieuwe vlag `VeldDefinitie.toonAlsBroer`
-  (`lib/types.ts`) die een veld alleen toont bij een waarde van een broer-veld en het wist als die waarde wijzigt.
-  Alleen voor Contact center, WFM, Conversational AI, CRM en Kennismanagement. De bovenste lijst in het aangeleverde
-  bericht stond onder de kop "CCO", die heb ik als Contact center gelezen. De waarden "zelf" en "extern" zijn niet
-  veranderd, dus bestaande data en de InDesign-export blijven kloppen. **Nog niet gedaan**: `ondersteuner` in de
-  InDesign-export (als extra attribuut). In de CSV zit het al, in de JSON-kolom met de kenmerken.
+- **"Ondersteund door" vervangt zelf/extern** bij Contact center, WFM, Conversational AI, CRM en Kennismanagement:
+  Eén keuzelijst per categorie met "Geen ondersteuning" (= zelf) als eerste keuze, daarna 25 partijen op alfabet
+  (Sabio, Coniche, Frontline, Accenture, KPN enz.) en "Anders…" onderaan. Eerst was dit een tweede veld bij "extern"
+  (`toonAlsBroer`), dat is na Sanders aanpassing weer verwijderd. Nieuw: `VeldDefinitie.voorop` (opties die bovenaan
+  blijven, niet alfabetisch) en `eigenOptiePlaceholder`, `lib/techstack.ts` (`GEEN_ONDERSTEUNING`,
+  `ondersteuningVan`, `migreerTechstackOndersteuning`). De bovenste lijst in het aangeleverde bericht stond onder de
+  kop "CCO", die heb ik als Contact center gelezen.
+- **Bestaande data**: Bij het laden wordt `ondersteuning: "zelf"` omgezet naar `ondersteuner: "Geen ondersteuning"`
+  (`lib/db/store.ts`, zonder aparte migratiestap). Een oude `extern` zonder bekende partij blijft staan tot er een
+  partij is gekozen. In de InDesign-export is `ondersteuning` nu afgeleid (`zelf` bij "Geen ondersteuning", `extern`
+  bij een partij), dus het sjabloon merkt niets. De partij zelf zit er **nog niet** in. In de CSV zit het veld al, in
+  de JSON-kolom met de kenmerken. Bij LLM-oplossing is dat veld later weggehaald, zie hierboven.
+- **Volgorde van de techstack-categorieën** (op verzoek van Sander): Contact center, WFM, CRM, Kennismanagement,
+  Conversational AI, LLM-oplossing (`techstackCategorieen`). Alleen het formulier: De volgorde van de elementen in de
+  InDesign-export is niet veranderd, het sjabloon koppelt op elementnaam.
+- **LLM-oplossing krijgt eigen velden**: "LLM (modelfamilie)" (16 opties, opgeslagen als `leverancier`) en
+  "LLM-toegangsroute" (7 opties, `toegangsroute`), beide keuzelijsten met "Anders…" in aangeleverde volgorde. Geen
+  "Ondersteund door", Deploymentmodel en Cloudleverancier meer bij LLM. Het oude veld zelf/extern is daar weg, dus de
+  InDesign-export zet `ondersteuning` bij `techstackLlmOplossing` altijd op "n.v.t." (een oude opgeslagen waarde
+  komt niet meer mee). Deploymentmodel en Cloudleverancier staan bij de andere vijf categorieën. De toegangsroute zit
+  nog niet in de InDesign-export. Alle zes categorieën hebben nu een keuzelijst voor de Oplossing.
+- **Categorie "IT en deployment" vervallen** (op verzoek van Sander): Er zijn nu zes techstack-categorieën. Deployment
+  en cloud staan als velden Deploymentmodel en Cloudleverancier bij elke categorie. Uit de InDesign-export is het
+  element `techstackItDeployment` gehaald (26 elementen, was 27). Een bestaand sjabloon dat dat element tagt, moet
+  de tag loslaten. Bestaande waarden onder `techstack-it-en-deployment` in opgeslagen organisaties worden niet
+  gewist: Ze staan nog in de data (en in de JSON-kolom van de CSV) maar niet meer in het formulier.
+- **CRM, ondersteunende partijen**: De BPO's Concentrix, Teleperformance en Yource zijn eruit en BusinessBase is
+  erbij, dus 23 partijen. De andere vier categorieën zijn niet aangepast. KPN, VodafoneZiggo Zakelijk en Odido
+  Business staan er nog in (telecomproviders, niet als BPO gerekend).
+- **Deploymentmodel (9 opties) en Cloudleverancier (20 opties)** bij elke techstack-categorie, op dezelfde regel
+  achter Oplossing en Ondersteund door (vier velden naast elkaar, elk 192px). Keuzelijsten met "Anders…", in de
+  aangeleverde volgorde (`voorop` met de hele lijst) en eigen invoer daarna op alfabet. Opgeslagen als
+  `deploymentmodel` en `cloudleverancier`. Nog niet in de InDesign-export.
+- **Demo-organisatie** (`data/demo-organisatie.ts`) gebruikt nu lijstwaarden (Genesys Cloud, Sabio, Seamly,
+  Salesforce Service Cloud).
 - **Waarde blijft een gewone tekst**, dus de InDesign-export (`techstackContactCenter leverancier`) en de CSV
   veranderen niet.
 - 5 nieuwe tests (110 in totaal): paden, verzamelen, alfabetische lijst, huidige waarde, spelling.

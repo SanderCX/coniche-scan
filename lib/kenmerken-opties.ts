@@ -28,12 +28,20 @@ export function gebruikteWaarden(organisaties: { kenmerken: Record<string, unkno
 }
 
 /**
- * De keuzelijst: de vaste opties en wat er verder is ingevuld, samen op alfabet (hoofdletterongevoelig). De huidige
- * waarde van deze organisatie staat er altijd in, ook als hij nergens anders voorkomt. "Anders…" is geen onderdeel van
- * de lijst: Dat staat in het formulier altijd onderaan.
+ * De keuzelijst: eerst de opties die vooraan horen (`voorop`, in de gegeven volgorde), daarna de vaste opties en wat er
+ * verder is ingevuld, samen op alfabet (hoofdletterongevoelig). De huidige waarde van deze organisatie staat er altijd
+ * in, ook als hij nergens anders voorkomt. "Anders…" is geen onderdeel van de lijst: Dat staat in het formulier altijd
+ * onderaan.
  */
-export function optieLijst(vast: string[], gebruikt: string[], huidige?: string): string[] {
+export function optieLijst(vast: string[], gebruikt: string[], huidige?: string, voorop: string[] = []): string[] {
   const sleutels = new Set<string>();
+  const kop: string[] = [];
+  for (const waarde of voorop) {
+    const schoon = waarde.trim();
+    if (!schoon || sleutels.has(schoon.toLowerCase())) continue;
+    sleutels.add(schoon.toLowerCase());
+    kop.push(schoon);
+  }
   const lijst: string[] = [];
   for (const waarde of [...vast, ...gebruikt, huidige ?? ""]) {
     const schoon = waarde.trim();
@@ -41,7 +49,8 @@ export function optieLijst(vast: string[], gebruikt: string[], huidige?: string)
     sleutels.add(schoon.toLowerCase());
     lijst.push(schoon);
   }
-  return lijst.sort((a, b) => a.localeCompare(b, "nl", { sensitivity: "base", numeric: true }));
+  lijst.sort((a, b) => a.localeCompare(b, "nl", { sensitivity: "base", numeric: true }));
+  return [...kop, ...lijst];
 }
 
 /** Een ingetypte waarde: Getrimd, en met de spelling van een bestaande optie als die er hoofdletterongevoelig mee overeenkomt. */

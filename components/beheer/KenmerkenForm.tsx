@@ -28,7 +28,7 @@ function SelectMetEigenOptie({
   const [andersOpen, setAndersOpen] = useState(false);
   const [concept, setConcept] = useState("");
   const huidige = typeof waarde === "string" ? waarde : "";
-  const lijst = optieLijst(veld.opties ?? [], gebruikteWaarden(organisaties, pad), huidige);
+  const lijst = optieLijst(veld.opties ?? [], gebruikteWaarden(organisaties, pad), huidige, veld.voorop);
 
   function bewaarConcept() {
     const gekozen = kiesSpelling(concept, lijst);
@@ -65,7 +65,7 @@ function SelectMetEigenOptie({
           type="text"
           autoFocus
           style={{ marginTop: "0.4rem" }}
-          placeholder="Naam van de oplossing"
+          placeholder={veld.eigenOptiePlaceholder ?? "Naam van de oplossing"}
           aria-label={`${veld.label}, anders`}
           value={concept}
           onChange={(e) => setConcept(e.target.value)}
@@ -112,10 +112,7 @@ function VeldInput({
       <fieldset className="veld-groep">
         <legend>{veld.label}</legend>
         <div className={opEenRegel ? "veld-rij" : undefined}>
-          {subvelden
-            // Een veld dat alleen bij een bepaalde waarde van een broer-veld hoort (`toonAlsBroer`), bijv. "Ondersteund door".
-            .filter((sub) => !sub.toonAlsBroer || obj[sub.toonAlsBroer.veld] === sub.toonAlsBroer.waarde)
-            .map((sub) => (
+          {subvelden.map((sub) => (
             <VeldInput
               key={sub.id}
               veld={sub}
@@ -130,10 +127,6 @@ function VeldInput({
                 // mogelijk niet meer geldig — wissen i.p.v. laten staan.
                 for (const afhankelijk of subvelden) {
                   if (afhankelijk.afhankelijkVan === sub.id) nieuw[afhankelijk.id] = undefined;
-                  // Idem voor een veld dat alleen bij een bepaalde waarde zichtbaar is: Anders blijft een verborgen waarde staan.
-                  if (afhankelijk.toonAlsBroer?.veld === sub.id && w !== afhankelijk.toonAlsBroer.waarde) {
-                    nieuw[afhankelijk.id] = undefined;
-                  }
                 }
                 onChange(nieuw);
               }}

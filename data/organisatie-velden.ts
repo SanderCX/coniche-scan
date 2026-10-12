@@ -1,4 +1,5 @@
 import { VeldDefinitie } from "@/lib/types";
+import { GEEN_ONDERSTEUNING } from "@/lib/techstack";
 
 const kanalen = ["Call", "Voicebot", "Livechat", "Chatbot", "E-mail", "Whatsapp"];
 
@@ -162,9 +163,8 @@ export const sbiSubsectorenPerSector: Record<string, string[]> = {
 };
 
 /**
- * Vaste keuzes voor de Oplossing per techstack-categorie. Een categorie in deze lijst krijgt een keuzelijst met
- * "Anders…" (`eigenOptie`), de andere categorieën houden een vrij tekstveld. De volgorde hier maakt niet uit: De app
- * toont de lijst op alfabet.
+ * Vaste keuzes voor de Oplossing per techstack-categorie (LLM-oplossing staat apart, zie `llmModelfamilies`). Keuzelijst
+ * met "Anders…" (`eigenOptie`). De volgorde hier maakt niet uit: De app toont de lijst op alfabet.
  */
 const techstackOplossingen: Record<string, string[]> = {
   "Contact center": [
@@ -264,9 +264,9 @@ const techstackOplossingen: Record<string, string[]> = {
 };
 
 /**
- * Partijen die een techstack-categorie extern ondersteunen, voor "Ondersteund door" (alleen zichtbaar als
- * `ondersteuning` = "extern"). Per categorie een eigen lijst, op alfabet getoond, met "Anders…" onderaan. Een
- * categorie zonder lijst hier (LLM-oplossing, IT en deployment) heeft alleen zelf/extern.
+ * Partijen die een techstack-categorie ondersteunen, voor de keuzelijst "Ondersteund door". Per categorie een eigen
+ * lijst, op alfabet getoond, met "Geen ondersteuning" (zelf) vooraan en "Anders…" onderaan. LLM-oplossing heeft geen
+ * "Ondersteund door" (zie `llmModelfamilies`).
  */
 const techstackOndersteuners: Record<string, string[]> = {
   "Contact center": [
@@ -288,7 +288,7 @@ const techstackOndersteuners: Record<string, string[]> = {
   CRM: [
     "Accenture", "Deloitte Digital", "Capgemini", "Coniche", "Frontline", "Cloudoe", "Bright Contact", "PwC",
     "Sopra Steria", "Avanade", "HSO", "Macaw", "ilionx", "Conclusion", "Plat4mation", "Devoteam",
-    "NTT Data Business Solutions", "Valtech", "Cegeka", "Concentrix", "Teleperformance", "Yource", "KPN",
+    "NTT Data Business Solutions", "Valtech", "BusinessBase", "Cegeka", "KPN",
     "VodafoneZiggo Zakelijk", "Odido Business",
   ],
   "Conversational AI": [
@@ -298,14 +298,89 @@ const techstackOndersteuners: Record<string, string[]> = {
   ],
 };
 
+/**
+ * Per techstack-categorie komen er twee keuzelijsten bij op dezelfde regel: Deploymentmodel en Cloudleverancier. Beide
+ * staan in de volgorde zoals aangeleverd (een logische volgorde, niet alfabetisch) via `voorop`. Eigen invoer ("Anders…")
+ * komt daarna, op alfabet.
+ */
+const deploymentmodellen = [
+  "Public Cloud (SaaS, multi-tenant)",
+  "Dedicated Cloud (single-tenant)",
+  "Private Cloud",
+  "Sovereign Cloud",
+  "Hosted bij provider",
+  "Hosted bij partner/integrator",
+  "On-premises",
+  "Hybride",
+  "Multicloud",
+];
+
+const cloudleveranciers = [
+  "Microsoft Azure",
+  "Amazon Web Services",
+  "Google Cloud",
+  "Oracle Cloud",
+  "IBM Cloud",
+  "Vendor eigen cloud",
+  "VMware",
+  "OpenStack",
+  "OVHcloud",
+  "STACKIT",
+  "Scaleway",
+  "IONOS",
+  "Leaseweb",
+  "Previder",
+  "Cyso",
+  "KPN",
+  "VodafoneZiggo",
+  "Odido",
+  "Rijkscloud / ODC",
+  "Eigen datacenter",
+];
+
+/**
+ * LLM-oplossing wijkt af van de andere categorieën: Geen "Ondersteund door", Deploymentmodel of Cloudleverancier, maar
+ * een modelfamilie (de Oplossing) en een toegangsroute. Beide staan in de aangeleverde volgorde (`voorop`).
+ */
+const llmModelfamilies = [
+  "OpenAI GPT",
+  "Anthropic Claude",
+  "Google Gemini",
+  "Meta Llama",
+  "Mistral",
+  "Cohere Command",
+  "xAI Grok",
+  "DeepSeek",
+  "Alibaba Qwen",
+  "Amazon Nova",
+  "Microsoft Phi",
+  "IBM Granite",
+  "NVIDIA Nemotron",
+  "GPT-NL",
+  "Vendor eigen model",
+  "Onbekend / niet openbaar",
+];
+
+const llmToegangsroutes = [
+  "Direct via modelleverancier (API)",
+  "Azure AI Foundry / Azure OpenAI",
+  "AWS Bedrock",
+  "Google Vertex AI",
+  "Ingebouwd in vendorplatform",
+  "Self-hosted (open-weight model)",
+  "EU-gehost / sovereign",
+];
+
+const LLM_CATEGORIE = "LLM-oplossing";
+
+/** De volgorde van het formulier: Contact center, WFM, CRM, Kennismanagement, Conversational AI, LLM-oplossing. */
 const techstackCategorieen = [
   "Contact center",
   "WFM",
-  "Conversational AI",
   "CRM",
   "Kennismanagement",
+  "Conversational AI",
   "LLM-oplossing",
-  "IT en deployment",
 ];
 
 export const organisatieVelden: VeldDefinitie[] = [
@@ -373,35 +448,64 @@ export const organisatieVelden: VeldDefinitie[] = [
       id: `techstack-${categorie.toLowerCase().replace(/\s+/g, "-")}`,
       label: categorie,
       type: "groep" as const,
-      subvelden: [
-        techstackOplossingen[categorie]
-          ? {
-              id: "leverancier",
-              label: "Oplossing",
-              type: "select" as const,
-              opties: techstackOplossingen[categorie],
-              eigenOptie: true,
-            }
-          : { id: "leverancier", label: "Oplossing", type: "tekst" as const },
-        {
-          id: "ondersteuning",
-          label: "Zelf / extern ondersteund",
-          type: "select" as const,
-          opties: ["zelf", "extern"],
-        },
-        ...(techstackOndersteuners[categorie]
+      subvelden:
+        categorie === LLM_CATEGORIE
           ? [
+              {
+                id: "leverancier",
+                label: "LLM (modelfamilie)",
+                type: "select" as const,
+                opties: [],
+                voorop: llmModelfamilies,
+                eigenOptie: true,
+                eigenOptiePlaceholder: "Naam van de modelfamilie",
+              },
+              {
+                id: "toegangsroute",
+                label: "LLM-toegangsroute",
+                type: "select" as const,
+                opties: [],
+                voorop: llmToegangsroutes,
+                eigenOptie: true,
+                eigenOptiePlaceholder: "Naam van de toegangsroute",
+              },
+            ]
+          : [
+              {
+                id: "leverancier",
+                label: "Oplossing",
+                type: "select" as const,
+                opties: techstackOplossingen[categorie],
+                eigenOptie: true,
+              },
               {
                 id: "ondersteuner",
                 label: "Ondersteund door",
                 type: "select" as const,
                 opties: techstackOndersteuners[categorie],
+                voorop: [GEEN_ONDERSTEUNING],
                 eigenOptie: true,
-                toonAlsBroer: { veld: "ondersteuning", waarde: "extern" },
+                eigenOptiePlaceholder: "Naam van de partij",
               },
-            ]
-          : []),
-      ],
+              {
+                id: "deploymentmodel",
+                label: "Deploymentmodel",
+                type: "select" as const,
+                opties: [],
+                voorop: deploymentmodellen,
+                eigenOptie: true,
+                eigenOptiePlaceholder: "Naam van het deploymentmodel",
+              },
+              {
+                id: "cloudleverancier",
+                label: "Cloudleverancier",
+                type: "select" as const,
+                opties: [],
+                voorop: cloudleveranciers,
+                eigenOptie: true,
+                eigenOptiePlaceholder: "Naam van de cloudleverancier",
+              },
+            ],
     })),
   },
   {
@@ -448,3 +552,8 @@ export const organisatieVelden: VeldDefinitie[] = [
     ],
   },
 ];
+
+/** Id's van de techstack-categorieën met een lijst "Ondersteund door" (voor het omzetten van het oude veld `ondersteuning`). */
+export const techstackCategorieIdsMetLijst: string[] = Object.keys(techstackOndersteuners).map(
+  (categorie) => `techstack-${categorie.toLowerCase().replace(/\s+/g, "-")}`
+);

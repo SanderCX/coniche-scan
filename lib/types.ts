@@ -68,10 +68,13 @@ export interface VeldDefinitie {
    */
   eigenOptie?: boolean;
   /**
-   * Alleen tonen als een broer-veld in dezelfde groep deze waarde heeft (bijv. "Ondersteund door" alleen bij
-   * `ondersteuning` = "extern"). Wijzigt dat broer-veld, dan wordt dit veld gewist.
+   * Alleen voor type "select" met `eigenOptie`: Opties die altijd bovenaan staan, in deze volgorde en niet
+   * alfabetisch (bijv. "Geen ondersteuning" voor de partijen). Ze staan niet in `opties`. Staat hier de hele lijst in,
+   * dan blijft de aangeleverde volgorde en komt eigen invoer daarna op alfabet (bijv. Deploymentmodel).
    */
-  toonAlsBroer?: { veld: string; waarde: string };
+  voorop?: string[];
+  /** Alleen voor type "select" met `eigenOptie`: De hint in het invoerveld bij "Anders…" (standaard "Naam van de oplossing"). */
+  eigenOptiePlaceholder?: string;
   /**
    * Alleen voor type "select-afhankelijk": id van het broer-veld binnen
    * dezelfde groep waarvan de gekozen waarde bepaalt welke opties hier
@@ -88,7 +91,15 @@ export interface VeldDefinitie {
 export interface TechstackItem {
   categorie: string;
   leverancier: string;
-  ondersteuning: "zelf" | "extern";
+  /** Verouderd: Zelf/extern uit de tijd vóór "Ondersteund door". Niet meer in het formulier, alleen gelezen voor oude data. */
+  ondersteuning?: "zelf" | "extern";
+  /** "Ondersteund door": "Geen ondersteuning" of een partij. Gaat voor op `ondersteuning`. */
+  ondersteuner?: string;
+  /** Keuzelijsten op dezelfde regel, `data/organisatie-velden.ts`. */
+  deploymentmodel?: string;
+  cloudleverancier?: string;
+  /** Alleen bij LLM-oplossing: Hoe het model wordt aangeboden (`leverancier` is dan de modelfamilie). */
+  toegangsroute?: string;
 }
 
 export interface FeatureCard {

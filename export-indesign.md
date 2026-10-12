@@ -109,7 +109,6 @@ Geen nieuwe contentbron: Dezelfde velden als de PDF-export
       <techstackCrm leverancier="Microsoft Dynamics 365" ondersteuning="zelf" />
       <techstackKennismanagement leverancier="onderdeel van CRM/MS" ondersteuning="zelf" />
       <techstackLlmOplossing leverancier="n.v.t." ondersteuning="n.v.t." />
-      <techstackItDeployment leverancier="Microsoft" ondersteuning="zelf" />
       <techstackWfm leverancier="Injixo" ondersteuning="extern" />
       <fteKlantcontactmedewerkers waarde="..." inhousePercentage="..." bpoPercentage="..." />
       <fteKlantcontactManagementSupport waarde="..." />
@@ -185,8 +184,21 @@ beheerbaar worden (`beheerpagina.md`, "Nog te bouwen") en de
 lijst dus kan wijzigen, moeten deze elementnamen en het sjabloon
 gelijk opgaan. Geen nieuw risico t.o.v. de rest van deze spec (zie
 "Eigenaarschap van de tagnamen" onderaan), maar hier weegt het zwaarder
-mee: Deze 27 elementen zijn de plek waar een toekomstige wijziging in
+mee: Deze 26 elementen zijn de plek waar een toekomstige wijziging in
 organisatievelden het eerst merkbaar wordt.
+
+**`ondersteuning` bij de techstack-elementen is afgeleid.** Bij Contact center,
+WFM, Conversational AI, CRM en Kennismanagement kiest de gebruiker "Ondersteund
+door" (`datamodel.md`, Techstack): "Geen ondersteuning" wordt `zelf`, een partij
+wordt `extern`. Bij LLM-oplossing bestaat Ondersteund door niet, dus `ondersteuning`
+is daar altijd "n.v.t.". De gekozen partij en de LLM-toegangsroute zitten er nog
+niet in, omdat dat het contract met het sjabloon verandert. Zie
+`content-techstack.md`.
+
+**Categorie "IT en deployment" vervallen.** Het element `techstackItDeployment`
+is uit de export gehaald: Deployment en cloudleverancier staan nu per categorie
+in de organisatievelden (`datamodel.md`, Techstack). Een bestaand sjabloon dat
+dit element tagt, moet die tag loslaten.
 
 **`top3Sterktes`/`top3Verbeterkansen` als SVG, geen tekstelementen**
 (toelichting): Elke lijst is één afbeelding (rangnummer, naam, score-badge in de

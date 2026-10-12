@@ -31,6 +31,16 @@ describe("kenmerken-opties", () => {
     expect(optieLijst(["Odigo"], [], "Eigen platform")).toEqual(["Eigen platform", "Odigo"]);
   });
 
+  it("zet de voorop-opties eerst, in hun eigen volgorde, en de rest op alfabet", () => {
+    const lijst = optieLijst(["Sabio", "Accenture"], ["Zeta"], undefined, ["Geen ondersteuning"]);
+    expect(lijst).toEqual(["Geen ondersteuning", "Accenture", "Sabio", "Zeta"]);
+  });
+
+  it("zet een voorop-optie niet nog eens in de lijst, ook niet bij een andere schrijfwijze", () => {
+    const lijst = optieLijst(["Sabio"], ["geen ondersteuning"], "GEEN ONDERSTEUNING", ["Geen ondersteuning"]);
+    expect(lijst).toEqual(["Geen ondersteuning", "Sabio"]);
+  });
+
   it("kiest bij een ingetypte waarde de spelling van een bestaande optie", () => {
     const lijst = ["Genesys Cloud", "Odigo"];
     expect(kiesSpelling("  genesys cloud ", lijst)).toBe("Genesys Cloud");
