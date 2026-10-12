@@ -575,7 +575,15 @@ datakoppelingen.
   binnen de kaart in een eigen laatste kolom, rechts uitgelijnd en verticaal
   gecentreerd, dus op elke kaart op dezelfde plek (`stylesheet.md`, Knop in
   een lijstrij). Het Info-icoon staat direct rechts van de knop (`stylesheet.md`,
-  Info-icoon). Onder de knop staat geen tekst.
+  Info-icoon). Onder de knop staat geen tekst. De plek van het icoon is op
+  elke kaart gereserveerd, ook als er geen icoon staat: Een vaste kolom van
+  `1.25rem` (de breedte van het icoon) met `0.5rem` ruimte ervoor, dus de knop
+  eindigt op elke kaart op dezelfde afstand van de rechterrand. Zonder die
+  vaste kolom staat een actieve knop verder naar rechts dan een
+  uitgeschakelde, omdat alleen de laatste het icoon naast zich heeft. Alle
+  knoppen zijn even breed en even hoog (`.btn-outline .btn-compact`, ook als
+  ze uitgeschakeld zijn; de uitgeschakelde staat verandert alleen kleur en
+  cursor, niet de maat).
 - **Uitgeschakeld**: Zolang er Metingen zijn, is de knop uitgeschakeld, met
   een Info-icoon (`info.assessmentVerwijderen`) dat de reden geeft. De tekst
   begint met een zin die de app zelf maakt en die de Admin niet kan
