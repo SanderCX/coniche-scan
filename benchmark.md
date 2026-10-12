@@ -18,7 +18,7 @@ Scores worden berekend en nooit opgeslagen (`datamodel.md`, Scoreberekening). Da
 
 ## Plek in beheer
 
-**Gebouwd.** Een hoofdlink "Benchmark" in `.nav-right` voor een Admin, naast Applicatie, Assessments en Organisaties. Een benchmark hoort bij een groep en dus niet onder één organisatie. Ook de niveaus 2 en 3 komen hier te staan, zodat alle vergelijkingen op één plek zitten. Bij het aanmaken kiest de Admin eerst het niveau.
+**Gebouwd.** Een hoofdlink "Benchmark" in `.nav-right` voor een Admin, naast Assessments en Organisaties. Een benchmark hoort bij een groep en dus niet onder één organisatie. Ook de niveaus 2 en 3 komen hier te staan, zodat alle vergelijkingen op één plek zitten. Bij het aanmaken kiest de Admin eerst het niveau.
 
 **Besloten.** Vooralsnog kan alleen een Admin erbij. Er is een eigen permissie `benchmark.beheren`, alleen voor Admin, zodat een Consultant er later bij kan zonder dat de rechtenmatrix om moet. De schermen staan in `beheerpagina.md`, punt 14.
 
@@ -99,13 +99,13 @@ De view toont nooit de namen van andere organisaties. De Admin bekijkt de view e
 - Geen automatische toegang. De Lead krijgt de view alleen als een Admin die toewijst, per benchmark en per organisatie.
 - Een Lead voor de hele organisatie (zie Bereik van een Lead). De view gaat over de Meting van de organisatie die als lid in de benchmark zit. Van de Lead zelf speelt niets mee: Niet zijn eigen scan en niet de Metingen waarop hij Lead is. Eerder moest de Lead de lid-Meting zelf kunnen inzien (`leadMetingIds`). Dat veroorzaakte vergelijkingen met scores die niet van de Lead waren, en is vervangen door het organisatiebereik (voorstel, nog niet gebouwd).
 - Een sectie alleen als het Assessment aan de drempel voldoet. Toewijzen kan pas als minstens één Assessment aan de drempel voldoet. De Lead ziet alleen de secties die eraan voldoen.
-- Wijzigt de samenstelling zodat de organisatie niet meer meedoet, of verdwijnt de Lead-respondent, dan vervalt de toewijzing.
+- Wijzigt de samenstelling zodat de organisatie niet meer meedoet, of verdwijnt de Lead-respondent, of verliest de Lead zijn bereik, dan vervalt de toewijzing.
 
 **Rechten.** In de rechtenmatrix staat `benchmark.inzien` voor de Lead, met het bereik "toegewezen benchmarkviews" (`datamodel.md` deel 2). Het prototype kent dit recht nog niet als aparte regel in `lib/rechten.ts`. Daar loopt de toegang van de Lead via de toewijzing en `leadMetingIds`, zoals `export.uitvoeren` ook nog niet in de code staat. Het recht in de matrix is het doel voor de rolrechten die met de database komen.
 
 ### Drempels
 
-**Gebouwd.** Twee instellingen, door een Admin aan te passen (Applicatie, Instellingen).
+**Gebouwd.** Twee instellingen, door een Admin aan te passen (Instellingen, Drempels en termijnen).
 
 - `benchmarkMinOrganisaties` (startwaarde 5). Minimale groepsgrootte per Assessment, inclusief de organisatie van de view. Bij 5 ziet een Lead het gemiddelde van minstens 4 anderen. De drempel is een afweging op privacy. Bij minder anderen kan een deelnemer uit het groepsgemiddelde en zijn eigen score vrij precies afleiden wat de rest scoort. De Admin ziet de benchmark altijd, ook onder de drempel.
 - `benchmarkMinScans` (startwaarde 3). Minimaal aantal afgeronde scans in een Meting om gekozen te mogen worden. Dit gaat over betrouwbaarheid, omdat een score uit één of twee scans te weinig zegt, zeker met gelijk gewicht per lid.
@@ -156,7 +156,8 @@ Het privacy statement belooft een minimale groepsgrootte. Die belofte moet overe
 - **Lead voor een of meer Metingen.** Kan voor elke Meting M waarop hij Lead is de view van M tegenover de overige Metingen van de organisatie krijgen (niveau 2), en de views binnen M (niveau 3). Niveau 1 krijgt hij niet, want die gaat over de organisatie als geheel.
 - **Niveau 3 en individuele scores.** Een view binnen M gaat over de scan van één Respondent, die de Admin bij het toewijzen kiest. De Lead hoeft die Respondent niet zelf te zijn. De toewijzing geeft de Lead toegang tot de individuele scores van die ene Respondent in M. Dat geldt alleen voor deze view, niet voor de scans van de andere Respondenten.
 - **Geen scan nodig.** Een Lead kan een view krijgen zonder zelf een scan te hebben.
-- **Bestaande toewijzingen.** Een toewijzing van niveau 1 aan een Lead zonder organisatiebereik blijft in de lijst staan, met de melding "Deze Lead heeft geen bereik op deze organisatie". De Lead ziet dan niets. De Admin past het bereik aan of trekt de toewijzing in.
+- **Bereik verliezen.** Verliest een Lead zijn bereik op het onderwerp van een view, dan vervalt de toewijzing, op elk niveau.
+- **Bestaande toewijzingen.** Dit is een overgangsregel. Een toewijzing van niveau 1 die al bestond toen het bereik werd ingevoerd, aan een Lead zonder organisatiebereik, blijft eenmalig in de lijst staan, met de melding "Deze Lead heeft geen bereik op deze organisatie". De Lead ziet dan niets. De Admin past het bereik aan of trekt de toewijzing in.
 
 ## Toewijzen aan een Lead op alle niveaus
 
@@ -180,7 +181,7 @@ Het privacy statement belooft een minimale groepsgrootte. Die belofte moet overe
 
 - Een lijst van de Leads aan wie de view is toegewezen, met de datum, het bereik van de Lead ("Hele organisatie" of "Meting {label}") en twee knoppen: "Bekijk" en "Intrekken".
 - "Bekijk" opent het Respondent-overzicht (modal) van die Lead (`beheerpagina.md`, punt 6b), over de benchmarkpagina heen. De Admin ziet daarin het blok Toegang en de Metingen waarop de Lead Lead is, en kan er de persoonlijke link kopiëren. Sluiten brengt de Admin terug op de view. Op niveau 1 is de knop "Bekijk" nog niet gebouwd.
-- Onder de lijst een keuzelijst met de Leads die in aanmerking komen (zie Bereik van een Lead) en de view nog niet hebben, met de knop "Toewijzen". Zijn er geen Leads meer, dan staat er "Alle Leads hebben deze view al". Heeft het onderwerp geen Lead met passend bereik, dan staat er "Geen Lead met bereik op {organisatie of Meting}" en de knop is uitgeschakeld (`info.benchmarkToewijzen`). Daarnaast staat een knop "+ Lead toevoegen" (`.btn-or .btn-compact`) die het formulier uit `beheerpagina.md`, punt 6a opent, met het bereik al voorgekozen.
+- Onder de lijst een keuzelijst met de Leads die in aanmerking komen (zie Bereik van een Lead) en de view nog niet hebben, met de knop "Toewijzen". Zijn er geen Leads meer, dan staat er "Alle Leads hebben deze view al". Heeft het onderwerp geen Lead met passend bereik, dan staat er "Geen Lead met bereik op {organisatie of Meting}" en de knop is uitgeschakeld (`info.benchmarkToewijzen`). Daarnaast staat een knop "+ Lead toevoegen" (`.btn-or .btn-compact`) die het formulier uit `beheerpagina.md`, punt 6a opent, met het bereik al voorgekozen: Op niveau 1 "Hele organisatie", op niveau 2 en 3 "Specifieke Metingen" met de Meting van de view aangevinkt. De Admin kan het bereik nog aanpassen, maar een Lead die de Meting of organisatie van de view niet dekt, kan de view niet krijgen. Het formulier opent als modal boven de benchmarkpagina, met de organisatie al ingevuld. Na opslaan sluit de modal en staat de nieuwe Lead geselecteerd in de keuzelijst, klaar voor "Toewijzen". Annuleren verandert niets.
 
 **Verwijderen en intrekken.** Een toewijzing vervalt als de Meting wordt verwijderd, als de Respondent van de view of de Lead wordt verwijderd, als de scan wordt verwijderd, of als de Lead de Lead-rol op de Meting verliest. Een organisatie of Meting die uit de benchmark valt, haalt haar toewijzingen weg (`datamodel.md`, Verwijderen en datakoppelingen).
 

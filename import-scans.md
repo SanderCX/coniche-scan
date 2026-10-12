@@ -184,7 +184,11 @@ De Respondent komt uit de gegevens in het bestand. Dat is meestal de
 Coniche-medewerker die de scan destijds namens de organisatie invulde. Er
 is geen aparte neutrale Respondent. De beheerder kan de Respondent na de
 import bewerken, bijvoorbeeld naar de echte klantcontactpersoon
-(`beheerpagina.md`, punt 6b, "Respondent bewerken").
+(`beheerpagina.md`, punt 6b, "Respondent bewerken"). Een Respondent die de
+import aanmaakt, is nooit Lead (`datamodel.md`, Verplaatsen, samenvoegen en
+importeren). `respondent_role` komt ongewijzigd binnen als `functie`, ook als de
+waarde niet in de keuzelijst staat (`content-respondentrol.md`). Zo'n waarde
+wordt vanzelf een extra keuze zolang een Respondent hem heeft.
 
 | Kolom in het bestand | Veld op `Respondent` |
 |---|---|

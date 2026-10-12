@@ -77,7 +77,7 @@ een scan geaggregeerd en anoniem in een benchmark worden gebruikt
   van individuele respondenten verlaten hun organisatie niet.
 - Een organisatie wordt nooit met naam getoond aan een andere organisatie.
 - Een Lead ziet een vergelijking met anderen alleen bij een minimale
-  groepsgrootte (`benchmarkMinOrganisaties`, `beheerpagina.md`, punt 10).
+  groepsgrootte (`benchmarkMinOrganisaties`, `beheerpagina.md`, punt 10, Drempels en termijnen).
   Deze sectie noemt dezelfde waarde.
 - Een organisatie doet alleen mee nadat een Admin dat heeft vastgelegd
   (`Organisatie.benchmarkToegestaan`, `datamodel.md` deel 3).

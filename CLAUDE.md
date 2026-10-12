@@ -189,8 +189,8 @@ De nav heeft een vast deel links (logo) en een contextueel deel rechts
    "Naar resultaten →" op de doorloopflow zodra de scan afgerond is,
    "← Terug naar de scan" samen met "Exporteren" op de resultatenpagina,
    geen scheidingslijn tussen die twee onderling, in beheer:
-   "Applicatie", "Assessments", "Organisaties" en "Benchmark" voor een Admin, alleen
-   "Organisaties" voor een Consultant, zie `beheerpagina.md`, Wat
+   "Assessments", "Organisaties" en "Benchmark" voor een Admin, alleen
+   "Organisaties" voor een Consultant; "Instellingen" staat in het Accountmenu, zie `beheerpagina.md`, Wat
    beheerbaar is). Geen
    apart concept meer voor een terug- versus een vooruit-actie binnen
    hetzelfde scherm: Beide staan hier, uiterst links, ongeacht de

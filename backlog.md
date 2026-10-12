@@ -234,9 +234,48 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   Metingen die later worden aangemaakt"; in `lib/benchmark.ts` het filter
   `viewsVoorLead` vervangen door een controle op bereik; de keuzelijst bij het
   toewijzen beperken tot Leads met bereik, met "+ Lead toevoegen"; bestaande
-  toewijzingen zonder bereik laten staan met de melding "Deze Lead heeft geen
-  bereik op deze organisatie". Optioneel: een blok "Leads" op organisatie-detail
+  toewijzingen zonder bereik eenmalig laten staan met de melding "Deze Lead
+  heeft geen bereik op deze organisatie", nieuwe laten vervallen; "Lead" is
+  `leadVoorOrganisatie` of minstens één Meting (badge, lijsten, filters,
+  integriteitscontrole); `leadMetingIds` en `leadVoorOrganisatie` leegmaken op
+  alle plekken in `lib/db/verplaatsen.ts` (vier) en bij samenvoegen; het
+  voorgekozen bereik in "+ Lead toevoegen" (modal). Optioneel: Een blok "Leads" op organisatie-detail
   en Meting-overzicht.
+- **Andere Respondent koppelen vanuit het Scan-overzicht (voorstel)**: Een
+  naamwijziging via "Respondent bewerken" geldt voor alle scans van de
+  Respondent. Nodig: De vaste regel "Deze wijziging geldt voor alle {n} scans"
+  in dat formulier, en de actie "Andere Respondent koppelen" in het
+  Scan-overzicht (hergebruik het blok uit "Conflict oplossen") voor een
+  wijziging bij één scan (`beheerpagina.md`, punt 7).
+- **Rol / functie als keuzelijst (besloten)**: In de intake, in "Mijn gegevens"
+  en in "Respondent bewerken" (en dus ook in "Nieuwe Respondent" en "Andere
+  Respondent koppelen") een keuzelijst met de 29 waarden uit
+  `content-respondentrol.md` en "Anders…" met een invoerveld. De waarde blijft
+  gewone tekst in `Respondent.functie`. Eigen invoer komt in de lijst zolang
+  iemand hem gebruikt, zoals bij Techstack (`lib/kenmerken-opties.ts`).
+- **Toelichting-veld in het contentbeheer werkt niet bij de bestaande
+  Assessments**: Bij Klantcontact, AI en Zorg gebruikt de toelichting een losse
+  lookup-tabel (`data/bouwstenen-content.ts`, `data/ai-domeinen-content.ts`) en
+  niet het veld `Bouwblok.toelichting`. Alleen bij een zelf aangemaakt bouwblok
+  heeft het veld effect. Open: Het scherm laten waarschuwen als het veld wordt
+  genegeerd, of de lookup-tabellen vervangen door het veld.
+- **Instellingen in het Accountmenu (voorstel)**: De hoofdlink "Applicatie" vervalt
+  en wordt de rij "Instellingen" in het Accountmenu, alleen voor een Admin
+  (`beheerpagina.md`, Accountmenu en Instellingen). Te bouwen: De rij met
+  scheidingslijn boven "Uitloggen"; de pagina met tabbalk (Gebruikers, Drempels
+  en termijnen, Algemene teksten, Content-pagina's, Audit-log,
+  Data-integriteit); het onderdeel dat nu Instellingen heet hernoemen naar
+  Drempels en termijnen; de route en de kruimelpaden; de plekken in
+  `data/info-teksten.ts` ("Applicatie, Instellingen" wordt "Instellingen,
+  Drempels en termijnen"). De actieve staat van de Accountmenu-knop
+  staat in `stylesheet.md`, Dropdown-knop.
+- **Mijn account in het Accountmenu (voorstel)**: Een Admin of Consultant wijzigt
+  zijn eigen naam en wachtwoord (`beheerpagina.md`, Accountmenu). Het
+  e-mailadres is alleen-lezen. Te bouwen: De rij en de modal, het recht
+  `account.bewerken` (bereik `zelf`) en `gebruiker.eigenGegevensGewijzigd`. De
+  naam kan nu al, het wachtwoord komt met de echte inlog (Fase 2). Besloten: Een
+  Admin kan het e-mailadres van een gebruiker wel wijzigen, via Instellingen,
+  Gebruikers (punt 9), maar een gebruiker zelf niet.
 
 ### Fase 2: Database en rollen en rechten
 
@@ -320,12 +359,14 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   bevestiging dat het niet ongedaan kan worden gemaakt.
 - **Organisatievelden** (`beheerpagina.md`, punt 3): De tab bestaat nog
   niet. `VeldDefinitieEditor` staat klaar en moet in een pagina onder
-  Applicatie of bij Organisaties worden gebruikt, zoals de spec vraagt.
+  Instellingen of bij Organisaties worden gebruikt, zoals de spec vraagt.
 - **Losse bestanden in de repo opruimen**: `v1-aanpassingen.md`,
-  `datamodel-rbac-voorstel.md`, `coniche_bouwstenen.md` en
-  `OverlegMetJoost.md` mogen weg (Joost akkoord, 8 oktober). Sander
-  verwijdert ze via een PR. De open vragen die alleen daarin staan, zijn
-  hieronder vastgelegd, onder "Open vragen uit de losse bestanden".
+  `datamodel-rbac-voorstel.md` en `OverlegMetJoost.md` zijn verwijderd
+  (12 oktober), voor zover relevant verwerkt in de andere specs.
+  `coniche_bouwstenen.md` mag ook weg (Joost akkoord, 8 oktober) en staat
+  nog in de repo. De open vragen die alleen in de verwijderde bestanden
+  stonden, zijn hieronder vastgelegd, onder "Open vragen uit de losse
+  bestanden".
 - **Content-pagina's** (`beheerpagina.md`, punt 11): Beheerbaar maken is
   gespecificeerd en de spec is leidend. Sander twijfelt nog over de beste
   uitvoering. Pas als een nieuw overleg-document in de map staat, wordt er
@@ -365,6 +406,25 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
 - **Zorgscan-inhoud**: 29 van de 60 vragen zijn nog gelijk aan de
   Klantcontact-scan, dus niet sector-vertaald. Inhoudelijke input van Joost en
   Sander nodig (`content-zorgscan.md`).
+
+**Te bespreken met Joost: Rol / functie en Techstack** (12 oktober 2026)
+
+De volledige punten staan onderaan `content-respondentrol.md` (punt 4) en
+`content-techstack.md` (punt 6). Wat de bouw het meest raakt:
+
+- **Rol / functie, verplicht of optioneel**: Het veld is nu verplicht in de intake,
+  terwijl `privacy-pagina.md` de intakegegevens optioneel noemt. Dat moet gelijk
+  zijn, ook bij een keuzelijst.
+- **Rol / functie, "Anders…"**: De keuzelijst houdt het vrije veld open. Wil
+  Coniche een analyse per rol, dan moet "Anders…" er niet in.
+- **Rol / functie, één lijst of per Assessment**: De lijst is klantcontactgericht
+  en geldt nu voor alle Assessments, ook de Zorgscan.
+- **Techstack, namen van partijen**: "Deloitte" en "Deloitte Digital", "NTT Data"
+  en "NTT Data Business Solutions" staan als verschillende partijen in de lijsten.
+- **Techstack, `ondersteuner` en `toegangsroute` in de InDesign-export**: Dat
+  verandert het contract met het sjabloon.
+- **Techstack-lijsten beheerbaar maken**: Nu staan ze in de code
+  (`beheerpagina.md`, punt 3).
 
 **Te bespreken met Joost: Look & feel** (9 oktober 2026)
 

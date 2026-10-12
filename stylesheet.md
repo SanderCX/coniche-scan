@@ -392,6 +392,24 @@ dus `var(--or)` in een outline-knop en `var(--ink-m)` in een select. Het
 pijltje staat `.5rem` achter de tekst. De rechter padding van de knop is
 even groot als de linker.
 
+**Accountmenu in beheer.** Het Accountmenu (`beheerpagina.md`, Accountmenu)
+is een Dropdown-knop als `.btn-outline .btn-compact` met het e-mailadres als
+label, uiterst rechts in `.nav-right`. Omdat de knop aan de rechterrand
+staat, is het menu rechts uitgelijnd met de knop en niet links, anders loopt
+het buiten het scherm.
+
+- **Eerste rij** (e-mailadres en rol): Niet klikbaar, `var(--ink-s)`,
+  `--fs-s`, zonder hover.
+- **Scheidingslijn** boven "Uitloggen": `1px solid var(--border)`, met
+  `.25rem` ruimte boven en onder.
+- **Actieve staat**: Zolang een pagina onder Instellingen open is, heeft de
+  knop een achtergrond `var(--or-faint)`, met rand en tekst ongewijzigd in
+  `var(--or)`. De rij "Instellingen" in het menu heeft dan dezelfde
+  achtergrond, tekst `var(--or)` en gewicht 700, met `aria-current="page"`.
+  Zonder actieve pagina is de knop zoals elke `.btn-outline`.
+- **Mijn account**: De rij opent een modal (`Modal`, zoals "Mijn gegevens"). De
+  rij zelf heeft geen actieve staat.
+
 ### Badges
 
 - `.hero-tag`: Kop-label. Gevuld `var(--or)`, witte tekst, hoofdletters,
@@ -651,7 +669,7 @@ een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
   beheerpagina's (`max-width: 1300px`). Tabtekst `.85rem`, gewicht 600,
   `var(--ink-m)`. De actieve tab is `var(--ink)` met een onderstreep van
   `3px solid var(--or)`. Alleen zichtbaar op de lijstpagina's van
-  Organisaties, niet op een detailpagina (`beheerpagina.md`, Navigatie in
+  Organisaties en op de pagina's onder Instellingen, niet op een detailpagina (`beheerpagina.md`, Navigatie in
   beheer).
 - **Kruimelpad** (`.kruimelpad`): Boven de paginatitel, `.85rem`,
   `var(--ink-s)`, gescheiden door een `›` in `var(--border-d)`. Elk deel is
