@@ -575,7 +575,15 @@ datakoppelingen.
   binnen de kaart in een eigen laatste kolom, rechts uitgelijnd en verticaal
   gecentreerd, dus op elke kaart op dezelfde plek (`stylesheet.md`, Knop in
   een lijstrij). Het Info-icoon staat direct rechts van de knop (`stylesheet.md`,
-  Info-icoon). Onder de knop staat geen tekst.
+  Info-icoon). Onder de knop staat geen tekst. De plek van het icoon is op
+  elke kaart gereserveerd, ook als er geen icoon staat: Een vaste kolom van
+  `1.25rem` (de breedte van het icoon) met `0.5rem` ruimte ervoor, dus de knop
+  eindigt op elke kaart op dezelfde afstand van de rechterrand. Zonder die
+  vaste kolom staat een actieve knop verder naar rechts dan een
+  uitgeschakelde, omdat alleen de laatste het icoon naast zich heeft. Alle
+  knoppen zijn even breed en even hoog (`.btn-outline .btn-compact`, ook als
+  ze uitgeschakeld zijn; de uitgeschakelde staat verandert alleen kleur en
+  cursor, niet de maat).
 - **Uitgeschakeld**: Zolang er Metingen zijn, is de knop uitgeschakeld, met
   een Info-icoon (`info.assessmentVerwijderen`) dat de reden geeft. De tekst
   begint met een zin die de app zelf maakt en die de Admin niet kan
@@ -828,10 +836,13 @@ Lead-worden (identiteit en toegang) en een vragenlijst krijgen
 (uitgenodigd worden voor een Meting) zijn twee losse acties, geen
 automatisme. Een Lead-rol is een `RespondentRol` op een `Respondent`
 (`datamodel.md` deel 2); die respondent hoeft geen enkele
-`ScanInvulling` te hebben. Een Lead ziet **niet automatisch alle
-Metingen van de organisatie**: Welke Metingen hij mag zien, wordt per
-Meting toegekend (`RespondentRolMeting`, `datamodel.md` deel 2), met
-minstens 1 verplicht.
+`ScanInvulling` te hebben. Een Lead heeft een bereik: **Specifieke
+Metingen** (standaard) of de **hele organisatie** (`datamodel.md` deel 2,
+Het bereik van een Lead). Bij specifieke Metingen ziet hij niet automatisch
+alle Metingen van de organisatie. Welke hij mag zien, wordt per Meting
+toegekend (`RespondentRolMeting`), met minstens 1 verplicht. Het bereik
+bepaalt ook welke benchmarkviews hij kan krijgen (`benchmark.md`, Bereik van
+een Lead).
 
 - **Lead toevoegen** (nieuwe actie op organisatieniveau, niet per
   Meting): Een oranje knop "+ Lead toevoegen" (`.btn-or .btn-compact`,
@@ -841,8 +852,9 @@ minstens 1 verplicht.
   met Respondenten, links uitgelijnd. Pas na een klik op de knop klapt
   het formulier eronder open: Naam +
   e-mailadres invoeren, plus een **verplichte keuze
-  van 1 of meer Metingen** van deze organisatie waar de Lead toegang
-  toe krijgt. Maakt een `Respondent` met Lead-rol aan, met meteen een
+  van het bereik**: Specifieke Metingen (1 of meer Metingen van deze
+  organisatie) of de hele organisatie. Dezelfde keuze als bij "Lead-toegang
+  beheren" hieronder. Maakt een `Respondent` met Lead-rol aan, met meteen een
   werkende persoonlijke link/toegangscode, zonder `ScanInvulling`. Net
   als bij "Respondenten uitnodigen" hierboven: de knoppen "Kopieer
   link" en "Openen" (nieuw tabblad), zodat de link direct zelf te
@@ -850,13 +862,17 @@ minstens 1 verplicht.
 - **Lead-toegang beheren op een bestaande respondent**: Direct in het
   blok "Toegang" van het Respondent-overzicht (punt 6b), zonder tweede
   venster. Het blok heeft een selectievakje "Lead". Aanvinken klapt in
-  hetzelfde blok de lijst met Metingen van deze organisatie open, elk met
-  een selectievakje. Er moet minstens één Meting aan staan voordat de
-  keuze kan worden opgeslagen, want zonder Meting is er geen Lead.
+  hetzelfde blok een keuze voor het bereik open: "Specifieke Metingen" of
+  "Hele organisatie". Bij "Specifieke Metingen" volgt de lijst met Metingen
+  van deze organisatie, elk met een selectievakje, en moet minstens één
+  Meting aan staan voordat de keuze kan worden opgeslagen. Bij "Hele
+  organisatie" staat er een waarschuwing: "Deze Lead ziet ook Metingen die
+  later worden aangemaakt." Het bereik hangt niet af van of de Lead zelf een
+  scan heeft ingevuld.
   Uitvinken van "Lead" trekt de rol in, na een bevestiging. Aanvinken geeft
   ook toegang als de respondent al `ScanInvullingen` heeft. Bij meer dan
   vijf Metingen scrolt de lijst. Onder het vakje staat als samenvatting
-  "Geen Lead" of "Lead voor 2 Metingen". "Kopieer link" en "Openen" staan
+  "Geen Lead", "Lead voor 2 Metingen" of "Lead voor de hele organisatie". "Kopieer link" en "Openen" staan
   er zoals altijd.
 - **Vinkje "Ook Lead maken" bij het uitnodigen** (punt 6 hierboven):
   Snelkoppeling die in één stap zowel de `ScanInvulling` (uitnodiging
@@ -890,10 +906,10 @@ geen vragenlijst. Krijgt de Lead later alsnog een `ScanInvulling` (via
 item in dezelfde lijst, met de bestaande status-routing
 (uitgenodigd/bezig/afgerond).
 
-**Benchmarkview voor een Lead** (niveau 1): Heeft een Admin een benchmarkview aan de
+**Benchmarkview voor een Lead**: Heeft een Admin een benchmarkview aan de
 Lead toegewezen (punt 14), dan staat die op "Mijn metingen" naast de
 resultaten van zijn Metingen. Wat hij ziet en wanneer, staat in
-`benchmark.md`, Toewijzen aan een Lead.
+`benchmark.md`, Bereik van een Lead en Toewijzen aan een Lead.
 
 **Verificatie-blokkade opheffen**: Na 3 mislukte pogingen op een
 verificatiecode raakt die geblokkeerd (`datamodel.md` deel 2, Toegang

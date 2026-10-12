@@ -97,7 +97,7 @@ De view toont nooit de namen van andere organisaties. De Admin bekijkt de view e
 **Gebouwd.** De Admin kan de view van organisatie X toewijzen aan een bestaande Lead van die organisatie (`BenchmarkToewijzing`). De Lead ziet de view naast zijn eigen resultaten op zijn pagina. Intrekken kan ook, door een Admin. De Admin ziet bij de toewijzingen per Lead een knop "Bekijk" en "Intrekken" (zie Toewijzen aan een Lead op alle niveaus). Wat de Lead ziet:
 
 - Geen automatische toegang. De Lead krijgt de view alleen als een Admin die toewijst, per benchmark en per organisatie.
-- Een sectie alleen voor Assessments waarvan hij de Meting van zijn organisatie mag inzien (`leadMetingIds`, afgeleid van `RespondentRolMeting`). Anders ziet hij een vergelijking met resultaten die hij zelf niet mag openen.
+- Een Lead voor de hele organisatie (zie Bereik van een Lead). De view gaat over de Meting van de organisatie die als lid in de benchmark zit. Van de Lead zelf speelt niets mee: Niet zijn eigen scan en niet de Metingen waarop hij Lead is. Eerder moest de Lead de lid-Meting zelf kunnen inzien (`leadMetingIds`). Dat veroorzaakte vergelijkingen met scores die niet van de Lead waren, en is vervangen door het organisatiebereik (voorstel, nog niet gebouwd).
 - Een sectie alleen als het Assessment aan de drempel voldoet. Toewijzen kan pas als minstens één Assessment aan de drempel voldoet. De Lead ziet alleen de secties die eraan voldoen.
 - Wijzigt de samenstelling zodat de organisatie niet meer meedoet, of verdwijnt de Lead-respondent, dan vervalt de toewijzing.
 
@@ -148,29 +148,39 @@ Het privacy statement belooft een minimale groepsgrootte. Die belofte moet overe
 - **Opslag.** Omdat een view toewijsbaar is, is er een `Benchmark` met niveau "scans" en één lid, de Meting. De scan waar de view over gaat, staat op de toewijzing (`BenchmarkToewijzing.onderwerpRespondentId`).
 - **Nog te ontwerpen.** Spreiding per bouwblok (bijvoorbeeld de verdeling van de antwoorden of de laagste tot hoogste score), de plek van een scan in die spreiding, en het zichtbaar maken van hoge en lage scores. Zie `backlog.md`.
 
+## Bereik van een Lead
+
+**Voorstel.** Een benchmarkview volgt het bereik van de Lead en niet zijn eigen scan. Dat bereik stelt een Admin in bij de Lead zelf, niet bij de benchmark (`beheerpagina.md`, punt 6a en 6b).
+
+- **Lead voor de hele organisatie X.** Kan de view van X tegenover de rest van de groep krijgen (niveau 1). Hij is ook Lead voor alle Metingen van X, dus hij komt ook in aanmerking voor de views van niveau 2 en 3 binnen X.
+- **Lead voor een of meer Metingen.** Kan voor elke Meting M waarop hij Lead is de view van M tegenover de overige Metingen van de organisatie krijgen (niveau 2), en de views binnen M (niveau 3). Niveau 1 krijgt hij niet, want die gaat over de organisatie als geheel.
+- **Niveau 3 en individuele scores.** Een view binnen M gaat over de scan van één Respondent, die de Admin bij het toewijzen kiest. De Lead hoeft die Respondent niet zelf te zijn. De toewijzing geeft de Lead toegang tot de individuele scores van die ene Respondent in M. Dat geldt alleen voor deze view, niet voor de scans van de andere Respondenten.
+- **Geen scan nodig.** Een Lead kan een view krijgen zonder zelf een scan te hebben.
+- **Bestaande toewijzingen.** Een toewijzing van niveau 1 aan een Lead zonder organisatiebereik blijft in de lijst staan, met de melding "Deze Lead heeft geen bereik op deze organisatie". De Lead ziet dan niets. De Admin past het bereik aan of trekt de toewijzing in.
+
 ## Toewijzen aan een Lead op alle niveaus
 
 **Besloten.** Op elk niveau kan een Admin een view toewijzen aan een Lead. Een view is steeds één lid tegenover de rest van de groep, zonder dat lid zelf (zie View per organisatie). Op niveau 1 is dit gebouwd. Niveau 2 en 3 zijn voorstel.
 
 | Niveau | De view gaat over | De Lead is | Vergelijkt met |
 |---|---|---|---|
-| 1 | Organisatie X | Een Lead van X, die de Meting van X mag inzien | De overige organisaties |
-| 2 | Meting M | Een Lead op M (`RespondentRolMeting`) | De overige Metingen in de benchmark |
-| 3 | De scan van Respondent R in Meting M | Een Lead op M | De overige scans in M |
+| 1 | Organisatie X | Een Lead voor de hele organisatie X | De overige organisaties |
+| 2 | Meting M | Een Lead met bereik op M: Voor M zelf of voor de hele organisatie | De overige Metingen in de benchmark |
+| 3 | De scan van Respondent R in Meting M | Een Lead met bereik op M | De overige scans in M |
 
 **Voorstel.** De regels van niveau 1 gelden op alle niveaus.
 
 - Er is geen automatische toegang. De Lead krijgt de view alleen als een Admin die toewijst, per benchmark en per onderwerp (organisatie, Meting of scan).
 - De Lead ziet nooit de namen van andere leden. Op niveau 2 staan dus geen namen van andere Metingen in zijn view, ook al ziet de Admin ze wel.
-- Een Lead ziet een sectie alleen voor een Assessment waarvan hij de Meting mag inzien, en alleen als de groep aan de drempel voldoet.
+- Een Lead ziet een sectie alleen als de groep aan de drempel voldoet. Of hij zelf een scan heeft ingevuld, doet niet ter zake.
 - **Drempels.** Elk niveau heeft een eigen instelling, door een Admin aan te passen in Instellingen. Niveau 1: `benchmarkMinOrganisaties` (gebouwd, startwaarde 5). Niveau 2: `benchmarkMinMetingen` (voorstel, startwaarde 3): Het minimale aantal Metingen in de groep per Assessment, inclusief de Meting van de view. Niveau 3: `benchmarkMinRespondenten` (voorstel, startwaarde 5, zie Niveau 3). De startwaarden van niveau 2 en 3 moeten nog worden bevestigd. Een view kan alleen worden toegewezen als de groep aan de drempel van zijn niveau voldoet. De Admin ziet de benchmark altijd, ook onder de drempel.
 - **Niveau 3 en privacy.** Een view van de scan van R laat de scores van die ene Respondent zien. Een Lead ziet standaard alleen geaggregeerde resultaten (`beheerpagina.md`, punt 6a), en dat blijft zo. De toewijzing is het expliciete besluit van een Admin om één Lead deze view te geven, op één Respondent. Daar is geen extra bevestiging voor nodig. De knop "Toewijzen" noemt wel dat de Lead hiermee de scores van deze Respondent ziet. Hoge en lage scores en spreiding komen later in deze view.
 
 **Het scherm.** Op elke view staat een blok "Toewijzen aan een Lead", gelijk op alle niveaus.
 
-- Een lijst van de Leads aan wie de view is toegewezen, met de datum en twee knoppen: "Bekijk" en "Intrekken".
+- Een lijst van de Leads aan wie de view is toegewezen, met de datum, het bereik van de Lead ("Hele organisatie" of "Meting {label}") en twee knoppen: "Bekijk" en "Intrekken".
 - "Bekijk" opent het Respondent-overzicht (modal) van die Lead (`beheerpagina.md`, punt 6b), over de benchmarkpagina heen. De Admin ziet daarin het blok Toegang en de Metingen waarop de Lead Lead is, en kan er de persoonlijke link kopiëren. Sluiten brengt de Admin terug op de view. Op niveau 1 is de knop "Bekijk" nog niet gebouwd.
-- Onder de lijst een keuzelijst met de Leads die in aanmerking komen en de view nog niet hebben, met de knop "Toewijzen". Zijn er geen Leads meer, dan staat er "Alle Leads hebben deze view al". Heeft het onderwerp geen enkele Lead, dan staat er "Geen Lead beschikbaar" met de reden (de organisatie of Meting heeft nog geen Lead), en de knop is uitgeschakeld (`info.benchmarkToewijzen`).
+- Onder de lijst een keuzelijst met de Leads die in aanmerking komen (zie Bereik van een Lead) en de view nog niet hebben, met de knop "Toewijzen". Zijn er geen Leads meer, dan staat er "Alle Leads hebben deze view al". Heeft het onderwerp geen Lead met passend bereik, dan staat er "Geen Lead met bereik op {organisatie of Meting}" en de knop is uitgeschakeld (`info.benchmarkToewijzen`). Daarnaast staat een knop "+ Lead toevoegen" (`.btn-or .btn-compact`) die het formulier uit `beheerpagina.md`, punt 6a opent, met het bereik al voorgekozen.
 
 **Verwijderen en intrekken.** Een toewijzing vervalt als de Meting wordt verwijderd, als de Respondent van de view of de Lead wordt verwijderd, als de scan wordt verwijderd, of als de Lead de Lead-rol op de Meting verliest. Een organisatie of Meting die uit de benchmark valt, haalt haar toewijzingen weg (`datamodel.md`, Verwijderen en datakoppelingen).
 
