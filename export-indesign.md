@@ -110,6 +110,7 @@ Geen nieuwe contentbron: Dezelfde velden als de PDF-export
       <techstackKennismanagement leverancier="onderdeel van CRM/MS" ondersteuning="zelf" />
       <techstackLlmOplossing leverancier="n.v.t." ondersteuning="n.v.t." />
       <techstackItDeployment leverancier="Microsoft" ondersteuning="zelf" />
+      <techstackWfm leverancier="Injixo" ondersteuning="extern" />
       <fteKlantcontactmedewerkers waarde="..." inhousePercentage="..." bpoPercentage="..." />
       <fteKlantcontactManagementSupport waarde="..." />
       <fteItDevops waarde="..." percentageDigital="..." />
@@ -184,7 +185,7 @@ beheerbaar worden (`beheerpagina.md`, "Nog te bouwen") en de
 lijst dus kan wijzigen, moeten deze elementnamen en het sjabloon
 gelijk opgaan. Geen nieuw risico t.o.v. de rest van deze spec (zie
 "Eigenaarschap van de tagnamen" onderaan), maar hier weegt het zwaarder
-mee: Deze 24 elementen zijn de plek waar een toekomstige wijziging in
+mee: Deze 27 elementen zijn de plek waar een toekomstige wijziging in
 organisatievelden het eerst merkbaar wordt.
 
 **`top3Sterktes`/`top3Verbeterkansen` als SVG, geen tekstelementen**

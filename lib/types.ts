@@ -63,6 +63,16 @@ export interface VeldDefinitie {
   type: VeldType;
   opties?: string[];
   /**
+   * Alleen voor type "select": Naast de vaste `opties` is er een keuze "Anders…" met een invoerveld. De ingevulde tekst
+   * wordt daarna ook aangeboden aan andere organisaties (`lib/kenmerken-opties.ts`).
+   */
+  eigenOptie?: boolean;
+  /**
+   * Alleen tonen als een broer-veld in dezelfde groep deze waarde heeft (bijv. "Ondersteund door" alleen bij
+   * `ondersteuning` = "extern"). Wijzigt dat broer-veld, dan wordt dit veld gewist.
+   */
+  toonAlsBroer?: { veld: string; waarde: string };
+  /**
    * Alleen voor type "select-afhankelijk": id van het broer-veld binnen
    * dezelfde groep waarvan de gekozen waarde bepaalt welke opties hier
    * beschikbaar zijn (bijv. Subsector hangt af van Sector,

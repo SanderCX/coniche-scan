@@ -105,6 +105,12 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     tekst: "Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie.",
   },
   {
+    sleutel: "info.assessmentVerwijderen",
+    plek: "Assessments, op de kaart en het detail, naast de uitgeschakelde knop \"Verwijderen\"",
+    tekst:
+      "Verwijder eerst alle Metingen van dit Assessment, bij alle organisaties. Daarna kan het Assessment worden verwijderd. Dit kan niet ongedaan worden gemaakt.",
+  },
+  {
     sleutel: "info.benchmarkInstellingen",
     plek: "Applicatie, Instellingen, formulier Benchmark",
     tekst:

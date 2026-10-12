@@ -1,5 +1,54 @@
 # Coniche Scan — Changelog
 
+## 2026-10-12 — Techstack: keuzelijsten voor Contact center, Conversational AI, CRM, Kennismanagement en WFM
+
+**Gedaan** (op verzoek van Sander, nog niet in een spec van Joost; `datamodel.md` is bijgewerkt):
+- **WFM is een nieuwe, zevende Techstack-categorie** (`techstackCategorieen`, id `techstack-wfm`), in het formulier direct
+  onder Contact center, met 20 vaste opties. Daardoor krijgt de InDesign-export een element `techstackWfm`
+  (`lib/indesign/kenmerken-xml.ts`, `export-indesign.md`, voorbeeld en telling). Het aantal elementen in de spec
+  stond op 24, de code had er 26, nu 27. Een bestaand InDesign-sjabloon moet het nieuwe element nog taggen. De CSV
+  heeft geen eigen kolom: De kenmerken zitten daar als geheel in, dus WFM komt daar vanzelf in mee.
+- **Oplossing bij Techstack, Contact center (19 opties), Conversational AI (14), CRM (17), Kennismanagement (14) en
+  WFM (20)**
+  (`data/organisatie-velden.ts`, `techstackOplossingen`) is een keuzelijst op alfabet met "Anders…" onderaan. Bij
+  "Anders…" verschijnt een invoerveld (`Naam van de oplossing`) dat bij Enter of bij het verlaten van het veld wordt
+  bewaard. LLM-oplossing en IT en deployment blijven een vrij tekstveld. Een nieuwe lijst voor een categorie is
+  één regel in `techstackOplossingen`.
+- **Nieuw veldtype-vlag** `VeldDefinitie.eigenOptie` (`lib/types.ts`) en component `SelectMetEigenOptie` in
+  `components/beheer/KenmerkenForm.tsx`. Elk `select`-veld kan er nu mee worden ingericht.
+- **Eigen invoer komt in de lijst** zonder aparte opslag (`lib/kenmerken-opties.ts`): De lijst is de vaste lijst plus
+  alles wat organisaties op dat veld hebben ingevuld. Getrimd, zonder dubbelen op hoofdletters (de spelling van de
+  vaste optie wint). Bestaande vrije tekst, bijvoorbeeld "Genesys" in de demo-organisatie, verschijnt zo vanzelf als
+  keuze. Gevolg: Gebruikt geen enkele organisatie een eigen waarde meer, dan verdwijnt hij uit de lijst.
+- **"Ondersteund door"** bij Zelf / extern ondersteund: Per categorie een keuzelijst met 25 partijen (Sabio,
+  Coniche, Frontline, Accenture, KPN enz.) en "Anders…", alleen zichtbaar bij "extern". Nieuw veld
+  `ondersteuner` naast `leverancier` en `ondersteuning`, en een nieuwe vlag `VeldDefinitie.toonAlsBroer`
+  (`lib/types.ts`) die een veld alleen toont bij een waarde van een broer-veld en het wist als die waarde wijzigt.
+  Alleen voor Contact center, WFM, Conversational AI, CRM en Kennismanagement. De bovenste lijst in het aangeleverde
+  bericht stond onder de kop "CCO", die heb ik als Contact center gelezen. De waarden "zelf" en "extern" zijn niet
+  veranderd, dus bestaande data en de InDesign-export blijven kloppen. **Nog niet gedaan**: `ondersteuner` in de
+  InDesign-export (als extra attribuut). In de CSV zit het al, in de JSON-kolom met de kenmerken.
+- **Waarde blijft een gewone tekst**, dus de InDesign-export (`techstackContactCenter leverancier`) en de CSV
+  veranderen niet.
+- 5 nieuwe tests (110 in totaal): paden, verzamelen, alfabetische lijst, huidige waarde, spelling.
+
+## 2026-10-12 — Assessment verwijderen: plek op de kaart en tekst van het Info-icoon
+
+**Gedaan** (spec van Joost, PR 69, `beheerpagina.md` punt 1 en het Info-register):
+- **Kaart in de Assessment-lijst** (`app/beheer/content/page.tsx`, `.admin-row-groep` en `.admin-row-link` in
+  `admin.css`): De kaart is nu de wrapper over de volle breedte van de lijst, met de link als vulling en de knop
+  "Verwijderen" in een eigen laatste kolom, rechts uitgelijnd en verticaal gecentreerd. Eerder stond de knop naast de
+  kaart en was die even breed als de inhoud. Gemeten: 3 kaarten van 896px, knop op elke rij op dezelfde plek.
+- **Telregel onder de knop weg** (`components/beheer/AssessmentVerwijderen.tsx`). De zin komt nu uit de app zelf als
+  eerste zin van het Info-icoon: "Dit Assessment kan niet worden verwijderd, want er zijn nog {n} Metingen bij {m}
+  organisaties." (enkelvoud: "er is nog 1 Meting bij 1 organisatie"). `InfoIcoon` kreeg daarvoor een prop `voorloop`:
+  de zin staat voor de tekst, is niet aanpasbaar, staat in de bewerkstand alleen-lezen boven het tekstvak en telt
+  niet mee in de 500 tekens.
+- **`info.assessmentVerwijderen` stond niet in `data/info-teksten.ts`**: Het icoon had dus geen standaardtekst.
+  Toegevoegd met de tekst uit het register. De laatste zin uit het register ("De tekst begint altijd met het aantal
+  Metingen en organisaties, die zin maakt de app zelf") is een uitleg voor de bouwer en staat niet in de
+  standaardtekst, omdat een Admin hem anders in het icoon ziet. Aan Joost bevestigd te krijgen.
+
 ## 2026-10-08 — Tabbladtitel, Inloggen op elke publieke pagina, Coniche-favicon, Content-iconen
 
 **Gedaan**:

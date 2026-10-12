@@ -25,6 +25,7 @@ export function InfoIcoon({
   sleutel,
   label = "Toelichting",
   naastVeld = false,
+  voorloop,
 }: {
   /** Sleutel in het register `data/info-teksten.ts`, bijv. `info.bewaartermijn`. */
   sleutel: string;
@@ -32,6 +33,11 @@ export function InfoIcoon({
   label?: string;
   /** In een rij met invoervelden en knoppen: Centreert het icoon op de hoogte van die velden. */
   naastVeld?: boolean;
+  /**
+   * Een zin die de app zelf maakt (bijv. met een aantal) en vóór de tekst staat. Niet aanpasbaar: In de bewerkstand
+   * staat hij alleen-lezen boven het tekstvak en hij telt niet mee in de 500 tekens.
+   */
+  voorloop?: string;
 }) {
   const standaard = standaardInfoTekst(sleutel);
   const opgeslagen = useOpgeslagenTeksten()[sleutel];
@@ -89,6 +95,7 @@ export function InfoIcoon({
       <div className="info-veld" role="dialog" aria-modal="true" aria-label={label} tabIndex={-1} ref={veldRef}>
         {bewerken ? (
           <div className="info-veld-bewerken">
+            {voorloop && <p className="info-veld-voorloop">{voorloop}</p>}
             <textarea
               autoFocus
               value={concept}
@@ -116,7 +123,7 @@ export function InfoIcoon({
           </div>
         ) : (
           <>
-            <p>{tekst}</p>
+            <p>{voorloop ? `${voorloop} ${tekst}` : tekst}</p>
             {admin && (
               <button
                 type="button"

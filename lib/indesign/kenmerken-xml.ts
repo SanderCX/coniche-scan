@@ -1,6 +1,6 @@
 /**
  * Zet `Organisatie.kenmerken` (genest, `data/organisatie-velden.ts`) om naar
- * de 24 losse, benoemde XML-elementen uit `export-indesign.md` — geen
+ * de 27 losse, benoemde XML-elementen uit `export-indesign.md` — geen
  * JSON-blob zoals bij de CSV-export, elk kenmerk krijgt zijn eigen taggable
  * elementnaam. Ontbreekt een waarde, dan is die "n.v.t.", nooit een leeg
  * element (zie de spec, "kenmerken").
@@ -84,6 +84,10 @@ export function kenmerkenXml(kenmerken: Record<string, unknown>): string {
     el("techstackItDeployment", {
       leverancier: pad(techstack, "techstack-it-en-deployment", "leverancier"),
       ondersteuning: pad(techstack, "techstack-it-en-deployment", "ondersteuning"),
+    }),
+    el("techstackWfm", {
+      leverancier: pad(techstack, "techstack-wfm", "leverancier"),
+      ondersteuning: pad(techstack, "techstack-wfm", "ondersteuning"),
     }),
     el("fteKlantcontactmedewerkers", {
       waarde: pad(fte, "fte-klantcontact", "aantal"),

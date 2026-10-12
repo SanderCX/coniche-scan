@@ -1,4 +1,86 @@
+"use client";
+
+import { useState } from "react";
 import { VeldDefinitie } from "@/lib/types";
+import { useOrganisaties } from "@/lib/db";
+import { gebruikteWaarden, kiesSpelling, optieLijst } from "@/lib/kenmerken-opties";
+
+const ANDERS = "__anders__";
+
+/**
+ * Een keuzelijst (op alfabet) met vaste opties en "Anders…" onderaan voor een eigen invoer (`VeldDefinitie.eigenOptie`).
+ * De eigen invoer wordt als gewone tekst opgeslagen en staat daarna in de lijst van alle organisaties
+ * (`lib/kenmerken-opties.ts`). Het invoerveld bewaart pas bij Enter of bij het verlaten van het veld, zodat er geen
+ * halve woorden in de lijst komen.
+ */
+function SelectMetEigenOptie({
+  veld,
+  waarde,
+  onChange,
+  pad,
+}: {
+  veld: VeldDefinitie;
+  waarde: unknown;
+  onChange: (waarde: unknown) => void;
+  pad: string[];
+}) {
+  const organisaties = useOrganisaties();
+  const [andersOpen, setAndersOpen] = useState(false);
+  const [concept, setConcept] = useState("");
+  const huidige = typeof waarde === "string" ? waarde : "";
+  const lijst = optieLijst(veld.opties ?? [], gebruikteWaarden(organisaties, pad), huidige);
+
+  function bewaarConcept() {
+    const gekozen = kiesSpelling(concept, lijst);
+    if (gekozen) onChange(gekozen);
+    setAndersOpen(false);
+    setConcept("");
+  }
+
+  return (
+    <div className="admin-field">
+      <label>{veld.label}</label>
+      <select
+        value={andersOpen ? ANDERS : huidige}
+        onChange={(e) => {
+          if (e.target.value === ANDERS) {
+            setAndersOpen(true);
+            setConcept("");
+          } else {
+            setAndersOpen(false);
+            onChange(e.target.value);
+          }
+        }}
+      >
+        <option value="">Kies...</option>
+        {lijst.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+        <option value={ANDERS}>Anders…</option>
+      </select>
+      {andersOpen && (
+        <input
+          type="text"
+          autoFocus
+          style={{ marginTop: "0.4rem" }}
+          placeholder="Naam van de oplossing"
+          aria-label={`${veld.label}, anders`}
+          value={concept}
+          onChange={(e) => setConcept(e.target.value)}
+          onBlur={bewaarConcept}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              bewaarConcept();
+            }
+          }}
+        />
+      )}
+    </div>
+  );
+}
 
 function VeldInput({
   veld,
@@ -6,6 +88,7 @@ function VeldInput({
   onChange,
   alleWaarden,
   alleVelden,
+  pad,
 }: {
   veld: VeldDefinitie;
   waarde: unknown;
@@ -14,6 +97,8 @@ function VeldInput({
   alleWaarden?: Record<string, unknown>;
   /** Definities van diezelfde broer-velden, op id — voor het label in de placeholder ("Kies eerst {label}"). */
   alleVelden?: Record<string, VeldDefinitie>;
+  /** De id's van de voorouders en dit veld, op volgorde: De plek van de waarde in `Organisatie.kenmerken`. */
+  pad: string[];
 }) {
   if (veld.type === "groep") {
     const obj = (waarde as Record<string, unknown>) ?? {};
@@ -27,13 +112,17 @@ function VeldInput({
       <fieldset className="veld-groep">
         <legend>{veld.label}</legend>
         <div className={opEenRegel ? "veld-rij" : undefined}>
-          {subvelden.map((sub) => (
+          {subvelden
+            // Een veld dat alleen bij een bepaalde waarde van een broer-veld hoort (`toonAlsBroer`), bijv. "Ondersteund door".
+            .filter((sub) => !sub.toonAlsBroer || obj[sub.toonAlsBroer.veld] === sub.toonAlsBroer.waarde)
+            .map((sub) => (
             <VeldInput
               key={sub.id}
               veld={sub}
               waarde={obj[sub.id]}
               alleWaarden={obj}
               alleVelden={veldPerId}
+              pad={[...pad, sub.id]}
               onChange={(w) => {
                 const nieuw = { ...obj, [sub.id]: w };
                 // Wijzigt een veld waar een ander veld in deze groep van afhangt
@@ -41,6 +130,10 @@ function VeldInput({
                 // mogelijk niet meer geldig — wissen i.p.v. laten staan.
                 for (const afhankelijk of subvelden) {
                   if (afhankelijk.afhankelijkVan === sub.id) nieuw[afhankelijk.id] = undefined;
+                  // Idem voor een veld dat alleen bij een bepaalde waarde zichtbaar is: Anders blijft een verborgen waarde staan.
+                  if (afhankelijk.toonAlsBroer?.veld === sub.id && w !== afhankelijk.toonAlsBroer.waarde) {
+                    nieuw[afhankelijk.id] = undefined;
+                  }
                 }
                 onChange(nieuw);
               }}
@@ -49,6 +142,10 @@ function VeldInput({
         </div>
       </fieldset>
     );
+  }
+
+  if (veld.type === "select" && veld.eigenOptie) {
+    return <SelectMetEigenOptie veld={veld} waarde={waarde} onChange={onChange} pad={pad} />;
   }
 
   if (veld.type === "select") {
@@ -128,6 +225,7 @@ export function KenmerkenForm({
           waarde={waarden[veld.id]}
           alleWaarden={waarden}
           alleVelden={veldPerId}
+          pad={[veld.id]}
           onChange={(w) => onChange({ ...waarden, [veld.id]: w })}
         />
       ))}

@@ -13,8 +13,9 @@ import { InfoIcoon } from "@/components/InfoIcoon";
 
 /**
  * De knop "Verwijderen" van een Assessment, op de kaart in de Assessment-lijst en op het detail (`beheerpagina.md`, punt 1,
- * Assessment verwijderen). Uitgeschakeld zolang er Metingen van zijn, met een Info-icoon (`info.assessmentVerwijderen`) en een
- * regel met het aantal ("3 Metingen bij 2 organisaties"), zodat de Admin ziet wat er eerst weg moet. De bevestiging zegt
+ * Assessment verwijderen). Uitgeschakeld zolang er Metingen van zijn, met een Info-icoon (`info.assessmentVerwijderen`) dat met
+ * een zin van de app begint ("Dit Assessment kan niet worden verwijderd, want er zijn nog 3 Metingen bij 2 organisaties.").
+ * Onder de knop staat geen tekst. De bevestiging zegt
  * wat er verdwijnt. Bij bevestigen wordt opnieuw gecontroleerd (`lib/assessment-verwijderen.ts`). Recht: `content.beheren`,
  * dus alleen een Admin.
  */
@@ -31,6 +32,11 @@ export function AssessmentVerwijderen({ assessment, naVerwijderen }: { assessmen
   const gebruik = assessmentGebruik(organisaties, assessment.id);
   const geblokkeerd = gebruik.aantalMetingen > 0;
   const effecten = assessmentEffecten(assessment, alleAssessments, benchmarks);
+  const enkelvoud = gebruik.aantalMetingen === 1;
+  // De eerste zin van het Info-icoon maakt de app zelf, die is niet aanpasbaar (beheerpagina.md, punt 1).
+  const blokkadeZin = `Dit Assessment kan niet worden verwijderd, want er ${enkelvoud ? "is" : "zijn"} nog ${gebruik.aantalMetingen} ${
+    enkelvoud ? "Meting" : "Metingen"
+  } bij ${gebruik.aantalOrganisaties} ${gebruik.aantalOrganisaties === 1 ? "organisatie" : "organisaties"}.`;
 
   function bevestig() {
     const resultaat = verwijderAssessment(assessment.id, benchmarks);
@@ -49,14 +55,8 @@ export function AssessmentVerwijderen({ assessment, naVerwijderen }: { assessmen
         <button type="button" className="btn btn-outline btn-compact" disabled={geblokkeerd} onClick={() => setOpen(true)}>
           Verwijderen
         </button>
-        {geblokkeerd && <InfoIcoon naastVeld sleutel="info.assessmentVerwijderen" />}
+        {geblokkeerd && <InfoIcoon naastVeld sleutel="info.assessmentVerwijderen" voorloop={blokkadeZin} />}
       </div>
-      {geblokkeerd && (
-        <p className="text-sm text-ink-s" style={{ margin: "0.3rem 0 0" }}>
-          {gebruik.aantalMetingen} {gebruik.aantalMetingen === 1 ? "Meting" : "Metingen"} bij {gebruik.aantalOrganisaties}{" "}
-          {gebruik.aantalOrganisaties === 1 ? "organisatie" : "organisaties"}
-        </p>
-      )}
       {melding && (
         <p className="admin-notice" role="status" style={{ margin: "0.5rem 0 0" }}>
           {melding}
