@@ -327,7 +327,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.dataIntegriteit` | Applicatie, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
 | `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
 | `info.bulkExportOrganisatie` | Ingevulde scans, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie. |
-| `info.assessmentVerwijderen` | Assessments, op de kaart en het detail, naast de uitgeschakelde knop "Verwijderen" | Een Assessment kan alleen worden verwijderd als er geen Meting van is. Verwijder eerst alle Metingen van dit Assessment, bij alle organisaties. |
+| `info.assessmentVerwijderen` | Assessments, op de kaart en het detail, naast de uitgeschakelde knop "Verwijderen" | Verwijder eerst alle Metingen van dit Assessment, bij alle organisaties. Daarna kan het Assessment worden verwijderd. Dit kan niet ongedaan worden gemaakt. De tekst begint altijd met het aantal Metingen en organisaties, die zin maakt de app zelf. |
 | `info.benchmarkInstellingen` | Applicatie, Instellingen, formulier Benchmark | Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. |
 | `info.benchmarkVlag` | Organisatie-detail, bij de schakelaar "Doet mee aan benchmark" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks. |
 | `info.benchmarkToewijzen` | Benchmark, view per organisatie, achter de uitgeschakelde knop "Toewijzen" | Toewijzen kan pas als er een Lead is en de groep aan de drempel van dit niveau voldoet. Anders zou een Lead een vergelijking zien met te weinig anderen om anoniem te blijven. |
@@ -570,10 +570,19 @@ datakoppelingen.
 - **Knop**: Op de kaart in de Assessment-lijst en op het detail, een
   "Verwijderen" in de stijl van de andere verwijderacties
   (`.btn-outline .btn-compact`, destructief in de bevestiging).
-- **Uitgeschakeld**: Zolang er Metingen zijn, is de knop uitgeschakeld. Ernaast
-  staat een Info-icoon (`info.assessmentVerwijderen`) en een regel met het
-  aantal, bijvoorbeeld "3 Metingen bij 2 organisaties". Zo ziet de Admin wat
-  er eerst weg moet.
+- **Plaats op de kaart**: Alle kaarten in de lijst zijn even breed, over de
+  volle breedte van de lijst, en niet zo breed als hun inhoud. De knop staat
+  binnen de kaart in een eigen laatste kolom, rechts uitgelijnd en verticaal
+  gecentreerd, dus op elke kaart op dezelfde plek (`stylesheet.md`, Knop in
+  een lijstrij). Het Info-icoon staat direct rechts van de knop (`stylesheet.md`,
+  Info-icoon). Onder de knop staat geen tekst.
+- **Uitgeschakeld**: Zolang er Metingen zijn, is de knop uitgeschakeld, met
+  een Info-icoon (`info.assessmentVerwijderen`) dat de reden geeft. De tekst
+  begint met een zin die de app zelf maakt en die de Admin niet kan
+  aanpassen: "Dit Assessment kan niet worden verwijderd, want er zijn nog
+  {n} Metingen bij {m} organisaties." Daarna volgt de standaardtekst uit het
+  register, die wel aanpasbaar is. Is er geen Meting, dan is de knop actief en
+  staat er geen Info-icoon.
 - **Bevestiging**: Een modal met de titel "Assessment verwijderen?" en de
   tekst "Weet je zeker dat je {naam} wilt verwijderen? Dit kan niet ongedaan
   worden gemaakt." Daaronder wat er verdwijnt: Het Assessment met zijn
