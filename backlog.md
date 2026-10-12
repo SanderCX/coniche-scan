@@ -226,6 +226,17 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
 - **Opsplitsen** van de Import-pagina (590 regels).
 - **Meer tests**: Import (parsen en valideren van rijen), `scan-slot`, de
   overige stores.
+- **Bereik van een Lead (voorstel)**: Een Lead krijgt bereik op specifieke
+  Metingen of op de hele organisatie, los van of hij zelf een scan heeft
+  gedaan (`benchmark.md`, Bereik van een Lead). Te bouwen: het veld
+  `leadVoorOrganisatie` op de Respondent; de keuze van het bereik in "Lead
+  toevoegen" en "Lead-toegang beheren" met de waarschuwing "Deze Lead ziet ook
+  Metingen die later worden aangemaakt"; in `lib/benchmark.ts` het filter
+  `viewsVoorLead` vervangen door een controle op bereik; de keuzelijst bij het
+  toewijzen beperken tot Leads met bereik, met "+ Lead toevoegen"; bestaande
+  toewijzingen zonder bereik laten staan met de melding "Deze Lead heeft geen
+  bereik op deze organisatie". Optioneel: een blok "Leads" op organisatie-detail
+  en Meting-overzicht.
 
 ### Fase 2: Database en rollen en rechten
 

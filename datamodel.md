@@ -420,6 +420,9 @@ is alleen herkomstinformatie, zie Sector-varianten). Staat het Assessment in
 landingspagina van het Assessment verdwijnen.
 
 Een benchmark (deel 3) verwijst naar organisaties, metingen en Leads.
+Een benchmarkview kan alleen aan een Lead zijn toegewezen die voor het
+onderwerp van de view bereik heeft, zie `benchmark.md`, Bereik van een Lead.
+Verliest een Lead dat bereik, dan vervalt de toewijzing.
 Verdwijnt een van die records, dan verdwijnt ook de verwijzing. Een Meting
 weg haalt het lid uit de benchmark. Een Organisatie weg haalt haar leden en
 toewijzingen weg. Een Respondent met Lead-rol weg haalt zijn toewijzingen
@@ -619,15 +622,22 @@ samen met de backend en de database.
 |---|---|---|
 | Admin | Beheer | Alles, inclusief rechten toekennen en verwijderen |
 | Consultant | Beheer | Organisaties en metingen aanmaken, Lead en respondenten koppelen (en weer loskoppelen), resultaten inzien — voor organisaties die hij zelf aanmaakte of die een Admin aan hem toewees |
-| Lead | Organisatie | Respondenten uitnodigen voor en resultaten inzien van zijn toegewezen Metingen. Kan ook zelf invullen, maar hoeft niet |
+| Lead | Organisatie | Respondenten uitnodigen voor en resultaten inzien van zijn bereik: Specifieke Metingen of de hele organisatie. Kan ook zelf invullen, maar hoeft niet |
 | (geen rol) | Organisatie | Gewone respondent: Eigen scans invullen en eigen resultaten zien |
 
-**Een Lead ziet niet automatisch alle Metingen van de organisatie.**
-Toegang wordt per Meting toegekend, niet als blanket-toegang op de hele
-organisatie: Anders zou een nieuwe Meting die later wordt aangemaakt
-meteen zichtbaar zijn voor elke bestaande Lead, zonder dat iemand dat
-bewust besloot. Een Lead kan aan meerdere Metingen tegelijk gekoppeld
-zijn.
+**Het bereik van een Lead.** Een Lead heeft een van twee bereiken.
+
+- **Specifieke Metingen** (standaard): Toegang wordt per Meting toegekend.
+  Een nieuwe Meting die later wordt aangemaakt, is niet zichtbaar voor deze
+  Lead, tenzij iemand die bewust koppelt. Een Lead kan aan meerdere Metingen
+  tegelijk gekoppeld zijn.
+- **Hele organisatie** (voorstel): De Lead is Lead voor de organisatie van
+  zijn Respondent-record en ziet alle Metingen daarvan, ook Metingen die
+  later worden aangemaakt. Dit is een bewuste uitzondering op de regel
+  hierboven. Een Admin kiest het, en het scherm waarschuwt daarvoor (zie
+  `beheerpagina.md`, punt 6a).
+
+Het bereik hangt niet af van of de Lead zelf een scan heeft ingevuld.
 
 ```
 RespondentRolMeting {
@@ -636,9 +646,14 @@ RespondentRolMeting {
 }
 ```
 
-Minstens 1 koppeling verplicht bij het toekennen van de Lead-rol (zie
-`beheerpagina.md`, punt 6a): Geen Lead zonder minstens één toegewezen
-Meting.
+Een Lead heeft op de Respondent een veld `leadVoorOrganisatie` (boolean,
+voorstel, standaard `false`). Staat het aan, dan geldt het bereik "hele
+organisatie" en zijn er geen `RespondentRolMeting`-koppelingen nodig. Anders
+is minstens 1 koppeling verplicht bij het toekennen van de Lead-rol (zie
+`beheerpagina.md`, punt 6a): Geen Lead zonder minstens één toegewezen Meting
+of het bereik "hele organisatie". De Metingen die een Lead mag zien, zijn
+alle Metingen van zijn organisatie bij `leadVoorOrganisatie`, en anders de
+Metingen in `RespondentRolMeting` (in de code `leadMetingIds`).
 
 **Wat de Lead op zijn eigen pagina ziet**: Zijn eigen vragenlijst,
 alleen als hij ook zelf respondent is (dus zelf invult); en sowieso de
@@ -822,7 +837,8 @@ Betekenis van `bereik`:
   met alles wat daaronder hangt (Consultant). Zie Eigenaarschap en
   toegang van/tot organisaties hierboven.
 - `toegewezen metingen`: Alleen de Metingen die via `RespondentRolMeting`
-  expliciet aan deze Lead zijn gekoppeld (Lead).
+  expliciet aan deze Lead zijn gekoppeld, of alle Metingen van de organisatie
+  bij `leadVoorOrganisatie` (Lead).
 - `toegewezen benchmarkviews`: Alleen de views die een Admin via
   `BenchmarkToewijzing` aan deze Lead heeft gekoppeld (Lead, deel 3).
 - `zelf`: Alleen de eigen ingevulde scans (respondent).
