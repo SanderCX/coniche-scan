@@ -180,7 +180,10 @@ beheer de gewone beheer-nav met het kruimelpad Organisaties › Organisatie
 › Meting › Resultaten van {Respondent}, en niet de respondentacties
 "Terug naar de scan" en "Terug naar Mijn metingen". Wel de dropdown
 "Exporteren". Terug gaat via het kruimelpad. Dat wordt het Meting-overzicht
-en niet de Respondent-modal, want die is niet meer open.
+en niet de Respondent-modal, want die is niet meer open. Boven de resultaten
+staat een schakelaar met Scores van deze scan en Positie in de Meting
+(besloten op 12 oktober 2026, nog niet gebouwd, zie `visualisatie-scores.md`,
+Navigatie).
 
 **Organisatie-resultaten** (punt 4): Zelfde kruimelpad, eindigend op
 Resultaten van de Meting.
@@ -808,6 +811,14 @@ het antwoord daarom zelf kunnen vastleggen.
   1 afgeronde scan is binnen de Meting, geen hoger minimum. Dezelfde
   weergave gebruikt de Lead-rol op zijn eigen pagina (`datamodel.md`
   deel 2, Rollen).
+
+  **Weergaven (besloten op 12 oktober 2026, nog niet gebouwd).** Boven de
+  inhoud staat een weergave-schakelaar (`stylesheet.md`, Weergave-schakelaar)
+  met Overzicht, Per bouwblok en Spreiding. Overzicht is de standaard en de
+  opbouw hierboven, die ongewijzigd blijft. Rechts van de schakelaar staat de
+  knop "Vergelijk met vorige Meting". De weergaven, de knop en de
+  adresbalkparameters staan in `visualisatie-scores.md`, Navigatie. Een Lead
+  ziet Overzicht en Per bouwblok, en de vergelijking.
 
   **Eén kop.** De pagina heeft één kop. Bovenaan staat het Meting-label als
   eyebrow ("Nulmeting"), daaronder de naam van het Assessment als titel, en

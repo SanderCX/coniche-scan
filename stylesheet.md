@@ -675,6 +675,19 @@ een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
   `var(--ink-s)`, gescheiden door een `›` in `var(--border-d)`. Elk deel is
   een link, het laatste deel staat in `var(--ink)` en is niet klikbaar. Een
   link krijgt bij hover `var(--or)`.
+- **Weergave-schakelaar** (`.weergave-wissel`, voorstel, besloten op
+  12 oktober 2026, nog niet gebouwd): Een rij van 2 tot 3 knoppen aan elkaar
+  op een resultatenpagina, onder de kop en boven de inhoud. Hij is bedoeld
+  voor het wisselen van weergave binnen één pagina en dus niet voor
+  navigatie, de bestaande tabbalk blijft voor lijstpagina's. Gezamenlijke
+  omtrek `1.5px solid var(--border-d)`, `border-radius: 10px`, witte
+  achtergrond, knoptekst `.85rem` gewicht 600 in `var(--ink-m)`. De
+  actieve knop heeft `background: var(--ink)` en witte tekst. Hover op een
+  niet-actieve knop `var(--bg-warm)`. Een uitgeschakelde knop staat op 50%
+  dekking met een Info-icoon voor de reden. Het toetsenbord kent Tab naar
+  de schakelaar en pijltjes links en rechts binnen de schakelaar, met
+  `role="tablist"` en `aria-selected` op de knoppen. Rechts ernaast kan een
+  losse actieknop staan (`.btn-compact`).
 - **Melding bovenaan een beheerpagina** (`.beheer-melding`): Een
   `.admin-notice` met groene tint (`--stat-green-faint`, rand
   `--stat-green`) en een sluitkruisje, na een actie die de Respondent van de

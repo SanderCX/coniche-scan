@@ -34,9 +34,42 @@ Deze regels gelden voor alle vijf de weergaven.
 
 **Lege en onvolledige toestand.** Een bouwblok zonder afgeronde scan toont een streepje en geen stip. Een weergave zonder enige afgeronde scan toont de bestaande lege-toestand van de resultaatcomponenten.
 
+## Navigatie
+
+**Besloten op 12 oktober 2026.** De weergaven komen in aanvulling op de bestaande resultaatschermen. Wat er nu is, blijft ongewijzigd. Er komt een schakelaar bij en een knop om te vergelijken.
+
+**Regels**
+
+- Het kruimelpad blijft de hiërarchie volgen (Organisaties › Organisatie › Meting › Resultaten, `beheerpagina.md`, Navigatie in beheer). Een weergave staat niet in het pad.
+- Wisselen van weergave is een knop en geen link (`CLAUDE.md`, Uitgangspunten), omdat dezelfde gegevens anders worden getoond.
+- De gekozen weergave staat in de adresbalk, zodat de terugknop van de browser werkt en de link te delen is. `?weergave=` met de waarden `bouwblok` en `spreiding` (zonder parameter is het Overzicht), `?vergelijk=<metingId>` voor weergave C en `?focus=<scanId>` voor de scan die in B de ring krijgt. Het bestaande `?scan=` blijft voor de modal.
+- De schakelaar is een nieuw component, zie `stylesheet.md`, Weergave-schakelaar. De bestaande tabbalk blijft voor lijstpagina's.
+
+**Resultatenpagina van een Meting** (`beheerpagina.md`, punt 4, Organisatie-resultaten)
+
+- Onder de kop staat de schakelaar met drie weergaven: Overzicht, Per bouwblok en Spreiding. Overzicht is de standaard en is de huidige pagina (classificatiecirkel, radar, staafdiagram per categorie, top 3, legenda). Per bouwblok is weergave A, Spreiding is weergave B zonder ring.
+- Rechts van de schakelaar staat de knop "Vergelijk met vorige Meting". Hij is er alleen als er een eerdere Meting van hetzelfde Assessment is waarvan het aantal afgeronde scans minstens `benchmarkMinScans` is. Zijn er meerdere eerdere Metingen, dan wordt het een dropdown-knop met de Metingen op label, de meest recente bovenaan.
+- Tijdens een vergelijking toont de pagina weergave C. De schakelaar is dan verborgen. Er staat een knop "Vergelijking sluiten" die terugkeert naar de weergave van daarvoor. Boven de titel staat als eyebrow "Vergelijking met {label van de vorige Meting}".
+- Een Admin ziet onder de weergave de link "Bekijk in benchmark" als de organisatie (niveau 1) of de Meting (niveau 2) lid is van een benchmark. Zit ze in meer dan één, dan is het een keuzelijst.
+
+**Resultatenpagina van één scan** (beheer, kruimelpad … › Resultaten van {Respondent})
+
+- Een tweede schakelaar met Scores van deze scan en Positie in de Meting. Positie in de Meting is weergave B met de ring op deze scan (`?focus=<scanId>`). Dit is de view van niveau 3.
+- Is het aantal afgeronde scans in de Meting kleiner dan `benchmarkMinRespondenten`, dan is "Positie in de Meting" uitgeschakeld, met de reden in een Info-icoon (`info.positieMeting`).
+- Het Scan-overzicht (modal) krijgt bij "Resultaten bekijken" geen extra knop. De schakelaar staat op de resultatenpagina zelf.
+- De respondent zelf ziet op het resultatenscherm (`CLAUDE.md`, scherm 6) geen schakelaar. Er verandert niets aan scherm 6 en aan de PDF-export.
+
+**Benchmark** (Admin)
+
+- Weergave D staat in de view per organisatie en weergave E in het detail van een benchmark op niveau 2, onder het kruimelpad Benchmark › {naam} (`beheerpagina.md`, punt 14). Er komt geen schakelaar bij.
+
+**Lead**
+
+- Op zijn eigen resultaten ziet een Lead de schakelaar met Overzicht en Per bouwblok, en de knop voor de vergelijking met de vorige Meting. Spreiding en Positie in de Meting zijn er alleen als weergave die een Admin heeft toegewezen (`benchmark.md`, Toewijzen aan een Lead op alle niveaus). Die staat als kaart op zijn pagina "Mijn metingen", zoals nu al gespecificeerd.
+
 ## A. Eén meting
 
-**Plek.** De aggregatieweergave van een Meting (`beheerpagina.md`, Organisatie-resultaten), als aanvulling op of vervanging van wat daar nu staat. Dezelfde component wordt hergebruikt voor de Lead op zijn pagina.
+**Plek.** De weergave Per bouwblok op de resultatenpagina van een Meting (`beheerpagina.md`, Organisatie-resultaten), naast het bestaande Overzicht dat ongewijzigd blijft. Dezelfde component wordt hergebruikt voor de Lead op zijn pagina. Zie Navigatie.
 
 **Data.** Per bouwblok het gemiddelde antwoord per vraag over de afgeronde scans van de Meting, daarop de gedeelde scorefunctie (zoals bij `benchmark.md`, Gedeelde regels, met de scans als leden).
 
@@ -54,7 +87,7 @@ Deze regels gelden voor alle vijf de weergaven.
 
 Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
-**Plek.** De view van niveau 3, en daarnaast als verdieping onder weergave A voor een Admin.
+**Plek.** De weergave Spreiding op de resultatenpagina van een Meting (zonder ring, voor een Admin) en de weergave Positie in de Meting op de resultatenpagina van één scan (met ring). Dat tweede is de view van niveau 3. Zie Navigatie.
 
 **Data.** Per bouwblok de bouwblokscore van elke afgeronde scan. Bij vier vragen per bouwblok zijn dat stappen van 0,25. De vergelijkgroep van een scan-view is alle andere afgeronde scans in de Meting, zonder de scan zelf (`benchmark.md`, Niveau 3). Gemiddelde en spreiding komen dus uit de andere scans. Zonder scan-view (de weergave onder A) tellen alle scans mee.
 
@@ -75,7 +108,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 ## C. Tussen metingen
 
-**Plek.** De Metingen van één organisatie. De Admin of Consultant kiest twee Metingen van hetzelfde Assessment, een Lead ziet de vergelijking van zijn eigen Meting met de vorige Meting van hetzelfde bereik. Dit is het item "Trend tussen Metingen van dezelfde organisatie" uit `backlog.md`. Het is niet hetzelfde als niveau 2 van de benchmark.
+**Plek.** De knop "Vergelijk met vorige Meting" op de resultatenpagina van een Meting (zie Navigatie). Een Lead vergelijkt zijn eigen Meting met een eerdere Meting waarop hij ook Lead is. Dit is het item "Trend tussen Metingen van dezelfde organisatie" uit `backlog.md`. Het is niet hetzelfde als niveau 2 van de benchmark.
 
 **Data.** Het gemiddelde per bouwblok van beide Metingen, berekend als bij A. Het verschil is de getoonde waarde van de nieuwere Meting min de getoonde waarde van de oudere, zodat wat de lezer ziet optelt. Alleen Metingen van hetzelfde Assessment zijn te vergelijken. Beide Metingen moeten voldoen aan `benchmarkMinScans`.
 
@@ -147,7 +180,6 @@ Voorstel, op te nemen in `stylesheet.md` zodra ze zijn bevestigd:
 - De grenzen voor het spreidingslabel (0,55 en 0,8).
 - Of de band en de kwartielen in D een eigen, hogere drempel krijgen dan `benchmarkMinOrganisaties`. Bij vijf leden in totaal bestaat de rest uit vier organisaties en zijn minimum en maximum dan vrij herleidbaar.
 - Of een Admin in B de naam van een respondent bij een stip kan zien.
-- Of A en B samen één scherm zijn (met B als uitklapbare verdieping) of twee schermen.
 - Een extra uitsplitsing van B naar Rol, bijvoorbeeld management tegenover medewerkers. Zie `backlog.md`.
 - Meer dan twee Metingen in C.
 - Export van deze weergaven naar PDF, CSV en InDesign.
