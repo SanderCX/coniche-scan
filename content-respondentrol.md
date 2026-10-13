@@ -6,8 +6,8 @@ functie), `CLAUDE.md` (scherm 4, Respondent-intake) en `beheerpagina.md` (punt 6
 Respondent bewerken). De lijst is aangeleverd door Sander op 12 oktober 2026.
 
 **Status**: Besloten op 12 oktober 2026: Rol / functie wordt een keuzelijst met deze
-waarden, in de intake, in "Mijn gegevens" en in beheer. Opgenomen in de specs, nog niet
-gebouwd. In de app is het nu een vrij tekstveld. De punten onder 4 zijn open.
+waarden, in de intake, in "Mijn gegevens" en in beheer. Opgenomen in de specs en
+gebouwd op 13 oktober 2026: Een keuzelijst met "Anders…" in de intake, in "Mijn gegevens" en in beheer. De punten onder 4 zijn open.
 
 **Let op de naam.** Dit gaat over de functie van de persoon in zijn organisatie,
 niet over een autorisatierol. Het bestand heet `content-respondentrol.md`, maar
@@ -75,7 +75,8 @@ Zelfde patroon als de keuzelijsten bij Techstack (`content-techstack.md`):
 - Bestaande vrije tekst blijft staan en wordt vanzelf een extra keuze.
 
 De keuzelijst zelf is besloten. De uitwerking hierboven (met "Anders…", eigen invoer in
-de lijst) volgt het patroon van Techstack en is een voorstel. Er is nog niets van gebouwd.
+de lijst) volgt het patroon van Techstack en is zo gebouwd. De lijst in de code
+(`data/respondent-rollen.ts`) wordt door een test gelijk gehouden aan dit bestand.
 
 ## 4. Punten voor Joost
 

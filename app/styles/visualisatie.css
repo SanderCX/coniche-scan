@@ -1,0 +1,369 @@
+/* ---------- Visualisatie van hoge en lage scores (visualisatie-scores.md, A tot en met E) ----------
+   Eén schaal van 1 tot 5 met de drie banden van de classificatie, dezelfde leesrichting op alle weergaven. De kleur van een
+   stip volgt de klasse (`--stat-red`, `--stat-amber`, `--stat-green`) en staat nooit alleen: Er staat altijd een getal of
+   een label bij. De categoriekleur is alleen een accentrand van 4px links van de naam, nooit een vulling. */
+
+.vis {
+  --vis-rood: var(--stat-red);
+  --vis-oranje: var(--stat-amber);
+  --vis-groen: var(--stat-green);
+  --vis-stijging: var(--bl);
+  --vis-daling: #c2570c;
+  --vis-spreiding: rgba(93, 106, 120, 0.75);
+}
+
+/* Tegels met kerncijfers, vier naast elkaar. */
+.vis-tegels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1.6rem;
+}
+.vis-tegel {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+}
+.vis-tegel-label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.vis-tegel-waarde {
+  margin-top: 0.2rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.vis-tegel-sub {
+  margin-top: 0.1rem;
+  font-size: var(--fs-s);
+  color: var(--ink-m);
+}
+
+/* Rijen: Naam, spoor en rechterkolom op een vast raster, zodat alle rijen onder elkaar uitlijnen. */
+.vis-rij {
+  display: grid;
+  grid-template-columns: minmax(11rem, 17rem) minmax(0, 1fr) minmax(7.5rem, 13rem);
+  align-items: center;
+  gap: 1rem;
+  padding: 0.25rem 0;
+}
+.vis-schaalkop {
+  padding-bottom: 0.3rem;
+}
+.vis-banden {
+  display: flex;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--ink-m);
+}
+.vis-banden span {
+  text-align: center;
+}
+.vis-groep {
+  margin: 0.9rem 0 0.15rem;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.vis-naam {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  padding-left: 0.6rem;
+  border-left: 4px solid var(--accent, var(--or));
+  font-size: var(--fs-s);
+  font-weight: 600;
+  color: var(--ink);
+}
+.vis-naam-tekst {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vis-nr {
+  flex: none;
+  min-width: 1.3rem;
+  color: var(--ink-s);
+  font-weight: 700;
+}
+.vis-factor {
+  flex: none;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--ink-s);
+}
+
+/* Het spoor met de drie banden: 37,5% Basis op Orde, 25% Uitbouwen, 37,5% Sterk punt. */
+.vis-spoor {
+  position: relative;
+  height: 2.2rem;
+  border-radius: 6px;
+  background: linear-gradient(
+    to right,
+    var(--stat-red-faint) 0 37.5%,
+    var(--stat-amber-faint) 37.5% 62.5%,
+    var(--stat-green-faint) 62.5% 100%
+  );
+}
+/* Bij D en E vervalt de bandachtergrond. */
+.vis-spoor--neutraal {
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+}
+.vis-spoor-leeg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-s);
+}
+
+.vis-stip {
+  position: absolute;
+  top: 50%;
+  width: 0.9rem;
+  height: 0.9rem;
+  margin: -0.45rem 0 0 -0.45rem;
+  border-radius: 50%;
+  background: var(--vis-kleur, var(--ink-s));
+}
+.vis-stip--ring {
+  background: var(--bg);
+  border: 2px solid var(--vis-kleur, var(--ink-s));
+  box-sizing: border-box;
+}
+.vis-stip--groot {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: -0.55rem 0 0 -0.55rem;
+}
+.vis-stip--focus {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: -0.575rem 0 0 -0.575rem;
+  background: transparent;
+  border: 3px solid var(--or);
+  box-sizing: border-box;
+}
+.vis-stip--wit {
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+}
+.vis-stip--spreiding {
+  background: var(--vis-spreiding);
+  width: 0.7rem;
+  height: 0.7rem;
+  margin: -0.35rem 0 0 -0.35rem;
+}
+.vis-lijn {
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--vis-lijnkleur, var(--ink-s));
+  opacity: 0.55;
+}
+.vis-band {
+  position: absolute;
+  top: 18%;
+  bottom: 18%;
+  border-radius: 4px;
+}
+.vis-band--breed {
+  background: rgba(34, 91, 160, 0.14);
+}
+.vis-band--smal {
+  top: 30%;
+  bottom: 30%;
+  background: rgba(34, 91, 160, 0.34);
+}
+.vis-streep {
+  position: absolute;
+  top: 12%;
+  bottom: 12%;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--ink);
+}
+
+.vis-waarde {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.6rem;
+  font-size: var(--fs-s);
+  color: var(--ink-m);
+}
+.vis-getal {
+  font-size: var(--fs-m);
+  font-weight: 800;
+  color: var(--ink);
+}
+
+/* Labels: Spreiding, positie en klasse. Een label is vulling of omtrek, nooit alleen kleur. */
+.vis-label {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border-radius: 100px;
+  border: 1px solid var(--border-d);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--ink-m);
+  white-space: nowrap;
+}
+.vis-label--vol {
+  background: var(--ink-m);
+  border-color: var(--ink-m);
+  color: #fff;
+}
+.vis-label--boven {
+  background: #e8f1fb;
+  border-color: #bcd3ee;
+  color: #174473;
+}
+.vis-label--onder {
+  background: #fdf2e3;
+  border-color: #f2cf9b;
+  color: #8a4a00;
+}
+.vis-stijging {
+  color: var(--vis-stijging);
+  font-weight: 700;
+}
+.vis-daling {
+  color: var(--vis-daling);
+  font-weight: 700;
+}
+
+.vis-onderschrift {
+  margin-top: 1rem;
+  font-size: var(--fs-s);
+  color: var(--ink-m);
+}
+.vis-acties {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0 0 1.2rem;
+}
+
+/* Matrix (E): Rijen zijn bouwblokken, kolommen zijn Metingen. */
+.vis-matrix {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 4px;
+  font-size: var(--fs-s);
+}
+.vis-matrix th {
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink-m);
+  vertical-align: bottom;
+}
+.vis-matrix th.vis-matrix-naam,
+.vis-matrix td.vis-matrix-naam {
+  text-align: left;
+}
+.vis-matrix-aantal {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  color: var(--ink-s);
+}
+.vis-cel {
+  min-width: 4.5rem;
+  padding: 0.5rem 0.4rem;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  text-align: center;
+  font-weight: 800;
+}
+.vis-cel--rood {
+  background: #f7c6c1;
+  color: #7f1d1d;
+}
+.vis-cel--oranje {
+  background: #fde9c8;
+  color: #6b3a00;
+}
+.vis-cel--groen {
+  background: #c3e6d2;
+  color: #0e4d30;
+}
+.vis-cel--afwijkend {
+  border-color: #000;
+}
+.vis-cel--leeg {
+  background: var(--bg-warm);
+  color: var(--ink-s);
+  font-weight: 400;
+}
+.vis-matrix-zij {
+  text-align: center;
+  color: var(--ink-m);
+  white-space: nowrap;
+}
+.vis-matrix tr.vis-matrix-totaal td {
+  padding-top: 0.6rem;
+}
+
+.vis-sorteer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--fs-s);
+  font-weight: 600;
+  color: var(--ink-m);
+}
+
+/* Weergave-schakelaar (stylesheet.md, Weergave-schakelaar): 2 tot 3 knoppen aan elkaar, een gezamenlijke omtrek, de actieve
+   knop donker met witte tekst. Voor wisselen van weergave binnen één pagina, niet voor navigatie. */
+.weergave-wissel-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.weergave-wissel {
+  display: inline-flex;
+  border: 1.5px solid var(--border-d);
+  border-radius: 10px;
+  background: var(--bg);
+  overflow: hidden;
+}
+.weergave-wissel button {
+  padding: 0.55rem 1.1rem;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-m);
+  cursor: pointer;
+}
+.weergave-wissel button + button {
+  border-left: 1.5px solid var(--border-d);
+}
+.weergave-wissel button:hover:not(.actief):not(:disabled) {
+  background: var(--bg-warm);
+}
+.weergave-wissel button.actief {
+  background: var(--ink);
+  color: #fff;
+}
+.weergave-wissel button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

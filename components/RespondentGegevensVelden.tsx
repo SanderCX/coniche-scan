@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+import { RespondentFunctieKeuze } from "./RespondentFunctieKeuze";
+
 /**
  * De 4 velden van het intakeformulier (naam, rol/functie, team, notities),
  * losgetrokken zodat "Mijn gegevens" → "Gegevens bekijken/wijzigen"
@@ -5,6 +10,9 @@
  * nieuwe versie te bouwen. Geen eigen `<form>`/submit-knop hier: de
  * intakepagina en de Mijn-gegevens-modal hebben elk hun eigen omringende
  * formulier (met/zonder toestemmingsvakje, ander opslaggedrag).
+ *
+ * "Rol / functie" is een keuzelijst met "Anders…" (`content-respondentrol.md`) en komt via een verborgen veld
+ * `functie` in de `FormData`, net als de andere velden.
  */
 export function RespondentGegevensVelden({
   naam,
@@ -17,6 +25,7 @@ export function RespondentGegevensVelden({
   team: string;
   notities: string;
 }) {
+  const [functieWaarde, setFunctieWaarde] = useState(functie);
   return (
     <>
       <div className="field">
@@ -25,7 +34,7 @@ export function RespondentGegevensVelden({
       </div>
       <div className="field">
         <label>Rol / functie</label>
-        <input type="text" name="functie" required defaultValue={functie} />
+        <RespondentFunctieKeuze name="functie" required waarde={functieWaarde} onChange={setFunctieWaarde} />
       </div>
       <div className="field">
         <label>

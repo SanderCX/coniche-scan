@@ -255,7 +255,7 @@ export function verplaatsRespondentNaarOrganisatie(
   // verwijzen naar Metingen van de oude organisatie en vervallen.
   if (!doelLid) {
     bronOrganisatie.leden = bronOrganisatie.leden.filter((l) => l.id !== lidId);
-    doelOrganisatie.leden.push({ ...lid, organisatieId: doelOrganisatie.id, leadMetingIds: [] });
+    doelOrganisatie.leden.push({ ...lid, organisatieId: doelOrganisatie.id, leadMetingIds: [], leadVoorOrganisatie: false });
   } else if (resultaat.overgeslagen.length === 0) {
     bronOrganisatie.leden = bronOrganisatie.leden.filter((l) => l.id !== lidId);
     resultaat.respondentVerwijderd = true;
@@ -353,6 +353,7 @@ export function verplaatsResponsNaarOrganisatie(
       notities: bronLid.notities,
       toegangscode: genereerUniekeToegangscode(alles),
       leadMetingIds: [],
+      leadVoorOrganisatie: false,
       aangemaaktOp: new Date().toISOString(),
     };
     doelOrganisatie.leden.push(doelLid);

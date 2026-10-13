@@ -11,6 +11,7 @@
 @import "./styles/components.css";
 @import "./styles/admin.css";
 @import "./styles/charts.css";
+@import "./styles/visualisatie.css";
 
 @theme inline {
   --font-sans: var(--font-epilogue);

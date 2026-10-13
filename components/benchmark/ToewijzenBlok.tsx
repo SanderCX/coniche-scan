@@ -4,16 +4,22 @@ import { Suspense, useState } from "react";
 import { Benchmark, Organisatie, OrganisatieLid, ScanUitvoering } from "@/lib/types";
 import { niveauVan } from "@/lib/benchmark";
 import { trekBenchmarkToewijzingIn, useBenchmarkToewijzingen, wijsBenchmarkToe } from "@/lib/benchmark-store";
+import { heeftBereikOpMeting, heeftBereikOpOrganisatie } from "@/lib/lead";
 import { useBeheerOverzicht } from "@/lib/beheer-url";
 import { InfoIcoon } from "@/components/InfoIcoon";
+import { Modal } from "@/components/Modal";
+import type { LeadBereikKeuze } from "@/lib/db";
+import { LeadToevoegenFormulier } from "@/components/beheer/LeadToevoegenFormulier";
 
 /**
  * Het blok "Toewijzen aan een Lead" op een view (`benchmark.md`, Toewijzen aan een Lead op alle niveaus; `beheerpagina.md`,
  * punt 14), gelijk op alle niveaus: Een lijst van de Leads aan wie de view is toegewezen met de datum en de knoppen "Bekijk"
  * en "Intrekken", en daaronder een keuzelijst met de Leads die in aanmerking komen met de knop "Toewijzen".
  *
- * Wie in aanmerking komt: Niveau 1 een Lead van de organisatie, niveau 2 en 3 een Lead op de Meting van de view
- * (`leadMetingIds`). Toewijzen kan alleen als de groep aan de drempel van het niveau voldoet.
+ * Wie in aanmerking komt (`benchmark.md`, Bereik van een Lead): Niveau 1 een Lead voor de hele organisatie, niveau 2 en 3
+ * een Lead met bereik op de Meting van de view. Toewijzen kan alleen als de groep aan de drempel van het niveau voldoet.
+ * Heeft het onderwerp geen Lead met passend bereik, dan kan de Admin er een toevoegen in een modal, met het bereik al
+ * voorgekozen: Op niveau 1 "Hele organisatie", op niveau 2 en 3 "Specifieke Metingen" met de Meting van de view.
  */
 export interface ToewijzenOnderwerp {
   organisatie: Organisatie;
@@ -45,6 +51,7 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
   const toewijzingen = useBenchmarkToewijzingen();
   const { open } = useBeheerOverzicht();
   const [leadId, setLeadId] = useState("");
+  const [leadToevoegenOpen, setLeadToevoegenOpen] = useState(false);
 
   const eigen = toewijzingen.filter(
     (t) =>
@@ -53,9 +60,13 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
       (t.metingId ?? null) === (meting?.id ?? null) &&
       (t.onderwerpRespondentId ?? null) === (respondent?.id ?? null)
   );
-  const leads = organisatie.leden.filter(
-    (l) => l.leadMetingIds.length > 0 && (niveau === "organisaties" || (meting ? l.leadMetingIds.includes(meting.id) : false))
-  );
+  const heeftBereik = (l: OrganisatieLid) =>
+    niveau === "organisaties"
+      ? heeftBereikOpOrganisatie(l, organisatie.id)
+      : meting
+        ? heeftBereikOpMeting(l, organisatie.id, meting.id)
+        : false;
+  const leads = organisatie.leden.filter(heeftBereik);
   const nogToeTeWijzen = leads.filter((l) => !eigen.some((t) => t.respondentId === l.id));
   const gekozen = nogToeTeWijzen.some((l) => l.id === leadId) ? leadId : (nogToeTeWijzen[0]?.id ?? "");
   const kanToewijzen = voldoetAanDrempel && nogToeTeWijzen.length > 0;
@@ -66,6 +77,9 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
     ...(meting ? { metingLabel: meting.label } : {}),
   };
   const onderwerpTekst = respondent ? respondent.naam || respondent.email : null;
+  const bereikNaam = niveau === "organisaties" ? organisatie.naam : `Meting ${meting?.label ?? ""}`.trim();
+  const voorgekozenBereik: LeadBereikKeuze =
+    niveau === "organisaties" || !meting ? { soort: "organisatie" } : { soort: "metingen", metingIds: [meting.id] };
 
   return (
     <>
@@ -75,6 +89,7 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
           <thead>
             <tr>
               <th>Lead</th>
+              <th>Bereik</th>
               <th>Toegewezen op</th>
               <th></th>
             </tr>
@@ -82,9 +97,25 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
           <tbody>
             {eigen.map((t) => {
               const lead = organisatie.leden.find((l) => l.id === t.respondentId);
+              const organisatieBereik = lead ? heeftBereikOpOrganisatie(lead, organisatie.id) : false;
+              const metingBereik = lead && meting ? heeftBereikOpMeting(lead, organisatie.id, meting.id) : false;
+              // Een niveau 1-toewijzing van vóór het bereik, aan een Lead zonder organisatiebereik: Blijft eenmalig staan, de
+              // Lead ziet niets (`benchmark.md`, Bereik van een Lead, Bestaande toewijzingen).
+              const zonderBereik = !!lead && !(niveau === "organisaties" ? organisatieBereik : metingBereik);
               return (
                 <tr key={t.id}>
                   <td>{lead ? lead.naam || lead.email : "Onbekende Lead"}</td>
+                  <td>
+                    {zonderBereik ? (
+                      <span className="text-sm" style={{ color: "var(--stat-red)" }}>
+                        Deze Lead heeft geen bereik op deze organisatie
+                      </span>
+                    ) : organisatieBereik ? (
+                      "Hele organisatie"
+                    ) : (
+                      `Meting ${meting?.label ?? ""}`.trim()
+                    )}
+                  </td>
                   <td>{new Date(t.toegewezenOp).toLocaleDateString("nl-NL")}</td>
                   <td className="cel-knop">
                     <div className="knoppen-gelijk">
@@ -105,19 +136,20 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
 
       {leads.length === 0 ? (
         <div className="filter-rij flex flex-wrap items-end gap-3">
+          {/* De melding staat in de keuzelijst zelf (`benchmark.md`, Toewijzen aan een Lead): Eén keer, niet ernaast. */}
           <div className="admin-field" style={{ marginBottom: 0, minWidth: "16rem" }}>
             <label>Lead</label>
-            <select disabled>
-              <option>Geen Lead beschikbaar</option>
+            <select disabled aria-label="Lead">
+              <option>Geen Lead met bereik op {bereikNaam}</option>
             </select>
           </div>
           <button type="button" className="btn btn-or btn-compact" disabled>
             Toewijzen
           </button>
           <InfoIcoon naastVeld sleutel="info.benchmarkToewijzen" />
-          <span className="text-sm text-ink-m" style={{ alignSelf: "center" }}>
-            {niveau === "organisaties" ? "Deze organisatie heeft nog geen Lead." : "Deze Meting heeft nog geen Lead."}
-          </span>
+          <button type="button" className="btn btn-or btn-compact" onClick={() => setLeadToevoegenOpen(true)}>
+            + Lead toevoegen
+          </button>
         </div>
       ) : (
         <div className="filter-rij flex flex-wrap items-end gap-3">
@@ -155,8 +187,29 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
             Toewijzen
           </button>
           {!voldoetAanDrempel && <InfoIcoon naastVeld sleutel="info.benchmarkToewijzen" />}
+          <button type="button" className="btn btn-or btn-compact" onClick={() => setLeadToevoegenOpen(true)}>
+            + Lead toevoegen
+          </button>
         </div>
       )}
+      <Modal open={leadToevoegenOpen} onClose={() => setLeadToevoegenOpen(false)} title="Lead toevoegen">
+        <p className="text-sm text-ink-m" style={{ marginTop: 0 }}>
+          Voor {organisatie.naam}. Een Lead die {niveau === "organisaties" ? "de organisatie" : "deze Meting"} niet dekt, kan
+          de view niet krijgen.
+        </p>
+        {leadToevoegenOpen && (
+          <LeadToevoegenFormulier
+            organisatie={organisatie}
+            voorgekozen={voorgekozenBereik}
+            onToegevoegd={(lid) => {
+              // Na opslaan sluit de modal en staat de nieuwe Lead geselecteerd, klaar voor "Toewijzen".
+              setLeadId(lid.id);
+              setLeadToevoegenOpen(false);
+            }}
+            onAnnuleren={() => setLeadToevoegenOpen(false)}
+          />
+        )}
+      </Modal>
       {onderwerpTekst && (
         <p id="toewijzen-privacy" className="text-sm text-ink-m" style={{ marginTop: "0.6rem" }}>
           De Lead ziet hiermee de scores van {onderwerpTekst}.

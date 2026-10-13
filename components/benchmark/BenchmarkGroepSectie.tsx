@@ -7,6 +7,8 @@ import { scoreKleur } from "@/lib/colors";
 import { ScoreCircle } from "@/components/ScoreCircle";
 import { RadarChartView } from "@/components/RadarChartView";
 import { CategoryBarChart } from "@/components/CategoryBarChart";
+import { WeergaveMatrix } from "@/components/visualisatie/WeergaveMatrix";
+import { matrix } from "@/lib/visualisatie";
 
 function Score({ waarde }: { waarde: number | null }) {
   if (waarde === null) return <span className="text-ink-s">–</span>;
@@ -101,6 +103,20 @@ export function BenchmarkGroepSectie({
               ))}
             </tbody>
           </table>
+
+          {binnen && (
+            // Weergave E (`visualisatie-scores.md`): Het overzicht van alle gekozen Metingen is een matrix, alleen voor de Admin.
+            <>
+              <h3>Per {assessment.bouwblokEenheidEnkelvoud} en per Meting</h3>
+              <WeergaveMatrix
+                assessment={assessment}
+                weergave={matrix(
+                  assessment,
+                  rijen.map((r) => ({ label: r.meting.label, aantalScans: r.aantalAfgerond, antwoorden: r.antwoorden }))
+                )}
+              />
+            </>
+          )}
 
           <div className="resultaten-header" style={{ paddingTop: "1rem" }}>
             {resultaten.overall !== null && (

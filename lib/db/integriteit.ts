@@ -252,7 +252,7 @@ export function koppelWeesMetingAanOrganisatie(metingId: string, organisatieId: 
         if (!lid || doel.leden.some((l) => l.id === lid.id)) continue;
         const zelfdeEmail = doel.leden.find((l) => l.email === lid.email);
         if (zelfdeEmail) i.organisatieLidId = zelfdeEmail.id;
-        else doel.leden.push({ ...lid, organisatieId: doel.id, leadMetingIds: [] });
+        else doel.leden.push({ ...lid, organisatieId: doel.id, leadMetingIds: [], leadVoorOrganisatie: false });
       }
     }
     meting.organisatieId = doel.id;

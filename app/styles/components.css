@@ -161,9 +161,32 @@
   overflow: visible;
 }
 
+.dropdown-menu--rechts {
+  left: auto;
+  right: 0;
+}
+
+/* Actieve staat van een Dropdown-knop (`stylesheet.md`, Accountmenu in beheer): Een pagina onder het menu is open. Rand en
+   tekst blijven `var(--or)` zoals bij elke `.btn-outline`, de achtergrond krijgt de lichte oranje tint. */
+.btn.dropdown-knop-actief,
+.btn.dropdown-knop-actief:hover {
+  background: var(--or-faint);
+}
+
 .dropdown-menu-rij {
   display: flex;
   align-items: center;
+}
+/* Scheidingslijn boven een optie, met .25rem ruimte boven en onder. */
+.dropdown-menu-rij--scheiding {
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border);
+}
+.dropdown-menu-item[aria-current="page"] {
+  background: var(--or-faint);
+  color: var(--or);
+  font-weight: 700;
 }
 .dropdown-menu-rij .info-icoon-wrap {
   margin-right: 0.7rem;
@@ -207,7 +230,7 @@
 .dropdown-menu-header {
   padding: 0.6rem 1rem;
   font-size: var(--fs-s);
-  color: var(--ink-m);
+  color: var(--ink-s);
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }

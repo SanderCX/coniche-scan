@@ -1,5 +1,7 @@
 import { Assessment, Benchmark, BenchmarkLid, BenchmarkNiveau, Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering } from "./types";
 import { alleVragen } from "./assessment-structuur";
+import { heeftBereikOpMeting, heeftBereikOpOrganisatie, LeadBereikLid } from "./lead";
+import { SpreidingWeergave, spreiding, tussenOrganisaties, TussenOrganisatiesWeergave } from "./visualisatie";
 import {
   alleBouwblokResultaten,
   alleGroepResultaten,
@@ -221,6 +223,16 @@ export interface VergelijkingsView {
   verschillen: { bouwblok: BouwblokResultaat["bouwblok"]; score: number | null; rest: number | null; verschil: number | null }[];
   /** De groep is groot genoeg (`benchmarkMinOrganisaties` op niveau 1, twee Metingen op niveau 2, `benchmarkMinScans` op niveau 3). */
   voldoetAanDrempel: boolean;
+  /**
+   * Weergave D (`visualisatie-scores.md`): Per bouwblok de band van minimum tot maximum van de groep, de kwartielen en het
+   * gemiddelde, zonder X. Alleen aggregaten: Geen antwoorden van andere leden en geen namen. `null` zonder andere leden.
+   */
+  groep: TussenOrganisatiesWeergave | null;
+  /**
+   * Weergave B op niveau 3: De scores van de scans in de Meting, met een ring op de scan van de view. Alleen bij een
+   * scan-view (`bouwScanView`). De stippen hebben geen naam.
+   */
+  spreiding?: SpreidingWeergave;
 }
 
 export interface OrganisatieView extends VergelijkingsView {
@@ -254,6 +266,7 @@ function maakVergelijking(
     rest,
     verschillen,
     voldoetAanDrempel: aantalInGroep >= drempel && anderen.length > 0,
+    groep: anderen.length > 0 ? tussenOrganisaties(assessment, eigen, anderen) : null,
   };
 }
 
@@ -298,19 +311,15 @@ export function organisatiesInBenchmark(secties: BenchmarkSectie[]): Organisatie
 }
 
 /**
- * De secties die een Lead mag zien (`benchmark.md`, Toewijzen aan een Lead): Alleen voor Assessments waarvan hij de Meting
- * van zijn organisatie mag inzien (`leadMetingIds`) én waarvan de groep aan de drempel voldoet. Anders ziet hij een
- * vergelijking met resultaten die hij zelf niet mag openen, of met te weinig anderen om anoniem te blijven.
+ * De secties die een Lead van niveau 1 mag zien (`benchmark.md`, Toewijzen aan een Lead): Alleen de secties waarvan de groep
+ * aan de drempel voldoet, anders ziet hij een vergelijking met te weinig anderen om anoniem te blijven. Of de Lead bereik
+ * heeft op de organisatie, controleert de aanroeper (`leadViewVoorToewijzing`): Van de Lead zelf speelt niets mee, niet zijn
+ * eigen scan en niet de Metingen waarop hij Lead is.
  */
-export function viewsVoorLead(
-  secties: BenchmarkSectie[],
-  organisatieId: string,
-  leadMetingIds: string[],
-  minOrganisaties: number
-): OrganisatieView[] {
+export function viewsVoorLead(secties: BenchmarkSectie[], organisatieId: string, minOrganisaties: number): OrganisatieView[] {
   return secties
     .map((s) => bouwOrganisatieView(s, organisatieId, minOrganisaties))
-    .filter((v): v is OrganisatieView => v !== null && v.voldoetAanDrempel && leadMetingIds.includes(v.rij.meting.id));
+    .filter((v): v is OrganisatieView => v !== null && v.voldoetAanDrempel);
 }
 
 /** Namen voor het audit-log, zoals ze op dat moment zijn (`datamodel.md`, Audit, Benchmark). */
@@ -435,7 +444,10 @@ export function bouwScanView(sectie: ScanSectie, invullingId: string, minScans: 
   const scan = sectie.scans.find((s) => s.invulling.id === invullingId);
   if (!scan) return null;
   const anderen = sectie.scans.filter((s) => s.invulling.id !== invullingId);
-  return maakVergelijking(sectie.assessment, scan.antwoorden, anderen.map((s) => s.antwoorden), sectie.scans.length, minScans);
+  return {
+    ...maakVergelijking(sectie.assessment, scan.antwoorden, anderen.map((s) => s.antwoorden), sectie.scans.length, minScans),
+    spreiding: spreiding(sectie.assessment, sectie.scans.map((s) => s.invulling), invullingId),
+  };
 }
 
 /* ---------- De view van een Lead, op alle niveaus ---------- */
@@ -467,27 +479,29 @@ export interface LeadBenchmarkView {
 }
 
 /**
- * Wat een Lead ziet van een toegewezen view (`benchmark.md`, Toewijzen aan een Lead op alle niveaus). Op elk niveau geldt: De
- * Lead mag de Meting van de view inzien (`leadMetingIds`) en de groep voldoet aan de drempel van dat niveau. Anders staat
- * er niets, ook geen kaart. Nooit de namen van andere leden: Alleen het lid zelf en aggregaten.
+ * Wat een Lead ziet van een toegewezen view (`benchmark.md`, Bereik van een Lead en Toewijzen aan een Lead op alle
+ * niveaus). Niveau 1 vraagt een Lead voor de hele organisatie. Niveau 2 en 3 vragen bereik op de Meting van de view, via de
+ * hele organisatie of via die Meting. Op elk niveau moet de groep aan de drempel van dat niveau voldoen. Anders staat er
+ * niets, ook geen kaart. Nooit de namen van andere leden: Alleen het lid zelf en aggregaten.
  */
 export function leadViewVoorToewijzing(
   toewijzing: { organisatieId: string; metingId?: string; onderwerpRespondentId?: string },
   benchmark: Benchmark,
   assessments: Assessment[],
   organisaties: Organisatie[],
-  leadMetingIds: string[],
+  lead: LeadBereikLid,
   drempels: BenchmarkDrempels
 ): LeadBenchmarkView | null {
   const niveau = niveauVan(benchmark);
   if (niveau === "organisaties") {
+    if (!heeftBereikOpOrganisatie(lead, toewijzing.organisatieId)) return null;
     const organisatie = organisaties.find((o) => o.id === toewijzing.organisatieId);
     if (!organisatie) return null;
     const secties = bouwBenchmarkSecties(benchmark, assessments, organisaties);
-    const views = viewsVoorLead(secties, toewijzing.organisatieId, leadMetingIds, drempels.minOrganisaties);
+    const views = viewsVoorLead(secties, toewijzing.organisatieId, drempels.minOrganisaties);
     return { niveau, eigenNaam: organisatie.naam, metingLabel: null, views: views.map(zonderRij) };
   }
-  if (!toewijzing.metingId || !leadMetingIds.includes(toewijzing.metingId)) return null;
+  if (!toewijzing.metingId || !heeftBereikOpMeting(lead, toewijzing.organisatieId, toewijzing.metingId)) return null;
   if (niveau === "metingen") {
     const secties = bouwBenchmarkSecties(benchmark, assessments, organisaties);
     const sectie = secties.find((s) => s.rijen.some((r) => r.meting.id === toewijzing.metingId));

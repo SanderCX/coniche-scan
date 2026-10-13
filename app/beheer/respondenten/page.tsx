@@ -11,6 +11,7 @@ import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { useBeheerOverzicht, useUrlParams } from "@/lib/beheer-url";
 import { RespondentStatusBadge } from "@/components/beheer/overzicht-helpers";
 import { ScanInvulling } from "@/lib/types";
+import { isLead } from "@/lib/lead";
 
 type Kolom = "naam" | "organisatie" | "metingen" | "status";
 
@@ -74,7 +75,7 @@ function RespondentenPageInhoud() {
           metingIds: metingen.map((m) => m.id),
           metingen,
           invullingen,
-          isLead: lid.leadMetingIds.length > 0,
+          isLead: isLead(lid),
           link: typeof window === "undefined" ? "" : maakPubliekeLink(window.location.origin, lid),
           statusSortering: invullingen.length === 0 ? -1 : afgerond / invullingen.length,
         };

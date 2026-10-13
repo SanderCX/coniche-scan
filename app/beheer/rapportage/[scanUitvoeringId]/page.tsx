@@ -4,10 +4,12 @@ import { use } from "react";
 import { useScanUitvoering } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
-import { magOrganisatieToegang } from "@/lib/rechten";
+import { isAdmin, magOrganisatieToegang } from "@/lib/rechten";
 import { gemiddeldeAntwoordenVoorMeting } from "@/lib/scoring";
 import { ResultsView } from "@/components/ResultsView";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
+import { MetingWeergaven } from "@/components/visualisatie/MetingWeergaven";
+import { VergelijkingEyebrow } from "@/components/visualisatie/VergelijkingEyebrow";
 
 /**
  * Rapportage over één meting: het gemiddelde per vraag over alle
@@ -72,6 +74,10 @@ export default function RapportagePage({
   }
 
   const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMeting(assessment, scanUitvoering.invullingen);
+  // Eerdere Metingen van dezelfde organisatie en hetzelfde Assessment, om mee te vergelijken (`visualisatie-scores.md`, C).
+  const eerdereMetingen = organisatie.scanUitvoeringen.filter(
+    (m) => m.id !== scanUitvoering.id && m.assessmentId === scanUitvoering.assessmentId && m.aangemaaktOp < scanUitvoering.aangemaaktOp
+  );
 
   return (
     <div className="admin-main admin-main--breed">
@@ -83,14 +89,23 @@ export default function RapportagePage({
           { label: "Resultaten van de Meting" },
         ]}
       />
-      <span className="eyebrow">{scanUitvoering.label}</span>
+      <VergelijkingEyebrow label={scanUitvoering.label} eerdereMetingen={eerdereMetingen} />
       <h1>{assessment.naam}</h1>
       <p className="text-sm text-ink-m">
         Gemiddelde over {afgerond.length} {afgerond.length === 1 ? "afgeronde respondent" : "afgeronde respondenten"}
       </p>
 
       <div className="mt-8">
-        <ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />
+        <MetingWeergaven
+          assessment={assessment}
+          organisatie={organisatie}
+          scanUitvoering={scanUitvoering}
+          overzicht={<ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />}
+          spreidingToegestaan
+          bereikAltijd
+          toonBenchmarkLink={isAdmin(ingelogd)}
+          eerdereMetingen={eerdereMetingen}
+        />
       </div>
     </div>
   );

@@ -229,7 +229,7 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
 - **Opsplitsen** van de Import-pagina (590 regels).
 - **Meer tests**: Import (parsen en valideren van rijen), `scan-slot`, de
   overige stores.
-- **Bereik van een Lead (voorstel)**: Een Lead krijgt bereik op specifieke
+- **Bereik van een Lead (gebouwd op 13 oktober 2026)**: Een Lead krijgt bereik op specifieke
   Metingen of op de hele organisatie, los van of hij zelf een scan heeft
   gedaan (`benchmark.md`, Bereik van een Lead). Te bouwen: het veld
   `leadVoorOrganisatie` op de Respondent; de keuze van het bereik in "Lead
@@ -244,13 +244,13 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   alle plekken in `lib/db/verplaatsen.ts` (vier) en bij samenvoegen; het
   voorgekozen bereik in "+ Lead toevoegen" (modal). Optioneel: Een blok "Leads" op organisatie-detail
   en Meting-overzicht.
-- **Andere Respondent koppelen vanuit het Scan-overzicht (voorstel)**: Een
+- **Andere Respondent koppelen vanuit het Scan-overzicht (gebouwd op 13 oktober 2026)**: Een
   naamwijziging via "Respondent bewerken" geldt voor alle scans van de
   Respondent. Nodig: De vaste regel "Deze wijziging geldt voor alle {n} scans"
   in dat formulier, en de actie "Andere Respondent koppelen" in het
   Scan-overzicht (hergebruik het blok uit "Conflict oplossen") voor een
   wijziging bij één scan (`beheerpagina.md`, punt 7).
-- **Rol / functie als keuzelijst (besloten)**: In de intake, in "Mijn gegevens"
+- **Rol / functie als keuzelijst (gebouwd op 13 oktober 2026)**: In de intake, in "Mijn gegevens"
   en in "Respondent bewerken" (en dus ook in "Nieuwe Respondent" en "Andere
   Respondent koppelen") een keuzelijst met de 29 waarden uit
   `content-respondentrol.md` en "Anders…" met een invoerveld. De waarde blijft
@@ -262,7 +262,7 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   niet het veld `Bouwblok.toelichting`. Alleen bij een zelf aangemaakt bouwblok
   heeft het veld effect. Open: Het scherm laten waarschuwen als het veld wordt
   genegeerd, of de lookup-tabellen vervangen door het veld.
-- **Instellingen in het Accountmenu (voorstel)**: De hoofdlink "Applicatie" vervalt
+- **Instellingen in het Accountmenu (gebouwd op 13 oktober 2026)**: De hoofdlink "Applicatie" vervalt
   en wordt de rij "Instellingen" in het Accountmenu, alleen voor een Admin
   (`beheerpagina.md`, Accountmenu en Instellingen). Te bouwen: De rij met
   scheidingslijn boven "Uitloggen"; de pagina met tabbalk (Gebruikers, Drempels
@@ -272,7 +272,7 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   `data/info-teksten.ts` ("Applicatie, Instellingen" wordt "Instellingen,
   Drempels en termijnen"). De actieve staat van de Accountmenu-knop
   staat in `stylesheet.md`, Dropdown-knop.
-- **Mijn account in het Accountmenu (voorstel)**: Een Admin of Consultant wijzigt
+- **Mijn account in het Accountmenu (gebouwd op 13 oktober 2026, zonder wachtwoord)**: Een Admin of Consultant wijzigt
   zijn eigen naam en wachtwoord (`beheerpagina.md`, Accountmenu). Het
   e-mailadres is alleen-lezen. Te bouwen: De rij en de modal, het recht
   `account.bewerken` (bereik `zelf`) en `gebruiker.eigenGegevensGewijzigd`. De

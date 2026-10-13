@@ -75,6 +75,8 @@ function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
           ...l,
           email: normaliseerEmail(l.email),
           leadMetingIds: Array.isArray(l.leadMetingIds) ? l.leadMetingIds : [],
+          // Ontbreekt bij data van vóór het bereik van een Lead: Dan geldt "Specifieke Metingen".
+          leadVoorOrganisatie: l.leadVoorOrganisatie === true,
         }))
       : [],
     scanUitvoeringen: Array.isArray(ruw.scanUitvoeringen)

@@ -1,5 +1,60 @@
 # Coniche Scan — Changelog
 
+## 2026-10-13 — Specs van Joost van 12 oktober (PR 74): Rol / functie, Bereik van een Lead, Instellingen, Mijn account, visualisatie van scores
+
+**Gedaan**:
+- **`datamodel.md` hersteld**: Joosts commit `1634e38` had de Techstack-sectie teruggezet naar de stand van vóór `aefa956`
+  (zes categorieën, zelf/extern, IT en deployment). Hersteld naar de huidige stand, zonder de lijsten te herhalen: Die staan
+  in `content-techstack.md` (zoals Joost bedoelde). `VeldDefinitie` heeft weer `voorop` en `eigenOptiePlaceholder`, en
+  `toonAlsBroer` is vervallen.
+- **Rol / functie als keuzelijst** (`content-respondentrol.md`, 29 rollen): Eén gedeeld component
+  `KeuzelijstMetEigenOptie` voor Techstack en Rol / functie (`RespondentFunctieKeuze`), in de intake, "Mijn gegevens",
+  Respondent bewerken, Conflict oplossen en "Andere Respondent koppelen". Aangeleverde volgorde, "Anders…" onderaan,
+  eigen invoer en bestaande vrije tekst komen vanzelf in de lijst. `data/respondent-rollen.ts` wordt door een test
+  gelijk gehouden aan het contentbestand. Het veld blijft verplicht, zoals het was (open punt bij Joost).
+- **Bereik van een Lead** (`datamodel.md` deel 2, `benchmark.md`, `beheerpagina.md` punt 6a): `OrganisatieLid.leadVoorOrganisatie`,
+  gedeelde hulpfuncties in `lib/lead.ts` (`isLead`, `leadMetingIdsVan`, `heeftBereikOpOrganisatie`, `heeftBereikOpMeting`).
+  - Formulier "Lead toevoegen" (`LeadToevoegenFormulier`) en blok Toegang: Specifieke Metingen of Hele organisatie, met de
+    vaste waarschuwing (`.admin-notice`, zonder bevestiging). Wisselen van bereik bewaart de gekozen Metingen, pas het
+    intrekken wist ze. `zetLeadBereik` vervangt `zetLeadMetingen` (die blijft als wrapper).
+  - "Lead" is `leadVoorOrganisatie` of minstens één Meting: badge, lijsten, Mijn metingen, resultaten en benchmark.
+  - Verplaatsen, samenvoegen, importeren en nieuwe Respondenten maken `leadVoorOrganisatie` leeg.
+  - Benchmark: Niveau 1 vraagt een Lead voor de hele organisatie, niveau 2 en 3 bereik op de Meting. Een toewijzing vervalt op
+    elk niveau als het bereik wegvalt (`verwijderToewijzingenZonderBereik`). Een niveau 1-toewijzing van vóór het bereik blijft
+    eenmalig staan, met de melding "Deze Lead heeft geen bereik op deze organisatie". Het blok Toewijzen toont het bereik van
+    de Lead, "Geen Lead met bereik op {…}" en "+ Lead toevoegen" als modal met het bereik voorgekozen.
+  - `viewsVoorLead` en `leadViewVoorToewijzing` nemen nu het bereik van de Lead in plaats van `leadMetingIds`.
+- **Andere Respondent koppelen** in het Scan-overzicht (`AndereRespondentKoppelenStap`): Hergebruikt
+  `koppelScanAanAndereRespondent`. Een Respondent met al een scan in de Meting is niet te kiezen en de lijst zegt waarom.
+  Bij Respondent bewerken staat de vaste regel "Deze wijziging geldt voor alle {n} scans van {naam} bij {organisatie}".
+- **Instellingen in het Accountmenu**: "Applicatie" is geen hoofdlink meer. Het Accountmenu heeft "Mijn account",
+  "Instellingen" (Admin) en "Uitloggen" met een scheidingslijn, rechts uitgelijnd, met actieve staat zolang een pagina onder
+  Instellingen open is. Tabbalk: Gebruikers (landing), Drempels en termijnen (was Instellingen, `/beheer/drempels`), Algemene
+  teksten, Content-pagina's (nog een lege pagina), Audit-log en Data-integriteit (`/beheer/data-integriteit`). `/beheer/applicatie`
+  en `/beheer/instellingen` sturen door. Het menu volgt het toetsenbord (pijltjes, Esc).
+- **Mijn account** (`MijnAccountModal`): Naam wijzigen, e-mailadres en rol alleen-lezen, "Wachtwoord wijzigen" uitgeschakeld
+  met Info-icoon (komt met de echte inlog), recht `account.bewerken` en audit `gebruiker.eigenGegevensGewijzigd`.
+- **Visualisatie van hoge en lage scores** (`visualisatie-scores.md`, A tot en met E): Berekeningen in `lib/visualisatie.ts`,
+  weergaven in `components/visualisatie/`, de schakelaar `.weergave-wissel`.
+  - Resultatenpagina van een Meting: Overzicht, Per bouwblok (A) en Spreiding (B), de vergelijking met een vorige Meting (C)
+    en "Bekijk in benchmark" (Admin). De weergave staat in de adresbalk.
+  - Resultatenpagina van één scan: "Scores van deze scan" en "Positie in de Meting" (B met ring), uitgeschakeld onder
+    `benchmarkMinRespondenten` met `info.positieMeting`.
+  - Benchmark: D vervangt de lijst met het verschil per bouwblok op niveau 1 en bij de view per Meting, B op niveau 3, en
+    E is de matrix op niveau 2. Een Lead ziet D en B alleen via een toegewezen view.
+  - Tests: 131 → 179, onder meer voor de berekeningen (kwartielen zoals `KWARTIEL.INC`, steekproef-standaardafwijking,
+    klassewissel), het Lead-bereik (wisselen, verplaatsen, vervallen van toewijzingen) en de rollenlijst.
+- **Blok Toewijzen zonder Lead met bereik**: De melding "Geen Lead met bereik op {organisatie of Meting}" staat nu in de
+  keuzelijst zelf (zoals `benchmark.md` zegt), niet ernaast en niet naast "Geen Lead beschikbaar". Eén keer.
+- **Statusregels in de specs** op "gebouwd op 13 oktober 2026" gezet, en twee nieuwe Info-teksten in het register
+  (`info.positieMeting`, `info.mijnAccountWachtwoord`).
+
+**Niet gedaan / open**:
+- Export van de nieuwe weergaven (PDF, CSV, InDesign).
+- De spreidingsgrenzen (0,55 en 0,8) staan als constante. Joosts open punten (drempel voor de band in D, namen bij een
+  stip in B, meer dan twee Metingen in C) zijn niet aangeraakt.
+- Content-pagina's (`beheerpagina.md`, punt 11) en het wachtwoord in Mijn account wachten op overleg en de echte inlog.
+
 ## 2026-10-12 — Techstack: keuzelijsten voor Contact center, Conversational AI, CRM, Kennismanagement en WFM
 
 **Gedaan** (op verzoek van Sander, nog niet in een spec van Joost; `datamodel.md` is bijgewerkt):

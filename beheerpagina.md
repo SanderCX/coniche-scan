@@ -82,7 +82,7 @@ losse elementen naast elkaar.
 - **Toetsenbord**: Zoals de Dropdown-knop in `stylesheet.md`: Enter of spatie
   opent het menu, pijltjestoetsen lopen door de rijen, Esc sluit.
 
-**Mijn account** (voorstel). Een modal volgens het patroon van "Mijn
+**Mijn account** (gebouwd op 13 oktober 2026, het wachtwoord komt met de echte inlog). Een modal volgens het patroon van "Mijn
 gegevens" aan de respondentkant (`CLAUDE.md`, scherm 4), voor Admin en
 Consultant. Hier wijzigt een gebruiker zijn eigen gegevens. Wat een Admin bij
 een andere gebruiker wijzigt, staat bij Gebruikers (punt 9).
@@ -182,7 +182,7 @@ beheer de gewone beheer-nav met het kruimelpad Organisaties › Organisatie
 "Exporteren". Terug gaat via het kruimelpad. Dat wordt het Meting-overzicht
 en niet de Respondent-modal, want die is niet meer open. Boven de resultaten
 staat een schakelaar met Scores van deze scan en Positie in de Meting
-(besloten op 12 oktober 2026, nog niet gebouwd, zie `visualisatie-scores.md`,
+(besloten op 12 oktober 2026, gebouwd op 13 oktober 2026, zie `visualisatie-scores.md`,
 Navigatie).
 
 **Organisatie-resultaten** (punt 4): Zelfde kruimelpad, eindigend op
@@ -383,6 +383,8 @@ standaardteksten zoals ze nu in de app staan):
 | `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
 | `info.bulkExportOrganisatie` | Ingevulde scans, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie. |
 | `info.assessmentVerwijderen` | Assessments, op de kaart en het detail, naast de uitgeschakelde knop "Verwijderen" | Verwijder eerst alle Metingen van dit Assessment, bij alle organisaties. Daarna kan het Assessment worden verwijderd. Dit kan niet ongedaan worden gemaakt. De tekst begint altijd met het aantal Metingen en organisaties, die zin maakt de app zelf. |
+| `info.positieMeting` | Resultaten van één scan, naast de uitgeschakelde weergave "Positie in de Meting" | De positie van een scan tegenover de andere scans in de Meting is er pas bij voldoende afgeronde scans. Bij minder is een scan te herleiden naar een persoon. Het minimum staat bij Drempels en termijnen (aantal respondenten per Meting). |
+| `info.mijnAccountWachtwoord` | Mijn account, naast de uitgeschakelde knop "Wachtwoord wijzigen" | Wachtwoord wijzigen komt met de echte inlog. Tot die tijd vraag je een Admin om je wachtwoord te wijzigen. |
 | `info.benchmarkInstellingen` | Instellingen, Drempels en termijnen, formulier Benchmark | Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. |
 | `info.benchmarkVlag` | Organisatie-detail, bij de schakelaar "Doet mee aan benchmark" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks. |
 | `info.benchmarkToewijzen` | Benchmark, view per organisatie, achter de uitgeschakelde knop "Toewijzen" | Toewijzen kan pas als er een Lead is en de groep aan de drempel van dit niveau voldoet. Anders zou een Lead een vergelijking zien met te weinig anderen om anoniem te blijven. |
@@ -812,7 +814,7 @@ het antwoord daarom zelf kunnen vastleggen.
   weergave gebruikt de Lead-rol op zijn eigen pagina (`datamodel.md`
   deel 2, Rollen).
 
-  **Weergaven (besloten op 12 oktober 2026, nog niet gebouwd).** Boven de
+  **Weergaven (besloten op 12 oktober 2026, gebouwd op 13 oktober 2026).** Boven de
   inhoud staat een weergave-schakelaar (`stylesheet.md`, Weergave-schakelaar)
   met Overzicht, Per bouwblok en Spreiding. Overzicht is de standaard en de
   opbouw hierboven, die ongewijzigd blijft. Rechts van de schakelaar staat de
@@ -1333,7 +1335,7 @@ ook niet hier op het globale overzicht.
      die Respondent, en het formulier zegt dat (punt 6b). Alleen deze scan
      onder een andere naam is "Andere Respondent koppelen".
 
-     **Andere Respondent koppelen** (voorstel): Opent een vervolgstap met
+     **Andere Respondent koppelen** (gebouwd op 13 oktober 2026): Opent een vervolgstap met
      hetzelfde blok als in "Conflict oplossen" (punt 6b): Een keuzelijst met
      "Nieuwe Respondent" en de bestaande Respondenten van dezelfde
      organisatie. Bij "Nieuwe Respondent" zijn Naam, E-mail, Functie, Team en

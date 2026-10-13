@@ -3,7 +3,8 @@ import { nieuwId } from "../id";
 import { genereerToegangscode } from "../toegangscode";
 import { normaliseerEmail } from "../email";
 import { laadAlles, slaAlles, useOrganisaties } from "./store";
-import { verwijderToewijzingenVanRespondenten, verwijderToewijzingenVoorVerlorenLeadMetingen } from "../benchmark-store";
+import { verwijderToewijzingenVanRespondenten, verwijderToewijzingenZonderBereik } from "../benchmark-store";
+import { isLead, leadMetingIdsVan } from "../lead";
 import { logAudit } from "../audit-store";
 import { metingContext, organisatieContext } from "../audit-context";
 
@@ -68,12 +69,14 @@ export function nodigLidUit(
         notities: "",
         toegangscode: genereerUniekeToegangscode(alles),
         leadMetingIds: [],
+        leadVoorOrganisatie: false,
         aangemaaktOp: new Date().toISOString(),
       };
       organisatie.leden.push(lid);
     }
 
-    if (ookLeadMaken && !lid.leadMetingIds.includes(scanUitvoeringId)) {
+    // Een Lead voor de hele organisatie heeft deze Meting al in zijn bereik: Er is niets toe te voegen.
+    if (ookLeadMaken && !lid.leadVoorOrganisatie && !lid.leadMetingIds.includes(scanUitvoeringId)) {
       lid.leadMetingIds = [...lid.leadMetingIds, scanUitvoeringId];
     }
 
@@ -100,18 +103,20 @@ export function nodigLidUit(
   return null;
 }
 
+/** Het bereik van een Lead (`datamodel.md` deel 2, Het bereik van een Lead). */
+export type LeadBereikKeuze = { soort: "organisatie" } | { soort: "metingen"; metingIds: string[] };
+
 /**
- * "Lead toevoegen" (beheerpagina.md punt 6a): maakt/hergebruikt een lid
- * zoals `nodigLidUit`, maar zonder ScanInvulling — een Lead hoeft geen
- * respondent te zijn. Vereist minstens 1 Meting ("Geen Lead zonder
- * minstens één toegewezen Meting"), afgedwongen door de aanroeper (UI): de
- * lijst mag hier niet leeg binnenkomen.
+ * "Lead toevoegen" (beheerpagina.md punt 6a): maakt/hergebruikt een lid zoals `nodigLidUit`, maar zonder ScanInvulling,
+ * want een Lead hoeft geen respondent te zijn. Met een bereik: Specifieke Metingen (minstens 1, afgedwongen hier en
+ * door de UI) of de hele organisatie.
  */
 export function voegLeadToe(
   organisatieId: string,
-  input: { naam: string; email: string; metingIds: string[] }
+  input: { naam: string; email: string; bereik: LeadBereikKeuze }
 ): OrganisatieLid | null {
-  if (input.metingIds.length === 0) return null;
+  const { bereik } = input;
+  if (bereik.soort === "metingen" && bereik.metingIds.length === 0) return null;
   const alles = laadAlles();
   const organisatie = alles.find((o) => o.id === organisatieId);
   if (!organisatie) return null;
@@ -129,12 +134,16 @@ export function voegLeadToe(
       notities: "",
       toegangscode: genereerUniekeToegangscode(alles),
       leadMetingIds: [],
+      leadVoorOrganisatie: false,
       aangemaaktOp: new Date().toISOString(),
     };
     organisatie.leden.push(lid);
   }
-  const nieuweIds = input.metingIds.filter((id) => !lid!.leadMetingIds.includes(id));
-  if (nieuweIds.length > 0) {
+  const eerder = leadAantal(lid);
+  if (bereik.soort === "organisatie") {
+    lid.leadVoorOrganisatie = true;
+  } else {
+    const nieuweIds = bereik.metingIds.filter((id) => !lid!.leadMetingIds.includes(id));
     lid.leadMetingIds = [...lid.leadMetingIds, ...nieuweIds];
   }
   slaAlles(alles);
@@ -142,44 +151,70 @@ export function voegLeadToe(
     ...(nieuwLid
       ? [{ actie: "respondent.aangemaakt", entiteitType: "respondent", entiteitId: lid.id, details: organisatieContext(organisatie) }]
       : []),
-    ...(nieuweIds.length > 0
-      ? [
-          {
-            actie: "respondent.leadToegekend",
-            entiteitType: "respondent",
-            entiteitId: lid.id,
-            details: { ...organisatieContext(organisatie), aantalMetingen: nieuweIds.length },
-          },
-        ]
-      : []),
+    {
+      actie: "respondent.leadToegekend",
+      entiteitType: "respondent",
+      entiteitId: lid.id,
+      details: {
+        ...organisatieContext(organisatie),
+        bereik: bereik.soort === "organisatie" ? "hele organisatie" : "specifieke Metingen",
+        aantalMetingenVoor: eerder,
+        aantalMetingenNa: leadAantal(lid),
+      },
+    },
   ]);
   return lid;
 }
 
+function leadAantal(lid: OrganisatieLid): number {
+  return lid.leadVoorOrganisatie === true ? -1 : lid.leadMetingIds.length;
+}
+
 /**
- * "Lead-toegang beheren" (beheerpagina.md punt 6a): zet de volledige lijst
- * Metingen waar dit lid Lead-toegang toe heeft. Alles uitvinken (lege
- * lijst) trekt de Lead-rol in — er is geen apart "is Lead"-veld om los in
- * te trekken.
+ * "Lead-toegang beheren" (beheerpagina.md punt 6a): zet het bereik van dit lid. Specifieke Metingen (de volledige lijst,
+ * alles uitvinken trekt de rol in) of de hele organisatie. Wisselt het lid naar "hele organisatie" en weer terug, dan
+ * blijven de eerder gekozen Metingen bewaard (`datamodel.md`, Wisselen van bereik): Ze zijn alleen niet te zien zolang de
+ * hele organisatie aan staat. Pas bij het intrekken van de Lead-rol worden ze gewist.
  */
-export function zetLeadMetingen(lidId: string, metingIds: string[]): void {
+export function zetLeadBereik(lidId: string, bereik: LeadBereikKeuze | { soort: "ingetrokken" }): void {
   const alles = laadAlles();
   for (const organisatie of alles) {
     const lid = organisatie.leden.find((l) => l.id === lidId);
     if (!lid) continue;
-    const eerder = lid.leadMetingIds.length;
-    lid.leadMetingIds = metingIds;
+    const voorOrganisatie = lid.leadVoorOrganisatie === true;
+    const voor = leadAantal(lid);
+    if (bereik.soort === "ingetrokken") {
+      lid.leadVoorOrganisatie = false;
+      lid.leadMetingIds = [];
+    } else if (bereik.soort === "organisatie") {
+      lid.leadVoorOrganisatie = true;
+    } else {
+      lid.leadVoorOrganisatie = false;
+      lid.leadMetingIds = bereik.metingIds;
+    }
     slaAlles(alles);
-    // Verliest de Lead de rol op een Meting, dan vervalt zijn toewijzing van een view van die Meting (`datamodel.md`).
-    verwijderToewijzingenVoorVerlorenLeadMetingen(lid.id, metingIds);
+    // Verliest de Lead zijn bereik op het onderwerp van een view, dan vervalt de toewijzing, op elk niveau (`benchmark.md`).
+    verwijderToewijzingenZonderBereik(lid);
+    const ingetrokken = !isLead(lid);
     logAudit({
-      actie: metingIds.length === 0 ? "respondent.leadIngetrokken" : "respondent.leadToegekend",
+      actie: ingetrokken ? "respondent.leadIngetrokken" : "respondent.leadToegekend",
       entiteitType: "respondent",
       entiteitId: lid.id,
-      details: { ...organisatieContext(organisatie), aantalMetingenVoor: eerder, aantalMetingenNa: metingIds.length },
+      details: {
+        ...organisatieContext(organisatie),
+        bereik: lid.leadVoorOrganisatie === true ? "hele organisatie" : "specifieke Metingen",
+        bereikVoor: voorOrganisatie ? "hele organisatie" : "specifieke Metingen",
+        aantalMetingenVoor: voor,
+        aantalMetingenNa: leadAantal(lid),
+      },
     });
     return;
   }
+}
+
+/** Alleen de Metingen wijzigen (bestaande aanroepers): Zelfde als `zetLeadBereik` met "metingen". */
+export function zetLeadMetingen(lidId: string, metingIds: string[]): void {
+  zetLeadBereik(lidId, metingIds.length === 0 ? { soort: "ingetrokken" } : { soort: "metingen", metingIds });
 }
 
 /**
@@ -216,7 +251,7 @@ export interface RespondentContext {
   invullingen: { scanUitvoering: ScanUitvoering; invulling: ScanInvulling }[];
   /**
    * Metingen van deze organisatie waar dit lid Lead-toegang toe heeft
-   * (`lid.leadMetingIds`), los van zijn eigen `invullingen` hierboven —
+   * (`leadMetingIdsVan`: Alle Metingen bij `leadVoorOrganisatie`, anders `lid.leadMetingIds`), los van zijn eigen `invullingen` hierboven —
    * beheerpagina.md punt 6a, "Lead-worden en een vragenlijst krijgen zijn
    * twee losse acties". Leeg als dit lid geen Lead is.
    */
@@ -238,9 +273,8 @@ export function zoekRespondentPerToegangscode(alles: Organisatie[], code: string
         .filter((invulling) => invulling.organisatieLidId === lid.id)
         .map((invulling) => ({ scanUitvoering, invulling }))
     );
-    const leadMetingen = organisatie.scanUitvoeringen.filter((s) =>
-      lid.leadMetingIds.includes(s.id)
-    );
+    const leadIds = new Set(leadMetingIdsVan(lid, organisatie));
+    const leadMetingen = organisatie.scanUitvoeringen.filter((s) => leadIds.has(s.id));
     return { organisatie, lid, invullingen, leadMetingen };
   }
   return null;

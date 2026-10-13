@@ -130,3 +130,12 @@ export function magLeadToekennen(
 export function magAlgemeneTekstenBeheren(gebruiker: Gebruiker | null): boolean {
   return isAdmin(gebruiker);
 }
+
+/**
+ * `account.bewerken` (bereik `zelf`, `datamodel.md` deel 2, Rechtenmatrix): Een Admin of Consultant wijzigt zijn eigen naam
+ * en wachtwoord in "Mijn account" (`beheerpagina.md`, Accountmenu). Nooit het e-mailadres en nooit de rol. De gegevens van
+ * een andere gebruiker wijzigt alleen een Admin, bij Gebruikers (punt 9).
+ */
+export function magEigenAccountBewerken(gebruiker: Gebruiker | null, gebruikerId: string): boolean {
+  return gebruiker !== null && gebruiker.actief && gebruiker.id === gebruikerId;
+}
