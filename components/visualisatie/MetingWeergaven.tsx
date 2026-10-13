@@ -3,16 +3,23 @@
 import { Suspense, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Assessment, Organisatie, ScanUitvoering } from "@/lib/types";
+import { Assessment, Organisatie, ScanInvulling, ScanUitvoering } from "@/lib/types";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useBenchmarks } from "@/lib/benchmark-store";
-import { aantalAfgerond } from "@/lib/benchmark";
+import {
+  aantalAfgerondInMeting,
+  gemiddeldeAntwoordenVoorMetingMetSamenstelling,
+  isSamengesteld,
+  vergelijkbareMetingen,
+  voldoetAanMinScans,
+} from "@/lib/rondes";
 import { eenMeting, spreiding, tussenMetingen } from "@/lib/visualisatie";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { WeergaveWissel } from "./WeergaveWissel";
 import { WeergaveBouwblok } from "./WeergaveBouwblok";
 import { WeergaveSpreiding } from "./WeergaveSpreiding";
 import { WeergaveVergelijking } from "./WeergaveVergelijking";
+import { STANDAARD_ONDERDEEL } from "@/lib/rondes";
 
 type Weergave = "overzicht" | "bouwblok" | "spreiding";
 
@@ -44,8 +51,11 @@ interface Props {
   spreidingToegestaan: boolean;
   /** De lijn van laagste tot hoogste score: Voor een Admin altijd, voor een Lead pas vanaf `benchmarkMinRespondenten`. */
   bereikAltijd: boolean;
-  /** Eerdere Metingen van dezelfde organisatie en hetzelfde Assessment waarmee deze Meting te vergelijken is. */
-  eerdereMetingen: ScanUitvoering[];
+  /**
+   * Alleen deze Metingen zijn te vergelijken (voor een Lead: De Metingen waarop hij ook bereik heeft). Zonder deze lijst zijn
+   * dat alle eerdere Metingen van hetzelfde Assessment in de organisatie.
+   */
+  toegestaneMetingIds?: string[];
   /** Alleen een Admin: De link "Bekijk in benchmark" als de organisatie of de Meting lid is van een benchmark. */
   toonBenchmarkLink: boolean;
 }
@@ -57,7 +67,7 @@ function MetingWeergavenInhoud({
   overzicht,
   spreidingToegestaan,
   bereikAltijd,
-  eerdereMetingen,
+  toegestaneMetingIds,
   toonBenchmarkLink,
 }: Props) {
   const router = useRouter();
@@ -71,17 +81,42 @@ function MetingWeergavenInhoud({
     weergaveParam === "bouwblok" || (weergaveParam === "spreiding" && spreidingToegestaan) ? weergaveParam : "overzicht";
   const vergelijkId = zoek.get("vergelijk");
 
-  const huidigeScans = aantalAfgerond(scanUitvoering);
+  const huidigeScans = aantalAfgerondInMeting(organisatie, scanUitvoering);
+  // De voorgestelde vorige Meting staat bovenaan: Dezelfde combinatie van onderdeel en Assessment in de vorige ronde
+  // (`visualisatie-scores.md`, C). Beide Metingen moeten aan `benchmarkMinScans` voldoen.
   const vergelijkbaar = useMemo(
     () =>
-      huidigeScans >= instellingen.benchmarkMinScans
-        ? eerdereMetingen
-            .filter((m) => aantalAfgerond(m) >= instellingen.benchmarkMinScans)
-            .sort((a, b) => b.aangemaaktOp.localeCompare(a.aangemaaktOp))
+      voldoetAanMinScans(organisatie, scanUitvoering, instellingen.benchmarkMinScans)
+        ? vergelijkbareMetingen(organisatie, scanUitvoering).filter(
+            (v) =>
+              voldoetAanMinScans(organisatie, v.meting, instellingen.benchmarkMinScans) &&
+              (!toegestaneMetingIds || toegestaneMetingIds.includes(v.meting.id))
+          )
         : [],
-    [eerdereMetingen, huidigeScans, instellingen.benchmarkMinScans]
+    [organisatie, scanUitvoering, toegestaneMetingIds, instellingen.benchmarkMinScans]
   );
-  const vorige = vergelijkId ? vergelijkbaar.find((m) => m.id === vergelijkId) ?? null : null;
+  const gekozenVergelijking = vergelijkId ? vergelijkbaar.find((v) => v.meting.id === vergelijkId) ?? null : null;
+  const vorige = gekozenVergelijking?.meting ?? null;
+
+  // Een samengestelde Meting heeft geen scans: Ze telt als één "scan" met het gemiddelde van de onderliggende Metingen.
+  const invullingenVan = (m: ScanUitvoering): ScanInvulling[] =>
+    isSamengesteld(m)
+      ? [
+          {
+            id: `samengesteld-${m.id}`,
+            scanUitvoeringId: m.id,
+            organisatieLidId: "",
+            status: "afgerond",
+            antwoorden: gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, organisatie, m),
+            opmerkingenPerBouwblok: {},
+            aangemaaktOp: m.aangemaaktOp,
+            uitgenodigdOp: m.aangemaaktOp,
+            gestartOp: null,
+            afgerondOp: null,
+            bewaarVerlengdTot: null,
+          },
+        ]
+      : m.invullingen;
 
   function zet(wijziging: Record<string, string | null>) {
     const params = new URLSearchParams(zoek.toString());
@@ -112,7 +147,7 @@ function MetingWeergavenInhoud({
 
   /* ---------- C. Vergelijking ---------- */
   if (vorige) {
-    const w = tussenMetingen(assessment, vorige.invullingen, scanUitvoering.invullingen);
+    const w = tussenMetingen(assessment, invullingenVan(vorige), invullingenVan(scanUitvoering));
     return (
       <div>
         <div className="vis-acties">
@@ -120,6 +155,11 @@ function MetingWeergavenInhoud({
             Vergelijking sluiten
           </button>
         </div>
+        {gekozenVergelijking && !gekozenVergelijking.ontwikkeling && (
+          <p className="admin-notice" role="status">
+            Let op: Dit zijn verschillende onderdelen, het verschil is geen ontwikkeling.
+          </p>
+        )}
         <WeergaveVergelijking assessment={assessment} weergave={w} vorigLabel={vorige.label} huidigLabel={scanUitvoering.label} />
       </div>
     );
@@ -141,21 +181,26 @@ function MetingWeergavenInhoud({
           onChange={(w) => zet({ weergave: w === "overzicht" ? null : w })}
         />
         {vergelijkbaar.length === 1 && (
-          <button type="button" className="btn btn-outline btn-compact" onClick={() => zet({ vergelijk: vergelijkbaar[0].id })}>
+          <button type="button" className="btn btn-outline btn-compact" onClick={() => zet({ vergelijk: vergelijkbaar[0].meting.id })}>
             Vergelijk met vorige Meting
           </button>
         )}
         {vergelijkbaar.length > 1 && (
           <DropdownKnop
             label="Vergelijk met vorige Meting"
-            opties={vergelijkbaar.map((m) => ({ label: m.label, onClick: () => zet({ vergelijk: m.id }) }))}
+            opties={vergelijkbaar.map((v) => ({
+              label: [v.meting.label, v.ronde?.label, v.onderdeel !== STANDAARD_ONDERDEEL ? v.onderdeel : null]
+                .filter((x, i, a) => x && a.indexOf(x) === i)
+                .join(" · "),
+              onClick: () => zet({ vergelijk: v.meting.id }),
+            }))}
           />
         )}
       </div>
 
       {weergave === "overzicht" && overzicht}
       {weergave === "bouwblok" && (
-        <WeergaveBouwblok assessment={assessment} weergave={eenMeting(assessment, scanUitvoering.invullingen)} toonBereik={toonBereik} />
+        <WeergaveBouwblok assessment={assessment} weergave={eenMeting(assessment, invullingenVan(scanUitvoering))} toonBereik={toonBereik && !isSamengesteld(scanUitvoering)} />
       )}
       {weergave === "spreiding" && (
         <WeergaveSpreiding assessment={assessment} weergave={spreiding(assessment, scanUitvoering.invullingen)} />

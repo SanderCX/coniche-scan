@@ -425,7 +425,7 @@ Neem je een rij later alsnog mee met dezelfde knop (zie
 sessie al voor die combinatie is aangemaakt. Een nieuwe upload, ook van
 hetzelfde bestand, begint met nieuwe Metingen.
 
-**Ronde en onderdeel (voorstel, 13 oktober 2026).** De oude tool kende geen
+**Ronde en onderdeel (gebouwd op 13 oktober 2026).** De oude tool kende geen
 ronde en geen onderdeel (`datamodel.md`, Ronde en onderdeel). De import leidt ze
 af uit wat hij al weet, zodat de beheerder achteraf één ronde hernoemt en niet
 elke Meting apart.
@@ -580,7 +580,7 @@ formaat hierboven:
   {jaar}" (dit is geen import uit een externe tool). Rijen met dezelfde
   organisatie, dezelfde bronnaam, hetzelfde Assessment en hetzelfde
   `meting_label` delen één Meting, zie "Meting" hierboven. Een bestaande Meting met dezelfde naam
-  wordt niet hergebruikt. Voorstel: De ronde en het onderdeel komen uit de
+  wordt niet hergebruikt. Gebouwd: De ronde en het onderdeel komen uit de
   kolommen `ronde` en `onderdeel` als die in het bestand staan (`export-csv.md`).
   Ontbreken ze, dan geldt de afleiding bij "Ronde en onderdeel" hierboven.
 

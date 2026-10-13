@@ -270,14 +270,18 @@ describe("de view van een Lead op alle niveaus", () => {
     expect(leadViewVoorToewijzing(t2, b, [assessment], [o], lead(), drempels)).toBeNull();
   });
 
-  it("niveau 1: Alleen een Lead voor de hele organisatie, een Lead van specifieke Metingen ziet niets", () => {
+  it("niveau 1: Een Lead met bereik op de lid-Meting of op de hele organisatie, een Lead op een andere Meting ziet niets", () => {
     const orgs = ["A", "B", "C", "D", "E"].map((i) => org(i, 3));
     const b = benchmark(["A", "B", "C", "D", "E"]);
     const t1 = { organisatieId: "A" };
     const metBereik = leadViewVoorToewijzing(t1, b, [assessment], orgs, lead({ organisatieId: "A", leadVoorOrganisatie: true }), drempels)!;
     expect(metBereik.views).toHaveLength(1);
-    const alleenMeting = leadViewVoorToewijzing(t1, b, [assessment], orgs, lead({ organisatieId: "A", leadMetingIds: ["m-A"] }), drempels);
-    expect(alleenMeting).toBeNull();
+    // Bereik op alleen de lid-Meting is genoeg (benchmark.md, Niveau 1 volgt het bereik op de lid-Meting).
+    const opLidMeting = leadViewVoorToewijzing(t1, b, [assessment], orgs, lead({ organisatieId: "A", leadMetingIds: ["m-A"] }), drempels)!;
+    expect(opLidMeting.views).toHaveLength(1);
+    expect(opLidMeting.eigenNaam).toBe("Org A");
+    // Een Lead op een andere Meting van de organisatie dan de lid-Meting ziet niets.
+    expect(leadViewVoorToewijzing(t1, b, [assessment], orgs, lead({ organisatieId: "A", leadMetingIds: ["m-ander"] }), drempels)).toBeNull();
     // De drempel van niveau 1 blijft gelden, ook voor een Lead voor de hele organisatie.
     const onder = leadViewVoorToewijzing(t1, b, [assessment], orgs, lead({ organisatieId: "A", leadVoorOrganisatie: true }), { ...drempels, minOrganisaties: 6 })!;
     expect(onder.views).toHaveLength(0);

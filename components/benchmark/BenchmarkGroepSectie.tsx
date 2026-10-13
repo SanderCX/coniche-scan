@@ -9,6 +9,7 @@ import { RadarChartView } from "@/components/RadarChartView";
 import { CategoryBarChart } from "@/components/CategoryBarChart";
 import { WeergaveMatrix } from "@/components/visualisatie/WeergaveMatrix";
 import { matrix } from "@/lib/visualisatie";
+import { onderdeelVan, rondeVan, sorteerPerOnderdeel } from "@/lib/rondes";
 
 function Score({ waarde }: { waarde: number | null }) {
   if (waarde === null) return <span className="text-ink-s">–</span>;
@@ -112,12 +113,20 @@ export function BenchmarkGroepSectie({
             kolomSoort={binnen ? "meting" : "organisatie"}
             weergave={matrix(
               assessment,
-              rijen.map((r) => ({
-                label: binnen ? r.meting.label : r.organisatie.naam,
-                ...(binnen ? {} : { sublabel: r.meting.label }),
-                aantalScans: r.aantalAfgerond,
-                antwoorden: r.antwoorden,
-              }))
+              // Bij verschillende onderdelen staan de kolommen per onderdeel bij elkaar, met onderdeel en ronde in de kop.
+              (binnen ? sorteerPerOnderdeel(rijen) : rijen).map((r) => {
+                const metOnderdelen = binnen && new Set(rijen.map((x) => onderdeelVan(x.meting))).size >= 2;
+                return {
+                  label: metOnderdelen ? onderdeelVan(r.meting) : binnen ? r.meting.label : r.organisatie.naam,
+                  ...(metOnderdelen
+                    ? { sublabel: rondeVan(r.organisatie, r.meting)?.label ?? r.meting.label }
+                    : binnen
+                      ? {}
+                      : { sublabel: r.meting.label }),
+                  aantalScans: r.aantalAfgerond,
+                  antwoorden: r.antwoorden,
+                };
+              })
             )}
           />
 

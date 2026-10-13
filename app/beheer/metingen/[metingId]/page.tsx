@@ -4,7 +4,7 @@ import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAssessment } from "@/lib/assessment-store";
-import { hernoemMeting, nodigLidUit, useScanUitvoering, verwijderLeden, verwijderMeting } from "@/lib/db";
+import { nodigLidUit, useScanUitvoering, verwijderLeden, verwijderMeting } from "@/lib/db";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magOrganisatieToegang } from "@/lib/rechten";
 import { aantalBenchmarksMetMeting } from "@/lib/benchmark-store";
@@ -25,6 +25,9 @@ import { conflictActies } from "@/components/beheer/ConflictHost";
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { STATUS_LABEL } from "@/components/beheer/overzicht-helpers";
 import { heeftBereikOpMeting, isLead } from "@/lib/lead";
+import { STANDAARD_ONDERDEEL, isSamengesteld, onderdeelVan, rondeVan } from "@/lib/rondes";
+import { MetingWijzigenFormulier } from "@/components/beheer/MetingWijzigenFormulier";
+import { SamengesteldMetingOverzicht } from "@/components/beheer/SamengesteldMetingOverzicht";
 
 /**
  * Meting-overzicht (beheerpagina.md punt 5): alles binnen één Meting op
@@ -46,7 +49,6 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
   const [nieuweLink, setNieuweLink] = useState<string | null>(null);
   const [kopieerStatus, setKopieerStatus] = useState<{ id: string; gelukt: boolean } | null>(null);
   const [labelBewerken, setLabelBewerken] = useState(false);
-  const [labelInput, setLabelInput] = useState("");
   const [metingVerwijderenOpen, setMetingVerwijderenOpen] = useState(false);
   const [respondentenVerwijderenOpen, setRespondentenVerwijderenOpen] = useState(false);
   const [naarMetingOpen, setNaarMetingOpen] = useState(false);
@@ -72,6 +74,11 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
     );
   }
 
+  // Een samengestelde Meting heeft een eigen overzicht: Geen Respondenten, wel een samenstelling.
+  if (isSamengesteld(scanUitvoering)) {
+    return <SamengesteldMetingOverzicht organisatie={organisatie} meting={scanUitvoering} />;
+  }
+
   const afgerond = invullingen.filter((i) => i.status === "afgerond").length;
   const leads = organisatie.leden.filter((l) => heeftBereikOpMeting(l, organisatie.id, scanUitvoering.id));
   const benchmarksMetMeting = aantalBenchmarksMetMeting(scanUitvoering.id);
@@ -80,13 +87,6 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
     const gelukt = await kopieerNaarKlembord(url);
     setKopieerStatus({ id, gelukt });
     setTimeout(() => setKopieerStatus((h) => (h?.id === id ? null : h)), 1600);
-  }
-
-  function handleLabelOpslaan(e: React.FormEvent) {
-    e.preventDefault();
-    const nieuwLabel = labelInput.trim();
-    if (nieuwLabel) hernoemMeting(scanUitvoering.id, nieuwLabel);
-    setLabelBewerken(false);
   }
 
   function handleUitnodigen(e: React.FormEvent) {
@@ -153,17 +153,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
       />
 
       {labelBewerken ? (
-        <form onSubmit={handleLabelOpslaan} className="flex items-center gap-2" style={{ marginBottom: "0.5rem" }}>
-          <div className="admin-field" style={{ marginBottom: 0, width: "20rem" }}>
-            <input type="text" value={labelInput} onChange={(e) => setLabelInput(e.target.value)} autoFocus />
-          </div>
-          <button type="submit" className="btn btn-or btn-compact">
-            Opslaan
-          </button>
-          <button type="button" className="btn btn-outline btn-compact" onClick={() => setLabelBewerken(false)}>
-            Annuleren
-          </button>
-        </form>
+        <MetingWijzigenFormulier organisatie={organisatie} meting={scanUitvoering} onKlaar={() => setLabelBewerken(false)} />
       ) : (
         <h1>{scanUitvoering.label}</h1>
       )}
@@ -171,8 +161,10 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
         {assessment.naam} ·{" "}
         <Link href={`/beheer/organisaties/${organisatie.id}`} style={{ color: "var(--or)" }}>
           {organisatie.naam}
-        </Link>{" "}
-        · {afgerond} van {invullingen.length} afgerond
+        </Link>
+        {rondeVan(organisatie, scanUitvoering) && ` · ${rondeVan(organisatie, scanUitvoering)!.label}`}
+        {onderdeelVan(scanUitvoering) !== STANDAARD_ONDERDEEL && ` · onderdeel ${onderdeelVan(scanUitvoering)}`} · {afgerond} van{" "}
+        {invullingen.length} afgerond
       </p>
 
       <div className="overzicht-acties" style={{ margin: "1rem 0 0.5rem" }}>
@@ -185,12 +177,9 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
           <button
             type="button"
             className="btn btn-outline btn-compact"
-            onClick={() => {
-              setLabelInput(scanUitvoering.label);
-              setLabelBewerken(true);
-            }}
+            onClick={() => setLabelBewerken(true)}
           >
-            Wijzig label
+            Wijzig label, onderdeel en ronde
           </button>
         )}
         <button type="button" className="btn btn-danger btn-compact" onClick={() => setMetingVerwijderenOpen(true)}>

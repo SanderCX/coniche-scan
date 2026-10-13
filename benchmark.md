@@ -104,7 +104,7 @@ De view toont nooit de namen van andere organisaties. De Admin bekijkt de view e
 **Gebouwd.** De Admin kan de view van organisatie X toewijzen aan een bestaande Lead van die organisatie (`BenchmarkToewijzing`). De Lead ziet de view naast zijn eigen resultaten op zijn pagina. Intrekken kan ook, door een Admin. De Admin ziet bij de toewijzingen per Lead een knop "Bekijk" en "Intrekken" (zie Toewijzen aan een Lead op alle niveaus). Wat de Lead ziet:
 
 - Geen automatische toegang. De Lead krijgt de view alleen als een Admin die toewijst, per benchmark en per organisatie.
-- Een Lead met bereik op de Meting van de organisatie die als lid in de benchmark zit (zie Bereik van een Lead). De view gaat over die Meting. Van de Lead zelf speelt niets mee, ook niet zijn eigen scan. Gebouwd is dat de Lead voor de hele organisatie moet zijn (13 oktober 2026). **Voorstel, 13 oktober 2026.** Een Lead hoeft dat niet meer te zijn, zolang hij bereik heeft op de lid-Meting. Dat voorkomt vergelijkingen met scores die niet van de Lead zijn, want hij is Lead op precies de Meting waarover de view gaat.
+- Een Lead met bereik op de Meting van de organisatie die als lid in de benchmark zit (zie Bereik van een Lead). De view gaat over die Meting. Van de Lead zelf speelt niets mee, ook niet zijn eigen scan. Een Lead hoeft dat niet meer te zijn, zolang hij bereik heeft op de lid-Meting. Dat voorkomt vergelijkingen met scores die niet van de Lead zijn, want hij is Lead op precies de Meting waarover de view gaat.
 - Een sectie alleen als het Assessment aan de drempel voldoet. Toewijzen kan pas als minstens één Assessment aan de drempel voldoet. De Lead ziet alleen de secties die eraan voldoen.
 - Wijzigt de samenstelling zodat de organisatie niet meer meedoet, of verdwijnt de Lead-respondent, of verliest de Lead zijn bereik, dan vervalt de toewijzing.
 
@@ -134,7 +134,7 @@ Het privacy statement belooft een minimale groepsgrootte. Die belofte moet overe
 
 ## Onderdeel en samengestelde Meting
 
-**Voorstel, besproken met Joost op 13 oktober 2026. Nog niet gebouwd.** Twee Metingen van dezelfde organisatie kunnen twee dingen betekenen. Het zijn twee delen van de organisatie in dezelfde ronde, bijvoorbeeld Team A en Team B in de 0-meting. Of het is hetzelfde deel in twee rondes, bijvoorbeeld de 0-meting en de nameting van Team A. In het eerste geval is een gemiddelde zinvol. In het tweede geval zegt een gemiddelde weinig en wil je de ontwikkeling zien. Daarom heeft elke Meting een ronde en een onderdeel (`datamodel.md`, Meting, Ronde en onderdeel). Een ronde is een moment waarop de organisatie meet, een onderdeel is het deel van de organisatie, en een Meting is één onderdeel in één ronde voor één Assessment.
+**Besproken met Joost en gebouwd op 13 oktober 2026.** Twee Metingen van dezelfde organisatie kunnen twee dingen betekenen. Het zijn twee delen van de organisatie in dezelfde ronde, bijvoorbeeld Team A en Team B in de 0-meting. Of het is hetzelfde deel in twee rondes, bijvoorbeeld de 0-meting en de nameting van Team A. In het eerste geval is een gemiddelde zinvol. In het tweede geval zegt een gemiddelde weinig en wil je de ontwikkeling zien. Daarom heeft elke Meting een ronde en een onderdeel (`datamodel.md`, Meting, Ronde en onderdeel). Een ronde is een moment waarop de organisatie meet, een onderdeel is het deel van de organisatie, en een Meting is één onderdeel in één ronde voor één Assessment.
 
 - **Zelfde onderdeel en Assessment, andere ronde.** Dit is ontwikkeling. Het vergelijken gaat met "Vergelijk met vorige Meting" (`visualisatie-scores.md`, onderdeel C), die als vorige Meting dezelfde combinatie in de vorige ronde neemt.
 - **Verschillende onderdelen in dezelfde ronde.** Dit zijn delen van een geheel. De Admin of Consultant maakt er een samengestelde Meting van (hieronder).
@@ -190,7 +190,7 @@ Een Meting die verwijst naar andere Metingen (`Meting.samenstelling`) en daarvan
 - **Bereik verliezen.** Verliest een Lead zijn bereik op het onderwerp van een view, dan vervalt de toewijzing, op elk niveau.
 - **Bestaande toewijzingen.** Dit is een overgangsregel. Een toewijzing van niveau 1 die al bestond toen het bereik werd ingevoerd, aan een Lead zonder organisatiebereik, blijft eenmalig in de lijst staan, met de melding "Deze Lead heeft geen bereik op deze organisatie". De Lead ziet dan niets. De Admin past het bereik aan of trekt de toewijzing in.
 
-**Voorstel, 13 oktober 2026: Niveau 1 volgt het bereik op de lid-Meting.** Dit wijzigt wat hierboven gebouwd is. De organisatievergelijking vraagt niet meer om "Hele organisatie", zodat een Lead die geen Meting van andere teams hoeft te zien, toch de organisatie tegenover de groep krijgt.
+**Gebouwd op 13 oktober 2026: Niveau 1 volgt het bereik op de lid-Meting.** Dit wijzigde wat eerder gebouwd was. De organisatievergelijking vraagt niet meer om "Hele organisatie", zodat een Lead die geen Meting van andere teams hoeft te zien, toch de organisatie tegenover de groep krijgt.
 
 - **Regel.** Een view van niveau 1 is toe te wijzen aan een Lead met bereik op de Meting van X die als lid in de benchmark zit. Dat bereik is "Specifieke Metingen" met die Meting aangevinkt, of "Hele organisatie". De lid-Meting is vaak een samengestelde Meting (Onderdeel en samengestelde Meting).
 - **Per Assessment.** De lid-Meting kan per Assessment een andere zijn. De Lead ziet alleen de secties waarvan de lid-Meting binnen zijn bereik valt en die aan de drempel voldoen. Toewijzen kan zodra minstens één Assessment daaraan voldoet.
@@ -206,7 +206,7 @@ Een Meting die verwijst naar andere Metingen (`Meting.samenstelling`) en daarvan
 
 | Niveau | De view gaat over | De Lead is | Vergelijkt met |
 |---|---|---|---|
-| 1 | Organisatie X | Een Lead met bereik op de Meting van X die in de benchmark zit (voorstel). Gebouwd: Een Lead voor de hele organisatie X | De overige organisaties |
+| 1 | Organisatie X | Een Lead met bereik op de Meting van X die in de benchmark zit, of een Lead voor de hele organisatie X | De overige organisaties |
 | 2 | Meting M | Een Lead met bereik op M: Voor M zelf of voor de hele organisatie | De overige Metingen in de benchmark |
 | 3 | De scan van Respondent R in Meting M | Een Lead met bereik op M | De overige scans in M |
 
@@ -239,7 +239,6 @@ De gebeurtenissen staan in `datamodel.md`, Audit, onder Benchmark. Wat een verwi
 - Een vastgezette versie in plaats van live cijfers.
 - De range van de groep als band in de view: Ontworpen, zie `visualisatie-scores.md`, onderdeel D. Nog te bouwen.
 - De berekening op de server (`backlog.md`, Fase 2). Nu draait ze in de browser, dus de privacyregels voor een Lead worden alleen in de schermen bewaakt.
-- Een samengestelde Meting, zodat een organisatie met meerdere delen als één deelnemer meedoet aan niveau 1: Uitgewerkt als voorstel, zie Onderdeel en samengestelde Meting. Nog te bouwen.
 - Ontwikkeling in de tijd binnen een benchmark.
 - De spreiding en de hoge en lage scores op niveau 2 en 3: Ontworpen, zie `visualisatie-scores.md`, onderdeel B en E. Nog te bouwen.
 - De privacytekst en het toestemmingsvakje in de intake in de code.

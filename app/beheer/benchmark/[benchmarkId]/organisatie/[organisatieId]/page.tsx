@@ -52,6 +52,8 @@ export default function BenchmarkOrganisatiePage({
     .filter((v) => v !== null);
   const peildatum = new Date();
   const voldoet = views.some((v) => v.voldoetAanDrempel);
+  // De lid-Metingen van deze organisatie waarvan de groep aan de drempel voldoet: Een Lead ziet alleen die secties.
+  const voldoendeMetingIds = views.filter((v) => v.voldoetAanDrempel).map((v) => v.rij.meting.id);
 
 
   return (
@@ -73,6 +75,7 @@ export default function BenchmarkOrganisatiePage({
         benchmark={benchmark}
         onderwerp={{ organisatie }}
         voldoetAanDrempel={voldoet}
+        voldoendeMetingIds={voldoendeMetingIds}
         gebruikerId={gebruiker!.id}
       />
 

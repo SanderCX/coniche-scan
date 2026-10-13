@@ -1,4 +1,4 @@
-import { Organisatie, ScanInvulling, ScanUitvoering } from "../types";
+import { Organisatie, Ronde, ScanInvulling, ScanUitvoering } from "../types";
 import { nieuwId } from "../id";
 import { normaliseerEmail } from "../email";
 import { GevalideerdeRij } from "../import-legacy";
@@ -7,6 +7,7 @@ import { genereerUniekeToegangscode } from "./respondenten";
 import { AuditInvoer, logAudit } from "../audit-store";
 import { getGebruikers } from "../gebruikers-store";
 import { metingContext, organisatieContext } from "../audit-context";
+import { STANDAARD_ONDERDEEL, metingMetCombinatie, rondesVan } from "../rondes";
 
 /** Import van scans uit een CSV (import-scans.md): schrijft rijen weg als Organisatie, Respondent, Meting en scan. */
 
@@ -47,6 +48,16 @@ export interface LegacyImportKeuze {
    * varianten met een datum (zie hieronder) aan bij een latere, aparte aanroep.
    */
   bekendeMetingen?: Record<string, string>;
+  /**
+   * Rondes die deze import eerder aanmaakte voor dezelfde organisatie, per ronde-label (`import-scans.md`, Ronde en
+   * onderdeel). Zo sluit een latere, aparte aanroep aan bij dezelfde ronde, ook voor de varianten met een datum.
+   */
+  bekendeRondes?: Record<string, string>;
+  /**
+   * Het onderdeel van de Meting, zoals de beheerder het per bronnaam instelde. Leeg: De kolom `onderdeel` van de eigen export,
+   * anders de bronnaam als er meerdere bronnamen zijn (`bronnaamInLabel`), anders "Hele organisatie".
+   */
+  onderdeel?: string;
 }
 
 /** Per verwerkte rij, in dezelfde volgorde als de input: met welke organisatie/Meting hij uiteindelijk geschreven is — voor de aanroeper om te onthouden richting een latere, aparte aanroep (zie `LegacyImportKeuze`). */
@@ -56,6 +67,10 @@ export interface LegacyImportRijResultaat {
   /** Het uiteindelijke label van de Meting, voor de aanroeper om te onthouden (zie `LegacyImportKeuze.bekendeMetingen`). */
   label: string;
   bronnaam: string;
+  /** De ronde van de Meting en haar label, voor de aanroeper om te onthouden (zie `LegacyImportKeuze.bekendeRondes`). */
+  rondeId: string;
+  rondeLabel: string;
+  onderdeel: string;
 }
 
 /**
@@ -118,8 +133,11 @@ export function voerLegacyImportUit(
   // dat doet de aanroeper zelf, via de teruggegeven `rijResultaten`.
   const nieuweOrgPerNaam = new Map<string, Organisatie>();
   const nieuweMetingPerSleutel = new Map<string, ScanUitvoering>();
+  const nieuweRondePerSleutel = new Map<string, Ronde>();
+  // De rondes van deze aanroep met het moment van hun oudste scan: Ze krijgen daarna `aangemaaktOp` in die volgorde.
+  const nieuweRondes: { ronde: Ronde; oudste: number }[] = [];
 
-  for (const { rij, assessmentId, organisatieId, metingId, bronnaam: bronnaamKeuze, bronnaamInLabel, bekendeMetingen } of keuzes) {
+  for (const { rij, assessmentId, organisatieId, metingId, bronnaam: bronnaamKeuze, bronnaamInLabel, bekendeMetingen, bekendeRondes, onderdeel: onderdeelKeuze } of keuzes) {
     let organisatie =
       (organisatieId ? alles.find((o) => o.id === organisatieId) : undefined) ??
       nieuweOrgPerNaam.get(rij.organisatieNaam);
@@ -199,24 +217,64 @@ export function voerLegacyImportUit(
 
     // Eén Meting per doelorganisatie, Assessment, bronnaam en label, en hooguit één scan per Respondent per Meting
     // (`import-scans.md`, Meting en Eén scan per Respondent per Meting). Heeft de Respondent in de gevonden Meting al een scan,
-    // dan krijgt de scan een eigen Meting met een label met de datum erachter.
+    // dan krijgt de scan een eigen Meting met een label met de datum erachter, en die Meting hoort in een eigen ronde.
     const bronnaam = (bronnaamKeuze ?? rij.organisatieNaam).trim();
     const basisLabel = bronnaamInLabel ? `${rij.meetingLabel} ${bronnaam}` : rij.meetingLabel;
+    // Ronde en onderdeel (`import-scans.md`, Ronde en onderdeel): De ronde is het importlabel zonder de bronnaam, het onderdeel
+    // de bronnaam bij meerdere bronnamen, tenzij de beheerder of de eigen export er een zette.
+    const basisRonde = rij.ronde?.trim() || rij.meetingLabel;
+    const onderdeel =
+      onderdeelKeuze?.trim() || rij.onderdeel?.trim() || (bronnaamInLabel ? bronnaam : STANDAARD_ONDERDEEL);
     const bekend: Record<string, string> = { ...(bekendeMetingen ?? {}), ...(metingId ? { [basisLabel]: metingId } : {}) };
     const datumTekst = labelDatum(rij.gestartOp ?? rij.uitgenodigdOp);
+    const scanTijd = Date.parse(rij.gestartOp ?? rij.uitgenodigdOp ?? "");
     let scanUitvoering: ScanUitvoering | undefined;
+    let ronde: Ronde | undefined;
     for (let poging = 0; !scanUitvoering; poging++) {
       const label = importMetingLabel(basisLabel, datumTekst, poging);
+      const rondeLabel = importMetingLabel(basisRonde, datumTekst, poging);
       const metingSleutel = `${organisatie.id}::${assessmentId}::${bronnaam}::${label}`;
       let meting =
         (bekend[label] ? organisatie.scanUitvoeringen.find((s) => s.id === bekend[label]) : undefined) ??
         nieuweMetingPerSleutel.get(metingSleutel);
-      if (!meting) {
+      let kandidaatRonde: Ronde | undefined;
+      if (meting) {
+        kandidaatRonde = meting.rondeId ? rondesVan(organisatie).find((r) => r.id === meting!.rondeId) : undefined;
+      } else {
+        // Een nieuwe Meting hoort in de ronde met dit label. Staat daar voor dit onderdeel en Assessment al een Meting
+        // (twee bronnamen met hetzelfde onderdeel), dan is deze poging bezet en volgt de variant met een datum.
+        const rondeSleutel = `${organisatie.id}::${rondeLabel}`;
+        const bekendeRondeId = bekendeRondes?.[rondeLabel];
+        kandidaatRonde =
+          (bekendeRondeId ? rondesVan(organisatie).find((r) => r.id === bekendeRondeId) : undefined) ??
+          nieuweRondePerSleutel.get(rondeSleutel);
+        if (kandidaatRonde && metingMetCombinatie(organisatie, kandidaatRonde.id, onderdeel, assessmentId)) continue;
+        if (!kandidaatRonde) {
+          kandidaatRonde = {
+            id: nieuwId(),
+            organisatieId: organisatie.id,
+            label: rondeLabel,
+            aangemaaktOp: new Date().toISOString(),
+          };
+          organisatie.rondes = [...rondesVan(organisatie), kandidaatRonde];
+          nieuweRondePerSleutel.set(rondeSleutel, kandidaatRonde);
+          nieuweRondes.push({ ronde: kandidaatRonde, oudste: Number.isNaN(scanTijd) ? Infinity : scanTijd });
+          gelogd.push({
+            actie: "ronde.aangemaakt",
+            entiteitType: "ronde",
+            entiteitId: kandidaatRonde.id,
+            entiteitNaam: kandidaatRonde.label,
+            groepId,
+            details: { ...organisatieContext(organisatie), aantalMetingen: 1 },
+          });
+        }
         meting = {
           id: nieuwId(),
           organisatieId: organisatie.id,
           assessmentId,
+          rondeId: kandidaatRonde.id,
           label,
+          onderdeel,
           aangemaaktOp: new Date().toISOString(),
           invullingen: [],
         };
@@ -228,10 +286,13 @@ export function voerLegacyImportUit(
           entiteitId: meting.id,
           entiteitNaam: meting.label,
           groepId,
-          details: metingContext(organisatie, meting),
+          details: { ...metingContext(organisatie, meting), onderdeel, ronde: kandidaatRonde.label },
         });
       }
-      if (!meting.invullingen.some((i) => i.organisatieLidId === lid!.id)) scanUitvoering = meting;
+      if (!meting.invullingen.some((i) => i.organisatieLidId === lid!.id)) {
+        scanUitvoering = meting;
+        ronde = kandidaatRonde;
+      }
     }
 
     const invulling: ScanInvulling = {
@@ -263,9 +324,26 @@ export function voerLegacyImportUit(
         ...(rij.vereistBevestiging ? { vraagtekstMatchPercentage: rij.assessmentMatchPercentage } : {}),
       },
     });
-    rijResultaten.push({ organisatieId: organisatie.id, scanUitvoeringId: scanUitvoering.id, label: scanUitvoering.label, bronnaam });
+    rijResultaten.push({
+      organisatieId: organisatie.id,
+      scanUitvoeringId: scanUitvoering.id,
+      label: scanUitvoering.label,
+      bronnaam,
+      rondeId: ronde?.id ?? "",
+      rondeLabel: ronde?.label ?? "",
+      onderdeel: scanUitvoering.onderdeel ?? onderdeel,
+    });
     geimporteerd++;
   }
+
+  // De rondes van deze import staan op volgorde van de oudste scan erin, de oudste eerst (`import-scans.md`, Volgorde): Een
+  // 0-meting staat dan vóór de nameting, ook als het bestand ze in een andere volgorde heeft.
+  const basis = Date.parse(importMoment);
+  [...nieuweRondes]
+    .sort((a, b) => a.oudste - b.oudste)
+    .forEach(({ ronde }, i) => {
+      ronde.aangemaaktOp = new Date(basis + i).toISOString();
+    });
 
   slaAlles(alles);
   logAudit(gelogd);

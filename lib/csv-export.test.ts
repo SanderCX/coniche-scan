@@ -97,3 +97,24 @@ describe("CSV aangemaakt_op", () => {
     expect(kolom(csv, "aangemaakt_op")).toBe("2026-02-01T10:00:00.000Z");
   });
 });
+
+describe("CSV ronde en onderdeel", () => {
+  it("staan direct na meting_label, met het label van de ronde en het onderdeel (Hele organisatie zonder onderdeel)", () => {
+    const o = organisatie(zorgscan, [scan(zorgscan)]);
+    const zonder = genereerScansCsv([{ organisatie: o, scanUitvoering: o.scanUitvoeringen[0], lid, invulling: scan(zorgscan), assessment: zorgscan }]);
+    const kop = zonder.replace(/^﻿/, "").split("\r\n")[0].split(";");
+    expect(kop.indexOf("ronde")).toBe(kop.indexOf("meting_label") + 1);
+    expect(kop.indexOf("onderdeel")).toBe(kop.indexOf("ronde") + 1);
+    expect(kolom(zonder, "ronde")).toBe("");
+    expect(kolom(zonder, "onderdeel")).toBe("Hele organisatie");
+
+    const metRonde: Organisatie = {
+      ...o,
+      rondes: [{ id: "R1", organisatieId: "O1", label: "0-meting", aangemaaktOp: "x" }],
+      scanUitvoeringen: [{ ...o.scanUitvoeringen[0], rondeId: "R1", onderdeel: "Team A" }],
+    };
+    const met = genereerScansCsv([{ organisatie: metRonde, scanUitvoering: metRonde.scanUitvoeringen[0], lid, invulling: scan(zorgscan), assessment: zorgscan }]);
+    expect(kolom(met, "ronde")).toBe("0-meting");
+    expect(kolom(met, "onderdeel")).toBe("Team A");
+  });
+});

@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 import { Benchmark, BenchmarkLid, BenchmarkNiveau, BenchmarkToewijzing } from "./types";
 import { nieuwId } from "./id";
 import { logAudit } from "./audit-store";
-import { heeftBereikOpMeting, heeftBereikOpOrganisatie, LeadBereikLid } from "./lead";
+import { heeftBereikOpLidMeting, heeftBereikOpMeting, LeadBereikLid } from "./lead";
 
 /**
  * Opslag van benchmarks en hun toewijzingen (`datamodel.md` deel 3, `benchmark.md`). Alleen de samenstelling staat
@@ -132,17 +132,31 @@ export function maakBenchmark(
 export function wijzigBenchmark(
   id: string,
   input: { naam: string; assessmentIds: string[]; leden: BenchmarkLid[] },
-  namen: BenchmarkNamen
+  namen: BenchmarkNamen,
+  /**
+   * Heeft de Lead van een toewijzing nog bereik op het onderwerp na de wijziging? Niveau 1 volgt het bereik op de lid-Meting:
+   * Wordt dat een andere Meting buiten het bereik van de Lead, dan vervalt de toewijzing (`benchmark.md`, Bereik van een
+   * Lead, Wisselt het lid). De store kent geen Respondenten, dus de aanroeper levert deze controle.
+   */
+  heeftBereik?: (toewijzing: BenchmarkToewijzing, leden: BenchmarkLid[]) => boolean
 ): void {
   const opslag = laad();
   const benchmark = opslag.benchmarks.find((b) => b.id === id);
   if (!benchmark) return;
+  const oudeLeden = benchmark.leden;
   benchmark.naam = input.naam;
   benchmark.assessmentIds = input.assessmentIds;
   benchmark.leden = input.leden.filter((l) => input.assessmentIds.includes(l.assessmentId));
   benchmark.meldingen = [];
   // Een toewijzing voor een lid dat niet meer meedoet, heeft geen view meer om te tonen.
   ruimToewijzingenOp(opslag, benchmark);
+  if (heeftBereik && isTussenOrganisaties(benchmark)) {
+    const leden = benchmark.leden;
+    // Alleen een toewijzing die bereik had en het door deze wijziging verliest. Eén zonder bereik van vóór de regel blijft staan.
+    opslag.toewijzingen = opslag.toewijzingen.filter(
+      (t) => t.benchmarkId !== benchmark.id || !heeftBereik(t, oudeLeden) || heeftBereik(t, leden)
+    );
+  }
   bewaar(opslag);
   logAudit({
     actie: "benchmark.gewijzigd",
@@ -361,8 +375,8 @@ export function verwijderToewijzingenVanScans(scans: { metingId: string; respond
 
 /**
  * Een Lead heeft zijn bereik gewijzigd (`benchmark.md`, Bereik van een Lead): Verliest hij het bereik op het onderwerp van
- * een view, dan vervalt de toewijzing, op elk niveau. Niveau 1 vraagt een Lead voor de hele organisatie. Niveau 2 en 3
- * vragen bereik op de Meting van de view, via de hele organisatie of via die Meting.
+ * een view, dan vervalt de toewijzing, op elk niveau. Niveau 1 vraagt bereik op de lid-Meting van de organisatie in de
+ * benchmark. Niveau 2 en 3 vragen bereik op de Meting van de view, via de hele organisatie of via die Meting.
  *
  * Een niveau 1-toewijzing die al bestond toen het bereik werd ingevoerd, aan een Lead zonder organisatiebereik, blijft
  * staan zolang het bereik van die Lead niet wordt gewijzigd (de overgangsregel). De Admin ziet dan de melding in het blok
@@ -373,7 +387,10 @@ export function verwijderToewijzingenZonderBereik(lead: LeadBereikLid & { id: st
   const voor = opslag.toewijzingen.length;
   opslag.toewijzingen = opslag.toewijzingen.filter((t) => {
     if (t.respondentId !== lead.id) return true;
-    return t.metingId ? heeftBereikOpMeting(lead, t.organisatieId, t.metingId) : heeftBereikOpOrganisatie(lead, t.organisatieId);
+    if (t.metingId) return heeftBereikOpMeting(lead, t.organisatieId, t.metingId);
+    // Niveau 1: Bereik op de lid-Meting van de organisatie in deze benchmark.
+    const benchmark = opslag.benchmarks.find((b) => b.id === t.benchmarkId);
+    return !!benchmark && heeftBereikOpLidMeting(lead, benchmark.leden, t.organisatieId);
   });
   if (opslag.toewijzingen.length !== voor) bewaar(opslag);
 }

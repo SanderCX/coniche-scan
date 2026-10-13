@@ -298,6 +298,9 @@ export interface GevalideerdeRij {
   gestartOp: string | null;
   afgerondOp: string | null;
   meetingLabel: string;
+  /** Alleen "nieuw": De kolommen `ronde` en `onderdeel` van de eigen export (`export-csv.md`), als die er zijn en gevuld. */
+  ronde?: string;
+  onderdeel?: string;
   antwoorden: Record<string, number>;
   opmerkingenPerBouwblok: Record<string, string>;
 }
@@ -594,6 +597,9 @@ export function valideerLegacyRijen(rijen: LegacyCsvRow[], assessments: Assessme
 export interface NieuweExportCsvRow {
   organisatie_naam: string;
   meting_label: string;
+  /** Voorstel (`export-csv.md`): Ontbreekt in een export van vóór de rondes. */
+  ronde?: string;
+  onderdeel?: string;
   assessment_naam: string;
   respondent_naam: string;
   respondent_email: string;
@@ -705,6 +711,10 @@ export function valideerNieuweExportRijen(
       // kale label zelf — onderscheidt een geïmporteerde Meting meteen van
       // een handmatig aangemaakte met toevallig dezelfde naam.
       meetingLabel: `Import ${rij.meting_label || "Geïmporteerde meting"}`,
+      // Kolommen `ronde` en `onderdeel`: De ronde is het label van de ronde zelf, zonder "Import ", want de export legde
+      // die ronde vast (`import-scans.md`, Ronde en onderdeel).
+      ...(rij.ronde?.trim() ? { ronde: rij.ronde.trim() } : {}),
+      ...(rij.onderdeel?.trim() ? { onderdeel: rij.onderdeel.trim() } : {}),
     };
 
     if (!rij.organisatie_naam.trim() || !rij.respondent_email.trim()) {

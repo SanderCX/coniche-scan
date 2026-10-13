@@ -1,5 +1,52 @@
 # Coniche Scan — Changelog
 
+## 2026-10-13 (3) — Specs van Joost, PR 86 en 87: Ronde en onderdeel, samengestelde Meting, bereik op de lid-Meting
+
+**Gedaan**:
+- **Ronde en onderdeel** (`datamodel.md`, Meting, Ronde en onderdeel): `Ronde` als record op `Organisatie.rondes`, en
+  `ScanUitvoering.rondeId`, `onderdeel` en `samenstelling`. Pure helpers in `lib/rondes.ts` (label "{onderdeel} | {ronde}",
+  uniekheid per ronde, opruimen van lege rondes en samenstellingen, vergelijkbare Metingen), schrijfacties in
+  `lib/db/rondes.ts` (`maakMeting`, `wijzigMeting`, `hernoemRonde`, `naarRonde`, `startNieuweRonde`). Een lege ronde verdwijnt
+  vanzelf. Audit: `ronde.aangemaakt`, `ronde.hernoemd`.
+- **Organisatie-detail** (`MetingenSectie`): De lijst Metingen is gegroepeerd per ronde met de nieuwste bovenaan en
+  "Zonder ronde" onderaan, met "Nieuwe ronde starten", hernoemen met het potlood en "Naar ronde…" voor bestaande Metingen.
+  "+ Meting plannen" heeft de velden Ronde en Onderdeel, `MetingWijzigenFormulier` wijzigt label, onderdeel en ronde.
+- **Samengestelde Meting** (`benchmark.md`, Onderdeel en samengestelde Meting): Eén ronde, één Assessment, minstens twee
+  Metingen, elk even zwaar (`gemiddeldeAntwoordenVoorMetingMetSamenstelling`). Formulier, overzicht met de onderliggende
+  Metingen en matrix (E), badge "Gemiddelde", geen Respondenten en niet invulbaar. Verwijderen van een onderliggende Meting
+  haalt haar uit de samenstelling en logt `meting.samengesteldVerwijderd`. Op niveau 2 en 3 is een samengestelde Meting geen lid.
+  Een niveau 1-lid mag er wel een zijn.
+- **Overzicht van een ronde** (`app/beheer/rondes/[rondeId]`): De matrix van één ronde, met de onderdelen als kolommen.
+- **Vergelijken** (`visualisatie-scores.md`, C): De voorgestelde vorige Meting is dezelfde combinatie van onderdeel en
+  Assessment in de vorige ronde, met de regel "Let op: Dit zijn verschillende onderdelen, het verschil is geen ontwikkeling."
+- **Matrix, volgorde van de kolommen** (E): Bij Metingen met verschillende onderdelen staan de kolommen per onderdeel bij
+  elkaar en binnen een onderdeel op volgorde van ronde, met onderdeel en ronde in de kop (`sorteerPerOnderdeel`).
+- **Import** (`import-scans.md`, Ronde en onderdeel): Elke geïmporteerde Meting krijgt `rondeId` en `onderdeel`. De ronde is het
+  importlabel zonder de bronnaam, het onderdeel de bronnaam bij meerdere bronnamen (aanpasbaar per bronnaam in de koppeltabel,
+  kolom "Onderdeel") of anders "Hele organisatie". De kolommen `ronde` en `onderdeel` van de eigen export gaan voor. Dezelfde
+  Respondent twee keer geeft een eigen ronde met de datum erachter. De rondes van één aanroep krijgen `aangemaaktOp` op
+  volgorde van de oudste scan. `bekendeRondes` laat een latere aanroep aansluiten.
+- **CSV-export**: De kolommen `ronde` en `onderdeel` staan direct na `meting_label`.
+- **Bereik op de lid-Meting, niveau 1** (`benchmark.md`, Bereik van een Lead): Een view van niveau 1 is toe te wijzen aan een
+  Lead met bereik op de Meting van de organisatie die als lid in de benchmark zit (`heeftBereikOpLidMeting`). De Lead ziet
+  alleen de secties waarvan de lid-Meting binnen zijn bereik valt en die aan de drempel voldoen. Een toewijzing vervalt als het
+  bereik wegvalt (`verwijderToewijzingenZonderBereik`) of als de benchmark wordt gewijzigd en de lid-Meting buiten het bereik
+  valt (`wijzigBenchmark`). Een toewijzing van vóór de regel, zonder bereik, blijft eenmalig staan met de melding "Deze Lead
+  heeft geen bereik op de Meting van deze organisatie in de benchmark". In het blok Toewijzen staat het bereik van de Lead.
+  Een samengestelde Meting is in "Lead toevoegen" en het blok Toegang een bewuste keuze, met de badge "Gemiddelde" en de regel
+  "Ziet alleen het gemiddelde". Toegang erft niet mee.
+- **Specs**: De statusregels van Ronde, onderdeel, samengestelde Meting, import, CSV en de matrix staan op gebouwd
+  (`datamodel.md`, `beheerpagina.md`, `benchmark.md`, `import-scans.md`, `export-csv.md`, `visualisatie-scores.md`, `backlog.md`).
+
+**Tests**: 212 (was 183): `lib/rondes.test.ts` (21), import van ronde en onderdeel (6), CSV-kolommen, bereik op de
+lid-Meting op niveau 1 (aangepast).
+
+**Open**:
+- Een kolom met het verschil binnen een groep per onderdeel in E (open bij Joost).
+- Bij een nieuwe ronde de Respondenten meenemen, een eigen peildatum op een ronde en een samengestelde Meting die slechts
+  één onderliggende Meting overhoudt (alleen een melding): Niet aangeraakt, zie `backlog.md`.
+- Tussen twee aparte imports blijft het aan de beheerder om de oudste eerst te importeren.
+
 ## 2026-10-13 (2) — Specs van Joost, PR 84: Organisatie hernoemen, Info-icoon op de regel, matrix op niveau 1
 
 **Gedaan**:

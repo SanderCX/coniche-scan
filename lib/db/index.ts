@@ -8,6 +8,7 @@
 export * from "./store";
 export * from "./organisaties";
 export * from "./metingen";
+export * from "./rondes";
 export * from "./respondenten";
 export * from "./verplaatsen";
 export * from "./scans";

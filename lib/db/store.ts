@@ -4,6 +4,8 @@ import { normaliseerEmail } from "../email";
 import { demoOrganisatie } from "@/data/demo-organisatie";
 import { haalServerKopieOp, stuurNaarServer } from "../server-sync";
 import { migreerTechstackOndersteuning } from "@/lib/techstack";
+import { ruimOrganisatieOp } from "@/lib/rondes";
+import { haalMetingenUitBenchmarks } from "@/lib/benchmark-store";
 import { techstackCategorieIdsMetLijst } from "@/data/organisatie-velden";
 
 const KEY = "coniche-scan:organisaties";
@@ -79,6 +81,8 @@ function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
           leadVoorOrganisatie: l.leadVoorOrganisatie === true,
         }))
       : [],
+    // Ontbreekt bij data van vóór de rondes (`datamodel.md`, Ronde en onderdeel).
+    rondes: Array.isArray(ruw.rondes) ? ruw.rondes : [],
     scanUitvoeringen: Array.isArray(ruw.scanUitvoeringen)
       ? ruw.scanUitvoeringen.map((s) => ({
           ...s,
@@ -123,6 +127,14 @@ export function laadAlles(): Organisatie[] {
 
 export function slaAlles(alles: Organisatie[]): void {
   if (typeof window === "undefined") return;
+  // Houdt rondes en samenstellingen kloppend na elke wijziging: Een lege ronde of een samengestelde Meting zonder
+  // onderliggende Metingen verdwijnt vanzelf (`datamodel.md`, Lege ronde). Eén plek, zodat geen schrijfactie het vergeet.
+  const verdwenen: { metingId: string; organisatieNaam: string }[] = [];
+  for (const organisatie of alles) {
+    const r = ruimOrganisatieOp(organisatie);
+    for (const id of r.verwijderdeSamengesteldeIds) verdwenen.push({ metingId: id, organisatieNaam: organisatie.naam });
+  }
+  if (verdwenen.length > 0) haalMetingenUitBenchmarks(verdwenen);
   const json = JSON.stringify(alles);
   window.localStorage.setItem(KEY, json);
   emitChange();

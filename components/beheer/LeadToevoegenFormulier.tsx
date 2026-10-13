@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAssessments } from "@/lib/assessment-store";
 import { voegLeadToe, LeadBereikKeuze } from "@/lib/db";
 import { Organisatie, OrganisatieLid, ScanUitvoering } from "@/lib/types";
+import { isSamengesteld } from "@/lib/rondes";
 
 /**
  * Het formulier "Lead toevoegen" (`beheerpagina.md`, punt 6a): Naam, e-mailadres en een verplichte keuze van het bereik,
@@ -83,6 +84,12 @@ export function LeadToevoegenFormulier({
                   }
                 />
                 {metingLabel(s)}
+                {isSamengesteld(s) && (
+                            <>
+                              <span className="admin-badge status-uitgenodigd" style={{ marginLeft: "0.4rem" }}>Gemiddelde</span>
+                              <span className="text-ink-s"> — Ziet alleen het gemiddelde</span>
+                            </>
+                          )}
               </label>
             ))}
           </div>

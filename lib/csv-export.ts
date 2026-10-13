@@ -2,6 +2,7 @@ import { Assessment, Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering 
 import { alleBouwblokkenMetGroep, isVlakkeAssessment } from "./assessment-structuur";
 import { alleBouwblokResultaten, alleGroepResultaten, overallScore, voortgang } from "./scoring";
 import { formatGewicht } from "./format";
+import { onderdeelVan, rondeVan } from "./rondes";
 
 /**
  * CSV-export van ingevulde scans (`export-csv.md`), vanaf de
@@ -21,6 +22,8 @@ export interface CsvRijContext {
 const KOLOMMEN = [
   "organisatie_naam",
   "meting_label",
+  "ronde",
+  "onderdeel",
   "assessment_naam",
   "respondent_naam",
   "respondent_email",
@@ -170,6 +173,9 @@ function bouwRijRecord(ctx: CsvRijContext): Record<string, string> {
   return {
     organisatie_naam: organisatie.naam,
     meting_label: scanUitvoering.label,
+    // Leeg bij een Meting zonder ronde, het onderdeel is dan "Hele organisatie" (`export-csv.md`, Basisgegevens).
+    ronde: rondeVan(organisatie, scanUitvoering)?.label ?? "",
+    onderdeel: onderdeelVan(scanUitvoering),
     assessment_naam: assessment.naam,
     respondent_naam: lid.naam ?? "",
     respondent_email: lid.email,
