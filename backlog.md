@@ -101,6 +101,11 @@ Bewust nog niet opgepakt. Geen prioritering.
   bouwblok — is ontworpen voor twee Metingen (besloten op 12 oktober 2026,
   nog te bouwen): `visualisatie-scores.md`, onderdeel C. Voor drie of meer
   Metingen is er nog geen ontwerp.
+- **Peildatum op een Meting**: De volgorde van Metingen volgt `aangemaaktOp`
+  (`datamodel.md`, Meting, Onderdeel). Wie een nulmeting en een nameting
+  importeert, importeert de oudste eerst. Pas als de ontwikkeling in de tijd
+  wordt gevolgd, bijvoorbeeld bij drie of meer Metingen, is een eigen
+  peildatum nodig. Besloten op 13 oktober 2026 om dit nu te laten.
 - **Benchmark, niveau 1 (tussen organisaties)**: Gebouwd (PR 61,
   `benchmark.md`). Daarbij nog niet gedekt: Export (PDF, CSV, InDesign) van
   een benchmark, rechten voor een Consultant, een vastgezette versie voor de
@@ -120,7 +125,11 @@ Bewust nog niet opgepakt. Geen prioritering.
   `visualisatie-scores.md`, onderdeel B (besloten op 12 oktober 2026, nog te
   bouwen). Houd rekening met herleidbaarheid bij weinig scans, zie de drempel
   `benchmarkMinRespondenten`.
-- **Benchmark of gemiddelde opslaan als samengestelde Meting**: Een
+- **Benchmark of gemiddelde opslaan als samengestelde Meting**: Uitgewerkt
+  als voorstel op 13 oktober 2026, samen met het veld `onderdeel` op de Meting,
+  zie `benchmark.md`, Onderdeel en samengestelde Meting, en `datamodel.md`,
+  Meting. Elke onderliggende Meting telt één keer mee, ongeacht het aantal
+  scans. Nog te bouwen. Oorspronkelijke omschrijving: Een
   gemiddelde over meerdere Metingen van één organisatie (zie niveau 2)
   vastleggen als eigen Meting, zodat een organisatie met meerdere delen als
   één deelnemer meedoet aan een benchmark tussen organisaties. De
@@ -128,7 +137,9 @@ Bewust nog niet opgepakt. Geen prioritering.
   kopieert geen antwoorden. Ze staat in de lijst Metingen met een badge
   "Gemiddelde", heeft geen respondenten en is niet invulbaar. Een Lead kan Lead
   worden op een samengestelde Meting (`RespondentRolMeting`) en ziet dan alleen
-  het gemiddelde, niet de onderliggende Metingen. Nog te beslissen: Wat er
+  het gemiddelde, niet de onderliggende Metingen. Dat bereik stelt de Admin
+  expliciet in en erft niet mee (besloten op 13 oktober 2026, `benchmark.md`,
+  Bereik van een Lead). Nog te beslissen: Wat er
   gebeurt als een onderliggende Meting wordt verwijderd. Blokkeren kan niet,
   want verwijderen moet altijd kunnen (bewaartermijn, AVG-verzoek). Voorstel:
   De Meting valt uit de samenstelling, de bevestiging noemt de samengestelde

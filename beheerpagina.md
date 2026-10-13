@@ -864,7 +864,15 @@ Vanuit de organisatie: Een meting aanmaken met een assessment-type en
 een label (bijv. "Nulmeting 2026"). Een organisatie kan meerdere metingen
 hebben, ook van verschillende scan-types.
 
-**Wijzigen**: Alleen het label, achteraf aanpasbaar (bijv. een typo
+**Onderdeel** (voorstel, `datamodel.md`, Meting): Bij het aanmaken staat
+naast het label een veld "Onderdeel", voorgevuld met "Hele organisatie". Het
+veld is een tekstveld met als suggesties de onderdelen die deze organisatie al
+heeft ("Team A", "Team B"), zodat dezelfde naam niet op twee manieren wordt
+gespeld. Metingen met hetzelfde onderdeel zijn rondes van hetzelfde deel, zie
+`benchmark.md`, Onderdeel en samengestelde Meting. De lijst Metingen in het
+organisatie-detail toont het onderdeel in een eigen kolom.
+
+**Wijzigen**: Het label en het onderdeel, achteraf aanpasbaar (bijv. een typo
 corrigeren). Het assessment-type ligt vast na aanmaken — dat achteraf
 wijzigen zou de al ingevulde antwoorden inconsistent maken met een
 ander scan-type; voor een ander scan-type maak je een nieuwe Meting
@@ -893,6 +901,38 @@ alle Metingen, een Consultant die van zijn eigen organisaties.
   Meting verplaatsen via selectie in de lijst (zelfde actie als punt 6b,
   "Respons naar andere Meting verplaatsen") en de Meting verwijderen (de
   bestaande verwijderfunctie, ook voor een lege import-Meting).
+
+**Samengestelde Meting** (voorstel, `benchmark.md`, Onderdeel en
+samengestelde Meting): Een gemiddelde over meerdere Metingen van één
+organisatie, bruikbaar als één deelnemer in een benchmark tussen organisaties.
+Admin en Consultant (bij zijn eigen organisaties, `metingen.plannen`).
+
+- **Aanmaken**: Onder de lijst Metingen in het organisatie-detail een oranje
+  knop "+ Samengestelde Meting" (`.btn-or .btn-compact`). Het formulier vraagt
+  een label, het Assessment en het onderdeel (voorgevuld met "Hele
+  organisatie"). Na de keuze van het Assessment volgt de lijst met Metingen van
+  dat Assessment, elk met een selectievakje, het onderdeel en het aantal
+  afgeronde scans. Een Meting met te weinig scans (`benchmarkMinScans`) is
+  uitgeschakeld, met de reden erbij. Opslaan kan pas bij minstens twee
+  Metingen.
+- **Waarschuwing**: Heeft een gekozen Meting hetzelfde onderdeel als een andere
+  gekozen Meting, dan staat er direct onder de lijst een `.admin-notice` over
+  een mogelijke hermeting (tekst in `benchmark.md`). Het is een gevolg en geen
+  uitleg, dus geen Info-icoon, en opslaan blijft mogelijk.
+- **In de lijst**: De badge "Gemiddelde", het aantal onderliggende Metingen en
+  geen knop "Respondent uitnodigen".
+- **Meting-overzicht**: Zelfde kop als hierboven, maar zonder het blok
+  Respondenten. In plaats daarvan het blok Samenstelling met de onderliggende
+  Metingen, elk met een link naar zijn eigen Meting-overzicht. Daarnaast
+  "Naar resultaten →", de acties "Samenstelling wijzigen" en "Verwijderen",
+  en de Leads zoals bij een gewone Meting.
+- **Resultaten**: Zoals Organisatie-resultaten (punt 4), met onder de titel
+  "Gemiddelde van {n} Metingen, elk even zwaar". Voor de Admin staat eronder de
+  matrix met de onderliggende Metingen als kolommen
+  (`visualisatie-scores.md`, onderdeel E).
+- **Verwijderen van een onderliggende Meting**: De Meting valt uit de
+  samenstelling. De bevestiging noemt de samengestelde Metingen waarin ze zit en
+  dat het gemiddelde daardoor verandert.
 
 #### 6. Respondenten uitnodigen
 
@@ -923,7 +963,10 @@ Het bereik van een Lead). Bij specifieke Metingen ziet hij niet automatisch
 alle Metingen van de organisatie. Welke hij mag zien, wordt per Meting
 toegekend (`RespondentRolMeting`), met minstens 1 verplicht. Het bereik
 bepaalt ook welke benchmarkviews hij kan krijgen (`benchmark.md`, Bereik van
-een Lead).
+een Lead). Een samengestelde Meting (voorstel, punt 5) staat in die lijst met
+de badge "Gemiddelde" en met de regel "Ziet alleen het gemiddelde". Ze is
+altijd een bewuste keuze en staat nooit vanzelf aan: Toegang erft niet mee van
+de onderliggende Metingen en gaat er ook niet naartoe.
 
 - **Lead toevoegen** (nieuwe actie op organisatieniveau, niet per
   Meting): Een oranje knop "+ Lead toevoegen" (`.btn-or .btn-compact`,
@@ -1457,7 +1500,11 @@ en is voorstel.
   de teller "X van Y organisaties", de gemiddelden van de groep en per
   organisatie het aantal afgeronde scans. De Admin ziet hier de namen van
   de organisaties, ook van de organisaties die in een Assessment
-  ontbreken (`benchmark.md`, Weergave voor de Admin). Is een lid
+  ontbreken (`benchmark.md`, Weergave voor de Admin). Onder de gemiddelden
+  staat per Assessment de matrix "Per bouwblok en per organisatie", met de
+  bouwblokken als rijen en de organisaties als kolommen (`benchmark.md`,
+  Weergave voor de Admin, en `visualisatie-scores.md`, onderdeel E). Nog niet
+  gebouwd. Is een lid
   automatisch weggevallen, dan staat boven het detail een melding
   (`Benchmark.meldingen`) die de Admin kan wegklikken. Onder de cijfers
   staat de peildatum.
@@ -1466,7 +1513,10 @@ en is voorstel.
   van de groep (`benchmark.md`, View per organisatie). Het groepsgemiddelde
   staat in het staafdiagram als tweede, neutrale balk.
 - **Toewijzen**: Op de view van een organisatie kiest de Admin een
-  bestaande Lead van die organisatie. Per toegewezen Lead staan een rij met de
+  bestaande Lead van die organisatie. Voorstel: De keuzelijst toont de Leads met
+  bereik op de Meting van die organisatie die in de benchmark zit, en niet meer
+  alleen de Leads voor de hele organisatie (`benchmark.md`, Bereik van een
+  Lead). Per toegewezen Lead staan een rij met de
   datum en de knoppen "Bekijk" (nog niet gebouwd) en "Intrekken". "Bekijk"
   opent het Respondent-overzicht van die Lead (punt 6b) over de pagina heen.
   Hetzelfde blok staat op elk niveau (`benchmark.md`, Toewijzen aan een Lead

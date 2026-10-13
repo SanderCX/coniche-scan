@@ -238,9 +238,29 @@ Meting {
   organisatieId: string
   assessmentId: string
   label: string
+  onderdeel: string                 // voorstel, standaard "Hele organisatie", bijv. "Team A"
+  samenstelling?: string[]          // voorstel, metingIds, alleen bij een samengestelde Meting
   aangemaaktOp: datetime
 }
 ```
+
+**Onderdeel (voorstel).** Het veld zegt over welk deel van de organisatie een
+Meting gaat. Metingen met hetzelfde `onderdeel` zijn rondes van hetzelfde deel,
+bijvoorbeeld de nulmeting en de nameting van Team A. Hun volgorde volgt
+`aangemaaktOp`. Metingen met een verschillend onderdeel zijn verschillende delen,
+bijvoorbeeld Team A en Team B in dezelfde periode. Het onderscheid bepaalt of een
+gemiddelde zinvol is of dat de ontwikkeling getoond moet worden
+(`benchmark.md`, Onderdeel en samengestelde Meting). Bestaande Metingen krijgen
+"Hele organisatie".
+
+**Samengestelde Meting (voorstel).** Een Meting met `samenstelling` is een
+gemiddelde over andere Metingen van dezelfde organisatie en hetzelfde
+Assessment, minstens twee, elk hoogstens één keer en zelf niet samengesteld. Ze
+heeft geen Respondenten en geen `ScanInvulling`s, en kopieert geen antwoorden:
+De scores worden berekend uit de onderliggende Metingen (Scoreberekening,
+Gemiddelde over een groep leden). Een samengestelde Meting is zelf een Meting,
+dus ze kan als `BenchmarkLid.metingId` meedoen aan een benchmark tussen
+organisaties.
 
 ### ScanInvulling
 
@@ -349,6 +369,11 @@ scan (niveau 3).
   tweede rekenmethode bij.
 - De leden horen bij hetzelfde Assessment. Een lid zonder afgeronde scan
   telt niet mee.
+- Een samengestelde Meting (voorstel) volgt dezelfde regel: De onderliggende
+  Metingen zijn de leden en elke Meting telt één keer mee, ongeacht het aantal
+  scans. Team A met 5 scans en overall 3,0 en Team B met 40 scans en overall 4,0
+  geven samen 3,5. Per scan gewogen zou het 3,9 zijn, en die variant bestaat
+  niet.
 
 ### Toegangscode
 
@@ -613,6 +638,13 @@ samen met de backend en de database.
   `beheerpagina.md`, punt 6a).
 
 Het bereik hangt niet af van of de Lead zelf een scan heeft ingevuld.
+
+**Samengestelde Meting en bereik (voorstel).** Een `RespondentRolMeting` mag
+naar een samengestelde Meting verwijzen. De Lead ziet dan alleen het gemiddelde.
+Toegang erft niet mee: Een koppeling met een onderliggende Meting geeft geen
+toegang tot de samengestelde Meting, en andersom. "Hele organisatie" dekt wel
+alle Metingen, dus ook de samengestelde. Een benchmarkview van niveau 1 volgt
+het bereik op de lid-Meting, zie `benchmark.md`, Bereik van een Lead.
 
 ```
 RespondentRolMeting {
@@ -1002,6 +1034,9 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   e-mailadres van de Lead.
 - `organisatie.benchmarkVlagGewijzigd`. `details` bevat de naam van de
   organisatie en de nieuwe stand van de vlag.
+- `meting.samengesteldAangemaakt`, `meting.samengesteldGewijzigd` en
+  `meting.samengesteldVerwijderd` (voorstel). `details` bevat het label en de
+  labels van de onderliggende Metingen zoals ze op dat moment waren.
 - `organisatie.hernoemd`. `details` bevat de oude en de nieuwe naam van de
   organisatie. Alleen `Organisatie.naam` verandert, het `id` en alle
   koppelingen blijven gelijk.
