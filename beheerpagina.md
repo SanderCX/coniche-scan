@@ -296,7 +296,11 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
   getal, geldt voor de hele omgeving, niet per organisatie of
   respondent.
 - **Bewaartermijn ingevulde scans** (`bewaarTermijnDagen`,
-  `datamodel.md` deel 2, Bewaartermijn ingevulde scans): Aantal dagen
+  `datamodel.md` deel 2, Bewaartermijn ingevulde scans). **Opmaak van de
+  rij**: Veld, eenheid ("dagen") en Info-icoon staan op één regel en het
+  icoon valt nooit naar een eigen regel (`stylesheet.md`, Info-icoon, Nooit
+  van de regel af). Hetzelfde geldt voor de aantallen scans bij de
+  benchmarkdrempels hieronder. Aantal dagen
   na `ScanInvulling.afgerondOp` waarna een ingevulde scan als "oud"
   geldt. Geen default, door een Admin zelf te bepalen
   (`privacy-pagina.md` noemt dit als openstaand). Eén globale waarde voor
@@ -763,6 +767,18 @@ het antwoord daarom zelf kunnen vastleggen.
   meedoet. De leden van de organisatie vallen dan uit die benchmarks.
   Wijzigen wordt gelogd (`organisatie.benchmarkVlagGewijzigd`). Zie
   `benchmark.md`, Toestemming en privacy.
+- **Naam wijzigen** (`organisaties.bewerken`, dus Admin voor alle
+  organisaties en Consultant voor zijn eigen): Op het organisatie-detail
+  staat de naam in de kop met een potlood ernaast. Een klik maakt van de
+  naam een invoerveld met "Opslaan" en "Annuleren". Er gelden dezelfde
+  regels als bij Aanmaken: De naam is verplicht en wordt getrimd. Na opslaan
+  staat de nieuwe naam direct in de kop, het kruimelpad, de lijst en overal
+  waar de organisatie wordt genoemd (Respondent-overzicht, Ingevulde scans,
+  benchmarks). Het `id` en de koppelingen blijven gelijk, dus er verandert
+  niets aan Metingen, Respondenten of scans. Het wijzigen wordt gelogd als
+  `organisatie.hernoemd`, met de oude en de nieuwe naam in `details`
+  (`datamodel.md`, Audit). Oudere audit-regels houden de naam zoals die was
+  bij het loggen.
 - **Detail**: Kenmerken (altijd bewerkbaar), "Aangemaakt door" (zie
   hierboven), de metingen van deze organisatie met "Bekijk" naar het
   Meting-overzicht (punt 5), en de respondenten met hun status, elk met

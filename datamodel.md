@@ -185,7 +185,7 @@ Die koppeling loopt via Meting.
 ```
 Organisatie {
   id: string
-  naam: string
+  naam: string                      // bewerkbaar via organisaties.bewerken, gelogd als organisatie.hernoemd
   kenmerken: { [veldId: string]: waarde }   // in beheer, altijd bewerkbaar, niet door respondenten
   aangemaaktOp: datetime
 }
@@ -1002,6 +1002,9 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   e-mailadres van de Lead.
 - `organisatie.benchmarkVlagGewijzigd`. `details` bevat de naam van de
   organisatie en de nieuwe stand van de vlag.
+- `organisatie.hernoemd`. `details` bevat de oude en de nieuwe naam van de
+  organisatie. Alleen `Organisatie.naam` verandert, het `id` en alle
+  koppelingen blijven gelijk.
 
 **Bewaartermijn.** De bewaartermijn van ingevulde scans
 (`bewaarTermijnDagen`, zie Bewaartermijn ingevulde scans hierboven)
