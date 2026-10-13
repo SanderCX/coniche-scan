@@ -2,11 +2,11 @@
 
 **Status.** Ontwerprichting besloten door Joost op 12 oktober 2026. Gebouwd op 13 oktober 2026 (A tot en met E, de navigatie en de schakelaar), met de afwijkingen en wat nog niet is gebouwd onder Gebouwd. Wat een voorstel is dat nog bevestiging vraagt, staat per onderdeel aangegeven. Dit bestand beschrijft wat getoond wordt en hoe het berekend wordt. De precieze opmaak (maten, kleuren, lettergrootte) volgt `stylesheet.md`. Waar dit bestand daar iets aan toevoegt, staat dat onder Nieuwe stijlwaarden.
 
-**Visueel referentieontwerp.** Het canvas "Coniche Scan – visualisatie van scores" (vijf borden, voorbeeldgegevens) is een ontwerpschets en geen code. Waar schets en tekst verschillen, geldt de tekst. De borden staan ook als afbeelding in de map `afbeeldingen` (`visualisatie-a-een-meting.png`, `visualisatie-b-spreiding.png`, `visualisatie-c-tussen-metingen.png`, `visualisatie-d-tussen-organisaties.png` en `visualisatie-e-matrix.png`). Het canvas zelf is privé en moet door Joost gedeeld worden voordat Sander het kan openen.
+**Visueel referentieontwerp.** Het canvas "Coniche Scan – visualisatie van scores" (vijf borden, voorbeeldgegevens) is een ontwerpschets en geen code. Waar schets en tekst verschillen, geldt de tekst. De borden staan ook als afbeelding in de map `afbeeldingen` (`visualisatie-a-een-meting.png`, `visualisatie-b-spreiding.png`, `visualisatie-c-tussen-metingen.png`, `visualisatie-d-tussen-organisaties.png` en `visualisatie-e-matrix.png`), plus `visualisatie-f-navigatie.png` met de schakelaar en de knop op de resultatenpagina's (Navigatie). Het canvas zelf is privé en moet door Joost gedeeld worden voordat Sander het kan openen.
 
 ## Wat het oplost
 
-Een resultaat moet in één blik laten zien waar een organisatie hoog en laag scoort. Dat geldt op vier plekken, met dezelfde schaal en dezelfde leesrichting:
+Een resultaat moet in één blik laten zien waar een organisatie hoog en laag scoort. Dat geldt op meerdere plekken, met dezelfde schaal en dezelfde leesrichting. G is het laagste niveau, de antwoorden per vraag, dat Sander eerder in Excel maakte.
 
 | Weergave | Vraag | Niveau in `benchmark.md` | Wie ziet het |
 |---|---|---|---|
@@ -15,10 +15,11 @@ Een resultaat moet in één blik laten zien waar een organisatie hoog en laag sc
 | C. Tussen metingen | Wat is er veranderd sinds de vorige Meting? | Trend in de tijd (`backlog.md`), valt buiten niveau 2 | Admin, Consultant, Lead |
 | D. Tussen organisaties | Waar zitten we boven of onder de groep? | Niveau 1, de view per organisatie | Admin, Lead met toewijzing |
 | E. Matrix | Welke Metingen of organisaties wijken af, op welk bouwblok? | Niveau 2, binnen een organisatie, en niveau 1, tussen organisaties | Alleen Admin |
+| G. Antwoorden per vraag | Wie antwoordde wat, per vraag en per bouwblok? | Het laagste niveau, binnen een Meting | Admin en Consultant |
 
 ## Gedeelde regels
 
-Deze regels gelden voor alle vijf de weergaven.
+Deze regels gelden voor alle weergaven. G wijkt af in de kleuren en heeft geen banden, zie daar.
 
 **Schaal en banden.** De horizontale as loopt van 1 tot 5. De positie van een score is `(score − 1) / 4` van de breedte. Achter elke rij staan drie banden die de classificatie van `CLAUDE.md` (sectie 1) volgen: onder 2,5 (Basis op Orde, 37,5% van de breedte), 2,5 tot en met 3,49 (Uitbouwen, 25%) en vanaf 3,5 (Sterk punt, 37,5%). Boven de eerste rij staan de drie namen. Bij D en E vervalt de bandachtergrond, zie daar.
 
@@ -47,7 +48,7 @@ Deze regels gelden voor alle vijf de weergaven.
 
 **Resultatenpagina van een Meting** (`beheerpagina.md`, punt 4, Organisatie-resultaten)
 
-- Onder de kop staat de schakelaar met drie weergaven: Overzicht, Per bouwblok en Spreiding. Overzicht is de standaard en is de huidige pagina (classificatiecirkel, radar, staafdiagram per categorie, top 3, legenda). Per bouwblok is weergave A, Spreiding is weergave B zonder ring.
+- Onder de kop staat de schakelaar met drie weergaven: Overzicht, Per bouwblok en Spreiding. Een Admin en een Consultant zien daarnaast Antwoorden (weergave G). Overzicht is de standaard en is de huidige pagina (classificatiecirkel, radar, staafdiagram per categorie, top 3, legenda). Per bouwblok is weergave A, Spreiding is weergave B zonder ring.
 - Rechts van de schakelaar staat de knop "Vergelijk met vorige Meting". Hij is er alleen als er een eerdere Meting van hetzelfde Assessment is waarvan het aantal afgeronde scans minstens `benchmarkMinScans` is. Zijn er meerdere eerdere Metingen, dan wordt het een dropdown-knop met de Metingen op label, de meest recente bovenaan.
 - Tijdens een vergelijking toont de pagina weergave C. De schakelaar is dan verborgen. Er staat een knop "Vergelijking sluiten" die terugkeert naar de weergave van daarvoor. Boven de titel staat als eyebrow "Vergelijking met {label van de vorige Meting}".
 - Een Admin ziet onder de weergave de link "Bekijk in benchmark" als de organisatie (niveau 1) of de Meting (niveau 2) lid is van een benchmark. Zit ze in meer dan één, dan is het een keuzelijst.
@@ -173,6 +174,33 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Andere kolommen.** Alleen opeenvolgende Metingen in de tijd in dezelfde matrix, zonder groepering, is nu geen besluit en vraagt eerst een uitwerking.
 
+## G. Antwoorden per vraag
+
+**Status.** Voorstel van 13 oktober 2026, nog niet gebouwd.
+
+**Plek.** De weergave Antwoorden op de resultatenpagina van een Meting (zie Navigatie), alleen voor een Admin en een Consultant met bereik op de organisatie. Dit is het laagste niveau en vervangt het Excel-overzicht van Sander.
+
+**Data.** Eén kolom per afgeronde scan in de Meting. Rijen zijn de bouwblokken, elk uitklapbaar tot zijn vragen.
+
+- Een vraagrij toont links de echte vraagtekst uit de content van het Assessment, volledig en niet ingekort, en dus in de vorm die de respondent zag (`content-klantcontact-volwassenheid.md` en de andere contentbestanden). Bij een Zorgscan zijn dat de sectorvarianten. De teksten in het canvas zijn voorbeelden. Rechts daarvan staat het antwoord van elke respondent als geheel getal van 1 tot 5. Een onbeantwoorde vraag is een lege cel.
+- Is de content van een vraag later gewijzigd of gearchiveerd, dan toont de rij de tekst zoals die bij deze Meting hoort, in lijn met hoe gearchiveerde content elders meetelt (`datamodel.md`, Content bewerken).
+- Een bouwblokrij toont per respondent de bouwblokscore, het gemiddelde van de beantwoorde vragen van die respondent, op één decimaal.
+- Rechts staat per rij het gemiddelde (Gem.) en het aantal beantwoorde antwoorden (N). Gem. bij een vraag is het gemiddelde antwoord over de respondenten. Gem. bij een bouwblok is het gemiddelde van de vraaggemiddelden, zoals bij weergave A.
+- Onderaan staat een rij Totaalscore per respondent, uit de gedeelde scorefunctie met `Bouwblok.gewicht`. Gem. is de totaalscore van de Meting. N is het aantal beantwoorde antwoorden.
+
+**Kleur.** Elke cel krijgt de scorekleur van de afgeronde waarde, met de vijf stappen van `stylesheet.md`: 1 `--score-1` (rood) tot 5 `--score-5` (donkergroen). Afronden gaat half-away-from-zero, dus 2,5 krijgt de kleur van 3. Tekst is wit op 1 en 5 en donker op 2, 3 en 4. Dit wijkt af van de PDF, waar de tekst op oranje wit is, omdat wit op `--score-2` een te laag contrast geeft. Een lege cel is wit met een rand van 1px (`--border`). Deze weergave gebruikt dus de vijf scorekleuren en niet de drie klassekleuren van A tot en met E, omdat hier losse antwoorden staan en geen gemiddelden over een groep.
+
+**Opbouw.**
+
+- Kolomkop met de initialen van de respondent. De volledige naam staat in een tooltip. Het voorbeeld toont R1 tot R14.
+- Een blokrij heeft een achtergrond van `--bg-warm`, de accentrand van 4px in de categoriekleur, het volgnummer, de naam en een pijltje dat de rij open- en dichtklapt. Een vraagrij heeft de vraagtekst op één tot drie regels. Vraagrijen zijn hoger dan blokrijen (50px tegenover 30px per cel).
+- Alle bouwblokken staan standaard ingeklapt. Boven de kaart staan de knoppen "Alles uitklappen" en "Alles inklappen". De open of dichte stand wordt niet in de adresbalk bewaard.
+- De kolomkop blijft staan bij het scrollen. Bij meer dan 14 respondenten scrolt de kaart horizontaal, met de linkerkolom (bouwblok en vraag) vast.
+
+**Tegels.** Aantal respondenten, percentage beantwoorde vragen (met het totaal), laagste vraag (score, bouwblok en vraagnummer) en hoogste vraag.
+
+**Privacy.** Dit zijn de antwoorden van individuele personen met naam. Een Lead ziet deze weergave nooit, ook niet bij een toewijzing: Een toewijzing van niveau 3 geeft de Lead één scan (`benchmark.md`, Toewijzen aan een Lead op alle niveaus) en niet deze matrix.
+
 ## Gebouwd
 
 Gebouwd op 13 oktober 2026. De berekeningen staan in `lib/visualisatie.ts` (met tests), de weergaven in
@@ -226,6 +254,8 @@ Voorstel, op te nemen in `stylesheet.md` zodra ze zijn bevestigd:
 | Positielabel boven de groep | vulling `#e8f1fb`, tekst `#174473`, rand `#bcd3ee` |
 | Positielabel onder de groep | vulling `#fdf2e3`, tekst `#8a4a00`, rand `#f2cf9b` |
 | Spreiding, stip van een respondent | `#5d6a78` met 75% dekking |
+| G, cel met een antwoord of score | `--score-1` tot `--score-5`, tekst wit op 1 en 5, `--ink` op 2 tot en met 4 |
+| G, lege cel | wit, rand `1px solid var(--border)` |
 
 ## Open punten
 
@@ -235,4 +265,6 @@ Voorstel, op te nemen in `stylesheet.md` zodra ze zijn bevestigd:
 - Of een Admin in B de naam van een respondent bij een stip kan zien.
 - Een extra uitsplitsing van B naar Rol, bijvoorbeeld management tegenover medewerkers. Zie `backlog.md`.
 - Meer dan twee Metingen in C.
+- G: De volgorde van de kolommen (voorstel alfabetisch op achternaam), sorteren of filteren op bouwblok, en een CSV-export van deze matrix naast de bestaande export per scan (`export-csv.md`).
+- G: Of de initialen in de kolomkop genoeg zijn bij respondenten met dezelfde initialen.
 - Export van deze weergaven naar PDF, CSV en InDesign.

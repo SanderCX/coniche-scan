@@ -834,7 +834,7 @@ het antwoord daarom zelf kunnen vastleggen.
 
   **Weergaven (besloten op 12 oktober 2026, gebouwd op 13 oktober 2026).** Boven de
   inhoud staat een weergave-schakelaar (`stylesheet.md`, Weergave-schakelaar)
-  met Overzicht, Per bouwblok en Spreiding. Overzicht is de standaard en de
+  met Overzicht, Per bouwblok en Spreiding, en voor een Admin en Consultant ook Antwoorden (de antwoorden per vraag en per respondent). Overzicht is de standaard en de
   opbouw hierboven, die ongewijzigd blijft. Rechts van de schakelaar staat de
   knop "Vergelijk met vorige Meting". De weergaven, de knop en de
   adresbalkparameters staan in `visualisatie-scores.md`, Navigatie. Een Lead
