@@ -104,7 +104,7 @@ De view toont nooit de namen van andere organisaties. De Admin bekijkt de view e
 **Gebouwd.** De Admin kan de view van organisatie X toewijzen aan een bestaande Lead van die organisatie (`BenchmarkToewijzing`). De Lead ziet de view naast zijn eigen resultaten op zijn pagina. Intrekken kan ook, door een Admin. De Admin ziet bij de toewijzingen per Lead een knop "Bekijk" en "Intrekken" (zie Toewijzen aan een Lead op alle niveaus). Wat de Lead ziet:
 
 - Geen automatische toegang. De Lead krijgt de view alleen als een Admin die toewijst, per benchmark en per organisatie.
-- Een Lead voor de hele organisatie (zie Bereik van een Lead). De view gaat over de Meting van de organisatie die als lid in de benchmark zit. Van de Lead zelf speelt niets mee: Niet zijn eigen scan en niet de Metingen waarop hij Lead is. Eerder moest de Lead de lid-Meting zelf kunnen inzien (`leadMetingIds`). Dat veroorzaakte vergelijkingen met scores die niet van de Lead waren, en is vervangen door het organisatiebereik (gebouwd op 13 oktober 2026).
+- Een Lead met bereik op de Meting van de organisatie die als lid in de benchmark zit (zie Bereik van een Lead). De view gaat over die Meting. Van de Lead zelf speelt niets mee, ook niet zijn eigen scan. Gebouwd is dat de Lead voor de hele organisatie moet zijn (13 oktober 2026). **Voorstel, 13 oktober 2026.** Een Lead hoeft dat niet meer te zijn, zolang hij bereik heeft op de lid-Meting. Dat voorkomt vergelijkingen met scores die niet van de Lead zijn, want hij is Lead op precies de Meting waarover de view gaat.
 - Een sectie alleen als het Assessment aan de drempel voldoet. Toewijzen kan pas als minstens één Assessment aan de drempel voldoet. De Lead ziet alleen de secties die eraan voldoen.
 - Wijzigt de samenstelling zodat de organisatie niet meer meedoet, of verdwijnt de Lead-respondent, of verliest de Lead zijn bereik, dan vervalt de toewijzing.
 
@@ -131,6 +131,29 @@ Het privacy statement belooft een minimale groepsgrootte. Die belofte moet overe
 
 - `privacy-pagina.md` (sectie 3a) vermeldt dat er alleen geaggregeerde gegevens in een benchmark komen, dat er nooit een organisatienaam bij staat, welke minimale groepsgrootte geldt, en dat het verwijderen van een scan die scan ook uit de benchmark haalt, omdat alles wordt berekend. De tekst staat in de spec en nog niet op de publieke privacypagina.
 - Het toestemmingsvakje in de intake (`CLAUDE.md`, schermflow punt 4) krijgt een aangepaste tekst. Die geldt voor nieuwe respondenten.
+
+## Onderdeel en samengestelde Meting
+
+**Voorstel, besproken met Joost op 13 oktober 2026. Nog niet gebouwd.** Twee Metingen van dezelfde organisatie kunnen twee dingen betekenen. Het zijn twee delen van de organisatie in dezelfde periode, bijvoorbeeld Team A en Team B. Of het is hetzelfde deel op twee momenten, bijvoorbeeld de nulmeting en de nameting van Team A. In het eerste geval is een gemiddelde zinvol. In het tweede geval zegt een gemiddelde weinig en wil je de ontwikkeling zien. De app kan die twee nu niet uit elkaar houden, omdat een Meting alleen een label heeft.
+
+- **Onderdeel.** Elke Meting krijgt een veld `onderdeel` (`datamodel.md`, Meting), standaard "Hele organisatie". Metingen met hetzelfde onderdeel en een andere datum zijn rondes van hetzelfde deel. Metingen met een verschillend onderdeel horen bij verschillende delen.
+- **Hetzelfde onderdeel.** Dit is ontwikkeling. Het vergelijken gaat met "Vergelijk met vorige Meting" (`visualisatie-scores.md`, onderdeel C), die als vorige Meting de meest recente eerdere Meting met hetzelfde onderdeel voorstelt.
+- **Verschillend onderdeel in dezelfde periode.** Dit zijn delen van een geheel. De Admin of Consultant maakt er een samengestelde Meting van (hieronder).
+- **Benchmark tussen organisaties.** Per organisatie doet één Meting per Assessment mee, en dat kan een nulmeting, een nameting of een samengestelde Meting zijn. De keuzelijst in stap 3 van Samenstellen toont ze allemaal. Een organisatie die een nulmeting en een nameting heeft, kan dus in twee benchmarks staan, of in één met de keuze voor de nameting.
+
+### Samengestelde Meting
+
+Een Meting die verwijst naar andere Metingen (`Meting.samenstelling`) en daarvan het gemiddelde toont.
+
+- **Samenstelling.** Eén organisatie, één Assessment, minstens twee Metingen, elke Meting hoogstens één keer. Een samengestelde Meting zit niet in een andere samengestelde Meting. Elke onderliggende Meting moet voldoen aan `benchmarkMinScans`, zoals op niveau 2.
+- **Wat ze is.** Een gewone Meting zonder Respondenten en zonder scans. Ze is niet invulbaar en staat in de lijst met de badge "Gemiddelde". De antwoorden worden niet gekopieerd, de scores worden berekend.
+- **Gewicht.** Elke Meting telt één keer mee, ongeacht het aantal scans. Dit is dezelfde regel als in de benchmark (Gedeelde regels). Team A met 5 scans en overall 3,0 en Team B met 40 scans en overall 4,0 geven samen 3,5. Per scan gewogen zou het 3,9 zijn, en die variant bestaat niet. Uitleg in één zin: Elk onderdeel telt even zwaar, een team van vijf evenveel als een team van veertig.
+- **Waarschuwing bij een hermeting.** Heeft een gekozen Meting hetzelfde onderdeel als een andere gekozen Meting, dan staat er een `.admin-notice`: "Deze Metingen hebben hetzelfde onderdeel ({onderdeel}). Dat lijkt een nameting van hetzelfde team, en een gemiddelde zegt dan weinig. Wil je de ontwikkeling zien, gebruik dan Vergelijk met vorige Meting." Opslaan blijft mogelijk.
+- **Onderdeel van de samengestelde Meting.** Standaard "Hele organisatie". Een samengestelde nulmeting en een samengestelde nameting hebben dan hetzelfde onderdeel en zijn onderling te vergelijken met onderdeel C.
+- **Niveau 2 en 3.** Een samengestelde Meting is daar geen lid. De onderliggende Metingen zijn zelf te kiezen, en meetellen van beide zou dubbel tellen.
+- **Verwijderen van een onderliggende Meting.** Verwijderen moet altijd kunnen (bewaartermijn, AVG-verzoek). De Meting valt uit de samenstelling. De bevestiging noemt de samengestelde Metingen waarin ze zit en dat het gemiddelde daardoor verandert. Een samengestelde Meting zonder onderliggende Metingen verdwijnt. Blijft er één over, dan toont ze een melding, en de Admin past haar aan of verwijdert haar. Het alternatief, de gemiddelde antwoorden bij het opslaan vastleggen, staat in `backlog.md`.
+- **Wie ziet wat.** Admin en Consultant (eigen organisatie) zien de samenstelling. Een Lead op een samengestelde Meting ziet alleen het gemiddelde en niet de onderliggende Metingen (`backlog.md`). Het bereik daarop stelt de Admin expliciet in (Bereik van een Lead).
+- **Weergave.** De resultatenpagina is die van een Meting, met als regel onder de titel "Gemiddelde van {n} Metingen, elk even zwaar". Voor de Admin staat eronder de matrix uit `visualisatie-scores.md`, onderdeel E, met de onderliggende Metingen als kolommen.
 
 ## Niveau 2: Binnen een organisatie
 
@@ -166,13 +189,23 @@ Het privacy statement belooft een minimale groepsgrootte. Die belofte moet overe
 - **Bereik verliezen.** Verliest een Lead zijn bereik op het onderwerp van een view, dan vervalt de toewijzing, op elk niveau.
 - **Bestaande toewijzingen.** Dit is een overgangsregel. Een toewijzing van niveau 1 die al bestond toen het bereik werd ingevoerd, aan een Lead zonder organisatiebereik, blijft eenmalig in de lijst staan, met de melding "Deze Lead heeft geen bereik op deze organisatie". De Lead ziet dan niets. De Admin past het bereik aan of trekt de toewijzing in.
 
+**Voorstel, 13 oktober 2026: Niveau 1 volgt het bereik op de lid-Meting.** Dit wijzigt wat hierboven gebouwd is. De organisatievergelijking vraagt niet meer om "Hele organisatie", zodat een Lead die geen Meting van andere teams hoeft te zien, toch de organisatie tegenover de groep krijgt.
+
+- **Regel.** Een view van niveau 1 is toe te wijzen aan een Lead met bereik op de Meting van X die als lid in de benchmark zit. Dat bereik is "Specifieke Metingen" met die Meting aangevinkt, of "Hele organisatie". De lid-Meting is vaak een samengestelde Meting (Onderdeel en samengestelde Meting).
+- **Per Assessment.** De lid-Meting kan per Assessment een andere zijn. De Lead ziet alleen de secties waarvan de lid-Meting binnen zijn bereik valt en die aan de drempel voldoen. Toewijzen kan zodra minstens één Assessment daaraan voldoet.
+- **Samengestelde Meting.** Het bereik erop is altijd een bewuste keuze van de Admin. De Admin vinkt de samengestelde Meting aan in de lijst Metingen van de Lead (met de badge "Gemiddelde"). Toegang erft niet mee. Een Lead op een onderliggende Meting krijgt de samengestelde Meting niet, en een Lead op de samengestelde Meting krijgt de onderliggende Metingen niet. Hij ziet alleen het gemiddelde. Er zijn geen Respondenten om uit te nodigen, en export van een samengestelde Meting is nog niet gedekt. "Hele organisatie" dekt haar wel, net als alle andere Metingen, ook de latere.
+- **Niveau 2 en 3.** Een Lead met bereik op alleen een samengestelde Meting krijgt geen views van niveau 2 en 3, want de samengestelde Meting is daar geen lid.
+- **Wisselt het lid.** Past de Admin de benchmark aan, zodat de lid-Meting van X een andere Meting wordt buiten het bereik van de Lead, dan vervalt de toewijzing voor dat Assessment. Vervalt ze voor alle Assessments, dan verdwijnt de toewijzing.
+- **Bestaande toewijzingen.** Een toewijzing aan een Lead met bereik op de lid-Meting blijft gelden. Een toewijzing aan een Lead zonder dat bereik krijgt de melding "Deze Lead heeft geen bereik op de Meting van deze organisatie in de benchmark", met dezelfde afhandeling als hierboven.
+- **Voorbeeld.** Een manager van het serviceteam doet een nulmeting en een nameting. Hij is Lead op "Service nulmeting", "Service nameting" en de samengestelde Meting "Hele organisatie". Hij ziet zijn eigen resultaten en de ontwikkeling daartussen, het organisatiegemiddelde, en de organisatie tegenover de groep. Van andere teams ziet hij niets.
+
 ## Toewijzen aan een Lead op alle niveaus
 
 **Besloten.** Op elk niveau kan een Admin een view toewijzen aan een Lead. Een view is steeds één lid tegenover de rest van de groep, zonder dat lid zelf (zie View per organisatie). Op niveau 1 is dit gebouwd. Niveau 2 en 3 zijn voorstel.
 
 | Niveau | De view gaat over | De Lead is | Vergelijkt met |
 |---|---|---|---|
-| 1 | Organisatie X | Een Lead voor de hele organisatie X | De overige organisaties |
+| 1 | Organisatie X | Een Lead met bereik op de Meting van X die in de benchmark zit (voorstel). Gebouwd: Een Lead voor de hele organisatie X | De overige organisaties |
 | 2 | Meting M | Een Lead met bereik op M: Voor M zelf of voor de hele organisatie | De overige Metingen in de benchmark |
 | 3 | De scan van Respondent R in Meting M | Een Lead met bereik op M | De overige scans in M |
 
@@ -205,7 +238,7 @@ De gebeurtenissen staan in `datamodel.md`, Audit, onder Benchmark. Wat een verwi
 - Een vastgezette versie in plaats van live cijfers.
 - De range van de groep als band in de view: Ontworpen, zie `visualisatie-scores.md`, onderdeel D. Nog te bouwen.
 - De berekening op de server (`backlog.md`, Fase 2). Nu draait ze in de browser, dus de privacyregels voor een Lead worden alleen in de schermen bewaakt.
-- Een samengestelde Meting, zodat een organisatie met meerdere delen als één deelnemer meedoet aan niveau 1 (`backlog.md`).
+- Een samengestelde Meting, zodat een organisatie met meerdere delen als één deelnemer meedoet aan niveau 1: Uitgewerkt als voorstel, zie Onderdeel en samengestelde Meting. Nog te bouwen.
 - Ontwikkeling in de tijd binnen een benchmark.
 - De spreiding en de hoge en lage scores op niveau 2 en 3: Ontworpen, zie `visualisatie-scores.md`, onderdeel B en E. Nog te bouwen.
 - De privacytekst en het toestemmingsvakje in de intake in de code.
@@ -220,3 +253,5 @@ De gebeurtenissen staan in `datamodel.md`, Audit, onder Benchmark. Wat een verwi
 - Niveau 3: De grenzen van het spreidingslabel en de vraag of een Admin bij een stip de naam kan zien (`visualisatie-scores.md`, Open punten).
 - Niveau 1: Of de band en de kwartielen van de groep een eigen drempel krijgen.
 - Niveau 1: Of de matrix bij heel veel organisaties een andere weergave nodig heeft dan horizontaal scrollen.
+- Onderdeel: Of een Meting een eigen peildatum nodig heeft. De volgorde van rondes volgt nu `aangemaaktOp`, en dat klopt niet bij geïmporteerde Metingen die op één dag zijn aangemaakt.
+- Samengestelde Meting: Wat er gebeurt als er één onderliggende Meting overblijft, en de aanvulling in `datamodel.md`, Verwijderen en datakoppelingen.
