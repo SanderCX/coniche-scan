@@ -377,7 +377,7 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   scan een eigen Meting met de datum in het label. Gespecificeerd op 8 oktober
   2026, nog niet gebouwd (nu groepeert `lib/db/import.ts` op organisatie,
   Assessment en label).
-- **Notitie per scan en Scans samenbrengen** (13 oktober 2026, voorstel):
+- **Notitie per scan en Scans samenbrengen** (13 oktober 2026, gebouwd):
   Bij het importeren van meerdere bestanden kreeg dezelfde Respondent alle
   `start_comment`-teksten als één geplakte notitie. Herstel: `start_comment`
   wordt `ScanInvulling.notitie` en de import schrijft niet meer naar

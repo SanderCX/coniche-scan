@@ -10,6 +10,7 @@ import { BulkToolbar } from "@/components/beheer/BulkToolbar";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { NaarAndereMetingStap, ScanVerplaatsResultaat } from "@/components/beheer/VerplaatsStappen";
+import { ScansSamenbrengenModal } from "@/components/beheer/ScansSamenbrengenModal";
 import { conflictActies } from "@/components/beheer/ConflictHost";
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { STATUS_LABEL, rolTeamTekst } from "@/components/beheer/overzicht-helpers";
@@ -29,7 +30,8 @@ type Kolom =
   | "status"
   | "voortgang"
   | "gestart"
-  | "aangemaakt";
+  | "aangemaakt"
+  | "notitie";
 
 interface Rij {
   invullingId: string;
@@ -44,6 +46,8 @@ interface Rij {
   voortgang: number;
   gestart: number;
   aangemaakt: number;
+  /** De notitie van de scan (`ScanInvulling.notitie`), leeg als er geen is. */
+  notitie: string;
 }
 
 const KOLOMMEN: { key: Kolom; label: string }[] = [
@@ -56,6 +60,7 @@ const KOLOMMEN: { key: Kolom; label: string }[] = [
   { key: "voortgang", label: "Voortgang" },
   { key: "gestart", label: "Gestart" },
   { key: "aangemaakt", label: "Aangemaakt" },
+  { key: "notitie", label: "Notitie" },
 ];
 
 /**
@@ -99,6 +104,7 @@ function IngevuldeScansPageInhoud() {
               voortgang: percentage,
               gestart: invulling.gestartOp ? new Date(invulling.gestartOp).getTime() : 0,
               aangemaakt: new Date(invulling.aangemaaktOp).getTime(),
+              notitie: invulling.notitie ?? "",
             },
           ];
         });
@@ -149,6 +155,7 @@ function IngevuldeScansPageInhoud() {
   const bulk = useBulkSelect(gesorteerd.map((r) => r.invullingId));
   const [verwijderenOpen, setVerwijderenOpen] = useState(false);
   const [naarMetingOpen, setNaarMetingOpen] = useState(false);
+  const [samenbrengenOpen, setSamenbrengenOpen] = useState(false);
   const [pdfBezig, setPdfBezig] = useState(false);
 
   function handleSort(kolom: Kolom) {
@@ -176,6 +183,9 @@ function IngevuldeScansPageInhoud() {
     [...bulk.selected].map((id) => exportContextPerInvulling.get(id)?.organisatie.id).filter(Boolean)
   );
   const selectieMeerdereOrganisaties = geselecteerdeOrganisaties.size > 1;
+  // Samenbrengen kan alleen voor scans van hetzelfde Assessment (`beheerpagina.md`, punt 6b).
+  const selectieMeerdereAssessments =
+    new Set([...bulk.selected].map((id) => gesorteerd.find((r) => r.invullingId === id)?.assessmentId)).size > 1;
 
   // PDF/InDesign zijn "beschikbaar bij precies één scan".
   const enkeleSelectie = bulk.selected.size === 1 ? exportContextPerInvulling.get([...bulk.selected][0]) : undefined;
@@ -284,6 +294,8 @@ function IngevuldeScansPageInhoud() {
                 }
                 exportBezig={pdfBezig}
                 onNaarAndereMeting={filterOrganisatieObject ? () => setNaarMetingOpen(true) : undefined}
+                onSamenbrengen={filterOrganisatieObject ? () => setSamenbrengenOpen(true) : undefined}
+                samenbrengenUitgeschakeld={selectieMeerdereAssessments}
               />
               <BevestigModal
                 open={verwijderenOpen}
@@ -301,6 +313,17 @@ function IngevuldeScansPageInhoud() {
                     onKlaar={handleVerplaatst}
                   />
                 </OverzichtModal>
+              )}
+              {samenbrengenOpen && filterOrganisatieObject && (
+                <ScansSamenbrengenModal
+                  organisatie={filterOrganisatieObject}
+                  invullingIds={[...bulk.selected]}
+                  onSluit={() => {
+                    setSamenbrengenOpen(false);
+                    bulk.clear();
+                  }}
+                  onKlaar={() => {}}
+                />
               )}
               <table className="admin-table">
                 <thead>
@@ -344,6 +367,9 @@ function IngevuldeScansPageInhoud() {
                       <td>{r.voortgang}%</td>
                       <td>{r.gestart ? new Date(r.gestart).toLocaleDateString("nl-NL") : ""}</td>
                       <td>{new Date(r.aangemaakt).toLocaleDateString("nl-NL")}</td>
+                      <td className="cel-notitie" title={r.notitie || undefined}>
+                        {r.notitie}
+                      </td>
                       <td className="cel-knop">
                         <button type="button" className="btn btn-outline btn-compact" onClick={() => open("scan", r.invullingId)}>
                           Bekijk
