@@ -310,12 +310,25 @@ ScanInvulling {
   afgerondOp: datetime | null
   antwoorden: { [vraagId: string]: number }            // 1-5
   opmerkingenPerBouwblok: { [bouwblokId: string]: string }
+  notitie: string | null            // voorstel, 13 oktober 2026, zie hieronder
   bewaarVerlengdTot: datetime | null        // zie Bewaartermijn ingevulde scans
 }
 ```
 
 Uniek per combinatie van meting en respondent. Dezelfde scan opnieuw
 invullen gebeurt via een nieuwe meting.
+
+**Notitie op de scan (voorstel, 13 oktober 2026).** Een notitie bij het starten
+van een scan (bij de import `start_comment`, `import-scans.md`) hoort bij die
+ene scan en staat op de `ScanInvulling`, niet op de Respondent. Reden: Eén
+Respondent kan veel scans hebben, en bij een import is dat vaak dezelfde
+Respondent voor alle regels (een Coniche-medewerker die voor een klant invult).
+Stond de notitie op de Respondent, dan werden alle notities van die Respondent
+aan elkaar geplakt en was niet meer te zien welke notitie bij welke scan hoort.
+`Respondent.notities` blijft bestaan voor wat de beheerder zelf bij de persoon
+opschrijft. De import schrijft er niet meer naar. Bestaande, aan elkaar geplakte
+notities op een Respondent zijn niet meer uit elkaar te halen. De scans zijn dan
+opnieuw te importeren (`import-scans.md`, Notitie per scan).
 
 Status: `"uitgenodigd"` bij het uitnodigen, `"bezig"` zodra de intake is
 verzonden (ook al is de voortgang dan nog 0%), `"afgerond"` als alle

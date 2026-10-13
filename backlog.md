@@ -377,6 +377,17 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   scan een eigen Meting met de datum in het label. Gespecificeerd op 8 oktober
   2026, nog niet gebouwd (nu groepeert `lib/db/import.ts` op organisatie,
   Assessment en label).
+- **Notitie per scan en Scans samenbrengen** (13 oktober 2026, voorstel):
+  Bij het importeren van meerdere bestanden kreeg dezelfde Respondent alle
+  `start_comment`-teksten als één geplakte notitie. Herstel: `start_comment`
+  wordt `ScanInvulling.notitie` en de import schrijft niet meer naar
+  `Respondent.notities` (`datamodel.md`, Notitie op de scan, `import-scans.md`,
+  Notitie per scan). Bestaande geplakte notities zijn niet te herstellen, dus
+  die scans opnieuw importeren. Daarbij hoort de actie "Scans samenbrengen in
+  één Meting" (`beheerpagina.md`, bij "Respons naar andere Meting verplaatsen"):
+  Eén scherm dat per scan de Respondent koppelt en alles in één ronde en
+  Meting zet. Ook nodig: Kolom Notitie in de lijst Ingevulde scans en het
+  Scan-overzicht, kolom `scan_notitie` in de CSV-export (`export-csv.md`).
 - **Assessment verwijderen** (`beheerpagina.md`, punt 1, `datamodel.md`,
   Verwijderen en datakoppelingen): Gespecificeerd, nog niet gebouwd. Alleen
   mogelijk als er geen Meting van het Assessment bestaat, met een

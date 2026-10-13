@@ -1325,6 +1325,9 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
     de scan (Meting, afgerond op, voortgang en totaalscore) en daaronder
     de gegevens van de Respondent (naam, e-mail, functie, team, notities).
     De gegevens van de gedeelde Respondent zijn in beide kolommen gelijk.
+    Per kolom staat ook de notitie van de scan zelf (`datamodel.md`, Notitie
+    op de scan), die per scan verschilt en dus laat zien welke Respondent erbij
+    hoort.
   - **Per kolom de knop "Andere Respondent koppelen"**: De knop zit onder
     het Respondent-blok van die kolom. Na een klik wordt dat blok zelf
     bewerkbaar, op de plek waar het staat. Er opent geen apart formulier
@@ -1358,6 +1361,66 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   **Lege Meting**: Blijft staan na het verplaatsen van de laatste respons.
   Opruimen is een aparte actie, via de bestaande verwijderfunctie
   (Verwijderen).
+- **Scans samenbrengen in één Meting** (voorstel, 13 oktober 2026): Zet
+  scans die na een import verspreid over losse Metingen staan en onder één
+  Respondent hangen, in één keer in één Meting en koppelt ze aan de juiste
+  Respondent. Het voorbeeld is een import van tien bestanden waarin steeds
+  dezelfde medewerker de invuller is en de echte persoon in de notitie
+  staat. Het gewenste eindresultaat is één Meting in één ronde met tien
+  Respondenten. De bestaande acties "Respons naar andere Meting verplaatsen"
+  en "Andere Respondent koppelen" kunnen dit ook, maar dan scan voor scan en
+  met een conflictmelding bij elke scan na de eerste, omdat één Respondent
+  maar één scan per Meting kan hebben. Deze actie doet het in één scherm.
+
+  **Waar**: Actie "Samenbrengen in één Meting…" op de selectie in de
+  organisatie-gefilterde lijst Ingevulde scans (punt 7). Alle geselecteerde scans
+  hebben dezelfde organisatie en hetzelfde Assessment, anders is de actie
+  uitgeschakeld met een Info-icoon dat zegt waarom.
+
+  **Het scherm** (modal, twee delen):
+  1. **Doel-Meting** bovenaan: Kiezen uit bestaande Metingen van dezelfde
+     organisatie en hetzelfde Assessment, of "Nieuwe Meting" met de velden
+     Label, Onderdeel en Ronde (bestaande ronde kiezen of een nieuwe
+     aanmaken, zoals bij punt 5). Voor het voorbeeld: Ronde "0-meting",
+     Label "Volwassenheid", Onderdeel bijvoorbeeld "Team Service". De
+     uniciteitsregel van de ronde geldt (`datamodel.md`, Ronde en onderdeel).
+     Bestaat de combinatie al, dan kiest de beheerder die Meting.
+  2. **Tabel met één regel per scan**: Kolommen Huidige Meting, Notitie
+     (van de scan), Huidige Respondent en Respondent in de doel-Meting. De
+     laatste kolom is een keuzelijst met "Dezelfde Respondent houden", "Nieuwe
+     Respondent" en de bestaande Respondenten van de organisatie. Bij "Nieuwe
+     Respondent" klapt de regel open met Naam, E-mail (verplicht, nog niet in
+     gebruik, een tijdelijk adres mag), Functie en Team. De velden zijn
+     leeg, niet vooraf ingevuld met de gegevens van de gedeelde Respondent.
+     De notitie staat zichtbaar in de regel, zodat de beheerder de naam eruit
+     kan overnemen. Een nieuwe Respondent krijgt een nieuwe Toegangscode.
+
+  **Controle vóór opslaan**: De knop "Samenbrengen" is pas actief als elke
+  Respondent hoogstens één scan in de doel-Meting heeft. Dat geldt ook voor
+  scans die er al in staan. Een regel die botst krijgt een rode melding in de
+  regel zelf ("{naam} heeft al een scan in deze Meting"), met de andere regel
+  erbij genoemd. Er is dus geen losse conflictmelding achteraf.
+
+  **Alles of niets**: De actie slaat alles in één keer op, of niets. Per scan
+  wordt zowel de Respondent als de Meting bijgewerkt (`scanUitvoeringId` en
+  `organisatieLidId`, zie "Twee verwijzingen per scan"). Antwoorden en
+  organisatie blijven ongewijzigd.
+
+  **Na afloop**: De melding noemt het aantal scans, de doel-Meting en de
+  ronde. De bron-Metingen die leeg zijn, blijven staan (zie "Lege Meting"),
+  met in de melding het aantal lege Metingen en een knop "Lege Metingen
+  verwijderen" die de bestaande verwijderfunctie gebruikt na bevestiging.
+
+  **Bewerkslot**: Alle betrokken scans en Respondenten vallen onder het
+  Bewerkslot zolang de modal open staat (`datamodel.md`).
+
+  **Audit-log**: Per scan `respons.metingVerplaatst` en, als de Respondent
+  wijzigt, `respons.respondentGewijzigd`, alle met hetzelfde `groepId`
+  (`datamodel.md`, Audit).
+
+  **Niet automatisch**: De app probeert de Respondent niet zelf uit de notitie
+  te halen. Notities zijn vrije tekst, en een verkeerde koppeling merkt
+  niemand op. De beheerder leest de notitie en kiest.
 - **Respondent bewerken** (1 oktober 2026): Actie in het Respondent-overzicht
   (Admin: alle organisaties, Consultant: eigen). Bedoeld om een Respondent die de import
   aanmaakt (`import-scans.md`, "Wie de Respondent wordt"), vaak een
@@ -1404,7 +1467,9 @@ ook niet hier op het globale overzicht.
 - **Kolommen**: Naam, Organisatie, Meting, Assessment, Rol/Team, Status,
   Voortgang, Gestart, Aangemaakt (`ScanInvulling.aangemaaktOp`, bij een
   import het importmoment, zodat je geïmporteerde scans kunt terugvinden
-  en groeperen), en "Bekijk" als compacte knop. De hele rij is
+  en groeperen), Notitie (voorstel, 13 oktober 2026: `ScanInvulling.notitie`,
+  afgekapt op één regel met de volledige tekst bij hover, leeg als er geen is),
+  en "Bekijk" als compacte knop. De hele rij is
   klikbaar en opent het Scan-overzicht (hieronder). Rol/Team toont alleen
   wat er is: Is de rol leeg, dan staat er alleen het team, is het team
   leeg alleen de rol, en zijn ze allebei leeg dan blijft de cel leeg.
@@ -1417,7 +1482,7 @@ ook niet hier op het globale overzicht.
   1. **Kop**: Naam van de Respondent, daaronder Organisatie, Meting en
      Assessment, en de status als badge.
   2. **Scan**: Beschrijvingslijst met Rol/Team (volgens de lege-waarderegel
-     hierboven), Gestart, Afgerond (alleen bij een afgeronde scan),
+     hierboven), Notitie (voorstel, alleen als de scan er een heeft), Gestart, Afgerond (alleen bij een afgeronde scan),
      Voortgang ("60 van 60 vragen", bij een lopende scan met percentage)
      en Overall score met het niveau (alleen bij een afgeronde scan). Geen
      tegels.

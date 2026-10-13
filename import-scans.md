@@ -99,7 +99,7 @@ Kolommen, gegroepeerd naar wat ermee gebeurt:
 | `respondent_email` | `Respondent.email`, genormaliseerd |
 | `respondent_role` | `Respondent.functie` |
 | `team_name` | `Respondent.team` |
-| `start_comment` | `Respondent.notities` |
+| `start_comment` | `ScanInvulling.notitie` (voorstel, 13 oktober 2026, zie "Notitie per scan") |
 | `created_at` | `ScanInvulling.gestartOp` |
 | (geen kolom) | `ScanInvulling.aangemaaktOp`: Het moment van importeren, niet de datum uit het bestand |
 | `completed_at` | `ScanInvulling.afgerondOp` |
@@ -196,15 +196,22 @@ wordt vanzelf een extra keuze zolang een Respondent hem heeft.
 | `respondent_email` | `email`, genormaliseerd (getrimd, lowercase) |
 | `respondent_role` | `functie` |
 | `team_name` | `team` |
-| `start_comment` | `notities`, ongewijzigd en zonder opbouwtekst |
+| `start_comment` | `ScanInvulling.notitie`, ongewijzigd en zonder opbouwtekst (voorstel, zie "Notitie per scan") |
 
 - **Hergebruik**: De regel uit `datamodel.md` (Respondent) geldt
   ongewijzigd. Hetzelfde genormaliseerde e-mailadres binnen een
   organisatie is één Respondent, binnen één import en ook in latere
   imports. De gegevens van een bestaande Respondent worden niet
-  overschreven. Heeft een latere scan een `start_comment` die nog niet in
-  de notities staat, dan komt die als nieuwe regel onder de bestaande
-  notities.
+  overschreven, ook `Respondent.notities` niet.
+- **Notitie per scan (voorstel, 13 oktober 2026)**: Elke rij houdt zijn eigen
+  `start_comment` als notitie op zijn eigen scan. Er wordt niets aan de
+  Respondent geplakt, ook niet als meerdere rijen of bestanden dezelfde
+  Respondent hebben. Dit was de fout bij het importeren van meerdere
+  bestanden: Dezelfde Respondent kreeg alle notities als één tekst. De
+  notitie is zichtbaar in de voorbeeldweergave van de import, in het
+  Scan-overzicht en in de lijst Ingevulde scans (kolom Notitie), en hij gaat
+  mee naar een andere Meting en naar een andere Respondent samen met de scan
+  (`beheerpagina.md`, "Scans samenbrengen in één Meting").
 - **Geen e-mailadres in de rij**: Het e-mailadres is verplicht, dus de rij
   heeft een matchingprobleem en wordt niet geïmporteerd. De rij staat met
   die reden in beeld.
@@ -214,7 +221,12 @@ wordt vanzelf een extra keuze zolang een Respondent hem heeft.
   die link niet te delen. Bewerken naar de echte persoon kan achteraf.
 - **Daarna aanpassen**: Alle scans van een Respondent in die organisatie
   gaan mee bij bewerken. Een losse respons aan een andere Respondent in
-  dezelfde organisatie hangen kan nog niet (`backlog.md`).
+  dezelfde organisatie hangen kan met "Andere Respondent koppelen"
+  (`beheerpagina.md`, "Respons naar andere Meting verplaatsen"). Staan bij
+  een import veel scans onder één Respondent die er eigenlijk bij
+  verschillende personen horen, en moeten ze in één Meting komen, dan doet
+  "Scans samenbrengen in één Meting" het koppelen en verplaatsen in één stap
+  (`beheerpagina.md`).
 
 ## Organisatie-matching
 
@@ -573,8 +585,8 @@ formaat hierboven:
 - **Respondenten uit de export zelf**: De
   Respondent komt uit `respondent_naam`, `respondent_email`,
   `respondent_functie` en `respondent_team`, en `Respondent.notities` wordt
-  niet aangepast (er is geen `start_comment`-achtig veld in onze eigen
-  export om te bewaren).
+  niet aangepast. De kolom `scan_notitie` (voorstel, `export-csv.md`) wordt
+  `ScanInvulling.notitie`. Ontbreekt de kolom, dan blijft de notitie leeg.
 - **Meting**: Een nieuwe Meting met het label "Import {meting_label}",
   met het `meting_label` uit de export erin, niet het label "Legacy-import
   {jaar}" (dit is geen import uit een externe tool). Rijen met dezelfde
