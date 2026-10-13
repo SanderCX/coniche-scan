@@ -281,6 +281,16 @@ onderdeel zegt over welk deel van de organisatie een Meting gaat, bijvoorbeeld
 - **Zonder ronde.** Bestaande Metingen hebben geen ronde. Een Admin of
   Consultant koppelt ze aan een ronde (`beheerpagina.md`, punt 5). Een Meting
   zonder ronde krijgt het onderdeel "Hele organisatie".
+- **Onderdeel uit het label voorstellen (voorstel, 13 oktober 2026).** Een
+  Meting zonder ronde heeft het onderdeel "Hele organisatie", ook als haar label
+  een onderdeel noemt (bijv. "Zuid-Nederland | 0-meting" na een import). Zulke
+  Metingen botsen dan in elke ronde op elkaar. Daarom stellen "Naar ronde…" en
+  "Scans samenbrengen" het onderdeel voor uit het label: De tekst vóór " | ",
+  anders "Hele organisatie". Het is een voorstel dat de beheerder ziet en kan
+  aanpassen, nooit een stille wijziging.
+- **Botsing.** Botst een Meting op de uniciteitsregel, dan zegt elke melding
+  waar het misgaat én beide uitwegen: Een andere Meting kiezen, of het onderdeel
+  of de ronde aanpassen. Een actie slaat nooit stilletjes iets over.
 - **Lege ronde.** Een ronde zonder Metingen verdwijnt vanzelf.
 
 **Samengestelde Meting (gebouwd op 13 oktober 2026).** Een Meting met `samenstelling` is een
