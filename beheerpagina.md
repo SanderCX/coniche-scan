@@ -864,15 +864,63 @@ Vanuit de organisatie: Een meting aanmaken met een assessment-type en
 een label (bijv. "Nulmeting 2026"). Een organisatie kan meerdere metingen
 hebben, ook van verschillende scan-types.
 
-**Onderdeel** (voorstel, `datamodel.md`, Meting): Bij het aanmaken staat
-naast het label een veld "Onderdeel", voorgevuld met "Hele organisatie". Het
-veld is een tekstveld met als suggesties de onderdelen die deze organisatie al
-heeft ("Team A", "Team B"), zodat dezelfde naam niet op twee manieren wordt
-gespeld. Metingen met hetzelfde onderdeel zijn rondes van hetzelfde deel, zie
-`benchmark.md`, Onderdeel en samengestelde Meting. De lijst Metingen in het
-organisatie-detail toont het onderdeel in een eigen kolom.
+**Ronde en onderdeel** (voorstel, `datamodel.md`, Meting, Ronde en onderdeel):
+Een Meting is één onderdeel in één ronde voor één Assessment. Bij het aanmaken
+staan naast het assessment-type de velden "Ronde" en "Onderdeel".
 
-**Wijzigen**: Het label en het onderdeel, achteraf aanpasbaar (bijv. een typo
+- **Ronde**: Een keuzelijst met de bestaande rondes van deze organisatie en de
+  keuze "Nieuwe ronde", met een naamveld. Heeft de organisatie nog geen ronde,
+  dan staat "Nieuwe ronde" voorgekozen. Een ronde met één Meting is gewoon.
+- **Onderdeel**: Een tekstveld, voorgevuld met "Hele organisatie", met als
+  suggesties de onderdelen die deze organisatie al heeft ("Team A", "Team B"),
+  zodat dezelfde naam niet op twee manieren wordt gespeld. Hetzelfde onderdeel
+  voor hetzelfde Assessment in dezelfde ronde kan niet twee keer. Het formulier
+  zegt dat, met de Meting die er al is.
+- **Label**: Voorgevuld als "{onderdeel} | {ronde}", of alleen de naam van de
+  ronde bij het onderdeel "Hele organisatie". Het blijft aanpasbaar
+  (`datamodel.md`, Label).
+
+**Lijst Metingen in het organisatie-detail** (voorstel): De lijst is gegroepeerd
+per ronde, de nieuwste bovenaan. Elke ronde heeft een kop met de naam, de
+voortgang van alle Metingen erin ("3 van 3 afgerond") en de knoppen "+ Meting
+aan deze ronde" en "Gemiddelde van deze ronde" (zie Samengestelde Meting). Eronder
+staat per Meting een rij met het label, het Assessment, het aantal Respondenten
+en "Bekijk", zoals nu. Metingen zonder ronde staan onderaan onder "Zonder ronde".
+Boven de lijst staat een oranje knop "Nieuwe ronde starten" (`.btn-or
+.btn-compact`).
+
+**Nieuwe ronde starten** (voorstel): Admin en Consultant (bij zijn eigen
+organisaties, `metingen.plannen`). Het formulier opent als modal.
+
+- **Naam**: De naam van de nieuwe ronde, verplicht (bijv. "Nameting 2027").
+- **Vanuit**: De vorige ronde, standaard de nieuwste, te wijzigen. Eronder de
+  Metingen van die ronde, elk met een selectievakje en het onderdeel en het
+  Assessment erbij, standaard allemaal aan. Een onderdeel dat niet meedoet,
+  vink je uit.
+- **Samengestelde Metingen**: Staan in dezelfde lijst met de badge "Gemiddelde".
+  Een samengestelde Meting is alleen aan te vinken als al haar onderliggende
+  Metingen aanstaan, met de reden erbij als dat niet zo is.
+- **Respondenten meenemen**: Een apart vinkje, standaard uit. Staat het aan,
+  dan krijgt elke nieuwe Meting dezelfde Respondenten als de Meting waaruit ze
+  komt, met de status "uitgenodigd" en een eigen persoonlijke link. De
+  Respondent wordt hergebruikt en niet opnieuw aangemaakt.
+- **Opslaan**: Maakt de ronde en per vinkje een Meting aan, met hetzelfde
+  onderdeel en Assessment, het gegenereerde label en `rondeId` van de nieuwe
+  ronde. Daarna opent het organisatie-detail met de nieuwe ronde bovenaan.
+  Gelogd als `ronde.aangemaakt` (`datamodel.md`, Audit).
+
+**Rondes beheren** (voorstel):
+- **Hernoemen**: Het potlood naast de naam in de rondekop. Gelogd als
+  `ronde.hernoemd`. Labels die nog het gegenereerde label zijn, volgen de nieuwe
+  naam.
+- **Naar ronde…**: In de lijst Metingen selecteer je één of meer Metingen,
+  waarna "Naar ronde…" een bestaande ronde of een nieuwe laat kiezen. Dit is de
+  manier om bestaande en geïmporteerde Metingen zonder ronde onder te brengen.
+  Een Meting kan alleen naar een ronde waarin haar onderdeel en Assessment nog
+  niet voorkomen.
+- **Een lege ronde** verdwijnt vanzelf.
+
+**Wijzigen**: Het label, het onderdeel en de ronde, achteraf aanpasbaar (bijv. een typo
 corrigeren). Het assessment-type ligt vast na aanmaken — dat achteraf
 wijzigen zou de al ingevulde antwoorden inconsistent maken met een
 ander scan-type; voor een ander scan-type maak je een nieuwe Meting
@@ -904,21 +952,19 @@ alle Metingen, een Consultant die van zijn eigen organisaties.
 
 **Samengestelde Meting** (voorstel, `benchmark.md`, Onderdeel en
 samengestelde Meting): Een gemiddelde over meerdere Metingen van één
-organisatie, bruikbaar als één deelnemer in een benchmark tussen organisaties.
-Admin en Consultant (bij zijn eigen organisaties, `metingen.plannen`).
+organisatie in één ronde, bruikbaar als één deelnemer in een benchmark tussen
+organisaties. Admin en Consultant (bij zijn eigen organisaties,
+`metingen.plannen`).
 
-- **Aanmaken**: Onder de lijst Metingen in het organisatie-detail een oranje
-  knop "+ Samengestelde Meting" (`.btn-or .btn-compact`). Het formulier vraagt
-  een label, het Assessment en het onderdeel (voorgevuld met "Hele
-  organisatie"). Na de keuze van het Assessment volgt de lijst met Metingen van
-  dat Assessment, elk met een selectievakje, het onderdeel en het aantal
-  afgeronde scans. Een Meting met te weinig scans (`benchmarkMinScans`) is
-  uitgeschakeld, met de reden erbij. Opslaan kan pas bij minstens twee
-  Metingen.
-- **Waarschuwing**: Heeft een gekozen Meting hetzelfde onderdeel als een andere
-  gekozen Meting, dan staat er direct onder de lijst een `.admin-notice` over
-  een mogelijke hermeting (tekst in `benchmark.md`). Het is een gevolg en geen
-  uitleg, dus geen Info-icoon, en opslaan blijft mogelijk.
+- **Aanmaken**: Met de knop "Gemiddelde van deze ronde" in de rondekop. Het
+  formulier vraagt een label, het Assessment en het onderdeel (voorgevuld met
+  "Hele organisatie"). Daaronder staan de Metingen van die ronde voor dat
+  Assessment, elk met een selectievakje, het onderdeel en het aantal afgeronde
+  scans, standaard allemaal aan. Een Meting met te weinig scans
+  (`benchmarkMinScans`) is uitgeschakeld, met de reden erbij. Opslaan kan pas bij
+  minstens twee Metingen. Een samengestelde Meting hoort bij die ronde.
+- **Metingen zonder ronde**: Ze staan niet in de lijst. Koppel ze eerst aan een
+  ronde met "Naar ronde…".
 - **In de lijst**: De badge "Gemiddelde", het aantal onderliggende Metingen en
   geen knop "Respondent uitnodigen".
 - **Meting-overzicht**: Zelfde kop als hierboven, maar zonder het blok

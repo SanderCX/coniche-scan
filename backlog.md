@@ -101,11 +101,21 @@ Bewust nog niet opgepakt. Geen prioritering.
   bouwblok — is ontworpen voor twee Metingen (besloten op 12 oktober 2026,
   nog te bouwen): `visualisatie-scores.md`, onderdeel C. Voor drie of meer
   Metingen is er nog geen ontwerp.
-- **Peildatum op een Meting**: De volgorde van Metingen volgt `aangemaaktOp`
-  (`datamodel.md`, Meting, Onderdeel). Wie een nulmeting en een nameting
-  importeert, importeert de oudste eerst. Pas als de ontwikkeling in de tijd
-  wordt gevolgd, bijvoorbeeld bij drie of meer Metingen, is een eigen
-  peildatum nodig. Besloten op 13 oktober 2026 om dit nu te laten.
+- **Ronde en onderdeel**: Een Meting is één onderdeel in één ronde voor één
+  Assessment. Uitgewerkt als voorstel op 13 oktober 2026, nog te bouwen:
+  `Ronde` als record, `Meting.rondeId` en `Meting.onderdeel`, de lijst Metingen
+  gegroepeerd per ronde, "Nieuwe ronde starten", "Naar ronde…" voor bestaande
+  Metingen, de afleiding bij import en de kolommen `ronde` en `onderdeel` in de
+  CSV-export. Zie `datamodel.md`, Ronde en onderdeel, `beheerpagina.md`, punt 5,
+  `import-scans.md` en `benchmark.md`, Onderdeel en samengestelde Meting. Open:
+  Of bij een nieuwe ronde de Respondenten mee kunnen (voorstel is een vinkje,
+  standaard uit).
+- **Peildatum op een ronde**: De volgorde van rondes volgt
+  `Ronde.aangemaaktOp`. Wie een 0-meting en een nameting importeert,
+  importeert de oudste eerst, en binnen één bestand sorteert de import zelf.
+  Pas als de ontwikkeling in de tijd wordt gevolgd, bijvoorbeeld bij drie of
+  meer rondes, is een eigen peildatum nodig. Besloten op 13 oktober 2026 om dit
+  nu te laten.
 - **Benchmark, niveau 1 (tussen organisaties)**: Gebouwd (PR 61,
   `benchmark.md`). Daarbij nog niet gedekt: Export (PDF, CSV, InDesign) van
   een benchmark, rechten voor een Consultant, een vastgezette versie voor de

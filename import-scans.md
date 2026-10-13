@@ -425,6 +425,35 @@ Neem je een rij later alsnog mee met dezelfde knop (zie
 sessie al voor die combinatie is aangemaakt. Een nieuwe upload, ook van
 hetzelfde bestand, begint met nieuwe Metingen.
 
+**Ronde en onderdeel (voorstel, 13 oktober 2026).** De oude tool kende geen
+ronde en geen onderdeel (`datamodel.md`, Ronde en onderdeel). De import leidt ze
+af uit wat hij al weet, zodat de beheerder achteraf één ronde hernoemt en niet
+elke Meting apart.
+
+- **Ronde.** Het importlabel zonder de bronnaam: "Legacy-import 2026" bij de oude
+  tool, "Import {meting_label}" bij de eigen export. Rijen van dezelfde
+  organisatie met hetzelfde importlabel komen in één ronde, met per bronnaam en
+  Assessment een Meting. Eén import van drie onderdelen geeft dus één ronde met
+  drie Metingen. Het label van de Meting blijft zoals het nu is.
+- **Onderdeel.** De bronnaam, als meerdere bronnamen aan dezelfde organisatie
+  zijn gekoppeld. In de voorbeeldweergave staat dan per bronnaam een veld
+  "Onderdeel", voorgevuld met de bronnaam en aanpasbaar. Bij één bronnaam is het
+  onderdeel "Hele organisatie". Bij de eigen export geldt het onderdeel uit de
+  kolom `onderdeel`, als die er is (`export-csv.md`).
+- **Dezelfde Respondent twee keer.** Krijgt een scan nu een eigen Meting omdat
+  dezelfde Respondent al een scan heeft in die Meting (zie hierboven), dan hoort
+  die Meting in een eigen ronde. Een onderdeel kan binnen een ronde maar één
+  keer per Assessment voorkomen. De ronde krijgt dezelfde datumconventie als het
+  label, bijvoorbeeld "Legacy-import 2026 (14-01-2026)". Zo ontstaan een 0-meting
+  en een nameting die in hetzelfde jaar zijn gedaan.
+- **Volgorde.** De import maakt de rondes aan op volgorde van de oudste
+  `created_at` in het bestand. Tussen twee imports blijft het de oudste eerst
+  importeren.
+- **Daarna.** De beheerder hernoemt de ronde (bijv. naar "0-meting") en
+  verplaatst indien nodig responsen of hele Metingen (`beheerpagina.md`, punt 5,
+  Rondes beheren). Bestaande import-Metingen zonder ronde krijgen er met
+  "Naar ronde…" alsnog een.
+
 **Omhangen na de import.** Dit is een voorwaarde voor deze aanpak: De
 beheerder kan elke geïmporteerde respons naar een andere Meting van
 dezelfde organisatie en hetzelfde Assessment verplaatsen
@@ -551,7 +580,9 @@ formaat hierboven:
   {jaar}" (dit is geen import uit een externe tool). Rijen met dezelfde
   organisatie, dezelfde bronnaam, hetzelfde Assessment en hetzelfde
   `meting_label` delen één Meting, zie "Meting" hierboven. Een bestaande Meting met dezelfde naam
-  wordt niet hergebruikt.
+  wordt niet hergebruikt. Voorstel: De ronde en het onderdeel komen uit de
+  kolommen `ronde` en `onderdeel` als die in het bestand staan (`export-csv.md`).
+  Ontbreken ze, dan geldt de afleiding bij "Ronde en onderdeel" hierboven.
 
 ## Audit-log
 

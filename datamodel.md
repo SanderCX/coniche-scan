@@ -230,13 +230,23 @@ al ingevuld.
 ### Meting (in de code: `ScanUitvoering`)
 
 Eén geplande ronde van één scan-type bij één organisatie, bijv.
-"Nulmeting 2026" of een AI-scan naast een Klantcontact-scan.
+"Nulmeting 2026" of een AI-scan naast een Klantcontact-scan. Met de ronde en het
+onderdeel (voorstel, hieronder) is een Meting één cel: Eén onderdeel in één ronde
+voor één Assessment.
 
 ```
+Ronde {                             // voorstel
+  id: string
+  organisatieId: string
+  label: string                     // bijv. "0-meting" of "Nameting 2027"
+  aangemaaktOp: datetime
+}
+
 Meting {
   id: string
   organisatieId: string
   assessmentId: string
+  rondeId?: string                  // voorstel, ontbreekt bij een Meting zonder ronde
   label: string
   onderdeel: string                 // voorstel, standaard "Hele organisatie", bijv. "Team A"
   samenstelling?: string[]          // voorstel, metingIds, alleen bij een samengestelde Meting
@@ -244,18 +254,40 @@ Meting {
 }
 ```
 
-**Onderdeel (voorstel).** Het veld zegt over welk deel van de organisatie een
-Meting gaat. Metingen met hetzelfde `onderdeel` zijn rondes van hetzelfde deel,
-bijvoorbeeld de nulmeting en de nameting van Team A. Hun volgorde volgt
-`aangemaaktOp`. Metingen met een verschillend onderdeel zijn verschillende delen,
-bijvoorbeeld Team A en Team B in dezelfde periode. Het onderscheid bepaalt of een
-gemiddelde zinvol is of dat de ontwikkeling getoond moet worden
-(`benchmark.md`, Onderdeel en samengestelde Meting). Bestaande Metingen krijgen
-"Hele organisatie".
+**Ronde en onderdeel (voorstel, 13 oktober 2026).** Een organisatie meet in
+rondes. Een ronde is een moment waarop de organisatie meet, bijvoorbeeld de
+0-meting of de nameting, met een Meting per onderdeel en per Assessment. Het
+onderdeel zegt over welk deel van de organisatie een Meting gaat, bijvoorbeeld
+"Team A", en is standaard "Hele organisatie". De oude tool kende geen van beide
+(`import-scans.md`, Ronde en onderdeel).
+
+- **Uniek.** Binnen een ronde is er hoogstens één Meting per combinatie van
+  onderdeel en Assessment. Een ronde mag Metingen van verschillende Assessments
+  bevatten, en niet elk onderdeel hoeft in elke ronde mee te doen.
+- **Ontwikkeling en gemiddelde.** Dezelfde combinatie van onderdeel en Assessment
+  in twee rondes is ontwikkeling, en die vergelijk je (`visualisatie-scores.md`,
+  onderdeel C). Verschillende onderdelen in dezelfde ronde zijn delen van een
+  geheel, en daarvan kan een samengestelde Meting het gemiddelde zijn
+  (`benchmark.md`, Onderdeel en samengestelde Meting).
+- **Volgorde.** Rondes staan in de volgorde van `Ronde.aangemaaktOp`. Een eigen
+  peildatum komt pas als er iets over de tijd gevolgd moet worden
+  (`backlog.md`). Bij importeren geldt: De oudste ronde eerst, en binnen één
+  bestand maakt de import de rondes zelf aan op volgorde van de oudste
+  `created_at`.
+- **Label.** Het label van een Meting is standaard "{onderdeel} | {ronde}". Bij
+  het onderdeel "Hele organisatie" is het alleen de naam van de ronde. Een label
+  dat nog gelijk is aan het gegenereerde label, volgt een nieuwe naam van de
+  ronde of het onderdeel. Een label dat met de hand is aangepast, blijft staan.
+- **Zonder ronde.** Bestaande Metingen hebben geen ronde. Een Admin of
+  Consultant koppelt ze aan een ronde (`beheerpagina.md`, punt 5). Een Meting
+  zonder ronde krijgt het onderdeel "Hele organisatie".
+- **Lege ronde.** Een ronde zonder Metingen verdwijnt vanzelf.
 
 **Samengestelde Meting (voorstel).** Een Meting met `samenstelling` is een
-gemiddelde over andere Metingen van dezelfde organisatie en hetzelfde
-Assessment, minstens twee, elk hoogstens één keer en zelf niet samengesteld. Ze
+gemiddelde over andere Metingen van dezelfde organisatie, hetzelfde Assessment en
+dezelfde ronde, minstens twee, elk hoogstens één keer en zelf niet samengesteld.
+Ze hoort bij die ronde en heeft standaard het onderdeel "Hele organisatie", zodat
+de uniekheid per ronde ook voor haar geldt. Ze
 heeft geen Respondenten en geen `ScanInvulling`s, en kopieert geen antwoorden:
 De scores worden berekend uit de onderliggende Metingen (Scoreberekening,
 Gemiddelde over een groep leden). Een samengestelde Meting is zelf een Meting,
@@ -1034,6 +1066,10 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   e-mailadres van de Lead.
 - `organisatie.benchmarkVlagGewijzigd`. `details` bevat de naam van de
   organisatie en de nieuwe stand van de vlag.
+- `ronde.aangemaakt` en `ronde.hernoemd` (voorstel). `details` bevat bij
+  aanmaken het label en, bij "Nieuwe ronde starten", het label van de vorige
+  ronde en het aantal Metingen dat is meegenomen. Bij hernoemen staan de oude en
+  de nieuwe naam erin.
 - `meting.samengesteldAangemaakt`, `meting.samengesteldGewijzigd` en
   `meting.samengesteldVerwijderd` (voorstel). `details` bevat het label en de
   labels van de onderliggende Metingen zoals ze op dat moment waren.
