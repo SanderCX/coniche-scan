@@ -502,3 +502,40 @@ describe("het bereik van een Lead", () => {
     expect(db.zoekRespondentPerToegangscode(db.laadAlles(), "cL1")!.leadMetingen.map((m) => m.id)).toEqual(["M1", "M2"]);
   });
 });
+
+describe("organisatie hernoemen", () => {
+  const auditActies = () => (JSON.parse(opslag.get("coniche-scan:audit") ?? "[]") as { actie: string; details: Record<string, unknown> | null; entiteitNaam?: string | null }[]);
+  const basis = () => zet([org("O1", [lid("L1", "O1", "a@x.nl")], [meting("M1", "O1", "Nul", [inv("I1", "M1", "L1")])])]);
+
+  it("wijzigt alleen de naam: id en koppelingen blijven gelijk, en logt de oude en de nieuwe naam", () => {
+    basis();
+    const r = db.hernoemOrganisatie("O1", "  Nieuwe naam  ");
+    expect(r).toEqual({ ok: true, gewijzigd: true });
+    const o = laad()[0];
+    expect(o.id).toBe("O1");
+    expect(o.naam).toBe("Nieuwe naam");
+    expect(o.leden).toHaveLength(1);
+    expect(o.scanUitvoeringen).toHaveLength(1);
+    const e = auditActies().find((a) => a.actie === "organisatie.hernoemd")!;
+    expect(e.details).toMatchObject({ oudeNaam: "O1", nieuweNaam: "Nieuwe naam" });
+    expect(e.entiteitNaam).toBe("Nieuwe naam");
+  });
+
+  it("weigert een lege naam en wijzigt niets", () => {
+    basis();
+    expect(db.hernoemOrganisatie("O1", "   ")).toEqual({ ok: false, reden: "De naam is verplicht." });
+    expect(laad()[0].naam).toBe("O1");
+    expect(auditActies().some((a) => a.actie === "organisatie.hernoemd")).toBe(false);
+  });
+
+  it("een ongewijzigde naam logt niets", () => {
+    basis();
+    expect(db.hernoemOrganisatie("O1", "O1")).toEqual({ ok: true, gewijzigd: false });
+    expect(auditActies().some((a) => a.actie === "organisatie.hernoemd")).toBe(false);
+  });
+
+  it("een onbekende organisatie geeft een fout", () => {
+    basis();
+    expect(db.hernoemOrganisatie("ONBEKEND", "X").ok).toBe(false);
+  });
+});

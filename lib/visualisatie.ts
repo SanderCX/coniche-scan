@@ -347,6 +347,8 @@ export function tussenOrganisaties(
 
 export interface MatrixKolomInvoer {
   label: string;
+  /** Onder de kop: Bij kolommen met organisaties het label van de Meting (`visualisatie-scores.md`, E, Niveau 1). */
+  sublabel?: string;
   aantalScans: number;
   antwoorden: Record<string, number>;
 }
@@ -369,7 +371,7 @@ export interface MatrixRij {
 }
 
 export interface MatrixWeergave {
-  kolommen: { label: string; aantalScans: number; totaal: number | null; totaalKlasse: Classificatie | null }[];
+  kolommen: { label: string; sublabel?: string; aantalScans: number; totaal: number | null; totaalKlasse: Classificatie | null }[];
   rijen: MatrixRij[];
   hoogsteMeting: { label: string; totaal: number } | null;
   laagsteMeting: { label: string; totaal: number } | null;
@@ -410,7 +412,13 @@ export function matrix(assessment: Assessment, kolommen: MatrixKolomInvoer[]): M
   const laagste = metTotaal.reduce<(typeof metTotaal)[number] | null>((m, k) => (m === null || k.totaal < m.totaal ? k : m), null);
   const grootste = rijen.reduce<MatrixRij | null>((m, r) => (r.verschil !== null && (m === null || r.verschil > (m.verschil ?? -1)) ? r : m), null);
   return {
-    kolommen: kolommen.map((k, i) => ({ label: k.label, aantalScans: k.aantalScans, totaal: totalen[i], totaalKlasse: klasseVan(totalen[i]) })),
+    kolommen: kolommen.map((k, i) => ({
+      label: k.label,
+      sublabel: k.sublabel,
+      aantalScans: k.aantalScans,
+      totaal: totalen[i],
+      totaalKlasse: klasseVan(totalen[i]),
+    })),
     rijen,
     hoogsteMeting: hoogste,
     laagsteMeting: laagste,

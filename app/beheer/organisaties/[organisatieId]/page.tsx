@@ -4,7 +4,7 @@ import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
-import { useOrganisatie, updateOrganisatie, maakScanUitvoering } from "@/lib/db";
+import { useOrganisatie, updateOrganisatie, maakScanUitvoering, hernoemOrganisatie } from "@/lib/db";
 import { maakPubliekeLink } from "@/lib/uitnodiging-link";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { voortgang } from "@/lib/scoring";
@@ -70,6 +70,69 @@ function LeadToevoegen({ organisatie }: { organisatie: Organisatie }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * De naam in de kop met een potlood (`beheerpagina.md`, punt 4, Naam wijzigen): Een klik maakt van de naam een invoerveld
+ * met "Opslaan" en "Annuleren". De naam is verplicht en wordt getrimd. Wie dit scherm ziet, mag de organisatie bewerken
+ * (`organisaties.bewerken`: Admin alle, Consultant eigen).
+ */
+function OrganisatieNaam({ organisatieId, naam }: { organisatieId: string; naam: string }) {
+  const [bewerken, setBewerken] = useState(false);
+  const [concept, setConcept] = useState(naam);
+  const [fout, setFout] = useState<string | null>(null);
+
+  function start() {
+    setConcept(naam);
+    setFout(null);
+    setBewerken(true);
+  }
+
+  function slaOp(e: React.FormEvent) {
+    e.preventDefault();
+    const r = hernoemOrganisatie(organisatieId, concept);
+    if (!r.ok) {
+      setFout(r.reden);
+      return;
+    }
+    setBewerken(false);
+  }
+
+  if (bewerken) {
+    return (
+      <form onSubmit={slaOp} className="flex flex-wrap items-start gap-2" style={{ margin: "0.4rem 0 0.6rem" }}>
+        <div className="admin-field" style={{ marginBottom: 0, minWidth: "20rem", flex: "0 1 28rem" }}>
+          <input
+            type="text"
+            autoFocus
+            required
+            aria-label="Naam van de organisatie"
+            value={concept}
+            onChange={(e) => setConcept(e.target.value)}
+            onKeyDown={(e) => e.key === "Escape" && setBewerken(false)}
+          />
+          {fout && <p className="overzicht-melding fout" style={{ marginTop: "0.4rem" }}>{fout}</p>}
+        </div>
+        <button type="submit" className="btn btn-or btn-compact">
+          Opslaan
+        </button>
+        <button type="button" className="btn btn-outline btn-compact" onClick={() => setBewerken(false)}>
+          Annuleren
+        </button>
+      </form>
+    );
+  }
+
+  return (
+    <div className="titel-rij">
+      <h1>{naam}</h1>
+      <button type="button" className="titel-potlood" aria-label="Naam wijzigen" title="Naam wijzigen" onClick={start}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
     </div>
   );
 }
@@ -161,7 +224,7 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
   return (
     <div className="admin-main">
       <Kruimelpad delen={[{ label: "Organisaties", href: "/beheer/organisaties" }, { label: organisatie.naam }]} />
-      <h1>{organisatie.naam}</h1>
+      <OrganisatieNaam organisatieId={organisatie.id} naam={organisatie.naam} />
       <p className="text-sm text-ink-m">
         Aangemaakt door: {eigenaar ? eigenaar.naam : "onbekend"}
         {toegewezenGebruikers.length > 0 && ` · Ook toegewezen aan: ${toegewezenGebruikers.map((g) => g.naam).join(", ")}`}

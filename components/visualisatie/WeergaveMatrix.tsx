@@ -3,19 +3,31 @@ import { KLASSE_LABEL, MatrixWeergave } from "@/lib/visualisatie";
 import { Tegels, toon } from "./gedeeld";
 
 /**
- * Weergave E, matrix voor Metingen binnen een organisatie (`visualisatie-scores.md`, E): Rijen zijn bouwblokken, kolommen
- * de Metingen met hun label en het aantal afgeronde scans. Elke cel is gevuld naar de klasse, met het getal erin. Rechts het
+ * Weergave E, matrix voor Metingen binnen een organisatie (niveau 2) of voor organisaties (niveau 1)
+ * (`visualisatie-scores.md`, E): Rijen zijn bouwblokken, kolommen de Metingen of de organisaties met hun naam, eventueel het
+ * label van de Meting en het aantal afgeronde scans. Elke cel is gevuld naar de klasse, met het getal erin. Rechts het
  * gemiddelde van de rij en het bereik, onderaan de totaalscore. Een cel die 0,5 of meer afwijkt van het rijgemiddelde krijgt
- * een zwarte rand. Alleen voor een Admin: De kolomkoppen tonen de labels van de Metingen.
+ * een zwarte rand. Alleen voor een Admin: De kolomkoppen tonen de namen. Bij veel kolommen scrolt de matrix horizontaal met
+ * een vaste eerste kolom.
  */
-export function WeergaveMatrix({ assessment, weergave }: { assessment: Assessment; weergave: MatrixWeergave }) {
+export function WeergaveMatrix({
+  assessment,
+  weergave,
+  kolomSoort = "meting",
+}: {
+  assessment: Assessment;
+  weergave: MatrixWeergave;
+  /** `organisatie`: De tegels heten Hoogste en Laagste organisatie en de koppen tonen de organisatienaam. */
+  kolomSoort?: "meting" | "organisatie";
+}) {
   const { kolommen, rijen } = weergave;
+  const soort = kolomSoort === "organisatie" ? "organisatie" : "Meting";
   return (
     <div className="vis" data-weergave="matrix">
       <Tegels
         tegels={[
-          { label: "Hoogste Meting", waarde: toon(weergave.hoogsteMeting?.totaal), sub: weergave.hoogsteMeting?.label },
-          { label: "Laagste Meting", waarde: toon(weergave.laagsteMeting?.totaal), sub: weergave.laagsteMeting?.label },
+          { label: `Hoogste ${soort}`, waarde: toon(weergave.hoogsteMeting?.totaal), sub: weergave.hoogsteMeting?.label },
+          { label: `Laagste ${soort}`, waarde: toon(weergave.laagsteMeting?.totaal), sub: weergave.laagsteMeting?.label },
           {
             label: "Grootste verschil",
             waarde: toon(weergave.grootsteVerschil?.verschil),
@@ -32,6 +44,7 @@ export function WeergaveMatrix({ assessment, weergave }: { assessment: Assessmen
               {kolommen.map((k, i) => (
                 <th key={i}>
                   {k.label}
+                  {k.sublabel && <span className="vis-matrix-aantal">{k.sublabel}</span>}
                   <span className="vis-matrix-aantal">
                     {k.aantalScans} {k.aantalScans === 1 ? "scan" : "scans"}
                   </span>
@@ -77,7 +90,7 @@ export function WeergaveMatrix({ assessment, weergave }: { assessment: Assessmen
         </table>
       </div>
       <p className="vis-onderschrift">
-        Elke Meting telt even zwaar mee, ongeacht het aantal respondenten. Een zwarte rand betekent: 0,5 of meer van het
+        Elke {soort} telt even zwaar mee, ongeacht het aantal respondenten. Een zwarte rand betekent: 0,5 of meer van het
         gemiddelde van de rij.
       </p>
     </div>

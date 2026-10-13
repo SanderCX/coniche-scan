@@ -1038,6 +1038,7 @@ select.veld-compact:focus {
 /* ---------- Info-icoon (stylesheet.md, "Info-icoon") ---------- */
 .info-icoon-wrap {
   flex: none;
+  white-space: nowrap;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -1184,4 +1185,16 @@ select.veld-compact:focus {
 }
 .bouwblok-kop-titelrij .gewicht-chip {
   align-self: center;
+}
+
+/* Het Info-icoon valt nooit van de regel af (stylesheet.md, Info-icoon, Nooit van de regel af): De knop of het veld waar het
+   icoon achter staat en het icoon zelf vormen één groep die niet afbreekt. Is er te weinig ruimte, dan breekt de rij ervoor af
+   en niet het icoon naar een eigen regel. Een veld in dezelfde rij mag krimpen (`min-width: 0`), het icoon niet. */
+.knop-met-icoon {
+  display: inline-flex;
+  flex: none;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.75rem;
+  white-space: nowrap;
 }

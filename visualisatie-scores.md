@@ -155,7 +155,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Tegels.** Hoogste Meting en laagste Meting (totaalscore en label), bouwblok met het grootste verschil tussen Metingen, aantal cellen met een zwarte rand.
 
-**Niveau 1, kolommen met organisaties.** Besloten op 13 oktober 2026, nog niet gebouwd. De opbouw, de kleuren, de zwarte rand, de rij Totaalscore en de tegels zijn gelijk aan niveau 2. Wat anders is:
+**Niveau 1, kolommen met organisaties.** Besloten op 13 oktober 2026, gebouwd op 13 oktober 2026. De opbouw, de kleuren, de zwarte rand, de rij Totaalscore en de tegels zijn gelijk aan niveau 2. Wat anders is:
 
 - De kolomkop is de organisatienaam, met daaronder het label van de Meting en het aantal afgeronde scans. Op niveau 2 is de kop het label van de Meting.
 - De tegels heten Hoogste organisatie en Laagste organisatie, met de totaalscore en de organisatienaam.
@@ -177,7 +177,9 @@ Gebouwd op 13 oktober 2026. De berekeningen staan in `lib/visualisatie.ts` (met 
   "Positie in de Meting" op de resultatenpagina van één scan.
 - C: de knop "Vergelijk met vorige Meting" (`?vergelijk=<metingId>`). Een dropdown-knop bij meer dan één eerdere Meting.
 - D: de view per organisatie (niveau 1) en de view per Meting (niveau 2) van de benchmark, ook voor een Lead.
-- E: de matrix in de sectie van een benchmark op niveau 2, alleen voor de Admin.
+- E: de matrix in de sectie van een benchmark op niveau 2 (kolommen met Metingen) en op niveau 1 (kolommen met organisaties,
+  met het label van de Meting en het aantal scans onder de naam), alleen voor de Admin. Bij veel kolommen scrolt de matrix
+  horizontaal met een vaste eerste kolom.
 
 **Afwijkingen en keuzes**
 

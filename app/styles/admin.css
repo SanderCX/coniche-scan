@@ -940,3 +940,24 @@ body:has(.admin-main) {
   width: 1.25rem;
   height: var(--control-h);
 }
+
+/* Potlood naast de naam van een organisatie (beheerpagina.md, punt 4, Naam wijzigen): Zelfde stijl als het potlood in het
+   Info-veld (`--ink-s`, bij hover `--ink`), op de hoogte van de titel. */
+.titel-potlood {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--ink-s);
+  cursor: pointer;
+}
+.titel-potlood:hover {
+  color: var(--ink);
+  background: var(--bg-mid);
+}

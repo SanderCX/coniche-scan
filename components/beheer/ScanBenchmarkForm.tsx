@@ -130,11 +130,13 @@ export function ScanBenchmarkForm({
         </div>
       )}
 
-      <div className="btn-rij" style={{ marginTop: "1.5rem", maxWidth: "22rem" }}>
-        <button type="submit" className="btn btn-or btn-compact" disabled={!kanOpslaan}>
-          {bevestigLabel}
-        </button>
-        {!kanOpslaan && <InfoIcoon naastVeld sleutel="info.benchmarkAanmakenScans" />}
+      <div style={{ marginTop: "1.5rem" }}>
+        <span className="knop-met-icoon">
+          <button type="submit" className="btn btn-or btn-compact" disabled={!kanOpslaan}>
+            {bevestigLabel}
+          </button>
+          {!kanOpslaan && <InfoIcoon naastVeld sleutel="info.benchmarkAanmakenScans" />}
+        </span>
       </div>
     </form>
   );
