@@ -4,16 +4,21 @@ import { useEffect, useMemo, useState } from "react";
 import { useAssessments } from "@/lib/assessment-store";
 import { brengScansSamen, SamenbrengResultaat, verwijderMeting } from "@/lib/db";
 import { RespondentKeuze, controleerSamenbrengen, lidNaam } from "@/lib/samenbrengen";
-import { STANDAARD_ONDERDEEL, bestaandeOnderdelen, isSamengesteld, onderdeelVan, rondesNieuwsteEerst } from "@/lib/rondes";
+import { STANDAARD_ONDERDEEL, botsingTekst, isSamengesteld, onderdeelVan, stelOnderdeelVoor } from "@/lib/rondes";
 import { SlotType, useBewerkslot } from "@/lib/bewerkslot";
 import { Organisatie } from "@/lib/types";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { RespondentFunctieKeuze } from "@/components/RespondentFunctieKeuze";
+import {
+  NIEUWE_RONDE,
+  OnderdeelRondeVelden,
+  OnderdeelRondeWaarde,
+  beginWaarde,
+  rondeDoel,
+} from "@/components/beheer/OnderdeelRondeVelden";
 
 const NIEUWE_METING = "__nieuw__";
-const GEEN_RONDE = "__geen__";
-const NIEUWE_RONDE = "__nieuweronde__";
 const HOUDEN = "__houden__";
 const NIEUWE_RESPONDENT = "__nieuweRespondent__";
 
@@ -97,12 +102,11 @@ export function ScansSamenbrengenModal({
 
   /* ---------- Doel ---------- */
   const doelMetingen = organisatie.scanUitvoeringen.filter((m) => m.assessmentId === assessmentId && !isSamengesteld(m));
-  const rondes = rondesNieuwsteEerst(organisatie);
   const [doelKeuze, setDoelKeuze] = useState<string>(NIEUWE_METING);
-  const [label, setLabel] = useState("");
-  const [onderdeel, setOnderdeel] = useState(STANDAARD_ONDERDEEL);
-  const [ronde, setRonde] = useState<string>(rondes.length === 0 ? NIEUWE_RONDE : rondes[0].id);
-  const [nieuweRonde, setNieuweRonde] = useState("");
+  // Het onderdeel van de nieuwe Meting: Voorgesteld uit het oude label van de eerste scan, nooit blind "Hele organisatie".
+  const [nieuw, setNieuw] = useState<OnderdeelRondeWaarde | null>(null); // `null`: De beginwaarde
+  const voorstelOnderdeel = scans[0] ? stelOnderdeelVoor(scans[0].meting) : STANDAARD_ONDERDEEL;
+  const waarde = nieuw ?? beginWaarde(organisatie, voorstelOnderdeel);
   const nieuweMeting = doelKeuze === NIEUWE_METING;
 
   /* ---------- Regels ---------- */
@@ -119,13 +123,14 @@ export function ScansSamenbrengenModal({
   };
 
   // Een nieuwe Meting in een bestaande ronde: Staat daar voor dit onderdeel en Assessment al een Meting, dan is die te kiezen.
-  const onderdeelNaam = onderdeel.trim() || STANDAARD_ONDERDEEL;
+  const onderdeelNaam = waarde.onderdeel.trim() || STANDAARD_ONDERDEEL;
   const botsendeMeting =
-    nieuweMeting && ronde !== NIEUWE_RONDE && ronde !== GEEN_RONDE
+    nieuweMeting && waarde.ronde !== NIEUWE_RONDE
       ? organisatie.scanUitvoeringen.find(
-          (m) => m.rondeId === ronde && m.assessmentId === assessmentId && onderdeelVan(m) === onderdeelNaam
+          (m) => m.rondeId === waarde.ronde && m.assessmentId === assessmentId && onderdeelVan(m) === onderdeelNaam
         )
       : undefined;
+  const botsendeRonde = botsendeMeting ? organisatie.rondes?.find((r) => r.id === waarde.ronde) : undefined;
 
   const fouten = useMemo(
     () =>
@@ -140,9 +145,7 @@ export function ScansSamenbrengenModal({
   );
 
   const doelGeldig = nieuweMeting
-    ? (label.trim() !== "" || ronde !== GEEN_RONDE) &&
-      !botsendeMeting &&
-      (ronde !== NIEUWE_RONDE || nieuweRonde.trim() !== "")
+    ? !botsendeMeting && (waarde.ronde !== NIEUWE_RONDE || waarde.nieuweRonde.trim() !== "")
     : doelMetingen.some((m) => m.id === doelKeuze);
   const kanOpslaan = scans.length > 0 && doelGeldig && Object.keys(fouten).length === 0 && !bezet && !controleren;
 
@@ -156,12 +159,7 @@ export function ScansSamenbrengenModal({
     const uitkomst = brengScansSamen(
       organisatie.id,
       nieuweMeting
-        ? {
-            soort: "nieuw",
-            label,
-            onderdeel: onderdeelNaam,
-            ...(ronde === NIEUWE_RONDE ? { nieuweRondeLabel: nieuweRonde } : ronde === GEEN_RONDE ? {} : { rondeId: ronde }),
-          }
+        ? { soort: "nieuw", onderdeel: onderdeelNaam, ...rondeDoel(waarde) }
         : { soort: "bestaand", metingId: doelKeuze },
       scans.map((s) => ({ invullingId: s.invulling.id, respondent: keuzeVan(s.invulling.id) }))
     );
@@ -255,44 +253,16 @@ export function ScansSamenbrengenModal({
           </div>
         </div>
         {nieuweMeting && (
-          <div className="flex flex-wrap items-end gap-3" style={{ marginTop: "0.7rem" }}>
-            <div className="admin-field" style={{ marginBottom: 0, minWidth: "14rem" }}>
-              <label>Label</label>
-              <input type="text" value={label} placeholder="Leeg: gegenereerd uit onderdeel en ronde" onChange={(e) => setLabel(e.target.value)} />
-            </div>
-            <div className="admin-field" style={{ marginBottom: 0 }}>
-              <label>Onderdeel</label>
-              <input type="text" list="samenbreng-onderdelen" value={onderdeel} onChange={(e) => setOnderdeel(e.target.value)} />
-              <datalist id="samenbreng-onderdelen">
-                {bestaandeOnderdelen(organisatie).map((o) => (
-                  <option key={o} value={o} />
-                ))}
-              </datalist>
-            </div>
-            <div className="admin-field" style={{ marginBottom: 0 }}>
-              <label>Ronde</label>
-              <select value={ronde} onChange={(e) => setRonde(e.target.value)}>
-                <option value={GEEN_RONDE}>Zonder ronde</option>
-                {rondes.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.label}
-                  </option>
-                ))}
-                <option value={NIEUWE_RONDE}>Nieuwe ronde</option>
-              </select>
-            </div>
-            {ronde === NIEUWE_RONDE && (
-              <div className="admin-field" style={{ marginBottom: 0 }}>
-                <label>Naam van de ronde</label>
-                <input type="text" value={nieuweRonde} onChange={(e) => setNieuweRonde(e.target.value)} />
-              </div>
-            )}
+          <div style={{ marginTop: "0.7rem" }}>
+            <OnderdeelRondeVelden organisatie={organisatie} waarde={waarde} onChange={setNieuw} idPrefix="samenbrengen" />
           </div>
         )}
         {botsendeMeting && (
           <p className="overzicht-melding fout">
-            In deze ronde staat voor dit onderdeel en Assessment al de Meting &quot;{botsendeMeting.label}&quot;. Kies die Meting
-            hierboven.
+            {botsingTekst(botsendeRonde?.label ?? "deze ronde", botsendeMeting.label, "nieuw").replace(
+              "Kies die Meting,",
+              "Kies die Meting hierboven,"
+            )}
           </p>
         )}
       </section>

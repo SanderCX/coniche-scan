@@ -274,14 +274,17 @@ onderdeel zegt over welk deel van de organisatie een Meting gaat, bijvoorbeeld
   (`backlog.md`). Bij importeren geldt: De oudste ronde eerst, en binnen één
   bestand maakt de import de rondes zelf aan op volgorde van de oudste
   `created_at`.
-- **Label.** Het label van een Meting is standaard "{onderdeel} | {ronde}". Bij
-  het onderdeel "Hele organisatie" is het alleen de naam van de ronde. Een label
-  dat nog gelijk is aan het gegenereerde label, volgt een nieuwe naam van de
-  ronde of het onderdeel. Een label dat met de hand is aangepast, blijft staan.
+- **Naam van een Meting (gebouwd op 13 oktober 2026).** Niemand vult het label
+  van een Meting nog in: De app maakt de naam uit onderdeel en ronde, "{onderdeel}
+  | {ronde}", bij het onderdeel "Hele organisatie" alleen de naam van de ronde.
+  Het veld `label` blijft bestaan als opslag van die naam. Verandert het
+  onderdeel of de ronde, of wordt de ronde hernoemd, dan volgt de naam. Een Meting
+  zonder ronde houdt haar oude label tot ze een ronde krijgt, en een geïmporteerd
+  label wordt bij "Naar ronde…" of Wijzigen vervangen door de gegenereerde naam.
 - **Zonder ronde.** Bestaande Metingen hebben geen ronde. Een Admin of
   Consultant koppelt ze aan een ronde (`beheerpagina.md`, punt 5). Een Meting
   zonder ronde krijgt het onderdeel "Hele organisatie".
-- **Onderdeel uit het label voorstellen (voorstel, 13 oktober 2026).** Een
+- **Onderdeel uit het label voorstellen (gebouwd op 13 oktober 2026).** Een
   Meting zonder ronde heeft het onderdeel "Hele organisatie", ook als haar label
   een onderdeel noemt (bijv. "Zuid-Nederland | 0-meting" na een import). Zulke
   Metingen botsen dan in elke ronde op elkaar. Daarom stellen "Naar ronde…" en

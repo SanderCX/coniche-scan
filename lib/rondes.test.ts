@@ -8,6 +8,7 @@ import {
   gemiddeldeAntwoordenVoorMetingMetSamenstelling,
   ruimOrganisatieOp,
   sorteerPerOnderdeel,
+  stelOnderdeelVoor,
   vergelijkbareMetingen,
   voldoetAanMinScans,
 } from "./rondes";
@@ -189,7 +190,7 @@ describe("rondes beheren", () => {
     expect(botsing.ok).toBe(false);
   });
 
-  it("'Naar ronde…' slaat een Meting met een botsing en een samengestelde Meting over, met reden", () => {
+  it("'Naar ronde…' is alles of niets: Een botsing of een samengestelde Meting verandert niets en geeft per Meting een reden", () => {
     zet(
       org({
         rondes: [ronde("R1", "0-meting", "2026-01-01"), ronde("R2", "Nameting", "2026-06-01")],
@@ -201,13 +202,83 @@ describe("rondes beheren", () => {
         ],
       })
     );
-    const r = db.naarRonde("O", ["A1", "Los", "S"], { rondeId: "R2" });
-    expect(r.ok).toBe(true);
-    if (r.ok) {
-      expect(r.verplaatst).toBe(1);
-      expect(r.overgeslagen.map((o) => o.metingId).sort()).toEqual(["A1", "S"]);
+    const voor = JSON.stringify(laad());
+    // "Los" gaat als "Team A" naar R2, waar al een Team A staat, en de samengestelde Meting kan niet los verhuizen.
+    const botst = db.naarRonde(
+      "O",
+      [
+        { metingId: "Los", onderdeel: "Team A" },
+        { metingId: "S", onderdeel: "Hele organisatie" },
+      ],
+      { rondeId: "R2" }
+    );
+    expect(botst.ok).toBe(false);
+    if (!botst.ok) {
+      expect(botst.fouten!.Los).toContain("Geef deze Meting een ander onderdeel");
+      expect(botst.fouten!.Los).toContain("A2");
+      expect(botst.fouten!.S).toContain("samengestelde");
     }
-    expect(laad().scanUitvoeringen.find((m) => m.id === "Los")!.rondeId).toBe("R2");
+    expect(JSON.stringify(laad())).toBe(voor);
+
+    // Met een eigen onderdeel per Meting gaan ze in één keer mee, en de naam volgt uit onderdeel en ronde.
+    const ok = db.naarRonde("O", [{ metingId: "Los", onderdeel: "Team C" }], { rondeId: "R2" });
+    expect(ok.ok).toBe(true);
+    const los = laad().scanUitvoeringen.find((m) => m.id === "Los")!;
+    expect(los).toMatchObject({ rondeId: "R2", onderdeel: "Team C", label: "Team C | Nameting" });
+  });
+
+  it("'Naar ronde…' controleert ook de Metingen onderling en maakt een nieuwe ronde pas bij succes", () => {
+    zet(
+      org({
+        scanUitvoeringen: [
+          meting("Z1", { label: "Zuid | 0-meting" }),
+          meting("Z2", { label: "Zuid | 0-meting kopie" }),
+          meting("N1", { label: "Noord | 0-meting" }),
+        ],
+      })
+    );
+    // Dezelfde combinatie twee keer onderling: Geen enkele Meting verhuist.
+    const dubbel = db.naarRonde(
+      "O",
+      [
+        { metingId: "Z1", onderdeel: "Zuid" },
+        { metingId: "Z2", onderdeel: "Zuid" },
+      ],
+      { nieuweRondeLabel: "0-meting" }
+    );
+    expect(dubbel.ok).toBe(false);
+    expect(laad().rondes ?? []).toHaveLength(0);
+    const ok = db.naarRonde(
+      "O",
+      [
+        { metingId: "Z1", onderdeel: "Zuid" },
+        { metingId: "Z2", onderdeel: "Zuid zakelijk" },
+        { metingId: "N1", onderdeel: "Noord" },
+      ],
+      { nieuweRondeLabel: "0-meting" }
+    );
+    expect(ok.ok).toBe(true);
+    const o = laad();
+    expect(o.rondes).toHaveLength(1);
+    expect(o.scanUitvoeringen.map((m) => m.label).sort()).toEqual(["Noord | 0-meting", "Zuid | 0-meting", "Zuid zakelijk | 0-meting"].sort());
+  });
+
+  it("een Meting heeft altijd een ronde en een naam uit onderdeel en ronde, een Meting zonder ronde houdt haar oude label", () => {
+    zet(org({ scanUitvoeringen: [meting("Oud", { label: "Legacy-import 2026 Unive" })] }));
+    expect(db.maakMeting("O", { assessmentId: A.id, onderdeel: "Team A" })).toMatchObject({ ok: false });
+    // Zonder ronde blijft het oude label bij een ander onderdeel.
+    expect(db.wijzigMeting("Oud", { onderdeel: "Unive" }).ok).toBe(true);
+    expect(laad().scanUitvoeringen.find((m) => m.id === "Oud")!.label).toBe("Legacy-import 2026 Unive");
+    // Met een ronde volgt de naam, ook van een geïmporteerde Meting.
+    expect(db.wijzigMeting("Oud", { onderdeel: "Unive", nieuweRondeLabel: "0-meting" }).ok).toBe(true);
+    expect(laad().scanUitvoeringen.find((m) => m.id === "Oud")!.label).toBe("Unive | 0-meting");
+  });
+
+  it("stelt het onderdeel voor uit het label: De tekst vóór ' | ', een eigen onderdeel blijft, anders Hele organisatie", () => {
+    expect(stelOnderdeelVoor({ label: "Zuid-Nederland | 0-meting" })).toBe("Zuid-Nederland");
+    expect(stelOnderdeelVoor({ label: "Legacy-import 2026 Unive" })).toBe("Hele organisatie");
+    expect(stelOnderdeelVoor({ label: "Zuid | 0-meting", onderdeel: "Team A" })).toBe("Team A");
+    expect(stelOnderdeelVoor({ label: "Zuid | 0-meting", onderdeel: "Hele organisatie" })).toBe("Zuid");
   });
 
   it("start een nieuwe ronde vanuit de vorige: Onderdeel en Assessment over, Respondenten alleen met het vinkje", () => {
@@ -268,7 +339,7 @@ describe("samengestelde Meting maken en verwijderen", () => {
 
   it("maakt een samengestelde Meting in de ronde met minstens twee Metingen", () => {
     basis();
-    const r = db.maakSamengesteldeMeting("O", { rondeId: "R1", assessmentId: A.id, label: "Gemiddelde", metingIds: ["A", "B"], minScans: 3 });
+    const r = db.maakSamengesteldeMeting("O", { rondeId: "R1", assessmentId: A.id, metingIds: ["A", "B"], minScans: 3 });
     expect(r.ok).toBe(true);
     const s = laad().scanUitvoeringen.find((m) => m.samenstelling)!;
     expect(s).toMatchObject({ rondeId: "R1", onderdeel: "Hele organisatie", invullingen: [] });
@@ -278,7 +349,7 @@ describe("samengestelde Meting maken en verwijderen", () => {
   it("weigert minder dan twee Metingen, een Meting onder benchmarkMinScans en een botsing van het onderdeel", () => {
     basis();
     const stap = (metingIds: string[], onderdeel?: string) =>
-      db.maakSamengesteldeMeting("O", { rondeId: "R1", assessmentId: A.id, label: "G", metingIds, onderdeel, minScans: 3 });
+      db.maakSamengesteldeMeting("O", { rondeId: "R1", assessmentId: A.id, metingIds, onderdeel, minScans: 3 });
     expect(stap(["A"]).ok).toBe(false);
     const weinig = stap(["A", "Weinig"]);
     expect(weinig.ok).toBe(false);
@@ -288,7 +359,7 @@ describe("samengestelde Meting maken en verwijderen", () => {
 
   it("verwijderen van een onderliggende Meting laat de samengestelde Meting staan met de rest, en verwijdert haar bij nul", () => {
     basis();
-    db.maakSamengesteldeMeting("O", { rondeId: "R1", assessmentId: A.id, label: "G", metingIds: ["A", "B"], minScans: 3 });
+    db.maakSamengesteldeMeting("O", { rondeId: "R1", assessmentId: A.id, metingIds: ["A", "B"], minScans: 3 });
     db.verwijderMeting("A");
     expect(laad().scanUitvoeringen.find((m) => m.samenstelling)?.samenstelling).toEqual(["B"]);
     db.verwijderMeting("B");
@@ -298,9 +369,9 @@ describe("samengestelde Meting maken en verwijderen", () => {
 
   it("een samengestelde Meting zit niet in een andere samengestelde Meting", () => {
     basis();
-    db.maakSamengesteldeMeting("O", { rondeId: "R1", assessmentId: A.id, label: "G1", metingIds: ["A", "B"], minScans: 3 });
+    db.maakSamengesteldeMeting("O", { rondeId: "R1", assessmentId: A.id, metingIds: ["A", "B"], minScans: 3 });
     const s = laad().scanUitvoeringen.find((m) => m.samenstelling)!;
-    const r = db.maakSamengesteldeMeting("O", { rondeId: "R1", assessmentId: A.id, label: "G2", onderdeel: "Anders", metingIds: [s.id, "A"], minScans: 3 });
+    const r = db.maakSamengesteldeMeting("O", { rondeId: "R1", assessmentId: A.id, onderdeel: "Anders", metingIds: [s.id, "A"], minScans: 3 });
     expect(r.ok).toBe(false);
   });
 });

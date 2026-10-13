@@ -6,7 +6,7 @@ import { zoekScanInvulling } from "./scans";
 import { genereerUniekeToegangscode } from "./respondenten";
 import { logAudit, nieuweGroepId } from "../audit-store";
 import { metingContext, organisatieContext } from "../audit-context";
-import { STANDAARD_ONDERDEEL, genereerLabel, isSamengesteld, metingMetCombinatie, rondesVan } from "../rondes";
+import { STANDAARD_ONDERDEEL, botsingTekst, genereerLabel, isSamengesteld, metingMetCombinatie, rondesVan } from "../rondes";
 import { SamenbrengBron, SamenbrengRegel, controleerSamenbrengen } from "../samenbrengen";
 
 /**
@@ -21,10 +21,9 @@ export type SamenbrengDoel =
   | { soort: "bestaand"; metingId: string }
   | {
       soort: "nieuw";
-      label: string;
-      /** Leeg: "Hele organisatie". */
+      /** Leeg: "Hele organisatie". De naam van de Meting maakt de app uit onderdeel en ronde. */
       onderdeel?: string;
-      /** Een bestaande ronde, of `nieuweRondeLabel` voor een nieuwe. Zonder beide staat de Meting zonder ronde. */
+      /** Een bestaande ronde, of `nieuweRondeLabel` voor een nieuwe. Een van beide is verplicht. */
       rondeId?: string;
       nieuweRondeLabel?: string;
     };
@@ -87,9 +86,7 @@ export function brengScansSamen(
       ronde = rondesVan(organisatie).find((r) => r.id === doel.rondeId);
       if (!ronde) return { ok: false, reden: "Ronde niet gevonden." };
       const bestaand = metingMetCombinatie(organisatie, ronde.id, onderdeel, assessmentId);
-      if (bestaand) {
-        return { ok: false, reden: `In ${ronde.label} staat voor dit onderdeel en Assessment al de Meting "${bestaand.label}". Kies die Meting.` };
-      }
+      if (bestaand) return { ok: false, reden: botsingTekst(ronde.label, bestaand.label, "nieuw") };
     } else if (doel.nieuweRondeLabel?.trim()) {
       ronde = {
         id: nieuwId(),
@@ -100,13 +97,13 @@ export function brengScansSamen(
       organisatie.rondes = [...rondesVan(organisatie), ronde];
       nieuweRondeAangemaakt = ronde;
     }
-    const label = doel.label.trim() || (ronde ? genereerLabel(onderdeel, ronde.label) : "");
-    if (!label) return { ok: false, reden: "Geef de nieuwe Meting een label of kies een ronde." };
+    if (!ronde) return { ok: false, reden: "Kies een ronde of geef een nieuwe ronde een naam." };
+    const label = genereerLabel(onderdeel, ronde.label);
     doelMeting = {
       id: nieuwId(),
       organisatieId: organisatie.id,
       assessmentId,
-      ...(ronde ? { rondeId: ronde.id } : {}),
+      rondeId: ronde.id,
       label,
       onderdeel,
       aangemaaktOp: new Date().toISOString(),

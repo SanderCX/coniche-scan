@@ -1,5 +1,37 @@
 # Coniche Scan — Changelog
 
+## 2026-10-13 (5) — Specs van Joost, PR 91: Label van een Meting vervalt, Naar ronde met onderdeel per Meting
+
+**Gedaan**:
+- **Naam van een Meting** (`datamodel.md`, Naam van een Meting; `beheerpagina.md`, punt 5): Het label is nergens meer een
+  invoerveld. `maakMeting`, `wijzigMeting`, `maakSamengesteldeMeting`, `wijzigSamengesteldeMeting` en `brengScansSamen` maken
+  de naam uit onderdeel en ronde (`genereerLabel`). Een ronde is verplicht bij het aanmaken. Een Meting zonder ronde houdt
+  haar oude label tot ze een ronde krijgt. Het formulier toont ter controle "Wordt: …".
+- **Eén component voor de twee velden** (`OnderdeelRondeVelden`): Ronde (bestaande of nieuwe) en Onderdeel, in Meting
+  plannen, de nieuwe Meting bij "Vragenlijst sturen" (Respondent-overzicht), Wijzigen en Scans samenbrengen.
+- **"Naar ronde…" als modal** (`NaarRondeModal`): Bovenaan de ronde, daaronder per Meting alleen het veld Onderdeel, voorgevuld
+  uit het oude label (`stelOnderdeelVoor`: de tekst vóór " | ", een eigen onderdeel blijft, anders "Hele organisatie").
+  `naarRonde` is alles of niets en neemt per Meting een onderdeel. De controle (`controleerNaarRonde`) draait in het scherm en
+  in de opslag: Geen twee Metingen met hetzelfde onderdeel en Assessment in de ronde, ook niet met wat er al staat. Een botsing
+  staat rood in de regel, met beide uitwegen (`botsingTekst`). Ook vanuit het Meting-overzicht, voor die ene Meting.
+- **Wijzigen achter een potlood** naast de naam in het Meting-overzicht (gewone en samengestelde Meting), met alleen Onderdeel
+  en Ronde. Een samengestelde Meting wijzigt alleen het onderdeel.
+- **Scans samenbrengen**: Het onderdeel van de nieuwe Meting is voorgesteld uit het oude label van de eerste scan, het label is
+  weg, "Zonder ronde" is er niet meer, en de botsmelding noemt beide uitwegen.
+- **Info-icoon `info.metingBegrippen`** naast de kop Metingen (register in `beheerpagina.md`, punt 2a).
+- **Specs**: De statusregels van Ronde, onderdeel, Naar ronde, Wijzigen en Samengestelde Meting stonden na PR 91 weer op
+  voorstel en staan nu op gebouwd. `datamodel.md` verwees naar "Naam van een Meting", die sectie ontbrak: Het Label-punt is
+  daarvoor omgeschreven.
+
+**Tests**: 225 (was 222): `naarRonde` alles of niets met onderdeel per Meting en een nieuwe ronde pas bij succes,
+`stelOnderdeelVoor`, de naam bij een Meting zonder ronde, en de bestaande tests zonder label.
+
+**Open**:
+- De voorstelregel gebruikt alleen de tekst vóór " | ": Een geïmporteerd label als "Legacy-import 2026 Univé Zuid-Nederland"
+  geeft "Hele organisatie" en vraagt dus een handmatig onderdeel. Een slimmere afleiding (importprefix weglaten) staat niet
+  in de spec.
+- `maakScanUitvoering` (met label, `lib/db/metingen.ts`) is niet meer in gebruik door de schermen.
+
 ## 2026-10-13 (4) — Specs van Joost, PR 89: Notitie per scan en Scans samenbrengen in één Meting
 
 **Gedaan**:

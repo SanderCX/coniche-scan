@@ -1,28 +1,30 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
-import { hernoemRonde, maakMeting, naarRonde, startNieuweRonde } from "@/lib/db";
+import { hernoemRonde, maakMeting, startNieuweRonde } from "@/lib/db";
 import {
   STANDAARD_ONDERDEEL,
-  bestaandeOnderdelen,
-  genereerLabel,
   isSamengesteld,
   metingenInRonde,
   onderdeelVan,
   onderliggendeMetingen,
   rondesNieuwsteEerst,
-  rondesVan,
 } from "@/lib/rondes";
 import { Organisatie, Ronde, ScanUitvoering } from "@/lib/types";
 import { Modal } from "@/components/Modal";
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { SamengesteldeMetingFormulier } from "@/components/beheer/SamengesteldeMetingFormulier";
-
-const NIEUWE_RONDE = "__nieuw__";
-const GEEN_RONDE = "__geen__";
+import { NaarRondeModal } from "@/components/beheer/NaarRondeModal";
+import {
+  OnderdeelRondeVelden,
+  OnderdeelRondeWaarde,
+  beginWaarde,
+  rondeDoel,
+} from "@/components/beheer/OnderdeelRondeVelden";
+import { InfoIcoon } from "@/components/InfoIcoon";
 
 /**
  * De Metingen van een organisatie, gegroepeerd per ronde (`beheerpagina.md`, punt 5, "Lijst Metingen in het
@@ -38,37 +40,24 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
 
   /* ---------- Meting plannen ---------- */
   const [assessmentId, setAssessmentId] = useState("");
-  const [rondeKeuze, setRondeKeuze] = useState<string>("");
-  const [nieuweRondeLabel, setNieuweRondeLabel] = useState("");
-  const [onderdeel, setOnderdeel] = useState(STANDAARD_ONDERDEEL);
-  const [label, setLabel] = useState<string | null>(null); // `null`: Het voorgestelde label
+  const [concept, setConcept] = useState<OnderdeelRondeWaarde | null>(null); // `null`: De beginwaarde
   const [fout, setFout] = useState<string | null>(null);
 
   const keuzeAssessment = assessmentId || assessments[0]?.id || "";
   // Heeft de organisatie nog geen ronde, dan staat "Nieuwe ronde" voorgekozen.
-  const keuzeRonde = rondeKeuze || (rondes.length === 0 ? NIEUWE_RONDE : rondes[0].id);
-  const gekozenRonde = rondes.find((r) => r.id === keuzeRonde);
-  const rondeNaam = keuzeRonde === NIEUWE_RONDE ? nieuweRondeLabel.trim() : gekozenRonde?.label ?? "";
-  const voorstel = rondeNaam ? genereerLabel(onderdeel, rondeNaam) : "";
-  const labelWaarde = label ?? voorstel;
-  const onderdelen = useMemo(() => bestaandeOnderdelen(organisatie), [organisatie]);
+  const waarde = concept ?? beginWaarde(organisatie);
 
   function plan(e: React.FormEvent) {
     e.preventDefault();
     setFout(null);
     if (!keuzeAssessment) return;
-    if (keuzeRonde === NIEUWE_RONDE && !nieuweRondeLabel.trim()) return setFout("Geef de nieuwe ronde een naam.");
     const r = maakMeting(organisatie.id, {
       assessmentId: keuzeAssessment,
-      onderdeel,
-      label: label ?? undefined,
-      ...(keuzeRonde === NIEUWE_RONDE ? { nieuweRondeLabel } : { rondeId: keuzeRonde === GEEN_RONDE ? undefined : keuzeRonde }),
+      onderdeel: waarde.onderdeel,
+      ...rondeDoel(waarde),
     });
     if (!r.ok) return setFout(r.reden);
-    setLabel(null);
-    setNieuweRondeLabel("");
-    setOnderdeel(STANDAARD_ONDERDEEL);
-    setRondeKeuze("");
+    setConcept(null);
   }
 
   /* ---------- Selectie, rondes en modals ---------- */
@@ -137,7 +126,7 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
           {afgerond} van {totaal} afgerond
         </span>
         <span className="knoppenrij" style={{ marginLeft: "auto" }}>
-          <button type="button" className="btn btn-outline btn-compact" onClick={() => { setRondeKeuze(r.id); document.getElementById("meting-plannen")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}>
+          <button type="button" className="btn btn-outline btn-compact" onClick={() => { setConcept({ ...waarde, ronde: r.id }); document.getElementById("meting-plannen")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}>
             + Meting aan deze ronde
           </button>
           <button type="button" className="btn btn-outline btn-compact" onClick={() => setGemiddeldeRondeId(r.id)}>
@@ -160,7 +149,10 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
   return (
     <>
       <div className="flex flex-wrap items-center gap-3" style={{ marginTop: "2rem" }}>
-        <h2 style={{ margin: 0 }}>Metingen</h2>
+        <span className="titel-rij" style={{ marginBottom: 0 }}>
+          <h2 style={{ margin: 0 }}>Metingen</h2>
+          <InfoIcoon sleutel="info.metingBegrippen" />
+        </span>
         <button type="button" className="btn btn-or btn-compact" disabled={rondes.length === 0} onClick={() => setNieuweRondeOpen(true)}>
           Nieuwe ronde starten
         </button>
@@ -177,36 +169,8 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
             ))}
           </select>
         </div>
-        <div className="admin-field" style={{ marginBottom: 0 }}>
-          <label>Ronde</label>
-          <select value={keuzeRonde} onChange={(e) => setRondeKeuze(e.target.value)}>
-            {rondes.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.label}
-              </option>
-            ))}
-            <option value={NIEUWE_RONDE}>Nieuwe ronde</option>
-            <option value={GEEN_RONDE}>Zonder ronde</option>
-          </select>
-        </div>
-        {keuzeRonde === NIEUWE_RONDE && (
-          <div className="admin-field" style={{ marginBottom: 0 }}>
-            <label>Naam van de ronde</label>
-            <input type="text" value={nieuweRondeLabel} onChange={(e) => setNieuweRondeLabel(e.target.value)} placeholder="0-meting" />
-          </div>
-        )}
-        <div className="admin-field" style={{ marginBottom: 0 }}>
-          <label>Onderdeel</label>
-          <input type="text" list="onderdelen-suggesties" value={onderdeel} onChange={(e) => setOnderdeel(e.target.value)} />
-          <datalist id="onderdelen-suggesties">
-            {onderdelen.map((o) => (
-              <option key={o} value={o} />
-            ))}
-          </datalist>
-        </div>
-        <div className="admin-field" style={{ marginBottom: 0 }}>
-          <label>Label</label>
-          <input type="text" value={labelWaarde} onChange={(e) => setLabel(e.target.value)} placeholder="Nulmeting 2026" />
+        <div style={{ flex: "1 1 auto" }}>
+          <OnderdeelRondeVelden organisatie={organisatie} waarde={waarde} onChange={setConcept} idPrefix="meting-plannen" />
         </div>
         <button type="submit" className="btn btn-or btn-compact">
           + Meting plannen
@@ -258,20 +222,18 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
         )}
       </Modal>
 
-      <Modal open={naarRondeOpen} onClose={() => setNaarRondeOpen(false)} title="Naar ronde…">
-        {naarRondeOpen && (
-          <NaarRondeFormulier
-            organisatie={organisatie}
-            metingIds={gekozen}
-            onKlaar={(tekst) => {
-              setNaarRondeOpen(false);
-              setGekozen([]);
-              zetBeheerMelding({ tekst });
-            }}
-            onAnnuleren={() => setNaarRondeOpen(false)}
-          />
-        )}
-      </Modal>
+      {naarRondeOpen && (
+        <NaarRondeModal
+          organisatie={organisatie}
+          metingIds={gekozen}
+          onSluit={() => setNaarRondeOpen(false)}
+          onKlaar={(tekst) => {
+            setNaarRondeOpen(false);
+            setGekozen([]);
+            zetBeheerMelding({ tekst });
+          }}
+        />
+      )}
 
       <Modal open={gemiddeldeRondeId !== null} onClose={() => setGemiddeldeRondeId(null)} title="Gemiddelde van deze ronde">
         {gemiddeldeRondeId && (
@@ -404,71 +366,6 @@ function NieuweRondeFormulier({
         </button>
         <button type="submit" className="btn btn-or" disabled={meegaand.length === 0 || !naam.trim()}>
           Ronde starten
-        </button>
-      </div>
-    </form>
-  );
-}
-
-/** "Naar ronde…": Kies een bestaande ronde of maak een nieuwe aan; overgeslagen Metingen staan met reden in de melding. */
-function NaarRondeFormulier({
-  organisatie,
-  metingIds,
-  onKlaar,
-  onAnnuleren,
-}: {
-  organisatie: Organisatie;
-  metingIds: string[];
-  onKlaar: (tekst: string) => void;
-  onAnnuleren: () => void;
-}) {
-  const rondes = rondesNieuwsteEerst(organisatie);
-  const [keuze, setKeuze] = useState(rondes[0]?.id ?? NIEUWE_RONDE);
-  const [nieuweNaam, setNieuweNaam] = useState("");
-  const [fout, setFout] = useState<string | null>(null);
-
-  function opslaan(e: React.FormEvent) {
-    e.preventDefault();
-    setFout(null);
-    const r = naarRonde(organisatie.id, metingIds, keuze === NIEUWE_RONDE ? { nieuweRondeLabel: nieuweNaam } : { rondeId: keuze });
-    if (!r.ok) return setFout(r.reden);
-    const overgeslagen = r.overgeslagen.map((o) => `${o.label}: ${o.reden}`);
-    onKlaar(
-      `${r.verplaatst} ${r.verplaatst === 1 ? "Meting" : "Metingen"} naar "${r.rondeLabel}".` +
-        (overgeslagen.length > 0 ? ` Overgeslagen: ${overgeslagen.join(" ")}` : "")
-    );
-  }
-
-  return (
-    <form onSubmit={opslaan} className="text-left">
-      <p className="text-sm text-ink-m" style={{ marginTop: 0 }}>
-        {metingIds.length} {metingIds.length === 1 ? "Meting" : "Metingen"} aan een ronde hangen. Een Meting kan alleen naar een
-        ronde waarin haar onderdeel en Assessment nog niet voorkomen.
-      </p>
-      <div className="admin-field">
-        <label>Ronde</label>
-        <select value={keuze} onChange={(e) => setKeuze(e.target.value)}>
-          {rondesVan(organisatie).map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.label}
-            </option>
-          ))}
-          <option value={NIEUWE_RONDE}>Nieuwe ronde</option>
-        </select>
-      </div>
-      {keuze === NIEUWE_RONDE && (
-        <div className="admin-field">
-          <label>Naam van de ronde</label>
-          <input type="text" required value={nieuweNaam} onChange={(e) => setNieuweNaam(e.target.value)} placeholder="0-meting" />
-        </div>
-      )}
-      {fout && <p className="overzicht-melding fout">{fout}</p>}
-      <div className="btn-rij">
-        <button type="button" className="btn btn-outline" onClick={onAnnuleren}>
-          Annuleren
-        </button>
-        <button type="submit" className="btn btn-or">
-          Naar ronde
         </button>
       </div>
     </form>

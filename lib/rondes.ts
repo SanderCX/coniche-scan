@@ -37,6 +37,32 @@ export function genereerLabel(onderdeel: string, rondeLabel: string): string {
   return o === STANDAARD_ONDERDEEL ? rondeLabel : `${o} | ${rondeLabel}`;
 }
 
+/**
+ * Het onderdeel dat "Naar ronde…" en "Scans samenbrengen" voorstellen (`datamodel.md`, Onderdeel uit het label voorstellen).
+ * Heeft de Meting al een eigen onderdeel, dan blijft dat. Anders de tekst vóór " | " in het label ("Zuid-Nederland |
+ * 0-meting" geeft "Zuid-Nederland"), en zonder " | " "Hele organisatie". Het is een voorstel dat de beheerder ziet en kan
+ * aanpassen, nooit een stille wijziging.
+ */
+export function stelOnderdeelVoor(meting: Pick<ScanUitvoering, "label" | "onderdeel">): string {
+  const eigen = meting.onderdeel?.trim();
+  if (eigen && eigen !== STANDAARD_ONDERDEEL) return eigen;
+  const index = meting.label.indexOf(" | ");
+  const voor = index > 0 ? meting.label.slice(0, index).trim() : "";
+  return voor || STANDAARD_ONDERDEEL;
+}
+
+/** De melding bij een botsing op de uniciteitsregel, met beide uitwegen (`datamodel.md`, Botsing). */
+export function botsingTekst(
+  rondeLabel: string,
+  bestaandLabel: string,
+  wie: "nieuw" | "deze"
+): string {
+  const basis = `In ${rondeLabel} staat voor dit onderdeel en Assessment al "${bestaandLabel}".`;
+  return wie === "nieuw"
+    ? `${basis} Kies die Meting, of geef de nieuwe Meting een ander onderdeel.`
+    : `${basis} Geef deze Meting een ander onderdeel, of kies een andere ronde.`;
+}
+
 /** De rondes van nieuw naar oud (op `aangemaaktOp`, `datamodel.md`, Volgorde). */
 export function rondesNieuwsteEerst(organisatie: Pick<Organisatie, "rondes">): Ronde[] {
   return [...rondesVan(organisatie)].sort((a, b) => b.aangemaaktOp.localeCompare(a.aangemaaktOp));
@@ -229,4 +255,66 @@ export function sorteerPerOnderdeel<T extends { meting: ScanUitvoering; organisa
   return [...rijen].sort(
     (a, b) => onderdeelVan(a.meting).localeCompare(onderdeelVan(b.meting), "nl") || moment(a).localeCompare(moment(b))
   );
+}
+
+/* ---------- Naar ronde ---------- */
+
+export interface NaarRondeRegel {
+  metingId: string;
+  /** Het onderdeel dat de Meting in de ronde krijgt (leeg: "Hele organisatie"). */
+  onderdeel: string;
+}
+
+/**
+ * Controleert "Naar ronde…" (`beheerpagina.md`, punt 5): In de gekozen ronde mogen geen twee Metingen hetzelfde onderdeel en
+ * Assessment hebben, ook niet met Metingen die er al in staan. Een Meting die zelf al in de ronde staat en nu een ander
+ * onderdeel krijgt, telt niet dubbel. Geeft per Meting een melding, een lege uitkomst betekent in orde. `rondeLabel` is de
+ * naam van de ronde in de melding ("de nieuwe ronde" bij een nieuwe, die is nog leeg).
+ */
+export function controleerNaarRonde(
+  organisatie: Pick<Organisatie, "scanUitvoeringen">,
+  rondeId: string | null,
+  rondeLabel: string,
+  regels: NaarRondeRegel[]
+): Record<string, string> {
+  const fouten: Record<string, string> = {};
+  const metingen = new Map(organisatie.scanUitvoeringen.map((m) => [m.id, m]));
+  const verplaatst = new Set(regels.map((r) => r.metingId));
+  const sleutel = (o: string, a: string) => `${a}::${o.trim() || STANDAARD_ONDERDEEL}`;
+
+  // Wat er al in de ronde staat en niet meeverhuist.
+  const aanwezig = new Map<string, ScanUitvoering>();
+  if (rondeId) {
+    for (const m of organisatie.scanUitvoeringen) {
+      if (m.rondeId === rondeId && !verplaatst.has(m.id)) aanwezig.set(sleutel(onderdeelVan(m), m.assessmentId), m);
+    }
+  }
+  const perSleutel = new Map<string, NaarRondeRegel[]>();
+  for (const regel of regels) {
+    const m = metingen.get(regel.metingId);
+    if (!m) {
+      fouten[regel.metingId] = "Deze Meting bestaat niet meer.";
+      continue;
+    }
+    if (isSamengesteld(m)) {
+      fouten[regel.metingId] = "Een samengestelde Meting hoort bij de ronde van haar onderliggende Metingen.";
+      continue;
+    }
+    const k = sleutel(regel.onderdeel, m.assessmentId);
+    perSleutel.set(k, [...(perSleutel.get(k) ?? []), regel]);
+  }
+  for (const [k, groep] of perSleutel) {
+    const bestaand = aanwezig.get(k);
+    for (const regel of groep) {
+      if (fouten[regel.metingId]) continue;
+      if (bestaand) {
+        fouten[regel.metingId] = botsingTekst(rondeLabel, bestaand.label, "deze");
+      } else if (groep.length > 1) {
+        const ander = groep.find((x) => x.metingId !== regel.metingId)!;
+        const naam = metingen.get(ander.metingId)?.label ?? "een andere Meting";
+        fouten[regel.metingId] = `Hetzelfde onderdeel en Assessment als "${naam}" in deze ronde. Geef een van beide een ander onderdeel.`;
+      }
+    }
+  }
+  return fouten;
 }

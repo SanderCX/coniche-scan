@@ -389,7 +389,7 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   Meting zet. Ook nodig: Kolom Notitie in de lijst Ingevulde scans en het
   Scan-overzicht, kolom `scan_notitie` in de CSV-export (`export-csv.md`).
 - **Fout: "Naar ronde…" werkt niet voor Metingen met hetzelfde onderdeel**
-  (13 oktober 2026): Geïmporteerde Metingen hebben allemaal het onderdeel "Hele
+  (13 oktober 2026, hersteld): Geïmporteerde Metingen hebben allemaal het onderdeel "Hele
   organisatie", ook als het label een onderdeel noemt ("Zuid-Nederland |
   0-meting"). Ze botsen daardoor op de uniciteitsregel van de ronde, en de actie
   doet dan niets zonder melding. In "Scans samenbrengen" geeft het formulier
@@ -399,7 +399,7 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   vóór " | ", met controle per regel en alles of niets. Ook het Meting-overzicht
   krijgt "Naar ronde…". Meldingen bij een botsing noemen beide uitwegen
   (`datamodel.md`, Botsing).
-- **Label van een Meting verdwijnt als invoerveld** (13 oktober 2026): Het
+- **Label van een Meting verdwijnt als invoerveld** (13 oktober 2026, gebouwd): Het
   label was ambigu naast onderdeel en ronde, en verplicht op sommige schermen en
   leeg toegestaan op andere. Nu vult niemand het in. Een Meting heeft alleen
   Onderdeel en Ronde (plus Assessment bij aanmaken), de naam maakt de app

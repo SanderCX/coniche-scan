@@ -386,6 +386,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.dataIntegriteit` | Instellingen, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
 | `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
 | `info.bulkExportOrganisatie` | Ingevulde scans, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie. |
+| `info.metingBegrippen` | Organisatie-detail, naast de kop "Metingen" | Ronde: een meetmoment van de organisatie, zoals "0-meting" of "Nameting 2027". Een ronde bevat meerdere Metingen en rondes vergelijk je met elkaar. Onderdeel: welk deel van de organisatie gemeten wordt, zoals "Zuid-Nederland Zakelijk", of "Hele organisatie". Assessment: de vragenlijst. Meting: één onderdeel in één ronde met één Assessment, de Respondenten horen bij een Meting. De naam van de Meting maakt de app uit onderdeel en ronde, je typt hem niet. |
 | `info.scansSamenbrengen` | Ingevulde scans, achter de uitgeschakelde knop "Samenbrengen in één Meting…" bij een selectie met meer dan één Assessment | Samenbrengen kan alleen voor scans van hetzelfde Assessment, binnen één organisatie. Selecteer alleen scans van één Assessment. |
 | `info.assessmentVerwijderen` | Assessments, op de kaart en het detail, naast de uitgeschakelde knop "Verwijderen" | Verwijder eerst alle Metingen van dit Assessment, bij alle organisaties. Daarna kan het Assessment worden verwijderd. Dit kan niet ongedaan worden gemaakt. De tekst begint altijd met het aantal Metingen en organisaties, die zin maakt de app zelf. |
 | `info.positieMeting` | Resultaten van één scan, naast de uitgeschakelde weergave "Positie in de Meting" | De positie van een scan tegenover de andere scans in de Meting is er pas bij voldoende afgeronde scans. Bij minder is een scan te herleiden naar een persoon. Het minimum staat bij Drempels en termijnen (aantal respondenten per Meting). |
@@ -865,7 +866,7 @@ Vanuit de organisatie: Een meting aanmaken met een assessment-type, een
 onderdeel en een ronde. Een organisatie kan meerdere metingen hebben, ook van
 verschillende scan-types.
 
-**Begrippen** (voorstel, 13 oktober 2026), ook als Info-icoon boven de lijst
+**Begrippen** (gebouwd op 13 oktober 2026), ook als Info-icoon boven de lijst
 Metingen (`info.metingBegrippen`):
 - **Ronde**: Een meetmoment van de organisatie, zoals "0-meting" of "Nameting
   2027". Een ronde bevat meerdere Metingen. Rondes vergelijk je met elkaar.
@@ -882,7 +883,7 @@ aanmaken ook het Assessment. Verder niets. Wat je achteraf kunt aanpassen, staat
 achter een potlood naast de naam van de Meting, en toont dan alleen Onderdeel en
 Ronde. Het Assessment ligt vast.
 
-**Ronde en onderdeel** (voorstel, `datamodel.md`, Meting, Ronde en onderdeel):
+**Ronde en onderdeel** (gebouwd op 13 oktober 2026, `datamodel.md`, Meting, Ronde en onderdeel):
 Een Meting is één onderdeel in één ronde voor één Assessment. Bij het aanmaken
 staan naast het assessment-type de velden "Ronde" en "Onderdeel".
 
@@ -898,7 +899,7 @@ staan naast het assessment-type de velden "Ronde" en "Onderdeel".
   ter controle wat het wordt, bijvoorbeeld "Wordt: Zuid-Nederland Zakelijk |
   0-meting" (`datamodel.md`, Naam van een Meting).
 
-**Lijst Metingen in het organisatie-detail** (voorstel): De lijst is gegroepeerd
+**Lijst Metingen in het organisatie-detail** (gebouwd op 13 oktober 2026): De lijst is gegroepeerd
 per ronde, de nieuwste bovenaan. Elke ronde heeft een kop met de naam, de
 voortgang van alle Metingen erin ("3 van 3 afgerond") en de knoppen "+ Meting
 aan deze ronde" en "Gemiddelde van deze ronde" (zie Samengestelde Meting). Eronder
@@ -907,7 +908,7 @@ en "Bekijk", zoals nu. Metingen zonder ronde staan onderaan onder "Zonder ronde"
 Boven de lijst staat een oranje knop "Nieuwe ronde starten" (`.btn-or
 .btn-compact`).
 
-**Nieuwe ronde starten** (voorstel): Admin en Consultant (bij zijn eigen
+**Nieuwe ronde starten** (gebouwd op 13 oktober 2026): Admin en Consultant (bij zijn eigen
 organisaties, `metingen.plannen`). Het formulier opent als modal.
 
 - **Naam**: De naam van de nieuwe ronde, verplicht (bijv. "Nameting 2027").
@@ -927,11 +928,11 @@ organisaties, `metingen.plannen`). Het formulier opent als modal.
   ronde. Daarna opent het organisatie-detail met de nieuwe ronde bovenaan.
   Gelogd als `ronde.aangemaakt` (`datamodel.md`, Audit).
 
-**Rondes beheren** (voorstel):
+**Rondes beheren** (gebouwd op 13 oktober 2026):
 - **Hernoemen**: Het potlood naast de naam in de rondekop. Gelogd als
   `ronde.hernoemd`. Labels die nog het gegenereerde label zijn, volgen de nieuwe
   naam.
-- **Naar ronde…** (aangescherpt op 13 oktober 2026): In de lijst Metingen
+- **Naar ronde…** (aangescherpt en gebouwd op 13 oktober 2026): In de lijst Metingen
   selecteer je één of meer Metingen, waarna "Naar ronde…" een modal opent. Dit is
   de manier om bestaande en geïmporteerde Metingen zonder ronde onder te brengen.
   Ook het Meting-overzicht heeft de actie, voor die ene Meting. De modal heeft
@@ -951,7 +952,7 @@ organisaties, `metingen.plannen`). Het formulier opent als modal.
   afloop noemt de melding het aantal Metingen en de ronde.
 - **Een lege ronde** verdwijnt vanzelf.
 
-**Wijzigen** (voorstel, 13 oktober 2026): Een potlood naast de naam van de Meting
+**Wijzigen** (gebouwd op 13 oktober 2026): Een potlood naast de naam van de Meting
 in het Meting-overzicht. Het opent op dezelfde plek de twee velden Onderdeel en
 Ronde, met Opslaan en Annuleren, en verder niets. De naam volgt vanzelf. Het
 assessment-type ligt vast na aanmaken, want achteraf wijzigen zou de al
@@ -984,7 +985,7 @@ alle Metingen, een Consultant die van zijn eigen organisaties.
   "Respons naar andere Meting verplaatsen") en de Meting verwijderen (de
   bestaande verwijderfunctie, ook voor een lege import-Meting).
 
-**Samengestelde Meting** (voorstel, `benchmark.md`, Onderdeel en
+**Samengestelde Meting** (gebouwd op 13 oktober 2026, `benchmark.md`, Onderdeel en
 samengestelde Meting): Een gemiddelde over meerdere Metingen van één
 organisatie in één ronde, bruikbaar als één deelnemer in een benchmark tussen
 organisaties. Admin en Consultant (bij zijn eigen organisaties,
@@ -1043,7 +1044,7 @@ Het bereik van een Lead). Bij specifieke Metingen ziet hij niet automatisch
 alle Metingen van de organisatie. Welke hij mag zien, wordt per Meting
 toegekend (`RespondentRolMeting`), met minstens 1 verplicht. Het bereik
 bepaalt ook welke benchmarkviews hij kan krijgen (`benchmark.md`, Bereik van
-een Lead). Een samengestelde Meting (voorstel, punt 5) staat in die lijst met
+een Lead). Een samengestelde Meting (gebouwd, punt 5) staat in die lijst met
 de badge "Gemiddelde" en met de regel "Ziet alleen het gemiddelde". Ze is
 altijd een bewuste keuze en staat nooit vanzelf aan: Toegang erft niet mee van
 de onderliggende Metingen en gaat er ook niet naartoe.

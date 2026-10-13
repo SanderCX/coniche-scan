@@ -542,15 +542,15 @@ describe("scans samenbrengen in één Meting", () => {
     basis();
     const r = db.brengScansSamen(
       "O1",
-      { soort: "nieuw", label: "Volwassenheid", onderdeel: "Team Service", nieuweRondeLabel: "0-meting" },
+      { soort: "nieuw", onderdeel: "Team Service", nieuweRondeLabel: "0-meting" },
       [1, 2, 3].map((n) => ({
         invullingId: `I${n}`,
         respondent: { soort: "nieuw" as const, naam: `Persoon ${n}`, email: `p${n}@x.nl`, functie: "", team: "" },
       }))
     );
-    expect(r).toMatchObject({ ok: true, aantal: 3, doelLabel: "Volwassenheid", rondeLabel: "0-meting" });
+    expect(r).toMatchObject({ ok: true, aantal: 3, doelLabel: "Team Service | 0-meting", rondeLabel: "0-meting" });
     const o = uit();
-    const doel = o.scanUitvoeringen.find((m) => m.label === "Volwassenheid")!;
+    const doel = o.scanUitvoeringen.find((m) => m.label === "Team Service | 0-meting")!;
     expect(doel).toMatchObject({ onderdeel: "Team Service" });
     expect(doel.invullingen).toHaveLength(3);
     expect(new Set(doel.invullingen.map((i) => i.organisatieLidId)).size).toBe(3);
@@ -569,7 +569,7 @@ describe("scans samenbrengen in één Meting", () => {
   it("alles of niets: Dezelfde Respondent twee keer in de doel-Meting verandert niets", () => {
     basis();
     const voor = opslag.get(KEY);
-    const r = db.brengScansSamen("O1", { soort: "nieuw", label: "Doel" }, regels("I1", "I2"));
+    const r = db.brengScansSamen("O1", { soort: "nieuw", nieuweRondeLabel: "Doelronde" }, regels("I1", "I2"));
     expect(r.ok).toBe(false);
     expect((r as { fouten?: Record<string, string> }).fouten).toMatchObject({ I1: expect.stringContaining("al een scan"), I2: expect.stringContaining("al een scan") });
     expect(opslag.get(KEY)).toBe(voor);
@@ -591,11 +591,11 @@ describe("scans samenbrengen in één Meting", () => {
   it("een e-mailadres dat al in gebruik is, of dat dubbel voorkomt, wordt geweigerd", () => {
     basis();
     const nieuw = (invullingId: string, email: string) => ({ invullingId, respondent: { soort: "nieuw" as const, naam: "", email, functie: "", team: "" } });
-    const bestaand = db.brengScansSamen("O1", { soort: "nieuw", label: "Doel" }, [nieuw("I1", " Coniche@X.nl ")]);
+    const bestaand = db.brengScansSamen("O1", { soort: "nieuw", nieuweRondeLabel: "Doelronde" }, [nieuw("I1", " Coniche@X.nl ")]);
     expect(bestaand.ok).toBe(false);
-    const dubbel = db.brengScansSamen("O1", { soort: "nieuw", label: "Doel" }, [nieuw("I1", "a@x.nl"), nieuw("I2", "A@x.nl")]);
+    const dubbel = db.brengScansSamen("O1", { soort: "nieuw", nieuweRondeLabel: "Doelronde" }, [nieuw("I1", "a@x.nl"), nieuw("I2", "A@x.nl")]);
     expect(dubbel.ok).toBe(false);
-    const leeg = db.brengScansSamen("O1", { soort: "nieuw", label: "Doel" }, [nieuw("I1", "")]);
+    const leeg = db.brengScansSamen("O1", { soort: "nieuw", nieuweRondeLabel: "Doelronde" }, [nieuw("I1", "")]);
     expect(leeg.ok).toBe(false);
     expect(uit().leden).toHaveLength(1);
   });
@@ -608,7 +608,7 @@ describe("scans samenbrengen in één Meting", () => {
         [meting("M1", "O1", "Een", [inv("I1", "M1", "L1")], "A"), meting("M2", "O1", "Twee", [inv("I2", "M2", "L2")], "B")]
       ),
     ]);
-    expect(db.brengScansSamen("O1", { soort: "nieuw", label: "Doel" }, regels("I1", "I2"))).toMatchObject({ ok: false });
+    expect(db.brengScansSamen("O1", { soort: "nieuw", nieuweRondeLabel: "Doelronde" }, regels("I1", "I2"))).toMatchObject({ ok: false });
 
     zet([
       {
@@ -616,20 +616,20 @@ describe("scans samenbrengen in één Meting", () => {
         rondes: [{ id: "R1", organisatieId: "O1", label: "0-meting", aangemaaktOp: "2026-01-01" }],
       },
     ]);
-    const r = db.brengScansSamen("O1", { soort: "nieuw", label: "Nieuw", onderdeel: "Team A", rondeId: "R1" }, regels("I1"));
+    const r = db.brengScansSamen("O1", { soort: "nieuw", onderdeel: "Team A", rondeId: "R1" }, regels("I1"));
     expect(r).toMatchObject({ ok: false, reden: expect.stringContaining('"Een"') });
   });
 
   it("logt per bron-Meting en per gewijzigde Respondent, met één groep en zonder persoonsgegevens", () => {
     basis();
-    db.brengScansSamen("O1", { soort: "nieuw", label: "Doel" }, [
+    db.brengScansSamen("O1", { soort: "nieuw", nieuweRondeLabel: "Doelronde" }, [
       { invullingId: "I1", respondent: { soort: "houden" } },
       { invullingId: "I2", respondent: { soort: "nieuw", naam: "Geheim Persoon", email: "geheim@x.nl", functie: "", team: "" } },
     ]);
     const log = JSON.parse(opslag.get("coniche-scan:audit") ?? "[]") as { actie: string; groepId: string | null; details: unknown }[];
     const acties = log.map((l) => l.actie).sort();
     expect(acties).toEqual(
-      ["meting.aangemaakt", "respondent.aangemaakt", "respons.metingVerplaatst", "respons.metingVerplaatst", "respons.respondentGewijzigd"].sort()
+      ["meting.aangemaakt", "respondent.aangemaakt", "respons.metingVerplaatst", "respons.metingVerplaatst", "respons.respondentGewijzigd", "ronde.aangemaakt"].sort()
     );
     expect(new Set(log.map((l) => l.groepId)).size).toBe(1);
     expect(JSON.stringify(log)).not.toContain("Geheim");

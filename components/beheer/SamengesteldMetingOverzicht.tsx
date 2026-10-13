@@ -61,9 +61,16 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
       {labelBewerken ? (
         <MetingWijzigenFormulier organisatie={organisatie} meting={meting} onKlaar={() => setLabelBewerken(false)} />
       ) : (
-        <h1>
-          {meting.label} <span className="admin-badge status-uitgenodigd" style={{ verticalAlign: "middle" }}>Gemiddelde</span>
-        </h1>
+        <div className="titel-rij">
+          <h1>
+            {meting.label} <span className="admin-badge status-uitgenodigd" style={{ verticalAlign: "middle" }}>Gemiddelde</span>
+          </h1>
+          <button type="button" className="titel-potlood" aria-label="Meting wijzigen (onderdeel en ronde)" title="Meting wijzigen (onderdeel en ronde)" onClick={() => setLabelBewerken(true)}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
       )}
       <p className="text-sm text-ink-m">
         {assessment?.naam ?? "Onbekend type"} · {organisatie.naam}
@@ -90,11 +97,6 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
         <button type="button" className="btn btn-outline btn-compact" onClick={() => setWijzigenOpen(true)}>
           Samenstelling wijzigen
         </button>
-        {!labelBewerken && (
-          <button type="button" className="btn btn-outline btn-compact" onClick={() => setLabelBewerken(true)}>
-            Wijzig label en onderdeel
-          </button>
-        )}
         <button type="button" className="btn btn-danger btn-compact" onClick={() => setVerwijderenOpen(true)}>
           Verwijderen
         </button>

@@ -100,6 +100,12 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     tekst: "Toegang tot een assessment loopt via een persoonlijke uitnodiging.",
   },
   {
+    sleutel: "info.metingBegrippen",
+    plek: "Organisatie-detail, naast de kop \"Metingen\"",
+    tekst:
+      "Ronde: een meetmoment van de organisatie, zoals \"0-meting\" of \"Nameting 2027\". Een ronde bevat meerdere Metingen en rondes vergelijk je met elkaar. Onderdeel: welk deel van de organisatie gemeten wordt, zoals \"Zuid-Nederland Zakelijk\", of \"Hele organisatie\". Assessment: de vragenlijst. Meting: één onderdeel in één ronde met één Assessment, de Respondenten horen bij een Meting. De naam van de Meting maakt de app uit onderdeel en ronde, je typt hem niet.",
+  },
+  {
     sleutel: "info.scansSamenbrengen",
     plek: "Ingevulde scans, achter de uitgeschakelde knop \"Samenbrengen in één Meting…\" bij een selectie met meer dan één Assessment",
     tekst: "Samenbrengen kan alleen voor scans van hetzelfde Assessment, binnen één organisatie. Selecteer alleen scans van één Assessment.",
