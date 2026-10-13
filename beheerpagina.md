@@ -861,11 +861,28 @@ het antwoord daarom zelf kunnen vastleggen.
 
 #### 5. Metingen
 
-Vanuit de organisatie: Een meting aanmaken met een assessment-type en
-een label (bijv. "Nulmeting 2026"). Een organisatie kan meerdere metingen
-hebben, ook van verschillende scan-types.
+Vanuit de organisatie: Een meting aanmaken met een assessment-type, een
+onderdeel en een ronde. Een organisatie kan meerdere metingen hebben, ook van
+verschillende scan-types.
 
-**Ronde en onderdeel** (gebouwd op 13 oktober 2026, `datamodel.md`, Meting, Ronde en onderdeel):
+**Begrippen** (voorstel, 13 oktober 2026), ook als Info-icoon boven de lijst
+Metingen (`info.metingBegrippen`):
+- **Ronde**: Een meetmoment van de organisatie, zoals "0-meting" of "Nameting
+  2027". Een ronde bevat meerdere Metingen. Rondes vergelijk je met elkaar.
+- **Onderdeel**: Welk deel van de organisatie gemeten wordt, zoals "Zuid-Nederland
+  Zakelijk", of "Hele organisatie".
+- **Assessment**: De vragenlijst.
+- **Meting**: Eén onderdeel in één ronde met één Assessment. Respondenten horen
+  bij een Meting.
+- **Naam van de Meting**: Wordt door de app gemaakt uit onderdeel en ronde. Je
+  typt hem niet.
+
+**Wat je invult.** Bij een Meting alleen twee velden: Onderdeel en Ronde, en bij
+aanmaken ook het Assessment. Verder niets. Wat je achteraf kunt aanpassen, staat
+achter een potlood naast de naam van de Meting, en toont dan alleen Onderdeel en
+Ronde. Het Assessment ligt vast.
+
+**Ronde en onderdeel** (voorstel, `datamodel.md`, Meting, Ronde en onderdeel):
 Een Meting is één onderdeel in één ronde voor één Assessment. Bij het aanmaken
 staan naast het assessment-type de velden "Ronde" en "Onderdeel".
 
@@ -877,11 +894,11 @@ staan naast het assessment-type de velden "Ronde" en "Onderdeel".
   zodat dezelfde naam niet op twee manieren wordt gespeld. Hetzelfde onderdeel
   voor hetzelfde Assessment in dezelfde ronde kan niet twee keer. Het formulier
   zegt dat, met de Meting die er al is.
-- **Label**: Voorgevuld als "{onderdeel} | {ronde}", of alleen de naam van de
-  ronde bij het onderdeel "Hele organisatie". Het blijft aanpasbaar
-  (`datamodel.md`, Label).
+- **Naam van de Meting**: Geen invoerveld. Onder de velden staat alleen
+  ter controle wat het wordt, bijvoorbeeld "Wordt: Zuid-Nederland Zakelijk |
+  0-meting" (`datamodel.md`, Naam van een Meting).
 
-**Lijst Metingen in het organisatie-detail** (gebouwd op 13 oktober 2026): De lijst is gegroepeerd
+**Lijst Metingen in het organisatie-detail** (voorstel): De lijst is gegroepeerd
 per ronde, de nieuwste bovenaan. Elke ronde heeft een kop met de naam, de
 voortgang van alle Metingen erin ("3 van 3 afgerond") en de knoppen "+ Meting
 aan deze ronde" en "Gemiddelde van deze ronde" (zie Samengestelde Meting). Eronder
@@ -890,7 +907,7 @@ en "Bekijk", zoals nu. Metingen zonder ronde staan onderaan onder "Zonder ronde"
 Boven de lijst staat een oranje knop "Nieuwe ronde starten" (`.btn-or
 .btn-compact`).
 
-**Nieuwe ronde starten** (gebouwd op 13 oktober 2026): Admin en Consultant (bij zijn eigen
+**Nieuwe ronde starten** (voorstel): Admin en Consultant (bij zijn eigen
 organisaties, `metingen.plannen`). Het formulier opent als modal.
 
 - **Naam**: De naam van de nieuwe ronde, verplicht (bijv. "Nameting 2027").
@@ -910,22 +927,37 @@ organisaties, `metingen.plannen`). Het formulier opent als modal.
   ronde. Daarna opent het organisatie-detail met de nieuwe ronde bovenaan.
   Gelogd als `ronde.aangemaakt` (`datamodel.md`, Audit).
 
-**Rondes beheren** (gebouwd op 13 oktober 2026):
+**Rondes beheren** (voorstel):
 - **Hernoemen**: Het potlood naast de naam in de rondekop. Gelogd als
   `ronde.hernoemd`. Labels die nog het gegenereerde label zijn, volgen de nieuwe
   naam.
-- **Naar ronde…**: In de lijst Metingen selecteer je één of meer Metingen,
-  waarna "Naar ronde…" een bestaande ronde of een nieuwe laat kiezen. Dit is de
-  manier om bestaande en geïmporteerde Metingen zonder ronde onder te brengen.
-  Een Meting kan alleen naar een ronde waarin haar onderdeel en Assessment nog
-  niet voorkomen.
+- **Naar ronde…** (aangescherpt op 13 oktober 2026): In de lijst Metingen
+  selecteer je één of meer Metingen, waarna "Naar ronde…" een modal opent. Dit is
+  de manier om bestaande en geïmporteerde Metingen zonder ronde onder te brengen.
+  Ook het Meting-overzicht heeft de actie, voor die ene Meting. De modal heeft
+  twee delen:
+  1. **Ronde** bovenaan: Een bestaande ronde of "Nieuwe ronde" met een naam.
+  2. **Eén regel per Meting** met alleen het veld Onderdeel, voorgevuld uit het
+     oude label (`datamodel.md`, Onderdeel uit het label voorstellen). Zo zet je
+     alle onderdelen in één stap goed. Ernaast staat alleen ter controle wat de
+     naam wordt.
+  **Controle vóór opslaan**: De knop is pas actief als in de gekozen ronde geen
+  twee Metingen hetzelfde onderdeel en Assessment hebben, ook niet met Metingen
+  die er al in staan. Een regel die botst krijgt een rode melding in de regel zelf
+  ("In {ronde} staat voor dit onderdeel en Assessment al {Meting}. Geef deze
+  Meting een ander onderdeel."). Een knop die niets doet zonder uitleg komt niet
+  voor.
+  **Alles of niets**: Alle regels gaan in één keer naar de ronde, of geen. Na
+  afloop noemt de melding het aantal Metingen en de ronde.
 - **Een lege ronde** verdwijnt vanzelf.
 
-**Wijzigen**: Het label, het onderdeel en de ronde, achteraf aanpasbaar (bijv. een typo
-corrigeren). Het assessment-type ligt vast na aanmaken — dat achteraf
-wijzigen zou de al ingevulde antwoorden inconsistent maken met een
-ander scan-type; voor een ander scan-type maak je een nieuwe Meting
-aan.
+**Wijzigen** (voorstel, 13 oktober 2026): Een potlood naast de naam van de Meting
+in het Meting-overzicht. Het opent op dezelfde plek de twee velden Onderdeel en
+Ronde, met Opslaan en Annuleren, en verder niets. De naam volgt vanzelf. Het
+assessment-type ligt vast na aanmaken, want achteraf wijzigen zou de al
+ingevulde antwoorden inconsistent maken met een ander scan-type. Voor een ander
+scan-type maak je een nieuwe Meting aan. Een botsing krijgt de melding uit
+"Naar ronde…".
 
 **Meting-overzicht** (eigen pagina, bereikbaar via "Bekijk" bij een
 Meting in het organisatie-detail en via het Meting-label in de lijst
@@ -935,8 +967,9 @@ Respondent-overzicht opent. Een eigen adres, zodat het te openen en te
 delen is binnen beheer. Zelfde bereik als de organisatie: Een Admin ziet
 alle Metingen, een Consultant die van zijn eigen organisaties.
 
-- **Kop**: Label, Assessment, de organisatie (met link terug naar het
-  organisatie-detail) en voortgang ("x van y afgerond").
+- **Kop**: Naam van de Meting met een potlood erachter (Wijzigen, hierboven),
+  Assessment, de organisatie (met link terug naar het organisatie-detail) en
+  voortgang ("x van y afgerond").
 - **Respondenten in deze Meting**: Lijst met Naam, Status, Voortgang en
   de persoonlijke link ("Kopieer link", "Openen"), elk met "Bekijk"
   naar het Respondent-overzicht (punt 6b). Hier staat ook "Respondent
@@ -946,20 +979,20 @@ alle Metingen, een Consultant die van zijn eigen organisaties.
 - **Leads**: Welke Leads toegang hebben tot deze Meting
   (`RespondentRolMeting`, punt 6a), alleen als weergave. Beheren gebeurt
   in het Respondent-overzicht.
-- **Acties**: Het label wijzigen (hierboven), responsen naar een andere
+- **Acties**: De Meting "Naar ronde…" hangen (hierboven), responsen naar een andere
   Meting verplaatsen via selectie in de lijst (zelfde actie als punt 6b,
   "Respons naar andere Meting verplaatsen") en de Meting verwijderen (de
   bestaande verwijderfunctie, ook voor een lege import-Meting).
 
-**Samengestelde Meting** (gebouwd op 13 oktober 2026, `benchmark.md`, Onderdeel en
+**Samengestelde Meting** (voorstel, `benchmark.md`, Onderdeel en
 samengestelde Meting): Een gemiddelde over meerdere Metingen van één
 organisatie in één ronde, bruikbaar als één deelnemer in een benchmark tussen
 organisaties. Admin en Consultant (bij zijn eigen organisaties,
 `metingen.plannen`).
 
 - **Aanmaken**: Met de knop "Gemiddelde van deze ronde" in de rondekop. Het
-  formulier vraagt een label, het Assessment en het onderdeel (voorgevuld met
-  "Hele organisatie"). Daaronder staan de Metingen van die ronde voor dat
+  formulier vraagt alleen het Assessment en het onderdeel (voorgevuld met
+  "Hele organisatie"). De naam maakt de app. Daaronder staan de Metingen van die ronde voor dat
   Assessment, elk met een selectievakje, het onderdeel en het aantal afgeronde
   scans, standaard allemaal aan. Een Meting met te weinig scans
   (`benchmarkMinScans`) is uitgeschakeld, met de reden erbij. Opslaan kan pas bij
@@ -1010,7 +1043,7 @@ Het bereik van een Lead). Bij specifieke Metingen ziet hij niet automatisch
 alle Metingen van de organisatie. Welke hij mag zien, wordt per Meting
 toegekend (`RespondentRolMeting`), met minstens 1 verplicht. Het bereik
 bepaalt ook welke benchmarkviews hij kan krijgen (`benchmark.md`, Bereik van
-een Lead). Een samengestelde Meting (gebouwd, punt 5) staat in die lijst met
+een Lead). Een samengestelde Meting (voorstel, punt 5) staat in die lijst met
 de badge "Gemiddelde" en met de regel "Ziet alleen het gemiddelde". Ze is
 altijd een bewuste keuze en staat nooit vanzelf aan: Toegang erft niet mee van
 de onderliggende Metingen en gaat er ook niet naartoe.
@@ -1304,7 +1337,8 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
 
   **Doel-Meting**: Kiezen uit de Metingen van dezelfde organisatie met
   hetzelfde Assessment-type als de huidige Meting, of in dezelfde stap een
-  nieuwe Meting aanmaken met een label (zoals bij punt 5). Organisatie,
+  nieuwe Meting aanmaken met een onderdeel en een ronde (zoals bij punt 5,
+  zonder label). Organisatie,
   Respondent en antwoorden blijven ongewijzigd.
 
   **Respondent heeft in de doel-Meting al een scan**: Een Respondent heeft
@@ -1381,11 +1415,14 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   **Het scherm** (modal, twee delen):
   1. **Doel-Meting** bovenaan: Kiezen uit bestaande Metingen van dezelfde
      organisatie en hetzelfde Assessment, of "Nieuwe Meting" met de velden
-     Label, Onderdeel en Ronde (bestaande ronde kiezen of een nieuwe
-     aanmaken, zoals bij punt 5). Voor het voorbeeld: Ronde "0-meting",
-     Label "Volwassenheid", Onderdeel bijvoorbeeld "Team Service". De
-     uniciteitsregel van de ronde geldt (`datamodel.md`, Ronde en onderdeel).
-     Bestaat de combinatie al, dan kiest de beheerder die Meting.
+     Onderdeel en Ronde (bestaande ronde kiezen of een nieuwe aanmaken, zoals bij
+     punt 5), zonder Label. Voor het voorbeeld: Ronde "0-meting", Onderdeel
+     "Team Service". Het onderdeel is voorgevuld uit het oude label van de eerste
+     geselecteerde Meting (`datamodel.md`, Onderdeel uit het label voorstellen),
+     niet blind met "Hele organisatie". De uniciteitsregel van de ronde geldt
+     (`datamodel.md`, Ronde en onderdeel). Bestaat de combinatie al, dan noemt de
+     melding beide uitwegen: "Kies die Meting hierboven, of geef de nieuwe Meting
+     een ander onderdeel."
   2. **Tabel met één regel per scan**: Kolommen Huidige Meting, Notitie
      (van de scan), Huidige Respondent en Respondent in de doel-Meting. De
      laatste kolom is een keuzelijst met "Dezelfde Respondent houden", "Nieuwe

@@ -388,6 +388,26 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   Eén scherm dat per scan de Respondent koppelt en alles in één ronde en
   Meting zet. Ook nodig: Kolom Notitie in de lijst Ingevulde scans en het
   Scan-overzicht, kolom `scan_notitie` in de CSV-export (`export-csv.md`).
+- **Fout: "Naar ronde…" werkt niet voor Metingen met hetzelfde onderdeel**
+  (13 oktober 2026): Geïmporteerde Metingen hebben allemaal het onderdeel "Hele
+  organisatie", ook als het label een onderdeel noemt ("Zuid-Nederland |
+  0-meting"). Ze botsen daardoor op de uniciteitsregel van de ronde, en de actie
+  doet dan niets zonder melding. In "Scans samenbrengen" geeft het formulier
+  alleen de uitweg "kies die Meting", niet "geef een ander onderdeel". Herstel
+  (`beheerpagina.md`, punt 5, Naar ronde…, en "Scans samenbrengen"): Een modal
+  met één regel per Meting en een invoerveld Onderdeel, voorgevuld uit het label
+  vóór " | ", met controle per regel en alles of niets. Ook het Meting-overzicht
+  krijgt "Naar ronde…". Meldingen bij een botsing noemen beide uitwegen
+  (`datamodel.md`, Botsing).
+- **Label van een Meting verdwijnt als invoerveld** (13 oktober 2026): Het
+  label was ambigu naast onderdeel en ronde, en verplicht op sommige schermen en
+  leeg toegestaan op andere. Nu vult niemand het in. Een Meting heeft alleen
+  Onderdeel en Ronde (plus Assessment bij aanmaken), de naam maakt de app
+  (`datamodel.md`, Naam van een Meting). Aanpassen kan achter een potlood naast
+  de naam, met alleen die twee velden. Verwijderen uit: de formulieren voor
+  aanmaken, Wijzigen, Samengestelde Meting en Scans samenbrengen. Een Meting
+  zonder ronde houdt haar oude label. Nieuw: Info-icoon `info.metingBegrippen` met
+  de begrippen boven de lijst Metingen (`beheerpagina.md`, punt 5, Begrippen).
 - **Assessment verwijderen** (`beheerpagina.md`, punt 1, `datamodel.md`,
   Verwijderen en datakoppelingen): Gespecificeerd, nog niet gebouwd. Alleen
   mogelijk als er geen Meting van het Assessment bestaat, met een
