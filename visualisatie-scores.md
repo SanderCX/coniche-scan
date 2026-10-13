@@ -121,7 +121,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Tegels.** Totaalscore van de vorige en huidige Meting ("2,9 → 3,1"), aantal bouwblokken gestegen, aantal gedaald, aantal van klasse gewisseld.
 
-**Onderdeel (voorstel, 13 oktober 2026).** Een verschil is alleen een ontwikkeling als beide Metingen hetzelfde onderdeel hebben (`datamodel.md`, Meting). De voorgestelde vorige Meting is daarom de meest recente eerdere Meting met hetzelfde onderdeel. De dropdown toont daarna alle eerdere Metingen van hetzelfde Assessment, met het onderdeel erbij. Kiest de gebruiker een Meting met een ander onderdeel, dan staat boven de weergave de regel "Let op: Dit zijn verschillende onderdelen, het verschil is geen ontwikkeling." De weergave zelf blijft gelijk. Een samengestelde Meting is te vergelijken met een eerdere samengestelde Meting van hetzelfde onderdeel.
+**Ronde en onderdeel (voorstel, 13 oktober 2026).** Een verschil is alleen een ontwikkeling als beide Metingen hetzelfde onderdeel en Assessment hebben, in verschillende rondes (`datamodel.md`, Meting, Ronde en onderdeel). De voorgestelde vorige Meting is daarom dezelfde combinatie van onderdeel en Assessment in de vorige ronde. Zit de Meting niet in een ronde, dan geldt de bestaande regel: De meest recente eerdere Meting van hetzelfde Assessment. De dropdown toont daarna alle eerdere Metingen van hetzelfde Assessment, met ronde en onderdeel erbij. Kiest de gebruiker een Meting met een ander onderdeel, dan staat boven de weergave de regel "Let op: Dit zijn verschillende onderdelen, het verschil is geen ontwikkeling." De weergave zelf blijft gelijk. Een samengestelde Meting is te vergelijken met de samengestelde Meting van de vorige ronde, omdat ze hetzelfde onderdeel heeft.
 
 **Meer dan twee Metingen.** Hier is nog geen ontwerp voor. Voorstel voor later is een lijn per bouwblok over de Metingen heen.
 
@@ -167,7 +167,9 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Samengestelde Meting (voorstel).** De matrix onder een samengestelde Meting (`benchmark.md`, Onderdeel en samengestelde Meting) heeft de onderliggende Metingen als kolommen. Alleen voor de Admin, om dezelfde reden als op niveau 2.
 
-**Volgorde van de kolommen (voorstel).** Bij Metingen met verschillende onderdelen staan de kolommen gegroepeerd per onderdeel, en binnen een onderdeel op volgorde van tijd. Team A (nulmeting, nameting) staat dan naast Team B (nulmeting, nameting), en de matrix toont zowel het verschil tussen de teams als de ontwikkeling per team. Of binnen zo'n groep een kolom met het verschil komt, is nog open.
+**Volgorde van de kolommen (voorstel).** Bij Metingen met verschillende onderdelen staan de kolommen gegroepeerd per onderdeel, en binnen een onderdeel op volgorde van ronde. Team A (0-meting, nameting) staat dan naast Team B (0-meting, nameting), en de matrix toont zowel het verschil tussen de teams als de ontwikkeling per team. De kolomkop toont het onderdeel en de naam van de ronde. Of binnen zo'n groep een kolom met het verschil komt, is nog open.
+
+**Overzicht van een ronde (voorstel).** In de rondekop in het organisatie-detail kan de Admin de matrix van één ronde openen, met de onderdelen als kolommen en de Metingen van die ronde voor één Assessment. Opbouw, tegels en rechten zijn gelijk aan niveau 2. Het overzicht hoort niet bij een benchmark en bestaat ook voor een organisatie met één ronde.
 
 **Andere kolommen.** Alleen opeenvolgende Metingen in de tijd in dezelfde matrix, zonder groepering, is nu geen besluit en vraagt eerst een uitwerking.
 

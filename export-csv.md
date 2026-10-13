@@ -43,10 +43,17 @@ organisatie, dan is "Exporteren" uitgeschakeld, met het Info-icoon
 
 ### Basisgegevens
 
+De kolommen `ronde` en `onderdeel` zijn een voorstel van 13 oktober 2026
+(`datamodel.md`, Ronde en onderdeel). Ze staan direct na `meting_label`. De
+import leest kolommen op hun kopnaam, zodat een bestand zonder deze kolommen
+blijft werken (`import-scans.md`, Ronde en onderdeel).
+
 | Kolom | Bron | Toelichting |
 |---|---|---|
 | `organisatie_naam` | `Organisatie.naam` | |
 | `meting_label` | `Meting.label` | bijv. "Nulmeting 2026" |
+| `ronde` | `Ronde.label` | voorstel: bijv. "0-meting", leeg bij een Meting zonder ronde |
+| `onderdeel` | `Meting.onderdeel` | voorstel: bijv. "Team A", of "Hele organisatie" |
 | `assessment_naam` | `Assessment.naam` | bijv. "Klantcontact Volwassenheid" |
 | `respondent_naam` | `Respondent.naam` | leeg zolang de intake niet is gestart |
 | `respondent_email` | `Respondent.email` | |
