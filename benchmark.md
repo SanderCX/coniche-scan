@@ -88,7 +88,7 @@ Opbouw van de view:
 - Het verschil per bouwblok (X min de rest, op één decimaal).
 - Onder de view de tekst "Vergelijkgroep van n organisaties, samengesteld door Coniche", met de peildatum.
 
-**Besloten, nog niet gebouwd.** De range van de groep (laagste tot hoogste score) komt als band in de view, zonder namen, samen met de middelste helft van de groep en een label voor de positie. Het verschil per bouwblok (hierboven) gaat op in die weergave. De uitwerking staat in `visualisatie-scores.md`, onderdeel D. Open: Of de band een eigen drempel krijgt.
+**Besloten, gebouwd op 13 oktober 2026.** De range van de groep (laagste tot hoogste score) komt als band in de view, zonder namen, samen met de middelste helft van de groep en een label voor de positie. Het verschil per bouwblok (hierboven) gaat op in die weergave. De uitwerking staat in `visualisatie-scores.md`, onderdeel D. Open: Of de band een eigen drempel krijgt.
 
 De view toont nooit de namen van andere organisaties. De Admin bekijkt de view eerst zelf.
 
@@ -97,7 +97,7 @@ De view toont nooit de namen van andere organisaties. De Admin bekijkt de view e
 **Gebouwd.** De Admin kan de view van organisatie X toewijzen aan een bestaande Lead van die organisatie (`BenchmarkToewijzing`). De Lead ziet de view naast zijn eigen resultaten op zijn pagina. Intrekken kan ook, door een Admin. De Admin ziet bij de toewijzingen per Lead een knop "Bekijk" en "Intrekken" (zie Toewijzen aan een Lead op alle niveaus). Wat de Lead ziet:
 
 - Geen automatische toegang. De Lead krijgt de view alleen als een Admin die toewijst, per benchmark en per organisatie.
-- Een Lead voor de hele organisatie (zie Bereik van een Lead). De view gaat over de Meting van de organisatie die als lid in de benchmark zit. Van de Lead zelf speelt niets mee: Niet zijn eigen scan en niet de Metingen waarop hij Lead is. Eerder moest de Lead de lid-Meting zelf kunnen inzien (`leadMetingIds`). Dat veroorzaakte vergelijkingen met scores die niet van de Lead waren, en is vervangen door het organisatiebereik (voorstel, nog niet gebouwd).
+- Een Lead voor de hele organisatie (zie Bereik van een Lead). De view gaat over de Meting van de organisatie die als lid in de benchmark zit. Van de Lead zelf speelt niets mee: Niet zijn eigen scan en niet de Metingen waarop hij Lead is. Eerder moest de Lead de lid-Meting zelf kunnen inzien (`leadMetingIds`). Dat veroorzaakte vergelijkingen met scores die niet van de Lead waren, en is vervangen door het organisatiebereik (gebouwd op 13 oktober 2026).
 - Een sectie alleen als het Assessment aan de drempel voldoet. Toewijzen kan pas als minstens één Assessment aan de drempel voldoet. De Lead ziet alleen de secties die eraan voldoen.
 - Wijzigt de samenstelling zodat de organisatie niet meer meedoet, of verdwijnt de Lead-respondent, of verliest de Lead zijn bereik, dan vervalt de toewijzing.
 
@@ -133,13 +133,13 @@ Het privacy statement belooft een minimale groepsgrootte. Die belofte moet overe
 - **Leden.** Een lid is een Meting (`BenchmarkLid`, met overal dezelfde `organisatieId`). In tegenstelling tot niveau 1 mag een organisatie meerdere leden per Assessment hebben, maar een Meting hoogstens één keer.
 - **Berekening.** Zie Gedeelde regels. Elke Meting telt even zwaar mee, ongeacht het aantal respondenten.
 - **Teller.** "N Metingen" per Assessment. Er is geen Y, want de Admin kiest de Metingen zelf.
-- **Weergave.** Per Assessment een sectie met het gemiddelde van alle gekozen Metingen en per Meting haar eigen scores ernaast. Daarnaast een view per Meting, met de Meting X naast het gemiddelde van de overige Metingen, zonder X, in dezelfde opbouw als de view per organisatie. Binnen één organisatie is anonimiteit geen probleem voor de Admin, dus de namen van de Metingen staan erbij. **Besloten, nog niet gebouwd.** Het overzicht van alle gekozen Metingen is een matrix met de bouwblokken als rijen en de Metingen als kolommen, de view per Meting heeft de opbouw van de view per organisatie. Zie `visualisatie-scores.md`, onderdeel E en D.
+- **Weergave.** Per Assessment een sectie met het gemiddelde van alle gekozen Metingen en per Meting haar eigen scores ernaast. Daarnaast een view per Meting, met de Meting X naast het gemiddelde van de overige Metingen, zonder X, in dezelfde opbouw als de view per organisatie. Binnen één organisatie is anonimiteit geen probleem voor de Admin, dus de namen van de Metingen staan erbij. **Besloten, gebouwd op 13 oktober 2026.** Het overzicht van alle gekozen Metingen is een matrix met de bouwblokken als rijen en de Metingen als kolommen, de view per Meting heeft de opbouw van de view per organisatie. Zie `visualisatie-scores.md`, onderdeel E en D.
 - **Toewijzen aan een Lead.** Een Admin kan de view van een Meting toewijzen aan een Lead op die Meting (zie Toewijzen aan een Lead op alle niveaus).
 - **Verwijderen.** Valt een Meting weg, dan verdwijnt het lid, zoals op niveau 1. Een benchmark met minder dan twee leden per Assessment geeft een melding.
 
 ## Niveau 3: Binnen een Meting
 
-**Voorstel, ontwerp besloten.** De vraag is hoe een scan scoort ten opzichte van alle andere scans in dezelfde Meting. Het ontwerp van de spreiding en van hoge en lage scores staat in `visualisatie-scores.md`, onderdeel B (besloten op 12 oktober 2026, nog niet gebouwd). Wat daarnaast vastligt:
+**Voorstel, ontwerp besloten.** De vraag is hoe een scan scoort ten opzichte van alle andere scans in dezelfde Meting. Het ontwerp van de spreiding en van hoge en lage scores staat in `visualisatie-scores.md`, onderdeel B (besloten op 12 oktober 2026, gebouwd op 13 oktober 2026). Wat daarnaast vastligt:
 
 - **Lid.** Een afgeronde scan. De vergelijkgroep van een scan is alle andere afgeronde scans in dezelfde Meting, zonder de scan zelf. Dat is dezelfde reden als op niveau 1.
 - **Berekening.** Elke scan telt even zwaar mee. Per vraag het gemiddelde antwoord van de andere scans, daarop de gedeelde scorefunctie.
@@ -150,7 +150,7 @@ Het privacy statement belooft een minimale groepsgrootte. Die belofte moet overe
 
 ## Bereik van een Lead
 
-**Voorstel.** Een benchmarkview volgt het bereik van de Lead en niet zijn eigen scan. Dat bereik stelt een Admin in bij de Lead zelf, niet bij de benchmark (`beheerpagina.md`, punt 6a en 6b).
+**Gebouwd op 13 oktober 2026.** Een benchmarkview volgt het bereik van de Lead en niet zijn eigen scan. Dat bereik stelt een Admin in bij de Lead zelf, niet bij de benchmark (`beheerpagina.md`, punt 6a en 6b).
 
 - **Lead voor de hele organisatie X.** Kan de view van X tegenover de rest van de groep krijgen (niveau 1). Hij is ook Lead voor alle Metingen van X, dus hij komt ook in aanmerking voor de views van niveau 2 en 3 binnen X.
 - **Lead voor een of meer Metingen.** Kan voor elke Meting M waarop hij Lead is de view van M tegenover de overige Metingen van de organisatie krijgen (niveau 2), en de views binnen M (niveau 3). Niveau 1 krijgt hij niet, want die gaat over de organisatie als geheel.

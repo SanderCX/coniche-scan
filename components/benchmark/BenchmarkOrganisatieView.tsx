@@ -2,33 +2,19 @@ import { VergelijkingsView } from "@/lib/benchmark";
 import { BenchmarkNiveau } from "@/lib/types";
 import { isVlakkeAssessment } from "@/lib/assessment-structuur";
 import { classificatie } from "@/lib/scoring";
-import { gewichtMarkering } from "@/lib/weging";
-import { scoreKleur } from "@/lib/colors";
 import { ScoreCircle } from "@/components/ScoreCircle";
 import { RadarChartView } from "@/components/RadarChartView";
 import { CategoryBarChart } from "@/components/CategoryBarChart";
+import { WeergaveGroep } from "@/components/visualisatie/WeergaveGroep";
+import { WeergaveSpreiding } from "@/components/visualisatie/WeergaveSpreiding";
 
 const datumFormat = new Intl.DateTimeFormat("nl-NL", { dateStyle: "long" });
-
-function Score({ waarde }: { waarde: number | null }) {
-  if (waarde === null) return <span className="text-ink-s">–</span>;
-  return (
-    <span className="score-pill" style={{ ["--kleur" as string]: scoreKleur(waarde) } as React.CSSProperties}>
-      {waarde.toFixed(1)}
-    </span>
-  );
-}
-
-function verschilTekst(verschil: number | null): string {
-  if (verschil === null) return "–";
-  const t = Math.abs(verschil).toFixed(1).replace(".", ",");
-  return verschil > 0 ? `+${t}` : verschil < 0 ? `−${t}` : "0,0";
-}
 
 /**
  * De view van één organisatie in één Assessment (`benchmark.md`, View per organisatie): De Meting van de organisatie naast
  * het gemiddelde van de rest van de groep, zónder de organisatie zelf. Een radar met twee reeksen, het staafdiagram per
- * categorie met het groepsgemiddelde ernaast, en het verschil per bouwblok. Nooit de namen van andere organisaties.
+ * categorie met het groepsgemiddelde ernaast, en per bouwblok de positie in de groep (weergave D, `visualisatie-scores.md`) of,
+ * bij een scan, de plek tussen de andere scans (weergave B). Nooit de namen van andere organisaties.
  * Dezelfde component voor de Admin (die de view eerst zelf bekijkt) en voor de Lead aan wie hij is toegewezen.
  */
 const TEKSTEN: Record<BenchmarkNiveau, { rest: string; restKort: string; voetnoot: (n: number) => string; geenAnderen: string }> = {
@@ -106,40 +92,14 @@ export function BenchmarkOrganisatieView({
         </div>
       </div>
 
-      <h3 style={{ marginTop: "2rem" }}>Verschil per {assessment.bouwblokEenheidEnkelvoud}</h3>
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>{assessment.bouwblokLabel}</th>
-            <th>{organisatieNaam}</th>
-            <th>{tekst.rest}</th>
-            <th>Verschil</th>
-          </tr>
-        </thead>
-        <tbody>
-          {view.verschillen.map((v) => (
-            <tr key={v.bouwblok.id}>
-              <td>
-                {v.bouwblok.volgnummer}. {v.bouwblok.naam}
-                {gewichtMarkering(v.bouwblok) && (
-                  <span className="gewicht-chip" style={{ marginLeft: "0.4rem" }}>
-                    {gewichtMarkering(v.bouwblok)}
-                  </span>
-                )}
-              </td>
-              <td>
-                <Score waarde={v.score} />
-              </td>
-              <td>
-                <Score waarde={v.rest} />
-              </td>
-              <td style={{ fontWeight: 700, color: v.verschil === null ? undefined : v.verschil >= 0 ? "var(--stat-green)" : "var(--stat-red)" }}>
-                {verschilTekst(v.verschil)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <h3 style={{ marginTop: "2rem" }}>
+        {niveau === "scans" ? `Positie per ${assessment.bouwblokEenheidEnkelvoud}` : `Verschil per ${assessment.bouwblokEenheidEnkelvoud}`}
+      </h3>
+      {niveau === "scans" && view.spreiding ? (
+        <WeergaveSpreiding assessment={assessment} weergave={view.spreiding} />
+      ) : view.groep ? (
+        <WeergaveGroep assessment={assessment} weergave={view.groep} eigenNaam={organisatieNaam} />
+      ) : null}
 
       <p className="benchmark-voetnoot">
         {tekst.voetnoot(view.aantalAnderen)} · peildatum {datumFormat.format(peildatum)}

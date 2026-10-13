@@ -13,12 +13,14 @@ import { volgendeUrl } from "@/lib/scan-routing";
 import { OrganisatieLid, ScanInvulling, ScanInvullingStatus, ScanUitvoering } from "@/lib/types";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
+import { isLead } from "@/lib/lead";
 
 /**
  * De benchmarkviews die een Admin aan deze Lead heeft toegewezen (`benchmark.md`, Toewijzen aan een Lead; `beheerpagina.md`,
- * punt 6a): Een kaart per toewijzing, alleen als er minstens één sectie te zien is. Een sectie is voor een Lead alleen
- * zichtbaar voor Assessments waarvan hij de Meting mag inzien en waarvan de groep aan de minimale groepsgrootte voldoet.
- * Zonder zichtbare sectie staat er niets, ook geen kaart.
+ * punt 6a): Een kaart per toewijzing, alleen als er minstens één sectie te zien is. Een view is voor een Lead alleen
+ * zichtbaar met bereik op het onderwerp (de hele organisatie op niveau 1, de Meting op niveau 2 en 3) en als de groep aan
+ * de minimale groepsgrootte voldoet (`benchmark.md`, Bereik van een Lead). Zonder zichtbare sectie staat er niets,
+ * ook geen kaart.
  */
 function BenchmarkKaarten({ code, lid }: { code: string; lid: OrganisatieLid }) {
   const toewijzingen = useBenchmarkToewijzingen().filter((t) => t.respondentId === lid.id);
@@ -26,7 +28,7 @@ function BenchmarkKaarten({ code, lid }: { code: string; lid: OrganisatieLid }) 
   const organisaties = useOrganisaties();
   const assessments = useAssessments();
   const instellingen = useInstellingen();
-  if (lid.leadMetingIds.length === 0) return null;
+  if (!isLead(lid)) return null;
   const drempels = {
     minOrganisaties: instellingen.benchmarkMinOrganisaties,
     minMetingen: instellingen.benchmarkMinMetingen,
@@ -35,7 +37,7 @@ function BenchmarkKaarten({ code, lid }: { code: string; lid: OrganisatieLid }) 
   const kaarten = toewijzingen.flatMap((t) => {
     const benchmark = benchmarks.find((b) => b.id === t.benchmarkId);
     if (!benchmark) return [];
-    const resultaat = leadViewVoorToewijzing(t, benchmark, assessments, organisaties, lid.leadMetingIds, drempels);
+    const resultaat = leadViewVoorToewijzing(t, benchmark, assessments, organisaties, lid, drempels);
     if (!resultaat || resultaat.views.length === 0) return [];
     // Per niveau wat de kaart zegt: Nooit de naam van een ander lid, wel zijn eigen Meting of de Respondent van de scan.
     const assessmentNamen = resultaat.views.map((v) => v.assessment.naam).join(" · ");

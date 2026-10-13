@@ -4,7 +4,7 @@ import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
-import { useOrganisatie, updateOrganisatie, maakScanUitvoering, voegLeadToe } from "@/lib/db";
+import { useOrganisatie, updateOrganisatie, maakScanUitvoering } from "@/lib/db";
 import { maakPubliekeLink } from "@/lib/uitnodiging-link";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { voortgang } from "@/lib/scoring";
@@ -13,52 +13,32 @@ import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
 import { BenchmarkVlag } from "@/components/beheer/BenchmarkVlag";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { RespondentStatusBadge, STATUS_LABEL } from "@/components/beheer/overzicht-helpers";
-import { Organisatie, ScanUitvoering } from "@/lib/types";
+import { Organisatie } from "@/lib/types";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren, magOrganisatieToegang, magOrganisatieToewijzen, magLeadToekennen } from "@/lib/rechten";
 import { useGebruikers } from "@/lib/gebruikers-store";
 import { useBeheerOverzicht } from "@/lib/beheer-url";
 import { MetBewerkslot } from "@/components/beheer/MetBewerkslot";
+import { LeadToevoegenFormulier } from "@/components/beheer/LeadToevoegenFormulier";
+import { isLead } from "@/lib/lead";
 
 /** Aantal rijen per lijst op de detailpagina (beheerpagina.md, punt 4, "Lange lijsten"). */
 const MAX_RIJEN = 5;
 
 /**
- * "+ Lead toevoegen" (beheerpagina.md punt 6a): nieuwe actie op
- * organisatieniveau. Bestaande Leads staan in de lijst Respondenten (met
- * het label Lead), hun toegang beheer je in het Respondent-overzicht.
+ * "+ Lead toevoegen" (beheerpagina.md punt 6a): nieuwe actie op organisatieniveau. Bestaande Leads staan in de lijst
+ * Respondenten (met het label Lead), hun toegang beheer je in het Respondent-overzicht. Het formulier staat in
+ * `LeadToevoegenFormulier`, ook voor de modal op een benchmarkview.
  */
 function LeadToevoegen({ organisatie }: { organisatie: Organisatie }) {
-  const assessments = useAssessments();
   const [open, setOpen] = useState(false);
-  const [naam, setNaam] = useState("");
-  const [email, setEmail] = useState("");
-  const [metingIds, setMetingIds] = useState<string[]>([]);
   const [nieuweLink, setNieuweLink] = useState<string | null>(null);
   const [kopieerGelukt, setKopieerGelukt] = useState<boolean | null>(null);
-
-  function metingLabel(s: ScanUitvoering): string {
-    const naamAssessment = assessments.find((a) => a.id === s.assessmentId)?.naam ?? "Onbekend type";
-    return `${s.label} — ${naamAssessment}`;
-  }
 
   async function kopieer(url: string) {
     setKopieerGelukt(await kopieerNaarKlembord(url));
     setTimeout(() => setKopieerGelukt(null), 1600);
   }
-
-  function handleToevoegen(e: React.FormEvent) {
-    e.preventDefault();
-    if (metingIds.length === 0) return;
-    const lid = voegLeadToe(organisatie.id, { naam, email, metingIds });
-    if (!lid) return;
-    setNieuweLink(maakPubliekeLink(window.location.origin, lid));
-    setNaam("");
-    setEmail("");
-    setMetingIds([]);
-  }
-
-  if (organisatie.scanUitvoeringen.length === 0) return null;
 
   // Een oranje knop direct onder de lijst Respondenten, links uitgelijnd (beheerpagina.md, punt 6a).
   // Pas na een klik klapt het formulier eronder open.
@@ -68,36 +48,13 @@ function LeadToevoegen({ organisatie }: { organisatie: Organisatie }) {
         + Lead toevoegen
       </button>
       {open && (
-      <form onSubmit={handleToevoegen} className="mt-3 flex flex-col gap-3" style={{ maxWidth: "28rem" }}>
-        <div className="admin-field" style={{ marginBottom: 0 }}>
-          <label>Naam</label>
-          <input type="text" value={naam} onChange={(e) => setNaam(e.target.value)} />
+        <div className="mt-3">
+          <LeadToevoegenFormulier
+            key={nieuweLink ?? "nieuw"}
+            organisatie={organisatie}
+            onToegevoegd={(lid) => setNieuweLink(maakPubliekeLink(window.location.origin, lid))}
+          />
         </div>
-        <div className="admin-field" style={{ marginBottom: 0 }}>
-          <label>E-mailadres</label>
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="naam@organisatie.nl" />
-        </div>
-        <div>
-          <label className="text-sm font-medium text-ink">Toegang tot Metingen (minstens 1)</label>
-          <div className="mt-1 flex flex-col gap-1">
-            {organisatie.scanUitvoeringen.map((s) => (
-              <label key={s.id} className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={metingIds.includes(s.id)}
-                  onChange={(e) =>
-                    setMetingIds((huidig) => (e.target.checked ? [...huidig, s.id] : huidig.filter((id) => id !== s.id)))
-                  }
-                />
-                {metingLabel(s)}
-              </label>
-            ))}
-          </div>
-        </div>
-        <button type="submit" disabled={metingIds.length === 0} className="btn btn-or btn-compact self-start">
-          Lead toevoegen
-        </button>
-      </form>
       )}
       {nieuweLink && (
         <div className="admin-notice mt-3">
@@ -295,7 +252,7 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
                   <tr key={lid.id} className="admin-table-rij-klikbaar" onClick={() => open("respondent", lid.id)}>
                     <td>
                       {lid.naam || <em className="text-ink-s">{lid.email}</em>}{" "}
-                      {lid.leadMetingIds.length > 0 && <span className="lead-badge">Lead</span>}
+                      {isLead(lid) && <span className="lead-badge">Lead</span>}
                     </td>
                     <td>{lid.email}</td>
                     <td>

@@ -1,6 +1,6 @@
 # Coniche Scan: Visualisatie van hoge en lage scores
 
-**Status.** Ontwerprichting besloten door Joost op 12 oktober 2026. Nog niets gebouwd. Wat een voorstel is dat nog bevestiging vraagt, staat per onderdeel aangegeven. Dit bestand beschrijft wat getoond wordt en hoe het berekend wordt. De precieze opmaak (maten, kleuren, lettergrootte) volgt `stylesheet.md`. Waar dit bestand daar iets aan toevoegt, staat dat onder Nieuwe stijlwaarden.
+**Status.** Ontwerprichting besloten door Joost op 12 oktober 2026. Gebouwd op 13 oktober 2026 (A tot en met E, de navigatie en de schakelaar), met de afwijkingen en wat nog niet is gebouwd onder Gebouwd. Wat een voorstel is dat nog bevestiging vraagt, staat per onderdeel aangegeven. Dit bestand beschrijft wat getoond wordt en hoe het berekend wordt. De precieze opmaak (maten, kleuren, lettergrootte) volgt `stylesheet.md`. Waar dit bestand daar iets aan toevoegt, staat dat onder Nieuwe stijlwaarden.
 
 **Visueel referentieontwerp.** Het canvas "Coniche Scan – visualisatie van scores" (vijf borden, voorbeeldgegevens) is een ontwerpschets en geen code. Waar schets en tekst verschillen, geldt de tekst. De borden staan ook als afbeelding in de map `afbeeldingen` (`visualisatie-a-een-meting.png`, `visualisatie-b-spreiding.png`, `visualisatie-c-tussen-metingen.png`, `visualisatie-d-tussen-organisaties.png` en `visualisatie-e-matrix.png`). Het canvas zelf is privé en moet door Joost gedeeld worden voordat Sander het kan openen.
 
@@ -156,6 +156,40 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 **Tegels.** Hoogste Meting en laagste Meting (totaalscore en label), bouwblok met het grootste verschil tussen Metingen, aantal cellen met een zwarte rand.
 
 **Andere kolommen.** Dezelfde matrix kan opeenvolgende Metingen in de tijd of organisaties tonen. Voor organisaties geldt dan de privacyregel van D en zijn de kolomkoppen anoniem. Dit is nu geen besluit en vraagt eerst een uitwerking.
+
+## Gebouwd
+
+Gebouwd op 13 oktober 2026. De berekeningen staan in `lib/visualisatie.ts` (met tests), de weergaven in
+`components/visualisatie/`, de schakelaar is `WeergaveWissel`.
+
+**Plekken**
+
+- A en B: `MetingWeergaven` op de resultatenpagina van een Meting in beheer en voor de Lead
+  (`/s/[code]/resultaten/[scanUitvoeringId]`). B op niveau 3 staat ook in de view van een scan (benchmark) en in
+  "Positie in de Meting" op de resultatenpagina van één scan.
+- C: de knop "Vergelijk met vorige Meting" (`?vergelijk=<metingId>`). Een dropdown-knop bij meer dan één eerdere Meting.
+- D: de view per organisatie (niveau 1) en de view per Meting (niveau 2) van de benchmark, ook voor een Lead.
+- E: de matrix in de sectie van een benchmark op niveau 2, alleen voor de Admin.
+
+**Afwijkingen en keuzes**
+
+- De waarde van "Sorteer op spreiding" staat niet in de adresbalk.
+- De kleuren van de stip zijn de drie klassekleuren (`--stat-red`, `--stat-amber`, `--stat-green`), zoals voorgesteld. De
+  vijf scorekleuren van `stylesheet.md` zijn niet gebruikt (zie Open punten).
+- De spreidingsgrenzen staan als constante (`SPREIDING_GRENZEN`, 0,55 en 0,8) en zijn nog niet instelbaar.
+- Is een Lead voor een Meting een Lead met `benchmarkMinRespondenten` nog niet gehaald, dan staat de lijn van laagste tot
+  hoogste score uit. Voor een Admin en een Consultant staat hij altijd aan.
+- Zonder categorielaag (AI-volwassenheid) vervallen de groepslabels. Bij "Sorteer op spreiding" vervallen ze ook.
+- Een Admin kan in B geen naam bij een stip zien (zie Open punten).
+- Elke Meting in de matrix telt even zwaar mee. Met twee kolommen wijkt elke cel precies 0,5 of meer af van het
+  rijgemiddelde en krijgt dus een rand. De regel is zo bedoeld, maar bij twee Metingen is de markering daardoor weinig
+  onderscheidend.
+
+**Nog niet gebouwd**
+
+- Export van deze weergaven naar PDF, CSV en InDesign.
+- Meer dan twee Metingen in C.
+- Een eigen drempel voor de band en de kwartielen in D.
 
 ## Nieuwe stijlwaarden
 

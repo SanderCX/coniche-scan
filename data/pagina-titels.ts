@@ -26,10 +26,13 @@ const PAGINA_TITELS: { route: string; titel: string }[] = [
 
   // Beheer
   { route: "/beheer", titel: "Beheer" },
-  { route: "/beheer/applicatie", titel: "Applicatie" },
+  { route: "/beheer/applicatie", titel: "Instellingen" },
+  { route: "/beheer/instellingen", titel: "Instellingen" },
+  { route: "/beheer/drempels", titel: "Drempels en termijnen" },
   { route: "/beheer/audit", titel: "Audit-log" },
   { route: "/beheer/teksten", titel: "Algemene teksten" },
-  { route: "/beheer/instellingen", titel: "Instellingen" },
+  { route: "/beheer/content-paginas", titel: "Content-pagina's" },
+  { route: "/beheer/data-integriteit", titel: "Data-integriteit" },
   { route: "/beheer/gebruikers", titel: "Gebruikers" },
   { route: "/beheer/gebruikers/nieuw", titel: "Nieuwe gebruiker" },
   { route: "/beheer/gebruikers/[gebruikerId]", titel: "Gebruiker" },

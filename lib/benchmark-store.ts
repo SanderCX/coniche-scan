@@ -2,6 +2,7 @@ import { useSyncExternalStore } from "react";
 import { Benchmark, BenchmarkLid, BenchmarkNiveau, BenchmarkToewijzing } from "./types";
 import { nieuwId } from "./id";
 import { logAudit } from "./audit-store";
+import { heeftBereikOpMeting, heeftBereikOpOrganisatie, LeadBereikLid } from "./lead";
 
 /**
  * Opslag van benchmarks en hun toewijzingen (`datamodel.md` deel 3, `benchmark.md`). Alleen de samenstelling staat
@@ -359,15 +360,20 @@ export function verwijderToewijzingenVanScans(scans: { metingId: string; respond
 }
 
 /**
- * Een Lead verliest de Lead-rol op een Meting: Zijn toewijzingen van views van die Meting (niveau 2 en 3) vervallen. Op
- * niveau 1 hangt de zichtbaarheid van `leadMetingIds` af op het moment van tonen (`viewsVoorLead`), dus die blijven staan.
+ * Een Lead heeft zijn bereik gewijzigd (`benchmark.md`, Bereik van een Lead): Verliest hij het bereik op het onderwerp van
+ * een view, dan vervalt de toewijzing, op elk niveau. Niveau 1 vraagt een Lead voor de hele organisatie. Niveau 2 en 3
+ * vragen bereik op de Meting van de view, via de hele organisatie of via die Meting.
+ *
+ * Een niveau 1-toewijzing die al bestond toen het bereik werd ingevoerd, aan een Lead zonder organisatiebereik, blijft
+ * staan zolang het bereik van die Lead niet wordt gewijzigd (de overgangsregel). De Admin ziet dan de melding in het blok
+ * Toewijzen. Deze functie draait pas bij een wijziging van het bereik van die ene Lead.
  */
-export function verwijderToewijzingenVoorVerlorenLeadMetingen(leadId: string, behoudenMetingIds: string[]): void {
+export function verwijderToewijzingenZonderBereik(lead: LeadBereikLid & { id: string }): void {
   const opslag = laad();
   const voor = opslag.toewijzingen.length;
   opslag.toewijzingen = opslag.toewijzingen.filter((t) => {
-    if (t.respondentId !== leadId || !t.metingId) return true;
-    return behoudenMetingIds.includes(t.metingId);
+    if (t.respondentId !== lead.id) return true;
+    return t.metingId ? heeftBereikOpMeting(lead, t.organisatieId, t.metingId) : heeftBereikOpOrganisatie(lead, t.organisatieId);
   });
   if (opslag.toewijzingen.length !== voor) bewaar(opslag);
 }

@@ -15,16 +15,25 @@ export function waardeOpPad(kenmerken: Record<string, unknown>, pad: string[]): 
   return huidig;
 }
 
-/** Alle ingevulde, niet-lege teksten op dit pad over de organisaties heen (getrimd, zonder dubbelen op hoofdletters). */
-export function gebruikteWaarden(organisaties: { kenmerken: Record<string, unknown> }[], pad: string[]): string[] {
+/** De niet-lege teksten uit een lijst waarden, getrimd en zonder dubbelen op hoofdletters (de eerste schrijfwijze wint). */
+export function uniekeTeksten(waarden: unknown[]): string[] {
   const gezien = new Map<string, string>();
-  for (const organisatie of organisaties) {
-    const waarde = waardeOpPad(organisatie.kenmerken ?? {}, pad);
+  for (const waarde of waarden) {
     if (typeof waarde !== "string") continue;
     const schoon = waarde.trim();
     if (schoon && !gezien.has(schoon.toLowerCase())) gezien.set(schoon.toLowerCase(), schoon);
   }
   return [...gezien.values()];
+}
+
+/** Alle ingevulde, niet-lege teksten op dit pad over de organisaties heen (getrimd, zonder dubbelen op hoofdletters). */
+export function gebruikteWaarden(organisaties: { kenmerken: Record<string, unknown> }[], pad: string[]): string[] {
+  return uniekeTeksten(organisaties.map((o) => waardeOpPad(o.kenmerken ?? {}, pad)));
+}
+
+/** Alle ingevulde functies van de Respondenten over de organisaties heen (`Respondent.functie`, vrije tekst of keuze). */
+export function gebruikteFuncties(organisaties: { leden: { functie: string | null }[] }[]): string[] {
+  return uniekeTeksten(organisaties.flatMap((o) => (o.leden ?? []).map((l) => l.functie)));
 }
 
 /**

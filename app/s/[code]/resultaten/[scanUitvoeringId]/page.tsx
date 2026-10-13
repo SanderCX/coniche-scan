@@ -9,6 +9,8 @@ import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { downloadPdf } from "@/lib/scan-export";
+import { MetingWeergaven } from "@/components/visualisatie/MetingWeergaven";
+import { VergelijkingEyebrow } from "@/components/visualisatie/VergelijkingEyebrow";
 
 /**
  * Resultaten van één Meting, voor een Lead die er Lead-toegang toe heeft
@@ -17,7 +19,7 @@ import { downloadPdf } from "@/lib/scan-export";
  * (`/beheer/rapportage/[scanUitvoeringId]`), maar bereikbaar via de
  * persoonlijke link in plaats van een beheerlogin.
  *
- * Beveiliging: toont alleen iets als `lid.leadMetingIds` (gekoppeld aan
+ * Beveiliging: toont alleen iets als het bereik van de Lead (`leadMetingIdsVan`, gekoppeld aan
  * déze toegangscode) deze scanUitvoeringId bevat — geen toegang tot
  * willekeurige metingen van de organisatie, alleen de toegewezen.
  */
@@ -58,6 +60,10 @@ export default function LeadResultatenPage({
   }
 
   const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMeting(assessment, scanUitvoering.invullingen);
+  // Alleen een eerdere Meting waarop de Lead ook Lead is (`visualisatie-scores.md`, C).
+  const eerdereMetingen = gegevens.leadMetingen.filter(
+    (m) => m.id !== scanUitvoering.id && m.assessmentId === scanUitvoering.assessmentId && m.aangemaaktOp < scanUitvoering.aangemaaktOp
+  );
 
   // export.uitvoeren voor een Lead (datamodel.md deel 2, Rechtenmatrix):
   // mag exporteren wat hij hier al ziet, dus het gemiddelde van deze Meting
@@ -100,14 +106,23 @@ export default function LeadResultatenPage({
       identiteitMenu={<MijnGegevensMenu lid={gegevens.lid} />}
     >
       <div className="container section" style={{ maxWidth: "64rem" }}>
-        <span className="eyebrow">{scanUitvoering.label}</span>
+        <VergelijkingEyebrow label={scanUitvoering.label} eerdereMetingen={eerdereMetingen} />
         <h1>{assessment.naam}</h1>
         <p className="text-sm text-ink-m">
           Gemiddelde over {afgerond.length}{" "}
           {afgerond.length === 1 ? "afgeronde respondent" : "afgeronde respondenten"}
         </p>
         <div className="mt-8">
-          <ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />
+          <MetingWeergaven
+            assessment={assessment}
+            organisatie={gegevens.organisatie}
+            scanUitvoering={scanUitvoering}
+            overzicht={<ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />}
+            spreidingToegestaan={false}
+            bereikAltijd={false}
+            toonBenchmarkLink={false}
+            eerdereMetingen={eerdereMetingen}
+          />
         </div>
       </div>
     </PageWithChrome>

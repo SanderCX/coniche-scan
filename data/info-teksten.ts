@@ -17,7 +17,7 @@ export interface InfoTekstDefinitie {
 export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
   {
     sleutel: "info.bewaartermijn",
-    plek: "Applicatie, Instellingen, formulier Bewaartermijn ingevulde scans",
+    plek: "Instellingen, Drempels en termijnen, formulier Bewaartermijn ingevulde scans",
     tekst:
       "Zonder ingestelde bewaartermijn verschijnt hier nooit een scan: Er is geen automatische verwijdering, alleen een melding zodra jij een termijn instelt.",
   },
@@ -90,7 +90,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
   },
   {
     sleutel: "info.dataIntegriteit",
-    plek: "Applicatie, Data-integriteit, naast \"Controleer nu\"",
+    plek: "Instellingen, Data-integriteit, naast \"Controleer nu\"",
     tekst:
       "Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen.",
   },
@@ -105,6 +105,17 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     tekst: "Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie.",
   },
   {
+    sleutel: "info.positieMeting",
+    plek: "Resultaten van één scan, naast de uitgeschakelde weergave \"Positie in de Meting\"",
+    tekst:
+      "De positie van een scan tegenover de andere scans in de Meting is er pas bij voldoende afgeronde scans. Bij minder is een scan te herleiden naar een persoon. Het minimum staat bij Drempels en termijnen (aantal respondenten per Meting).",
+  },
+  {
+    sleutel: "info.mijnAccountWachtwoord",
+    plek: "Mijn account, naast de uitgeschakelde knop \"Wachtwoord wijzigen\"",
+    tekst: "Wachtwoord wijzigen komt met de echte inlog. Tot die tijd vraag je een Admin om je wachtwoord te wijzigen.",
+  },
+  {
     sleutel: "info.assessmentVerwijderen",
     plek: "Assessments, op de kaart en het detail, naast de uitgeschakelde knop \"Verwijderen\"",
     tekst:
@@ -112,7 +123,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
   },
   {
     sleutel: "info.benchmarkInstellingen",
-    plek: "Applicatie, Instellingen, formulier Benchmark",
+    plek: "Instellingen, Drempels en termijnen, formulier Benchmark",
     tekst:
       "Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden.",
   },

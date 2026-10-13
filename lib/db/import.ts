@@ -184,6 +184,7 @@ export function voerLegacyImportUit(
         notities: rij.respondentNotities,
         toegangscode: genereerUniekeToegangscode(alles),
         leadMetingIds: [],
+        leadVoorOrganisatie: false,
         aangemaaktOp: new Date().toISOString(),
       };
       organisatie.leden.push(lid);

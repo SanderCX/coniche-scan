@@ -15,7 +15,7 @@ import { DropdownKnop } from "@/components/DropdownKnop";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
-import { NaarAndereMetingStap, ScanVerplaatsResultaat } from "@/components/beheer/VerplaatsStappen";
+import { AndereRespondentKoppelenStap, NaarAndereMetingStap, ScanVerplaatsResultaat } from "@/components/beheer/VerplaatsStappen";
 import { STATUS_LABEL, datumTekst, rolTeamTekst } from "@/components/beheer/overzicht-helpers";
 
 const NIVEAU_LABEL = { rood: "Basis op Orde", oranje: "Uitbouwen", groen: "Sterk punt" } as const;
@@ -44,6 +44,7 @@ export function ScanOverzicht({
 }) {
   const ingelogd = useIngelogdeGebruiker();
   const [naarMeting, setNaarMeting] = useState(false);
+  const [andereRespondent, setAndereRespondent] = useState(false);
   const [verwijderenOpen, setVerwijderenOpen] = useState(false);
   const [kopieerGelukt, setKopieerGelukt] = useState<boolean | null>(null);
   const [pdfBezig, setPdfBezig] = useState(false);
@@ -82,6 +83,11 @@ export function ScanOverzicht({
     });
   }
 
+  function handleGekoppeld(r: { naam: string; nieuw: boolean }) {
+    setAndereRespondent(false);
+    setMelding({ tekst: `De scan is gekoppeld aan ${r.naam}${r.nieuw ? " (nieuwe Respondent)" : ""}. ${naam} blijft bestaan.` });
+  }
+
   function handleVerwijderd() {
     verwijderScanInvullingen([invulling.id]);
     setVerwijderenOpen(false);
@@ -98,6 +104,13 @@ export function ScanOverzicht({
             invullingIds={[invulling.id]}
             onTerug={() => setNaarMeting(false)}
             onKlaar={handleVerplaatst}
+          />
+        ) : andereRespondent ? (
+          <AndereRespondentKoppelenStap
+            organisatie={organisatie}
+            invullingId={invulling.id}
+            onTerug={() => setAndereRespondent(false)}
+            onKlaar={handleGekoppeld}
           />
         ) : (
           <>
@@ -180,6 +193,9 @@ export function ScanOverzicht({
                 />
                 <button type="button" className="btn btn-outline btn-compact" onClick={() => setNaarMeting(true)}>
                   Naar andere Meting
+                </button>
+                <button type="button" className="btn btn-outline btn-compact" onClick={() => setAndereRespondent(true)}>
+                  Andere Respondent koppelen
                 </button>
                 <button type="button" className="btn btn-outline btn-compact" onClick={onOpenRespondent}>
                   Bekijk Respondent

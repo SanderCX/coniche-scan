@@ -9,6 +9,7 @@ import { Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering } from "@/li
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { MetBewerkslot } from "@/components/beheer/MetBewerkslot";
+import { RespondentFunctieKeuze } from "@/components/RespondentFunctieKeuze";
 
 const NIEUW = "__nieuw__";
 
@@ -245,7 +246,7 @@ function KolomKaart({
                 />
               </dd>
               <dt>Functie</dt>
-              <dd><input className="veld-compact" style={{ width: "100%" }} value={form.functie} onChange={(e) => setForm({ ...form, functie: e.target.value })} /></dd>
+              <dd><RespondentFunctieKeuze variant="compact" waarde={form.functie} onChange={(functie) => setForm({ ...form, functie })} /></dd>
               <dt>Team</dt>
               <dd><input className="veld-compact" style={{ width: "100%" }} value={form.team} onChange={(e) => setForm({ ...form, team: e.target.value })} /></dd>
               <dt>Notities</dt>

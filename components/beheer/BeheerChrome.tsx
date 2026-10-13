@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { DropdownKnop } from "@/components/DropdownKnop";
@@ -13,6 +13,7 @@ import { ROL_KLEUR } from "@/lib/colors";
 import { BeheerMeldingBalk } from "@/components/beheer/BeheerMelding";
 import { BeheerOverzichten } from "@/components/beheer/BeheerOverzichten";
 import { ConflictHost } from "@/components/beheer/ConflictHost";
+import { MijnAccountModal } from "@/components/beheer/MijnAccountModal";
 
 /**
  * Beheer hergebruikt de publieke nav/footer (zelfde logo, zelfde balk),
@@ -26,14 +27,12 @@ import { ConflictHost } from "@/components/beheer/ConflictHost";
  * Accountmenu: "Geen '← Terug naar site' in beheer" — vervangt met
  * "Uitloggen" als enige manier om beheer te verlaten).
  *
- * Drie hoofdlinks (beheerpagina.md, "Wat beheerbaar is"), geen 4e
- * "Overzicht" meer: **Applicatie** (Gebruikers, Instellingen, Algemene
- * teksten, Content-pagina's) en **Assessments** (Assessment-types,
- * Content) zijn Admin-only; **Organisaties** (Organisatievelden,
- * Organisaties, Metingen, Respondenten, Lead-rol, Ingevulde scans,
- * Import) ziet ook een Consultant, met bereik "eigen". Elke link wijst
- * naar één hub-pagina voor die sectie; onderdelen zonder eigen top-navlink
- * (Ingevulde scans, Import) zijn vanaf de Organisaties-hub bereikbaar.
+ * Drie hoofdlinks (beheerpagina.md, "Wat beheerbaar is"): **Assessments** (Assessment-types, Content, Admin-only),
+ * **Organisaties** (Organisatievelden, Organisaties, Metingen, Respondenten, Lead-rol, Ingevulde scans, Import, ook voor
+ * een Consultant, bereik "eigen") en **Benchmark** (Admin-only). **Instellingen** (voorheen Applicatie: Gebruikers,
+ * Drempels en termijnen, Algemene teksten, Content-pagina's, Audit-log, Data-integriteit) staat niet in de nav maar als
+ * rij in het Accountmenu, alleen voor een Admin. Elke link wijst naar één hub-pagina voor die sectie; onderdelen zonder
+ * eigen top-navlink (Ingevulde scans, Import) zijn vanaf de Organisaties-hub bereikbaar.
  *
  * **Scherm-specifieke acties vóór deze drie links** (CLAUDE.md sectie 3,
  * Globale layout, punt 1 — "Ingevulde scans →"/"Import van scans →" op de
@@ -42,8 +41,18 @@ import { ConflictHost } from "@/components/beheer/ConflictHost";
  * voor het scherm, dus in `.nav-right`, met een scheidingslijn erna net
  * als bij elke andere scherm-specifieke actie.
  */
-const PAD_PER_SECTIE: { sectie: "applicatie" | "assessments" | "organisaties" | "benchmark"; paden: string[] }[] = [
-  { sectie: "applicatie", paden: ["/beheer/applicatie", "/beheer/gebruikers", "/beheer/teksten", "/beheer/audit", "/beheer/instellingen"] },
+const INSTELLINGEN_PADEN = [
+  "/beheer/instellingen",
+  "/beheer/applicatie",
+  "/beheer/gebruikers",
+  "/beheer/drempels",
+  "/beheer/teksten",
+  "/beheer/content-paginas",
+  "/beheer/audit",
+  "/beheer/data-integriteit",
+];
+
+const PAD_PER_SECTIE: { sectie: "assessments" | "organisaties" | "benchmark"; paden: string[] }[] = [
   { sectie: "assessments", paden: ["/beheer/assessments", "/beheer/content"] },
   { sectie: "benchmark", paden: ["/beheer/benchmark"] },
   {
@@ -73,6 +82,19 @@ const ORGANISATIE_TABS = [
   { href: "/beheer/import", label: "Import" },
 ];
 
+/**
+ * Tabbalk van Instellingen (beheerpagina.md, "Navigatie in beheer"): Gebruikers is de landingstab. Alleen zichtbaar op de
+ * lijstpagina's zelf, niet op een detailpagina (Nieuwe gebruiker, Gebruiker).
+ */
+const INSTELLINGEN_TABS = [
+  { href: "/beheer/gebruikers", label: "Gebruikers" },
+  { href: "/beheer/drempels", label: "Drempels en termijnen" },
+  { href: "/beheer/teksten", label: "Algemene teksten" },
+  { href: "/beheer/content-paginas", label: "Content-pagina's" },
+  { href: "/beheer/audit", label: "Audit-log" },
+  { href: "/beheer/data-integriteit", label: "Data-integriteit" },
+];
+
 export function BeheerChrome({ children }: { children: React.ReactNode }) {
   return (
     <BeheerNavActionsProvider>
@@ -85,11 +107,12 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const gebruiker = useIngelogdeGebruiker();
   const navActions = useBeheerNavActionsValue();
+  const router = useRouter();
+  const [accountOpen, setAccountOpen] = useState(false);
+  const heeftInstellingen = magGebruikersBeheren(gebruiker);
+  const inInstellingen = INSTELLINGEN_PADEN.some((p) => pathname.startsWith(p));
 
   const links = [
-    ...(magGebruikersBeheren(gebruiker)
-      ? [{ sectie: "applicatie" as const, href: "/beheer/applicatie", label: "Applicatie" }]
-      : []),
     ...(magContentBeheren(gebruiker)
       ? [{ sectie: "assessments" as const, href: "/beheer/content", label: "Assessments" }]
       : []),
@@ -101,6 +124,7 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
 
   const rolInfo = gebruiker ? ROL_KLEUR[gebruiker.rol] : undefined;
   const toonTabs = ORGANISATIE_TABS.some((t) => pathname === t.href);
+  const toonInstellingenTabs = heeftInstellingen && INSTELLINGEN_TABS.some((t) => pathname === t.href);
 
   return (
     <>
@@ -125,7 +149,15 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
               <DropdownKnop
                 label={gebruiker.email}
                 header={`${gebruiker.email} (${ROL_KLEUR[gebruiker.rol].label})`}
-                opties={[{ label: "Uitloggen", onClick: logout }]}
+                rechtsUitgelijnd
+                actief={heeftInstellingen && inInstellingen}
+                opties={[
+                  { label: "Mijn account", onClick: () => setAccountOpen(true) },
+                  ...(heeftInstellingen
+                    ? [{ label: "Instellingen", onClick: () => router.push("/beheer/gebruikers"), actief: inInstellingen }]
+                    : []),
+                  { label: "Uitloggen", onClick: logout, scheidingVoor: true },
+                ]}
               />
             )}
           </>
@@ -142,7 +174,19 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
       )}
+      {toonInstellingenTabs && (
+        <div className="beheer-tabs">
+          <nav className="beheer-tabs-inner" aria-label="Onderdelen van Instellingen">
+            {INSTELLINGEN_TABS.map((tab) => (
+              <Link key={tab.href} href={tab.href} className={`beheer-tab ${pathname === tab.href ? "actief" : ""}`}>
+                {tab.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      )}
       <BeheerMeldingBalk />
+      {gebruiker && accountOpen && <MijnAccountModal gebruiker={gebruiker} open onSluit={() => setAccountOpen(false)} />}
       <main className="flex-1">{children}</main>
       <Suspense fallback={null}>
         <BeheerOverzichten />

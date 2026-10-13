@@ -24,6 +24,7 @@ import { NaarAndereMetingStap, ScanVerplaatsResultaat } from "@/components/behee
 import { conflictActies } from "@/components/beheer/ConflictHost";
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { STATUS_LABEL } from "@/components/beheer/overzicht-helpers";
+import { heeftBereikOpMeting, isLead } from "@/lib/lead";
 
 /**
  * Meting-overzicht (beheerpagina.md punt 5): alles binnen één Meting op
@@ -72,7 +73,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
   }
 
   const afgerond = invullingen.filter((i) => i.status === "afgerond").length;
-  const leads = organisatie.leden.filter((l) => l.leadMetingIds.includes(scanUitvoering.id));
+  const leads = organisatie.leden.filter((l) => heeftBereikOpMeting(l, organisatie.id, scanUitvoering.id));
   const benchmarksMetMeting = aantalBenchmarksMetMeting(scanUitvoering.id);
 
   async function kopieer(id: string, url: string) {
@@ -311,7 +312,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
                     </td>
                     <td>
                       {lid.naam || <em className="text-ink-s">{lid.email}</em>}{" "}
-                      {lid.leadMetingIds.length > 0 && <span className="lead-badge">Lead</span>}
+                      {isLead(lid) && <span className="lead-badge">Lead</span>}
                     </td>
                     <td>
                       <span className={`admin-badge status-${invulling.status}`}>{STATUS_LABEL[invulling.status]}</span>

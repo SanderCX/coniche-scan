@@ -3,7 +3,10 @@
 import { openConflict } from "@/components/beheer/ConflictHost";
 import { useMemo, useState } from "react";
 import { useAssessments } from "@/lib/assessment-store";
+import { RespondentFunctieKeuze } from "@/components/RespondentFunctieKeuze";
 import {
+  koppelScanAanAndereRespondent,
+  RespondentInvoer,
   VerplaatsMetingKeuze,
   VerplaatsRespondentResultaat,
   verplaatsResponsNaarMeting,
@@ -28,7 +31,7 @@ export interface ScanVerplaatsResultaat {
   doelLabel: string;
 }
 
-function StapKader({ titel, onTerug, children }: { titel: string; onTerug: () => void; children: React.ReactNode }) {
+export function StapKader({ titel, onTerug, children }: { titel: string; onTerug: () => void; children: React.ReactNode }) {
   return (
     <div>
       <button type="button" className="overzicht-stap-terug" onClick={onTerug}>
@@ -392,6 +395,135 @@ export function RespondentVerplaatsenStap({
           onClick={bevestig}
         >
           {conflictLid ? "Samenvoegen en verplaatsen" : "Verplaatsen"}
+        </button>
+      </div>
+    </StapKader>
+  );
+}
+
+/**
+ * "Andere Respondent koppelen" in het Scan-overzicht (beheerpagina.md punt 7): Hangt alleen deze ene scan aan een andere
+ * Respondent van dezelfde organisatie, of aan een nieuwe. Hetzelfde blok als bij "Conflict oplossen" (punt 6b). De
+ * oorspronkelijke Respondent blijft bestaan, ook zonder scans.
+ *
+ * Een Respondent die in deze Meting al een scan heeft, is niet te kiezen en de keuzelijst zegt waarom. Bij "Nieuwe
+ * Respondent" zijn de velden vooraf ingevuld met de huidige gegevens, met een leeg e-mailadres dat in de organisatie nog
+ * niet voorkomt. Bij een bestaande Respondent zijn de velden alleen-lezen.
+ */
+export function AndereRespondentKoppelenStap({
+  organisatie,
+  invullingId,
+  onTerug,
+  onKlaar,
+}: {
+  organisatie: Organisatie;
+  invullingId: string;
+  onTerug: () => void;
+  onKlaar: (resultaat: { naam: string; nieuw: boolean }) => void;
+}) {
+  const meting = organisatie.scanUitvoeringen.find((m) => m.invullingen.some((i) => i.id === invullingId));
+  const invulling = meting?.invullingen.find((i) => i.id === invullingId);
+  const huidig = organisatie.leden.find((l) => l.id === invulling?.organisatieLidId);
+  const [keuze, setKeuze] = useState(NIEUW);
+  const [form, setForm] = useState<RespondentInvoer>({
+    naam: huidig?.naam ?? "",
+    // Een nieuwe Respondent heeft een eigen e-mailadres nodig: Het adres van de huidige Respondent kan niet.
+    email: "",
+    functie: huidig?.functie ?? "",
+    team: huidig?.team ?? "",
+    notities: huidig?.notities ?? "",
+  });
+  const [fout, setFout] = useState<string | null>(null);
+  if (!meting || !invulling || !huidig) return null;
+
+  const naam = (l: OrganisatieLid) => l.naam || l.email;
+  const andere = organisatie.leden.filter((l) => l.id !== huidig.id);
+  const heeftAlScan = (l: OrganisatieLid) => meting.invullingen.some((i) => i.id !== invulling.id && i.organisatieLidId === l.id);
+  const gekozenLid = keuze === NIEUW ? null : andere.find((l) => l.id === keuze) ?? null;
+
+  function bevestig() {
+    const resultaat = koppelScanAanAndereRespondent(
+      invullingId,
+      keuze === NIEUW ? { soort: "nieuw", invoer: form } : { soort: "bestaand", lidId: keuze }
+    );
+    if (!resultaat.ok) {
+      setFout(resultaat.reden ?? "Koppelen is niet gelukt.");
+      return;
+    }
+    onKlaar({ naam: keuze === NIEUW ? form.naam.trim() || form.email.trim() : gekozenLid ? naam(gekozenLid) : "", nieuw: keuze === NIEUW });
+  }
+
+  const leesRij = (label: string, waarde: string) => (
+    <div className="admin-field" style={{ marginBottom: "0.6rem" }}>
+      <label>{label}</label>
+      <input type="text" readOnly value={waarde} />
+    </div>
+  );
+
+  return (
+    <StapKader titel="Andere Respondent koppelen" onTerug={onTerug}>
+      <p className="text-sm text-ink-m mb-3">
+        Alleen deze scan (Meting {meting.label}) gaat naar de gekozen Respondent. {naam(huidig)} blijft bestaan met zijn
+        andere scans.
+      </p>
+      <div className="admin-field">
+        <label>Respondent</label>
+        <select value={keuze} onChange={(e) => { setKeuze(e.target.value); setFout(null); }}>
+          <option value={NIEUW}>Nieuwe Respondent</option>
+          {andere.map((l) => (
+            <option key={l.id} value={l.id} disabled={heeftAlScan(l)}>
+              {naam(l)}
+              {heeftAlScan(l) ? " (heeft in deze Meting al een scan)" : ""}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {keuze === NIEUW ? (
+        <>
+          <div className="admin-field">
+            <label>Naam</label>
+            <input type="text" value={form.naam} onChange={(e) => setForm({ ...form, naam: e.target.value })} />
+          </div>
+          <div className="admin-field">
+            <label>E-mailadres</label>
+            <input
+              type="email"
+              value={form.email}
+              placeholder="Eigen e-mailadres, nog niet gebruikt in deze organisatie"
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </div>
+          <div className="admin-field">
+            <label>Rol / functie</label>
+            <RespondentFunctieKeuze variant="beheer" waarde={form.functie} onChange={(functie) => setForm({ ...form, functie })} />
+          </div>
+          <div className="admin-field">
+            <label>Team</label>
+            <input type="text" value={form.team} onChange={(e) => setForm({ ...form, team: e.target.value })} />
+          </div>
+          <div className="admin-field">
+            <label>Notities</label>
+            <textarea rows={3} value={form.notities} onChange={(e) => setForm({ ...form, notities: e.target.value })} />
+          </div>
+        </>
+      ) : (
+        <>
+          {leesRij("Naam", gekozenLid?.naam ?? "")}
+          {leesRij("E-mailadres", gekozenLid?.email ?? "")}
+          {leesRij("Rol / functie", gekozenLid?.functie ?? "")}
+          {leesRij("Team", gekozenLid?.team ?? "")}
+          {leesRij("Notities", gekozenLid?.notities ?? "")}
+        </>
+      )}
+
+      {fout && <p className="overzicht-melding fout">{fout}</p>}
+      <div className="btn-rij" style={{ marginTop: "1.2rem" }}>
+        <button type="button" className="btn btn-outline" onClick={onTerug}>
+          Annuleren
+        </button>
+        <button type="button" className="btn btn-or" onClick={bevestig}>
+          Koppelen
         </button>
       </div>
     </StapKader>

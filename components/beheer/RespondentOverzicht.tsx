@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
+import { isLead } from "@/lib/lead";
 import {
   bewerkRespondent,
   useOrganisaties,
@@ -17,6 +18,7 @@ import { overzichtHref } from "@/lib/beheer-url";
 import { Organisatie, OrganisatieLid } from "@/lib/types";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { InfoIcoon } from "@/components/InfoIcoon";
+import { RespondentFunctieKeuze } from "@/components/RespondentFunctieKeuze";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
@@ -232,7 +234,7 @@ export function RespondentOverzicht({
           <div className="overzicht-kop-sub">
             <span>{organisatie.naam}</span>
             <RespondentStatusBadge invullingen={scans.map((s) => s.invulling)} />
-            {lid.leadMetingIds.length > 0 && <span className="lead-badge">Lead</span>}
+            {isLead(lid) && <span className="lead-badge">Lead</span>}
           </div>
         </div>
 
@@ -260,6 +262,24 @@ export function RespondentOverzicht({
           </div>
           {bewerken ? (
             <form onSubmit={handleOpslaan}>
+              {scans.length > 0 && (
+                // Een vaste regel (`beheerpagina.md`, punt 6b, "Alle scans gaan mee"): De naam staat op de Respondent en niet op de
+                // scan. Alleen één scan onder een andere naam is "Andere Respondent koppelen" in het Scan-overzicht.
+                <div className="text-sm text-ink-m" style={{ marginBottom: "0.9rem" }}>
+                  <p style={{ margin: 0, fontWeight: 600, color: "var(--ink)" }}>
+                    {scans.length === 1
+                      ? `Deze wijziging geldt voor de scan in ${scans[0].meting.label}.`
+                      : `Deze wijziging geldt voor alle ${scans.length} scans van ${naam} bij ${organisatie.naam}.`}
+                  </p>
+                  {scans.length > 1 && (
+                    <ul style={{ margin: "0.2rem 0 0 1.1rem", listStyle: "disc" }}>
+                      {scans.map(({ meting, invulling }) => (
+                        <li key={invulling.id}>{meting.label}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
               <div className="admin-field">
                 <label>Naam</label>
                 <input type="text" value={form.naam} onChange={(e) => setForm({ ...form, naam: e.target.value })} />
@@ -270,7 +290,7 @@ export function RespondentOverzicht({
               </div>
               <div className="admin-field">
                 <label>Rol / functie</label>
-                <input type="text" value={form.functie} onChange={(e) => setForm({ ...form, functie: e.target.value })} />
+                <RespondentFunctieKeuze variant="beheer" waarde={form.functie} onChange={(functie) => setForm({ ...form, functie })} />
               </div>
               <div className="admin-field">
                 <label>Team</label>

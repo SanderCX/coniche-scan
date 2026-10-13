@@ -17,7 +17,7 @@ function beantwoordeScores(bouwblok: Bouwblok, antwoorden: Record<string, number
 }
 
 /** Bouwblokscore zonder afronding. Alleen voor verdere berekening; getoond wordt `bouwblokScore`. */
-function bouwblokScoreRuw(bouwblok: Bouwblok, antwoorden: Record<string, number>): number | null {
+export function bouwblokScoreRuw(bouwblok: Bouwblok, antwoorden: Record<string, number>): number | null {
   const scores = beantwoordeScores(bouwblok, antwoorden);
   return scores.length === 0 ? null : scores.reduce((a, b) => a + b, 0) / scores.length;
 }

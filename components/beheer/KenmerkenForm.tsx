@@ -1,17 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { VeldDefinitie } from "@/lib/types";
 import { useOrganisaties } from "@/lib/db";
-import { gebruikteWaarden, kiesSpelling, optieLijst } from "@/lib/kenmerken-opties";
-
-const ANDERS = "__anders__";
+import { gebruikteWaarden } from "@/lib/kenmerken-opties";
+import { KeuzelijstMetEigenOptie } from "@/components/KeuzelijstMetEigenOptie";
 
 /**
- * Een keuzelijst (op alfabet) met vaste opties en "Anders…" onderaan voor een eigen invoer (`VeldDefinitie.eigenOptie`).
- * De eigen invoer wordt als gewone tekst opgeslagen en staat daarna in de lijst van alle organisaties
- * (`lib/kenmerken-opties.ts`). Het invoerveld bewaart pas bij Enter of bij het verlaten van het veld, zodat er geen
- * halve woorden in de lijst komen.
+ * Een keuzelijst (op alfabet, of in aangeleverde volgorde bij `voorop`) met vaste opties en "Anders…" onderaan voor een
+ * eigen invoer (`VeldDefinitie.eigenOptie`). De eigen invoer wordt als gewone tekst opgeslagen en staat daarna in de
+ * lijst van alle organisaties (`lib/kenmerken-opties.ts`). Het component zelf staat in
+ * `components/KeuzelijstMetEigenOptie.tsx`, ook voor Rol / functie van een Respondent.
  */
 function SelectMetEigenOptie({
   veld,
@@ -25,59 +23,18 @@ function SelectMetEigenOptie({
   pad: string[];
 }) {
   const organisaties = useOrganisaties();
-  const [andersOpen, setAndersOpen] = useState(false);
-  const [concept, setConcept] = useState("");
-  const huidige = typeof waarde === "string" ? waarde : "";
-  const lijst = optieLijst(veld.opties ?? [], gebruikteWaarden(organisaties, pad), huidige, veld.voorop);
-
-  function bewaarConcept() {
-    const gekozen = kiesSpelling(concept, lijst);
-    if (gekozen) onChange(gekozen);
-    setAndersOpen(false);
-    setConcept("");
-  }
-
   return (
     <div className="admin-field">
       <label>{veld.label}</label>
-      <select
-        value={andersOpen ? ANDERS : huidige}
-        onChange={(e) => {
-          if (e.target.value === ANDERS) {
-            setAndersOpen(true);
-            setConcept("");
-          } else {
-            setAndersOpen(false);
-            onChange(e.target.value);
-          }
-        }}
-      >
-        <option value="">Kies...</option>
-        {lijst.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-        <option value={ANDERS}>Anders…</option>
-      </select>
-      {andersOpen && (
-        <input
-          type="text"
-          autoFocus
-          style={{ marginTop: "0.4rem" }}
-          placeholder={veld.eigenOptiePlaceholder ?? "Naam van de oplossing"}
-          aria-label={`${veld.label}, anders`}
-          value={concept}
-          onChange={(e) => setConcept(e.target.value)}
-          onBlur={bewaarConcept}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              bewaarConcept();
-            }
-          }}
-        />
-      )}
+      <KeuzelijstMetEigenOptie
+        waarde={typeof waarde === "string" ? waarde : ""}
+        onChange={onChange}
+        opties={veld.opties}
+        voorop={veld.voorop}
+        gebruikt={gebruikteWaarden(organisaties, pad)}
+        placeholder={veld.eigenOptiePlaceholder ?? "Naam van de oplossing"}
+        ariaLabel={veld.label}
+      />
     </div>
   );
 }

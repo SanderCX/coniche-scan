@@ -9,6 +9,7 @@ import { useInstellingen } from "@/lib/instellingen-store";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { BenchmarkOrganisatieView } from "@/components/benchmark/BenchmarkOrganisatieView";
+import { isLead } from "@/lib/lead";
 
 /**
  * De benchmarkview van een Lead (`benchmark.md`, Toewijzen aan een Lead): Zijn eigen organisatie naast het gemiddelde van de
@@ -25,7 +26,7 @@ export default function LeadBenchmarkPage({ params }: { params: Promise<{ code: 
   const assessments = useAssessments();
   const instellingen = useInstellingen();
 
-  const toegang = gegevens && toewijzing && benchmark && toewijzing.respondentId === gegevens.lid.id && gegevens.lid.leadMetingIds.length > 0;
+  const toegang = gegevens && toewijzing && benchmark && toewijzing.respondentId === gegevens.lid.id && isLead(gegevens.lid);
   if (!gegevens || !toegang) {
     return (
       <PageWithChrome code={code}>
@@ -37,7 +38,7 @@ export default function LeadBenchmarkPage({ params }: { params: Promise<{ code: 
     );
   }
 
-  const resultaat = leadViewVoorToewijzing(toewijzing, benchmark, assessments, organisaties, gegevens.lid.leadMetingIds, {
+  const resultaat = leadViewVoorToewijzing(toewijzing, benchmark, assessments, organisaties, gegevens.lid, {
     minOrganisaties: instellingen.benchmarkMinOrganisaties,
     minMetingen: instellingen.benchmarkMinMetingen,
     minRespondenten: instellingen.benchmarkMinRespondenten,

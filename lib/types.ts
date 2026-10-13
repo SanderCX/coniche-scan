@@ -280,6 +280,12 @@ export interface OrganisatieLid {
    * er ook geen apart "is Lead"-veld nodig.
    */
   leadMetingIds: string[];
+  /**
+   * Lead voor de hele organisatie (`datamodel.md` deel 2, Het bereik van een Lead): De Lead ziet alle Metingen van zijn
+   * organisatie, ook Metingen die later worden aangemaakt. Dan zijn er geen `leadMetingIds` nodig. Ontbreekt bij data van
+   * vóór dit veld en geldt dan als `false`. Gebruik `isLead` en `leadMetingIdsVan` uit `lib/lead.ts`.
+   */
+  leadVoorOrganisatie?: boolean;
   aangemaaktOp: string;
 }
 
