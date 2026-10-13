@@ -43,7 +43,7 @@ const laad = () => JSON.parse(opslag.get(KEY)!) as ReturnType<typeof org>[];
 
 describe("import alleen voor een Admin", () => {
   const gebruiker = (id: string, rol: string) => ({ id, email: `${id}@x.nl`, naam: id, wachtwoord: "x", rol, actief: true, laatstIngelogdOp: null, aangemaaktOp: "x" });
-  const keuze = { rij: { organisatieNaam: "Nieuw", respondentEmail: "a@x.nl", respondentNaam: "", respondentFunctie: "", respondentTeam: "", respondentNotities: "", meetingLabel: "Legacy-import 2026", status: "afgerond", uitgenodigdOp: "x", gestartOp: null, afgerondOp: null, antwoorden: {}, opmerkingenPerBouwblok: {}, rijNummer: 1 }, assessmentId: "A", organisatieId: null };
+  const keuze = { rij: { organisatieNaam: "Nieuw", respondentEmail: "a@x.nl", respondentNaam: "", respondentFunctie: "", respondentTeam: "", scanNotitie: "", meetingLabel: "Legacy-import 2026", status: "afgerond", uitgenodigdOp: "x", gestartOp: null, afgerondOp: null, antwoorden: {}, opmerkingenPerBouwblok: {}, rijNummer: 1 }, assessmentId: "A", organisatieId: null };
 
   it("weigert een importverzoek van een Consultant en schrijft niets weg", () => {
     opslag.set("coniche-scan:gebruikers", JSON.stringify([gebruiker("c1", "consultant"), gebruiker("a1", "admin")]));
@@ -342,7 +342,7 @@ describe("scanverwijzingen na verplaatsen", () => {
 describe("import: een Meting per bronnaam en één scan per Respondent per Meting", () => {
   const gebruiker = { id: "a1", email: "a1@x.nl", naam: "a1", wachtwoord: "x", rol: "admin", actief: true, laatstIngelogdOp: null, aangemaaktOp: "x" };
   const rij = (bronnaam: string, email: string, extra: Rij = {}) => ({
-    organisatieNaam: bronnaam, respondentEmail: email, respondentNaam: "", respondentFunctie: "", respondentTeam: "", respondentNotities: "",
+    organisatieNaam: bronnaam, respondentEmail: email, respondentNaam: "", respondentFunctie: "", respondentTeam: "", scanNotitie: "",
     meetingLabel: "Legacy-import 2026", status: "afgerond", uitgenodigdOp: "2026-01-14T10:00:00.000Z", gestartOp: "2026-01-14T10:00:00.000Z",
     afgerondOp: null, antwoorden: {}, opmerkingenPerBouwblok: {}, rijNummer: 1, ...extra,
   });
@@ -408,7 +408,7 @@ describe("import: een Meting per bronnaam en één scan per Respondent per Metin
 describe("import: ronde en onderdeel", () => {
   const gebruiker = { id: "a1", email: "a1@x.nl", naam: "a1", wachtwoord: "x", rol: "admin", actief: true, laatstIngelogdOp: null, aangemaaktOp: "x" };
   const rij = (bronnaam: string, email: string, extra: Rij = {}) => ({
-    organisatieNaam: bronnaam, respondentEmail: email, respondentNaam: "", respondentFunctie: "", respondentTeam: "", respondentNotities: "",
+    organisatieNaam: bronnaam, respondentEmail: email, respondentNaam: "", respondentFunctie: "", respondentTeam: "", scanNotitie: "",
     meetingLabel: "Legacy-import 2026", status: "afgerond", uitgenodigdOp: "2026-01-14T10:00:00.000Z", gestartOp: "2026-01-14T10:00:00.000Z",
     afgerondOp: null, antwoorden: {}, opmerkingenPerBouwblok: {}, rijNummer: 1, ...extra,
   });
@@ -491,6 +491,149 @@ describe("import: ronde en onderdeel", () => {
     db.voerLegacyImportUit([keuze(rij("Org", "b@x.nl"), { bekendeRondes, bekendeMetingen })] as never, "a1");
     expect(uit().rondes).toHaveLength(1);
     expect(uit().scanUitvoeringen).toHaveLength(1);
+  });
+});
+
+describe("notitie per scan", () => {
+  const gebruiker = { id: "a1", email: "a1@x.nl", naam: "a1", wachtwoord: "x", rol: "admin", actief: true, laatstIngelogdOp: null, aangemaaktOp: "x" };
+  const rij = (email: string, notitie: string, extra: Rij = {}) => ({
+    organisatieNaam: "Org", respondentEmail: email, respondentNaam: "", respondentFunctie: "", respondentTeam: "", scanNotitie: notitie,
+    meetingLabel: "Legacy-import 2026", status: "afgerond", uitgenodigdOp: "2026-01-14T10:00:00.000Z", gestartOp: "2026-01-14T10:00:00.000Z",
+    afgerondOp: null, antwoorden: {}, opmerkingenPerBouwblok: {}, rijNummer: 1, ...extra,
+  });
+  const keuze = (r: Rij) => ({ rij: r, assessmentId: "A", organisatieId: "O1" });
+  type Uit = { leden: { notities: string }[]; scanUitvoeringen: { invullingen: { notitie?: string | null }[] }[] };
+
+  it("elke rij houdt zijn eigen notitie op zijn scan en er wordt niets aan de Respondent geplakt", () => {
+    opslag.set("coniche-scan:gebruikers", JSON.stringify([gebruiker]));
+    zet([org("O1", [], [])]);
+    // Dezelfde Respondent (de invuller) in drie rijen, met elk een andere notitie.
+    db.voerLegacyImportUit([keuze(rij("coniche@x.nl", "Jan Jansen")), keuze(rij("coniche@x.nl", "Piet Pietersen")), keuze(rij("coniche@x.nl", ""))] as never, "a1");
+    const o = laad()[0] as unknown as Uit;
+    expect(o.leden).toHaveLength(1);
+    expect(o.leden[0].notities).toBe("");
+    const notities = o.scanUitvoeringen.flatMap((m) => m.invullingen.map((i) => i.notitie ?? null)).sort();
+    expect(notities).toEqual([null, "Jan Jansen", "Piet Pietersen"].sort());
+  });
+
+  it("een bestaande Respondent houdt zijn eigen notities, ook als een rij een notitie heeft", () => {
+    opslag.set("coniche-scan:gebruikers", JSON.stringify([gebruiker]));
+    zet([org("O1", [lid("L1", "O1", "coniche@x.nl", { notities: "Eigen notitie" })], [])]);
+    db.voerLegacyImportUit([keuze(rij("coniche@x.nl", "Jan Jansen"))] as never, "a1");
+    expect((laad()[0] as unknown as Uit).leden[0].notities).toBe("Eigen notitie");
+  });
+});
+
+describe("scans samenbrengen in één Meting", () => {
+  type Uit = {
+    rondes?: { id: string; label: string }[];
+    leden: { id: string; email: string; naam: string | null; toegangscode: string }[];
+    scanUitvoeringen: { id: string; label: string; rondeId?: string; onderdeel?: string; invullingen: { id: string; organisatieLidId: string; scanUitvoeringId: string; antwoorden: Record<string, number> }[] }[];
+  };
+  const uit = () => laad()[0] as unknown as Uit;
+  const basis = () => {
+    // Tien scans van één invuller in tien losse import-Metingen, zoals na het importeren van tien bestanden.
+    const metingen = [1, 2, 3].map((n) => meting(`M${n}`, "O1", `Import ${n}`, [{ ...inv(`I${n}`, `M${n}`, "L1"), antwoorden: { v: n }, notitie: `Persoon ${n}` }]));
+    zet([org("O1", [lid("L1", "O1", "coniche@x.nl")], metingen)]);
+  };
+  const regels = (...ids: string[]) => ids.map((invullingId) => ({ invullingId, respondent: { soort: "houden" as const } }));
+
+  it("zet de scans in één nieuwe Meting in een nieuwe ronde, met per scan een nieuwe Respondent", () => {
+    basis();
+    const r = db.brengScansSamen(
+      "O1",
+      { soort: "nieuw", label: "Volwassenheid", onderdeel: "Team Service", nieuweRondeLabel: "0-meting" },
+      [1, 2, 3].map((n) => ({
+        invullingId: `I${n}`,
+        respondent: { soort: "nieuw" as const, naam: `Persoon ${n}`, email: `p${n}@x.nl`, functie: "", team: "" },
+      }))
+    );
+    expect(r).toMatchObject({ ok: true, aantal: 3, doelLabel: "Volwassenheid", rondeLabel: "0-meting" });
+    const o = uit();
+    const doel = o.scanUitvoeringen.find((m) => m.label === "Volwassenheid")!;
+    expect(doel).toMatchObject({ onderdeel: "Team Service" });
+    expect(doel.invullingen).toHaveLength(3);
+    expect(new Set(doel.invullingen.map((i) => i.organisatieLidId)).size).toBe(3);
+    // Beide verwijzingen kloppen en de antwoorden zijn onaangeraakt.
+    expect(doel.invullingen.every((i) => i.scanUitvoeringId === doel.id)).toBe(true);
+    expect(doel.invullingen.map((i) => i.antwoorden.v).sort()).toEqual([1, 2, 3]);
+    expect(o.rondes!.map((x) => x.label)).toEqual(["0-meting"]);
+    expect(doel.rondeId).toBe(o.rondes![0].id);
+    // De Respondenten zijn nieuw en hebben een eigen toegangscode, de bron-Metingen blijven leeg staan.
+    expect(o.leden).toHaveLength(4);
+    expect(new Set(o.leden.map((l) => l.toegangscode)).size).toBe(4);
+    expect(o.scanUitvoeringen.filter((m) => m.invullingen.length === 0)).toHaveLength(3);
+    expect((r as { legeMetingen: unknown[] }).legeMetingen).toHaveLength(3);
+  });
+
+  it("alles of niets: Dezelfde Respondent twee keer in de doel-Meting verandert niets", () => {
+    basis();
+    const voor = opslag.get(KEY);
+    const r = db.brengScansSamen("O1", { soort: "nieuw", label: "Doel" }, regels("I1", "I2"));
+    expect(r.ok).toBe(false);
+    expect((r as { fouten?: Record<string, string> }).fouten).toMatchObject({ I1: expect.stringContaining("al een scan"), I2: expect.stringContaining("al een scan") });
+    expect(opslag.get(KEY)).toBe(voor);
+  });
+
+  it("een scan die er al staat telt mee in de controle", () => {
+    basis();
+    // M1 is de doel-Meting: L1 heeft daar al I1. Scan I2 houdt L1 en botst dus.
+    const r = db.brengScansSamen("O1", { soort: "bestaand", metingId: "M1" }, regels("I2"));
+    expect(r.ok).toBe(false);
+    // Met een nieuwe Respondent kan het wel, en I1 blijft staan.
+    const ok = db.brengScansSamen("O1", { soort: "bestaand", metingId: "M1" }, [
+      { invullingId: "I2", respondent: { soort: "nieuw", naam: "N", email: "n@x.nl", functie: "", team: "" } },
+    ]);
+    expect(ok).toMatchObject({ ok: true, aantal: 1 });
+    expect(uit().scanUitvoeringen.find((m) => m.id === "M1")!.invullingen.map((i) => i.id).sort()).toEqual(["I1", "I2"]);
+  });
+
+  it("een e-mailadres dat al in gebruik is, of dat dubbel voorkomt, wordt geweigerd", () => {
+    basis();
+    const nieuw = (invullingId: string, email: string) => ({ invullingId, respondent: { soort: "nieuw" as const, naam: "", email, functie: "", team: "" } });
+    const bestaand = db.brengScansSamen("O1", { soort: "nieuw", label: "Doel" }, [nieuw("I1", " Coniche@X.nl ")]);
+    expect(bestaand.ok).toBe(false);
+    const dubbel = db.brengScansSamen("O1", { soort: "nieuw", label: "Doel" }, [nieuw("I1", "a@x.nl"), nieuw("I2", "A@x.nl")]);
+    expect(dubbel.ok).toBe(false);
+    const leeg = db.brengScansSamen("O1", { soort: "nieuw", label: "Doel" }, [nieuw("I1", "")]);
+    expect(leeg.ok).toBe(false);
+    expect(uit().leden).toHaveLength(1);
+  });
+
+  it("scans van verschillende Assessments kunnen niet samen, en een bezette combinatie in de ronde wijst naar die Meting", () => {
+    zet([
+      org(
+        "O1",
+        [lid("L1", "O1", "a@x.nl"), lid("L2", "O1", "b@x.nl")],
+        [meting("M1", "O1", "Een", [inv("I1", "M1", "L1")], "A"), meting("M2", "O1", "Twee", [inv("I2", "M2", "L2")], "B")]
+      ),
+    ]);
+    expect(db.brengScansSamen("O1", { soort: "nieuw", label: "Doel" }, regels("I1", "I2"))).toMatchObject({ ok: false });
+
+    zet([
+      {
+        ...org("O1", [lid("L1", "O1", "a@x.nl")], [{ ...meting("M1", "O1", "Een", [inv("I1", "M1", "L1")]), rondeId: "R1", onderdeel: "Team A" }, meting("M2", "O1", "Twee", [])]),
+        rondes: [{ id: "R1", organisatieId: "O1", label: "0-meting", aangemaaktOp: "2026-01-01" }],
+      },
+    ]);
+    const r = db.brengScansSamen("O1", { soort: "nieuw", label: "Nieuw", onderdeel: "Team A", rondeId: "R1" }, regels("I1"));
+    expect(r).toMatchObject({ ok: false, reden: expect.stringContaining('"Een"') });
+  });
+
+  it("logt per bron-Meting en per gewijzigde Respondent, met één groep en zonder persoonsgegevens", () => {
+    basis();
+    db.brengScansSamen("O1", { soort: "nieuw", label: "Doel" }, [
+      { invullingId: "I1", respondent: { soort: "houden" } },
+      { invullingId: "I2", respondent: { soort: "nieuw", naam: "Geheim Persoon", email: "geheim@x.nl", functie: "", team: "" } },
+    ]);
+    const log = JSON.parse(opslag.get("coniche-scan:audit") ?? "[]") as { actie: string; groepId: string | null; details: unknown }[];
+    const acties = log.map((l) => l.actie).sort();
+    expect(acties).toEqual(
+      ["meting.aangemaakt", "respondent.aangemaakt", "respons.metingVerplaatst", "respons.metingVerplaatst", "respons.respondentGewijzigd"].sort()
+    );
+    expect(new Set(log.map((l) => l.groepId)).size).toBe(1);
+    expect(JSON.stringify(log)).not.toContain("Geheim");
+    expect(JSON.stringify(log)).not.toContain("geheim@x.nl");
   });
 });
 

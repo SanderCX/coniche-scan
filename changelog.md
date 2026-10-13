@@ -1,5 +1,38 @@
 # Coniche Scan — Changelog
 
+## 2026-10-13 (4) — Specs van Joost, PR 89: Notitie per scan en Scans samenbrengen in één Meting
+
+**Gedaan**:
+- **`ScanInvulling.notitie`** (`datamodel.md`, Notitie op de scan): Optioneel veld op de scan (ontbreekt bij oudere data). De import
+  zet `start_comment` (oude tool) of `scan_notitie` (eigen export) op de scan en schrijft niet meer naar
+  `Respondent.notities`. Een bestaande Respondent houdt zijn eigen notities. `GevalideerdeRij.respondentNotities` is hernoemd
+  naar `scanNotitie`. Eerder geplakte notities zijn niet te herstellen: Die scans opnieuw importeren.
+- **Notitie zichtbaar**: Kolom Notitie in de lijst Ingevulde scans (sorteerbaar, op één regel met de volledige tekst bij
+  hover, `.cel-notitie`), regel Notitie in het Scan-overzicht (alleen als er een is), regel Notitie per kolom bij "Conflict
+  oplossen" en een kolom Notitie in de voorbeeldweergave van de import.
+- **CSV-export**: Kolom `scan_notitie` direct na `respondent_team`, ook in de AVG-inzage. De import van de eigen export leest
+  hem terug, zonder de kolom blijft de notitie leeg.
+- **Scans samenbrengen in één Meting** (`beheerpagina.md`, punt 6b): Knop "Samenbrengen in één Meting…" in de
+  bulk-actiebalk van de organisatie-gefilterde lijst, uitgeschakeld met `info.scansSamenbrengen` bij een selectie met meer dan
+  één Assessment. De modal (`ScansSamenbrengenModal`) heeft bovenaan de doel-Meting (bestaand, of nieuw met Label, Onderdeel
+  en Ronde) en per scan een keuze van de Respondent: Dezelfde houden, nieuwe (naam, e-mail, functie, team, leeg) of een
+  bestaande. De controle (`lib/samenbrengen.ts`) kijkt naar het eindresultaat, ook voor scans die er al staan, en toont de
+  botsing als rode regel bij de scan zelf. Opslaan (`brengScansSamen`, `lib/db/samenbrengen.ts`) is alles of niets en
+  werkt per scan `scanUitvoeringId` en `organisatieLidId` bij. Daarna volgt de melding met het aantal scans, de Meting en de
+  ronde, en de knop "Lege Metingen verwijderen" (met bevestiging). Bewerkslot op alle scans en Respondenten van de selectie
+  zolang de modal open staat. Audit: `respons.metingVerplaatst` per bron-Meting, `respons.respondentGewijzigd` per
+  gewijzigde scan, plus `respondent.aangemaakt`, `meting.aangemaakt` en `ronde.aangemaakt`, allemaal met één `groepId`.
+- **Specs**: De statusregels staan op gebouwd (`datamodel.md`, `beheerpagina.md`, `import-scans.md`, `export-csv.md`,
+  `backlog.md`) en `info.scansSamenbrengen` staat in het register.
+
+**Tests**: 222 (was 212): Notitie per scan bij de import (twee notities onder één Respondent, bestaande notities blijven),
+`scan_notitie` in de import en de CSV, en samenbrengen (nieuwe Meting en ronde, alles of niets, scan die er al staat,
+e-mailadres in gebruik of dubbel, ander Assessment en bezette combinatie in de ronde, audit zonder persoonsgegevens).
+
+**Open**:
+- De lijst-weergave en de modal houden de notitie als platte tekst. Een zoekfilter op de notitie is niet gebouwd (niet gespecificeerd).
+- De Respondent wordt bewust niet uit de notitie afgeleid.
+
 ## 2026-10-13 (3) — Specs van Joost, PR 86 en 87: Ronde en onderdeel, samengestelde Meting, bereik op de lid-Meting
 
 **Gedaan**:

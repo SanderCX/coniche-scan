@@ -11,6 +11,7 @@ export * from "./metingen";
 export * from "./rondes";
 export * from "./respondenten";
 export * from "./verplaatsen";
+export * from "./samenbrengen";
 export * from "./scans";
 export * from "./import";
 export * from "./conflict";

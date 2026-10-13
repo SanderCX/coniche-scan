@@ -681,6 +681,15 @@
   width: 1%;
 }
 
+/* Notitie van een scan in een lijst (beheerpagina.md, punt 7): Afgekapt op één regel, de volledige tekst staat in de
+   `title` (hover). */
+.admin-table td.cel-notitie {
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Knoppen onder elkaar (stylesheet.md, Gelijke breedte): Alle knoppen in de stapel zo breed als de breedste,
    elke knop houdt zijn eigen variant. */
 .knoppenstapel {

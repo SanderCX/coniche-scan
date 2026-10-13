@@ -100,6 +100,11 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     tekst: "Toegang tot een assessment loopt via een persoonlijke uitnodiging.",
   },
   {
+    sleutel: "info.scansSamenbrengen",
+    plek: "Ingevulde scans, achter de uitgeschakelde knop \"Samenbrengen in één Meting…\" bij een selectie met meer dan één Assessment",
+    tekst: "Samenbrengen kan alleen voor scans van hetzelfde Assessment, binnen één organisatie. Selecteer alleen scans van één Assessment.",
+  },
+  {
     sleutel: "info.bulkExportOrganisatie",
     plek: "Ingevulde scans, achter de uitgeschakelde knop \"Exporteren\" bij een selectie over meer dan één organisatie",
     tekst: "Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie.",

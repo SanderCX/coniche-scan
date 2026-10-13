@@ -212,6 +212,7 @@ function KolomKaart({
       </div>
       <dl className="beschrijvingslijst">
         {rij("Meting", meting.label)}
+        {rij("Notitie", scan.notitie ?? "")}
         {rij("Afgerond op", scan.afgerondOp ? new Date(scan.afgerondOp).toLocaleDateString("nl-NL") : "")}
         {rij("Voortgang", voortgangTekst)}
         {rij("Totaalscore", score !== null ? score.toFixed(1).replace(".", ",") : "")}

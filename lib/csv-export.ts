@@ -29,6 +29,7 @@ const KOLOMMEN = [
   "respondent_email",
   "respondent_functie",
   "respondent_team",
+  "scan_notitie",
   "status",
   "aangemaakt_op",
   "uitgenodigd_op",
@@ -183,6 +184,8 @@ function bouwRijRecord(ctx: CsvRijContext): Record<string, string> {
     respondent_team: lid.team,
     respondent_notities: lid.notities,
     respondent_aangemaakt_op: lid.aangemaaktOp,
+    // De notitie van déze scan, niet de notities van de Respondent (`datamodel.md`, Notitie op de scan).
+    scan_notitie: invulling.notitie ?? "",
     status: invulling.status,
     aangemaakt_op: invulling.aangemaaktOp,
     uitgenodigd_op: invulling.uitgenodigdOp,

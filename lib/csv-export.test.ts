@@ -118,3 +118,16 @@ describe("CSV ronde en onderdeel", () => {
     expect(kolom(met, "onderdeel")).toBe("Team A");
   });
 });
+
+describe("CSV scan_notitie", () => {
+  it("staat direct na respondent_team met de notitie van de scan, niet de notities van de Respondent", () => {
+    const o = organisatie(zorgscan, [scan(zorgscan)]);
+    const met = { ...scan(zorgscan), notitie: "Jan Jansen, Service" };
+    const csv = genereerScansCsv([{ organisatie: o, scanUitvoering: o.scanUitvoeringen[0], lid, invulling: met, assessment: zorgscan }]);
+    const kop = csv.replace(/^﻿/, "").split("\r\n")[0].split(";");
+    expect(kop.indexOf("scan_notitie")).toBe(kop.indexOf("respondent_team") + 1);
+    expect(kolom(csv, "scan_notitie")).toBe("Jan Jansen, Service");
+    const zonder = genereerScansCsv([{ organisatie: o, scanUitvoering: o.scanUitvoeringen[0], lid, invulling: scan(zorgscan), assessment: zorgscan }]);
+    expect(kolom(zonder, "scan_notitie")).toBe("");
+  });
+});

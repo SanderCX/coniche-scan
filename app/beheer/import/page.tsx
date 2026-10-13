@@ -681,6 +681,7 @@ function ImportLegacyPage() {
                 <th>Assessment</th>
                 <th>Organisatie</th>
                 <th>Respondent</th>
+                <th>Notitie</th>
                 <th>Status</th>
                 <th></th>
               </tr>
@@ -697,6 +698,9 @@ function ImportLegacyPage() {
                     <td>{rij.assessmentNaam ?? "—"}</td>
                     <td>{rij.organisatieNaam}</td>
                     <td>{rij.respondentEmail}</td>
+                    <td className="cel-notitie" title={rij.scanNotitie || undefined}>
+                      {rij.scanNotitie}
+                    </td>
                     <td>
                       {geimporteerd ? (
                         <span className="admin-badge status-afgerond">Geïmporteerd</span>

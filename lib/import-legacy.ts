@@ -291,7 +291,8 @@ export interface GevalideerdeRij {
   respondentNaam: string;
   respondentFunctie: string;
   respondentTeam: string;
-  respondentNotities: string;
+  /** De notitie van deze scan (`ScanInvulling.notitie`): `start_comment` of `scan_notitie` (`import-scans.md`, Notitie per scan). */
+  scanNotitie: string;
   /** "nieuw" kent alle drie de statussen; "oud" importeert alleen "completed" → altijd "afgerond". */
   status: ScanInvullingStatus;
   uitgenodigdOp: string;
@@ -499,8 +500,8 @@ export function valideerLegacyRijen(rijen: LegacyCsvRow[], assessments: Assessme
       respondentNaam: rij.assessor_name,
       respondentFunctie: rij.respondent_role,
       respondentTeam: rij.team_name,
-      // `start_comment` ongewijzigd en zonder opbouwtekst (import-scans.md, "Wie de Respondent wordt").
-      respondentNotities: rij.start_comment ?? "",
+      // `start_comment` ongewijzigd en zonder opbouwtekst, als notitie van deze scan (import-scans.md, "Notitie per scan").
+      scanNotitie: rij.start_comment ?? "",
       // De oude tool kent geen apart "uitgenodigd"-moment; created_at is het beste beschikbare bod.
       uitgenodigdOp: rij.created_at,
       gestartOp: rij.created_at,
@@ -605,6 +606,8 @@ export interface NieuweExportCsvRow {
   respondent_email: string;
   respondent_functie: string;
   respondent_team: string;
+  /** Voorstel (`export-csv.md`): De notitie van de scan. Ontbreekt in een export van vóór deze kolom. */
+  scan_notitie?: string;
   status: string;
   uitgenodigd_op: string;
   gestart_op: string;
@@ -703,7 +706,7 @@ export function valideerNieuweExportRijen(
       respondentNaam: rij.respondent_naam,
       respondentFunctie: rij.respondent_functie,
       respondentTeam: rij.respondent_team,
-      respondentNotities: "",
+      scanNotitie: (rij.scan_notitie ?? "").trim(),
       uitgenodigdOp: rij.uitgenodigd_op || new Date().toISOString(),
       gestartOp: rij.gestart_op || null,
       afgerondOp: rij.afgerond_op || null,

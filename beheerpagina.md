@@ -386,6 +386,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.dataIntegriteit` | Instellingen, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
 | `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
 | `info.bulkExportOrganisatie` | Ingevulde scans, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie. |
+| `info.scansSamenbrengen` | Ingevulde scans, achter de uitgeschakelde knop "Samenbrengen in één Meting…" bij een selectie met meer dan één Assessment | Samenbrengen kan alleen voor scans van hetzelfde Assessment, binnen één organisatie. Selecteer alleen scans van één Assessment. |
 | `info.assessmentVerwijderen` | Assessments, op de kaart en het detail, naast de uitgeschakelde knop "Verwijderen" | Verwijder eerst alle Metingen van dit Assessment, bij alle organisaties. Daarna kan het Assessment worden verwijderd. Dit kan niet ongedaan worden gemaakt. De tekst begint altijd met het aantal Metingen en organisaties, die zin maakt de app zelf. |
 | `info.positieMeting` | Resultaten van één scan, naast de uitgeschakelde weergave "Positie in de Meting" | De positie van een scan tegenover de andere scans in de Meting is er pas bij voldoende afgeronde scans. Bij minder is een scan te herleiden naar een persoon. Het minimum staat bij Drempels en termijnen (aantal respondenten per Meting). |
 | `info.mijnAccountWachtwoord` | Mijn account, naast de uitgeschakelde knop "Wachtwoord wijzigen" | Wachtwoord wijzigen komt met de echte inlog. Tot die tijd vraag je een Admin om je wachtwoord te wijzigen. |
@@ -1361,7 +1362,7 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   **Lege Meting**: Blijft staan na het verplaatsen van de laatste respons.
   Opruimen is een aparte actie, via de bestaande verwijderfunctie
   (Verwijderen).
-- **Scans samenbrengen in één Meting** (voorstel, 13 oktober 2026): Zet
+- **Scans samenbrengen in één Meting** (gebouwd op 13 oktober 2026): Zet
   scans die na een import verspreid over losse Metingen staan en onder één
   Respondent hangen, in één keer in één Meting en koppelt ze aan de juiste
   Respondent. Het voorbeeld is een import van tien bestanden waarin steeds
@@ -1467,7 +1468,7 @@ ook niet hier op het globale overzicht.
 - **Kolommen**: Naam, Organisatie, Meting, Assessment, Rol/Team, Status,
   Voortgang, Gestart, Aangemaakt (`ScanInvulling.aangemaaktOp`, bij een
   import het importmoment, zodat je geïmporteerde scans kunt terugvinden
-  en groeperen), Notitie (voorstel, 13 oktober 2026: `ScanInvulling.notitie`,
+  en groeperen), Notitie (gebouwd op 13 oktober 2026: `ScanInvulling.notitie`,
   afgekapt op één regel met de volledige tekst bij hover, leeg als er geen is),
   en "Bekijk" als compacte knop. De hele rij is
   klikbaar en opent het Scan-overzicht (hieronder). Rol/Team toont alleen
@@ -1482,7 +1483,7 @@ ook niet hier op het globale overzicht.
   1. **Kop**: Naam van de Respondent, daaronder Organisatie, Meting en
      Assessment, en de status als badge.
   2. **Scan**: Beschrijvingslijst met Rol/Team (volgens de lege-waarderegel
-     hierboven), Notitie (voorstel, alleen als de scan er een heeft), Gestart, Afgerond (alleen bij een afgeronde scan),
+     hierboven), Notitie (gebouwd, alleen als de scan er een heeft), Gestart, Afgerond (alleen bij een afgeronde scan),
      Voortgang ("60 van 60 vragen", bij een lopende scan met percentage)
      en Overall score met het niveau (alleen bij een afgeronde scan). Geen
      tegels.

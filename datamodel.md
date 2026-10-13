@@ -310,7 +310,7 @@ ScanInvulling {
   afgerondOp: datetime | null
   antwoorden: { [vraagId: string]: number }            // 1-5
   opmerkingenPerBouwblok: { [bouwblokId: string]: string }
-  notitie: string | null            // voorstel, 13 oktober 2026, zie hieronder
+  notitie: string | null            // gebouwd op 13 oktober 2026, zie hieronder
   bewaarVerlengdTot: datetime | null        // zie Bewaartermijn ingevulde scans
 }
 ```
@@ -318,7 +318,7 @@ ScanInvulling {
 Uniek per combinatie van meting en respondent. Dezelfde scan opnieuw
 invullen gebeurt via een nieuwe meting.
 
-**Notitie op de scan (voorstel, 13 oktober 2026).** Een notitie bij het starten
+**Notitie op de scan (gebouwd op 13 oktober 2026).** Een notitie bij het starten
 van een scan (bij de import `start_comment`, `import-scans.md`) hoort bij die
 ene scan en staat op de `ScanInvulling`, niet op de Respondent. Reden: Eén
 Respondent kan veel scans hebben, en bij een import is dat vaak dezelfde

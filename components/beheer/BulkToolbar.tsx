@@ -37,6 +37,8 @@ export function BulkToolbar({
   onExporterenIndesign,
   exportBezig,
   onNaarAndereMeting,
+  onSamenbrengen,
+  samenbrengenUitgeschakeld,
 }: {
   aantal: number;
   onVerwijderen: () => void;
@@ -69,17 +71,37 @@ export function BulkToolbar({
    * organisatie hoort. Weglaten verbergt de knop.
    */
   onNaarAndereMeting?: () => void;
+  /**
+   * "Samenbrengen in één Meting…" (`beheerpagina.md`, punt 6b): Alleen in de organisatie-gefilterde lijst. Weglaten verbergt
+   * de knop. Met `samenbrengenUitgeschakeld` staat hij uit, met het Info-icoon `info.scansSamenbrengen` ernaast: De
+   * selectie heeft meer dan één Assessment.
+   */
+  onSamenbrengen?: () => void;
+  samenbrengenUitgeschakeld?: boolean;
 }) {
   if (aantal === 0) return null;
 
   return (
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[var(--r)] border border-border bg-bg-warm px-4 py-3">
       <span className="text-sm font-semibold text-ink">{aantal} geselecteerd</span>
-      <div className="btn-rij" style={{ maxWidth: onNaarAndereMeting ? "36rem" : "22rem" }}>
+      <div className="btn-rij" style={{ maxWidth: onSamenbrengen ? "56rem" : onNaarAndereMeting ? "36rem" : "22rem" }}>
         {onNaarAndereMeting && (
           <button type="button" onClick={onNaarAndereMeting} className="btn btn-outline btn-compact">
             Naar andere Meting
           </button>
+        )}
+        {onSamenbrengen && (
+          <span className="knop-met-icoon">
+            <button
+              type="button"
+              onClick={onSamenbrengen}
+              disabled={samenbrengenUitgeschakeld}
+              className="btn btn-outline btn-compact"
+            >
+              Samenbrengen in één Meting…
+            </button>
+            {samenbrengenUitgeschakeld && <InfoIcoon sleutel="info.scansSamenbrengen" naastVeld />}
+          </span>
         )}
         {(onExporteren || exporterenOverMeerdereOrganisaties) && (
           <>

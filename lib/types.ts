@@ -338,6 +338,11 @@ export interface ScanInvulling {
   status: ScanInvullingStatus;
   antwoorden: Record<string, number>;
   opmerkingenPerBouwblok: Record<string, string>;
+  /**
+   * Notitie bij het starten van déze scan (`datamodel.md`, Notitie op de scan). Bij een import de `start_comment`. Hoort bij
+   * de scan en niet bij de Respondent: Eén Respondent kan veel scans hebben. Ontbreekt bij data van vóór dit veld.
+   */
+  notitie?: string | null;
   /** Moment waarop de regel in de app is aangemaakt (`datamodel.md`, ScanInvulling). Bij een import het importmoment, niet de datum uit het bestand. */
   aangemaaktOp: string;
   /** Moment van uitnodigen — blijft staan, ook na een reset van de invulling. */

@@ -137,6 +137,12 @@ export function ScanOverzicht({
               <dl className="beschrijvingslijst">
                 <dt>Rol / team</dt>
                 <dd>{rolTeam}</dd>
+                {invulling.notitie && (
+                  <>
+                    <dt>Notitie</dt>
+                    <dd style={{ whiteSpace: "pre-wrap" }}>{invulling.notitie}</dd>
+                  </>
+                )}
                 <dt>Gestart</dt>
                 <dd>{datumTekst(invulling.gestartOp)}</dd>
                 {afgerond && (

@@ -185,11 +185,8 @@ export function voerLegacyImportUit(
     }
 
     let lid = organisatie.leden.find((l) => l.email === normaliseerEmail(rij.respondentEmail));
-    // Een bestaande Respondent wordt niet overschreven. Een `start_comment` die nog niet in de
-    // notities staat, komt als nieuwe regel onder de bestaande notities (import-scans.md).
-    if (lid && rij.respondentNotities && !lid.notities.includes(rij.respondentNotities)) {
-      lid.notities = lid.notities ? `${lid.notities}\n${rij.respondentNotities}` : rij.respondentNotities;
-    }
+    // Een bestaande Respondent wordt niet overschreven, ook `Respondent.notities` niet: De `start_comment` is de notitie van
+    // de scan en wordt niet aan de Respondent geplakt (import-scans.md, Notitie per scan).
     const respondentNieuw = !lid;
     if (!lid) {
       lid = {
@@ -199,7 +196,7 @@ export function voerLegacyImportUit(
         naam: rij.respondentNaam || null,
         functie: rij.respondentFunctie,
         team: rij.respondentTeam,
-        notities: rij.respondentNotities,
+        notities: "",
         toegangscode: genereerUniekeToegangscode(alles),
         leadMetingIds: [],
         leadVoorOrganisatie: false,
@@ -302,6 +299,7 @@ export function voerLegacyImportUit(
       status: rij.status,
       antwoorden: rij.antwoorden,
       opmerkingenPerBouwblok: rij.opmerkingenPerBouwblok,
+      notitie: rij.scanNotitie?.trim() ? rij.scanNotitie.trim() : null,
       aangemaaktOp: importMoment,
       uitgenodigdOp: rij.uitgenodigdOp,
       gestartOp: rij.gestartOp,

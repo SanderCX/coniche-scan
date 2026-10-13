@@ -99,7 +99,7 @@ Kolommen, gegroepeerd naar wat ermee gebeurt:
 | `respondent_email` | `Respondent.email`, genormaliseerd |
 | `respondent_role` | `Respondent.functie` |
 | `team_name` | `Respondent.team` |
-| `start_comment` | `ScanInvulling.notitie` (voorstel, 13 oktober 2026, zie "Notitie per scan") |
+| `start_comment` | `ScanInvulling.notitie` (gebouwd op 13 oktober 2026, zie "Notitie per scan") |
 | `created_at` | `ScanInvulling.gestartOp` |
 | (geen kolom) | `ScanInvulling.aangemaaktOp`: Het moment van importeren, niet de datum uit het bestand |
 | `completed_at` | `ScanInvulling.afgerondOp` |
@@ -196,14 +196,14 @@ wordt vanzelf een extra keuze zolang een Respondent hem heeft.
 | `respondent_email` | `email`, genormaliseerd (getrimd, lowercase) |
 | `respondent_role` | `functie` |
 | `team_name` | `team` |
-| `start_comment` | `ScanInvulling.notitie`, ongewijzigd en zonder opbouwtekst (voorstel, zie "Notitie per scan") |
+| `start_comment` | `ScanInvulling.notitie`, ongewijzigd en zonder opbouwtekst (gebouwd, zie "Notitie per scan") |
 
 - **Hergebruik**: De regel uit `datamodel.md` (Respondent) geldt
   ongewijzigd. Hetzelfde genormaliseerde e-mailadres binnen een
   organisatie is één Respondent, binnen één import en ook in latere
   imports. De gegevens van een bestaande Respondent worden niet
   overschreven, ook `Respondent.notities` niet.
-- **Notitie per scan (voorstel, 13 oktober 2026)**: Elke rij houdt zijn eigen
+- **Notitie per scan (gebouwd op 13 oktober 2026)**: Elke rij houdt zijn eigen
   `start_comment` als notitie op zijn eigen scan. Er wordt niets aan de
   Respondent geplakt, ook niet als meerdere rijen of bestanden dezelfde
   Respondent hebben. Dit was de fout bij het importeren van meerdere
@@ -585,7 +585,7 @@ formaat hierboven:
 - **Respondenten uit de export zelf**: De
   Respondent komt uit `respondent_naam`, `respondent_email`,
   `respondent_functie` en `respondent_team`, en `Respondent.notities` wordt
-  niet aangepast. De kolom `scan_notitie` (voorstel, `export-csv.md`) wordt
+  niet aangepast. De kolom `scan_notitie` (gebouwd, `export-csv.md`) wordt
   `ScanInvulling.notitie`. Ontbreekt de kolom, dan blijft de notitie leeg.
 - **Meting**: Een nieuwe Meting met het label "Import {meting_label}",
   met het `meting_label` uit de export erin, niet het label "Legacy-import
