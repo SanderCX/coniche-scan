@@ -143,10 +143,12 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
               <option>Geen Lead met bereik op {bereikNaam}</option>
             </select>
           </div>
-          <button type="button" className="btn btn-or btn-compact" disabled>
-            Toewijzen
-          </button>
-          <InfoIcoon naastVeld sleutel="info.benchmarkToewijzen" />
+          <span className="knop-met-icoon">
+            <button type="button" className="btn btn-or btn-compact" disabled>
+              Toewijzen
+            </button>
+            <InfoIcoon naastVeld sleutel="info.benchmarkToewijzen" />
+          </span>
           <button type="button" className="btn btn-or btn-compact" onClick={() => setLeadToevoegenOpen(true)}>
             + Lead toevoegen
           </button>
@@ -164,29 +166,31 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
               ))}
             </select>
           </div>
-          <button
-            type="button"
-            className="btn btn-or btn-compact"
-            disabled={!kanToewijzen || !gekozen}
-            aria-describedby={onderwerpTekst ? "toewijzen-privacy" : undefined}
-            onClick={() => {
-              wijsBenchmarkToe(
-                {
-                  benchmarkId: benchmark.id,
-                  organisatieId: organisatie.id,
-                  ...(meting ? { metingId: meting.id } : {}),
-                  ...(respondent ? { onderwerpRespondentId: respondent.id } : {}),
-                  respondentId: gekozen,
-                  toegewezenDoor: gebruikerId,
-                },
-                namen
-              );
-              setLeadId("");
-            }}
-          >
-            Toewijzen
-          </button>
-          {!voldoetAanDrempel && <InfoIcoon naastVeld sleutel="info.benchmarkToewijzen" />}
+          <span className="knop-met-icoon">
+            <button
+              type="button"
+              className="btn btn-or btn-compact"
+              disabled={!kanToewijzen || !gekozen}
+              aria-describedby={onderwerpTekst ? "toewijzen-privacy" : undefined}
+              onClick={() => {
+                wijsBenchmarkToe(
+                  {
+                    benchmarkId: benchmark.id,
+                    organisatieId: organisatie.id,
+                    ...(meting ? { metingId: meting.id } : {}),
+                    ...(respondent ? { onderwerpRespondentId: respondent.id } : {}),
+                    respondentId: gekozen,
+                    toegewezenDoor: gebruikerId,
+                  },
+                  namen
+                );
+                setLeadId("");
+              }}
+            >
+              Toewijzen
+            </button>
+            {!voldoetAanDrempel && <InfoIcoon naastVeld sleutel="info.benchmarkToewijzen" />}
+          </span>
           <button type="button" className="btn btn-or btn-compact" onClick={() => setLeadToevoegenOpen(true)}>
             + Lead toevoegen
           </button>

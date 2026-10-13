@@ -86,7 +86,7 @@ export default function DrempelsEnTermijnenPage() {
 
       <h2 style={{ marginTop: "2rem" }}>Bewaartermijn ingevulde scans</h2>
       <form onSubmit={handleOpslaan} className="flex flex-wrap items-end gap-3">
-        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "12rem" }}>
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "12rem", minWidth: 0 }}>
           <label>Bewaartermijn (dagen)</label>
           <input
             type="number"
@@ -96,7 +96,7 @@ export default function DrempelsEnTermijnenPage() {
             placeholder="Geen termijn ingesteld"
           />
         </div>
-        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "12rem" }}>
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "12rem", minWidth: 0 }}>
           <label>Verlengtermijn (dagen)</label>
           <input
             type="number"
@@ -106,36 +106,40 @@ export default function DrempelsEnTermijnenPage() {
             placeholder="Nog niet ingesteld"
           />
         </div>
-        <button type="submit" className="btn btn-or btn-compact">
-          Opslaan
-        </button>
-        <InfoIcoon naastVeld sleutel="info.bewaartermijn" />
-        {opgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
+        <span className="knop-met-icoon">
+          <button type="submit" className="btn btn-or btn-compact">
+            Opslaan
+          </button>
+          <InfoIcoon naastVeld sleutel="info.bewaartermijn" />
+          {opgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
+        </span>
       </form>
 
       <h2 style={{ marginTop: "2rem" }}>Benchmark</h2>
       <form onSubmit={handleBenchmarkOpslaan} className="flex flex-wrap items-end gap-3">
-        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem" }}>
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem", minWidth: 0 }}>
           <label>Groepsgrootte, organisaties</label>
           <input type="number" min={1} step={1} value={minOrg} onChange={(e) => setMinOrgInput(e.target.value)} />
         </div>
-        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem" }}>
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem", minWidth: 0 }}>
           <label>Groepsgrootte, Metingen</label>
           <input type="number" min={1} step={1} value={minMetingen} onChange={(e) => setMinMetingenInput(e.target.value)} />
         </div>
-        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem" }}>
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem", minWidth: 0 }}>
           <label>Scans in een Meting</label>
           <input type="number" min={1} step={1} value={minRespondenten} onChange={(e) => setMinRespondentenInput(e.target.value)} />
         </div>
-        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem" }}>
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem", minWidth: 0 }}>
           <label>Scans per gekozen Meting</label>
           <input type="number" min={1} step={1} value={minScans} onChange={(e) => setMinScansInput(e.target.value)} />
         </div>
-        <button type="submit" className="btn btn-or btn-compact" disabled={!benchmarkGeldig}>
-          Opslaan
-        </button>
-        <InfoIcoon naastVeld sleutel="info.benchmarkInstellingen" />
-        {benchmarkOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
+        <span className="knop-met-icoon">
+          <button type="submit" className="btn btn-or btn-compact" disabled={!benchmarkGeldig}>
+            Opslaan
+          </button>
+          <InfoIcoon naastVeld sleutel="info.benchmarkInstellingen" />
+          {benchmarkOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
+        </span>
       </form>
     </div>
   );

@@ -304,17 +304,19 @@ export function RespondentOverzicht({
                 <button type="submit" className="btn btn-or btn-compact">
                   Opslaan
                 </button>
-                <button
-                  type="button"
-                  className="btn btn-outline btn-compact"
-                  onClick={() => {
-                    setForm({ naam: lid.naam ?? "", email: lid.email, functie: lid.functie, team: lid.team, notities: lid.notities });
-                    setBewerken(false);
-                  }}
-                >
-                  Annuleren
-                </button>
-                <InfoIcoon naastVeld sleutel="info.respondentBewerken" />
+                <span className="knop-met-icoon">
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-compact"
+                    onClick={() => {
+                      setForm({ naam: lid.naam ?? "", email: lid.email, functie: lid.functie, team: lid.team, notities: lid.notities });
+                      setBewerken(false);
+                    }}
+                  >
+                    Annuleren
+                  </button>
+                  <InfoIcoon naastVeld sleutel="info.respondentBewerken" />
+                </span>
               </div>
             </form>
           ) : (

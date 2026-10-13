@@ -104,19 +104,22 @@ export function BenchmarkGroepSectie({
             </tbody>
           </table>
 
-          {binnen && (
-            // Weergave E (`visualisatie-scores.md`): Het overzicht van alle gekozen Metingen is een matrix, alleen voor de Admin.
-            <>
-              <h3>Per {assessment.bouwblokEenheidEnkelvoud} en per Meting</h3>
-              <WeergaveMatrix
-                assessment={assessment}
-                weergave={matrix(
-                  assessment,
-                  rijen.map((r) => ({ label: r.meting.label, aantalScans: r.aantalAfgerond, antwoorden: r.antwoorden }))
-                )}
-              />
-            </>
-          )}
+          {/* Weergave E (`visualisatie-scores.md`): De matrix met de bouwblokken als rijen. Op niveau 2 zijn de kolommen de
+              Metingen, op niveau 1 de organisaties (kop met naam, label van de Meting en aantal scans). Alleen voor de Admin. */}
+          <h3>{binnen ? `Per ${assessment.bouwblokEenheidEnkelvoud} en per Meting` : `Per ${assessment.bouwblokEenheidEnkelvoud} en per organisatie`}</h3>
+          <WeergaveMatrix
+            assessment={assessment}
+            kolomSoort={binnen ? "meting" : "organisatie"}
+            weergave={matrix(
+              assessment,
+              rijen.map((r) => ({
+                label: binnen ? r.meting.label : r.organisatie.naam,
+                ...(binnen ? {} : { sublabel: r.meting.label }),
+                aantalScans: r.aantalAfgerond,
+                antwoorden: r.antwoorden,
+              }))
+            )}
+          />
 
           <div className="resultaten-header" style={{ paddingTop: "1rem" }}>
             {resultaten.overall !== null && (

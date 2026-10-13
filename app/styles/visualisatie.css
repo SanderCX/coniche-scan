@@ -367,3 +367,13 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Bij veel kolommen scrolt de matrix horizontaal met een vaste eerste kolom (visualisatie-scores.md, E). */
+.vis-matrix th.vis-matrix-naam,
+.vis-matrix td.vis-matrix-naam {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 11rem;
+  background: var(--bg);
+}

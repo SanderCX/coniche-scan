@@ -1,5 +1,23 @@
 # Coniche Scan — Changelog
 
+## 2026-10-13 (2) — Specs van Joost, PR 84: Organisatie hernoemen, Info-icoon op de regel, matrix op niveau 1
+
+**Gedaan**:
+- **Organisatie hernoemen** (`beheerpagina.md` punt 4, `datamodel.md`, Audit): In de kop van het organisatie-detail staat de
+  naam met een potlood. Een klik maakt er een invoerveld van met Opslaan en Annuleren. De naam is verplicht en wordt
+  getrimd. `hernoemOrganisatie` (`lib/db/organisaties.ts`) wijzigt alleen `Organisatie.naam`, het `id` en de koppelingen
+  blijven gelijk, en logt `organisatie.hernoemd` met `oudeNaam` en `nieuweNaam`. Een ongewijzigde naam logt niets. 4 tests.
+- **Info-icoon valt nooit van de regel af** (`stylesheet.md`, Info-icoon): Nieuwe klasse `.knop-met-icoon` (knop of veld en
+  icoon in één groep zonder afbreken). Toegepast bij Drempels en termijnen (beide formulieren), het blok Toewijzen,
+  Respondent bewerken en het formulier voor een benchmark op niveau 3. De velden in de rij mogen krimpen (`min-width: 0`).
+  Gemeten op 760px breed: Het icoon staat op dezelfde regel als de knop.
+- **Matrix op niveau 1** (`visualisatie-scores.md`, E; `benchmark.md`): `BenchmarkGroepSectie` toont de matrix nu ook bij een
+  benchmark tussen organisaties, met organisaties als kolommen (naam, label van de Meting en aantal scans). De tegels heten
+  Hoogste en Laagste organisatie. Bij veel kolommen scrolt de matrix horizontaal met een vaste eerste kolom (voorstel van
+  Joost). Alleen voor de Admin.
+- **Opmerking over de testomgeving**: Door een herstart van de preview haalde de browser de organisaties opnieuw uit Neon.
+  In de benchmark "vb" ontbrak daardoor het lid Univé (de Meting stond alleen lokaal): De matrix toont twee kolommen.
+
 ## 2026-10-13 — Specs van Joost van 12 oktober (PR 74): Rol / functie, Bereik van een Lead, Instellingen, Mijn account, visualisatie van scores
 
 **Gedaan**:

@@ -77,7 +77,7 @@ Valt een lid weg doordat de Meting of de Organisatie is verwijderd, of doordat d
 
 **Gebouwd.** Per Assessment een sectie met de gemiddelden van de groep, per vraag, per bouwblok, per categorie en overall. De Admin ziet de namen van de organisaties. De resultaatcomponenten van het resultatenscherm (`CLAUDE.md`, schermflow punt 6) worden hergebruikt waar dat kan. Elke sectie is een zelfstandig onderdeel, zodat een latere PDF per Assessment een eigen deel kan krijgen.
 
-**Besloten, nog niet gebouwd.** Per Assessment komt onder de gemiddelden van de groep ook de matrix die niveau 2 heeft (Niveau 2, Weergave). De bouwblokken zijn de rijen en de organisaties de kolommen, zodat de Admin in één blik ziet welke organisatie op welk bouwblok afwijkt. De opbouw staat in `visualisatie-scores.md`, onderdeel E.
+**Besloten, gebouwd op 13 oktober 2026.** Per Assessment komt onder de gemiddelden van de groep ook de matrix die niveau 2 heeft (Niveau 2, Weergave). De bouwblokken zijn de rijen en de organisaties de kolommen, zodat de Admin in één blik ziet welke organisatie op welk bouwblok afwijkt. De opbouw staat in `visualisatie-scores.md`, onderdeel E.
 
 - **Kolommen.** Eén kolom per lid van het Assessment. De kop toont de organisatienaam, met daaronder het label van de Meting en het aantal afgeronde scans. Organisaties die bij dat Assessment ontbreken, staan niet als kolom in de matrix. Ze staan al bij de teller.
 - **Cijfers.** Het gemiddelde van de rij is het groepsgemiddelde van het bouwblok, want elk lid telt even zwaar mee (Gedeelde regels). De matrix leest dus uit dezelfde berekening als de rest van de sectie en heeft geen eigen rekenregel.

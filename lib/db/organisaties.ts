@@ -43,6 +43,35 @@ export function maakOrganisatie(input: {
   return organisatie;
 }
 
+export type HernoemResultaat = { ok: true; gewijzigd: boolean } | { ok: false; reden: string };
+
+/**
+ * Een organisatie hernoemen (`beheerpagina.md`, punt 4, Naam wijzigen): Dezelfde regels als bij aanmaken, dus de naam is
+ * verplicht en wordt getrimd. Alleen `Organisatie.naam` verandert: Het `id` en alle koppelingen (Metingen, Respondenten, scans,
+ * benchmarks) blijven gelijk, dus de nieuwe naam staat direct overal. Gelogd als `organisatie.hernoemd`, met de oude en de
+ * nieuwe naam in `details` (`datamodel.md`, Audit). Oudere audit-regels houden de naam zoals die was bij het loggen.
+ */
+export function hernoemOrganisatie(organisatieId: string, nieuweNaam: string): HernoemResultaat {
+  const naam = nieuweNaam.trim();
+  if (!naam) return { ok: false, reden: "De naam is verplicht." };
+  const alles = laadAlles();
+  const organisatie = alles.find((o) => o.id === organisatieId);
+  if (!organisatie) return { ok: false, reden: "Organisatie niet gevonden." };
+  if (organisatie.naam === naam) return { ok: true, gewijzigd: false };
+  const oudeNaam = organisatie.naam;
+  organisatie.naam = naam;
+  organisatie.gewijzigdOp = new Date().toISOString();
+  slaAlles(alles);
+  logAudit({
+    actie: "organisatie.hernoemd",
+    entiteitType: "organisatie",
+    entiteitId: organisatie.id,
+    entiteitNaam: naam,
+    details: { ...organisatieContext(organisatie), oudeNaam, nieuweNaam: naam },
+  });
+  return { ok: true, gewijzigd: true };
+}
+
 /** Cascadeert naar alle leden, scanuitvoeringen en invullingen van elke organisatie. */
 export function verwijderOrganisaties(organisatieIds: string[]): void {
   const ids = new Set(organisatieIds);
