@@ -392,6 +392,24 @@ dus `var(--or)` in een outline-knop en `var(--ink-m)` in een select. Het
 pijltje staat `.5rem` achter de tekst. De rechter padding van de knop is
 even groot als de linker.
 
+**Accountmenu in beheer.** Het Accountmenu (`beheerpagina.md`, Accountmenu)
+is een Dropdown-knop als `.btn-outline .btn-compact` met het e-mailadres als
+label, uiterst rechts in `.nav-right`. Omdat de knop aan de rechterrand
+staat, is het menu rechts uitgelijnd met de knop en niet links, anders loopt
+het buiten het scherm.
+
+- **Eerste rij** (e-mailadres en rol): Niet klikbaar, `var(--ink-s)`,
+  `--fs-s`, zonder hover.
+- **Scheidingslijn** boven "Uitloggen": `1px solid var(--border)`, met
+  `.25rem` ruimte boven en onder.
+- **Actieve staat**: Zolang een pagina onder Instellingen open is, heeft de
+  knop een achtergrond `var(--or-faint)`, met rand en tekst ongewijzigd in
+  `var(--or)`. De rij "Instellingen" in het menu heeft dan dezelfde
+  achtergrond, tekst `var(--or)` en gewicht 700, met `aria-current="page"`.
+  Zonder actieve pagina is de knop zoals elke `.btn-outline`.
+- **Mijn account**: De rij opent een modal (`Modal`, zoals "Mijn gegevens"). De
+  rij zelf heeft geen actieve staat.
+
 ### Badges
 
 - `.hero-tag`: Kop-label. Gevuld `var(--or)`, witte tekst, hoofdletters,
@@ -651,12 +669,25 @@ een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
   beheerpagina's (`max-width: 1300px`). Tabtekst `.85rem`, gewicht 600,
   `var(--ink-m)`. De actieve tab is `var(--ink)` met een onderstreep van
   `3px solid var(--or)`. Alleen zichtbaar op de lijstpagina's van
-  Organisaties, niet op een detailpagina (`beheerpagina.md`, Navigatie in
+  Organisaties en op de pagina's onder Instellingen, niet op een detailpagina (`beheerpagina.md`, Navigatie in
   beheer).
 - **Kruimelpad** (`.kruimelpad`): Boven de paginatitel, `.85rem`,
   `var(--ink-s)`, gescheiden door een `›` in `var(--border-d)`. Elk deel is
   een link, het laatste deel staat in `var(--ink)` en is niet klikbaar. Een
   link krijgt bij hover `var(--or)`.
+- **Weergave-schakelaar** (`.weergave-wissel`, voorstel, besloten op
+  12 oktober 2026, nog niet gebouwd): Een rij van 2 tot 3 knoppen aan elkaar
+  op een resultatenpagina, onder de kop en boven de inhoud. Hij is bedoeld
+  voor het wisselen van weergave binnen één pagina en dus niet voor
+  navigatie, de bestaande tabbalk blijft voor lijstpagina's. Gezamenlijke
+  omtrek `1.5px solid var(--border-d)`, `border-radius: 10px`, witte
+  achtergrond, knoptekst `.85rem` gewicht 600 in `var(--ink-m)`. De
+  actieve knop heeft `background: var(--ink)` en witte tekst. Hover op een
+  niet-actieve knop `var(--bg-warm)`. Een uitgeschakelde knop staat op 50%
+  dekking met een Info-icoon voor de reden. Het toetsenbord kent Tab naar
+  de schakelaar en pijltjes links en rechts binnen de schakelaar, met
+  `role="tablist"` en `aria-selected` op de knoppen. Rechts ernaast kan een
+  losse actieknop staan (`.btn-compact`).
 - **Melding bovenaan een beheerpagina** (`.beheer-melding`): Een
   `.admin-notice` met groene tint (`--stat-green-faint`, rand
   `--stat-green`) en een sluitkruisje, na een actie die de Respondent van de

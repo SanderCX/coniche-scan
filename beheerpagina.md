@@ -48,8 +48,8 @@ ingelogde gebruiker zelf, in `.nav-right`.
 Helemaal uiterst rechts: Punt 7 van de nav-volgorderegel in CLAUDE.md,
 Globale layout. Conventie: Een account-/profielmenu staat vrijwel altijd
 als allerlaatste element in een nav. Volgorde in `.nav-right`, van links
-naar rechts: Scherm-specifieke acties ("Applicatie"/"Assessments"/
-"Organisaties"/"Benchmark" voor een Admin, alleen "Organisaties" voor een Consultant
+naar rechts: Scherm-specifieke acties ("Assessments"/"Organisaties"/
+"Benchmark" voor een Admin, alleen "Organisaties" voor een Consultant
 — zie Wat beheerbaar is hieronder) → scheidingslijn → Accountmenu.
 
 **Geen "← Terug naar site" in beheer.** Voegt niets toe en verwart met
@@ -67,14 +67,53 @@ losse elementen naast elkaar.
 - **Knop**: Toont het e-mailadres van de ingelogde gebruiker (bijv.
   "admin@coniche.nl"), met het pijltje van de dropdown-knop.
 - **Dropdown-inhoud**: Eerste rij, niet-klikbaar: E-mailadres + rol
-  tussen haakjes (bijv. "admin@coniche.nl (Consultant)"). Tweede rij,
-  klikbaar: "Uitloggen". Functionaliteit van uitloggen blijft ongewijzigd
-  ten opzichte van nu, alleen de plek en vormgeving veranderen.
+  tussen haakjes (bijv. "admin@coniche.nl (Consultant)"). Voor elke rol
+  daarna de klikbare rij "Mijn account" (zie Mijn account hieronder) en voor
+  een Admin daaronder de klikbare rij "Instellingen", die de pagina
+  Instellingen opent (zie Instellingen hieronder). Boven de laatste rij
+  staat een scheidingslijn. Laatste rij, klikbaar: "Uitloggen". Een
+  Consultant heeft geen rij "Instellingen": Zijn menu bestaat uit de eerste
+  rij, "Mijn account" en "Uitloggen". Functionaliteit van uitloggen blijft
+  ongewijzigd ten opzichte van nu.
+- **Actieve staat**: Zolang een pagina onder Instellingen open is, heeft de
+  knop van het Accountmenu een duidelijke actieve staat, zoals een actieve
+  hoofdlink, en is de rij "Instellingen" in het menu gemarkeerd. De
+  vormgeving komt in `stylesheet.md`.
+- **Toetsenbord**: Zoals de Dropdown-knop in `stylesheet.md`: Enter of spatie
+  opent het menu, pijltjestoetsen lopen door de rijen, Esc sluit.
+
+**Mijn account** (voorstel). Een modal volgens het patroon van "Mijn
+gegevens" aan de respondentkant (`CLAUDE.md`, scherm 4), voor Admin en
+Consultant. Hier wijzigt een gebruiker zijn eigen gegevens. Wat een Admin bij
+een andere gebruiker wijzigt, staat bij Gebruikers (punt 9).
+
+- **Velden**: Naam (invoerveld), E-mailadres en Rol (beide alleen-lezen) en
+  een knop "Wachtwoord wijzigen".
+- **E-mailadres**: Kan in Mijn account door niemand worden gewijzigd, ook niet
+  door een Admin. Een Admin wijzigt het wel via Instellingen, Gebruikers
+  (punt 9). Het is de inlognaam en de sleutel
+  (`datamodel.md`, Gebruiker). Het veld staat er wel, alleen-lezen, zodat
+  duidelijk is waarmee je inlogt.
+- **Rol**: Alleen-lezen. Een rol wijzigt alleen een Admin, bij een andere
+  gebruiker (punt 9).
+- **Wachtwoord wijzigen**: Klapt in dezelfde modal drie velden open: Huidig
+  wachtwoord, Nieuw wachtwoord en Herhaal nieuw wachtwoord. Dit hoort bij de
+  echte inlog met gehashte wachtwoorden (`backlog.md`, Fase 2) en komt daarmee.
+- **2FA**: Staat hier niet. Een reset doet een Admin bij een andere gebruiker
+  (punt 9). Zelf opnieuw instellen komt met de backend.
+- **Opslaan en Annuleren**: Onder het formulier. Opslaan schrijft direct, zonder
+  aparte bevestigingsstap, en sluit de modal met een korte bevestiging.
+- **Rechten**: `account.bewerken`, bereik `zelf`, voor Admin en Consultant
+  (`datamodel.md`, Rechtenmatrix). Een gebruiker kan alleen zijn eigen gegevens
+  wijzigen.
+- **Gelogd**: `gebruiker.eigenGegevensGewijzigd` (`datamodel.md`, Audit), met alleen
+  welke velden zijn gewijzigd.
 
 ### Navigatie in beheer
 
-Beheer heeft drie niveaus: De hoofdlinks in de nav (Applicatie,
-Assessments, Organisaties, Benchmark), daaronder de onderdelen van die link, en
+Beheer heeft drie niveaus: De hoofdlinks in de nav (Assessments,
+Organisaties, Benchmark) en Instellingen, dat via het Accountmenu opent,
+daaronder de onderdelen van die link, en
 daaronder de detailpagina's van één organisatie, Meting of Respondent.
 Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
 
@@ -82,7 +121,9 @@ Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
   met de onderdelen van de gekozen hoofdlink. Bij Organisaties zijn dat
   Organisaties, Respondenten, Ingevulde scans en Import, voor een Admin
   aangevuld met Organisatievelden. Een Consultant ziet de tab Import
-  wel, maar daar staat de importfunctie niet (punt 8). De tabbalk is zichtbaar op de
+  wel, maar daar staat de importfunctie niet (punt 8). Bij Instellingen zijn
+  dat Gebruikers, Drempels en termijnen, Algemene teksten, Content-pagina's,
+  Audit-log en Data-integriteit. De tabbalk is zichtbaar op de
   lijstpagina's, niet op een detailpagina. Metingen en uitnodigen hebben
   geen tab: Die zitten in het organisatie-detail en het Meting-overzicht.
 - **Kruimelpad op detailpagina's**: Boven de paginatitel staat het pad
@@ -139,7 +180,10 @@ beheer de gewone beheer-nav met het kruimelpad Organisaties › Organisatie
 › Meting › Resultaten van {Respondent}, en niet de respondentacties
 "Terug naar de scan" en "Terug naar Mijn metingen". Wel de dropdown
 "Exporteren". Terug gaat via het kruimelpad. Dat wordt het Meting-overzicht
-en niet de Respondent-modal, want die is niet meer open.
+en niet de Respondent-modal, want die is niet meer open. Boven de resultaten
+staat een schakelaar met Scores van deze scan en Positie in de Meting
+(besloten op 12 oktober 2026, nog niet gebouwd, zie `visualisatie-scores.md`,
+Navigatie).
 
 **Organisatie-resultaten** (punt 4): Zelfde kruimelpad, eindigend op
 Resultaten van de Meting.
@@ -148,7 +192,7 @@ Resultaten van de Meting.
 
 - **Gebouwd**: Organisaties (lijst, aanmaken, detail), metingen per
   organisatie, respondenten uitnodigen, Ingevulde scans met filters, Import,
-  Assessments, Content, Gebruikersbeheer (punt 9), Instellingen (punt 10),
+  Assessments, Content, Gebruikersbeheer (punt 9), Drempels en termijnen (punt 10),
   Audit-log (punt 12) en Data-integriteit (punt 13). Ook gebouwd zijn de
   resultatenpagina's in beheer: de Organisatie-resultaten per Meting
   (punt 4) en de resultaten van één scan, met het kruimelpad hierboven en
@@ -166,10 +210,11 @@ Resultaten van de Meting.
 
 ## Wat beheerbaar is
 
-Vier hoofdonderdelen, elk een link in `.nav-right`: **Applicatie**,
-**Assessments**, **Organisaties** en **Benchmark**. Voor een Admin alle
-vier zichtbaar; een Consultant ziet alleen **Organisaties** (bereik
-`eigen`) — de andere drie gaan over dingen die voor de hele omgeving
+Vier hoofdonderdelen: Drie links in `.nav-right`, **Assessments**,
+**Organisaties** en **Benchmark**, en **Instellingen** (voorheen
+Applicatie), dat niet in de nav staat maar opent vanuit het Accountmenu
+(zie Accountmenu bovenaan). Voor een Admin alle vier zichtbaar; een
+Consultant ziet alleen **Organisaties** (bereik `eigen`) — de andere drie gaan over dingen die voor de hele omgeving
 gelden, niet over het eigen werk van één Consultant. "Overzicht" als apart
 dashboardscherm vervalt: Er is geen aparte dashboardlink, je landt direct
 op een van de hoofdlinks.
@@ -182,12 +227,21 @@ onderdelen (2a, 11 en 12). Benchmark is nummer 14.
 
 | Link | Onderdelen |
 |---|---|
-| **Applicatie** (Admin-only) | 9. Gebruikers, 10. Instellingen, 2a. Algemene teksten, 11. Content-pagina's, 12. Audit-log, 13. Data-integriteit |
+| **Instellingen** (Admin-only, via het Accountmenu) | 9. Gebruikers, 10. Drempels en termijnen, 2a. Algemene teksten, 11. Content-pagina's, 12. Audit-log, 13. Data-integriteit |
 | **Assessments** (Admin-only) | 1. Assessment-types, 2. Content |
 | **Organisaties** (Admin: alle, Consultant: eigen) | 3. Organisatievelden, 4. Organisaties, 5. Metingen, 6. Respondenten uitnodigen, 6a. Lead-rol toekennen, 6b. Respondenten, 7. Ingevulde scans, 8. Import (alleen voor een Admin, een Consultant ziet een melding) |
 | **Benchmark** (Admin-only) | 14. Benchmark |
 
-### Applicatie (Admin-only)
+### Instellingen (Admin-only)
+
+Heette eerder Applicatie en stond als hoofdlink in `.nav-right`. Het is nu een
+rij in het Accountmenu (zie Accountmenu bovenaan), alleen voor een Admin. Een
+klik opent de pagina Instellingen, met de tabbalk uit Navigatie in beheer:
+Gebruikers, Drempels en termijnen, Algemene teksten, Content-pagina's,
+Audit-log en Data-integriteit. De eerste tab, Gebruikers, is de landingstab.
+De inhoud van de onderdelen is niet veranderd, alleen de plek. Een Consultant
+heeft de rij niet en de pagina's zijn voor hem niet bereikbaar, ook niet via
+de adresregel, zoals elke Admin-only pagina.
 
 #### 9. Gebruikers (Admin-only)
 
@@ -228,12 +282,13 @@ bereikbaar via de organisatie (punt 4), niet hier.
   actieve Admin is — zelfde soort regel als hierboven.
 
 **Toegang tot dit scherm**: Alleen Admin (`gebruikers.beheren`, bereik
-`alle`, Rechtenmatrix). Een Consultant ziet "Applicatie" niet in
-`.nav-right`.
+`alle`, Rechtenmatrix). Een Consultant ziet "Instellingen" niet in
+het Accountmenu.
 
-#### 10. Instellingen (Admin-only)
+#### 10. Drempels en termijnen (Admin-only)
 
-Klein, groeit later mee. Instellingen nu:
+Heette eerder Instellingen. Die naam is nu van het hoofdonderdeel hierboven.
+Klein, groeit later mee. Waarden die een Admin hier instelt:
 
 - **Sessieduur respondenten/Leads** (`sessieDuurUren`, `datamodel.md`
   deel 2, Toegang voor respondenten): Hoe lang een `ToegangsSessie`
@@ -281,7 +336,7 @@ de scanlijst op "Mijn metingen" (`mijnMetingenIntro`). Was tot nu toe
 hardcoded in de code, dus dit maakt 'm voor het eerst zelf aan te
 passen zonder Sander erbij te hoeven halen.
 
-Staat onder Applicatie, niet onder Assessments (punt 2, Content): Deze
+Staat onder Instellingen, niet onder Assessments (punt 2, Content): Deze
 teksten horen niet bij één Assessment maar bij de applicatie als
 geheel.
 
@@ -311,7 +366,7 @@ standaardteksten zoals ze nu in de app staan):
 
 | Sleutel | Plek | Tekst |
 |---|---|---|
-| `info.bewaartermijn` | Applicatie, Instellingen, formulier Bewaartermijn ingevulde scans | Zonder ingestelde bewaartermijn verschijnt hier nooit een scan: Er is geen automatische verwijdering, alleen een melding zodra jij een termijn instelt. |
+| `info.bewaartermijn` | Instellingen, Drempels en termijnen, formulier Bewaartermijn ingevulde scans | Zonder ingestelde bewaartermijn verschijnt hier nooit een scan: Er is geen automatische verwijdering, alleen een melding zodra jij een termijn instelt. |
 | `info.importBestanden` | Import, bij "Bestanden kiezen" | Meerdere bestanden tegelijk mogen: Houd Cmd/Ctrl (of Shift voor een reeks) ingedrukt bij het selecteren, of kies direct een hele map met losse CSV's. Elk bestand mag een ander bronformaat hebben, dat wordt per bestand apart herkend. |
 | `info.importRijen` | Import, bij "rijen importeren" | Rijen met een 95%+-vraagtekstmatch (niet 100%) tellen pas mee na een expliciete goedkeuring per rij, met de knop "Goedkeuren" in de tabel hierboven. |
 | `info.respondentBewerken` | Respondent-overzicht, bewerkformulier | De persoonlijke link blijft ongewijzigd, ook na een nieuw e-mailadres. Een wijziging geldt voor alle scans van deze Respondent. |
@@ -324,11 +379,11 @@ standaardteksten zoals ze nu in de app staan):
 | `info.contentToelichting` | Content, veld Toelichting van een bouwblok | Lopende tekst in de Toelichtingsmodal bij dit bouwblok. Een lege regel scheidt de alinea's. Laat je het veld leeg, dan ontbreekt dit onderdeel in de modal. |
 | `info.contentBouwblokLabel` | Content, veld Bouwblok-label | De kleine kop boven de titel in de Toelichtingsmodal, bijvoorbeeld "Bouwsteen" of "AI-domein", gevolgd door het nummer. |
 | `info.conflictOplossen` | Conflict oplossen, naast de titel van de modal | Een Respondent heeft per Meting één scan. Hang één van de twee scans aan een andere Respondent. Alleen die scan gaat mee, de oorspronkelijke Respondent blijft bestaan met de andere scan. |
-| `info.dataIntegriteit` | Applicatie, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
+| `info.dataIntegriteit` | Instellingen, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
 | `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
 | `info.bulkExportOrganisatie` | Ingevulde scans, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie. |
 | `info.assessmentVerwijderen` | Assessments, op de kaart en het detail, naast de uitgeschakelde knop "Verwijderen" | Verwijder eerst alle Metingen van dit Assessment, bij alle organisaties. Daarna kan het Assessment worden verwijderd. Dit kan niet ongedaan worden gemaakt. De tekst begint altijd met het aantal Metingen en organisaties, die zin maakt de app zelf. |
-| `info.benchmarkInstellingen` | Applicatie, Instellingen, formulier Benchmark | Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. |
+| `info.benchmarkInstellingen` | Instellingen, Drempels en termijnen, formulier Benchmark | Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. |
 | `info.benchmarkVlag` | Organisatie-detail, bij de schakelaar "Doet mee aan benchmark" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks. |
 | `info.benchmarkToewijzen` | Benchmark, view per organisatie, achter de uitgeschakelde knop "Toewijzen" | Toewijzen kan pas als er een Lead is en de groep aan de drempel van dit niveau voldoet. Anders zou een Lead een vergelijking zien met te weinig anderen om anoniem te blijven. |
 | `info.benchmarkAanmaken` | Benchmark aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark heeft een naam nodig, minstens één Assessment en minstens één organisatie die je hebt aangevinkt. Een organisatie staat alleen in de lijst als ze meedoet aan benchmarks en een Meting heeft van een gekozen Assessment met genoeg afgeronde scans. |
@@ -370,7 +425,7 @@ implementatie ervan. Zie Open punten onderaan dit document.
 **Gebouwd.** `AuditEvent` (`datamodel.md` deel 2,
 Audit) wordt al gelogd: Wie (of "Systeem") wat deed, wanneer, op welk
 record. Er was nergens een scherm om die logging terug te zien.
-Alleen-lezen overzicht, Admin-only (net als de rest van Applicatie):
+Alleen-lezen overzicht, Admin-only (net als de rest van Instellingen):
 
 - **Kolommen**: Tijdstip, Actor, Actie (bijv. "organisatie.verwijderd",
   "respondent.uitgenodigd"), Entiteit en Details. Actor is de Gebruiker
@@ -640,7 +695,7 @@ bouwblokken en hun factor onder de tekst komen uit de gewichten zelf en
 hoeven niet in de tekst te staan.
 
 Teksten die niet aan één Assessment hangen (zoals de introtekst op
-"Mijn metingen"): zie 2a, Algemene teksten, onder Applicatie hierboven
+"Mijn metingen"): zie 2a, Algemene teksten, onder Instellingen hierboven
 — niet hier.
 
 ### Organisaties (Admin: alle, Consultant: eigen)
@@ -721,7 +776,7 @@ het antwoord daarom zelf kunnen vastleggen.
   geen link naar de lijst over alle organisaties heen.
 - **Data ouder dan de bewaartermijn** (`datamodel.md` deel 2,
   Bewaartermijn ingevulde scans). De twee instellingen (bewaartermijn en
-  verlengtermijn) staan bij Instellingen (punt 10) en zijn Admin-only.
+  verlengtermijn) staan bij Drempels en termijnen (punt 10) en zijn Admin-only.
   De lijst en acties hieronder zijn ook voor een Consultant, zoals de
   rest van dit scherm (bereik `eigen`).
   - **Geen automatische verwijdering.** Zodra `bewaarTermijnDagen`
@@ -756,6 +811,14 @@ het antwoord daarom zelf kunnen vastleggen.
   1 afgeronde scan is binnen de Meting, geen hoger minimum. Dezelfde
   weergave gebruikt de Lead-rol op zijn eigen pagina (`datamodel.md`
   deel 2, Rollen).
+
+  **Weergaven (besloten op 12 oktober 2026, nog niet gebouwd).** Boven de
+  inhoud staat een weergave-schakelaar (`stylesheet.md`, Weergave-schakelaar)
+  met Overzicht, Per bouwblok en Spreiding. Overzicht is de standaard en de
+  opbouw hierboven, die ongewijzigd blijft. Rechts van de schakelaar staat de
+  knop "Vergelijk met vorige Meting". De weergaven, de knop en de
+  adresbalkparameters staan in `visualisatie-scores.md`, Navigatie. Een Lead
+  ziet Overzicht en Per bouwblok, en de vergelijking.
 
   **Eén kop.** De pagina heeft één kop. Bovenaan staat het Meting-label als
   eyebrow ("Nulmeting"), daaronder de naam van het Assessment als titel, en
@@ -866,9 +929,15 @@ een Lead).
   "Hele organisatie". Bij "Specifieke Metingen" volgt de lijst met Metingen
   van deze organisatie, elk met een selectievakje, en moet minstens één
   Meting aan staan voordat de keuze kan worden opgeslagen. Bij "Hele
-  organisatie" staat er een waarschuwing: "Deze Lead ziet ook Metingen die
-  later worden aangemaakt." Het bereik hangt niet af van of de Lead zelf een
-  scan heeft ingevuld.
+  organisatie" staat direct onder de keuze een waarschuwing in een
+  `.admin-notice`: "Deze Lead ziet ook Metingen die later worden aangemaakt."
+  De tekst is vast, komt van de app en is niet aanpasbaar. De waarschuwing
+  staat er zolang "Hele organisatie" is gekozen en vraagt geen aparte
+  bevestiging bij het opslaan. Het is een gevolg en geen uitleg, dus geen
+  Info-icoon. Wisselt de Admin naar "Hele organisatie" en weer terug, dan
+  staan de eerder gekozen Metingen er nog (`datamodel.md`, Wisselen van
+  bereik). Het bereik hangt niet af van of de Lead zelf een scan heeft
+  ingevuld.
   Uitvinken van "Lead" trekt de rol in, na een bevestiging. Aanvinken geeft
   ook toegang als de respondent al `ScanInvullingen` heeft. Bij meer dan
   vijf Metingen scrolt de lijst. Onder het vakje staat als samenvatting
@@ -1087,6 +1156,12 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   oorspronkelijke organisatie, want een Meting hoort bij precies één
   organisatie.
 
+  **Lead-rol bij verplaatsen**: De Lead-rol gaat niet mee naar een andere
+  organisatie. Bij het verplaatsen van een Respondent worden zijn Metingen
+  (`leadMetingIds`) en `leadVoorOrganisatie` leeggemaakt. Bij een
+  samenvoeging behoudt de bestaande Respondent zijn eigen bereik (`datamodel.md`,
+  Verplaatsen, samenvoegen en importeren).
+
   **Twee verwijzingen per scan**: Een ScanInvulling heeft een verwijzing naar
   zijn Respondent (`organisatieLidId`) en naar zijn Meting
   (`scanUitvoeringId`). Elke verplaatsing werkt beide bij, ook "Respons naar
@@ -1194,9 +1269,18 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
     e-mailverificatie bestaat (`backlog.md`), bepaalt dit adres wie bij de
     scans van deze Respondent kan.
   - **Alle scans gaan mee**: Een wijziging geldt voor alle ingevulde scans
-    van deze Respondent in de organisatie. Een losse respons aan een
-    andere Respondent in dezelfde organisatie hangen kan nog niet
-    (`backlog.md`).
+    van deze Respondent in de organisatie. Dat staat in het formulier zelf,
+    boven de velden, als vaste regel: "Deze wijziging geldt voor alle {n}
+    scans van {naam} bij {organisatie}", met de labels van de Metingen
+    eronder. Heeft de Respondent maar één scan, dan staat er "voor de scan
+    in {Meting}". De regel staat er ook als het formulier vanuit een
+    Scan-overzicht is geopend.
+  - **Alleen voor één scan**: Wil de beheerder een andere naam alleen bij
+    één scan, dan is dat geen bewerking van de Respondent maar een andere
+    Respondent aan die scan koppelen ("Andere Respondent koppelen" in het
+    Scan-overzicht, punt 7). De scan krijgt dan een nieuwe of bestaande
+    Respondent, de oorspronkelijke Respondent houdt zijn naam en zijn andere
+    scans.
 
 #### 7. Ingevulde scans
 
@@ -1238,9 +1322,29 @@ ook niet hier op het globale overzicht.
      "Resultaten bekijken" (alleen bij een afgeronde scan, opent het
      resultatenscherm), "Exporteren" als dropdown-knop (zelfde opties en
      rechten als op de resultatenpagina), "Naar andere Meting" (opent een
-     vervolgstap, punt 6b) en apart onderaan "Verwijderen" (rood, opent een
-     vervolgstap met bevestiging). Daarnaast de knop "Bekijk
-     Respondent" (opent het Respondent-overzicht). Verplaatsen
+     vervolgstap, punt 6b), "Andere Respondent koppelen" (zie hieronder) en
+     apart onderaan "Verwijderen" (rood, opent een vervolgstap met
+     bevestiging). Daarnaast de knop "Bekijk
+     Respondent" (opent het Respondent-overzicht).
+
+     **Naam van de Respondent in de kop**: De kop is alleen-lezen. De naam
+     staat op de Respondent, niet op de scan, dus een naamwijziging via
+     "Bekijk Respondent" en "Respondent bewerken" geldt voor alle scans van
+     die Respondent, en het formulier zegt dat (punt 6b). Alleen deze scan
+     onder een andere naam is "Andere Respondent koppelen".
+
+     **Andere Respondent koppelen** (voorstel): Opent een vervolgstap met
+     hetzelfde blok als in "Conflict oplossen" (punt 6b): Een keuzelijst met
+     "Nieuwe Respondent" en de bestaande Respondenten van dezelfde
+     organisatie. Bij "Nieuwe Respondent" zijn Naam, E-mail, Functie, Team en
+     Notities invoervelden, vooraf ingevuld met de huidige gegevens, met een
+     leeg e-mailveld dat nog niet bij een Respondent in de organisatie
+     voorkomt. Bij een bestaande Respondent zijn de velden alleen-lezen. Alleen
+     deze ene scan gaat naar de gekozen Respondent. Heeft die Respondent in
+     deze Meting al een scan, dan is hij niet te kiezen en staat er waarom. De
+     oorspronkelijke Respondent blijft staan (ook zonder scans, zoals bij
+     "Leeggeraakte respondent" in punt 6b). Audit-log:
+     `respons.respondentGewijzigd`. Verplaatsen
      naar een andere organisatie staat alleen in het Respondent-overzicht.
   Rechten per actie zijn gelijk aan die op deze lijst en het resultaten-
   en exportbereik uit `datamodel.md` deel 2, Rechtenmatrix.
@@ -1409,7 +1513,7 @@ doet, niet een beheeractie (`backlog.md`).
   (`backlog.md`).
 - Geen eigen schermflow-beschrijving voor de beheerkant, zoals
   CLAUDE.md die wel heeft voor de respondentkant. De top-level
-  navigatie ligt nu vast (Applicatie/Assessments/Organisaties, zie Wat
+  navigatie ligt nu vast (Assessments/Organisaties/Benchmark, met Instellingen in het Accountmenu, zie Wat
   beheerbaar is hierboven), maar een doorlopende flow-beschrijving per
   scherm binnen die drie onderdelen ontbreekt nog — de schermen staan
   alleen hier, per onderdeel, niet als samenhangende flow.

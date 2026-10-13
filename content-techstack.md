@@ -1,12 +1,13 @@
 # Coniche Scan: Techstack, oplossingen en ondersteunende partijen
 
-Overzicht voor de specs: de vaste keuzes bij de organisatievelden onder
-Techstack. Dit bestand is bedoeld als bron voor `datamodel.md` (Organisatievelden,
-Techstack) en `beheerpagina.md` (punt 3, Organisatievelden). De lijsten staan nu
-in de code (`data/organisatie-velden.ts`) en zijn daaruit overgenomen, per
+De vaste keuzes bij de organisatievelden onder Techstack. De regels staan in
+`datamodel.md` (Organisatievelden, Techstack) en `beheerpagina.md` (punt 3,
+Organisatievelden). Dit bestand is de enige plek voor de lijsten zelf. Ze staan
+ook in de code (`data/organisatie-velden.ts`) en moeten daarmee gelijk blijven, per
 categorie op alfabet. Aangeleverd door Sander op 12 oktober 2026.
 
-**Status**: Gebouwd in de app (commit `f9b2615`), nog niet opgenomen in de specs.
+**Status**: Gebouwd in de app (commit `f9b2615`) en opgenomen in `datamodel.md`.
+De punten voor Joost onderaan zijn nog open.
 
 ## 1. Wat de app doet
 
@@ -488,6 +489,6 @@ dus een partij moet in elke lijst waar hij hoort apart staan.
     in twee lijsten met een andere betekenis.
 7. **Benchmark.** Is Techstack een filter of een vergelijking in de benchmark
    (`benchmark.md`)? De lijsten maken dat mogelijk, maar het is niet gespecificeerd.
-8. **Waar het in de specs hoort.** Voorstel: Deze lijsten als bijlage bij
-   `datamodel.md` (Organisatievelden) of als eigen contentbestand, zoals
-   `content-klantcontact-volwassenheid.md` dat voor de vragen is.
+8. **Waar het in de specs hoort.** Besloten: Dit bestand blijft het eigen
+   contentbestand voor de lijsten, zoals `content-klantcontact-volwassenheid.md`
+   dat voor de vragen is. `datamodel.md` verwijst ernaar en herhaalt de lijsten niet.

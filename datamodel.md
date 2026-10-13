@@ -422,7 +422,10 @@ landingspagina van het Assessment verdwijnen.
 Een benchmark (deel 3) verwijst naar organisaties, metingen en Leads.
 Een benchmarkview kan alleen aan een Lead zijn toegewezen die voor het
 onderwerp van de view bereik heeft, zie `benchmark.md`, Bereik van een Lead.
-Verliest een Lead dat bereik, dan vervalt de toewijzing.
+Verliest een Lead dat bereik, dan vervalt de toewijzing, op elk niveau. Alleen
+de niveau 1-toewijzingen die al bestonden toen het bereik werd ingevoerd,
+blijven eenmalig staan, met de melding uit `benchmark.md`, Bereik van een
+Lead. De Admin past dan het bereik aan of trekt de toewijzing in.
 Verdwijnt een van die records, dan verdwijnt ook de verwijzing. Een Meting
 weg haalt het lid uit de benchmark. Een Organisatie weg haalt haar leden en
 toewijzingen weg. Een Respondent met Lead-rol weg haalt zijn toewijzingen
@@ -477,8 +480,7 @@ VeldDefinitie {
   type: "tekst" | "getal" | "select" | "select-afhankelijk" | "select-met-verdeling" | "percentage" | "groep"
   opties?: string[]                 // vaste antwoordcategorieën
   eigenOptie?: boolean              // alleen "select": naast `opties` ook "Anders…" met een invoerveld, zie Techstack
-  voorop?: string[]                 // alleen "select" met `eigenOptie`: opties die bovenaan staan, in deze volgorde (bijv. "Geen ondersteuning")
-  eigenOptiePlaceholder?: string    // alleen "select" met `eigenOptie`: hint in het invoerveld bij "Anders…"
+  toonAlsBroer?: { veld: string, waarde: string } // alleen tonen als dit broer-veld die waarde heeft; wijzigt het, dan wordt dit veld gewist
   afhankelijkVan?: string           // alleen "select-afhankelijk": id van het broer-veld waarvan de keuze de lijst hier bepaalt
   optiesPerWaarde?: { [waarde: string]: string[] } // alleen "select-afhankelijk"
   subvelden?: VeldDefinitie[]       // voor herhalende structuren
@@ -507,21 +509,11 @@ VeldDefinitie {
 - Percentage 2026 (getal)
 - Ambitie 2030 (getal)
 
-**Techstack**, zes categorieën, in deze volgorde in het formulier: Contact
-center, WFM, CRM, Kennismanagement, Conversational AI en LLM-oplossing. Er is geen aparte categorie "IT en
-deployment" meer: Deploymentmodel en Cloudleverancier staan als velden bij
-de categorieën. Modelleer dit als één herbruikbaar `TechstackItem
-{ categorie, leverancier, ondersteuner, deploymentmodel, cloudleverancier,
-toegangsroute }`.
-
-- **Contact center, WFM, Conversational AI, CRM en Kennismanagement**:
-  `leverancier` (Oplossing), `ondersteuner` ("Geen ondersteuning" of een
-  partij), `deploymentmodel` en `cloudleverancier`. Zelf of extern
-  (`ondersteuning`) volgt uit `ondersteuner` en wordt alleen voor de exports
-  afgeleid.
-- **LLM-oplossing**: alleen `leverancier` (de modelfamilie) en
-  `toegangsroute`. Geen Ondersteund door, Deploymentmodel en
-  Cloudleverancier.
+**Techstack**, zeven keer dezelfde structuur (leverancier, zelf/extern
+ondersteund) voor Contact center, WFM, Conversational AI, CRM,
+Kennismanagement, LLM-oplossing en IT en deployment. Modelleer dit als
+één herbruikbaar `TechstackItem { categorie, leverancier, ondersteuning:
+"zelf" | "extern" }`.
 
 **Oplossing bij Contact center, Conversational AI, CRM, Kennismanagement en WFM** is een keuzelijst
 (`select` met `eigenOptie`) met vaste opties:
@@ -560,28 +552,20 @@ andere hoofdletter) en staat daarna in de lijst van alle organisaties,
 per categorie. Er is geen aparte lijst met toegevoegde opties: De lijst is
 de vaste lijst plus wat organisaties daar hebben ingevuld. Gebruikt geen
 enkele organisatie de waarde nog, dan verdwijnt hij weer uit de lijst. De
-LLM-oplossing heeft zijn eigen lijsten (zie hieronder).
+andere twee categorieën (LLM-oplossing en IT en deployment) blijven een
+vrij tekstveld.
 
-WFM is als categorie toegevoegd en staat in het formulier direct onder
-Contact center, gevolgd door CRM, Kennismanagement, Conversational AI en
-LLM-oplossing. De InDesign-export krijgt daarvoor het element
+WFM is als zevende categorie toegevoegd en staat in het formulier direct
+onder Contact center. De InDesign-export krijgt daarvoor het element
 `techstackWfm` (`export-indesign.md`).
 
-**Ondersteund door.** Bij een techstack-categorie met een lijst partijen
-is er één keuzelijst "Ondersteund door", in plaats van "Zelf / extern
-ondersteund". De eerste keuze is altijd "Geen ondersteuning": De
-organisatie ondersteunt de oplossing zelf. Daarna volgen de partijen op
-alfabet en onderaan "Anders…". De waarde staat als `ondersteuner` naast
-`leverancier`. Dezelfde regels als bij Oplossing: Eigen invoer komt in de
-lijst van die categorie, en het invoerveld vraagt "Naam van de partij".
-
-`ondersteuning` ("zelf" of "extern") wordt niet meer ingevuld maar
-afgeleid: "Geen ondersteuning" geeft `zelf`, een partij geeft `extern`,
-zonder keuze is het leeg. De InDesign-export (`export-indesign.md`) houdt
-daarmee zijn attribuut `ondersteuning`. Bestaande data wordt bij het laden
-omgezet: `zelf` wordt "Geen ondersteuning". Een oude waarde `extern`
-zonder bekende partij blijft staan tot er een partij wordt gekozen, en de
-export gebruikt dan de oude waarde. De lijsten:
+**Ondersteund door.** Bij een techstack-categorie met een lijst staat onder
+"Zelf / extern ondersteund" een tweede keuzelijst "Ondersteund door", alleen
+zichtbaar bij "extern" (`toonAlsBroer`). Wordt het veld teruggezet naar
+"zelf" of leeg, dan wordt de gekozen partij gewist. De waarde staat als
+`ondersteuner` naast `leverancier` en `ondersteuning`. Dezelfde regels als
+bij Oplossing: Op alfabet, "Anders…" onderaan, eigen invoer komt in de lijst
+van die categorie. De lijsten:
 
 - Contact center: Accenture, Avanade, Axians, Bright Contact, Capgemini,
   Cegeka, Cloudoe, Computacenter, Concentrix, Coniche, Conscia, Eviden,
@@ -597,52 +581,20 @@ export gebruikt dan de oude waarde. De lijsten:
   ilionx, Incentro, KPN, Macaw, Neople, Odido Business, Sabio, Seamly,
   Sopra Steria, Studio Winegum, Teleperformance, VodafoneZiggo Zakelijk,
   Wortell en Yource.
-- CRM: Accenture, Avanade, Bright Contact, BusinessBase, Capgemini,
-  Cegeka, Cloudoe, Conclusion, Coniche, Deloitte Digital, Devoteam,
-  Frontline, HSO, ilionx, KPN, Macaw, NTT Data Business Solutions, Odido
-  Business, Plat4mation, PwC, Sopra Steria, Valtech en VodafoneZiggo
-  Zakelijk.
+- CRM: Accenture, Avanade, Bright Contact, Capgemini, Cegeka, Cloudoe,
+  Concentrix, Conclusion, Coniche, Deloitte Digital, Devoteam, Frontline,
+  HSO, ilionx, KPN, Macaw, NTT Data Business Solutions, Odido Business,
+  Plat4mation, PwC, Sopra Steria, Teleperformance, Valtech,
+  VodafoneZiggo Zakelijk en Yource.
 - Kennismanagement: Accenture, Avanade, Bright Contact, Capgemini, Cegeka,
   Cloudoe, Concentrix, Conclusion, Coniche, Deloitte Digital, Devoteam,
   Frontline, HSO, ilionx, KPN, Macaw, Neople, Odido Business, Plat4mation,
   Sabio, Sopra Steria, Teleperformance, TKC The Knowledge Company,
   VodafoneZiggo Zakelijk en Yource.
 
-De InDesign-export neemt de gekozen partij (`ondersteuner`) nog niet mee.
-
-**Deploymentmodel en Cloudleverancier.** Elke techstack-categorie behalve
-LLM-oplossing heeft er twee keuzelijsten bij, op dezelfde regel als Oplossing en Ondersteund door,
-in die volgorde: Oplossing, Ondersteund door, Deploymentmodel,
-Cloudleverancier. Beide hebben "Anders…" onderaan en eigen invoer komt in de
-lijst van die categorie. De volgorde is die van de aanlevering en niet
-alfabetisch (`voorop`), met eigen invoer daarna op alfabet. Opgeslagen als
-`deploymentmodel` en `cloudleverancier`, als gewone tekst. De exports nemen
-ze nog niet mee, behalve de CSV in de JSON-kolom met de kenmerken.
-
-- Deploymentmodel: Public Cloud (SaaS, multi-tenant), Dedicated Cloud
-  (single-tenant), Private Cloud, Sovereign Cloud, Hosted bij provider,
-  Hosted bij partner/integrator, On-premises, Hybride, Multicloud.
-- Cloudleverancier: Microsoft Azure, Amazon Web Services, Google Cloud,
-  Oracle Cloud, IBM Cloud, Vendor eigen cloud, VMware, OpenStack, OVHcloud,
-  STACKIT, Scaleway, IONOS, Leaseweb, Previder, Cyso, KPN, VodafoneZiggo,
-  Odido, Rijkscloud / ODC, Eigen datacenter.
-
-**LLM-oplossing.** Wijkt af van de andere categorieën: Geen "Ondersteund
-door", Deploymentmodel of Cloudleverancier, maar twee keuzelijsten op
-dezelfde regel. Beide hebben "Anders…" onderaan, eigen invoer komt in de
-lijst en de volgorde is die van de aanlevering (`voorop`), met eigen invoer
-daarna op alfabet. `ondersteuning` bestaat hier niet meer, dus de
-InDesign-export geeft voor het attribuut `ondersteuning` altijd "n.v.t.". De
-toegangsroute zit nog niet in de InDesign-export.
-
-- LLM (modelfamilie), opgeslagen als `leverancier`: OpenAI GPT, Anthropic
-  Claude, Google Gemini, Meta Llama, Mistral, Cohere Command, xAI Grok,
-  DeepSeek, Alibaba Qwen, Amazon Nova, Microsoft Phi, IBM Granite, NVIDIA
-  Nemotron, GPT-NL, Vendor eigen model, Onbekend / niet openbaar.
-- LLM-toegangsroute, opgeslagen als `toegangsroute`: Direct via
-  modelleverancier (API), Azure AI Foundry / Azure OpenAI, AWS Bedrock,
-  Google Vertex AI, Ingebouwd in vendorplatform, Self-hosted (open-weight
-  model), EU-gehost / sovereign.
+LLM-oplossing en IT en deployment hebben geen lijst en houden alleen
+zelf/extern. De InDesign-export neemt `ondersteuner` nog niet mee
+(`export-indesign.md`).
 
 **FTE**
 - Klantcontactmedewerkers (getal, met inhouse/BPO-verdeling)
@@ -706,6 +658,26 @@ of het bereik "hele organisatie". De Metingen die een Lead mag zien, zijn
 alle Metingen van zijn organisatie bij `leadVoorOrganisatie`, en anders de
 Metingen in `RespondentRolMeting` (in de code `leadMetingIds`).
 
+**Wat een Lead is.** Een Respondent is Lead als `leadVoorOrganisatie` aan
+staat of als hij minstens één `RespondentRolMeting` heeft. Dat geldt overal
+waar de app dat vraagt: De badge "Lead", de lijsten en filters, de keuzelijst
+bij het toewijzen van een benchmarkview en de data-integriteitscontrole. In
+de code staat nu alleen `leadMetingIds.length > 0`, dat wordt dus uitgebreid.
+
+**Wisselen van bereik.** Gaat een Admin van "Specifieke Metingen" naar "Hele
+organisatie" en weer terug, dan blijven de eerder aangevinkte Metingen
+bewaard. Zolang `leadVoorOrganisatie` aan staat, tellen ze niet mee en zijn
+ze niet te zien. Pas bij het intrekken van de Lead-rol worden ze gewist.
+
+**Verplaatsen, samenvoegen en importeren.** De Lead-rol gaat niet mee naar een
+andere organisatie. Bij elke verplaatsing van een Respondent naar een andere
+organisatie worden `leadMetingIds` en `leadVoorOrganisatie` leeggemaakt
+(`false`), op alle plekken waar de code dat nu al voor `leadMetingIds` doet.
+Bij een samenvoeging behoudt de bestaande Respondent zijn eigen bereik; dat
+van de samengevoegde Respondent vervalt. Een Respondent die de import
+aanmaakt, is nooit Lead. Zonder deze regel blijft iemand Lead voor een
+organisatie waar hij niet meer hoort.
+
 **Wat de Lead op zijn eigen pagina ziet**: Zijn eigen vragenlijst,
 alleen als hij ook zelf respondent is (dus zelf invult); en sowieso de
 resultaten van elke Meting waar hij aan gekoppeld is, zodra daar
@@ -735,6 +707,9 @@ Gebruiker {
   aangemaaktOp: datetime
 }
 ```
+
+Een gebruiker wijzigt zijn eigen naam en wachtwoord via "Mijn account"
+(`beheerpagina.md`, Accountmenu), het e-mailadres niet.
 
 #### 2FA: TOTP via authenticator-app
 
@@ -947,7 +922,7 @@ stilzwijgende verlenging.
 #### Bewaartermijn ingevulde scans
 
 Twee globale instellingen, door een Admin te bepalen in beheer
-(`beheerpagina.md`, punt 10, Instellingen): `bewaarTermijnDagen`
+(`beheerpagina.md`, punt 10, Drempels en termijnen): `bewaarTermijnDagen`
 (vanaf `ScanInvulling.afgerondOp`, geen default) en
 `verlengTermijnDagen` (hoe lang een expliciete "Verlengen"-actie de
 melding uitstelt). Verstrijkt `bewaarTermijnDagen` (of, na een eerdere
@@ -1013,8 +988,13 @@ punt 6b (Respondent-overzicht), loggen elk een eigen gebeurtenis:
 - `respons.respondentGewijzigd`: Eén respons aan een andere Respondent
   van dezelfde organisatie gehangen, bijvoorbeeld bij het oplossen van een
   conflict bij "Respons naar andere Meting verplaatsen" (`beheerpagina.md`,
-  punt 6b). `details` bevat de Meting en of de Respondent nieuw is
+  punt 6b), of met "Andere Respondent koppelen" in het Scan-overzicht
+  (punt 7). `details` bevat de Meting en of de Respondent nieuw is
   aangemaakt, zonder persoonsgegevens.
+- `gebruiker.eigenGegevensGewijzigd`: Een Admin of Consultant wijzigde zijn
+  eigen gegevens via "Mijn account" (`beheerpagina.md`, Accountmenu). `details`
+  bevat alleen welke velden zijn gewijzigd (`["naam"]` of `["wachtwoord"]`),
+  nooit de waarden.
 - `respondent.bewerkt`: Alleen welke velden zijn gewijzigd, bijvoorbeeld
   `["naam", "e-mail"]`. De waarden (oud of nieuw) staan niet in de log,
   wegens het verbod op persoonsgegevens uit scans hierboven.
@@ -1069,6 +1049,7 @@ Een streepje betekent geen toegang.
 | Permissie | Admin | Consultant | Lead | Respondent |
 |---|---|---|---|---|
 | `gebruikers.beheren` | alle | - | - | - |
+| `account.bewerken` (eigen naam en wachtwoord) | zelf | zelf | - | - |
 | `rollen.toekennen` | alle | - | - | - |
 | `content.beheren` (ook de definitie van organisatievelden) | alle | - | - | - |
 | `organisaties.aanmaken` | alle | ja | - | - |
@@ -1089,11 +1070,19 @@ Een streepje betekent geen toegang.
 Een Lead die zelf invult, doet dat met het bereik `zelf`, net als elke
 respondent.
 
+**Lead voor de hele organisatie.** Dit bereik geldt voor alle Metingen van de
+organisatie, ook voor Metingen die later worden aangemaakt. Voor die Metingen
+mag hij dus Respondenten uitnodigen (`respondenten.uitnodigen`), resultaten
+inzien (`resultaten.inzien`) en per Meting exporteren (`export.uitvoeren`),
+zoals een Lead dat voor een afzonderlijke Meting mag. De beperkingen blijven:
+Geen bulk-export, niets van andere organisaties, geen Lead-rollen toekennen
+(`respondenten.leadToekennen`) en geen beheerrechten.
+
 **`export.uitvoeren`, bereik van een Lead/Respondent**: Bewust smaller dan
 `resultaten.inzien` hierboven. Een Respondent en een Lead kunnen alleen
 exporteren wat ze ook al zelf op hun eigen scherm zien: een Respondent zijn
 eigen ingevulde scan (resultatenpagina, bereik `zelf`), een Lead daarnaast
-ook de Metingen waarvoor hij Lead is (`respondent.leadMetingIds`) — dus
+ook de Metingen waarvoor hij Lead is (`respondent.leadMetingIds`, of alle Metingen van zijn organisatie bij `leadVoorOrganisatie`) — dus
 niet elke Meting die hij toevallig kan *inzien* via een andere weg. Geen
 bulk-export en geen toegang tot exports van andere organisaties/Metingen,
 ook niet "te bevestigen": dat was hier eerder nog open, nu vastgelegd. Voor
@@ -1210,7 +1199,7 @@ organisaties met de vlag kunnen in een benchmark worden opgenomen. Zie
 ### Instellingen
 
 Globale instellingen, door een Admin te bepalen in beheer
-(`beheerpagina.md`, punt 10). `benchmarkMinOrganisaties` (startwaarde 5,
+(`beheerpagina.md`, punt 10, Drempels en termijnen). `benchmarkMinOrganisaties` (startwaarde 5,
 niveau 1) en `benchmarkMinScans` (startwaarde 3) zijn gebouwd. Voorstel: Per
 niveau een eigen drempel voor het toewijzen van een view aan een Lead,
 `benchmarkMinMetingen` (niveau 2, startwaarde 3) en `benchmarkMinRespondenten`

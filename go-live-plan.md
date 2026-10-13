@@ -253,7 +253,7 @@ verandert.
   navigatie op de resultatenpagina.
 - [ ] Open contentvragen beantwoorden: De cutoffs voor Basis op Orde,
   Uitbouwen en Sterk punt (nu een aanname), de kleurcodes per categorie,
-  en of Rol/Functie vrije tekst of een vaste lijst wordt (`backlog.md`,
+  en of Rol/Functie verplicht of optioneel is, nu het een keuzelijst wordt (`backlog.md`,
   `CLAUDE.md` sectie 5).
 - [ ] Status van de contentbestanden nalopen. Bouwsteenbeschrijvingen
   staan volgens `CLAUDE.md` nog op concept, en de bestaande tekst blijft

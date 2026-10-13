@@ -32,6 +32,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `import-scans.md` | Import van scans (CSV): de oude, stopgezette tool, en onze eigen export teruglezen |
 | `sbi-indeling.md` | Vaste optielijst voor Sector/Subsector (SBI2025, top 2 niveaus) |
 | `benchmark.md` | Benchmark op drie niveaus: Tussen organisaties (gebouwd, geaggregeerd en anoniem, met een view per organisatie voor een Lead), binnen een organisatie tussen Metingen, en binnen een Meting (beide voorstel) |
+| `visualisatie-scores.md` | Hoe hoge en lage scores getoond worden: één meting, spreiding binnen een Meting, tussen Metingen, tussen organisaties en de matrix over Metingen (besloten ontwerp, nog niet gebouwd) |
 | `backlog.md` | Bewust nog niet opgepakt |
 | `go-live-plan.md` | Actielijst naar productie |
 | `azure-plan.md` | Aanvulling op `go-live-plan.md` met de stappen voor de Azure-omgeving (Azure DevOps, Azure SQL, `coniche-scan.nl`) |
@@ -189,8 +190,8 @@ De nav heeft een vast deel links (logo) en een contextueel deel rechts
    "Naar resultaten →" op de doorloopflow zodra de scan afgerond is,
    "← Terug naar de scan" samen met "Exporteren" op de resultatenpagina,
    geen scheidingslijn tussen die twee onderling, in beheer:
-   "Applicatie", "Assessments", "Organisaties" en "Benchmark" voor een Admin, alleen
-   "Organisaties" voor een Consultant, zie `beheerpagina.md`, Wat
+   "Assessments", "Organisaties" en "Benchmark" voor een Admin, alleen
+   "Organisaties" voor een Consultant; "Instellingen" staat in het Accountmenu, zie `beheerpagina.md`, Wat
    beheerbaar is). Geen
    apart concept meer voor een terug- versus een vooruit-actie binnen
    hetzelfde scherm: Beide staan hier, uiterst links, ongeacht de
@@ -478,7 +479,8 @@ bouwblokken met naam, omschrijving, tags en vragen.
 
 - Aggregatie over meerdere respondenten: Het gemiddelde per Meting is
   gebouwd (`beheerpagina.md`, Organisatie-resultaten). Afwijking en
-  spreiding daarbovenop zijn nog niet ontworpen (`backlog.md`).
+  spreiding daarbovenop zijn ontworpen en nog niet gebouwd
+  (`visualisatie-scores.md`).
 - Benchmark: Niveau 1 is gebouwd. Niveau 2 en 3 zijn uitgewerkt in
   `benchmark.md`, met de open punten onderaan dat bestand.
 - Weging: De weging is gebouwd. De gewichten van de Zorgscan (bouwblok 4, 10
