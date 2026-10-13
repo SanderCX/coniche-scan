@@ -59,6 +59,7 @@ blijft werken (`import-scans.md`, Ronde en onderdeel).
 | `respondent_email` | `Respondent.email` | |
 | `respondent_functie` | `Respondent.functie` | |
 | `respondent_team` | `Respondent.team` | |
+| `scan_notitie` | `ScanInvulling.notitie` | voorstel, 13 oktober 2026: De notitie van déze scan, niet de notities van de Respondent (`datamodel.md`, Notitie op de scan) |
 | `status` | `ScanInvulling.status` | `"uitgenodigd"` / `"bezig"` / `"afgerond"` |
 | `aangemaakt_op` | `ScanInvulling.aangemaaktOp` | bij een geïmporteerde scan het importmoment |
 | `uitgenodigd_op` | `ScanInvulling.uitgenodigdOp` | |
