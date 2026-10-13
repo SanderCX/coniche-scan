@@ -864,7 +864,7 @@ Vanuit de organisatie: Een meting aanmaken met een assessment-type en
 een label (bijv. "Nulmeting 2026"). Een organisatie kan meerdere metingen
 hebben, ook van verschillende scan-types.
 
-**Ronde en onderdeel** (voorstel, `datamodel.md`, Meting, Ronde en onderdeel):
+**Ronde en onderdeel** (gebouwd op 13 oktober 2026, `datamodel.md`, Meting, Ronde en onderdeel):
 Een Meting is één onderdeel in één ronde voor één Assessment. Bij het aanmaken
 staan naast het assessment-type de velden "Ronde" en "Onderdeel".
 
@@ -880,7 +880,7 @@ staan naast het assessment-type de velden "Ronde" en "Onderdeel".
   ronde bij het onderdeel "Hele organisatie". Het blijft aanpasbaar
   (`datamodel.md`, Label).
 
-**Lijst Metingen in het organisatie-detail** (voorstel): De lijst is gegroepeerd
+**Lijst Metingen in het organisatie-detail** (gebouwd op 13 oktober 2026): De lijst is gegroepeerd
 per ronde, de nieuwste bovenaan. Elke ronde heeft een kop met de naam, de
 voortgang van alle Metingen erin ("3 van 3 afgerond") en de knoppen "+ Meting
 aan deze ronde" en "Gemiddelde van deze ronde" (zie Samengestelde Meting). Eronder
@@ -889,7 +889,7 @@ en "Bekijk", zoals nu. Metingen zonder ronde staan onderaan onder "Zonder ronde"
 Boven de lijst staat een oranje knop "Nieuwe ronde starten" (`.btn-or
 .btn-compact`).
 
-**Nieuwe ronde starten** (voorstel): Admin en Consultant (bij zijn eigen
+**Nieuwe ronde starten** (gebouwd op 13 oktober 2026): Admin en Consultant (bij zijn eigen
 organisaties, `metingen.plannen`). Het formulier opent als modal.
 
 - **Naam**: De naam van de nieuwe ronde, verplicht (bijv. "Nameting 2027").
@@ -909,7 +909,7 @@ organisaties, `metingen.plannen`). Het formulier opent als modal.
   ronde. Daarna opent het organisatie-detail met de nieuwe ronde bovenaan.
   Gelogd als `ronde.aangemaakt` (`datamodel.md`, Audit).
 
-**Rondes beheren** (voorstel):
+**Rondes beheren** (gebouwd op 13 oktober 2026):
 - **Hernoemen**: Het potlood naast de naam in de rondekop. Gelogd als
   `ronde.hernoemd`. Labels die nog het gegenereerde label zijn, volgen de nieuwe
   naam.
@@ -950,7 +950,7 @@ alle Metingen, een Consultant die van zijn eigen organisaties.
   "Respons naar andere Meting verplaatsen") en de Meting verwijderen (de
   bestaande verwijderfunctie, ook voor een lege import-Meting).
 
-**Samengestelde Meting** (voorstel, `benchmark.md`, Onderdeel en
+**Samengestelde Meting** (gebouwd op 13 oktober 2026, `benchmark.md`, Onderdeel en
 samengestelde Meting): Een gemiddelde over meerdere Metingen van één
 organisatie in één ronde, bruikbaar als één deelnemer in een benchmark tussen
 organisaties. Admin en Consultant (bij zijn eigen organisaties,
@@ -1009,7 +1009,7 @@ Het bereik van een Lead). Bij specifieke Metingen ziet hij niet automatisch
 alle Metingen van de organisatie. Welke hij mag zien, wordt per Meting
 toegekend (`RespondentRolMeting`), met minstens 1 verplicht. Het bereik
 bepaalt ook welke benchmarkviews hij kan krijgen (`benchmark.md`, Bereik van
-een Lead). Een samengestelde Meting (voorstel, punt 5) staat in die lijst met
+een Lead). Een samengestelde Meting (gebouwd, punt 5) staat in die lijst met
 de badge "Gemiddelde" en met de regel "Ziet alleen het gemiddelde". Ze is
 altijd een bewuste keuze en staat nooit vanzelf aan: Toegang erft niet mee van
 de onderliggende Metingen en gaat er ook niet naartoe.

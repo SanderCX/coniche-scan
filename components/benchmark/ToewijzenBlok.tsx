@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import { Benchmark, Organisatie, OrganisatieLid, ScanUitvoering } from "@/lib/types";
 import { niveauVan } from "@/lib/benchmark";
 import { trekBenchmarkToewijzingIn, useBenchmarkToewijzingen, wijsBenchmarkToe } from "@/lib/benchmark-store";
-import { heeftBereikOpMeting, heeftBereikOpOrganisatie } from "@/lib/lead";
+import { heeftBereikOpLidMeting, heeftBereikOpMeting, heeftBereikOpOrganisatie } from "@/lib/lead";
 import { useBeheerOverzicht } from "@/lib/beheer-url";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { Modal } from "@/components/Modal";
@@ -16,8 +16,9 @@ import { LeadToevoegenFormulier } from "@/components/beheer/LeadToevoegenFormuli
  * punt 14), gelijk op alle niveaus: Een lijst van de Leads aan wie de view is toegewezen met de datum en de knoppen "Bekijk"
  * en "Intrekken", en daaronder een keuzelijst met de Leads die in aanmerking komen met de knop "Toewijzen".
  *
- * Wie in aanmerking komt (`benchmark.md`, Bereik van een Lead): Niveau 1 een Lead voor de hele organisatie, niveau 2 en 3
- * een Lead met bereik op de Meting van de view. Toewijzen kan alleen als de groep aan de drempel van het niveau voldoet.
+ * Wie in aanmerking komt (`benchmark.md`, Bereik van een Lead): Niveau 1 een Lead met bereik op de lid-Meting van de
+ * organisatie in de benchmark (de Meting aangevinkt, of de hele organisatie), niveau 2 en 3 een Lead met bereik op de Meting
+ * van de view. Toewijzen kan alleen als de groep aan de drempel van het niveau voldoet.
  * Heeft het onderwerp geen Lead met passend bereik, dan kan de Admin er een toevoegen in een modal, met het bereik al
  * voorgekozen: Op niveau 1 "Hele organisatie", op niveau 2 en 3 "Specifieke Metingen" met de Meting van de view.
  */
@@ -34,6 +35,12 @@ interface Props {
   onderwerp: ToewijzenOnderwerp;
   /** De groep voldoet aan de drempel van dit niveau. */
   voldoetAanDrempel: boolean;
+  /**
+   * Niveau 1: De lid-Metingen van de organisatie waarvan de groep aan de drempel voldoet. Een Lead komt dan alleen in
+   * aanmerking met bereik op een van die Metingen, want hij ziet alleen de secties die aan de drempel voldoen. Zonder deze
+   * lijst telt `voldoetAanDrempel` voor alle Leads.
+   */
+  voldoendeMetingIds?: string[];
   gebruikerId: string;
 }
 
@@ -45,7 +52,7 @@ export function ToewijzenBlok(props: Props) {
   );
 }
 
-function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruikerId }: Props) {
+function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, voldoendeMetingIds, gebruikerId }: Props) {
   const niveau = niveauVan(benchmark);
   const { organisatie, meting, respondent } = onderwerp;
   const toewijzingen = useBenchmarkToewijzingen();
@@ -60,16 +67,24 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
       (t.metingId ?? null) === (meting?.id ?? null) &&
       (t.onderwerpRespondentId ?? null) === (respondent?.id ?? null)
   );
+  // Niveau 1 volgt het bereik op de lid-Meting van de organisatie in de benchmark.
+  const lidMetingen = benchmark.leden.filter((l) => l.organisatieId === organisatie.id);
   const heeftBereik = (l: OrganisatieLid) =>
     niveau === "organisaties"
-      ? heeftBereikOpOrganisatie(l, organisatie.id)
+      ? heeftBereikOpLidMeting(l, lidMetingen, organisatie.id)
       : meting
         ? heeftBereikOpMeting(l, organisatie.id, meting.id)
         : false;
   const leads = organisatie.leden.filter(heeftBereik);
   const nogToeTeWijzen = leads.filter((l) => !eigen.some((t) => t.respondentId === l.id));
   const gekozen = nogToeTeWijzen.some((l) => l.id === leadId) ? leadId : (nogToeTeWijzen[0]?.id ?? "");
-  const kanToewijzen = voldoetAanDrempel && nogToeTeWijzen.length > 0;
+  // Niveau 1: Alleen een Lead die minstens één sectie ziet die aan de drempel voldoet.
+  const lidMetingDrempel = voldoendeMetingIds
+    ? lidMetingen.filter((l) => voldoendeMetingIds.includes(l.metingId))
+    : lidMetingen;
+  const ziet = (l: OrganisatieLid) => niveau !== "organisaties" || heeftBereikOpLidMeting(l, lidMetingDrempel, organisatie.id);
+  const gekozenLead = nogToeTeWijzen.find((l) => l.id === gekozen);
+  const kanToewijzen = voldoetAanDrempel && !!gekozenLead && ziet(gekozenLead);
   const namen = {
     benchmarkNaam: benchmark.naam,
     organisatieNaam: organisatie.naam,
@@ -77,7 +92,7 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
     ...(meting ? { metingLabel: meting.label } : {}),
   };
   const onderwerpTekst = respondent ? respondent.naam || respondent.email : null;
-  const bereikNaam = niveau === "organisaties" ? organisatie.naam : `Meting ${meting?.label ?? ""}`.trim();
+  const bereikNaam = niveau === "organisaties" ? `de Meting van ${organisatie.naam} in deze benchmark` : `Meting ${meting?.label ?? ""}`.trim();
   const voorgekozenBereik: LeadBereikKeuze =
     niveau === "organisaties" || !meting ? { soort: "organisatie" } : { soort: "metingen", metingIds: [meting.id] };
 
@@ -99,19 +114,30 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
               const lead = organisatie.leden.find((l) => l.id === t.respondentId);
               const organisatieBereik = lead ? heeftBereikOpOrganisatie(lead, organisatie.id) : false;
               const metingBereik = lead && meting ? heeftBereikOpMeting(lead, organisatie.id, meting.id) : false;
-              // Een niveau 1-toewijzing van vóór het bereik, aan een Lead zonder organisatiebereik: Blijft eenmalig staan, de
-              // Lead ziet niets (`benchmark.md`, Bereik van een Lead, Bestaande toewijzingen).
-              const zonderBereik = !!lead && !(niveau === "organisaties" ? organisatieBereik : metingBereik);
+              // Een toewijzing van vóór het bereik, aan een Lead zonder bereik op de lid-Meting (niveau 1) of de Meting: Blijft
+              // eenmalig staan, de Lead ziet niets (`benchmark.md`, Bereik van een Lead, Bestaande toewijzingen).
+              const lidBereik = lead ? heeftBereikOpLidMeting(lead, lidMetingen, organisatie.id) : false;
+              const zonderBereik = !!lead && !(niveau === "organisaties" ? lidBereik : metingBereik);
+              // De Metingen van de lid-Meting waarop de Lead bereik heeft, voor de kolom Bereik op niveau 1.
+              const dekkendeLabels = lead
+                ? lidMetingen
+                    .filter((l) => heeftBereikOpMeting(lead, organisatie.id, l.metingId))
+                    .map((l) => organisatie.scanUitvoeringen.find((m) => m.id === l.metingId)?.label ?? "Onbekende Meting")
+                : [];
               return (
                 <tr key={t.id}>
                   <td>{lead ? lead.naam || lead.email : "Onbekende Lead"}</td>
                   <td>
                     {zonderBereik ? (
                       <span className="text-sm" style={{ color: "var(--stat-red)" }}>
-                        Deze Lead heeft geen bereik op deze organisatie
+                        {niveau === "organisaties"
+                          ? "Deze Lead heeft geen bereik op de Meting van deze organisatie in de benchmark"
+                          : "Deze Lead heeft geen bereik op deze Meting"}
                       </span>
                     ) : organisatieBereik ? (
                       "Hele organisatie"
+                    ) : niveau === "organisaties" ? (
+                      `Meting ${dekkendeLabels.join(", ")}`
                     ) : (
                       `Meting ${meting?.label ?? ""}`.trim()
                     )}
@@ -170,7 +196,7 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
             <button
               type="button"
               className="btn btn-or btn-compact"
-              disabled={!kanToewijzen || !gekozen}
+              disabled={!kanToewijzen}
               aria-describedby={onderwerpTekst ? "toewijzen-privacy" : undefined}
               onClick={() => {
                 wijsBenchmarkToe(
@@ -198,8 +224,8 @@ function ToewijzenBlokInhoud({ benchmark, onderwerp, voldoetAanDrempel, gebruike
       )}
       <Modal open={leadToevoegenOpen} onClose={() => setLeadToevoegenOpen(false)} title="Lead toevoegen">
         <p className="text-sm text-ink-m" style={{ marginTop: 0 }}>
-          Voor {organisatie.naam}. Een Lead die {niveau === "organisaties" ? "de organisatie" : "deze Meting"} niet dekt, kan
-          de view niet krijgen.
+          Voor {organisatie.naam}. Een Lead die {niveau === "organisaties" ? "de Meting van deze organisatie in de benchmark" : "deze Meting"} niet
+          dekt, kan de view niet krijgen.
         </p>
         {leadToevoegenOpen && (
           <LeadToevoegenFormulier

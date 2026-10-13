@@ -17,11 +17,11 @@ export function WeergaveMatrix({
 }: {
   assessment: Assessment;
   weergave: MatrixWeergave;
-  /** `organisatie`: De tegels heten Hoogste en Laagste organisatie en de koppen tonen de organisatienaam. */
-  kolomSoort?: "meting" | "organisatie";
+  /** `organisatie` of `onderdeel`: De tegels heten Hoogste en Laagste organisatie of onderdeel en de koppen tonen de naam. */
+  kolomSoort?: "meting" | "organisatie" | "onderdeel";
 }) {
   const { kolommen, rijen } = weergave;
-  const soort = kolomSoort === "organisatie" ? "organisatie" : "Meting";
+  const soort = kolomSoort === "organisatie" ? "organisatie" : kolomSoort === "onderdeel" ? "onderdeel" : "Meting";
   return (
     <div className="vis" data-weergave="matrix">
       <Tegels

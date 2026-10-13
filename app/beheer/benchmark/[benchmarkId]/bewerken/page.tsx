@@ -6,6 +6,7 @@ import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties } from "@/lib/db";
 import { useBenchmark, wijzigBenchmark } from "@/lib/benchmark-store";
 import { benchmarkNamen, niveauVan } from "@/lib/benchmark";
+import { heeftBereikOpLidMeting } from "@/lib/lead";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
@@ -41,7 +42,16 @@ export default function BenchmarkBewerkenPage({ params }: { params: Promise<{ be
 
   // Het niveau staat vast na het aanmaken: Een ander niveau heeft andere leden.
   function opslaan(w: { naam: string; assessmentIds: string[]; leden: Parameters<typeof benchmarkNamen>[1] }) {
-    wijzigBenchmark(benchmark!.id, w, benchmarkNamen(w.assessmentIds, w.leden, organisaties, assessments, niveauVan(benchmark!)));
+    wijzigBenchmark(
+      benchmark!.id,
+      w,
+      benchmarkNamen(w.assessmentIds, w.leden, organisaties, assessments, niveauVan(benchmark!)),
+      // Niveau 1: Wisselt de lid-Meting van een organisatie, dan vervalt de toewijzing aan een Lead zonder bereik daarop.
+      (t, leden) => {
+        const lead = organisaties.find((o) => o.id === t.organisatieId)?.leden.find((l) => l.id === t.respondentId);
+        return !!lead && heeftBereikOpLidMeting(lead, leden, t.organisatieId);
+      }
+    );
     router.push(`/beheer/benchmark/${benchmark!.id}`);
   }
 

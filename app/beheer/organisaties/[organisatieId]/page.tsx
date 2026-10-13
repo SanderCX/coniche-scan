@@ -2,9 +2,8 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
-import { useOrganisatie, updateOrganisatie, maakScanUitvoering, hernoemOrganisatie } from "@/lib/db";
+import { useOrganisatie, updateOrganisatie, hernoemOrganisatie } from "@/lib/db";
 import { maakPubliekeLink } from "@/lib/uitnodiging-link";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { voortgang } from "@/lib/scoring";
@@ -20,6 +19,7 @@ import { useGebruikers } from "@/lib/gebruikers-store";
 import { useBeheerOverzicht } from "@/lib/beheer-url";
 import { MetBewerkslot } from "@/components/beheer/MetBewerkslot";
 import { LeadToevoegenFormulier } from "@/components/beheer/LeadToevoegenFormulier";
+import { MetingenSectie } from "@/components/beheer/MetingenSectie";
 import { isLead } from "@/lib/lead";
 
 /** Aantal rijen per lijst op de detailpagina (beheerpagina.md, punt 4, "Lange lijsten"). */
@@ -156,11 +156,8 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
   const assessments = useAssessments();
   const ingelogd = useIngelogdeGebruiker();
   const alleGebruikers = useGebruikers();
-  const router = useRouter();
   const { open } = useBeheerOverzicht();
   const [kenmerkenOpgeslagen, setKenmerkenOpgeslagen] = useState(false);
-  const [nieuweScanAssessmentId, setNieuweScanAssessmentId] = useState("");
-  const [nieuweScanLabel, setNieuweScanLabel] = useState("Nulmeting");
 
   if (!organisatie) {
     return (
@@ -182,7 +179,6 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
     );
   }
 
-  const assessmentIdVoorForm = nieuweScanAssessmentId || assessments[0]?.id || "";
   const assessmentNaam = (id: string) => assessments.find((a) => a.id === id)?.naam ?? "Onbekend type";
 
   function handleKenmerkenOpslaan(kenmerken: Record<string, unknown>) {
@@ -196,16 +192,6 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
       ...o,
       toegewezenAan: toegewezen ? [...o.toegewezenAan, consultantId] : o.toegewezenAan.filter((id) => id !== consultantId),
     }));
-  }
-
-  function handleNieuweScan(e: React.FormEvent) {
-    e.preventDefault();
-    if (!assessmentIdVoorForm) return;
-    maakScanUitvoering(organisatieId, {
-      assessmentId: assessmentIdVoorForm,
-      label: nieuweScanLabel.trim() || "Nulmeting",
-    });
-    setNieuweScanLabel("Nulmeting");
   }
 
   const eigenaar = alleGebruikers.find((g) => g.id === organisatie.aangemaaktDoor);
@@ -252,53 +238,7 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
         </details>
       )}
 
-      <h2>Metingen</h2>
-      <form onSubmit={handleNieuweScan} className="filter-rij flex flex-wrap items-end gap-3 mb-4">
-        <div className="admin-field" style={{ marginBottom: 0 }}>
-          <label>Assessment-type</label>
-          <select value={assessmentIdVoorForm} onChange={(e) => setNieuweScanAssessmentId(e.target.value)}>
-            {assessments.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.naam}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="admin-field" style={{ marginBottom: 0 }}>
-          <label>Label</label>
-          <input type="text" value={nieuweScanLabel} onChange={(e) => setNieuweScanLabel(e.target.value)} placeholder="Nulmeting 2026" />
-        </div>
-        <button type="submit" className="btn btn-or btn-compact">
-          + Meting plannen
-        </button>
-      </form>
-
-      {organisatie.scanUitvoeringen.length === 0 ? (
-        <p className="admin-notice">Nog geen meting gepland voor deze organisatie.</p>
-      ) : (
-        <table className="admin-table">
-          <tbody>
-            {organisatie.scanUitvoeringen.map((s) => {
-              const afgerond = s.invullingen.filter((i) => i.status === "afgerond").length;
-              return (
-                <tr key={s.id} className="admin-table-rij-klikbaar" onClick={() => router.push(`/beheer/metingen/${s.id}`)}>
-                  <td>
-                    <strong>{s.label}</strong> <span className="text-ink-s">— {assessmentNaam(s.assessmentId)}</span>
-                  </td>
-                  <td>
-                    {s.invullingen.length} respondent{s.invullingen.length === 1 ? "" : "en"}, {afgerond} afgerond
-                  </td>
-                  <td className="cel-knop">
-                    <Link href={`/beheer/metingen/${s.id}`} className="btn btn-outline btn-compact" onClick={(e) => e.stopPropagation()}>
-                      Bekijk
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      )}
+      <MetingenSectie organisatie={organisatie} />
 
       <h2>Respondenten</h2>
       {organisatie.leden.length === 0 ? (

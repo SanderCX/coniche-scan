@@ -65,6 +65,7 @@ const PAD_PER_SECTIE: { sectie: "assessments" | "organisaties" | "benchmark"; pa
       "/beheer/metingen",
       "/beheer/resultaten",
       "/beheer/rapportage",
+      "/beheer/rondes",
     ],
   },
 ];

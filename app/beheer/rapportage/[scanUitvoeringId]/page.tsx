@@ -5,10 +5,19 @@ import { useScanUitvoering } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { isAdmin, magOrganisatieToegang } from "@/lib/rechten";
-import { gemiddeldeAntwoordenVoorMeting } from "@/lib/scoring";
 import { ResultsView } from "@/components/ResultsView";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { MetingWeergaven } from "@/components/visualisatie/MetingWeergaven";
+import { WeergaveMatrix } from "@/components/visualisatie/WeergaveMatrix";
+import { matrix } from "@/lib/visualisatie";
+import {
+  aantalAfgerondInMeting,
+  gemiddeldeAntwoordenVoorMetingMetSamenstelling,
+  isSamengesteld,
+  onderdeelVan,
+  onderliggendeMetingen,
+  vergelijkbareMetingen,
+} from "@/lib/rondes";
 import { VergelijkingEyebrow } from "@/components/visualisatie/VergelijkingEyebrow";
 
 /**
@@ -51,9 +60,12 @@ export default function RapportagePage({
       </div>
     );
   }
-  const afgerond = scanUitvoering.invullingen.filter((i) => i.status === "afgerond");
+  const samengesteld = isSamengesteld(scanUitvoering);
+  const onderliggend = onderliggendeMetingen(organisatie, scanUitvoering);
+  // Bij een samengestelde Meting zijn de afgeronde scans die van de onderliggende Metingen.
+  const aantalAfgerond = aantalAfgerondInMeting(organisatie, scanUitvoering);
 
-  if (afgerond.length === 0) {
+  if (aantalAfgerond === 0) {
     return (
       <div className="admin-main">
         <Kruimelpad
@@ -73,11 +85,10 @@ export default function RapportagePage({
     );
   }
 
-  const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMeting(assessment, scanUitvoering.invullingen);
-  // Eerdere Metingen van dezelfde organisatie en hetzelfde Assessment, om mee te vergelijken (`visualisatie-scores.md`, C).
-  const eerdereMetingen = organisatie.scanUitvoeringen.filter(
-    (m) => m.id !== scanUitvoering.id && m.assessmentId === scanUitvoering.assessmentId && m.aangemaaktOp < scanUitvoering.aangemaaktOp
-  );
+  // Elke onderliggende Meting telt één keer mee (`datamodel.md`, Scoreberekening).
+  const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, organisatie, scanUitvoering);
+  // Metingen om mee te vergelijken (`visualisatie-scores.md`, C): Dezelfde combinatie van onderdeel en Assessment in de vorige ronde.
+  const eerdereMetingen = vergelijkbareMetingen(organisatie, scanUitvoering).map((v) => v.meting);
 
   return (
     <div className="admin-main admin-main--breed">
@@ -92,7 +103,9 @@ export default function RapportagePage({
       <VergelijkingEyebrow label={scanUitvoering.label} eerdereMetingen={eerdereMetingen} />
       <h1>{assessment.naam}</h1>
       <p className="text-sm text-ink-m">
-        Gemiddelde over {afgerond.length} {afgerond.length === 1 ? "afgeronde respondent" : "afgeronde respondenten"}
+        {samengesteld
+          ? `Gemiddelde van ${onderliggend.length} ${onderliggend.length === 1 ? "Meting" : "Metingen"}, elk even zwaar`
+          : `Gemiddelde over ${aantalAfgerond} ${aantalAfgerond === 1 ? "afgeronde respondent" : "afgeronde respondenten"}`}
       </p>
 
       <div className="mt-8">
@@ -101,12 +114,29 @@ export default function RapportagePage({
           organisatie={organisatie}
           scanUitvoering={scanUitvoering}
           overzicht={<ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />}
-          spreidingToegestaan
+          spreidingToegestaan={!samengesteld}
           bereikAltijd
           toonBenchmarkLink={isAdmin(ingelogd)}
-          eerdereMetingen={eerdereMetingen}
         />
       </div>
+      {samengesteld && isAdmin(ingelogd) && (
+        // De matrix met de onderliggende Metingen als kolommen, alleen voor de Admin (`visualisatie-scores.md`, E).
+        <div className="mt-8">
+          <h2>Per bouwblok en per Meting</h2>
+          <WeergaveMatrix
+            assessment={assessment}
+            weergave={matrix(
+              assessment,
+              onderliggend.map((m) => ({
+                label: m.label,
+                sublabel: onderdeelVan(m),
+                aantalScans: aantalAfgerondInMeting(organisatie, m),
+                antwoorden: gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, organisatie, m),
+              }))
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 }

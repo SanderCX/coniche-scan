@@ -4,6 +4,7 @@ import { laadAlles, slaAlles, useOrganisaties } from "./store";
 import { logAudit } from "../audit-store";
 import { metingContext } from "../audit-context";
 import { haalMetingenUitBenchmarks } from "../benchmark-store";
+import { isSamengesteld, samengesteldeMetingenMet } from "../rondes";
 
 /** Metingen (in de code `ScanUitvoering`): plannen, hernoemen, verwijderen en opzoeken. */
 
@@ -69,16 +70,29 @@ export function verwijderMeting(scanUitvoeringId: string): void {
     const index = organisatie.scanUitvoeringen.findIndex((s) => s.id === scanUitvoeringId);
     if (index === -1) continue;
     const [meting] = organisatie.scanUitvoeringen.splice(index, 1);
+    // Een onderliggende Meting valt uit de samenstelling van een samengestelde Meting. Houdt ze er niets over, dan verdwijnt
+    // ze zelf (`slaAlles`): Dat staat ook in het log (`benchmark.md`, Verwijderen van een onderliggende Meting).
+    const geraakt = samengesteldeMetingenMet({ scanUitvoeringen: [...organisatie.scanUitvoeringen, meting] }, meting.id);
+    const verdwijnt = geraakt.filter((s) => s.samenstelling!.every((id) => id === meting.id));
     slaAlles(alles);
     // Het lid met deze Meting verdwijnt uit elke benchmark waarin het meedoet (`datamodel.md`).
     haalMetingenUitBenchmarks([{ metingId: meting.id, organisatieNaam: organisatie.naam }]);
-    logAudit({
-      actie: "meting.verwijderd",
-      entiteitType: "meting",
-      entiteitId: meting.id,
-      entiteitNaam: meting.label,
-      details: { ...metingContext(organisatie, meting), aantalScans: meting.invullingen.length },
-    });
+    logAudit([
+      {
+        actie: isSamengesteld(meting) ? "meting.samengesteldVerwijderd" : "meting.verwijderd",
+        entiteitType: "meting",
+        entiteitId: meting.id,
+        entiteitNaam: meting.label,
+        details: { ...metingContext(organisatie, meting), aantalScans: meting.invullingen.length },
+      },
+      ...verdwijnt.map((s) => ({
+        actie: "meting.samengesteldVerwijderd",
+        entiteitType: "meting",
+        entiteitId: s.id,
+        entiteitNaam: s.label,
+        details: { ...metingContext(organisatie, s), reden: "onderliggende Meting verwijderd" },
+      })),
+    ]);
     return;
   }
 }

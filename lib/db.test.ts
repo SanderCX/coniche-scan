@@ -405,10 +405,101 @@ describe("import: een Meting per bronnaam en één scan per Respondent per Metin
   });
 });
 
+describe("import: ronde en onderdeel", () => {
+  const gebruiker = { id: "a1", email: "a1@x.nl", naam: "a1", wachtwoord: "x", rol: "admin", actief: true, laatstIngelogdOp: null, aangemaaktOp: "x" };
+  const rij = (bronnaam: string, email: string, extra: Rij = {}) => ({
+    organisatieNaam: bronnaam, respondentEmail: email, respondentNaam: "", respondentFunctie: "", respondentTeam: "", respondentNotities: "",
+    meetingLabel: "Legacy-import 2026", status: "afgerond", uitgenodigdOp: "2026-01-14T10:00:00.000Z", gestartOp: "2026-01-14T10:00:00.000Z",
+    afgerondOp: null, antwoorden: {}, opmerkingenPerBouwblok: {}, rijNummer: 1, ...extra,
+  });
+  const keuze = (r: Rij, extra: Rij = {}) => ({ rij: r, assessmentId: "A", organisatieId: "O1", ...extra });
+  type Uit = { rondes?: { id: string; label: string; aangemaaktOp: string }[]; scanUitvoeringen: { label: string; rondeId?: string; onderdeel?: string }[] };
+  const uit = () => laad()[0] as unknown as Uit;
+  const opzet = () => {
+    opslag.set("coniche-scan:gebruikers", JSON.stringify([gebruiker]));
+    zet([org("O1", [], [])]);
+  };
+
+  it("een import van drie onderdelen geeft één ronde met drie Metingen, met de bronnaam als onderdeel", () => {
+    opzet();
+    db.voerLegacyImportUit(
+      ["Onderdeel A", "Onderdeel B", "Onderdeel C"].map((n, i) => keuze(rij(n, `r${i}@x.nl`), { bronnaam: n, bronnaamInLabel: true })) as never,
+      "a1"
+    );
+    const o = uit();
+    expect(o.rondes).toHaveLength(1);
+    expect(o.rondes![0].label).toBe("Legacy-import 2026");
+    expect(o.scanUitvoeringen.map((m) => m.onderdeel).sort()).toEqual(["Onderdeel A", "Onderdeel B", "Onderdeel C"]);
+    expect(new Set(o.scanUitvoeringen.map((m) => m.rondeId)).size).toBe(1);
+    // Het label van de Meting blijft zoals het was.
+    expect(o.scanUitvoeringen.map((m) => m.label).sort()[0]).toBe("Legacy-import 2026 Onderdeel A");
+  });
+
+  it("bij één bronnaam is het onderdeel Hele organisatie", () => {
+    opzet();
+    db.voerLegacyImportUit([keuze(rij("Org", "a@x.nl"), { bronnaam: "Org", bronnaamInLabel: false })] as never, "a1");
+    expect(uit().scanUitvoeringen[0].onderdeel).toBe("Hele organisatie");
+  });
+
+  it("een door de beheerder ingesteld onderdeel gaat voor de bronnaam", () => {
+    opzet();
+    db.voerLegacyImportUit(
+      [keuze(rij("Org A", "a@x.nl"), { bronnaam: "Org A", bronnaamInLabel: true, onderdeel: "Team Noord" })] as never,
+      "a1"
+    );
+    expect(uit().scanUitvoeringen[0].onderdeel).toBe("Team Noord");
+  });
+
+  it("de kolommen ronde en onderdeel van de eigen export gaan voor de afleiding", () => {
+    opzet();
+    db.voerLegacyImportUit(
+      [keuze(rij("Org", "a@x.nl", { meetingLabel: "Import Nulmeting", ronde: "0-meting", onderdeel: "Team A" }))] as never,
+      "a1"
+    );
+    const o = uit();
+    expect(o.rondes![0].label).toBe("0-meting");
+    expect(o.scanUitvoeringen[0]).toMatchObject({ label: "Import Nulmeting", onderdeel: "Team A" });
+  });
+
+  it("dezelfde Respondent twee keer: De tweede Meting komt in een eigen ronde met de datum, met de oudste ronde eerst", () => {
+    opzet();
+    db.voerLegacyImportUit(
+      [
+        keuze(rij("Org", "a@x.nl", { gestartOp: "2026-06-01T10:00:00.000Z", uitgenodigdOp: "2026-06-01T10:00:00.000Z" })),
+        keuze(rij("Org", "a@x.nl", { gestartOp: "2026-01-14T10:00:00.000Z" })),
+      ] as never,
+      "a1"
+    );
+    const o = uit();
+    expect(o.rondes!.map((r) => r.label).sort()).toEqual(["Legacy-import 2026", "Legacy-import 2026 (14-01-2026)"].sort());
+    const oudste = o.rondes!.find((r) => r.label === "Legacy-import 2026 (14-01-2026)")!;
+    const eerste = o.rondes!.find((r) => r.label === "Legacy-import 2026")!;
+    // De rij met de oudste datum staat in de ronde die als eerste is aangemaakt, hoewel de bestandsvolgorde andersom is.
+    expect(oudste.aangemaaktOp < eerste.aangemaaktOp).toBe(true);
+  });
+
+  it("een latere, aparte aanroep sluit aan bij dezelfde ronde", () => {
+    opzet();
+    const eerste = db.voerLegacyImportUit([keuze(rij("Org", "a@x.nl"))] as never, "a1");
+    const bekendeRondes: Record<string, string> = {};
+    const bekendeMetingen: Record<string, string> = {};
+    eerste.rijResultaten.forEach((r) => {
+      bekendeRondes[r.rondeLabel] = r.rondeId;
+      bekendeMetingen[r.label] = r.scanUitvoeringId;
+    });
+    // Een andere Respondent sluit aan bij dezelfde Meting en dus dezelfde ronde. Dezelfde Respondent krijgt een eigen Meting.
+    db.voerLegacyImportUit([keuze(rij("Org", "b@x.nl"), { bekendeRondes, bekendeMetingen })] as never, "a1");
+    expect(uit().rondes).toHaveLength(1);
+    expect(uit().scanUitvoeringen).toHaveLength(1);
+  });
+});
+
 
 describe("het bereik van een Lead", () => {
   const benchmarks = () => JSON.parse(opslag.get("coniche-scan:benchmarks") ?? '{"benchmarks":[],"toewijzingen":[]}') as { toewijzingen: { id: string; respondentId: string; metingId?: string }[] };
-  const zetToewijzingen = (toewijzingen: Rij[]) => opslag.set("coniche-scan:benchmarks", JSON.stringify({ benchmarks: [], toewijzingen }));
+  // Benchmark B tussen organisaties met M1 van O1 als lid-Meting: Niveau 1 volgt het bereik op de lid-Meting.
+  const benchmarkB = { id: "B", naam: "B", niveau: "organisaties", assessmentIds: ["A"], leden: [{ organisatieId: "O1", assessmentId: "A", metingId: "M1" }], meldingen: [], aangemaaktOp: "x", aangemaaktDoor: "a1" };
+  const zetToewijzingen = (toewijzingen: Rij[]) => opslag.set("coniche-scan:benchmarks", JSON.stringify({ benchmarks: [benchmarkB], toewijzingen }));
   const basis = () =>
     zet([
       org("O1", [lid("L1", "O1", "a@x.nl", { leadMetingIds: ["M1", "M2"] })], [meting("M1", "O1", "Nul", []), meting("M2", "O1", "Vervolg", [])]),
@@ -450,23 +541,30 @@ describe("het bereik van een Lead", () => {
       { id: "t3", benchmarkId: "B", organisatieId: "O1", metingId: "M2", respondentId: "L1" },
       { id: "t4", benchmarkId: "B", organisatieId: "O1", metingId: "M1", respondentId: "ANDER" },
     ]);
-    // Alleen M1 houden: De niveau 1-toewijzing (geen organisatiebereik) en die van M2 vervallen.
-    db.zetLeadBereik("L1", { soort: "metingen", metingIds: ["M1"] });
-    expect(benchmarks().toewijzingen.map((t) => t.id).sort()).toEqual(["t2", "t4"]);
+    // Alleen M2 houden: De niveau 1-toewijzing (lid-Meting M1) en die van M1 vervallen, die van M2 blijft.
+    db.zetLeadBereik("L1", { soort: "metingen", metingIds: ["M2"] });
+    expect(benchmarks().toewijzingen.map((t) => t.id).sort()).toEqual(["t3", "t4"]);
   });
 
-  it("een niveau 1-toewijzing blijft staan zolang het bereik van de Lead niet wordt gewijzigd (overgangsregel)", () => {
+  it("een niveau 1-toewijzing zonder bereik op de lid-Meting blijft staan zolang het bereik van de Lead niet wordt gewijzigd (overgangsregel)", () => {
     basis();
     zetToewijzingen([{ id: "t1", benchmarkId: "B", organisatieId: "O1", respondentId: "L1" }]);
-    // Een andere Respondent wijzigen raakt deze toewijzing niet.
+    // L1 heeft bereik op M2 en niet op de lid-Meting M1. Een andere Respondent wijzigen raakt deze toewijzing niet.
     zet([
-      org("O1", [lid("L1", "O1", "a@x.nl", { leadMetingIds: ["M1"] }), lid("L2", "O1", "b@x.nl")], [meting("M1", "O1", "Nul", [])]),
+      org("O1", [lid("L1", "O1", "a@x.nl", { leadMetingIds: ["M2"] }), lid("L2", "O1", "b@x.nl")], [meting("M1", "O1", "Nul", []), meting("M2", "O1", "Vervolg", [])]),
     ]);
     db.zetLeadBereik("L2", { soort: "organisatie" });
     expect(benchmarks().toewijzingen.map((t) => t.id)).toEqual(["t1"]);
-    // Wijzigen van het bereik van die Lead zelf: De toewijzing heeft geen organisatiebereik en vervalt.
-    db.zetLeadBereik("L1", { soort: "metingen", metingIds: ["M1"] });
+    // Wijzigen van het bereik van die Lead zelf: De toewijzing heeft geen bereik op de lid-Meting en vervalt.
+    db.zetLeadBereik("L1", { soort: "metingen", metingIds: ["M2"] });
     expect(benchmarks().toewijzingen).toHaveLength(0);
+  });
+
+  it("een Lead met bereik op de lid-Meting houdt zijn niveau 1-toewijzing, ook zonder de hele organisatie", () => {
+    basis();
+    zetToewijzingen([{ id: "t1", benchmarkId: "B", organisatieId: "O1", respondentId: "L1" }]);
+    db.zetLeadBereik("L1", { soort: "metingen", metingIds: ["M1"] });
+    expect(benchmarks().toewijzingen).toHaveLength(1);
   });
 
   it("een Lead voor de hele organisatie houdt zijn niveau 1-toewijzing en die van elke Meting", () => {

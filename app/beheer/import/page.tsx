@@ -124,6 +124,10 @@ function ImportLegacyPage() {
   const [orgIdPerNaam, setOrgIdPerNaam] = useState<Record<string, string>>({});
   // Per doelorganisatie, Assessment en bronnaam de Metingen die deze import al aanmaakte, per label (`LegacyImportKeuze.bekendeMetingen`).
   const [metingIdPerSleutel, setMetingIdPerSleutel] = useState<Record<string, Record<string, string>>>({});
+  // Per doelorganisatie de rondes die deze import al aanmaakte, per label (`LegacyImportKeuze.bekendeRondes`).
+  const [rondeIdPerOrganisatie, setRondeIdPerOrganisatie] = useState<Record<string, Record<string, string>>>({});
+  // Het onderdeel per bronnaam, als de beheerder het aanpaste (`import-scans.md`, Ronde en onderdeel). Leeg = de bronnaam.
+  const [onderdeelPerBronnaam, setOnderdeelPerBronnaam] = useState<Record<string, string>>({});
   const [genegeerd, setGenegeerd] = useState<{ inSubmap: number; anderType: number }>({ inSubmap: 0, anderType: 0 });
   const [laatsteActie, setLaatsteActie] = useState<{ aantal: number } | null>(null);
   // Audit-log: De groep begint bij de eerste bevestiging van deze import, annuleren daarvoor logt
@@ -333,6 +337,9 @@ function ImportLegacyPage() {
     return perDoel;
   }, [rijen, keuzeVoorNaam, doelVan]);
 
+  /** Is er een organisatie met meerdere bronnamen, dan krijgt de koppeltabel een kolom "Onderdeel" (`import-scans.md`, Ronde en onderdeel). */
+  const metOnderdelen = [...bronnamenPerDoel.values()].some((set) => set.size >= 2);
+
   /** Resolve't het organisatie-/Meting-id voor één rij, vóór het bouwen van een `LegacyImportKeuze` (zie de uitleg bij de Provider hierboven). */
   function bouwKeuze(rij: RijMetBron): LegacyImportKeuze {
     const keuze = keuzeVoorNaam(rij.organisatieNaam);
@@ -341,7 +348,10 @@ function ImportLegacyPage() {
     const bronnaam = rij.organisatieNaam.trim();
     const bekendeMetingen = organisatieId ? metingIdPerSleutel[`${organisatieId}::${rij.assessmentId}::${bronnaam}`] : undefined;
     const bronnaamInLabel = (bronnamenPerDoel.get(doelVan(rij.organisatieNaam))?.size ?? 0) >= 2;
-    return { rij, assessmentId: rij.assessmentId!, organisatieId, bronnaam, bronnaamInLabel, bekendeMetingen };
+    const bekendeRondes = organisatieId ? rondeIdPerOrganisatie[organisatieId] : undefined;
+    // Het onderdeel geldt alleen bij meerdere bronnamen: Bij één bronnaam is het "Hele organisatie" of de kolom `onderdeel`.
+    const onderdeel = bronnaamInLabel ? onderdeelPerBronnaam[bronnaam]?.trim() || undefined : undefined;
+    return { rij, assessmentId: rij.assessmentId!, organisatieId, bronnaam, bronnaamInLabel, bekendeMetingen, bekendeRondes, onderdeel };
   }
 
   /** Na een geslaagde `voerLegacyImportUit`-aanroep: de org/Meting-geheugens bijwerken en de rijen als "geïmporteerd" markeren. */
@@ -362,6 +372,13 @@ function ImportLegacyPage() {
         const { organisatieId, scanUitvoeringId, label, bronnaam } = resultaat.rijResultaten[i];
         const sleutel = `${organisatieId}::${rij.assessmentId}::${bronnaam}`;
         nieuw[sleutel] = { ...(nieuw[sleutel] ?? {}), [label]: scanUitvoeringId };
+      });
+      return nieuw;
+    });
+    setRondeIdPerOrganisatie((prev) => {
+      const nieuw = { ...prev };
+      resultaat.rijResultaten.forEach(({ organisatieId, rondeId, rondeLabel }) => {
+        if (rondeId) nieuw[organisatieId] = { ...(nieuw[organisatieId] ?? {}), [rondeLabel]: rondeId };
       });
       return nieuw;
     });
@@ -580,6 +597,7 @@ function ImportLegacyPage() {
                 <th>Organisatienaam (in CSV)</th>
                 <th>Rijen</th>
                 <th>Keuze</th>
+                {metOnderdelen && <th>Onderdeel</th>}
               </tr>
             </thead>
             <tbody>
@@ -633,6 +651,21 @@ function ImportLegacyPage() {
                         </div>
                       )}
                     </td>
+                    {metOnderdelen && (
+                      <td>
+                        {(bronnamenPerDoel.get(doelVan(naam))?.size ?? 0) >= 2 ? (
+                          <input
+                            type="text"
+                            className="veld-compact"
+                            value={onderdeelPerBronnaam[naam.trim()] ?? naam.trim()}
+                            onChange={(e) => setOnderdeelPerBronnaam((prev) => ({ ...prev, [naam.trim()]: e.target.value }))}
+                            aria-label={`Onderdeel voor ${naam}`}
+                          />
+                        ) : (
+                          <span className="text-sm text-ink-m">Hele organisatie</span>
+                        )}
+                      </td>
+                    )}
                   </tr>
                 );
               })}

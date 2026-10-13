@@ -3,13 +3,18 @@
 import { use, useState } from "react";
 import { useRespondentPerToegangscode } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
-import { gemiddeldeAntwoordenVoorMeting } from "@/lib/scoring";
 import { ResultsView } from "@/components/ResultsView";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { downloadPdf } from "@/lib/scan-export";
 import { MetingWeergaven } from "@/components/visualisatie/MetingWeergaven";
+import {
+  aantalAfgerondInMeting,
+  gemiddeldeAntwoordenVoorMetingMetSamenstelling,
+  isSamengesteld,
+  vergelijkbareMetingen,
+} from "@/lib/rondes";
 import { VergelijkingEyebrow } from "@/components/visualisatie/VergelijkingEyebrow";
 
 /**
@@ -45,7 +50,10 @@ export default function LeadResultatenPage({
     );
   }
 
-  const afgerond = scanUitvoering.invullingen.filter((i) => i.status === "afgerond");
+  // Bij een samengestelde Meting ziet de Lead alleen het gemiddelde, niet de onderliggende Metingen (`benchmark.md`).
+  const samengesteld = isSamengesteld(scanUitvoering);
+  const aantalAfgerond = aantalAfgerondInMeting(gegevens.organisatie, scanUitvoering);
+  const afgerond = { length: aantalAfgerond };
 
   if (afgerond.length === 0) {
     return (
@@ -59,11 +67,12 @@ export default function LeadResultatenPage({
     );
   }
 
-  const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMeting(assessment, scanUitvoering.invullingen);
-  // Alleen een eerdere Meting waarop de Lead ook Lead is (`visualisatie-scores.md`, C).
-  const eerdereMetingen = gegevens.leadMetingen.filter(
-    (m) => m.id !== scanUitvoering.id && m.assessmentId === scanUitvoering.assessmentId && m.aangemaaktOp < scanUitvoering.aangemaaktOp
-  );
+  const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, gegevens.organisatie, scanUitvoering);
+  // Alleen een eerdere Meting waarop de Lead ook bereik heeft (`visualisatie-scores.md`, C).
+  const toegestaneIds = gegevens.leadMetingen.map((m) => m.id);
+  const eerdereMetingen = vergelijkbareMetingen(gegevens.organisatie, scanUitvoering)
+    .map((v) => v.meting)
+    .filter((m) => toegestaneIds.includes(m.id));
 
   // export.uitvoeren voor een Lead (datamodel.md deel 2, Rechtenmatrix):
   // mag exporteren wat hij hier al ziet, dus het gemiddelde van deze Meting
@@ -109,8 +118,9 @@ export default function LeadResultatenPage({
         <VergelijkingEyebrow label={scanUitvoering.label} eerdereMetingen={eerdereMetingen} />
         <h1>{assessment.naam}</h1>
         <p className="text-sm text-ink-m">
-          Gemiddelde over {afgerond.length}{" "}
-          {afgerond.length === 1 ? "afgeronde respondent" : "afgeronde respondenten"}
+          {samengesteld
+            ? "Gemiddelde van de onderdelen, elk even zwaar"
+            : `Gemiddelde over ${afgerond.length} ${afgerond.length === 1 ? "afgeronde respondent" : "afgeronde respondenten"}`}
         </p>
         <div className="mt-8">
           <MetingWeergaven
@@ -121,7 +131,7 @@ export default function LeadResultatenPage({
             spreidingToegestaan={false}
             bereikAltijd={false}
             toonBenchmarkLink={false}
-            eerdereMetingen={eerdereMetingen}
+            toegestaneMetingIds={toegestaneIds}
           />
         </div>
       </div>

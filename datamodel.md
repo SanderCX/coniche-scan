@@ -231,11 +231,11 @@ al ingevuld.
 
 Eén geplande ronde van één scan-type bij één organisatie, bijv.
 "Nulmeting 2026" of een AI-scan naast een Klantcontact-scan. Met de ronde en het
-onderdeel (voorstel, hieronder) is een Meting één cel: Eén onderdeel in één ronde
+onderdeel (gebouwd op 13 oktober 2026, hieronder) is een Meting één cel: Eén onderdeel in één ronde
 voor één Assessment.
 
 ```
-Ronde {                             // voorstel
+Ronde {                             // gebouwd op 13 oktober 2026
   id: string
   organisatieId: string
   label: string                     // bijv. "0-meting" of "Nameting 2027"
@@ -246,15 +246,15 @@ Meting {
   id: string
   organisatieId: string
   assessmentId: string
-  rondeId?: string                  // voorstel, ontbreekt bij een Meting zonder ronde
+  rondeId?: string                  // gebouwd, ontbreekt bij een Meting zonder ronde
   label: string
-  onderdeel: string                 // voorstel, standaard "Hele organisatie", bijv. "Team A"
-  samenstelling?: string[]          // voorstel, metingIds, alleen bij een samengestelde Meting
+  onderdeel: string                 // gebouwd, standaard "Hele organisatie", bijv. "Team A"
+  samenstelling?: string[]          // gebouwd, metingIds, alleen bij een samengestelde Meting
   aangemaaktOp: datetime
 }
 ```
 
-**Ronde en onderdeel (voorstel, 13 oktober 2026).** Een organisatie meet in
+**Ronde en onderdeel (gebouwd op 13 oktober 2026).** Een organisatie meet in
 rondes. Een ronde is een moment waarop de organisatie meet, bijvoorbeeld de
 0-meting of de nameting, met een Meting per onderdeel en per Assessment. Het
 onderdeel zegt over welk deel van de organisatie een Meting gaat, bijvoorbeeld
@@ -283,7 +283,7 @@ onderdeel zegt over welk deel van de organisatie een Meting gaat, bijvoorbeeld
   zonder ronde krijgt het onderdeel "Hele organisatie".
 - **Lege ronde.** Een ronde zonder Metingen verdwijnt vanzelf.
 
-**Samengestelde Meting (voorstel).** Een Meting met `samenstelling` is een
+**Samengestelde Meting (gebouwd op 13 oktober 2026).** Een Meting met `samenstelling` is een
 gemiddelde over andere Metingen van dezelfde organisatie, hetzelfde Assessment en
 dezelfde ronde, minstens twee, elk hoogstens één keer en zelf niet samengesteld.
 Ze hoort bij die ronde en heeft standaard het onderdeel "Hele organisatie", zodat
@@ -401,7 +401,7 @@ scan (niveau 3).
   tweede rekenmethode bij.
 - De leden horen bij hetzelfde Assessment. Een lid zonder afgeronde scan
   telt niet mee.
-- Een samengestelde Meting (voorstel) volgt dezelfde regel: De onderliggende
+- Een samengestelde Meting (gebouwd) volgt dezelfde regel: De onderliggende
   Metingen zijn de leden en elke Meting telt één keer mee, ongeacht het aantal
   scans. Team A met 5 scans en overall 3,0 en Team B met 40 scans en overall 4,0
   geven samen 3,5. Per scan gewogen zou het 3,9 zijn, en die variant bestaat
@@ -671,7 +671,7 @@ samen met de backend en de database.
 
 Het bereik hangt niet af van of de Lead zelf een scan heeft ingevuld.
 
-**Samengestelde Meting en bereik (voorstel).** Een `RespondentRolMeting` mag
+**Samengestelde Meting en bereik (gebouwd op 13 oktober 2026).** Een `RespondentRolMeting` mag
 naar een samengestelde Meting verwijzen. De Lead ziet dan alleen het gemiddelde.
 Toegang erft niet mee: Een koppeling met een onderliggende Meting geeft geen
 toegang tot de samengestelde Meting, en andersom. "Hele organisatie" dekt wel
@@ -1066,12 +1066,12 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   e-mailadres van de Lead.
 - `organisatie.benchmarkVlagGewijzigd`. `details` bevat de naam van de
   organisatie en de nieuwe stand van de vlag.
-- `ronde.aangemaakt` en `ronde.hernoemd` (voorstel). `details` bevat bij
+- `ronde.aangemaakt` en `ronde.hernoemd` (gebouwd). `details` bevat bij
   aanmaken het label en, bij "Nieuwe ronde starten", het label van de vorige
   ronde en het aantal Metingen dat is meegenomen. Bij hernoemen staan de oude en
   de nieuwe naam erin.
 - `meting.samengesteldAangemaakt`, `meting.samengesteldGewijzigd` en
-  `meting.samengesteldVerwijderd` (voorstel). `details` bevat het label en de
+  `meting.samengesteldVerwijderd` (gebouwd). `details` bevat het label en de
   labels van de onderliggende Metingen zoals ze op dat moment waren.
 - `organisatie.hernoemd`. `details` bevat de oude en de nieuwe naam van de
   organisatie. Alleen `Organisatie.naam` verandert, het `id` en alle

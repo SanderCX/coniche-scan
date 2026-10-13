@@ -101,11 +101,11 @@ Bewust nog niet opgepakt. Geen prioritering.
   bouwblok — is ontworpen voor twee Metingen (besloten op 12 oktober 2026,
   nog te bouwen): `visualisatie-scores.md`, onderdeel C. Voor drie of meer
   Metingen is er nog geen ontwerp.
-- **Ronde en onderdeel**: Een Meting is één onderdeel in één ronde voor één
-  Assessment. Uitgewerkt als voorstel op 13 oktober 2026, nog te bouwen:
-  `Ronde` als record, `Meting.rondeId` en `Meting.onderdeel`, de lijst Metingen
-  gegroepeerd per ronde, "Nieuwe ronde starten", "Naar ronde…" voor bestaande
-  Metingen, de afleiding bij import en de kolommen `ronde` en `onderdeel` in de
+- **Ronde en onderdeel (gebouwd op 13 oktober 2026)**: Een Meting is één
+  onderdeel in één ronde voor één Assessment. Gebouwd: `Ronde` als record,
+  `Meting.rondeId` en `Meting.onderdeel`, de lijst Metingen gegroepeerd per
+  ronde, "Nieuwe ronde starten", "Naar ronde…" voor bestaande Metingen, de
+  afleiding bij import en de kolommen `ronde` en `onderdeel` in de
   CSV-export. Zie `datamodel.md`, Ronde en onderdeel, `beheerpagina.md`, punt 5,
   `import-scans.md` en `benchmark.md`, Onderdeel en samengestelde Meting. Open:
   Of bij een nieuwe ronde de Respondenten mee kunnen (voorstel is een vinkje,
@@ -135,11 +135,11 @@ Bewust nog niet opgepakt. Geen prioritering.
   `visualisatie-scores.md`, onderdeel B (besloten op 12 oktober 2026, nog te
   bouwen). Houd rekening met herleidbaarheid bij weinig scans, zie de drempel
   `benchmarkMinRespondenten`.
-- **Benchmark of gemiddelde opslaan als samengestelde Meting**: Uitgewerkt
-  als voorstel op 13 oktober 2026, samen met het veld `onderdeel` op de Meting,
-  zie `benchmark.md`, Onderdeel en samengestelde Meting, en `datamodel.md`,
+- **Benchmark of gemiddelde opslaan als samengestelde Meting (gebouwd op 13
+  oktober 2026)**: Samen met het veld `onderdeel` op de Meting, zie
+  `benchmark.md`, Onderdeel en samengestelde Meting, en `datamodel.md`,
   Meting. Elke onderliggende Meting telt één keer mee, ongeacht het aantal
-  scans. Nog te bouwen. Oorspronkelijke omschrijving: Een
+  scans. Oorspronkelijke omschrijving: Een
   gemiddelde over meerdere Metingen van één organisatie (zie niveau 2)
   vastleggen als eigen Meting, zodat een organisatie met meerdere delen als
   één deelnemer meedoet aan een benchmark tussen organisaties. De
@@ -149,10 +149,10 @@ Bewust nog niet opgepakt. Geen prioritering.
   worden op een samengestelde Meting (`RespondentRolMeting`) en ziet dan alleen
   het gemiddelde, niet de onderliggende Metingen. Dat bereik stelt de Admin
   expliciet in en erft niet mee (besloten op 13 oktober 2026, `benchmark.md`,
-  Bereik van een Lead). Nog te beslissen: Wat er
+  Bereik van een Lead). Besloten en gebouwd: Wat er
   gebeurt als een onderliggende Meting wordt verwijderd. Blokkeren kan niet,
-  want verwijderen moet altijd kunnen (bewaartermijn, AVG-verzoek). Voorstel:
-  De Meting valt uit de samenstelling, de bevestiging noemt de samengestelde
+  want verwijderen moet altijd kunnen (bewaartermijn, AVG-verzoek). Zo is het
+  gebouwd: De Meting valt uit de samenstelling, de bevestiging noemt de samengestelde
   Metingen waarin ze zit en dat het gemiddelde daardoor verandert, en een
   samengestelde Meting zonder leden verdwijnt. Het alternatief is bij het
   opslaan de gemiddelde antwoorden per vraag vast te leggen. Dan verandert het

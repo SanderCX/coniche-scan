@@ -10,7 +10,8 @@ import { useAssessments } from "@/lib/assessment-store";
 import { useAlgemeneTekst } from "@/lib/algemene-teksten-store";
 import { voortgang } from "@/lib/scoring";
 import { volgendeUrl } from "@/lib/scan-routing";
-import { OrganisatieLid, ScanInvulling, ScanInvullingStatus, ScanUitvoering } from "@/lib/types";
+import { Organisatie, OrganisatieLid, ScanInvulling, ScanInvullingStatus, ScanUitvoering } from "@/lib/types";
+import { aantalAfgerondInMeting, isSamengesteld } from "@/lib/rondes";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { isLead } from "@/lib/lead";
@@ -76,10 +77,20 @@ function BenchmarkKaarten({ code, lid }: { code: string; lid: OrganisatieLid }) 
  * datamodel.md deel 2, Rechtenmatrix) en een link naar de resultaten,
  * alleen als er al minstens 1 afgeronde scan is.
  */
-function LeadMetingKaart({ code, scanUitvoering }: { code: string; scanUitvoering: ScanUitvoering }) {
+function LeadMetingKaart({
+  code,
+  scanUitvoering,
+  organisatie,
+}: {
+  code: string;
+  scanUitvoering: ScanUitvoering;
+  organisatie: Organisatie;
+}) {
   const [email, setEmail] = useState("");
   const [melding, setMelding] = useState<string | null>(null);
-  const afgerond = scanUitvoering.invullingen.filter((i) => i.status === "afgerond").length;
+  // Een samengestelde Meting heeft geen Respondenten: Er is niets om uit te nodigen en de Lead ziet alleen het gemiddelde.
+  const samengesteld = isSamengesteld(scanUitvoering);
+  const afgerond = aantalAfgerondInMeting(organisatie, scanUitvoering);
 
   function handleUitnodigen(e: React.FormEvent) {
     e.preventDefault();
@@ -94,8 +105,15 @@ function LeadMetingKaart({ code, scanUitvoering }: { code: string; scanUitvoerin
     <div className="card">
       <p className="font-semibold text-ink">{scanUitvoering.label}</p>
       <p className="text-sm text-ink-m mt-1">
-        {scanUitvoering.invullingen.length} respondenten, {afgerond} afgerond
+        {samengesteld ? (
+          <>
+            <span className="admin-badge status-uitgenodigd">Gemiddelde</span> {afgerond} afgeronde scans
+          </>
+        ) : (
+          `${scanUitvoering.invullingen.length} respondenten, ${afgerond} afgerond`
+        )}
       </p>
+      {!samengesteld && (
       <form onSubmit={handleUitnodigen} className="flex gap-2 mt-3">
         <div className="admin-field flex-1" style={{ marginBottom: 0 }}>
           <input
@@ -110,6 +128,7 @@ function LeadMetingKaart({ code, scanUitvoering }: { code: string; scanUitvoerin
           Uitnodigen
         </button>
       </form>
+      )}
       {melding && <p className="text-sm text-ink-m mt-2">{melding}</p>}
       {afgerond > 0 && (
         <Link
@@ -298,7 +317,7 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
             <h2>Metingen waar je Lead van bent</h2>
             <div className="grid grid-cols-1 gap-4 mt-4">
               {overigeLeadMetingen.map((scanUitvoering) => (
-                <LeadMetingKaart key={scanUitvoering.id} code={code} scanUitvoering={scanUitvoering} />
+                <LeadMetingKaart key={scanUitvoering.id} code={code} scanUitvoering={scanUitvoering} organisatie={gegevens.organisatie} />
               ))}
             </div>
           </>

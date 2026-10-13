@@ -7,6 +7,7 @@ import { isLead as lidIsLead, leadSamenvatting } from "@/lib/lead";
 import { LEAD_HELE_ORGANISATIE_WAARSCHUWING } from "@/components/beheer/LeadToevoegenFormulier";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { Organisatie, OrganisatieLid } from "@/lib/types";
+import { isSamengesteld } from "@/lib/rondes";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 
 const NIEUWE_METING = "__nieuw__";
@@ -98,7 +99,8 @@ export function ToegangBlok({
   }
 
   /* ---------- Vragenlijst sturen ---------- */
-  const beschikbaar = metingen.filter((m) => !m.invullingen.some((i) => i.organisatieLidId === lid.id));
+  // Een samengestelde Meting heeft geen Respondenten en is niet invulbaar (`benchmark.md`, Samengestelde Meting).
+  const beschikbaar = metingen.filter((m) => !isSamengesteld(m) && !m.invullingen.some((i) => i.organisatieLidId === lid.id));
   const [metingKeuze, setMetingKeuze] = useState("");
   const [nieuwAssessment, setNieuwAssessment] = useState("");
   const [nieuwLabel, setNieuwLabel] = useState("");
@@ -184,6 +186,12 @@ export function ToegangBlok({
                         <input type="checkbox" checked={actueel.includes(m.id)} onChange={(e) => toggleMeting(m.id, e.target.checked)} />
                         <span>
                           {m.label} <span className="text-ink-s">— {assessmentNaam(m.assessmentId)}</span>
+                          {isSamengesteld(m) && (
+                            <>
+                              <span className="admin-badge status-uitgenodigd" style={{ marginLeft: "0.4rem" }}>Gemiddelde</span>
+                              <span className="text-ink-s"> — Ziet alleen het gemiddelde</span>
+                            </>
+                          )}
                         </span>
                       </label>
                     ))}

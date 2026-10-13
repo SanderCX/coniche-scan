@@ -220,6 +220,8 @@ export interface Organisatie {
   kenmerken: Record<string, unknown>;
   leden: OrganisatieLid[];
   scanUitvoeringen: ScanUitvoering[];
+  /** De rondes van deze organisatie (`datamodel.md`, Ronde en onderdeel). Ontbreekt bij data van vóór dit veld. */
+  rondes?: Ronde[];
   /**
    * `gebruikerId` van de Consultant/Admin die deze organisatie aanmaakte —
    * samen met `toegewezenAan` het bereik "eigen" in de rechtenmatrix
@@ -298,9 +300,32 @@ export interface ScanUitvoering {
   id: string;
   organisatieId: string;
   assessmentId: string;
+  /** De ronde waarin deze Meting valt (`datamodel.md`, Ronde en onderdeel). Ontbreekt bij een Meting zonder ronde. */
+  rondeId?: string;
   label: string;
+  /**
+   * Het deel van de organisatie waar de Meting over gaat, bijvoorbeeld "Team A". Ontbreekt bij data van vóór dit veld en
+   * geldt dan als "Hele organisatie" (`lib/rondes.ts`, `onderdeelVan`).
+   */
+  onderdeel?: string;
+  /**
+   * Alleen bij een samengestelde Meting (`benchmark.md`, Onderdeel en samengestelde Meting): De Meting-id's waarvan ze het
+   * gemiddelde is. Een samengestelde Meting heeft geen Respondenten en geen `invullingen`.
+   */
+  samenstelling?: string[];
   aangemaaktOp: string;
   invullingen: ScanInvulling[];
+}
+
+/**
+ * Een moment waarop een organisatie meet, bijvoorbeeld de "0-meting" of de "Nameting 2027" (`datamodel.md`, Ronde en
+ * onderdeel). Binnen een ronde is er hoogstens één Meting per combinatie van onderdeel en Assessment.
+ */
+export interface Ronde {
+  id: string;
+  organisatieId: string;
+  label: string;
+  aangemaaktOp: string;
 }
 
 export type ScanInvullingStatus = "uitgenodigd" | "bezig" | "afgerond";

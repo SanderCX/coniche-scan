@@ -47,6 +47,19 @@ export function heeftBereikOpMeting(lid: LeadBereikLid, organisatieId: string, m
   return lid.leadVoorOrganisatie === true || lid.leadMetingIds.includes(metingId);
 }
 
+/**
+ * Niveau 1 volgt het bereik op de lid-Meting (`benchmark.md`, Bereik van een Lead): Heeft de Lead bereik op een Meting die
+ * als lid van de benchmark voor deze organisatie meedoet? Dat is "Specifieke Metingen" met die Meting aangevinkt, of "Hele
+ * organisatie". Een bereik op de onderliggende Metingen van een samengestelde lid-Meting telt niet mee: Toegang erft niet.
+ */
+export function heeftBereikOpLidMeting(
+  lid: LeadBereikLid,
+  leden: { organisatieId: string; metingId: string }[],
+  organisatieId: string
+): boolean {
+  return leden.some((l) => l.organisatieId === organisatieId && heeftBereikOpMeting(lid, organisatieId, l.metingId));
+}
+
 /** De samenvatting onder het vakje "Lead" in het Respondent-overzicht (`beheerpagina.md`, punt 6a). */
 export function leadSamenvatting(lid: Pick<LeadBereikLid, "leadMetingIds" | "leadVoorOrganisatie">): string {
   if (lid.leadVoorOrganisatie === true) return "Lead voor de hele organisatie";

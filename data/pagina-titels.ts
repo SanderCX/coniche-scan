@@ -45,6 +45,7 @@ const PAGINA_TITELS: { route: string; titel: string }[] = [
   { route: "/beheer/respondenten", titel: "Respondenten" },
   { route: "/beheer/scans", titel: "Ingevulde scans" },
   { route: "/beheer/metingen/[metingId]", titel: "Meting" },
+  { route: "/beheer/rondes/[rondeId]", titel: "Ronde" },
   { route: "/beheer/rapportage/[scanUitvoeringId]", titel: "Resultaten van de Meting" },
   { route: "/beheer/resultaten/[scanInvullingId]", titel: "Resultaten" },
   { route: "/beheer/import", titel: "Import van scans" },

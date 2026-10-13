@@ -1,12 +1,17 @@
 import { Assessment, Benchmark, BenchmarkLid, BenchmarkNiveau, Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering } from "./types";
 import { alleVragen } from "./assessment-structuur";
-import { heeftBereikOpMeting, heeftBereikOpOrganisatie, LeadBereikLid } from "./lead";
+import { heeftBereikOpLidMeting, heeftBereikOpMeting, LeadBereikLid } from "./lead";
+import {
+  aantalAfgerondInMeting,
+  gemiddeldeAntwoordenVoorMetingMetSamenstelling,
+  isSamengesteld,
+  voldoetAanMinScans,
+} from "./rondes";
 import { SpreidingWeergave, spreiding, tussenOrganisaties, TussenOrganisatiesWeergave } from "./visualisatie";
 import {
   alleBouwblokResultaten,
   alleGroepResultaten,
   BouwblokResultaat,
-  gemiddeldeAntwoordenVoorMeting,
   GroepResultaat,
   overallScore,
 } from "./scoring";
@@ -70,9 +75,10 @@ export function kandidaatOrganisaties(
     const perAssessment = assessmentIds
       .map((assessmentId) => ({
         assessmentId,
+        // Een samengestelde Meting voldoet als elke onderliggende Meting aan `minScans` voldoet (`benchmark.md`).
         metingen: organisatie.scanUitvoeringen
-          .filter((m) => m.assessmentId === assessmentId && aantalAfgerond(m) >= minScans)
-          .map((meting) => ({ meting, aantalAfgerond: aantalAfgerond(meting) }))
+          .filter((m) => m.assessmentId === assessmentId && voldoetAanMinScans(organisatie, m, minScans))
+          .map((meting) => ({ meting, aantalAfgerond: aantalAfgerondInMeting(organisatie, meting) }))
           .sort((a, b) => b.meting.aangemaaktOp.localeCompare(a.meting.aangemaaktOp)),
       }))
       .filter((p) => p.metingen.length > 0);
@@ -100,7 +106,7 @@ export function nietTeKiezenOrganisaties(
       const naam = assessments.find((a) => a.id === assessmentId)?.naam ?? "onbekend Assessment";
       const metingen = organisatie.scanUitvoeringen.filter((m) => m.assessmentId === assessmentId);
       if (metingen.length === 0) return `geen Meting van ${naam}`;
-      const meeste = Math.max(...metingen.map(aantalAfgerond));
+      const meeste = Math.max(...metingen.map((m) => aantalAfgerondInMeting(organisatie, m)));
       return `${naam}: hoogstens ${meeste} afgeronde ${meeste === 1 ? "scan" : "scans"} in één Meting, minimaal ${minScans} nodig`;
     });
     uit.push({ organisatie, redenen });
@@ -140,8 +146,15 @@ function bouwRij(lid: BenchmarkLid, assessment: Assessment, organisaties: Organi
   const organisatie = organisaties.find((o) => o.id === lid.organisatieId);
   const meting = organisatie?.scanUitvoeringen.find((m) => m.id === lid.metingId);
   if (!organisatie || !meting || meting.assessmentId !== assessment.id) return null;
-  const antwoorden = gemiddeldeAntwoordenVoorMeting(assessment, meting.invullingen);
-  return { organisatie, meting, aantalAfgerond: aantalAfgerond(meting), antwoorden, overall: overallScore(assessment, antwoorden) };
+  // Bij een samengestelde Meting het gemiddelde van de onderliggende Metingen, elke Meting even zwaar.
+  const antwoorden = gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, organisatie, meting);
+  return {
+    organisatie,
+    meting,
+    aantalAfgerond: aantalAfgerondInMeting(organisatie, meting),
+    antwoorden,
+    overall: overallScore(assessment, antwoorden),
+  };
 }
 
 /** Eén sectie per gekozen Assessment, in de volgorde van de benchmark. Een Assessment dat niet meer bestaat valt weg. */
@@ -316,8 +329,15 @@ export function organisatiesInBenchmark(secties: BenchmarkSectie[]): Organisatie
  * heeft op de organisatie, controleert de aanroeper (`leadViewVoorToewijzing`): Van de Lead zelf speelt niets mee, niet zijn
  * eigen scan en niet de Metingen waarop hij Lead is.
  */
-export function viewsVoorLead(secties: BenchmarkSectie[], organisatieId: string, minOrganisaties: number): OrganisatieView[] {
+export function viewsVoorLead(
+  secties: BenchmarkSectie[],
+  organisatieId: string,
+  minOrganisaties: number,
+  /** Alleen de secties waarvan de lid-Meting van de organisatie binnen het bereik van deze Lead valt (`benchmark.md`, Bereik van een Lead). */
+  lead?: LeadBereikLid
+): OrganisatieView[] {
   return secties
+    .filter((s) => !lead || s.rijen.some((r) => r.organisatie.id === organisatieId && heeftBereikOpMeting(lead, organisatieId, r.meting.id)))
     .map((s) => bouwOrganisatieView(s, organisatieId, minOrganisaties))
     .filter((v): v is OrganisatieView => v !== null && v.voldoetAanDrempel);
 }
@@ -350,8 +370,10 @@ export function benchmarkNamen(
 
 /** De Metingen van één organisatie in één Assessment met genoeg afgeronde scans, meest recente eerst. Geen vlag nodig (`benchmark.md`, Niveau 2). */
 export function kandidaatMetingen(organisatie: Organisatie, assessmentId: string, minScans: number): KandidaatMeting[] {
+  // Een samengestelde Meting is op niveau 2 en 3 geen lid: De onderliggende Metingen zijn zelf te kiezen en beide meetellen
+  // zou dubbel tellen (`benchmark.md`, Samengestelde Meting).
   return organisatie.scanUitvoeringen
-    .filter((m) => m.assessmentId === assessmentId && aantalAfgerond(m) >= minScans)
+    .filter((m) => !isSamengesteld(m) && m.assessmentId === assessmentId && aantalAfgerond(m) >= minScans)
     .map((meting) => ({ meting, aantalAfgerond: aantalAfgerond(meting) }))
     .sort((a, b) => b.meting.aangemaaktOp.localeCompare(a.meting.aangemaaktOp));
 }
@@ -382,7 +404,7 @@ export function organisatiesVoorMetingenBenchmark(organisaties: Organisatie[], m
 /** De organisaties in de keuzelijst van niveau 3: Minstens één Meting met minimaal `minScans` afgeronde scans. */
 export function organisatiesVoorScansBenchmark(organisaties: Organisatie[], minScans: number): Organisatie[] {
   return organisaties
-    .filter((o) => o.scanUitvoeringen.some((m) => aantalAfgerond(m) >= minScans))
+    .filter((o) => o.scanUitvoeringen.some((m) => !isSamengesteld(m) && aantalAfgerond(m) >= minScans))
     .sort((a, b) => a.naam.localeCompare(b.naam, "nl"));
 }
 
@@ -494,11 +516,12 @@ export function leadViewVoorToewijzing(
 ): LeadBenchmarkView | null {
   const niveau = niveauVan(benchmark);
   if (niveau === "organisaties") {
-    if (!heeftBereikOpOrganisatie(lead, toewijzing.organisatieId)) return null;
+    // Niveau 1 volgt het bereik op de lid-Meting, niet op de hele organisatie.
+    if (!heeftBereikOpLidMeting(lead, benchmark.leden, toewijzing.organisatieId)) return null;
     const organisatie = organisaties.find((o) => o.id === toewijzing.organisatieId);
     if (!organisatie) return null;
     const secties = bouwBenchmarkSecties(benchmark, assessments, organisaties);
-    const views = viewsVoorLead(secties, toewijzing.organisatieId, drempels.minOrganisaties);
+    const views = viewsVoorLead(secties, toewijzing.organisatieId, drempels.minOrganisaties, lead);
     return { niveau, eigenNaam: organisatie.naam, metingLabel: null, views: views.map(zonderRij) };
   }
   if (!toewijzing.metingId || !heeftBereikOpMeting(lead, toewijzing.organisatieId, toewijzing.metingId)) return null;
