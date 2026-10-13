@@ -2,13 +2,20 @@
 
 import { useState } from "react";
 import { useAssessments } from "@/lib/assessment-store";
-import { maakScanUitvoering, nodigLidUit, zetLeadBereik } from "@/lib/db";
+import { maakMeting, nodigLidUit, zetLeadBereik } from "@/lib/db";
 import { isLead as lidIsLead, leadSamenvatting } from "@/lib/lead";
 import { LEAD_HELE_ORGANISATIE_WAARSCHUWING } from "@/components/beheer/LeadToevoegenFormulier";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { Organisatie, OrganisatieLid } from "@/lib/types";
 import { isSamengesteld } from "@/lib/rondes";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
+import {
+  NIEUWE_RONDE,
+  OnderdeelRondeVelden,
+  OnderdeelRondeWaarde,
+  beginWaarde,
+  rondeDoel,
+} from "@/components/beheer/OnderdeelRondeVelden";
 
 const NIEUWE_METING = "__nieuw__";
 
@@ -103,20 +110,31 @@ export function ToegangBlok({
   const beschikbaar = metingen.filter((m) => !isSamengesteld(m) && !m.invullingen.some((i) => i.organisatieLidId === lid.id));
   const [metingKeuze, setMetingKeuze] = useState("");
   const [nieuwAssessment, setNieuwAssessment] = useState("");
-  const [nieuwLabel, setNieuwLabel] = useState("");
+  // Een nieuwe Meting heeft alleen Onderdeel en Ronde, de naam maakt de app (`beheerpagina.md`, punt 5).
+  const [nieuwConcept, setNieuwConcept] = useState<OnderdeelRondeWaarde | null>(null);
+  const nieuwWaarde = nieuwConcept ?? beginWaarde(organisatie);
   const keuze = metingKeuze || (beschikbaar[0]?.id ?? NIEUWE_METING);
   const nieuweMeting = keuze === NIEUWE_METING;
-  const kanSturen = nieuweMeting ? nieuwAssessment !== "" && nieuwLabel.trim() !== "" : beschikbaar.some((m) => m.id === keuze);
+  const kanSturen = nieuweMeting
+    ? nieuwAssessment !== "" && (nieuwWaarde.ronde !== NIEUWE_RONDE || nieuwWaarde.nieuweRonde.trim() !== "")
+    : beschikbaar.some((m) => m.id === keuze);
 
   function stuur() {
     if (!kanSturen) return;
     let metingId = keuze;
     let label = beschikbaar.find((m) => m.id === keuze)?.label ?? "";
     if (nieuweMeting) {
-      const meting = maakScanUitvoering(organisatie.id, { assessmentId: nieuwAssessment, label: nieuwLabel.trim() });
-      if (!meting) return;
-      metingId = meting.id;
-      label = meting.label;
+      const r = maakMeting(organisatie.id, {
+        assessmentId: nieuwAssessment,
+        onderdeel: nieuwWaarde.onderdeel,
+        ...rondeDoel(nieuwWaarde),
+      });
+      if (!r.ok) {
+        onMelding(r.reden, true);
+        return;
+      }
+      metingId = r.meting.id;
+      label = r.meting.label;
     }
     // Is de Respondent Lead, dan geeft dezelfde stap hem ook toegang tot die Meting.
     const resultaat = nodigLidUit(metingId, lid.email, isLead);
@@ -126,7 +144,7 @@ export function ToegangBlok({
     }
     setMetingKeuze("");
     setNieuwAssessment("");
-    setNieuwLabel("");
+    setNieuwConcept(null);
     onMelding(`Vragenlijst gestuurd voor Meting "${label}"${isLead ? ", met Lead-toegang tot die Meting" : ""}.`);
   }
 
@@ -229,31 +247,26 @@ export function ToegangBlok({
           </button>
         </div>
         {nieuweMeting && (
-          <div className="knoppenrij" style={{ marginTop: "0.6rem" }}>
-            <select
-              className="veld-compact"
-              value={nieuwAssessment}
-              onChange={(e) => setNieuwAssessment(e.target.value)}
-              aria-label="Assessment-type"
-             
-            >
-              <option value="">Kies een Assessment-type</option>
-              {assessments.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.naam}
-                </option>
-              ))}
-            </select>
-            <input
-              className="veld-compact"
-              type="text"
-              value={nieuwLabel}
-              onChange={(e) => setNieuwLabel(e.target.value)}
-              placeholder="Label van de nieuwe Meting"
-              aria-label="Label van de nieuwe Meting"
-             
-            />
-          </div>
+          <>
+            <div className="knoppenrij" style={{ marginTop: "0.6rem" }}>
+              <select
+                className="veld-compact"
+                value={nieuwAssessment}
+                onChange={(e) => setNieuwAssessment(e.target.value)}
+                aria-label="Assessment-type"
+              >
+                <option value="">Kies een Assessment-type</option>
+                {assessments.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.naam}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div style={{ marginTop: "0.6rem" }}>
+              <OnderdeelRondeVelden organisatie={organisatie} waarde={nieuwWaarde} onChange={setNieuwConcept} idPrefix="toegang-meting" />
+            </div>
+          </>
         )}
       </section>
 

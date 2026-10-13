@@ -2,16 +2,20 @@
 
 import { useState } from "react";
 import { wijzigMeting } from "@/lib/db";
-import { STANDAARD_ONDERDEEL, bestaandeOnderdelen, isSamengesteld, onderdeelVan, rondesNieuwsteEerst } from "@/lib/rondes";
+import { STANDAARD_ONDERDEEL, isSamengesteld, onderdeelVan } from "@/lib/rondes";
 import { Organisatie, ScanUitvoering } from "@/lib/types";
-
-const GEEN_RONDE = "__geen__";
-const NIEUWE_RONDE = "__nieuw__";
+import {
+  GEEN_RONDE,
+  NIEUWE_RONDE,
+  OnderdeelRondeVelden,
+  OnderdeelRondeWaarde,
+} from "@/components/beheer/OnderdeelRondeVelden";
 
 /**
- * "Wijzigen" van een Meting (`beheerpagina.md`, punt 5): Het label, het onderdeel en de ronde zijn achteraf aanpasbaar. Het
- * Assessment ligt vast. Een label dat nog het gegenereerde label is, volgt een nieuw onderdeel of een nieuwe ronde, een met de
- * hand aangepast label blijft staan. Hetzelfde onderdeel voor hetzelfde Assessment in dezelfde ronde kan niet twee keer.
+ * "Wijzigen" van een Meting (`beheerpagina.md`, punt 5): Achter het potlood naast de naam van de Meting, met alleen de twee
+ * velden Onderdeel en Ronde en verder niets. De naam volgt vanzelf. Het Assessment ligt vast. Een Meting zonder ronde kan er
+ * een krijgen, en houdt tot dan haar oude label. Hetzelfde onderdeel voor hetzelfde Assessment in dezelfde ronde kan niet twee
+ * keer: De melding noemt de Meting die er al is en de uitwegen.
  */
 export function MetingWijzigenFormulier({
   organisatie,
@@ -23,66 +27,57 @@ export function MetingWijzigenFormulier({
   onKlaar: () => void;
 }) {
   const samengesteld = isSamengesteld(meting);
-  const rondes = rondesNieuwsteEerst(organisatie);
-  const [label, setLabel] = useState(meting.label);
-  const [onderdeel, setOnderdeel] = useState(onderdeelVan(meting));
-  const [ronde, setRonde] = useState(meting.rondeId ?? GEEN_RONDE);
-  const [nieuweRonde, setNieuweRonde] = useState("");
+  const [waarde, setWaarde] = useState<OnderdeelRondeWaarde>({
+    onderdeel: onderdeelVan(meting),
+    ronde: meting.rondeId ?? GEEN_RONDE,
+    nieuweRonde: "",
+  });
   const [fout, setFout] = useState<string | null>(null);
 
   function opslaan(e: React.FormEvent) {
     e.preventDefault();
     setFout(null);
-    if (!label.trim()) return setFout("Het label is verplicht.");
+    if (waarde.ronde === NIEUWE_RONDE && !waarde.nieuweRonde.trim()) return setFout("Geef de nieuwe ronde een naam.");
     const r = wijzigMeting(meting.id, {
-      label,
-      onderdeel: onderdeel.trim() || STANDAARD_ONDERDEEL,
-      ...(ronde === NIEUWE_RONDE ? { nieuweRondeLabel: nieuweRonde } : { rondeId: ronde === GEEN_RONDE ? null : ronde }),
+      onderdeel: waarde.onderdeel.trim() || STANDAARD_ONDERDEEL,
+      ...(waarde.ronde === NIEUWE_RONDE
+        ? { nieuweRondeLabel: waarde.nieuweRonde }
+        : { rondeId: waarde.ronde === GEEN_RONDE ? null : waarde.ronde }),
     });
     if (!r.ok) return setFout(r.reden);
     onKlaar();
   }
 
   return (
-    <form onSubmit={opslaan} className="flex flex-wrap items-end gap-3" style={{ marginBottom: "0.8rem" }}>
-      <div className="admin-field" style={{ marginBottom: 0, minWidth: "16rem" }}>
-        <label>Label</label>
-        <input type="text" autoFocus value={label} onChange={(e) => setLabel(e.target.value)} />
+    <form onSubmit={opslaan} style={{ marginBottom: "0.8rem" }}>
+      <div className="flex flex-wrap items-end gap-3">
+        {samengesteld ? (
+          // Een samengestelde Meting hoort bij de ronde van haar onderliggende Metingen: Alleen het onderdeel is te wijzigen.
+          <div className="admin-field" style={{ marginBottom: 0 }}>
+            <label>Onderdeel</label>
+            <input
+              type="text"
+              value={waarde.onderdeel}
+              onChange={(e) => setWaarde({ ...waarde, onderdeel: e.target.value })}
+            />
+          </div>
+        ) : (
+          <OnderdeelRondeVelden
+            organisatie={organisatie}
+            waarde={waarde}
+            onChange={setWaarde}
+            metZonderRonde={!meting.rondeId}
+            idPrefix="wijzig-meting"
+          />
+        )}
+        <button type="submit" className="btn btn-or btn-compact">
+          Opslaan
+        </button>
+        <button type="button" className="btn btn-outline btn-compact" onClick={onKlaar}>
+          Annuleren
+        </button>
       </div>
-      <div className="admin-field" style={{ marginBottom: 0 }}>
-        <label>Onderdeel</label>
-        <input type="text" list="wijzig-onderdelen" value={onderdeel} onChange={(e) => setOnderdeel(e.target.value)} />
-        <datalist id="wijzig-onderdelen">
-          {bestaandeOnderdelen(organisatie).map((o) => (
-            <option key={o} value={o} />
-          ))}
-        </datalist>
-      </div>
-      <div className="admin-field" style={{ marginBottom: 0 }}>
-        <label>Ronde</label>
-        <select value={ronde} disabled={samengesteld} onChange={(e) => setRonde(e.target.value)}>
-          <option value={GEEN_RONDE}>Zonder ronde</option>
-          {rondes.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.label}
-            </option>
-          ))}
-          <option value={NIEUWE_RONDE}>Nieuwe ronde</option>
-        </select>
-      </div>
-      {ronde === NIEUWE_RONDE && (
-        <div className="admin-field" style={{ marginBottom: 0 }}>
-          <label>Naam van de ronde</label>
-          <input type="text" required value={nieuweRonde} onChange={(e) => setNieuweRonde(e.target.value)} />
-        </div>
-      )}
-      <button type="submit" className="btn btn-or btn-compact">
-        Opslaan
-      </button>
-      <button type="button" className="btn btn-outline btn-compact" onClick={onKlaar}>
-        Annuleren
-      </button>
-      {fout && <p className="overzicht-melding fout" style={{ flexBasis: "100%", margin: 0 }}>{fout}</p>}
+      {fout && <p className="overzicht-melding fout" style={{ margin: "0.6rem 0 0" }}>{fout}</p>}
     </form>
   );
 }

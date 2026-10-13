@@ -1,17 +1,20 @@
 import { Organisatie, Ronde, ScanUitvoering } from "../types";
 import { nieuwId } from "../id";
 import { laadAlles, slaAlles } from "./store";
-import { logAudit } from "../audit-store";
+import { logAudit, nieuweGroepId } from "../audit-store";
 import { metingContext, organisatieContext } from "../audit-context";
 import { maakInvulling } from "./respondenten";
 import {
   STANDAARD_ONDERDEEL,
+  botsingTekst,
+  controleerNaarRonde,
   genereerLabel,
   isSamengesteld,
   metingMetCombinatie,
   onderdeelVan,
   onderliggendeMetingen,
   rondeVan,
+  NaarRondeRegel,
   rondesVan,
   samengesteldeMetingenMet,
   voldoetAanMinScans,
@@ -40,28 +43,21 @@ function nieuweRonde(organisatie: Organisatie, label: string): Ronde {
   return ronde;
 }
 
-/** De ronde van een Meting is bekend aan de organisatie: Nog niet opgeslagen rondes bestaan alleen binnen één actie. */
-function labelVolgtGegenereerd(meting: ScanUitvoering, organisatie: Organisatie): boolean {
-  const ronde = rondeVan(organisatie, meting);
-  return !!ronde && meting.label === genereerLabel(onderdeelVan(meting), ronde.label);
-}
-
 /* ---------- Een Meting aanmaken en wijzigen ---------- */
 
 export interface MetingInvoer {
   assessmentId: string;
-  /** Leeg: Het gegenereerde label ("{onderdeel} | {ronde}"). */
-  label?: string;
   /** Standaard "Hele organisatie". */
   onderdeel?: string;
-  /** Een bestaande ronde, of `nieuweRondeLabel` voor een nieuwe. Zonder beide staat de Meting zonder ronde. */
+  /** Een bestaande ronde, of `nieuweRondeLabel` voor een nieuwe. Een van beide is verplicht: De naam volgt uit onderdeel en ronde. */
   rondeId?: string;
   nieuweRondeLabel?: string;
 }
 
 /**
- * Een Meting aanmaken met ronde en onderdeel (`beheerpagina.md`, punt 5). Hetzelfde onderdeel voor hetzelfde Assessment in
- * dezelfde ronde kan niet twee keer: De reden noemt de Meting die er al is.
+ * Een Meting aanmaken met ronde en onderdeel (`beheerpagina.md`, punt 5). De naam van de Meting maakt de app uit onderdeel
+ * en ronde, een label is er niet meer om in te vullen (`datamodel.md`, Naam van een Meting). Hetzelfde onderdeel voor
+ * hetzelfde Assessment in dezelfde ronde kan niet twee keer: De reden noemt de Meting die er al is en beide uitwegen.
  */
 export function maakMeting(organisatieId: string, input: MetingInvoer): Resultaat<{ meting: ScanUitvoering }> {
   const alles = laadAlles();
@@ -78,22 +74,18 @@ export function maakMeting(organisatieId: string, input: MetingInvoer): Resultaa
     ronde = nieuweRonde(organisatie, input.nieuweRondeLabel);
     nieuw = true;
   }
+  if (!ronde) return { ok: false, reden: "Kies een ronde of geef een nieuwe ronde een naam." };
 
-  if (ronde) {
-    const bestaand = metingMetCombinatie(organisatie, ronde.id, onderdeel, input.assessmentId);
-    if (bestaand) {
-      return { ok: false, reden: `In ${ronde.label} staat voor dit onderdeel en Assessment al de Meting "${bestaand.label}".` };
-    }
-  }
+  const bestaand = metingMetCombinatie(organisatie, ronde.id, onderdeel, input.assessmentId);
+  if (bestaand) return { ok: false, reden: botsingTekst(ronde.label, bestaand.label, "nieuw") };
 
-  const label = input.label?.trim() || (ronde ? genereerLabel(onderdeel, ronde.label) : "");
-  if (!label) return { ok: false, reden: "Geef de Meting een label of kies een ronde." };
+  const label = genereerLabel(onderdeel, ronde.label);
 
   const meting: ScanUitvoering = {
     id: nieuwId(),
     organisatieId,
     assessmentId: input.assessmentId,
-    ...(ronde ? { rondeId: ronde.id } : {}),
+    rondeId: ronde.id,
     label,
     onderdeel,
     aangemaaktOp: new Date().toISOString(),
@@ -102,16 +94,15 @@ export function maakMeting(organisatieId: string, input: MetingInvoer): Resultaa
   organisatie.scanUitvoeringen.push(meting);
   slaAlles(alles);
   logAudit([
-    ...(nieuw && ronde
+    ...(nieuw
       ? [{ actie: "ronde.aangemaakt", entiteitType: "ronde", entiteitId: ronde.id, entiteitNaam: ronde.label, details: { ...organisatieContext(organisatie), aantalMetingen: 1 } }]
       : []),
-    { actie: "meting.aangemaakt", entiteitType: "meting", entiteitId: meting.id, entiteitNaam: meting.label, details: { ...metingContext(organisatie, meting), onderdeel, ronde: ronde?.label ?? null } },
+    { actie: "meting.aangemaakt", entiteitType: "meting", entiteitId: meting.id, entiteitNaam: meting.label, details: { ...metingContext(organisatie, meting), onderdeel, ronde: ronde.label } },
   ]);
   return { ok: true, meting };
 }
 
 export interface MetingWijziging {
-  label?: string;
   onderdeel?: string;
   /** `null`: De Meting uit zijn ronde halen. */
   rondeId?: string | null;
@@ -119,9 +110,8 @@ export interface MetingWijziging {
 }
 
 /**
- * Label, onderdeel en ronde van een Meting wijzigen (`beheerpagina.md`, punt 5, Wijzigen). Het Assessment ligt vast. Een
- * label dat nog het gegenereerde label is, volgt het nieuwe onderdeel of de nieuwe ronde (`datamodel.md`, Label). Een
- * label dat met de hand is aangepast, blijft staan.
+ * Onderdeel en ronde van een Meting wijzigen (`beheerpagina.md`, punt 5, Wijzigen). Het Assessment ligt vast. De naam volgt
+ * vanzelf uit onderdeel en ronde. Een Meting zonder ronde houdt haar oude label zolang ze geen ronde krijgt.
  */
 export function wijzigMeting(metingId: string, wijziging: MetingWijziging): Resultaat {
   const alles = laadAlles();
@@ -129,7 +119,6 @@ export function wijzigMeting(metingId: string, wijziging: MetingWijziging): Resu
   const meting = organisatie?.scanUitvoeringen.find((m) => m.id === metingId);
   if (!organisatie || !meting) return { ok: false, reden: "Meting niet gevonden." };
 
-  const volgdLabel = labelVolgtGegenereerd(meting, organisatie);
   const oud = { label: meting.label, onderdeel: onderdeelVan(meting), ronde: rondeVan(organisatie, meting)?.label ?? null };
 
   const nieuwOnderdeel = wijziging.onderdeel !== undefined ? wijziging.onderdeel.trim() || STANDAARD_ONDERDEEL : onderdeelVan(meting);
@@ -148,16 +137,13 @@ export function wijzigMeting(metingId: string, wijziging: MetingWijziging): Resu
   if (rondeId && !ronde) return { ok: false, reden: "Ronde niet gevonden." };
   if (ronde) {
     const bestaand = metingMetCombinatie(organisatie, ronde.id, nieuwOnderdeel, meting.assessmentId, meting.id);
-    if (bestaand) {
-      return { ok: false, reden: `In ${ronde.label} staat voor dit onderdeel en Assessment al de Meting "${bestaand.label}".` };
-    }
+    if (bestaand) return { ok: false, reden: botsingTekst(ronde.label, bestaand.label, "deze") };
   }
 
   meting.onderdeel = nieuwOnderdeel;
   if (rondeId) meting.rondeId = rondeId;
   else delete meting.rondeId;
-  if (wijziging.label !== undefined && wijziging.label.trim()) meting.label = wijziging.label.trim();
-  else if (volgdLabel && ronde) meting.label = genereerLabel(nieuwOnderdeel, ronde.label);
+  if (ronde) meting.label = genereerLabel(nieuwOnderdeel, ronde.label);
 
   // Een onderliggende Meting die naar een andere ronde gaat, valt uit de samenstelling van de samengestelde Meting daar.
   for (const s of samengesteldeMetingenMet(organisatie, meting.id)) {
@@ -223,82 +209,74 @@ export function hernoemRonde(rondeId: string, nieuweNaam: string): Resultaat<{ g
 
 export interface NaarRondeResultaat {
   verplaatst: number;
-  overgeslagen: { metingId: string; label: string; reden: string }[];
   rondeLabel: string;
 }
 
 /**
- * "Naar ronde…" (`beheerpagina.md`, punt 5, Rondes beheren): Hangt één of meer Metingen aan een bestaande of nieuwe ronde.
- * Een Meting kan alleen naar een ronde waarin haar onderdeel en Assessment nog niet voorkomen, en een samengestelde Meting
- * hoort bij de ronde van haar onderliggende Metingen. Overgeslagen Metingen staan met reden in het resultaat.
+ * "Naar ronde…" (`beheerpagina.md`, punt 5, Rondes beheren): Hangt één of meer Metingen aan een bestaande of nieuwe ronde,
+ * elk met een eigen onderdeel. Alles of niets: Vóór het schrijven loopt dezelfde controle als in het scherm
+ * (`controleerNaarRonde`), en bij één botsing verandert er niets. De naam van elke Meting volgt uit onderdeel en ronde, ook
+ * die van een geïmporteerde Meting. Een samengestelde Meting hoort bij de ronde van haar onderliggende Metingen.
  */
 export function naarRonde(
   organisatieId: string,
-  metingIds: string[],
+  regels: NaarRondeRegel[],
   doel: { rondeId: string } | { nieuweRondeLabel: string }
-): Resultaat<NaarRondeResultaat> {
+): Resultaat<NaarRondeResultaat> & { fouten?: Record<string, string> } {
+  if (regels.length === 0) return { ok: false, reden: "Kies minstens één Meting." };
   const alles = laadAlles();
   const organisatie = vindOrganisatie(alles, organisatieId);
   if (!organisatie) return { ok: false, reden: "Organisatie niet gevonden." };
   let ronde: Ronde | undefined;
   let nieuw = false;
+  let nieuweNaam = "";
   if ("rondeId" in doel) {
     ronde = rondesVan(organisatie).find((r) => r.id === doel.rondeId);
     if (!ronde) return { ok: false, reden: "Ronde niet gevonden." };
   } else {
-    if (!doel.nieuweRondeLabel.trim()) return { ok: false, reden: "Geef de nieuwe ronde een naam." };
-    ronde = nieuweRonde(organisatie, doel.nieuweRondeLabel);
+    nieuweNaam = doel.nieuweRondeLabel.trim();
+    if (!nieuweNaam) return { ok: false, reden: "Geef de nieuwe ronde een naam." };
+  }
+  const rondeLabel = ronde?.label ?? nieuweNaam;
+
+  const fouten = controleerNaarRonde(organisatie, ronde?.id ?? null, rondeLabel, regels);
+  if (Object.keys(fouten).length > 0) return { ok: false, reden: "Niet alle Metingen passen in deze ronde.", fouten };
+
+  if (!ronde) {
+    ronde = nieuweRonde(organisatie, nieuweNaam);
     nieuw = true;
   }
-
-  const overgeslagen: NaarRondeResultaat["overgeslagen"] = [];
-  let verplaatst = 0;
-  const bij: ScanUitvoering[] = [];
-  for (const id of metingIds) {
-    const m = organisatie.scanUitvoeringen.find((x) => x.id === id);
-    if (!m) continue;
-    if (isSamengesteld(m)) {
-      overgeslagen.push({ metingId: id, label: m.label, reden: "Een samengestelde Meting hoort bij de ronde van haar onderliggende Metingen." });
-      continue;
-    }
-    if (m.rondeId === ronde.id) continue;
-    const bestaand = metingMetCombinatie(organisatie, ronde.id, onderdeelVan(m), m.assessmentId, m.id);
-    if (bestaand) {
-      overgeslagen.push({ metingId: id, label: m.label, reden: `In ${ronde.label} staat voor dit onderdeel en Assessment al "${bestaand.label}".` });
-      continue;
-    }
-    const volgde = labelVolgtGegenereerd(m, organisatie);
+  const bij: { meting: ScanUitvoering; oudeRonde: string | null }[] = [];
+  for (const regel of regels) {
+    const m = organisatie.scanUitvoeringen.find((x) => x.id === regel.metingId)!;
+    const onderdeel = regel.onderdeel.trim() || STANDAARD_ONDERDEEL;
+    bij.push({ meting: m, oudeRonde: rondeVan(organisatie, m)?.label ?? null });
     m.rondeId = ronde.id;
-    // Een met de hand aangepast label (of het label van een import) blijft staan.
-    if (volgde) m.label = genereerLabel(onderdeelVan(m), ronde.label);
-    bij.push(m);
-    verplaatst += 1;
+    m.onderdeel = onderdeel;
+    m.label = genereerLabel(onderdeel, ronde.label);
   }
   // Een onderliggende Meting in een andere ronde valt uit de samenstelling van de samengestelde Meting in de oude ronde.
-  for (const m of bij) {
-    for (const s of samengesteldeMetingenMet(organisatie, m.id)) {
-      if (s.rondeId !== m.rondeId) s.samenstelling = s.samenstelling!.filter((id) => id !== m.id);
+  for (const { meting } of bij) {
+    for (const s of samengesteldeMetingenMet(organisatie, meting.id)) {
+      if (s.rondeId !== meting.rondeId) s.samenstelling = s.samenstelling!.filter((id) => id !== meting.id);
     }
   }
-  if (nieuw && verplaatst === 0) {
-    // Een nieuwe ronde zonder Metingen bestaat niet: Terugdraaien.
-    organisatie.rondes = rondesVan(organisatie).filter((r) => r.id !== ronde!.id);
-    nieuw = false;
-  }
   slaAlles(alles);
-  if (verplaatst > 0) {
-    logAudit([
-      ...(nieuw ? [{ actie: "ronde.aangemaakt", entiteitType: "ronde", entiteitId: ronde.id, entiteitNaam: ronde.label, details: { ...organisatieContext(organisatie), aantalMetingen: verplaatst } }] : []),
-      ...bij.map((m) => ({
-        actie: "meting.bewerkt",
-        entiteitType: "meting",
-        entiteitId: m.id,
-        entiteitNaam: m.label,
-        details: { ...metingContext(organisatie, m), velden: ["ronde"], nieuweRonde: ronde!.label },
-      })),
-    ]);
-  }
-  return { ok: true, verplaatst, overgeslagen, rondeLabel: ronde.label };
+  const groepId = nieuweGroepId();
+  logAudit([
+    ...(nieuw
+      ? [{ actie: "ronde.aangemaakt", entiteitType: "ronde", entiteitId: ronde.id, entiteitNaam: ronde.label, groepId, details: { ...organisatieContext(organisatie), aantalMetingen: bij.length } }]
+      : []),
+    ...bij.map(({ meting, oudeRonde }) => ({
+      actie: "meting.bewerkt",
+      entiteitType: "meting",
+      entiteitId: meting.id,
+      entiteitNaam: meting.label,
+      groepId,
+      details: { ...metingContext(organisatie, meting), velden: ["ronde", "onderdeel"], oudeRonde, nieuweRonde: ronde!.label },
+    })),
+  ]);
+  return { ok: true, verplaatst: bij.length, rondeLabel: ronde.label };
 }
 
 /* ---------- Nieuwe ronde starten ---------- */
@@ -401,7 +379,7 @@ export function startNieuweRonde(
 export interface SamengesteldInvoer {
   rondeId: string;
   assessmentId: string;
-  label: string;
+  /** Standaard "Hele organisatie". De naam van de Meting maakt de app. */
   onderdeel?: string;
   metingIds: string[];
   /** `benchmarkMinScans`: Elke onderliggende Meting moet daaraan voldoen. */
@@ -443,12 +421,9 @@ export function maakSamengesteldeMeting(organisatieId: string, invoer: Samengest
   const onderdeel = invoer.onderdeel?.trim() || STANDAARD_ONDERDEEL;
   const bestaand = metingMetCombinatie(organisatie, ronde.id, onderdeel, invoer.assessmentId);
   if (bestaand) {
-    return {
-      ok: false,
-      reden: `In ${ronde.label} bestaat voor het onderdeel "${onderdeel}" al "${bestaand.label}". Kies een andere naam voor het onderdeel.`,
-    };
+    return { ok: false, reden: botsingTekst(ronde.label, bestaand.label, "nieuw") };
   }
-  const label = invoer.label.trim() || genereerLabel(onderdeel, ronde.label);
+  const label = genereerLabel(onderdeel, ronde.label);
   const meting: ScanUitvoering = {
     id: nieuwId(),
     organisatieId,
@@ -475,10 +450,10 @@ export function maakSamengesteldeMeting(organisatieId: string, invoer: Samengest
   return { ok: true, meting };
 }
 
-/** De samenstelling, het label of het onderdeel van een samengestelde Meting wijzigen. De ronde en het Assessment liggen vast. */
+/** De samenstelling of het onderdeel van een samengestelde Meting wijzigen. De ronde en het Assessment liggen vast. */
 export function wijzigSamengesteldeMeting(
   metingId: string,
-  wijziging: { label?: string; onderdeel?: string; metingIds: string[]; minScans: number }
+  wijziging: { onderdeel?: string; metingIds: string[]; minScans: number }
 ): Resultaat {
   const alles = laadAlles();
   const organisatie = alles.find((o) => o.scanUitvoeringen.some((m) => m.id === metingId));
@@ -494,11 +469,15 @@ export function wijzigSamengesteldeMeting(
   const onderdeel = wijziging.onderdeel !== undefined ? wijziging.onderdeel.trim() || STANDAARD_ONDERDEEL : onderdeelVan(meting);
   if (meting.rondeId) {
     const bestaand = metingMetCombinatie(organisatie, meting.rondeId, onderdeel, meting.assessmentId, meting.id);
-    if (bestaand) return { ok: false, reden: `In deze ronde bestaat voor het onderdeel "${onderdeel}" al "${bestaand.label}".` };
+    if (bestaand) {
+      const ronde = rondesVan(organisatie).find((r) => r.id === meting.rondeId);
+      return { ok: false, reden: botsingTekst(ronde?.label ?? "deze ronde", bestaand.label, "deze") };
+    }
   }
   meting.samenstelling = [...new Set(wijziging.metingIds)];
   meting.onderdeel = onderdeel;
-  if (wijziging.label?.trim()) meting.label = wijziging.label.trim();
+  const ronde = rondeVan(organisatie, meting);
+  if (ronde) meting.label = genereerLabel(onderdeel, ronde.label);
   slaAlles(alles);
   logAudit({
     actie: "meting.samengesteldGewijzigd",

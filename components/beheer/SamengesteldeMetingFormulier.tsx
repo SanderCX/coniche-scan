@@ -17,8 +17,8 @@ import {
 import { Organisatie, ScanUitvoering } from "@/lib/types";
 
 /**
- * Het formulier voor een samengestelde Meting (`beheerpagina.md`, punt 5, Samengestelde Meting): Een label, het Assessment en
- * het onderdeel (voorgevuld met "Hele organisatie"). Daaronder de Metingen van die ronde voor dat Assessment, elk met een
+ * Het formulier voor een samengestelde Meting (`beheerpagina.md`, punt 5, Samengestelde Meting): Het Assessment en het
+ * onderdeel (voorgevuld met "Hele organisatie"). De naam maakt de app. Daaronder de Metingen van die ronde voor dat Assessment, elk met een
  * selectievakje, het onderdeel en het aantal afgeronde scans, standaard allemaal aan. Een Meting met te weinig scans
  * (`benchmarkMinScans`) is uitgeschakeld, met de reden erbij. Opslaan kan pas bij minstens twee Metingen.
  *
@@ -46,7 +46,6 @@ export function SamengesteldeMetingFormulier({
 
   const [assessmentId, setAssessmentId] = useState(bestaande?.assessmentId ?? assessmentIds[0] ?? "");
   const [onderdeel, setOnderdeel] = useState(bestaande ? onderdeelVan(bestaande) : STANDAARD_ONDERDEEL);
-  const [label, setLabel] = useState(bestaande?.label ?? "");
   const [gekozen, setGekozen] = useState<string[]>(bestaande?.samenstelling ?? []);
   const [initieel, setInitieel] = useState(!bestaande);
   const [fout, setFout] = useState<string | null>(null);
@@ -69,7 +68,7 @@ export function SamengesteldeMetingFormulier({
     e.preventDefault();
     setFout(null);
     if (bestaande) {
-      const r = wijzigSamengesteldeMeting(bestaande.id, { label, onderdeel, metingIds: actueel, minScans: benchmarkMinScans });
+      const r = wijzigSamengesteldeMeting(bestaande.id, { onderdeel, metingIds: actueel, minScans: benchmarkMinScans });
       if (!r.ok) return setFout(r.reden);
       onKlaar(bestaande);
       return;
@@ -77,7 +76,6 @@ export function SamengesteldeMetingFormulier({
     const r = maakSamengesteldeMeting(organisatie.id, {
       rondeId,
       assessmentId,
-      label: label.trim() || voorstelLabel,
       onderdeel,
       metingIds: actueel,
       minScans: benchmarkMinScans,
@@ -104,10 +102,6 @@ export function SamengesteldeMetingFormulier({
         Het gemiddelde van Metingen in {ronde.label}. Elke Meting telt even zwaar mee, ongeacht het aantal scans.
       </p>
       <div className="admin-field">
-        <label>Label</label>
-        <input type="text" value={label} placeholder={voorstelLabel} onChange={(e) => setLabel(e.target.value)} />
-      </div>
-      <div className="admin-field">
         <label>Assessment</label>
         <select value={assessmentId} disabled={!!bestaande} onChange={(e) => { setAssessmentId(e.target.value); setInitieel(true); }}>
           {assessmentIds.map((id) => (
@@ -120,6 +114,11 @@ export function SamengesteldeMetingFormulier({
       <div className="admin-field">
         <label>Onderdeel</label>
         <input type="text" value={onderdeel} onChange={(e) => setOnderdeel(e.target.value)} />
+        {voorstelLabel && (
+          <p className="text-sm text-ink-s" style={{ margin: "0.3rem 0 0" }}>
+            Wordt: {voorstelLabel}
+          </p>
+        )}
       </div>
       <div className="admin-field">
         <label>Metingen (minstens twee)</label>
