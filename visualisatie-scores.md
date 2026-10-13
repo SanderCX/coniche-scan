@@ -1,6 +1,6 @@
 # Coniche Scan: Visualisatie van hoge en lage scores
 
-**Status.** Ontwerprichting besloten door Joost op 12 oktober 2026. Gebouwd op 13 oktober 2026 (A tot en met E, de navigatie en de schakelaar), met de afwijkingen en wat nog niet is gebouwd onder Gebouwd. Wat een voorstel is dat nog bevestiging vraagt, staat per onderdeel aangegeven. Dit bestand beschrijft wat getoond wordt en hoe het berekend wordt. De precieze opmaak (maten, kleuren, lettergrootte) volgt `stylesheet.md`. Waar dit bestand daar iets aan toevoegt, staat dat onder Nieuwe stijlwaarden.
+**Status.** Ontwerprichting besloten door Joost op 12 oktober 2026. Gebouwd op 13 oktober 2026 (A tot en met E en G, de navigatie en de schakelaar), met de afwijkingen en wat nog niet is gebouwd onder Gebouwd. Wat een voorstel is dat nog bevestiging vraagt, staat per onderdeel aangegeven. Dit bestand beschrijft wat getoond wordt en hoe het berekend wordt. De precieze opmaak (maten, kleuren, lettergrootte) volgt `stylesheet.md`. Waar dit bestand daar iets aan toevoegt, staat dat onder Nieuwe stijlwaarden.
 
 **Visueel referentieontwerp.** Het canvas "Coniche Scan – visualisatie van scores" (vijf borden, voorbeeldgegevens) is een ontwerpschets en geen code. Waar schets en tekst verschillen, geldt de tekst. De borden staan ook als afbeelding in de map `afbeeldingen` (`visualisatie-a-een-meting.png`, `visualisatie-b-spreiding.png`, `visualisatie-c-tussen-metingen.png`, `visualisatie-d-tussen-organisaties.png` en `visualisatie-e-matrix.png`), plus `visualisatie-f-navigatie.png` met de schakelaar en de knop op de resultatenpagina's (Navigatie). Het canvas zelf is privé en moet door Joost gedeeld worden voordat Sander het kan openen.
 
@@ -176,7 +176,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 ## G. Antwoorden per vraag
 
-**Status.** Voorstel van 13 oktober 2026, nog niet gebouwd.
+**Status.** Voorstel van 13 oktober 2026, gebouwd op 13 oktober 2026 (zie Gebouwd).
 
 **Plek.** De weergave Antwoorden op de resultatenpagina van een Meting (zie Navigatie), alleen voor een Admin en een Consultant met bereik op de organisatie. Dit is het laagste niveau en vervangt het Excel-overzicht van Sander.
 
@@ -216,6 +216,9 @@ Gebouwd op 13 oktober 2026. De berekeningen staan in `lib/visualisatie.ts` (met 
 - E: de matrix in de sectie van een benchmark op niveau 2 (kolommen met Metingen) en op niveau 1 (kolommen met organisaties,
   met het label van de Meting en het aantal scans onder de naam), alleen voor de Admin. Bij veel kolommen scrolt de matrix
   horizontaal met een vaste eerste kolom.
+- G: de vierde knop "Antwoorden" in de schakelaar op de resultatenpagina van een Meting in beheer (`?weergave=antwoorden`),
+  alleen voor een Admin en Consultant (`antwoordenToegestaan`), nooit voor een Lead en niet bij een samengestelde Meting
+  (die heeft geen scans). `antwoordenPerVraag` (`lib/visualisatie.ts`), `WeergaveAntwoorden`.
 
 **Afwijkingen en keuzes**
 
@@ -227,6 +230,13 @@ Gebouwd op 13 oktober 2026. De berekeningen staan in `lib/visualisatie.ts` (met 
   hoogste score uit. Voor een Admin en een Consultant staat hij altijd aan.
 - Zonder categorielaag (AI-volwassenheid) vervallen de groepslabels. Bij "Sorteer op spreiding" vervallen ze ook.
 - Een Admin kan in B geen naam bij een stip zien (zie Open punten).
+- G, kolomvolgorde: Alfabetisch op het laatste woord van de naam, daarna de hele naam. Een Respondent heeft één veld `naam`,
+  dus "achternaam" is het laatste woord ("Jan de Vries" staat onder V).
+- G, initialen: De eerste letter van het eerste en het laatste woord, of de eerste twee letters van één woord. Gelijke
+  initialen krijgen een volgnummer ("JV", "JV2"). De volledige naam staat in de tooltip.
+- G, een gearchiveerde vraag die niemand beantwoordde, heeft geen rij. Wie haar wel beantwoordde, ziet haar met de tekst van de
+  content zoals die nu is (er is geen versiegeschiedenis van een vraagtekst).
+- G, de kleur volgt de afgeronde waarde op één decimaal (2,45 wordt 2,5 en dus de kleur van 3).
 - Elke Meting in de matrix telt even zwaar mee. Met twee kolommen wijkt elke cel precies 0,5 of meer af van het
   rijgemiddelde en krijgt dus een rand. De regel is zo bedoeld, maar bij twee Metingen is de markering daardoor weinig
   onderscheidend.
@@ -254,7 +264,7 @@ Voorstel, op te nemen in `stylesheet.md` zodra ze zijn bevestigd:
 | Positielabel boven de groep | vulling `#e8f1fb`, tekst `#174473`, rand `#bcd3ee` |
 | Positielabel onder de groep | vulling `#fdf2e3`, tekst `#8a4a00`, rand `#f2cf9b` |
 | Spreiding, stip van een respondent | `#5d6a78` met 75% dekking |
-| G, cel met een antwoord of score | `--score-1` tot `--score-5`, tekst wit op 1 en 5, `--ink` op 2 tot en met 4 |
+| G, cel met een antwoord of score | `--score-1` tot `--score-5`, tekst wit op 1 en 5, `--ink` op 2 tot en met 4 (gebouwd) |
 | G, lege cel | wit, rand `1px solid var(--border)` |
 
 ## Open punten
@@ -265,6 +275,6 @@ Voorstel, op te nemen in `stylesheet.md` zodra ze zijn bevestigd:
 - Of een Admin in B de naam van een respondent bij een stip kan zien.
 - Een extra uitsplitsing van B naar Rol, bijvoorbeeld management tegenover medewerkers. Zie `backlog.md`.
 - Meer dan twee Metingen in C.
-- G: De volgorde van de kolommen (voorstel alfabetisch op achternaam), sorteren of filteren op bouwblok, en een CSV-export van deze matrix naast de bestaande export per scan (`export-csv.md`).
+- G: De volgorde van de kolommen (gebouwd op het laatste woord van de naam), sorteren of filteren op bouwblok, en een CSV-export van deze matrix naast de bestaande export per scan (`export-csv.md`).
 - G: Of de initialen in de kolomkop genoeg zijn bij respondenten met dezelfde initialen.
 - Export van deze weergaven naar PDF, CSV en InDesign.

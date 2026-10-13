@@ -426,3 +426,143 @@ export function matrix(assessment: Assessment, kolommen: MatrixKolomInvoer[]): M
     aantalAfwijkend: rijen.reduce((n, r) => n + r.cellen.filter((c) => c.afwijkend).length, 0),
   };
 }
+
+/* ---------- G. Antwoorden per vraag ---------- */
+
+export interface AntwoordenKolom {
+  invullingId: string;
+  /** De volledige naam (tooltip), of het e-mailadres zolang de naam leeg is. */
+  naam: string;
+  initialen: string;
+}
+
+export interface AntwoordenVraagRij {
+  vraagId: string;
+  /** "3.2": Het volgnummer van het bouwblok en dat van de vraag. */
+  nummer: string;
+  tekst: string;
+  /** Per kolom het antwoord (1 tot 5), of `null` bij een onbeantwoorde vraag. */
+  antwoorden: (number | null)[];
+  gemiddelde: number | null;
+  /** Aantal beantwoorde antwoorden. */
+  n: number;
+}
+
+export interface AntwoordenBouwblokRij {
+  rij: BouwblokRij;
+  /** Per kolom de bouwblokscore van die respondent (ruw, getoond op één decimaal). */
+  scores: (number | null)[];
+  /** Het gemiddelde van de vraaggemiddelden, zoals bij weergave A. */
+  gemiddelde: number | null;
+  n: number;
+  vragen: AntwoordenVraagRij[];
+}
+
+export interface AntwoordenWeergave {
+  kolommen: AntwoordenKolom[];
+  rijen: AntwoordenBouwblokRij[];
+  /** Totaalscore per respondent (gedeelde scorefunctie met `Bouwblok.gewicht`). */
+  totaal: (number | null)[];
+  totaalGemiddelde: number | null;
+  totaalN: number;
+  aantalRespondenten: number;
+  /** Beantwoorde antwoorden en het aantal dat er had kunnen zijn (respondenten × vragen). */
+  beantwoord: number;
+  mogelijk: number;
+  laagsteVraag: { score: number; bouwblok: string; nummer: string } | null;
+  hoogsteVraag: { score: number; bouwblok: string; nummer: string } | null;
+}
+
+/** Initialen uit een naam: De eerste letter van het eerste en het laatste woord, of de eerste twee letters van één woord. */
+export function initialenVan(naam: string): string {
+  const woorden = naam.trim().split(/\s+/).filter(Boolean);
+  if (woorden.length === 0) return "?";
+  if (woorden.length === 1) return woorden[0].slice(0, 2).toUpperCase();
+  return (woorden[0][0] + woorden[woorden.length - 1][0]).toUpperCase();
+}
+
+/** Sorteersleutel: De achternaam (het laatste woord), daarna de hele naam. Het e-mailadres staat voor wie geen naam heeft. */
+function achternaamSleutel(naam: string): [string, string] {
+  const woorden = naam.trim().split(/\s+/).filter(Boolean);
+  return [(woorden[woorden.length - 1] ?? "").toLowerCase(), naam.trim().toLowerCase()];
+}
+
+/**
+ * De antwoorden per vraag van één Meting (`visualisatie-scores.md`, G): Eén kolom per afgeronde scan, de rijen de bouwblokken
+ * met hun vragen. De kolommen staan alfabetisch op achternaam. Gelijke initialen krijgen een volgnummer ("JJ", "JJ2"), zodat de
+ * kolomkoppen te onderscheiden zijn. Alles komt uit de gedeelde scorefuncties, er is geen tweede rekenmethode. Gearchiveerde
+ * vragen tellen mee voor wie ze beantwoordde (`datamodel.md`, Content bewerken).
+ */
+export function antwoordenPerVraag(
+  assessment: Assessment,
+  invullingen: ScanInvulling[],
+  naamVan: (invulling: ScanInvulling) => string
+): AntwoordenWeergave {
+  const scans = afgerond(invullingen)
+    .map((i) => ({ invulling: i, naam: naamVan(i) }))
+    .sort((a, b) => {
+      const [aa, an] = achternaamSleutel(a.naam);
+      const [ba, bn] = achternaamSleutel(b.naam);
+      return aa.localeCompare(ba, "nl") || an.localeCompare(bn, "nl");
+    });
+  const gebruikt = new Map<string, number>();
+  const kolommen: AntwoordenKolom[] = scans.map((s) => {
+    const basis = initialenVan(s.naam);
+    const keer = (gebruikt.get(basis) ?? 0) + 1;
+    gebruikt.set(basis, keer);
+    return { invullingId: s.invulling.id, naam: s.naam, initialen: keer === 1 ? basis : `${basis}${keer}` };
+  });
+
+  const gemiddeld = gemiddeldeAntwoordenVoorMeting(assessment, scans.map((s) => s.invulling));
+  let beantwoord = 0;
+  let mogelijk = 0;
+  let laagste: AntwoordenWeergave["laagsteVraag"] = null;
+  let hoogste: AntwoordenWeergave["hoogsteVraag"] = null;
+
+  const rijen: AntwoordenBouwblokRij[] = bouwblokRijen(assessment).map((rij) => {
+    const vragen: AntwoordenVraagRij[] = rij.bouwblok.vragen.map((vraag) => {
+      const antwoorden = scans.map((s) => {
+        const a = s.invulling.antwoorden[vraag.id];
+        return typeof a === "number" ? a : null;
+      });
+      const gegeven = antwoorden.filter((a): a is number => a !== null);
+      return {
+        vraagId: vraag.id,
+        nummer: `${rij.bouwblok.volgnummer}.${vraag.volgnummer}`,
+        tekst: vraag.tekst,
+        antwoorden,
+        gemiddelde: gemiddelde(gegeven),
+        n: gegeven.length,
+      };
+    });
+    // Een gearchiveerde vraag die niemand beantwoordde, heeft geen rij: Er valt niets te tonen.
+    const getoond = vragen.filter((v, i) => v.n > 0 || !rij.bouwblok.vragen[i].gearchiveerd);
+    for (const v of getoond) {
+      if (v.gemiddelde === null) continue;
+      if (laagste === null || v.gemiddelde < laagste.score) laagste = { score: v.gemiddelde, bouwblok: rij.bouwblok.naam, nummer: v.nummer };
+      if (hoogste === null || v.gemiddelde > hoogste.score) hoogste = { score: v.gemiddelde, bouwblok: rij.bouwblok.naam, nummer: v.nummer };
+    }
+    beantwoord += getoond.reduce((n, v) => n + v.n, 0);
+    mogelijk += getoond.length * scans.length;
+    return {
+      rij,
+      scores: scans.map((s) => bouwblokScoreRuw(rij.bouwblok, s.invulling.antwoorden)),
+      gemiddelde: scans.length === 0 ? null : bouwblokScoreRuw(rij.bouwblok, gemiddeld),
+      n: getoond.reduce((n, v) => n + v.n, 0),
+      vragen: getoond,
+    };
+  });
+
+  return {
+    kolommen,
+    rijen,
+    totaal: scans.map((s) => overallScore(assessment, s.invulling.antwoorden)),
+    totaalGemiddelde: scans.length === 0 ? null : overallScore(assessment, gemiddeld),
+    totaalN: beantwoord,
+    aantalRespondenten: scans.length,
+    beantwoord,
+    mogelijk,
+    laagsteVraag: laagste,
+    hoogsteVraag: hoogste,
+  };
+}

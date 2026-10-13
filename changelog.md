@@ -1,5 +1,30 @@
 # Coniche Scan — Changelog
 
+## 2026-10-13 (6) — Specs van Joost, PR 93: Weergave G, Antwoorden per vraag
+
+**Gedaan**:
+- **Weergave G** (`visualisatie-scores.md`, G): De vierde knop "Antwoorden" in de schakelaar op de resultatenpagina van een
+  Meting in beheer (`?weergave=antwoorden`), alleen voor een Admin en Consultant. Een Lead ziet haar nooit (op de pagina van de
+  Lead staat `antwoordenToegestaan` uit), en een samengestelde Meting heeft geen scans en dus geen knop.
+- **Berekening** (`antwoordenPerVraag`, `lib/visualisatie.ts`): Eén kolom per afgeronde scan, de bouwblokken met hun vragen
+  (met de tekst uit de content), per bouwblok de score van elke respondent, Gem. en N per rij, de Totaalscore uit de gedeelde
+  scorefunctie met de gewichten, en de tegels (Respondenten, Beantwoord, Laagste en Hoogste vraag).
+- **Weergave** (`WeergaveAntwoorden`): Initialen in de kolomkop met de naam in een tooltip, alle bouwblokken standaard
+  ingeklapt met "Alles uitklappen" en "Alles inklappen", de vijf scorekleuren per cel (wit op 1 en 5, donker op 2 tot en met 4,
+  lege cel wit met een rand), en een kaart die zelf scrolt met een vaste kolomkop en linkerkolom.
+- **Specs**: G staat op gebouwd in `visualisatie-scores.md`, met de gemaakte keuzes onder Afwijkingen en keuzes. De schakelaar
+  in `stylesheet.md` en de regel in `beheerpagina.md` volgen.
+
+**Keuzes waar de spec open liet**:
+- Kolomvolgorde: Op het laatste woord van de naam (een Respondent heeft één veld `naam`), daarna de hele naam.
+- Gelijke initialen krijgen een volgnummer ("JV", "JV2").
+- Een gearchiveerde vraag zonder antwoorden krijgt geen rij.
+
+**Tests**: 230 (was 225): Kolomvolgorde en initialen, antwoorden en scores per bouwblok, de totaalscore uit de gedeelde
+scorefunctie, een lege cel, en een Meting zonder afgeronde scans.
+
+**Open** (staat ook bij Joost): Sorteren of filteren op bouwblok en een CSV-export van deze matrix.
+
 ## 2026-10-13 (5) — Specs van Joost, PR 91: Label van een Meting vervalt, Naar ronde met onderdeel per Meting
 
 **Gedaan**:

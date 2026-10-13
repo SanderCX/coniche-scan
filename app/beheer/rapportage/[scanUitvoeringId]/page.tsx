@@ -115,6 +115,7 @@ export default function RapportagePage({
           scanUitvoering={scanUitvoering}
           overzicht={<ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />}
           spreidingToegestaan={!samengesteld}
+          antwoordenToegestaan={!samengesteld}
           bereikAltijd
           toonBenchmarkLink={isAdmin(ingelogd)}
         />
