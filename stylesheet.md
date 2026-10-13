@@ -623,6 +623,15 @@ een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
   op de titel staat. Het staat niet hoger (superscript), niet lager en niet
   op de basislijn. Bij een titel die op twee regels afbreekt, staat het icoon
   achter de laatste regel.
+- **Nooit van de regel af**: Het icoon valt niet los van het veld of de tekst
+  waar het achter staat. Het icoon krijgt `flex-shrink: 0` en `white-space:
+  nowrap`, en de rij (veld, eenheid of aantal, icoon) is een flexrij zonder
+  `flex-wrap`, of het laatste woord en het icoon staan samen in één
+  `white-space: nowrap`-element. Is er te weinig ruimte, dan breekt de tekst
+  ervoor af en niet het icoon naar een eigen regel. Dit geldt ook bij een
+  aantal of eenheid vlak voor het icoon, zoals "{n} scans" of "dagen" bij
+  Drempels en termijnen. Een veld of invoer in die rij mag krimpen
+  (`min-width: 0`), het icoon niet.
 - **Informatieveld**: Een klik op het icoon toont het veld gecentreerd in
   het zichtbare venster (`position: fixed`, horizontaal en verticaal in het
   midden van de viewport), niet vanaf het icoon. Daardoor staat het nooit

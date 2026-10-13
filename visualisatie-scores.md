@@ -14,7 +14,7 @@ Een resultaat moet in één blik laten zien waar een organisatie hoog en laag sc
 | B. Spreiding | Zijn de respondenten het eens? | Niveau 3, binnen een Meting | Admin, Lead met toewijzing |
 | C. Tussen metingen | Wat is er veranderd sinds de vorige Meting? | Trend in de tijd (`backlog.md`), valt buiten niveau 2 | Admin, Consultant, Lead |
 | D. Tussen organisaties | Waar zitten we boven of onder de groep? | Niveau 1, de view per organisatie | Admin, Lead met toewijzing |
-| E. Matrix | Welke Metingen wijken af, op welk bouwblok? | Niveau 2, binnen een organisatie | Alleen Admin |
+| E. Matrix | Welke Metingen of organisaties wijken af, op welk bouwblok? | Niveau 2, binnen een organisatie, en niveau 1, tussen organisaties | Alleen Admin |
 
 ## Gedeelde regels
 
@@ -145,9 +145,9 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Privacy.** Het maximum en het minimum zijn de score van één organisatie, al staat er geen naam bij. Zie Open punten voor de drempel. De view toont nooit namen van andere organisaties (`benchmark.md`).
 
-## E. Matrix voor Metingen binnen een organisatie (niveau 2)
+## E. Matrix voor Metingen en organisaties (niveau 2 en 1)
 
-**Plek.** De weergave van niveau 2 (`benchmark.md`, Niveau 2, Weergave), per Assessment, naast het gemiddelde van alle gekozen Metingen. Alleen voor een Admin, omdat de kolomkoppen de labels van de Metingen tonen en een Lead die van andere Metingen niet mag zien (`benchmark.md`, Toewijzen aan een Lead op alle niveaus). Een Lead krijgt de view van zijn Meting tegenover de rest, in de opbouw van D.
+**Plek.** De weergave van niveau 2 (`benchmark.md`, Niveau 2, Weergave), per Assessment, naast het gemiddelde van alle gekozen Metingen. Op niveau 1 staat dezelfde matrix per Assessment onder de gemiddelden van de groep (`benchmark.md`, Niveau 1, Weergave voor de Admin), met organisaties als kolommen. Alleen voor een Admin, omdat de kolomkoppen de labels van de Metingen tonen en een Lead die van andere Metingen niet mag zien (`benchmark.md`, Toewijzen aan een Lead op alle niveaus). Een Lead krijgt de view van zijn Meting tegenover de rest, in de opbouw van D.
 
 **Data.** Per bouwblok het gemiddelde van elke gekozen Meting. Elke Meting telt even zwaar mee, ongeacht het aantal respondenten.
 
@@ -155,7 +155,15 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Tegels.** Hoogste Meting en laagste Meting (totaalscore en label), bouwblok met het grootste verschil tussen Metingen, aantal cellen met een zwarte rand.
 
-**Andere kolommen.** Dezelfde matrix kan opeenvolgende Metingen in de tijd of organisaties tonen. Voor organisaties geldt dan de privacyregel van D en zijn de kolomkoppen anoniem. Dit is nu geen besluit en vraagt eerst een uitwerking.
+**Niveau 1, kolommen met organisaties.** Besloten op 13 oktober 2026, nog niet gebouwd. De opbouw, de kleuren, de zwarte rand, de rij Totaalscore en de tegels zijn gelijk aan niveau 2. Wat anders is:
+
+- De kolomkop is de organisatienaam, met daaronder het label van de Meting en het aantal afgeronde scans. Op niveau 2 is de kop het label van de Meting.
+- De tegels heten Hoogste organisatie en Laagste organisatie, met de totaalscore en de organisatienaam.
+- Organisaties zonder lid bij dit Assessment hebben geen kolom.
+- De matrix is alleen voor de Admin. De privacyregel van D geldt voor een Lead en verandert daar niets aan, omdat een Lead de matrix niet ziet.
+- Een Lead met een toegewezen view krijgt nooit de kolommen van andere organisaties, ook niet anoniem.
+
+**Andere kolommen.** Opeenvolgende Metingen in de tijd in dezelfde matrix is nu geen besluit en vraagt eerst een uitwerking.
 
 ## Gebouwd
 

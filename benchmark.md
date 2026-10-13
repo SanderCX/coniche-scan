@@ -77,6 +77,13 @@ Valt een lid weg doordat de Meting of de Organisatie is verwijderd, of doordat d
 
 **Gebouwd.** Per Assessment een sectie met de gemiddelden van de groep, per vraag, per bouwblok, per categorie en overall. De Admin ziet de namen van de organisaties. De resultaatcomponenten van het resultatenscherm (`CLAUDE.md`, schermflow punt 6) worden hergebruikt waar dat kan. Elke sectie is een zelfstandig onderdeel, zodat een latere PDF per Assessment een eigen deel kan krijgen.
 
+**Besloten, nog niet gebouwd.** Per Assessment komt onder de gemiddelden van de groep ook de matrix die niveau 2 heeft (Niveau 2, Weergave). De bouwblokken zijn de rijen en de organisaties de kolommen, zodat de Admin in één blik ziet welke organisatie op welk bouwblok afwijkt. De opbouw staat in `visualisatie-scores.md`, onderdeel E.
+
+- **Kolommen.** Eén kolom per lid van het Assessment. De kop toont de organisatienaam, met daaronder het label van de Meting en het aantal afgeronde scans. Organisaties die bij dat Assessment ontbreken, staan niet als kolom in de matrix. Ze staan al bij de teller.
+- **Cijfers.** Het gemiddelde van de rij is het groepsgemiddelde van het bouwblok, want elk lid telt even zwaar mee (Gedeelde regels). De matrix leest dus uit dezelfde berekening als de rest van de sectie en heeft geen eigen rekenregel.
+- **Alleen voor de Admin.** De kolomkoppen tonen de namen van de organisaties. Een Lead ziet deze matrix nooit en houdt alleen zijn view per organisatie (View per organisatie).
+- **Bij veel organisaties.** De matrix scrolt horizontaal met een vaste eerste kolom (voorstel).
+
 ### View per organisatie
 
 **Gebouwd.** Vanuit de benchmark opent de Admin voor elke deelnemende organisatie X een view. Per Assessment waar X lid van is, staat de Meting van X naast het gemiddelde van de rest van de groep, zonder X zelf. Zou X meetellen, dan trekt ze het gemiddelde naar zichzelf toe en kan ze bij een kleine groep de scores van de anderen terugrekenen.
@@ -212,3 +219,4 @@ De gebeurtenissen staan in `datamodel.md`, Audit, onder Benchmark. Wat een verwi
 - Niveau 2: Of voor het privacy statement iets nodig is, nu de gegevens binnen de organisatie blijven.
 - Niveau 3: De grenzen van het spreidingslabel en de vraag of een Admin bij een stip de naam kan zien (`visualisatie-scores.md`, Open punten).
 - Niveau 1: Of de band en de kwartielen van de groep een eigen drempel krijgen.
+- Niveau 1: Of de matrix bij heel veel organisaties een andere weergave nodig heeft dan horizontaal scrollen.
