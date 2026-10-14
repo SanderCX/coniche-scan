@@ -2,20 +2,25 @@
 
 import { useState } from "react";
 import { wijzigMeting } from "@/lib/db";
-import { STANDAARD_ONDERDEEL, isSamengesteld, onderdeelVan } from "@/lib/rondes";
-import { Organisatie, ScanUitvoering } from "@/lib/types";
 import {
-  GEEN_RONDE,
-  NIEUWE_RONDE,
-  OnderdeelRondeVelden,
-  OnderdeelRondeWaarde,
-} from "@/components/beheer/OnderdeelRondeVelden";
+  STANDAARD_ONDERDEEL,
+  dubbeleCombinatieTekst,
+  isGeldigeDatum,
+  isSamengesteld,
+  meetdatumVan,
+  metingMetCombinatie,
+  onderdeelVan,
+  standaardLabel,
+} from "@/lib/metingen";
+import { Organisatie, ScanUitvoering } from "@/lib/types";
+import { OnderdeelMeetdatumVelden } from "@/components/beheer/OnderdeelMeetdatumVelden";
 
 /**
- * "Wijzigen" van een Meting (`beheerpagina.md`, punt 5): Achter het potlood naast de naam van de Meting, met alleen de twee
- * velden Onderdeel en Ronde en verder niets. De naam volgt vanzelf. Het Assessment ligt vast. Een Meting zonder ronde kan er
- * een krijgen, en houdt tot dan haar oude label. Hetzelfde onderdeel voor hetzelfde Assessment in dezelfde ronde kan niet twee
- * keer: De melding noemt de Meting die er al is en de uitwegen.
+ * "Wijzigen" van een Meting (`beheerpagina.md`, punt 5): Achter het potlood naast de naam van de Meting, met alleen de velden
+ * Onderdeel, Meetdatum en Naam en verder niets. De naam is voorgevuld met de huidige naam. Pas je hem aan, dan volgt hij
+ * onderdeel en meetdatum niet meer (`Meting.labelHandmatig`), en "Standaardnaam herstellen" zet hem terug. Het Assessment ligt
+ * vast. Een samengestelde Meting heeft geen eigen meetdatum: Ze volgt de onderliggende Metingen. Dezelfde combinatie als een
+ * andere Meting is een waarschuwing en geen blokkade.
  */
 export function MetingWijzigenFormulier({
   organisatie,
@@ -27,22 +32,30 @@ export function MetingWijzigenFormulier({
   onKlaar: () => void;
 }) {
   const samengesteld = isSamengesteld(meting);
-  const [waarde, setWaarde] = useState<OnderdeelRondeWaarde>({
-    onderdeel: onderdeelVan(meting),
-    ronde: meting.rondeId ?? GEEN_RONDE,
-    nieuweRonde: "",
-  });
+  const [waarde, setWaarde] = useState({ onderdeel: onderdeelVan(meting), meetdatum: meetdatumVan(meting) ?? "" });
+  const [naam, setNaam] = useState(meting.label);
+  // De naam volgt onderdeel en meetdatum zolang de gebruiker hem niet zelf aanpast.
+  const [naamAangepast, setNaamAangepast] = useState(meting.labelHandmatig === true);
   const [fout, setFout] = useState<string | null>(null);
+
+  // De naam die de app zelf zou maken uit het onderdeel en de meetdatum zoals ze nu in het formulier staan.
+  const standaard = standaardLabel({
+    onderdeel: waarde.onderdeel,
+    meetdatum: isGeldigeDatum(waarde.meetdatum) ? waarde.meetdatum : meetdatumVan(meting) ?? undefined,
+  });
+  const getoondeNaam = naamAangepast ? naam : standaard;
+  const dubbel = isGeldigeDatum(waarde.meetdatum)
+    ? metingMetCombinatie(organisatie, waarde.onderdeel, meting.assessmentId, waarde.meetdatum, meting.id)
+    : undefined;
 
   function opslaan(e: React.FormEvent) {
     e.preventDefault();
     setFout(null);
-    if (waarde.ronde === NIEUWE_RONDE && !waarde.nieuweRonde.trim()) return setFout("Geef de nieuwe ronde een naam.");
+    if (!samengesteld && waarde.meetdatum && !isGeldigeDatum(waarde.meetdatum)) return setFout("De meetdatum klopt niet.");
     const r = wijzigMeting(meting.id, {
       onderdeel: waarde.onderdeel.trim() || STANDAARD_ONDERDEEL,
-      ...(waarde.ronde === NIEUWE_RONDE
-        ? { nieuweRondeLabel: waarde.nieuweRonde }
-        : { rondeId: waarde.ronde === GEEN_RONDE ? null : waarde.ronde }),
+      ...(samengesteld ? {} : { meetdatum: waarde.meetdatum || null }),
+      ...(naamAangepast ? { label: getoondeNaam } : { herstelLabel: true }),
     });
     if (!r.ok) return setFout(r.reden);
     onKlaar();
@@ -50,33 +63,55 @@ export function MetingWijzigenFormulier({
 
   return (
     <form onSubmit={opslaan} style={{ marginBottom: "0.8rem" }}>
-      <div className="flex flex-wrap items-end gap-3">
-        {samengesteld ? (
-          // Een samengestelde Meting hoort bij de ronde van haar onderliggende Metingen: Alleen het onderdeel is te wijzigen.
-          <div className="admin-field" style={{ marginBottom: 0 }}>
-            <label>Onderdeel</label>
-            <input
-              type="text"
-              value={waarde.onderdeel}
-              onChange={(e) => setWaarde({ ...waarde, onderdeel: e.target.value })}
-            />
-          </div>
-        ) : (
-          <OnderdeelRondeVelden
-            organisatie={organisatie}
-            waarde={waarde}
-            onChange={setWaarde}
-            metZonderRonde={!meting.rondeId}
-            idPrefix="wijzig-meting"
+      <div className="flex flex-wrap items-start gap-3">
+        <OnderdeelMeetdatumVelden
+          organisatie={organisatie}
+          waarde={waarde}
+          onChange={setWaarde}
+          idPrefix="wijzig-meting"
+          inRij
+          meetdatumUitgeschakeld={samengesteld}
+        />
+        <div className="admin-field" style={{ marginBottom: 0, minWidth: "18rem" }}>
+          <label htmlFor="wijzig-meting-naam">Naam</label>
+          <input
+            id="wijzig-meting-naam"
+            type="text"
+            required
+            value={getoondeNaam}
+            onChange={(e) => {
+              setNaam(e.target.value);
+              setNaamAangepast(true);
+            }}
           />
-        )}
-        <button type="submit" className="btn btn-or btn-compact">
-          Opslaan
-        </button>
-        <button type="button" className="btn btn-outline btn-compact" onClick={onKlaar}>
-          Annuleren
-        </button>
+        </div>
+        <div className="admin-field" style={{ marginBottom: 0 }}>
+          <label aria-hidden="true" style={{ visibility: "hidden" }}>
+            &nbsp;
+          </label>
+          <span className="knoppenrij">
+            <button type="submit" className="btn btn-or btn-compact">
+              Opslaan
+            </button>
+            <button type="button" className="btn btn-outline btn-compact" onClick={onKlaar}>
+              Annuleren
+            </button>
+            {(naamAangepast || meting.labelHandmatig) && getoondeNaam !== standaard && (
+              <button
+                type="button"
+                className="btn btn-outline btn-compact"
+                onClick={() => {
+                  setNaamAangepast(false);
+                  setNaam(standaard);
+                }}
+              >
+                Standaardnaam herstellen
+              </button>
+            )}
+          </span>
+        </div>
       </div>
+      {dubbel && <p className="overzicht-melding" style={{ margin: "0.6rem 0 0" }}>{dubbeleCombinatieTekst(dubbel.label)}</p>}
       {fout && <p className="overzicht-melding fout" style={{ margin: "0.6rem 0 0" }}>{fout}</p>}
     </form>
   );

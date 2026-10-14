@@ -9,7 +9,7 @@ import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { zichtbareOrganisaties } from "@/lib/rechten";
 import { useBulkSelect } from "@/lib/useBulkSelect";
 import { useUrlParams } from "@/lib/beheer-url";
-import { isSamengesteld, onderdeelVan, rondeVan } from "@/lib/rondes";
+import { DATUM_ONTBREEKT, isSamengesteld, meetdatumVan, onderdeelVan, toonMeetdatum } from "@/lib/metingen";
 import { metVia } from "@/lib/resultaten-nav";
 import { CsvRijContext } from "@/lib/csv-export";
 import { exporteerScansCsv } from "@/lib/scan-export";
@@ -17,36 +17,38 @@ import { IndeterminateCheckbox } from "@/components/beheer/IndeterminateCheckbox
 import { BulkToolbar } from "@/components/beheer/BulkToolbar";
 import { ScansSamenbrengenModal } from "@/components/beheer/ScansSamenbrengenModal";
 
-type Kolom = "organisatie" | "ronde" | "onderdeel" | "assessment" | "scans";
+type Kolom = "organisatie" | "meting" | "onderdeel" | "assessment" | "meetdatum" | "scans";
 
 interface Rij {
   metingId: string;
   organisatieId: string;
   assessmentId: string;
   organisatie: string;
-  ronde: string;
-  rondeId: string;
+  meting: string;
   onderdeel: string;
   assessment: string;
   samengesteld: boolean;
   afgerond: number;
   totaal: number;
-  aangemaaktOp: string;
+  /** `JJJJ-MM-DD`, of een lege tekst bij een Meting zonder meetdatum. */
+  meetdatum: string;
 }
 
 const KOLOMMEN: { key: Kolom; label: string }[] = [
   { key: "organisatie", label: "Organisatie" },
-  { key: "ronde", label: "Ronde" },
+  { key: "meting", label: "Meting" },
   { key: "onderdeel", label: "Onderdeel" },
   { key: "assessment", label: "Assessment" },
+  { key: "meetdatum", label: "Meetdatum" },
   { key: "scans", label: "Afgeronde scans" },
 ];
 
 /**
- * Resultaten, tab Metingen (`beheerpagina.md`, punt 7): Eén rij per Meting, ook een Meting zonder ronde (lege cel bij
- * Ronde) en een samengestelde Meting (badge "Gemiddelde"). Een klik opent het Meting-overzicht. Filters: Organisatie, Ronde en
- * Assessment, in de adresbalk. Op een selectie: Exporteren (de afgeronde scans, binnen één organisatie) en "Samenbrengen in
- * één Meting…" (alle scans van de geselecteerde Metingen, binnen één organisatie en één Assessment).
+ * Resultaten, tab Metingen (`beheerpagina.md`, punt 7): Eén rij per Meting, op meetdatum met de nieuwste bovenaan. Een Meting
+ * zonder meetdatum staat onderaan met "Datum ontbreekt", een samengestelde Meting heeft de badge "Gemiddelde". Een klik opent
+ * het Meting-overzicht. Filters: Organisatie, Assessment en een periode op meetdatum, in de adresbalk. Op een selectie:
+ * Exporteren (de afgeronde scans, binnen één organisatie) en "Samenbrengen in één Meting…" (alle scans van de geselecteerde
+ * Metingen, binnen één organisatie en één Assessment).
  */
 function MetingenInhoud() {
   const ingelogd = useIngelogdeGebruiker();
@@ -56,9 +58,10 @@ function MetingenInhoud() {
   const router = useRouter();
 
   const filterOrganisatie = get("organisatie");
-  const filterRonde = get("ronde");
   const filterAssessment = get("assessment");
-  const sortKolom = get("sort", "nieuwste") as Kolom | "nieuwste";
+  const filterVan = get("van");
+  const filterTot = get("tot");
+  const sortKolom = get("sort", "meetdatum") as Kolom;
   const sortRichting = get("dir", "desc") === "asc" ? "asc" : "desc";
   const [samenbrengenOpen, setSamenbrengenOpen] = useState(false);
 
@@ -72,39 +75,38 @@ function MetingenInhoud() {
             organisatieId: org.id,
             assessmentId: m.assessmentId,
             organisatie: org.naam,
-            ronde: rondeVan(org, m)?.label ?? "",
-            rondeId: m.rondeId ?? "",
+            meting: m.label,
+            meetdatum: meetdatumVan(m) ?? "",
             onderdeel: onderdeelVan(m),
             assessment: assessments.find((a) => a.id === m.assessmentId)?.naam ?? "Onbekend type",
             samengesteld,
             afgerond: samengesteld ? 0 : m.invullingen.filter((i) => i.status === "afgerond").length,
             totaal: samengesteld ? 0 : m.invullingen.length,
-            aangemaaktOp: m.aangemaaktOp,
           };
         })
       ),
     [organisaties, assessments]
   );
 
-  const rondeOpties = useMemo(() => {
-    const perNaam = new Map<string, string>();
-    for (const r of rijen) {
-      if (r.rondeId && (!filterOrganisatie || r.organisatieId === filterOrganisatie)) perNaam.set(r.rondeId, `${r.ronde} (${r.organisatie})`);
-    }
-    return [...perNaam.entries()];
-  }, [rijen, filterOrganisatie]);
-
   const gefilterd = rijen.filter(
     (r) =>
       (!filterOrganisatie || r.organisatieId === filterOrganisatie) &&
-      (!filterRonde || r.rondeId === filterRonde) &&
-      (!filterAssessment || r.assessmentId === filterAssessment)
+      (!filterAssessment || r.assessmentId === filterAssessment) &&
+      (!filterVan || (r.meetdatum !== "" && r.meetdatum >= filterVan)) &&
+      (!filterTot || (r.meetdatum !== "" && r.meetdatum <= filterTot))
   );
+  // Een Meting zonder meetdatum staat altijd onderaan, ook bij een omgekeerde volgorde.
   const gesorteerd = [...gefilterd].sort((a, b) => {
+    if (sortKolom === "meetdatum") {
+      if (a.meetdatum === "" || b.meetdatum === "") {
+        if (a.meetdatum === b.meetdatum) return a.meting.localeCompare(b.meting, "nl");
+        return a.meetdatum === "" ? 1 : -1;
+      }
+    }
     let cmp: number;
-    if (sortKolom === "nieuwste") cmp = a.aangemaaktOp.localeCompare(b.aangemaaktOp);
-    else if (sortKolom === "scans") cmp = a.afgerond - b.afgerond;
+    if (sortKolom === "scans") cmp = a.afgerond - b.afgerond;
     else cmp = String(a[sortKolom]).localeCompare(String(b[sortKolom]), "nl");
+    if (cmp === 0) cmp = a.meting.localeCompare(b.meting, "nl");
     return sortRichting === "asc" ? cmp : -cmp;
   });
 
@@ -136,7 +138,7 @@ function MetingenInhoud() {
     bulk.clear();
   }
 
-  const filtersActief = Boolean(filterOrganisatie || filterRonde || filterAssessment);
+  const filtersActief = Boolean(filterOrganisatie || filterAssessment || filterVan || filterTot);
 
   return (
     <div className="admin-main admin-main--breed">
@@ -147,25 +149,14 @@ function MetingenInhoud() {
         <p className="admin-notice">Nog geen Metingen.</p>
       ) : (
         <>
-          <div className="filter-rij mb-5 flex flex-wrap items-end gap-3">
+          <div className="filter-rij mb-5 flex flex-wrap items-start gap-3">
             <div className="admin-field" style={{ marginBottom: 0, minWidth: "12rem" }}>
               <label>Organisatie</label>
-              <select value={filterOrganisatie} onChange={(e) => set({ organisatie: e.target.value, ronde: null })}>
+              <select value={filterOrganisatie} onChange={(e) => set({ organisatie: e.target.value })}>
                 <option value="">Alle organisaties</option>
                 {organisaties.map((o) => (
                   <option key={o.id} value={o.id}>
                     {o.naam}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="admin-field" style={{ marginBottom: 0, minWidth: "12rem" }}>
-              <label>Ronde</label>
-              <select value={filterRonde} onChange={(e) => set({ ronde: e.target.value })}>
-                <option value="">Alle rondes</option>
-                {rondeOpties.map(([id, naam]) => (
-                  <option key={id} value={id}>
-                    {naam}
                   </option>
                 ))}
               </select>
@@ -181,11 +172,19 @@ function MetingenInhoud() {
                 ))}
               </select>
             </div>
+            <div className="admin-field" style={{ marginBottom: 0 }}>
+              <label htmlFor="filter-van">Meetdatum van</label>
+              <input id="filter-van" type="date" value={filterVan} max={filterTot || undefined} onChange={(e) => set({ van: e.target.value || null })} />
+            </div>
+            <div className="admin-field" style={{ marginBottom: 0 }}>
+              <label htmlFor="filter-tot">Meetdatum tot en met</label>
+              <input id="filter-tot" type="date" value={filterTot} min={filterVan || undefined} onChange={(e) => set({ tot: e.target.value || null })} />
+            </div>
             {filtersActief && (
               <button
                 type="button"
                 className="btn btn-outline btn-compact"
-                onClick={() => set({ organisatie: null, ronde: null, assessment: null })}
+                onClick={() => set({ organisatie: null, assessment: null, van: null, tot: null })}
               >
                 Filters wissen
               </button>
@@ -246,18 +245,19 @@ function MetingenInhoud() {
                         {!r.samengesteld && (
                           <input
                             type="checkbox"
-                            aria-label={`Kies ${r.onderdeel} ${r.ronde}`}
+                            aria-label={`Kies ${r.meting}`}
                             checked={bulk.isSelected(r.metingId)}
                             onChange={() => bulk.toggle(r.metingId)}
                           />
                         )}
                       </td>
                       <td>{r.organisatie}</td>
-                      <td>{r.ronde}</td>
                       <td>
-                        {r.onderdeel} {r.samengesteld && <span className="admin-badge status-uitgenodigd">Gemiddelde</span>}
+                        {r.meting} {r.samengesteld && <span className="admin-badge status-uitgenodigd">Gemiddelde</span>}
                       </td>
+                      <td>{r.onderdeel}</td>
                       <td>{r.assessment}</td>
+                      <td className={r.meetdatum === "" ? "text-ink-s" : undefined}>{r.meetdatum === "" ? DATUM_ONTBREEKT : toonMeetdatum(r.meetdatum)}</td>
                       <td>{r.samengesteld ? "" : `${r.afgerond} van ${r.totaal}`}</td>
                       <td className="cel-knop">
                         <Link

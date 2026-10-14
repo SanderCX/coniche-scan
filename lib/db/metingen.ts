@@ -1,62 +1,11 @@
 import { Organisatie, ScanUitvoering } from "../types";
-import { nieuwId } from "../id";
 import { laadAlles, slaAlles, useOrganisaties } from "./store";
 import { logAudit } from "../audit-store";
 import { metingContext } from "../audit-context";
 import { haalMetingenUitBenchmarks } from "../benchmark-store";
-import { isSamengesteld, samengesteldeMetingenMet } from "../rondes";
+import { isSamengesteld, samengesteldeMetingenMet } from "../metingen";
 
-/** Metingen (in de code `ScanUitvoering`): plannen, hernoemen, verwijderen en opzoeken. */
-
-/** Plant een nieuwe scanronde (assessment-type) binnen een organisatie. */
-export function maakScanUitvoering(
-  organisatieId: string,
-  input: { assessmentId: string; label: string }
-): ScanUitvoering | null {
-  const alles = laadAlles();
-  const organisatie = alles.find((o) => o.id === organisatieId);
-  if (!organisatie) return null;
-  const scanUitvoering: ScanUitvoering = {
-    id: nieuwId(),
-    organisatieId,
-    assessmentId: input.assessmentId,
-    label: input.label,
-    aangemaaktOp: new Date().toISOString(),
-    invullingen: [],
-  };
-  organisatie.scanUitvoeringen.push(scanUitvoering);
-  slaAlles(alles);
-  logAudit({
-    actie: "meting.aangemaakt",
-    entiteitType: "meting",
-    entiteitId: scanUitvoering.id,
-    entiteitNaam: scanUitvoering.label,
-    details: metingContext(organisatie, scanUitvoering),
-  });
-  return scanUitvoering;
-}
-
-/**
- * Meting wijzigen (beheerpagina.md, punt 5): alleen het label, achteraf
- * aanpasbaar (bijv. een typo corrigeren). Het assessment-type ligt vast
- * na aanmaken — dat achteraf wijzigen zou al ingevulde antwoorden
- * inconsistent maken met een ander scan-type.
- */
-export function hernoemMeting(scanUitvoeringId: string, label: string): void {
-  const alles = laadAlles();
-  const gevonden = zoekScanUitvoering(alles, scanUitvoeringId);
-  if (!gevonden) return;
-  const oudLabel = gevonden.scanUitvoering.label;
-  gevonden.scanUitvoering.label = label;
-  slaAlles(alles);
-  logAudit({
-    actie: "meting.hernoemd",
-    entiteitType: "meting",
-    entiteitId: scanUitvoeringId,
-    entiteitNaam: label,
-    details: { ...metingContext(gevonden.organisatie, gevonden.scanUitvoering), oudLabel },
-  });
-}
+/** Metingen (in de code `ScanUitvoering`): verwijderen en opzoeken. Plannen en wijzigen staan in `meting-plannen.ts`. */
 
 /**
  * Meting verwijderen (datamodel.md, "Verwijderen en datakoppelingen"): de

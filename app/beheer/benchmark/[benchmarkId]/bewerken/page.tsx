@@ -50,7 +50,7 @@ export default function BenchmarkBewerkenPage({ params }: { params: Promise<{ be
     <div className="admin-main admin-main--breed">
       <Kruimelpad
         delen={[
-          { label: "Resultaten", href: "/beheer/resultaten/rondes" },
+          { label: "Resultaten", href: "/beheer/resultaten/metingen" },
           { label: "Benchmarks", href: "/beheer/benchmark" },
           { label: benchmark.naam, href: `/beheer/benchmark/${benchmark.id}` },
           { label: "Wijzigen" },

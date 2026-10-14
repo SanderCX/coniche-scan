@@ -12,6 +12,7 @@ import { alleBouwblokkenMetGroep } from "./assessment-structuur";
 import {
   bouwblokScore,
   bouwblokScoreRuw,
+  categorieScore,
   classificatie,
   gemiddeldeAntwoordenVoorMeting,
   gewichtVan,
@@ -231,8 +232,22 @@ export function tussenMetingen(
   vorigeInvullingen: ScanInvulling[],
   huidigeInvullingen: ScanInvulling[]
 ): TussenMetingenWeergave {
-  const vorig = gemiddeldeAntwoordenVoorMeting(assessment, vorigeInvullingen);
-  const huidig = gemiddeldeAntwoordenVoorMeting(assessment, huidigeInvullingen);
+  return tussenMetingenUitAntwoorden(
+    assessment,
+    gemiddeldeAntwoordenVoorMeting(assessment, vorigeInvullingen),
+    gemiddeldeAntwoordenVoorMeting(assessment, huidigeInvullingen)
+  );
+}
+
+/**
+ * Weergave C uit twee antwoordensets, het gemiddelde per vraag van elke Meting. Een samengestelde Meting levert zo haar
+ * gemiddelde van gemiddelden zonder dat ze scans nodig heeft (`benchmark.md`, Niveau 2).
+ */
+export function tussenMetingenUitAntwoorden(
+  assessment: Assessment,
+  vorig: Record<string, number>,
+  huidig: Record<string, number>
+): TussenMetingenWeergave {
   const rijen: RijTussenMetingen[] = bouwblokRijen(assessment).map((rij) => {
     const v = bouwblokScore(rij.bouwblok, vorig);
     const h = bouwblokScore(rij.bouwblok, huidig);
@@ -368,8 +383,20 @@ export interface MatrixRij {
   hoogste: number | null;
   /** Hoogste min laagste van de rij, voor "bouwblok met het grootste verschil tussen Metingen". */
   verschil: number | null;
+  /** Bij precies twee kolommen op niveau 2: De tweede min de eerste kolom (de nieuwere Meting min de oudere). */
+  verschilTweeMetingen: number | null;
 }
 
+/** Een categorie in de matrix op niveau 2 met twee Metingen: Eigen scores per kolom en het verschil. */
+export interface MatrixGroepRij {
+  groepId: string;
+  naam: string;
+  kleur: string | null;
+  /** De index in `rijen` van het laatste bouwblok van deze categorie: De groeprij staat daaronder. */
+  naRij: number;
+  cellen: MatrixCel[];
+  verschilTweeMetingen: number | null;
+}
 export interface MatrixWeergave {
   kolommen: { label: string; sublabel?: string; aantalScans: number; totaal: number | null; totaalKlasse: Classificatie | null }[];
   rijen: MatrixRij[];
@@ -377,13 +404,34 @@ export interface MatrixWeergave {
   laagsteMeting: { label: string; totaal: number } | null;
   grootsteVerschil: { naam: string; verschil: number } | null;
   aantalAfwijkend: number;
+  /**
+   * Op niveau 2 bij precies twee Metingen een kolom Verschil (`visualisatie-scores.md`, E, Volgorde van de kolommen): De
+   * nieuwere Meting min de oudere, per bouwblok, per categorie en voor de totaalscore. De kolommen staan dan op meetdatum.
+   */
+  metVerschil: boolean;
+  groepRijen: MatrixGroepRij[];
+  totaalVerschil: number | null;
 }
 
 /** Een afwijking van deze grootte of meer van het rijgemiddelde krijgt een rand (`visualisatie-scores.md`, E). */
 export const MATRIX_AFWIJKING = 0.5;
 
-export function matrix(assessment: Assessment, kolommen: MatrixKolomInvoer[]): MatrixWeergave {
-  const rijen: MatrixRij[] = bouwblokRijen(assessment).map((rij) => {
+/**
+ * `groepsvergelijking` (standaard aan): Niveau 1 zet de organisaties naast het gemiddelde van de rij en geeft een cel die 0,5 of
+ * meer afwijkt een rand. Uit (niveau 2, ook de matrix onder een samengestelde Meting): Er is geen groep om van af te wijken,
+ * dus geen rand, en bij precies twee kolommen komt er een kolom Verschil (de tweede min de eerste, dus de kolommen staan op
+ * meetdatum met de oudste links).
+ */
+export function matrix(
+  assessment: Assessment,
+  kolommen: MatrixKolomInvoer[],
+  opties: { groepsvergelijking?: boolean } = {}
+): MatrixWeergave {
+  const groepsvergelijking = opties.groepsvergelijking ?? true;
+  const metVerschil = !groepsvergelijking && kolommen.length === 2;
+  const verschilTussen = (a: number | null, b: number | null) => (a !== null && b !== null ? rond1(b - a) : null);
+  const bouwRijen = bouwblokRijen(assessment);
+  const rijen: MatrixRij[] = bouwRijen.map((rij) => {
     const scores = kolommen.map((k) => bouwblokScore(rij.bouwblok, k.antwoorden));
     const aanwezig = scores.filter((s): s is number => s !== null);
     const gem = gemiddelde(aanwezig);
@@ -391,7 +439,7 @@ export function matrix(assessment: Assessment, kolommen: MatrixKolomInvoer[]): M
       score,
       klasse: klasseVan(score),
       // Op de getoonde waarden: Een afwijking van precies 0,5 telt mee.
-      afwijkend: score !== null && gem !== null && rond1(Math.abs(score - gem)) >= MATRIX_AFWIJKING,
+      afwijkend: groepsvergelijking && score !== null && gem !== null && rond1(Math.abs(score - gem)) >= MATRIX_AFWIJKING,
     }));
     const laagste = aanwezig.length ? Math.min(...aanwezig) : null;
     const hoogste = aanwezig.length ? Math.max(...aanwezig) : null;
@@ -402,8 +450,28 @@ export function matrix(assessment: Assessment, kolommen: MatrixKolomInvoer[]): M
       laagste,
       hoogste,
       verschil: laagste !== null && hoogste !== null ? rond1(hoogste - laagste) : null,
+      verschilTweeMetingen: metVerschil ? verschilTussen(scores[0], scores[1]) : null,
     };
   });
+  // Per categorie (alleen bij een Assessment met categorielaag) de score en het verschil, onder het laatste bouwblok.
+  const groepRijen: MatrixGroepRij[] = [];
+  if (metVerschil) {
+    bouwRijen.forEach((rij, i) => {
+      if (rij.groepNaam === null) return;
+      const laatsteVanGroep = i === bouwRijen.length - 1 || bouwRijen[i + 1].groepId !== rij.groepId;
+      if (!laatsteVanGroep) return;
+      const leden = bouwRijen.filter((r) => r.groepId === rij.groepId);
+      const scores = kolommen.map((k) => categorieScore(leden, k.antwoorden));
+      groepRijen.push({
+        groepId: rij.groepId,
+        naam: rij.groepNaam,
+        kleur: rij.groepKleur,
+        naRij: i,
+        cellen: scores.map((score) => ({ score, klasse: klasseVan(score), afwijkend: false })),
+        verschilTweeMetingen: verschilTussen(scores[0], scores[1]),
+      });
+    });
+  }
   const totalen = kolommen.map((k) => (k.aantalScans === 0 ? null : overallScore(assessment, k.antwoorden)));
   const metTotaal = kolommen
     .map((k, i) => ({ label: k.label, totaal: totalen[i] }))
@@ -424,6 +492,9 @@ export function matrix(assessment: Assessment, kolommen: MatrixKolomInvoer[]): M
     laagsteMeting: laagste,
     grootsteVerschil: grootste && grootste.verschil !== null ? { naam: grootste.rij.bouwblok.naam, verschil: grootste.verschil } : null,
     aantalAfwijkend: rijen.reduce((n, r) => n + r.cellen.filter((c) => c.afwijkend).length, 0),
+    metVerschil,
+    groepRijen,
+    totaalVerschil: metVerschil ? verschilTussen(totalen[0], totalen[1]) : null,
   };
 }
 

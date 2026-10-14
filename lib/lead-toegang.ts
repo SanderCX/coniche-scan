@@ -11,6 +11,9 @@
  */
 import { Benchmark, LeadToegang, LeadWeergave, Organisatie, OrganisatieLid, ScanUitvoering } from "./types";
 
+/** Een vergelijking tussen Metingen heeft minstens twee Metingen (`benchmark.md`, Niveau 2). */
+const MIN_LEDEN_VERGELIJKING = 2;
+
 export const LEAD_WEERGAVE_LABEL: Record<LeadWeergave, string> = {
   resultaten: "Resultaten",
   spreiding: "Spreiding",
@@ -162,8 +165,12 @@ export function ruimLeadToegangOp(org: Organisatie, benchmarks?: Benchmark[]): n
       const b = perId.get(t.benchmarkId as string);
       if (!benchmarkGeldigVoorOrganisatie(b, org.id)) return false;
       if ((b!.niveau ?? "organisaties") === "metingen") {
-        // Niveau 2: De view hoort bij een Meting, dus de Lead heeft Resultaten nodig op een lid-Meting van deze benchmark.
-        return b!.leden.some((l) => l.organisatieId === org.id && resultaten.has(`${t.respondentId}::${l.metingId}`));
+        // Niveau 2: De vergelijking is van Metingen, dus de Lead heeft Resultaten nodig op minstens twee lid-Metingen van deze
+        // benchmark: Met minder is er niets te vergelijken (`benchmark.md`, View voor een Lead).
+        return (
+          b!.leden.filter((l) => l.organisatieId === org.id && resultaten.has(`${t.respondentId}::${l.metingId}`)).length >=
+          MIN_LEDEN_VERGELIJKING
+        );
       }
       return true;
     });
@@ -172,7 +179,7 @@ export function ruimLeadToegangOp(org: Organisatie, benchmarks?: Benchmark[]): n
   return voor - lijst.length;
 }
 
-/* ---------- De cellen van de tabel Leads ---------- */
+/* ---------- De cellen van het Leads-venster ---------- */
 
 export interface LeadDrempels {
   /** `benchmarkMinRespondenten`: Het minimale aantal afgeronde scans in een Meting voor Spreiding en anonieme Antwoorden. */
@@ -180,7 +187,7 @@ export interface LeadDrempels {
 }
 
 /**
- * Is een cel van de tabel Leads grijs, en waarom (`beheerpagina.md`, punt 6a, Grijze cellen)? `resultatenAan` is de (concept)stand
+ * Is een cel van het Leads-venster grijs, en waarom (`beheerpagina.md`, punt 6a, Grijze cellen)? `resultatenAan` is de (concept)stand
  * van Resultaten van dezelfde Meting voor deze Lead. Geeft `null` als de cel aan te vinken is, anders de reden voor het
  * Info-icoon `info.leadToegangCel`.
  */
@@ -209,20 +216,20 @@ export function metingCelReden(opts: {
 }
 
 /**
- * De reden waarom een benchmarkkolom grijs is, of `null`. `voldoetAanDrempel`: Minstens één Assessment van de benchmark voldoet
- * aan de drempel van zijn niveau voor deze organisatie (`benchmark.md`, Drempels). `heeftResultatenOpLidMeting` geldt alleen
- * voor niveau 2.
+ * De reden waarom een benchmarkkolom grijs is, of `null`. `voldoetAanDrempel`: Op niveau 1 voldoet minstens één Assessment van
+ * de benchmark aan `benchmarkMinOrganisaties` (`benchmark.md`, Drempels). `aantalLidMetingenMetResultaten` geldt alleen voor
+ * niveau 2: Minder dan twee betekent dat er niets te vergelijken is.
  */
 export function benchmarkCelReden(opts: {
   niveau: "organisaties" | "metingen";
   voldoetAanDrempel: boolean;
-  heeftResultatenOpLidMeting: boolean;
+  aantalLidMetingenMetResultaten: number;
 }): string | null {
-  if (!opts.voldoetAanDrempel) {
+  if (opts.niveau === "organisaties" && !opts.voldoetAanDrempel) {
     return "Geen enkel Assessment in deze benchmark heeft een groep die groot genoeg is om anoniem te blijven.";
   }
-  if (opts.niveau === "metingen" && !opts.heeftResultatenOpLidMeting) {
-    return "Deze benchmark gaat over een Meting: Zet eerst Resultaten aan voor een Meting in deze benchmark.";
+  if (opts.niveau === "metingen" && opts.aantalLidMetingenMetResultaten < MIN_LEDEN_VERGELIJKING) {
+    return "Deze vergelijking gaat over Metingen: Zet eerst Resultaten aan voor minstens twee Metingen in deze benchmark.";
   }
   return null;
 }
@@ -264,7 +271,7 @@ export function zetLegacyBereikOm(org: Organisatie): void {
     org.leadToegang = [...leadToegangVan(org), ...extra.filter((t) => !bestaand.has(toegangSleutel(t)))];
   }
   if (hele > 0) {
-    const tekst = `${hele} ${hele === 1 ? "Lead was" : "Leads waren"} Lead voor de hele organisatie. Dat bereik bestaat niet meer: Resultaten, Uitnodigen en Exporteren staan nu aan voor de Metingen die er nu zijn, niet voor latere. Controleer de tabel Leads.`;
+    const tekst = `${hele} ${hele === 1 ? "Lead was" : "Leads waren"} Lead voor de hele organisatie. Dat bereik bestaat niet meer: Resultaten, Uitnodigen en Exporteren staan nu aan voor de Metingen die er nu zijn, niet voor latere. Controleer het Leads-venster.`;
     org.leadOvergangMelding = org.leadOvergangMelding ? `${org.leadOvergangMelding} ${tekst}` : tekst;
   }
 }

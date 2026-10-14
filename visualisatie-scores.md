@@ -122,7 +122,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Tegels.** Totaalscore van de vorige en huidige Meting ("2,9 → 3,1"), aantal bouwblokken gestegen, aantal gedaald, aantal van klasse gewisseld.
 
-**Meetdatum en onderdeel (voorstel van 14 oktober 2026).** De volgorde komt uit de meetdatum (`datamodel.md`, Meting). De Admin kiest zelf welke twee Metingen een vergelijking vormen, dus er is geen automatisch voorgestelde vorige Meting. Hebben de twee Metingen een ander onderdeel, dan staat boven de weergave de regel "Let op: Dit zijn verschillende onderdelen, het verschil is geen ontwikkeling." De weergave zelf blijft gelijk. Een samengestelde Meting is te vergelijken met een andere samengestelde Meting, zodat samenstelling 1 naast samenstelling 2 kan staan.
+**Meetdatum en onderdeel (gebouwd op 14 oktober 2026).** De volgorde komt uit de meetdatum (`datamodel.md`, Meting). De Admin kiest zelf welke twee Metingen een vergelijking vormen, dus er is geen automatisch voorgestelde vorige Meting. Hebben de twee Metingen een ander onderdeel, dan staat boven de weergave de regel "Let op: Dit zijn verschillende onderdelen, het verschil is geen ontwikkeling." De weergave zelf blijft gelijk. Een samengestelde Meting is te vergelijken met een andere samengestelde Meting, zodat samenstelling 1 naast samenstelling 2 kan staan.
 
 **Meer dan twee Metingen.** Hier is nog geen ontwerp voor. Voorstel voor later is een lijn per bouwblok over de Metingen heen.
 
@@ -168,7 +168,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Samengestelde Meting (gebouwd op 13 oktober 2026).** De matrix onder een samengestelde Meting (`benchmark.md`, Onderdeel en samengestelde Meting) heeft de onderliggende Metingen als kolommen. Alleen voor de Admin, om dezelfde reden als op niveau 2.
 
-**Volgorde van de kolommen (voorstel van 14 oktober 2026, ter vervanging van de groepering per onderdeel).** De kolommen staan op meetdatum, de oudste links. De kolomkop toont de naam van de Meting en haar meetdatum. Bij precies twee Metingen komt er rechts een kolom Verschil bij, de nieuwere min de oudere, met dezelfde opbouw als weergave C. Bij meer dan twee Metingen is er nog geen kolom met het verschil.
+**Volgorde van de kolommen (gebouwd op 14 oktober 2026, ter vervanging van de groepering per onderdeel).** De kolommen staan op meetdatum, de oudste links. De kolomkop toont de naam van de Meting en haar meetdatum. Bij precies twee Metingen komt er rechts een kolom Verschil bij, de nieuwere min de oudere, met dezelfde opbouw als weergave C. Bij meer dan twee Metingen is er nog geen kolom met het verschil.
 
 **Overzicht van een ronde (gebouwd op 13 oktober 2026, vervalt met de ronde).** Dit overzicht en de knop in de rondekop vervallen. Voor het zien van meerdere onderdelen naast elkaar maakt de Admin een vergelijking tussen Metingen.
 

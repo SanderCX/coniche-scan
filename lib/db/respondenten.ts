@@ -43,7 +43,7 @@ export function maakInvulling(scanUitvoeringId: string, organisatieLidId: string
  * dit lid al voor deze scanuitvoering was uitgenodigd.
  *
  * `ookLeadMaken` (beheerpagina.md punt 6a, vinkje "Ook Lead maken"): geeft het lid de Lead-rol en vinkt Resultaten aan voor
- * deze Meting, naast de uitnodiging zelf. Meer weergaven vinkt een Admin aan in de tabel Leads.
+ * deze Meting, naast de uitnodiging zelf. Meer weergaven vinkt een Admin aan in het Leads-venster.
  */
 export function nodigLidUit(
   scanUitvoeringId: string,
@@ -110,7 +110,7 @@ export function nodigLidUit(
 /**
  * "Lead toevoegen" (beheerpagina.md punt 6a): Geeft een bestaande Respondent van de organisatie de Lead-rol, of maakt een
  * nieuwe Respondent aan zoals `nodigLidUit`, zonder ScanInvulling, want een Lead hoeft geen respondent te zijn. De rij komt in
- * de tabel Leads zonder vinkjes: Wat de Lead ziet, vinkt de Admin daar aan.
+ * het Leads-venster zonder vinkjes: Wat de Lead ziet, vinkt de Admin daar aan.
  */
 export function voegLeadToe(
   organisatieId: string,
@@ -183,7 +183,7 @@ export function zetLeadRol(lidId: string, aan: boolean): void {
   }
 }
 
-/** Eén wijziging van de tabel Leads: Een vinkje aan of uit. */
+/** Eén wijziging van het Leads-venster: Een vinkje aan of uit. */
 export interface LeadToegangWijziging {
   respondentId: string;
   weergave: LeadToegang["weergave"];
@@ -193,7 +193,7 @@ export interface LeadToegangWijziging {
 }
 
 /**
- * "Opslaan" in de tabel Leads (`beheerpagina.md`, punt 6a): Past alle gewijzigde vinkjes in één keer toe, en logt per cel
+ * "Opslaan" in het Leads-venster (`beheerpagina.md`, punt 6a): Past alle gewijzigde vinkjes in één keer toe, en logt per cel
  * `lead.toegangGewijzigd` met de weergave en de Meting of benchmark, zonder naam of e-mailadres van de Lead (`datamodel.md`, Audit).
  * Vinkjes die niet kunnen (Spreiding zonder Resultaten, een samengestelde Meting met iets anders dan Resultaten, een Lead zonder
  * rol) worden niet gezet, en wat van een uitgezet vinkje afhangt gaat mee uit (`ruimLeadToegangOp`). Geeft het aantal

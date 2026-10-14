@@ -1,4 +1,4 @@
-import { Organisatie, OrganisatieLid, Ronde, ScanUitvoering } from "../types";
+import { Organisatie, OrganisatieLid, ScanUitvoering } from "../types";
 import { nieuwId } from "../id";
 import { normaliseerEmail } from "../email";
 import { laadAlles, slaAlles } from "./store";
@@ -6,7 +6,7 @@ import { zoekScanInvulling } from "./scans";
 import { genereerUniekeToegangscode } from "./respondenten";
 import { logAudit, nieuweGroepId } from "../audit-store";
 import { metingContext, organisatieContext } from "../audit-context";
-import { STANDAARD_ONDERDEEL, botsingTekst, genereerLabel, isSamengesteld, metingMetCombinatie, rondesVan } from "../rondes";
+import { STANDAARD_ONDERDEEL, genereerLabel, isGeldigeDatum, isSamengesteld, meetdatumVan } from "../metingen";
 import { SamenbrengBron, SamenbrengRegel, controleerSamenbrengen } from "../samenbrengen";
 
 /**
@@ -21,11 +21,10 @@ export type SamenbrengDoel =
   | { soort: "bestaand"; metingId: string }
   | {
       soort: "nieuw";
-      /** Leeg: "Hele organisatie". De naam van de Meting maakt de app uit onderdeel en ronde. */
+      /** Leeg: "Hele organisatie". De naam van de Meting maakt de app uit onderdeel en meetdatum. */
       onderdeel?: string;
-      /** Een bestaande ronde, of `nieuweRondeLabel` voor een nieuwe. Een van beide is verplicht. */
-      rondeId?: string;
-      nieuweRondeLabel?: string;
+      /** Verplicht, `JJJJ-MM-DD`. Het scherm stelt de oudste meetdatum van de bron-Metingen voor. */
+      meetdatum: string;
     };
 
 export type SamenbrengResultaat =
@@ -34,7 +33,6 @@ export type SamenbrengResultaat =
       aantal: number;
       doelMetingId: string;
       doelLabel: string;
-      rondeLabel: string | null;
       /** Bron-Metingen die na afloop leeg zijn (in te zien voor "Lege Metingen verwijderen"). */
       legeMetingen: { id: string; label: string }[];
     }
@@ -62,14 +60,11 @@ export function brengScansSamen(
   // De doel-Meting.
   let doelMeting: ScanUitvoering | undefined;
   let nieuweMeting = false;
-  let nieuweRondeAangemaakt: Ronde | undefined;
-  let ronde: Ronde | undefined;
   if (doel.soort === "bestaand") {
     doelMeting = organisatie.scanUitvoeringen.find((m) => m.id === doel.metingId);
     if (!doelMeting) return { ok: false, reden: "Doel-Meting niet gevonden." };
     if (doelMeting.assessmentId !== assessmentId) return { ok: false, reden: "Doel-Meting heeft een ander Assessment-type." };
     if (isSamengesteld(doelMeting)) return { ok: false, reden: "Een samengestelde Meting heeft geen scans." };
-    ronde = doelMeting.rondeId ? rondesVan(organisatie).find((r) => r.id === doelMeting!.rondeId) : undefined;
   }
 
   const bronnen: SamenbrengBron[] = regels.map((r, i) => ({
@@ -82,30 +77,15 @@ export function brengScansSamen(
 
   if (doel.soort === "nieuw") {
     const onderdeel = doel.onderdeel?.trim() || STANDAARD_ONDERDEEL;
-    if (doel.rondeId) {
-      ronde = rondesVan(organisatie).find((r) => r.id === doel.rondeId);
-      if (!ronde) return { ok: false, reden: "Ronde niet gevonden." };
-      const bestaand = metingMetCombinatie(organisatie, ronde.id, onderdeel, assessmentId);
-      if (bestaand) return { ok: false, reden: botsingTekst(ronde.label, bestaand.label, "nieuw") };
-    } else if (doel.nieuweRondeLabel?.trim()) {
-      ronde = {
-        id: nieuwId(),
-        organisatieId: organisatie.id,
-        label: doel.nieuweRondeLabel.trim(),
-        aangemaaktOp: new Date().toISOString(),
-      };
-      organisatie.rondes = [...rondesVan(organisatie), ronde];
-      nieuweRondeAangemaakt = ronde;
-    }
-    if (!ronde) return { ok: false, reden: "Kies een ronde of geef een nieuwe ronde een naam." };
-    const label = genereerLabel(onderdeel, ronde.label);
+    if (!isGeldigeDatum(doel.meetdatum)) return { ok: false, reden: "Kies een meetdatum." };
+    const label = genereerLabel(onderdeel, doel.meetdatum);
     doelMeting = {
       id: nieuwId(),
       organisatieId: organisatie.id,
       assessmentId,
-      rondeId: ronde.id,
       label,
       onderdeel,
+      meetdatum: doel.meetdatum,
       aangemaaktOp: new Date().toISOString(),
       invullingen: [],
     };
@@ -117,16 +97,6 @@ export function brengScansSamen(
   // Verplaatsen en koppelen.
   const groepId = nieuweGroepId();
   const gelogd: Parameters<typeof logAudit>[0] = [];
-  if (nieuweRondeAangemaakt) {
-    gelogd.push({
-      actie: "ronde.aangemaakt",
-      entiteitType: "ronde",
-      entiteitId: nieuweRondeAangemaakt.id,
-      entiteitNaam: nieuweRondeAangemaakt.label,
-      groepId,
-      details: { ...organisatieContext(organisatie), aantalMetingen: 1 },
-    });
-  }
   if (nieuweMeting) {
     gelogd.push({
       actie: "meting.aangemaakt",
@@ -134,7 +104,7 @@ export function brengScansSamen(
       entiteitId: doelM.id,
       entiteitNaam: doelM.label,
       groepId,
-      details: { ...metingContext(organisatie, doelM), onderdeel: doelM.onderdeel ?? STANDAARD_ONDERDEEL, ronde: ronde?.label ?? null },
+      details: { ...metingContext(organisatie, doelM), onderdeel: doelM.onderdeel ?? STANDAARD_ONDERDEEL, meetdatum: meetdatumVan(doelM) },
     });
   }
 
@@ -234,7 +204,6 @@ export function brengScansSamen(
     aantal: regels.length,
     doelMetingId: doelM.id,
     doelLabel: doelM.label,
-    rondeLabel: ronde?.label ?? null,
     legeMetingen,
   };
 }

@@ -103,18 +103,18 @@ describe("CSV ronde en onderdeel", () => {
     const o = organisatie(zorgscan, [scan(zorgscan)]);
     const zonder = genereerScansCsv([{ organisatie: o, scanUitvoering: o.scanUitvoeringen[0], lid, invulling: scan(zorgscan), assessment: zorgscan }]);
     const kop = zonder.replace(/^﻿/, "").split("\r\n")[0].split(";");
-    expect(kop.indexOf("ronde")).toBe(kop.indexOf("meting_label") + 1);
-    expect(kop.indexOf("onderdeel")).toBe(kop.indexOf("ronde") + 1);
-    expect(kolom(zonder, "ronde")).toBe("");
+    expect(kop.indexOf("meting_meetdatum")).toBe(kop.indexOf("meting_label") + 1);
+    expect(kop.indexOf("onderdeel")).toBe(kop.indexOf("meting_meetdatum") + 1);
+    expect(kop).not.toContain("ronde");
+    expect(kolom(zonder, "meting_meetdatum")).toBe("");
     expect(kolom(zonder, "onderdeel")).toBe("Hele organisatie");
 
-    const metRonde: Organisatie = {
+    const metDatum: Organisatie = {
       ...o,
-      rondes: [{ id: "R1", organisatieId: "O1", label: "0-meting", aangemaaktOp: "x" }],
-      scanUitvoeringen: [{ ...o.scanUitvoeringen[0], rondeId: "R1", onderdeel: "Team A" }],
+      scanUitvoeringen: [{ ...o.scanUitvoeringen[0], meetdatum: "2026-10-14", onderdeel: "Team A" }],
     };
-    const met = genereerScansCsv([{ organisatie: metRonde, scanUitvoering: metRonde.scanUitvoeringen[0], lid, invulling: scan(zorgscan), assessment: zorgscan }]);
-    expect(kolom(met, "ronde")).toBe("0-meting");
+    const met = genereerScansCsv([{ organisatie: metDatum, scanUitvoering: metDatum.scanUitvoeringen[0], lid, invulling: scan(zorgscan), assessment: zorgscan }]);
+    expect(kolom(met, "meting_meetdatum")).toBe("2026-10-14");
     expect(kolom(met, "onderdeel")).toBe("Team A");
   });
 });

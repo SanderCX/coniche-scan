@@ -11,7 +11,7 @@ import { useAlgemeneTekst } from "@/lib/algemene-teksten-store";
 import { voortgang } from "@/lib/scoring";
 import { volgendeUrl } from "@/lib/scan-routing";
 import { Organisatie, OrganisatieLid, ScanInvulling, ScanInvullingStatus, ScanUitvoering } from "@/lib/types";
-import { aantalAfgerondInMeting, isSamengesteld, onderdeelVan, rondeVan, rondesNieuwsteEerst } from "@/lib/rondes";
+import { aantalAfgerondInMeting, isSamengesteld, nieuwsteEerst, toonMeetdatum } from "@/lib/metingen";
 import {
   benchmarkGeldigVoorOrganisatie,
   benchmarkIdsMetToegang,
@@ -34,7 +34,6 @@ function BenchmarkKaarten({ code, organisatie, lid }: { code: string; organisati
   const instellingen = useInstellingen();
   const drempels = {
     minOrganisaties: instellingen.benchmarkMinOrganisaties,
-    minMetingen: instellingen.benchmarkMinMetingen,
     minRespondenten: instellingen.benchmarkMinRespondenten,
   };
   const resultatenIds = metingIdsMetWeergave(organisatie, lid.id, "resultaten");
@@ -43,12 +42,14 @@ function BenchmarkKaarten({ code, organisatie, lid }: { code: string; organisati
     if (!benchmark || !benchmarkGeldigVoorOrganisatie(benchmark, organisatie.id)) return [];
     const resultaat = leadViewsVoorBenchmark(benchmark, assessments, organisaties, organisatie, resultatenIds, drempels);
     if (resultaat.length === 0) return [];
-    // Wat de kaart zegt: Nooit de naam van een ander lid, wel zijn eigen Meting.
-    const assessmentNamen = [...new Set(resultaat.flatMap((r) => r.views.map((v) => v.assessment.naam)))].join(" · ");
-    const regel =
-      resultaat[0].niveau === "metingen"
-        ? `${assessmentNamen} · ${resultaat.map((r) => r.metingLabel).join(", ")}`
-        : assessmentNamen;
+    // Wat de kaart zegt: Nooit de naam van een ander lid, wel het Assessment en bij niveau 2 zijn eigen Metingen.
+    const regel = resultaat
+      .flatMap((r) =>
+        r.niveau === "metingen"
+          ? r.vergelijkingen.map((v) => `${v.assessment.naam} · ${v.metingen.map((m) => m.meting.label).join(" naast ")}`)
+          : r.views.map((v) => v.assessment.naam)
+      )
+      .join(" · ");
     return [{ id: benchmark.id, regel }];
   });
   if (kaarten.length === 0) return null;
@@ -57,11 +58,11 @@ function BenchmarkKaarten({ code, organisatie, lid }: { code: string; organisati
       <span className="eyebrow mt-10" style={{ display: "block" }}>
         Benchmark
       </span>
-      <h2>Jouw organisatie tegenover de groep</h2>
+      <h2>Vergelijkingen</h2>
       <div className="grid grid-cols-1 gap-4 mt-4">
         {kaarten.map(({ id, regel }) => (
           <Link key={id} href={`/s/${code}/benchmark/${id}`} className="card" style={{ display: "block" }}>
-            <p className="font-semibold text-ink">Benchmark</p>
+            <p className="font-semibold text-ink">Vergelijking</p>
             <p className="text-sm text-ink-m mt-1">{regel}</p>
           </Link>
         ))}
@@ -110,7 +111,10 @@ function LeadMetingKaart({
   return (
     <div className="card">
       <p className="font-semibold text-ink">
-        {onderdeelVan(scanUitvoering)} <span className="text-ink-s font-normal">— {assessmentNaam}</span>
+        {scanUitvoering.label} <span className="text-ink-s font-normal">— {assessmentNaam}</span>
+      </p>
+      <p className="text-sm text-ink-s" style={{ margin: 0 }}>
+        Meetdatum {toonMeetdatum(scanUitvoering.meetdatum)}
       </p>
       <p className="text-sm text-ink-m mt-1">
         {samengesteld ? (
@@ -273,7 +277,7 @@ function EigenEnLeadMetingKaart({
  * de nav, niet meer als losse kaarten op de pagina zelf. Dit is de hub, dus zonder terugknop.
  *
  * Een Lead ziet alleen wat een Admin voor hem heeft aangevinkt (`beheerpagina.md`, punt 6a): Bovenaan de naam van de
- * organisatie, een kaart per Meting waarvoor minstens één vinkje aan staat (per ronde, de nieuwste bovenaan), een kaart per
+ * organisatie, een kaart per Meting waarvoor minstens één vinkje aan staat (op meetdatum, de nieuwste bovenaan), een kaart per
  * benchmark die aan staat, en zijn eigen scans als hij ook respondent is. Een Lead die geen respondent is, ziet geen intake,
  * geen vragenlijst en geen lijst met eigen scans. Heeft hij niets aan staan en geen scans, dan staat er een korte melding.
  */
@@ -303,22 +307,14 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
   const assessmentNaam = (id: string) => assessments.find((a) => a.id === id)?.naam ?? "Onbekend type";
 
   // beheerpagina.md punt 6a: Valt een eigen Meting samen met een Meting waarvoor de Lead vinkjes heeft, dan één kaart in plaats
-  // van twee. De groepen hieronder laten die Metingen dus weg.
+  // van twee. De lijst hieronder laat die Metingen dus weg.
   const samenvallendeIds = new Set(
     leadMetingen.filter((s) => invullingen.some((i) => i.scanUitvoering.id === s.id)).map((s) => s.id)
   );
   const overigeLeadMetingen = leadMetingen.filter((s) => !samenvallendeIds.has(s.id));
 
-  // De Metingen per ronde, de nieuwste ronde bovenaan, een Meting zonder ronde onderaan.
-  const rondes = rondesNieuwsteEerst(organisatie);
-  const groepen = [
-    ...rondes.map((r) => ({ sleutel: r.id, naam: r.label, metingen: overigeLeadMetingen.filter((m) => m.rondeId === r.id) })),
-    {
-      sleutel: "__zonder__",
-      naam: "",
-      metingen: overigeLeadMetingen.filter((m) => !rondeVan(organisatie, m)),
-    },
-  ].filter((g) => g.metingen.length > 0);
+  // De Metingen op meetdatum, de nieuwste bovenaan (`CLAUDE.md`, scherm 4, bij een Lead-rol).
+  const gesorteerdeLeadMetingen = nieuwsteEerst(overigeLeadMetingen);
 
   // Een kaart per benchmark die aan staat: Dezelfde berekening als `BenchmarkKaarten`, alleen om de lege toestand te kennen.
   const resultatenIds = isLeadLid ? metingIdsMetWeergave(organisatie, lid.id, "resultaten") : [];
@@ -331,7 +327,6 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
         benchmarkGeldigVoorOrganisatie(benchmark, organisatie.id) &&
         leadViewsVoorBenchmark(benchmark, assessments, organisaties, organisatie, resultatenIds, {
           minOrganisaties: instellingen.benchmarkMinOrganisaties,
-          minMetingen: instellingen.benchmarkMinMetingen,
           minRespondenten: instellingen.benchmarkMinRespondenten,
         }).length > 0
       );
@@ -393,28 +388,23 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
           </div>
         )}
 
-        {groepen.length > 0 && (
+        {gesorteerdeLeadMetingen.length > 0 && (
           <>
             <span className="eyebrow mt-10" style={{ display: "block" }}>
               Wat voor jou klaarstaat
             </span>
-            {groepen.map((g) => (
-              <div key={g.sleutel}>
-                {g.naam && <h2 style={{ marginTop: "1.2rem" }}>{g.naam}</h2>}
-                <div className="grid grid-cols-1 gap-4 mt-4">
-                  {g.metingen.map((scanUitvoering) => (
-                    <LeadMetingKaart
-                      key={scanUitvoering.id}
-                      code={code}
-                      scanUitvoering={scanUitvoering}
-                      organisatie={organisatie}
-                      lid={lid}
-                      assessmentNaam={assessmentNaam(scanUitvoering.assessmentId)}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
+            <div className="grid grid-cols-1 gap-4 mt-4">
+              {gesorteerdeLeadMetingen.map((scanUitvoering) => (
+                <LeadMetingKaart
+                  key={scanUitvoering.id}
+                  code={code}
+                  scanUitvoering={scanUitvoering}
+                  organisatie={organisatie}
+                  lid={lid}
+                  assessmentNaam={assessmentNaam(scanUitvoering.assessmentId)}
+                />
+              ))}
+            </div>
           </>
         )}
 

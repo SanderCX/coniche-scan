@@ -3,75 +3,23 @@
 import { use, useState } from "react";
 import Link from "next/link";
 import { useOrganisatie, updateOrganisatie, hernoemOrganisatie } from "@/lib/db";
-import { maakPubliekeLink } from "@/lib/uitnodiging-link";
-import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { organisatieVelden } from "@/data/organisatie-velden";
 import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
 import { BenchmarkVlag } from "@/components/beheer/BenchmarkVlag";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { RespondentStatusBadge } from "@/components/beheer/overzicht-helpers";
-import { Organisatie } from "@/lib/types";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren, magOrganisatieToegang, magOrganisatieToewijzen, magLeadToekennen } from "@/lib/rechten";
 import { useGebruikers } from "@/lib/gebruikers-store";
 import { useBeheerOverzicht } from "@/lib/beheer-url";
 import { MetBewerkslot } from "@/components/beheer/MetBewerkslot";
-import { LeadToevoegenFormulier } from "@/components/beheer/LeadToevoegenFormulier";
 import { MetingenSectie } from "@/components/beheer/MetingenSectie";
-import { LeadsTabel } from "@/components/beheer/LeadsTabel";
+import { LeadsBlok } from "@/components/beheer/LeadsBlok";
 import { AntwoordenNamenSchakelaar } from "@/components/beheer/AntwoordenNamenSchakelaar";
 import { isLead } from "@/lib/lead";
 
 /** Aantal rijen per lijst op de detailpagina (beheerpagina.md, punt 4, "Lange lijsten"). */
 const MAX_RIJEN = 5;
-
-/**
- * "+ Lead toevoegen" (beheerpagina.md punt 6a): Een oranje knop onder de tabel Leads, links uitgelijnd. Een klik opent eronder
- * het formulier (`LeadToevoegenFormulier`): Een bestaande Respondent of een nieuwe. De nieuwe rij verschijnt zonder vinkjes.
- */
-function LeadToevoegen({ organisatie }: { organisatie: Organisatie }) {
-  const [open, setOpen] = useState(false);
-  const [nieuweLink, setNieuweLink] = useState<string | null>(null);
-  const [kopieerGelukt, setKopieerGelukt] = useState<boolean | null>(null);
-
-  async function kopieer(url: string) {
-    setKopieerGelukt(await kopieerNaarKlembord(url));
-    setTimeout(() => setKopieerGelukt(null), 1600);
-  }
-
-  // Een oranje knop direct onder de lijst Respondenten, links uitgelijnd (beheerpagina.md, punt 6a).
-  // Pas na een klik klapt het formulier eronder open.
-  return (
-    <div style={{ marginTop: "1rem" }}>
-      <button type="button" className="btn btn-or btn-compact" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        + Lead toevoegen
-      </button>
-      {open && (
-        <div className="mt-3">
-          <LeadToevoegenFormulier
-            key={nieuweLink ?? "nieuw"}
-            organisatie={organisatie}
-            onToegevoegd={(lid) => setNieuweLink(maakPubliekeLink(window.location.origin, lid))}
-          />
-        </div>
-      )}
-      {nieuweLink && (
-        <div className="admin-notice mt-3">
-          <p className="font-medium text-ink">Lead toegevoegd. Deel deze link handmatig:</p>
-          <div className="mt-2 flex items-center gap-2">
-            <code className="flex-1 truncate rounded bg-bg px-2 py-1 text-xs">{nieuweLink}</code>
-            <button type="button" onClick={() => kopieer(nieuweLink)} className="btn btn-outline btn-compact">
-              {kopieerGelukt === null ? "Kopieer" : kopieerGelukt ? "Gekopieerd!" : "Mislukt, probeer opnieuw"}
-            </button>
-            <a href={nieuweLink} target="_blank" rel="noreferrer" className="btn btn-outline btn-compact">
-              Openen
-            </a>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 /**
  * De naam in de kop met een potlood (`beheerpagina.md`, punt 4, Naam wijzigen): Een klik maakt van de naam een invoerveld
@@ -267,12 +215,7 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
           )}
         </>
       )}
-      {magLeadToekennen(ingelogd) && (
-        <>
-          <LeadsTabel organisatie={organisatie} gebruikerId={ingelogd!.id} />
-          <LeadToevoegen organisatie={organisatie} />
-        </>
-      )}
+      {magLeadToekennen(ingelogd) && <LeadsBlok organisatie={organisatie} />}
 
       <h2>Organisatiekenmerken</h2>
       {magBenchmarkBeheren(ingelogd) && <BenchmarkVlag organisatie={organisatie} />}

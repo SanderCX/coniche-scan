@@ -44,13 +44,14 @@ export function useUrlParams() {
   return { get, set };
 }
 
-export type OverzichtSoort = "respondent" | "scan";
+export type OverzichtSoort = "respondent" | "scan" | "leads";
 
 /**
- * Het Respondent-overzicht (`?respondent=<id>`) en Scan-overzicht
- * (`?scan=<id>`) als modal boven de pagina waar je was. Openen voegt een
- * history-entry toe, zodat de terugknop van de browser de modal sluit;
- * wisselen tussen de twee vervangt alleen de inhoud. Is de modal geopend
+ * Het Respondent-overzicht (`?respondent=<id>`), Scan-overzicht
+ * (`?scan=<id>`) en het Leads-venster (`?leads=<organisatieId>`, met `?toevoegen=1`
+ * als het formulier "Lead toevoegen" al open staat) als modal boven de pagina
+ * waar je was. Openen voegt een history-entry toe, zodat de terugknop van de
+ * browser de modal sluit; wisselen tussen de drie vervangt alleen de inhoud. Is de modal geopend
  * via een gedeelde link (geen eigen entry), dan haalt sluiten alleen de
  * parameter weg in plaats van de gebruiker uit de app terug te sturen.
  */
@@ -59,10 +60,18 @@ export function useBeheerOverzicht() {
   const pathname = usePathname();
   const respondentId = searchParams.get("respondent");
   const scanId = searchParams.get("scan");
+  const leadsId = searchParams.get("leads");
+  const leadToevoegen = searchParams.get("toevoegen") === "1";
 
   const open = useCallback(
-    (soort: OverzichtSoort, id: string) => {
-      const url = bouwUrl(pathname, { respondent: null, scan: null, [soort]: id });
+    (soort: OverzichtSoort, id: string, opties: { toevoegen?: boolean } = {}) => {
+      const url = bouwUrl(pathname, {
+        respondent: null,
+        scan: null,
+        leads: null,
+        toevoegen: soort === "leads" && opties.toevoegen ? "1" : null,
+        [soort]: id,
+      });
       window.history.pushState({ [STATE_VLAG]: true }, "", url);
     },
     [pathname]
@@ -70,7 +79,7 @@ export function useBeheerOverzicht() {
 
   const vervang = useCallback(
     (soort: OverzichtSoort, id: string) => {
-      const url = bouwUrl(pathname, { respondent: null, scan: null, [soort]: id });
+      const url = bouwUrl(pathname, { respondent: null, scan: null, leads: null, toevoegen: null, [soort]: id });
       window.history.replaceState(schoneState(), "", url);
     },
     [pathname]
@@ -80,14 +89,14 @@ export function useBeheerOverzicht() {
     if (window.history.state?.[STATE_VLAG]) {
       window.history.back();
     } else {
-      window.history.replaceState({}, "", bouwUrl(pathname, { respondent: null, scan: null }));
+      window.history.replaceState({}, "", bouwUrl(pathname, { respondent: null, scan: null, leads: null, toevoegen: null }));
     }
   }, [pathname]);
 
-  return { respondentId, scanId, open, vervang, sluit };
+  return { respondentId, scanId, leadsId, leadToevoegen, open, vervang, sluit };
 }
 
 /** Adres van de huidige pagina met het Respondent- of Scan-overzicht erop, filters blijven behouden (voor links in een melding). */
 export function overzichtHref(pathname: string, soort: OverzichtSoort, id: string): string {
-  return bouwUrl(pathname, { respondent: null, scan: null, [soort]: id });
+  return bouwUrl(pathname, { respondent: null, scan: null, leads: null, toevoegen: null, [soort]: id });
 }

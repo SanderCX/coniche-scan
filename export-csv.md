@@ -43,7 +43,7 @@ organisatie, dan is "Exporteren" uitgeschakeld, met het Info-icoon
 ### Basisgegevens
 
 De kolom `onderdeel` is gebouwd op 13 oktober 2026 en de kolom
-`meting_meetdatum` is een voorstel van 14 oktober 2026 (`datamodel.md`, Meting).
+`meting_meetdatum` is gebouwd op 14 oktober 2026 (`datamodel.md`, Meting).
 De kolom `ronde` van 13 oktober 2026 vervalt met de ronde. Ze staan direct na
 `meting_label`. De import leest kolommen op hun kopnaam, zodat een bestand zonder
 deze kolommen, of met een oude kolom `ronde`, blijft werken (`import-scans.md`,

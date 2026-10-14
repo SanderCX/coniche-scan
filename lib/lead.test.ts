@@ -94,7 +94,7 @@ describe("de vinkjes kloppend houden", () => {
     expect(o.leadToegang!.map((x) => x.weergave)).toEqual(["resultaten"]);
   });
 
-  it("een benchmark vervalt als ze weg is of de organisatie er geen lid van is, en bij niveau 2 zonder Resultaten op een lid-Meting", () => {
+  it("een benchmark vervalt als ze weg is of de organisatie er geen lid van is", () => {
     const basis = () =>
       org({
         leden: [lid("L1", { lead: true })],
@@ -110,12 +110,27 @@ describe("de vinkjes kloppend houden", () => {
     const c = basis();
     ruimLeadToegangOp(c, [benchmark({ leden: [{ organisatieId: "ANDERS", assessmentId: "A", metingId: "X" }] })]);
     expect(c.leadToegang).toHaveLength(0);
-    const d = basis();
-    ruimLeadToegangOp(d, [benchmark({ niveau: "metingen" })]);
-    expect(d.leadToegang).toHaveLength(0);
-    d.leadToegang = [t("L1", "benchmark", "B"), t("L1", "resultaten", "M1")];
-    ruimLeadToegangOp(d, [benchmark({ niveau: "metingen" })]);
-    expect(d.leadToegang).toHaveLength(2);
+  });
+
+  it("bij niveau 2 vraagt een benchmark Resultaten op minstens twee lid-Metingen: Met minder is er niets te vergelijken", () => {
+    const twee = benchmark({
+      niveau: "metingen",
+      leden: [
+        { organisatieId: "O", assessmentId: "A", metingId: "M1" },
+        { organisatieId: "O", assessmentId: "A", metingId: "M2" },
+      ],
+    });
+    const basis = (vinkjes: LeadToegang[]) =>
+      org({ leden: [lid("L1", { lead: true })], scanUitvoeringen: [meting("M1"), meting("M2")], leadToegang: vinkjes });
+    const geen = basis([t("L1", "benchmark", "B")]);
+    ruimLeadToegangOp(geen, [twee]);
+    expect(geen.leadToegang).toHaveLength(0);
+    const een = basis([t("L1", "benchmark", "B"), t("L1", "resultaten", "M1")]);
+    ruimLeadToegangOp(een, [twee]);
+    expect(een.leadToegang!.map((x) => x.weergave)).toEqual(["resultaten"]);
+    const beide = basis([t("L1", "benchmark", "B"), t("L1", "resultaten", "M1"), t("L1", "resultaten", "M2")]);
+    ruimLeadToegangOp(beide, [twee]);
+    expect(beide.leadToegang).toHaveLength(3);
   });
 
   it("een benchmark van niveau 3 heeft geen kolom voor een Lead", () => {
@@ -187,11 +202,13 @@ describe("de grijze cellen", () => {
     expect(metingCelReden({ ...basis, meting: samengesteld, weergave: "resultaten" })).toBeNull();
   });
 
-  it("een benchmarkkolom is grijs onder de drempel, en bij niveau 2 zonder Resultaten op een lid-Meting", () => {
-    expect(benchmarkCelReden({ niveau: "organisaties", voldoetAanDrempel: false, heeftResultatenOpLidMeting: false })).not.toBeNull();
+  it("een benchmarkkolom is grijs onder de drempel van niveau 1, en bij niveau 2 met Resultaten op minder dan twee lid-Metingen", () => {
+    expect(benchmarkCelReden({ niveau: "organisaties", voldoetAanDrempel: false, aantalLidMetingenMetResultaten: 0 })).not.toBeNull();
     // Niveau 1 vraagt geen Resultaten: De view toont de scores van de eigen organisatie zelf al.
-    expect(benchmarkCelReden({ niveau: "organisaties", voldoetAanDrempel: true, heeftResultatenOpLidMeting: false })).toBeNull();
-    expect(benchmarkCelReden({ niveau: "metingen", voldoetAanDrempel: true, heeftResultatenOpLidMeting: false })).not.toBeNull();
-    expect(benchmarkCelReden({ niveau: "metingen", voldoetAanDrempel: true, heeftResultatenOpLidMeting: true })).toBeNull();
+    expect(benchmarkCelReden({ niveau: "organisaties", voldoetAanDrempel: true, aantalLidMetingenMetResultaten: 0 })).toBeNull();
+    // Niveau 2 vergelijkt Metingen: Met één Meting met Resultaten is er niets te vergelijken.
+    expect(benchmarkCelReden({ niveau: "metingen", voldoetAanDrempel: true, aantalLidMetingenMetResultaten: 0 })).not.toBeNull();
+    expect(benchmarkCelReden({ niveau: "metingen", voldoetAanDrempel: true, aantalLidMetingenMetResultaten: 1 })).not.toBeNull();
+    expect(benchmarkCelReden({ niveau: "metingen", voldoetAanDrempel: true, aantalLidMetingenMetResultaten: 2 })).toBeNull();
   });
 });

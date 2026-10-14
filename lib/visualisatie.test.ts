@@ -246,6 +246,55 @@ describe("E. Matrix", () => {
     expect(m.grootsteVerschil?.verschil).toBe(2);
   });
 
+  describe("niveau 2: geen groep om van af te wijken", () => {
+    it("zonder groepsvergelijking geen zwarte rand, en bij precies twee Metingen een kolom Verschil (nieuwer min ouder)", () => {
+      const m = matrix(a, [kolom("Oud", 2), kolom("Nieuw", 4)], { groepsvergelijking: false });
+      expect(m.aantalAfwijkend).toBe(0);
+      expect(m.rijen[0].cellen.every((c) => !c.afwijkend)).toBe(true);
+      expect(m.metVerschil).toBe(true);
+      expect(m.rijen.every((r) => r.verschilTweeMetingen === 2)).toBe(true);
+      expect(m.totaalVerschil).toBe(2);
+    });
+
+    it("een daling is negatief en een Meting zonder score geeft geen verschil", () => {
+      const m = matrix(a, [kolom("Oud", 4), kolom("Nieuw", 3)], { groepsvergelijking: false });
+      expect(m.rijen[0].verschilTweeMetingen).toBe(-1);
+      expect(m.totaalVerschil).toBe(-1);
+      const leeg = matrix(a, [kolom("Leeg", 3, 0), { ...kolom("Vol", 3, 5), antwoorden: {} }], { groepsvergelijking: false });
+      expect(leeg.rijen[0].verschilTweeMetingen).toBeNull();
+    });
+
+    it("bij meer dan twee Metingen is er geen kolom Verschil", () => {
+      const m = matrix(a, [kolom("A", 2), kolom("B", 3), kolom("C", 4)], { groepsvergelijking: false });
+      expect(m.metVerschil).toBe(false);
+      expect(m.rijen.every((r) => r.verschilTweeMetingen === null)).toBe(true);
+      expect(m.groepRijen).toEqual([]);
+    });
+
+    it("geeft per categorie een rij met score en verschil, na het laatste bouwblok van de categorie", () => {
+      const m = matrix(a, [kolom("Oud", 2), kolom("Nieuw", 4)], { groepsvergelijking: false });
+      expect(m.groepRijen).toHaveLength(a.categorieen!.length);
+      const eerste = m.groepRijen[0];
+      expect(eerste.cellen.map((c) => c.score)).toEqual([2, 4]);
+      expect(eerste.verschilTweeMetingen).toBe(2);
+      expect(eerste.naRij).toBe(a.categorieen![0].bouwblokken.length - 1);
+    });
+
+    it("met groepsvergelijking (niveau 1) blijft alles zoals het was", () => {
+      const m = matrix(a, [kolom("A", 3), kolom("B", 3), kolom("C", 4)]);
+      expect(m.metVerschil).toBe(false);
+      expect(m.aantalAfwijkend).toBe(15);
+    });
+
+    it("een Assessment zonder categorielaag heeft geen categorierijen", () => {
+      const ai = aiVolwassenheid;
+      const kol = (waarde: number) => ({ label: String(waarde), aantalScans: 3, antwoorden: scan("s", waarde, "afgerond", ai).antwoorden });
+      const m = matrix(ai, [kol(2), kol(4)], { groepsvergelijking: false });
+      expect(m.groepRijen).toEqual([]);
+      expect(m.rijen[0].verschilTweeMetingen).toBe(2);
+    });
+  });
+
   it("een Meting zonder afgeronde scan heeft geen totaalscore", () => {
     const m = matrix(a, [kolom("Leeg", 3, 0), kolom("Vol", 3, 5)]);
     expect(m.kolommen[0].totaal).toBeNull();

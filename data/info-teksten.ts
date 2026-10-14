@@ -103,7 +103,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     sleutel: "info.metingBegrippen",
     plek: "Organisatie-detail, naast de kop \"Metingen\"",
     tekst:
-      "Ronde: een meetmoment van de organisatie, zoals \"0-meting\" of \"Nameting 2027\". Een ronde bevat meerdere Metingen en rondes vergelijk je met elkaar. Onderdeel: welk deel van de organisatie gemeten wordt, zoals \"Zuid-Nederland Zakelijk\", of \"Hele organisatie\". Assessment: de vragenlijst. Meting: één onderdeel in één ronde met één Assessment, de Respondenten horen bij een Meting. De naam van de Meting maakt de app uit onderdeel en ronde, je typt hem niet.",
+      "Onderdeel: Welk deel van de organisatie gemeten wordt, zoals \"Zuid-Nederland Zakelijk\", of \"Hele organisatie\". Assessment: De vragenlijst. Meetdatum: De dag waarop gemeten wordt, niet de dag van aanmaken of importeren. Meting: Eén onderdeel met één Assessment op één meetdatum, de Respondenten horen bij een Meting. De naam van de Meting maakt de app uit onderdeel en meetdatum, je kunt hem achteraf aanpassen.",
   },
   {
     sleutel: "info.scansSamenbrengen",
@@ -112,7 +112,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
   },
   {
     sleutel: "info.bulkExportOrganisatie",
-    plek: "Resultaten, lijsten Rondes en Metingen, achter de uitgeschakelde knop \"Exporteren\" bij een selectie over meer dan één organisatie",
+    plek: "Resultaten, lijst Metingen, achter de uitgeschakelde knop \"Exporteren\" bij een selectie over meer dan één organisatie",
     tekst: "Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie.",
   },
   {
@@ -154,7 +154,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     sleutel: "info.benchmarkAanmakenMetingen",
     plek: "Benchmark binnen een organisatie aanmaken of wijzigen, achter de uitgeschakelde knop",
     tekst:
-      "Een benchmark binnen een organisatie heeft een naam nodig, een organisatie en minstens één Assessment waarvoor je minstens twee Metingen hebt aangevinkt. Een Meting is alleen te kiezen met genoeg afgeronde scans.",
+      "Een vergelijking tussen Metingen heeft een naam nodig, een organisatie, een Assessment en precies twee Metingen. Een Meting is alleen te kiezen met een meetdatum en genoeg afgeronde scans.",
   },
   {
     sleutel: "info.benchmarkAanmakenScans",
@@ -163,14 +163,14 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Een benchmark binnen een Meting heeft een naam nodig, een organisatie, een Assessment en een Meting. Een Meting is alleen te kiezen met genoeg afgeronde scans.",
   },
   {
-    sleutel: "info.vergelijkRonde",
-    plek: "Resultaten van een Meting en de kop van een ronde, naast de uitgeschakelde knop \"Vergelijk met vorige ronde\"",
+    sleutel: "info.vergelijkMetingen",
+    plek: "Resultaten van een Meting, naast de uitgeschakelde knop \"Vergelijking\"",
     tekst:
-      "Vergelijken kan pas als deze organisatie een eerdere ronde heeft met hetzelfde onderdeel en hetzelfde Assessment, en met genoeg afgeronde scans. Start eerst een tweede ronde, of koppel een bestaande Meting aan een ronde.",
+      "Deze Meting zit in geen enkele vergelijking. Een Admin maakt die aan onder Resultaten, Benchmarks, met het niveau Binnen een organisatie.",
   },
   {
     sleutel: "info.leadToegangCel",
-    plek: "Organisatie-detail, tabel Leads, in een grijze cel",
+    plek: "Leads-venster van de organisatie, in een grijze cel",
     tekst:
       "De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark.",
   },

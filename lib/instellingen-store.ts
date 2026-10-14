@@ -22,12 +22,6 @@ export interface Instellingen {
   /** Minimaal aantal afgeronde scans dat een Meting moet hebben om in een benchmark gekozen te worden. Startwaarde 3. */
   benchmarkMinScans: number;
   /**
-   * Niveau 2 (binnen een organisatie): Het minimale aantal Metingen in de groep per Assessment, inclusief de Meting van de
-   * view, om die view aan een Lead te mogen toewijzen (`benchmark.md`, Toewijzen aan een Lead op alle niveaus). Voorstel,
-   * startwaarde 3.
-   */
-  benchmarkMinMetingen: number;
-  /**
    * Niveau 3 (binnen een Meting): Het minimale aantal afgeronde scans in de Meting, inclusief de scan van de view, om die view
    * aan een Lead te mogen toewijzen en voor de ondergrens in de weergave. Voorstel, startwaarde 5.
    */
@@ -39,7 +33,6 @@ const STANDAARDWAARDEN: Instellingen = {
   verlengTermijnDagen: null,
   benchmarkMinOrganisaties: 5,
   benchmarkMinScans: 3,
-  benchmarkMinMetingen: 3,
   benchmarkMinRespondenten: 5,
 };
 

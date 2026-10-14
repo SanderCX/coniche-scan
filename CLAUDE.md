@@ -88,9 +88,9 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   zijn alle drie gebouwd, vanuit dezelfde Exporteren-dropdown op de
   resultatenpagina, in het Meting-overzicht en in de lijsten onder Resultaten
   (`beheerpagina.md`, punt 5 en 7).
-- **Benchmark**: Het niveau tussen organisaties is gebouwd (PR 61,
-  `benchmark.md`). De niveaus binnen een organisatie en binnen een Meting
-  zijn besproken en nog niet gebouwd.
+- **Benchmark**: Alle drie de niveaus zijn gebouwd: Tussen organisaties
+  (PR 61), binnen een organisatie (een vergelijking van twee Metingen, 14
+  oktober 2026) en binnen een Meting (`benchmark.md`).
 
 ## Terminologie
 
@@ -489,8 +489,8 @@ bouwblokken met naam, omschrijving, tags en vragen.
   gebouwd (`beheerpagina.md`, Organisatie-resultaten). Afwijking en
   spreiding daarbovenop zijn ontworpen en nog niet gebouwd
   (`visualisatie-scores.md`).
-- Benchmark: Niveau 1 is gebouwd. Niveau 2 en 3 zijn uitgewerkt in
-  `benchmark.md`, met de open punten onderaan dat bestand.
+- Benchmark: Alle niveaus zijn gebouwd. De open punten staan onderaan
+  `benchmark.md`.
 - Weging: De weging is gebouwd. De gewichten van de Zorgscan (bouwblok 4, 10
   en 11 op 2) zijn besloten: de spec is leidend. De seed staat op 2. De
   opgeslagen data moeten daarop staan.

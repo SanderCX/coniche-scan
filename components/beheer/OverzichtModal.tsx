@@ -9,17 +9,21 @@ import { useFocusVal } from "@/lib/use-focus-val";
  * secties. Sluiten met het kruisje, Esc of een klik naast de modal; de
  * terugknop van de browser sluit hem via `useBeheerOverzicht`.
  * `escUitgeschakeld` voorkomt dat Esc deze modal sluit terwijl er een
- * bevestigingsmodal bovenop staat.
+ * bevestigingsmodal bovenop staat. `vol` is de brede variant `.modal-box--vol`
+ * voor het Leads-venster (`stylesheet.md`, Overzichtsmodal): Het venster zelf
+ * scrolt niet, de kop en de voettekst blijven staan en alleen de tabel scrolt.
  */
 export function OverzichtModal({
   label,
   onSluit,
   escUitgeschakeld = false,
+  vol = false,
   children,
 }: {
   label: string;
   onSluit: () => void;
   escUitgeschakeld?: boolean;
+  vol?: boolean;
   children: React.ReactNode;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
@@ -36,7 +40,7 @@ export function OverzichtModal({
 
   return (
     <div className="modal-overlay" onClick={onSluit} role="dialog" aria-modal="true" aria-label={label}>
-      <div className="modal-box modal-box--breed" ref={boxRef} tabIndex={-1} onClick={(e) => e.stopPropagation()}>
+      <div className={`modal-box ${vol ? "modal-box--vol" : "modal-box--breed"}`} ref={boxRef} tabIndex={-1} onClick={(e) => e.stopPropagation()}>
         <button type="button" onClick={onSluit} aria-label="Sluiten" className="modal-close">
           ✕
         </button>

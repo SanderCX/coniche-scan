@@ -447,7 +447,7 @@ Neem je een rij later alsnog mee met dezelfde knop (zie
 sessie al voor die combinatie is aangemaakt. Een nieuwe upload, ook van
 hetzelfde bestand, begint met nieuwe Metingen.
 
-**Meetdatum en onderdeel (voorstel van 14 oktober 2026, ter vervanging van de
+**Meetdatum en onderdeel (gebouwd op 14 oktober 2026, ter vervanging van de
 ronde van 13 oktober 2026).** De oude tool kende geen onderdeel en geen
 meetdatum (`datamodel.md`, Meting). De import leidt ze af uit wat hij al weet.
 

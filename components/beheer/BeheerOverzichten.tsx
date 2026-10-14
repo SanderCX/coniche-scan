@@ -3,12 +3,13 @@
 import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties } from "@/lib/db";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
-import { magOrganisatieToegang } from "@/lib/rechten";
+import { magLeadToekennen, magOrganisatieToegang } from "@/lib/rechten";
 import { useBeheerOverzicht } from "@/lib/beheer-url";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { RespondentOverzicht } from "@/components/beheer/RespondentOverzicht";
 import { ScanOverzicht } from "@/components/beheer/ScanOverzicht";
 import { MetBewerkslot } from "@/components/beheer/MetBewerkslot";
+import { LeadsVenster } from "@/components/beheer/LeadsVenster";
 
 /**
  * Rendert het Respondent- of Scan-overzicht als `?respondent=<id>` of
@@ -17,12 +18,24 @@ import { MetBewerkslot } from "@/components/beheer/MetBewerkslot";
  * bij die organisatie mag, zelfde bereik als de lijsten.
  */
 export function BeheerOverzichten() {
-  const { respondentId, scanId, vervang, sluit } = useBeheerOverzicht();
+  const { respondentId, scanId, leadsId, vervang, sluit } = useBeheerOverzicht();
   const organisaties = useOrganisaties();
   const assessments = useAssessments();
   const ingelogd = useIngelogdeGebruiker();
 
-  if (!ingelogd || (!respondentId && !scanId)) return null;
+  if (!ingelogd || (!respondentId && !scanId && !leadsId)) return null;
+
+  // Het Leads-venster (`beheerpagina.md`, punt 6a): Alleen voor een Admin, en de organisatie valt eronder onder het Bewerkslot.
+  if (leadsId) {
+    const organisatie = organisaties.find((o) => o.id === leadsId);
+    if (!organisatie) return <NietGevonden onSluit={sluit} wat="Organisatie" />;
+    if (!magLeadToekennen(ingelogd) || !magOrganisatieToegang(ingelogd, organisatie)) return <GeenToegang onSluit={sluit} />;
+    return (
+      <MetBewerkslot key={organisatie.id} type="organisatie" id={organisatie.id} wat="Organisatie" onSluit={sluit}>
+        <LeadsVenster organisatie={organisatie} gebruikerId={ingelogd.id} onSluit={sluit} />
+      </MetBewerkslot>
+    );
+  }
 
   if (respondentId) {
     const organisatie = organisaties.find((o) => o.leden.some((l) => l.id === respondentId));

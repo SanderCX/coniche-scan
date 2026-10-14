@@ -21,13 +21,12 @@ export interface Kruimel {
 
 /**
  * Het kruimelpad naar een Meting (`beheerpagina.md`, Navigatie in beheer): Via Resultaten is het Resultaten › Organisatie ›
- * Ronde › Meting (de ronde ontbreekt bij een Meting zonder ronde), anders Organisaties › Organisatie › Meting. `laatste` is
- * een extra deel erachter, bijvoorbeeld "Resultaten van de Meting"; dan is de Meting zelf een link.
+ * Meting, anders Organisaties › Organisatie › Meting. `laatste` is een extra deel erachter, bijvoorbeeld "Resultaten van de
+ * Meting"; dan is de Meting zelf een link.
  */
 export function kruimelsVoorMeting(
   organisatie: { id: string; naam: string },
   meting: { id: string; label: string },
-  ronde: { id: string; label: string } | undefined,
   via: boolean,
   laatste?: string
 ): Kruimel[] {
@@ -36,9 +35,8 @@ export function kruimelsVoorMeting(
   const staart: Kruimel[] = laatste ? [metingDeel, { label: laatste }] : [metingDeel];
   if (via) {
     return [
-      { label: "Resultaten", href: "/beheer/resultaten/rondes" },
+      { label: "Resultaten", href: "/beheer/resultaten/metingen" },
       { label: organisatie.naam, href: `/beheer/organisaties/${organisatie.id}` },
-      ...(ronde ? [{ label: ronde.label, href: metVia(`/beheer/rondes/${ronde.id}`, true) }] : []),
       ...staart,
     ];
   }

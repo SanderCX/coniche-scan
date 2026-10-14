@@ -12,8 +12,8 @@ import {
   aantalAfgerondInMeting,
   onderdeelVan,
   onderliggendeMetingen,
-  rondeVan,
-} from "@/lib/rondes";
+  toonMeetdatum,
+} from "@/lib/metingen";
 import { Organisatie, ScanUitvoering } from "@/lib/types";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
@@ -40,7 +40,6 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
   const [verwijderenOpen, setVerwijderenOpen] = useState(false);
 
   const onder = onderliggendeMetingen(organisatie, meting);
-  const ronde = rondeVan(organisatie, meting);
   const leads = leadsMetToegangTotMeting(organisatie, meting.id);
   const inBenchmarks = aantalBenchmarksMetMeting(meting.id);
   const scans = aantalAfgerondInMeting(organisatie, meting);
@@ -53,7 +52,7 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
 
   return (
     <div className="admin-main admin-main--breed">
-      <Kruimelpad delen={kruimelsVoorMeting(organisatie, meting, ronde, via)} />
+      <Kruimelpad delen={kruimelsVoorMeting(organisatie, meting, via)} />
       {labelBewerken ? (
         <MetingWijzigenFormulier organisatie={organisatie} meting={meting} onKlaar={() => setLabelBewerken(false)} />
       ) : (
@@ -61,7 +60,7 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
           <h1>
             {meting.label} <span className="admin-badge status-uitgenodigd" style={{ verticalAlign: "middle" }}>Gemiddelde</span>
           </h1>
-          <button type="button" className="titel-potlood" aria-label="Meting wijzigen (onderdeel en ronde)" title="Meting wijzigen (onderdeel en ronde)" onClick={() => setLabelBewerken(true)}>
+          <button type="button" className="titel-potlood" aria-label="Meting wijzigen (onderdeel en naam)" title="Meting wijzigen (onderdeel en naam)" onClick={() => setLabelBewerken(true)}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -70,7 +69,7 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
       )}
       <p className="text-sm text-ink-m">
         {assessment?.naam ?? "Onbekend type"} · {organisatie.naam}
-        {ronde && ` · ${ronde.label}`} · onderdeel {onderdeelVan(meting)}
+        {` · meetdatum ${toonMeetdatum(meting.meetdatum)}`} · onderdeel {onderdeelVan(meting)}
       </p>
       <p className="text-sm text-ink-m">
         Gemiddelde van {onder.length} {onder.length === 1 ? "Meting" : "Metingen"}, elk even zwaar ({scans} afgeronde scans in
@@ -125,7 +124,7 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
       {leads.length === 0 ? (
         <p className="admin-notice">
           Geen Lead ziet deze Meting. Toegang erft niet mee van de onderliggende Metingen: Vink Resultaten van deze Meting aan in
-          de tabel Leads van de organisatie.
+          het Leads-venster van de organisatie.
         </p>
       ) : (
         <ul className="text-sm text-ink-m" style={{ listStyle: "disc", paddingLeft: "1.2rem" }}>
@@ -141,10 +140,9 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
       )}
 
       <Modal open={wijzigenOpen} onClose={() => setWijzigenOpen(false)} title="Samenstelling wijzigen">
-        {wijzigenOpen && meting.rondeId && (
+        {wijzigenOpen && (
           <SamengesteldeMetingFormulier
             organisatie={organisatie}
-            rondeId={meting.rondeId}
             bestaande={meting}
             onKlaar={() => setWijzigenOpen(false)}
             onAnnuleren={() => setWijzigenOpen(false)}

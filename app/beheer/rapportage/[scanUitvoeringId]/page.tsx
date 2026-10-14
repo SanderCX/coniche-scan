@@ -17,10 +17,10 @@ import {
   isSamengesteld,
   onderdeelVan,
   onderliggendeMetingen,
-  rondeVan,
-  vergelijkbareMetingen,
-} from "@/lib/rondes";
-import { VergelijkingEyebrow } from "@/components/visualisatie/VergelijkingEyebrow";
+  oudsteEerst,
+  toonMeetdatum,
+} from "@/lib/metingen";
+import { useBenchmarks } from "@/lib/benchmark-store";
 import { kruimelsVoorMeting, VIA_RESULTATEN } from "@/lib/resultaten-nav";
 
 /**
@@ -40,6 +40,7 @@ export default function RapportagePage({
   const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
   const ingelogd = useIngelogdeGebruiker();
   const via = useSearchParams().get("via") === VIA_RESULTATEN;
+  const benchmarks = useBenchmarks();
 
   if (!gegevens || !assessment) {
     return (
@@ -73,7 +74,7 @@ export default function RapportagePage({
     return (
       <div className="admin-main">
         <Kruimelpad
-          delen={kruimelsVoorMeting(organisatie, scanUitvoering, rondeVan(organisatie, scanUitvoering), via, "Resultaten van de Meting")}
+          delen={kruimelsVoorMeting(organisatie, scanUitvoering, via, "Resultaten van de Meting")}
         />
         <span className="eyebrow">{scanUitvoering.label}</span>
         <h1>{assessment.naam}</h1>
@@ -86,19 +87,20 @@ export default function RapportagePage({
 
   // Elke onderliggende Meting telt één keer mee (`datamodel.md`, Scoreberekening).
   const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, organisatie, scanUitvoering);
-  // Metingen om mee te vergelijken (`visualisatie-scores.md`, C): Dezelfde combinatie van onderdeel en Assessment in de vorige ronde.
-  const eerdereMetingen = vergelijkbareMetingen(organisatie, scanUitvoering).map((v) => v.meting);
+  // De knop "Vergelijking" (`benchmark.md`, Niveau 2): Alleen een Admin opent benchmarks. De vergelijking zelf staat in de
+  // benchmark. Een Consultant krijgt de knop niet.
+  const vergelijkingen = isAdmin(ingelogd)
+    ? benchmarks
+        .filter((b) => b.niveau === "metingen" && b.leden.some((l) => l.metingId === scanUitvoering.id))
+        .map((b) => ({ id: b.id, naam: b.naam, href: `/beheer/benchmark/${b.id}` }))
+    : undefined;
 
   return (
     <div className="admin-main admin-main--breed">
       <Kruimelpad
-        delen={kruimelsVoorMeting(organisatie, scanUitvoering, rondeVan(organisatie, scanUitvoering), via, "Resultaten van de Meting")}
+        delen={kruimelsVoorMeting(organisatie, scanUitvoering, via, "Resultaten van de Meting")}
       />
-      <VergelijkingEyebrow
-        label={scanUitvoering.label}
-        eerdereMetingen={eerdereMetingen}
-        rondeLabelVan={(m) => rondeVan(organisatie, m)?.label}
-      />
+      <span className="eyebrow">{scanUitvoering.label}</span>
       <h1>{assessment.naam}</h1>
       <p className="text-sm text-ink-m">
         {samengesteld
@@ -115,6 +117,7 @@ export default function RapportagePage({
           spreidingToegestaan={!samengesteld}
           antwoordenToegestaan={!samengesteld}
           bereikAltijd
+          vergelijkingen={vergelijkingen}
           toonBenchmarkLink={isAdmin(ingelogd)}
         />
       </div>
@@ -126,12 +129,14 @@ export default function RapportagePage({
             assessment={assessment}
             weergave={matrix(
               assessment,
-              onderliggend.map((m) => ({
+              // Op meetdatum, de oudste links (`visualisatie-scores.md`, E, Volgorde van de kolommen).
+              oudsteEerst(onderliggend).map((m) => ({
                 label: m.label,
-                sublabel: onderdeelVan(m),
+                sublabel: `${onderdeelVan(m)} · ${toonMeetdatum(m.meetdatum)}`,
                 aantalScans: aantalAfgerondInMeting(organisatie, m),
                 antwoorden: gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, organisatie, m),
-              }))
+              })),
+              { groepsvergelijking: false }
             )}
           />
         </div>

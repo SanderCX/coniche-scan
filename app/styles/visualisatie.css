@@ -486,3 +486,10 @@
   height: 36px;
   border-top: 2px solid var(--border-d);
 }
+
+/* Categorie-rijen in de matrix van niveau 2 bij twee Metingen (`visualisatie-scores.md`, E). */
+.vis-matrix tr.vis-matrix-groep td {
+  border-top: 1px solid var(--border-d);
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}

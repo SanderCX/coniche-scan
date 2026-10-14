@@ -1,6 +1,7 @@
 import { Assessment, Bouwblok, ScanInvullingStatus } from "./types";
 import { alleBouwblokkenMetGroep, alleVragen } from "./assessment-structuur";
 import { organisatieVelden } from "@/data/organisatie-velden";
+import { dagVan, isGeldigeDatum } from "./metingen";
 
 /**
  * Import van scans (CSV), in twee bronformaten (`import-scans.md`):
@@ -299,8 +300,12 @@ export interface GevalideerdeRij {
   gestartOp: string | null;
   afgerondOp: string | null;
   meetingLabel: string;
-  /** Alleen "nieuw": De kolommen `ronde` en `onderdeel` van de eigen export (`export-csv.md`), als die er zijn en gevuld. */
-  ronde?: string;
+  /**
+   * De meetdatum van de scan (`import-scans.md`, Meetdatum en onderdeel), `JJJJ-MM-DD`. Oude tool: De dag van `created_at`. Eigen
+   * export: De kolom `meting_meetdatum`, als die er is en klopt. De Meting krijgt de oudste datum van haar scans.
+   */
+  meetdatum?: string;
+  /** Alleen "nieuw": De kolom `onderdeel` van de eigen export (`export-csv.md`), als die er is en gevuld. */
   onderdeel?: string;
   antwoorden: Record<string, number>;
   opmerkingenPerBouwblok: Record<string, string>;
@@ -508,6 +513,8 @@ export function valideerLegacyRijen(rijen: LegacyCsvRow[], assessments: Assessme
       afgerondOp: rij.completed_at || null,
       status: "afgerond" as ScanInvullingStatus,
       meetingLabel: `Legacy-import ${new Date(rij.created_at).getFullYear() || "onbekend"}`,
+      // De dag van `created_at`: De Meting krijgt de oudste (`import-scans.md`, Meetdatum en onderdeel).
+      ...(dagVan(rij.created_at) ? { meetdatum: dagVan(rij.created_at) } : {}),
       sectorTitel,
       subsectorTitel: mapNaarSbiTitel(
         rij.subsector_name ?? "",
@@ -598,8 +605,8 @@ export function valideerLegacyRijen(rijen: LegacyCsvRow[], assessments: Assessme
 export interface NieuweExportCsvRow {
   organisatie_naam: string;
   meting_label: string;
-  /** Voorstel (`export-csv.md`): Ontbreekt in een export van vóór de rondes. */
-  ronde?: string;
+  /** `export-csv.md`: Ontbreekt in een export van vóór de meetdatum. Een oude kolom `ronde` wordt genegeerd. */
+  meting_meetdatum?: string;
   onderdeel?: string;
   assessment_naam: string;
   respondent_naam: string;
@@ -714,9 +721,9 @@ export function valideerNieuweExportRijen(
       // kale label zelf — onderscheidt een geïmporteerde Meting meteen van
       // een handmatig aangemaakte met toevallig dezelfde naam.
       meetingLabel: `Import ${rij.meting_label || "Geïmporteerde meting"}`,
-      // Kolommen `ronde` en `onderdeel`: De ronde is het label van de ronde zelf, zonder "Import ", want de export legde
-      // die ronde vast (`import-scans.md`, Ronde en onderdeel).
-      ...(rij.ronde?.trim() ? { ronde: rij.ronde.trim() } : {}),
+      // Kolommen `meting_meetdatum` en `onderdeel` (`import-scans.md`, Meetdatum en onderdeel). Een kolom `ronde` uit de export
+      // van 13 oktober 2026 wordt genegeerd. Zonder meetdatum in het bestand blijft ze leeg.
+      ...(isGeldigeDatum(rij.meting_meetdatum?.trim()) ? { meetdatum: rij.meting_meetdatum!.trim() } : {}),
       ...(rij.onderdeel?.trim() ? { onderdeel: rij.onderdeel.trim() } : {}),
     };
 
