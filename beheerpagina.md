@@ -331,6 +331,12 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
   (`benchmarkMinScans`, startwaarde 3): Het minimale aantal afgeronde
   scans dat een Meting moet hebben om in een benchmark gekozen te kunnen
   worden.
+- **Maximaal aantal dagen tussen Metingen bij Naast elkaar**
+  (`benchmarkMaxDagenTussenMetingen`, voorstel, startwaarde 90): Het aantal
+  dagen tussen de oudste en de nieuwste meetdatum in een vergelijking met de
+  lezing Naast elkaar, waarboven de Admin bij het opslaan een waarschuwing
+  krijgt (`benchmark.md`, Niveau 2, Lezing). Het is geen blokkade en geldt niet
+  bij Ontwikkeling over tijd. Een geheel getal van minstens 1.
 - **Minimaal aantal scans per Meting voor een Lead**
   (`benchmarkMinRespondenten`, voorstel, startwaarde 5): Het minimale aantal
   afgeronde scans in een Meting om de kolom Antwoorden bij anonieme namen voor
@@ -1017,7 +1023,13 @@ vergelijking tussen Metingen. Admin en Consultant (bij zijn eigen organisaties,
   en Assessment, dan staat onder de lijst: "Een gemiddelde over twee momenten van
   hetzelfde onderdeel zegt weinig over de ontwikkeling." Opslaan blijft mogelijk.
 - **Meetdatum**: Volgt de selectie. Het is de laatste meetdatum van de
-  geselecteerde Metingen, en niet los te wijzigen.
+  geselecteerde Metingen, en niet los te wijzigen. In het formulier "Wijzigen"
+  en in het Meting-overzicht staat de datum daarom alleen-lezen, zonder
+  invoerveld, met de toelichting "Volgt de nieuwste Meting in de
+  samenstelling". Hebben de leden van een bestaande samenstelling geen datum, dan staat er
+  "Datum ontbreekt" en vul je eerst de datum van de leden in ("Meetdatum instellen…" in de
+  lijst). Daarna volgt de samenstelling vanzelf. "Meetdatum instellen…" werkt
+  niet op een samengestelde Meting.
 - **In de lijst**: De badge "Gemiddelde", het aantal onderliggende Metingen en
   geen knop "Respondent uitnodigen".
 - **Meting-overzicht**: Zelfde kop als hierboven, maar zonder het blok
@@ -1828,7 +1840,7 @@ en is voorstel.
 - **Lijst**: Alle benchmarks, per rij de naam, de Assessments, per
   Assessment het aantal organisaties als "X van Y" (`benchmark.md`, Teller)
   en wanneer de benchmark is aangemaakt. Voorstel: Een kolom Niveau, zodra
-  er meer dan één niveau bestaat. Boven de lijst een oranje knop
+  er meer dan één niveau bestaat, en bij niveau 2 de lezing. Boven de lijst een oranje knop
   "+ Benchmark aanmaken" (`.btn-or .btn-compact`).
 - **Aanmaken en wijzigen**: Eerst de Assessments, daarna de organisaties
   met het optionele sectorfilter, en per organisatie de Meting per
@@ -1867,9 +1879,19 @@ en is voorstel.
 andere keuzelijst: Eerst één organisatie, dan één Assessment, dan de Metingen
 daarvan (de eerste versie precies twee, zonder vlag). Elke Meting heeft een
 meetdatum en minimaal `benchmarkMinScans` afgeronde scans, en ook een
-samengestelde Meting mag meedoen. In het detail staan de Metingen op
-meetdatum, met de matrix, bij twee Metingen een kolom Verschil en weergave C
-(`benchmark.md`, Niveau 2). Er is geen groepsgemiddelde. Niveau 3 is een view
+samengestelde Meting mag meedoen. Onder de lijst staat de schakelaar "Lees
+als" met "Ontwikkeling over tijd" en "Naast elkaar" (`Benchmark.lezing`,
+`benchmark.md`, Niveau 2, Lezing). Onder elke keuze staat één regel uitleg:
+"Dezelfde Meting op twee momenten. Het onderdeel is gelijk en de meetdatum
+verschilt." en "Twee onderdelen of samenstellingen op een vergelijkbaar
+meetmoment." De app stelt een keuze voor zolang de Admin de schakelaar niet zelf
+heeft aangeraakt. Bij Ontwikkeling over tijd staan Metingen met een ander
+onderdeel uitgeschakeld in de lijst, met de reden erbij, en kan Opslaan niet bij
+twee gelijke meetdata. Bij Naast elkaar staat onder de lijst een waarschuwing als
+de meetdata meer dan `benchmarkMaxDagenTussenMetingen` dagen uit elkaar liggen
+(punt 10). Opslaan blijft dan mogelijk. In het detail staan de Metingen op
+meetdatum (bij Naast elkaar op naam), met de matrix, bij twee Metingen een kolom
+Verschil of Hoogste en weergave C of H, naar de lezing (`benchmark.md`, Niveau 2). Er is geen groepsgemiddelde. Niveau 3 is een view
 op één Meting: De scan van een Respondent naast het gemiddelde van de andere
 scans in die Meting. De spreiding en de hoge en lage scores zijn nog niet
 ontworpen (`benchmark.md`, Niveau 3). De vergelijking (niveau 2) geeft

@@ -320,6 +320,14 @@ Kan nu al starten.
   bevat geen antwoorden per vraag, dus elke scan wordt los geëxporteerd.
   Alle bestanden komen in één map, zonder submappen; de import leest die
   map in één keer.
+- [ ] Quickscan Ziekenhuis: Per scan, ook de onafgeronde, een export uit
+  de oude tool met alle antwoorden (Ja, Nee, Weet ik niet), de vraagtekst
+  en dimensie per vraag en de afdelingen die niet van toepassing waren.
+  De importspec dekt dit scan-type nog niet en de scan krijgt rework, dus
+  de export gaat onbewerkt in het archief tot de import is gespecificeerd
+  (`backlog.md`, Quickscan Ziekenhuis). De batch-export bevat alleen een
+  overzicht en is niet genoeg. Controleren of de drie scans daarin
+  testscans zijn.
 - [ ] Controlegetallen vastleggen per map: Aantal bestanden, aantal rijen,
   aantal scans per organisatie en de `overall_score` per scan. De import
   negeert die score, maar hij is bruikbaar om na de import te controleren

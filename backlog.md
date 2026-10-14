@@ -98,8 +98,10 @@ Bewust nog niet opgepakt. Geen prioritering.
   "Trend tussen Metingen van dezelfde organisatie" en de ronde (13 oktober 2026)
   zijn vervangen. Een Meting heeft een onderdeel en een meetdatum, en een
   vergelijking tussen Metingen is een benchmark binnen een organisatie
-  (niveau 2) die de Admin zelf aanmaakt, eerst met twee Metingen:
-  `benchmark.md`, Niveau 2, `visualisatie-scores.md`, onderdeel C, E,
+  (niveau 2) die de Admin zelf aanmaakt, eerst met twee Metingen. De Admin
+  kiest een lezing, Ontwikkeling over tijd (weergave C) of Naast elkaar
+  (weergave H, voorstel van 14 oktober 2026):
+  `benchmark.md`, Niveau 2, `visualisatie-scores.md`, onderdeel C, E, H,
   `datamodel.md`, Meting en `beheerpagina.md`, punt 5 en 14. Nog niet
   ontworpen: De weergave bij drie of meer Metingen, bijvoorbeeld een lijn per
   bouwblok over de meetdata.
@@ -201,6 +203,62 @@ Bewust nog niet opgepakt. Geen prioritering.
   onderaan de modal, of iets anders. Vraagt ook een plek in het
   datamodel om deze links per bouwsteen te kunnen vastleggen (nu nog
   geen veld hiervoor op `Bouwblok`, zie `datamodel.md`).
+
+### Quickscan Ziekenhuis (antwoordType Ja / Nee / Weet ik niet)
+
+Gespecificeerd in `content-ziekenhuis-quickscan.md`. Bewust nog niet
+opgepakt:
+
+- **PDF-export**: Eerst specificeren (eigen `export-pdf-visual-*.md`). De
+  PDF van de oude tool is alleen een referentie voor de inhoud.
+- **CSV- en InDesign-export** voor dit antwoordType: `export-csv.md` en
+  `export-indesign.md` gaan uit van een score van 1 tot 5.
+- **Import van scans uit de oude tool, en niets verliezen bij het
+  uitzetten van het oude platform.** De batch-export van de oude tool is
+  alleen een overzicht (organisatie, status, voortgang, contactgegevens)
+  zonder vragen en antwoorden en volstaat niet. Voor het uitzetten is per
+  scan een export nodig met alle antwoorden, de vraagtekst, de dimensie
+  per vraag en de afdelingen die niet van toepassing waren. Die gaat
+  onbewerkt in het archief (`go-live-plan.md`, Fase 5). De import in het
+  nieuwe model volgt na de rework van de scan, zie hieronder. Het veld
+  Voortgang in de oude export komt boven 100% uit (107), dus daar kan
+  niet op worden gerekend. De drie scans in de batch-export lijken
+  testscans (fictieve organisaties, dezelfde invuller); controleren of er
+  echte scans bestaan.
+- **Gemiddelde over meerdere Respondenten, spreiding en benchmark** voor
+  dit antwoordType. Een Ja telt als 1 en Nee en Weet ik niet als 0; de
+  berekeningen over een groep (`datamodel.md`, Scoreberekening) zijn nog
+  niet uitgewerkt voor punten.
+- **Afdelingen toevoegen** (bijvoorbeeld de SEH). Nu zijn het vier vaste
+  afdelingen. Of een afdeling niet van toepassing is, geeft de Respondent
+  zelf aan in de scan.
+- **Gemiddelde en benchmark bij afdelingen die niet van toepassing
+  zijn**: Respondenten kunnen verschillende afdelingen als Nee
+  beantwoorden, dus niet elke scan heeft dezelfde vragen. Hoe dat in
+  een gemiddelde over Respondenten en in de benchmark telt, is niet
+  besloten.
+- **Managementsamenvatting**: De PDF van de oude tool had een AI-tekst die
+  uitging van een score "van 5" en dus niet bij deze scoring past. Niet
+  overnemen; zie de bestaande backlog-regel over de AI-samenvatting.
+- **Wegen per afdeling in één handeling**: Nu moet het gewicht op alle
+  bouwblokken van een afdeling worden gezet. Een beheerhulp of een
+  gewicht op de categorie kan later.
+- **Rework van de scan zelf.** De scan lijkt snel in elkaar gezet. De
+  spec legt hem vast zoals hij is. Punten die bij het uitwerken
+  opvielen, nog niet besloten:
+  - De vragen gaan bijna allemaal over telefonie, terwijl de scan
+    "Klantcontact" heet. Andere kanalen komen alleen terloops voor
+    (selfservice, portaal, chatbot).
+  - De dimensies zijn niet vergelijkbaar tussen afdelingen: Mensen
+    ontbreekt bij twee afdelingen, heeft 1 vraag bij de poliklinieken en
+    6 bij de verpleegafdelingen.
+  - Weet ik niet telt als Nee. De score maakt dus geen verschil tussen
+    "niet geregeld" en "geen zicht op".
+  - Een aantal vragen bevat twee vragen in één, bijvoorbeeld "binnenkomen
+    én worden afgehandeld", zodat Ja of Nee niet eenduidig is.
+  - "Grootste aandachtspunt" verschijnt ook als alle dimensies hoog
+    scoren (bijvoorbeeld 100% en 90%) en leest dan als een tekort. Een
+    drempel kan dat voorkomen.
 
 ## Uit de scan van 2 oktober 2026
 

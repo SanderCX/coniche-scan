@@ -18,6 +18,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `content-klantcontact-volwassenheid.md` | Vragen en tags van de Klantcontact Volwassenheidsscan |
 | `content-ai-scan.md` | Vragen van de AI-volwassenheidsscan |
 | `content-zorgscan.md` | Vragen van de Zorgscan, sector-variant van de Klantcontact Volwassenheidsscan |
+| `content-ziekenhuis-quickscan.md` | Afdelingen (categorieën), dimensies (bouwblokken), vragen en resultaatopbouw van de Klantcontact Quickscan – Ziekenhuis (Ja / Nee / Weet ik niet) |
 | `visie-ai-klantcontact.md` | Visie op AI in klantcontact, per domein van de AI-volwassenheidsscan |
 | `content-2030.md` | Duidingsstuk "Klantcontact richting 2030", los van de scanresultaten |
 | `bouwstenenmodel-visual.md` | Spec voor het interactieve overzicht van de 15 bouwstenen |
@@ -90,7 +91,12 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   (`beheerpagina.md`, punt 5 en 7).
 - **Benchmark**: Alle drie de niveaus zijn gebouwd: Tussen organisaties
   (PR 61), binnen een organisatie (een vergelijking van twee Metingen, 14
-  oktober 2026) en binnen een Meting (`benchmark.md`).
+  oktober 2026) en binnen een Meting (`benchmark.md`). De lezing Naast
+  elkaar bij niveau 2 (weergave H) is een voorstel van 14 oktober 2026.
+- **Quickscan Ziekenhuis**: Gespecificeerd
+  (`content-ziekenhuis-quickscan.md`), nog niet gebouwd. Het eerste
+  Assessment met antwoordType Ja / Nee / Weet ik niet. PDF, CSV,
+  InDesign en import volgen later (`backlog.md`).
 
 ## Terminologie
 
@@ -122,6 +128,13 @@ Elk bouwblok heeft een gewicht `g` (standaard 1, zie `datamodel.md`,
 ander gewicht (4, 10 en 11 op 2). Volledige uitwerking en rekenvoorbeeld
 staan in `datamodel.md`, Scoreberekening.
 
+Deze sectie beschrijft het antwoordType `"schaal"` (1–5). Een Assessment
+met antwoordType `"ja-nee-weetniet"` (de Quickscan) rekent in punten en
+procenten: Zie `datamodel.md`, Scoreberekening, en de classificatie voor
+dat type hieronder. De categoriescore is daar geen gemiddelde van de
+bouwblokpercentages, maar het aantal Ja van de hele categorie gedeeld
+door het aantal vragen.
+
 - **Bouwblokscore**: Gemiddelde van de vragen binnen het bouwblok,
   ongewogen, afgerond op 1 decimaal.
 - **Categoriescore**: Gewogen gemiddelde van de bouwblokscores binnen de
@@ -149,6 +162,29 @@ staan in `datamodel.md`, Scoreberekening.
 - "Sterk punt" (vanaf 3,5): "Hier is de organisatie al heel goed in.
   Benut dit optimaal en bouw het verder uit, ook ter ondersteuning van
   zwakkere bouwblokken."
+
+### Classificatie bij Ja / Nee / Weet ik niet (Quickscan)
+
+Drie klassen, bepaald op het afgeronde percentage (hele procenten). Ze
+gelden voor een afdeling (categorie), een dimensie (bouwblok) en de
+totaalscore. Er zijn geen
+uitlegzinnen per klasse.
+
+- "Goed op orde": Vanaf 80% (groen). Bij 15 vragen 12 tot en met 15
+  punten.
+- "Gemiddeld inzicht": 50% tot en met 79% (oranje). Bij 15 vragen 8 tot
+  en met 11 punten.
+- "Ontwikkelruimte": Onder 50% (rood). Bij 15 vragen 0 tot en met 7
+  punten.
+
+Het percentage is leidend en de punten zijn daaruit afgeleid. De oude
+tool toonde 13–15 en 8–12 punten, maar 12 van 15 is precies 80% en dus
+Goed op orde; die puntenrange is hier gecorrigeerd. Kleuren: De bestaande
+groen, oranje en rood uit `stylesheet.md`, Scorekleuren.
+
+De totaalscore gebruikt dezelfde drie grenzen met eigen namen: "Sterk
+ontwikkeld", "Gemiddeld ontwikkeld" en "Aanzienlijke ontwikkelruimte"
+(besloten, `content-ziekenhuis-quickscan.md`, Besloten).
 
 ### Scorekleuren
 
@@ -413,6 +449,19 @@ geen afwijking van de spec maar een gat erin.
    achter het bouwblok dezelfde marker. Bij gewicht 1 staat er niets. Op het laatste bouwblok wordt "Volgende" de knop "Bekijk
    resultaten".
 
+   **Bij Ja / Nee / Weet ik niet (Quickscan).** Bij elke vraag staan drie
+   knoppen, "Ja", "Nee" en "Weet ik niet", in plaats van de 5-puntsschaal.
+   De instructieregel komt uit `Assessment.instructieregel`. De sidebar
+   werkt zoals bij de andere scans: De afdelingen zijn de categorieën, met
+   daaronder de genummerde bouwblokken (de dimensies) en per bouwblok het
+   aantal beantwoorde vragen. Een bouwblok kan maar één vraag hebben
+   (Mensen bij de poliklinieken). Eén persoon vult de hele scan in. Elke
+   afdeling begint met haar definitie en de vraag of ze relevant is voor
+   de situatie van de respondent (Ja of Nee). Bij Nee worden haar vragen
+   overgeslagen en telt ze niet mee in de score (`datamodel.md`,
+   Antwoordtype, Optionele categorieën, en
+   `content-ziekenhuis-quickscan.md`, Doorloop per afdeling).
+
    **Eén persoon tegelijk per scan.** Een scan die iemand invult, is
    voor anderen vergrendeld (`datamodel.md`, Bewerkslot). Opent een tweede
    persoon dezelfde scan, dan krijgt die een melding dat de scan nu in
@@ -435,6 +484,18 @@ geen afwijking van de spec maar een gat erin.
    vervalt het staafdiagram per categorie: In plaats daarvan "Scores per
    Domein", een horizontale balk per domein individueel, gesorteerd van
    hoog naar laag (`Assessment.scoresPerGroepGesorteerd`).
+
+   **Bij Ja / Nee / Weet ik niet (Quickscan)** heeft het scherm een eigen
+   opbouw: Een totaalkaart, een kaart per afdeling (categorie) met
+   verdieping op de bouwblokken (dimensies), "Sterkste afdeling" en
+   "Meeste ontwikkelruimte", en de legenda van de drie klassen. Radar,
+   staafdiagram per categorie en top 3 vervallen. Een afdeling die niet
+   van toepassing is staat er grijs en doorgestreept, en doet niet mee in
+   de totaalscore of in "Sterkste afdeling" en "Meeste ontwikkelruimte". Uitwerking in `content-ziekenhuis-quickscan.md`,
+   Resultaten. De Exporteren-dropdown toont voorlopig alleen de opties
+   die voor dit type bestaan, dus nu geen. Hoe de bestaande schermen
+   omgaan met antwoorden zonder 1–5-schaal (Spreiding, Benchmark,
+   Organisatie-resultaten) beslist Sander bij het bouwen.
 
    **Weging in de resultaten**: Een bouwblok met een gewicht ongelijk
    aan 1 toont zijn factor ("2×") bij de naam, in de radar-legenda en de
@@ -476,6 +537,10 @@ geen afwijking van de spec maar een gat erin.
   `datamodel.md`, Sector-varianten). Bouwblok-omschrijving, -toelichting en
   -tags zijn nog niet sector-vertaald, zie het open punt bovenaan
   `content-zorgscan.md`.
+- **Klantcontact Quickscan – Ziekenhuis**:
+  `content-ziekenhuis-quickscan.md` (4 categorieën die de afdelingen
+  zijn, 10 bouwblokken die de dimensies zijn, 60 vragen met Ja / Nee /
+  Weet ik niet, standalone Assessment). Gespecificeerd, nog niet gebouwd.
 - **Adoptiescan**: Nog niet gestart
 
 Elk contentbestand volgt dezelfde structuur: Per categorie de
@@ -494,5 +559,9 @@ bouwblokken met naam, omschrijving, tags en vragen.
 - Weging: De weging is gebouwd. De gewichten van de Zorgscan (bouwblok 4, 10
   en 11 op 2) zijn besloten: de spec is leidend. De seed staat op 2. De
   opgeslagen data moeten daarop staan.
+- Quickscan Ziekenhuis: De open punten staan bovenaan
+  `content-ziekenhuis-quickscan.md`. Ze zijn klein (een minimum voor een
+  chip, of de radar wegblijft, namen in de wegingskaart en de
+  voorstelteksten). De scan zelf heeft rework nodig (`backlog.md`).
 - Rol/functie bij de respondent: Vrij tekstveld of vaste lijst.
 - Focus- en error-states in formulieren (zie `stylesheet.md`).
