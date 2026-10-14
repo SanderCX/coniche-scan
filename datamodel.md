@@ -851,8 +851,8 @@ hij ook zelf respondent is (dus zelf invult), en de resultaten van elke Meting
 waarvoor `resultaten` aan staat, zodra daar minstens 1 scan is afgerond, geen
 hoger minimum. Zelfde aggregatieweergave (gemiddelde per Meting) als de
 organisatie-resultaten in beheer, zie `beheerpagina.md`,
-Organisatie-resultaten. Daarnaast Spreiding, Antwoorden en Uitnodigen voor elke Meting waarvoor die
-aan staan, en de views van de benchmarks die aan staan (`benchmark.md`, View voor
+Organisatie-resultaten. Daarnaast Uitnodigen voor elke Meting waarvoor dat aan staat, en Spreiding en
+Antwoorden als weergave op de resultatenpagina van de Meting waarvoor die aan staan, en de views van de benchmarks die aan staan (`benchmark.md`, View voor
 een Lead).
 
 ---

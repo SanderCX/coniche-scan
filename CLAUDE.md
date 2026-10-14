@@ -343,8 +343,8 @@ geen afwijking van de spec maar een gat erin.
    Admin voor deze Lead heeft aangevinkt (`beheerpagina.md`, punt 6a).
    Bovenaan staat de naam van de organisatie. Daaronder staat één kaart per
    Meting waarvoor minstens één weergave aan staat, op meetdatum, de nieuwste bovenaan, met
-   de nieuwste bovenaan, met alleen de knoppen van de weergaven die aan staan
-   (Resultaten, Spreiding, Antwoorden en Uitnodigen). Daaronder staat een
+   de nieuwste bovenaan, met alleen de knoppen Resultaten en Uitnodigen, voor zover ze aan staan
+   (Spreiding en Antwoorden zitten in de schakelaar op de resultatenpagina). Daaronder staat een
    kaart per benchmark die aan staat. Een Lead kan alleen een benchmark
    hebben, en dan bestaat de pagina alleen uit die kaart. Is de Lead ook
    respondent, dan komen zijn eigen scans erbij. Een Lead die geen respondent
