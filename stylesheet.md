@@ -546,18 +546,18 @@ elementen boven netjes uit.
 
 **Veldenrij met labels en een knop.** Dit geldt voor elke rij waarin velden met
 een label erboven naast elkaar staan, met of zonder knop erachter, zoals het
-plannen van een Meting (Assessment-type, Ronde, Onderdeel en "+ Meting
+plannen van een Meting (Assessment-type, Onderdeel, Meetdatum en "+ Meting
 plannen"). De rij heeft `align-items: flex-start`, nooit `flex-end` of
 `center`, en elk veld staat met zijn label in een eigen kolom. Alle labels
 hebben dezelfde hoogte, dus alle velden beginnen op dezelfde bovenrand. Een
 knop in de rij krijgt bovenaan een lege ruimte ter hoogte van een label
 (`padding-top` of een lege labelregel), zodat hij op de hoogte van de velden
 staat en niet op die van de labels. Hulptekst onder één veld, zoals "Wordt:
-0-meting" onder Ronde, maakt de rij niet hoger en duwt de andere velden niet
+Zuid-Nederland Zakelijk | okt 2026" onder Meetdatum, maakt de rij niet hoger en duwt de andere velden niet
 omlaag. Hij staat onder de rij, of absoluut gepositioneerd onder zijn eigen
 veld, zodat de kolom van dat veld niet hoger wordt dan de andere. Bij `flex-end`
 zakken anders alle velden zonder hulptekst naar beneden, en staat Assessment-type
-lager dan Ronde en Onderdeel.
+lager dan Onderdeel en Meetdatum.
 
 **Dropdowns (`select.field`, `.admin-field select` en de compacte select in
 een knoppenrij).** De pijl van de browser staat uit (`appearance: none`).
@@ -743,6 +743,23 @@ een klik naast de modal of de terugknop van de browser.
   actie, rood (`.fout`) bij een fout of overgeslagen scans.
 - **Acties** (`.overzicht-acties`): Compacte knoppen naast elkaar,
   links uitgelijnd. Destructieve acties zijn `.btn-danger`.
+
+**Brede variant `.modal-box--vol`.** Voor het Leads-venster
+(`beheerpagina.md`, punt 6a), waar een brede tabel in staat.
+`width: min(96vw, 1600px)`, `max-height: 90vh`. Het venster zelf scrolt niet.
+Het bestaat uit drie vlakken onder elkaar. Eerst de kop (`.overzicht-kop`), dan een
+scrollvlak (`.vol-scroll`, `overflow: auto`) en een vaste voettekst
+(`.vol-voet`, `border-top: 1px solid var(--border)`, `.btn-rij` rechts
+uitgelijnd). Sluiten werkt zoals bij de andere Overzichtsmodals.
+Op een scherm smaller dan 720px vult het venster het hele scherm.
+
+- **Vinkjestabel** (`.vinkjes-tabel`): In het scrollvlak. De eerste kolom
+  (naam en e-mailadres) is vast (`position: sticky; left: 0`, achtergrond
+  `var(--bg)`). De twee kopregels zijn vast (`position: sticky; top: 0`
+  en een tweede rij direct eronder). Bovenaan staat het label van de Meting over
+  de vijf kolommen heen, daaronder de weergave. Tussen twee Metingen staat een
+  lijn van `1px solid var(--border)`. Cellen zijn gecentreerd, een grijze
+  cel (`.cel-grijs`) heeft een Info-icoon.
 
 ### Vervolgstappen
 

@@ -120,8 +120,8 @@ Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
 - **Onderdelen binnen een hoofdlink**: Onder de nav staat een tabbalk
   met de onderdelen van de gekozen hoofdlink. Bij Organisaties zijn dat
   Organisaties en Respondenten, voor een Admin aangevuld met
-  Organisatievelden. Bij Resultaten zijn dat Rondes en Metingen, voor een
-  Admin aangevuld met Benchmarks (punt 7). Bij Instellingen zijn
+  Organisatievelden. Bij Resultaten zijn dat Metingen en, voor een
+  Admin, Benchmarks (punt 7). Bij Instellingen zijn
   dat Gebruikers, Drempels en termijnen, Algemene teksten, Content-pagina's,
   Audit-log en Data-integriteit. De tabbalk is zichtbaar op de
   lijstpagina's, niet op een detailpagina. Metingen en uitnodigen hebben
@@ -155,7 +155,12 @@ Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
   waar je was, met dezelfde filters, sortering en scrollpositie. Een
   gedeelde link met `?respondent=<id>` opent de pagina met de modal erop,
   mits de ontvanger bij die Respondent mag (zelfde bereik als de lijst).
-- **Filters in de URL**: De lijsten Respondenten, Rondes en Metingen
+- **Leads-venster (modal)**: Opent vanuit het blok Leads op het
+  organisatie-detail (punt 6a), alleen voor een Admin. De adresbalk krijgt
+  `?leads=<organisatieId>`. Sluiten, terugkeren en delen werken zoals bij het
+  Respondent-overzicht. Een gedeelde link opent de pagina met het venster
+  erop, mits de ontvanger een Admin is.
+- **Filters in de URL**: De lijsten Respondenten en Metingen
   bewaren hun filters, sortering en pagina in de adresbalk (zoals
   de audit-log, punt 12), zodat terugkeren uit een detailpagina of
   modal dezelfde lijst toont.
@@ -178,7 +183,7 @@ Scan-overzicht of "Bekijk resultaten" in een scanregel van het
 Respondent-overzicht): Het resultatenscherm (CLAUDE.md, scherm 6) toont in
 beheer de gewone beheer-nav met het kruimelpad Organisaties › Organisatie
 › Meting › Resultaten van {Respondent} (via Resultaten: Resultaten › Organisatie
-› Ronde › Meting › Resultaten van {Respondent}; de hoofdlink waarlangs je kwam
+› Meting › Resultaten van {Respondent}; de hoofdlink waarlangs je kwam
 bepaalt het begin van het pad), en niet de respondentacties
 "Terug naar de scan" en "Terug naar Mijn metingen". Wel de dropdown
 "Exporteren". Terug gaat via het kruimelpad. Dat wordt het Meting-overzicht
@@ -204,8 +209,7 @@ Resultaten van de Meting.
   `VeldDefinitieEditor` staat klaar, maar geen pagina gebruikt hem. En
   Het verwijderen van een Assessment (punt 1), gespecificeerd op 8 oktober
   2026. En Content-pagina's (punt 11), na overleg. De spec is leidend. Verder de
-  hoofdlink Resultaten met de tabs Rondes en Metingen (punt 7, gebouwd op
-  14
+  hoofdlink Resultaten met de tab Metingen (punt 7, voorstel van 14
   oktober 2026) en de Benchmark (punt 14, `benchmark.md`): Het niveau tussen organisaties is
   gebouwd (PR 61). De niveaus binnen een organisatie en binnen een Meting zijn
   besproken en nog niet gebouwd.
@@ -235,7 +239,7 @@ onderdelen (2a, 11 en 12). Benchmark is nummer 14.
 | **Instellingen** (Admin-only, via het Accountmenu) | 9. Gebruikers, 10. Drempels en termijnen, 2a. Algemene teksten, 11. Content-pagina's, 12. Audit-log, 13. Data-integriteit |
 | **Assessments** (Admin-only) | 1. Assessment-types, 2. Content |
 | **Organisaties** (Admin: alle, Consultant: eigen) | 3. Organisatievelden, 4. Organisaties, 5. Metingen, 6. Respondenten uitnodigen, 6a. Leads (toegang per weergave, Admin-only), 6b. Respondenten, 8. Import (knop in het organisatie-detail, alleen voor een Admin) |
-| **Resultaten** (Admin: alle, Consultant: eigen) | 7. Resultaten (tabs Rondes en Metingen), 14. Benchmarks (tab, Admin-only) |
+| **Resultaten** (Admin: alle, Consultant: eigen) | 7. Resultaten (tab Metingen), 14. Benchmarks (tab, Admin-only) |
 
 ### Instellingen (Admin-only)
 
@@ -320,17 +324,13 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
 - **Minimale groepsgrootte benchmark** (`benchmarkMinOrganisaties`,
   startwaarde 5): Het minimale aantal organisaties per Assessment in een
   benchmark, inclusief de organisatie van de view, om die view voor een Lead
-  aan te kunnen vinken in de tabel Leads. Eén getal voor deze drempel van niveau 1. De betekenis
+  aan te kunnen vinken in het Leads-venster. Eén getal voor deze drempel van niveau 1. De betekenis
   staat in `benchmark.md`, Drempels. Het privacy statement noemt dezelfde
   waarde (`privacy-pagina.md`, sectie 3a).
 - **Minimaal aantal scans per Meting in een benchmark**
   (`benchmarkMinScans`, startwaarde 3): Het minimale aantal afgeronde
   scans dat een Meting moet hebben om in een benchmark gekozen te kunnen
   worden.
-- **Minimale groepsgrootte niveau 2** (`benchmarkMinMetingen`, voorstel,
-  startwaarde 3): Het minimale aantal Metingen per Assessment in een
-  benchmark binnen een organisatie, inclusief de Meting van de view, om die
-  view voor een Lead aan te kunnen vinken.
 - **Minimaal aantal scans per Meting voor een Lead**
   (`benchmarkMinRespondenten`, voorstel, startwaarde 5): Het minimale aantal
   afgeronde scans in een Meting om de kolom Antwoorden bij anonieme namen voor
@@ -392,16 +392,16 @@ standaardteksten zoals ze nu in de app staan):
 | `info.conflictOplossen` | Conflict oplossen, naast de titel van de modal | Een Respondent heeft per Meting één scan. Hang één van de twee scans aan een andere Respondent. Alleen die scan gaat mee, de oorspronkelijke Respondent blijft bestaan met de andere scan. |
 | `info.dataIntegriteit` | Instellingen, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
 | `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
-| `info.bulkExportOrganisatie` | Resultaten, lijsten Rondes en Metingen, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie. |
-| `info.metingBegrippen` | Organisatie-detail, naast de kop "Metingen" | Ronde: een meetmoment van de organisatie, zoals "0-meting" of "Nameting 2027". Een ronde bevat meerdere Metingen en rondes vergelijk je met elkaar. Onderdeel: welk deel van de organisatie gemeten wordt, zoals "Zuid-Nederland Zakelijk", of "Hele organisatie". Assessment: de vragenlijst. Meting: één onderdeel in één ronde met één Assessment, de Respondenten horen bij een Meting. De naam van de Meting maakt de app uit onderdeel en ronde, je typt hem niet. |
+| `info.bulkExportOrganisatie` | Resultaten, lijst Metingen, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie. |
+| `info.metingBegrippen` | Organisatie-detail, naast de kop "Metingen" | Onderdeel: Welk deel van de organisatie gemeten wordt, zoals "Zuid-Nederland Zakelijk", of "Hele organisatie". Assessment: De vragenlijst. Meetdatum: De dag waarop gemeten wordt, niet de dag van aanmaken of importeren. Meting: Eén onderdeel met één Assessment op één meetdatum, de Respondenten horen bij een Meting. De naam van de Meting maakt de app uit onderdeel en meetdatum, je kunt hem achteraf aanpassen. |
 | `info.scansSamenbrengen` | Resultaten, lijst Metingen, achter de uitgeschakelde knop "Samenbrengen in één Meting…" bij een selectie met meer dan één Assessment of meer dan één organisatie | Samenbrengen kan alleen voor Metingen van hetzelfde Assessment, binnen één organisatie. Selecteer alleen Metingen van één Assessment. |
 | `info.assessmentVerwijderen` | Assessments, op de kaart en het detail, naast de uitgeschakelde knop "Verwijderen" | Verwijder eerst alle Metingen van dit Assessment, bij alle organisaties. Daarna kan het Assessment worden verwijderd. Dit kan niet ongedaan worden gemaakt. De tekst begint altijd met het aantal Metingen en organisaties, die zin maakt de app zelf. |
-| `info.vergelijkRonde` | Resultaten van een Meting, naast de uitgeschakelde knop "Vergelijk met vorige ronde" | Vergelijken kan pas als deze organisatie een eerdere ronde heeft met hetzelfde onderdeel en hetzelfde Assessment, en met genoeg afgeronde scans. Start eerst een tweede ronde, of koppel een bestaande Meting aan een ronde. |
+| `info.vergelijkMetingen` | Resultaten van een Meting, naast de uitgeschakelde knop "Vergelijking" | Deze Meting zit in geen enkele vergelijking. Een Admin maakt die aan onder Resultaten, Benchmarks, met het niveau Binnen een organisatie. |
 | `info.positieMeting` | Resultaten van één scan, naast de uitgeschakelde weergave "Positie in de Meting" | De positie van een scan tegenover de andere scans in de Meting is er pas bij voldoende afgeronde scans. Bij minder is een scan te herleiden naar een persoon. Het minimum staat bij Drempels en termijnen (aantal respondenten per Meting). |
 | `info.mijnAccountWachtwoord` | Mijn account, naast de uitgeschakelde knop "Wachtwoord wijzigen" | Wachtwoord wijzigen komt met de echte inlog. Tot die tijd vraag je een Admin om je wachtwoord te wijzigen. |
 | `info.benchmarkInstellingen` | Instellingen, Drempels en termijnen, formulier Benchmark | Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. |
 | `info.benchmarkVlag` | Organisatie-detail, bij de schakelaar "Doet mee aan benchmark" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks. |
-| `info.leadToegangCel` | Organisatie-detail, tabel Leads, in een grijze cel | De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark. |
+| `info.leadToegangCel` | Leads-venster van de organisatie, in een grijze cel | De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark. |
 | `info.antwoordenMetNamen` | Organisatie-detail, bij de schakelaar "Namen tonen bij Antwoorden" | Uit: Leads zien de antwoorden als R1 tot en met Rn. Aan: Leads zien de namen van de respondenten. Stem dit af met de opdrachtgever voordat je het aanzet. Het geldt voor alle Leads van deze organisatie. |
 | `info.benchmarkAanmaken` | Benchmark aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark heeft een naam nodig, minstens één Assessment en minstens één organisatie die je hebt aangevinkt. Een organisatie staat alleen in de lijst als ze meedoet aan benchmarks en een Meting heeft van een gekozen Assessment met genoeg afgeronde scans. |
 | `info.benchmarkAanmakenMetingen` | Benchmark binnen een organisatie aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark binnen een organisatie heeft een naam nodig, een organisatie en minstens één Assessment waarvoor je minstens twee Metingen hebt aangevinkt. Een Meting is alleen te kiezen met genoeg afgeronde scans. |
@@ -762,7 +762,7 @@ het antwoord daarom zelf kunnen vastleggen.
   Op de organisatiedetailpagina, naast Kenmerken, één of meer
   Consultants toevoegen die deze organisatie ook mogen zien en
   beheren, bovenop de eigenaar. Zelfde soort multi-select-patroon als
-  de selectievakjes in de tabel Leads (punt 6a), nu op Gebruikers in plaats
+  de selectievakjes in het Leads-venster (punt 6a), nu op Gebruikers in plaats
   van Respondenten. Intrekken van een toewijzing is de spiegel van
   toewijzen, geen aparte permissie. Dit scherm toont ook, los van de
   toewijs-actie zelf, wie de eigenaar is (`aangemaaktDoor`) en wie
@@ -800,11 +800,11 @@ het antwoord daarom zelf kunnen vastleggen.
   bij het loggen.
 - **Detail**: Kenmerken (altijd bewerkbaar), "Aangemaakt door" (zie
   hierboven), de metingen van deze organisatie met "Bekijk" naar het
-  Meting-overzicht (punt 5), per ronde met in de rondekop "Resultaten van
-  deze ronde →" naar het Ronde-overzicht (punt 7), en de respondenten met hun
+  Meting-overzicht (punt 5), op meetdatum, de nieuwste bovenaan, en de respondenten met hun
   status, elk met alleen "Bekijk" dat het Respondent-overzicht opent
   (punt 6b). Voor een Admin staat in de kop van het blok Metingen ook de knop
-  "Importeren" (punt 8). De ingevulde scans staan niet op deze pagina: Die
+  "Importeren" (punt 8), en onder het blok Respondenten een compact blok
+  Leads met de knop "Leads beheren" (punt 6a). De ingevulde scans staan niet op deze pagina: Die
   staan per Meting in het Meting-overzicht.
   **Lange lijsten**: Respondenten tonen op de detailpagina maximaal 5 rijen.
   Zijn het er meer, dan staat onder de lijst een link "Alle respondenten van
@@ -854,11 +854,12 @@ het antwoord daarom zelf kunnen vastleggen.
   inhoud staat een weergave-schakelaar (`stylesheet.md`, Weergave-schakelaar)
   met Overzicht, Per bouwblok en Spreiding, en voor een Admin en Consultant ook Antwoorden (de antwoorden per vraag en per respondent, gebouwd op 13 oktober 2026). Overzicht is de standaard en de
   opbouw hierboven, die ongewijzigd blijft. Rechts van de schakelaar staat de
-  knop "Vergelijk met vorige ronde". De weergaven, de knop en de
+  knop "Vergelijking", actief als de Meting in een vergelijking tussen Metingen zit
+  (punt 14). De weergaven, de knop en de
   adresbalkparameters staan in `visualisatie-scores.md`, Navigatie. Een Lead
-  ziet Overzicht en Per bouwblok, de vergelijking met een eerdere Meting
-  waarvoor hij Resultaten heeft, en Spreiding en Antwoorden als die vinkjes in
-  de tabel Leads aan staan (punt 6a).
+  ziet Overzicht en Per bouwblok, de vergelijking als hij de benchmark aangevinkt
+  heeft en Resultaten op de Metingen daarin, en Spreiding en Antwoorden als die vinkjes in
+  het Leads-venster aan staan (punt 6a).
 
   **Eén kop.** De pagina heeft één kop. Bovenaan staat het Meting-label als
   eyebrow ("Nulmeting"), daaronder de naam van het Assessment als titel, en
@@ -882,107 +883,84 @@ het antwoord daarom zelf kunnen vastleggen.
 
 #### 5. Metingen
 
-Vanuit de organisatie: Een meting aanmaken met een assessment-type, een
-onderdeel en een ronde. Een organisatie kan meerdere metingen hebben, ook van
-verschillende scan-types.
+Vanuit de organisatie: Een Meting aanmaken met een assessment-type, een
+onderdeel en een meetdatum. Een organisatie kan meerdere Metingen hebben, ook
+van verschillende scan-types.
 
-**Begrippen** (gebouwd op 13 oktober 2026), ook als Info-icoon boven de lijst
-Metingen (`info.metingBegrippen`):
-- **Ronde**: Een meetmoment van de organisatie, zoals "0-meting" of "Nameting
-  2027". Een ronde bevat meerdere Metingen. Rondes vergelijk je met elkaar.
-- **Onderdeel**: Welk deel van de organisatie gemeten wordt, zoals "Zuid-Nederland
-  Zakelijk", of "Hele organisatie".
+**Status.** Besloten door Joost op 14 oktober 2026, nog niet gebouwd. De ronde
+vervalt. Wat op 13 oktober 2026 met rondes is gebouwd (rondekoppen, "Nieuwe
+ronde starten", "Naar ronde…", het overzicht van een ronde) wordt vervangen
+door wat hieronder staat. Zie Overgang aan het eind van dit punt.
+
+**Begrippen**, ook als Info-icoon boven de lijst Metingen
+(`info.metingBegrippen`):
+- **Onderdeel**: Welk deel van de organisatie gemeten wordt, zoals
+  "Zuid-Nederland Zakelijk", of "Hele organisatie".
 - **Assessment**: De vragenlijst.
-- **Meting**: Eén onderdeel in één ronde met één Assessment. Respondenten horen
-  bij een Meting.
-- **Naam van de Meting**: Wordt door de app gemaakt uit onderdeel en ronde. Je
-  typt hem niet.
+- **Meetdatum**: De dag waarop gemeten wordt. Het is niet de datum waarop de
+  Meting in de app is aangemaakt en niet het moment van importeren.
+- **Meting**: Eén onderdeel met één Assessment op één meetdatum. Respondenten
+  horen bij een Meting.
+- **Naam van de Meting**: Wordt door de app gemaakt uit onderdeel en
+  meetdatum, en is aan te passen.
 
-**Wat je invult.** Bij een Meting alleen twee velden: Onderdeel en Ronde, en bij
-aanmaken ook het Assessment. Verder niets. Wat je achteraf kunt aanpassen, staat
-achter een potlood naast de naam van de Meting, en toont dan alleen Onderdeel en
-Ronde. Het Assessment ligt vast.
+**Wat je invult.** Bij aanmaken drie velden: Assessment-type, Onderdeel en
+Meetdatum (`datamodel.md`, Meting). Alle drie zijn verplicht.
 
-**Ronde en onderdeel** (gebouwd op 13 oktober 2026, `datamodel.md`, Meting, Ronde en onderdeel):
-Een Meting is één onderdeel in één ronde voor één Assessment. Bij het aanmaken
-staan naast het assessment-type de velden "Ronde" en "Onderdeel".
-
-- **Ronde**: Een keuzelijst met de bestaande rondes van deze organisatie en de
-  keuze "Nieuwe ronde", met een naamveld. Heeft de organisatie nog geen ronde,
-  dan staat "Nieuwe ronde" voorgekozen. Een ronde met één Meting is gewoon.
 - **Onderdeel**: Een tekstveld, voorgevuld met "Hele organisatie", met als
   suggesties de onderdelen die deze organisatie al heeft ("Team A", "Team B"),
-  zodat dezelfde naam niet op twee manieren wordt gespeld. Hetzelfde onderdeel
-  voor hetzelfde Assessment in dezelfde ronde kan niet twee keer. Het formulier
-  zegt dat, met de Meting die er al is.
-- **Naam van de Meting**: Geen invoerveld. Onder de velden staat alleen
-  ter controle wat het wordt, bijvoorbeeld "Wordt: Zuid-Nederland Zakelijk |
-  0-meting" (`datamodel.md`, Naam van een Meting).
-- **Uitlijning**: Assessment-type, Ronde en Onderdeel staan met hun labels op
-  één lijn, en "+ Meting plannen" staat op de hoogte van de velden. De regel
+  zodat dezelfde naam niet op twee manieren wordt gespeld.
+- **Meetdatum**: Een datumveld, leeg bij aanmaken, zodat de gebruiker bewust
+  een datum kiest. Een datum in de toekomst mag, want een Meting kan vooraf
+  worden gepland.
+- **Naam van de Meting**: Geen invoerveld bij aanmaken. Onder de velden staat
+  alleen ter controle wat het wordt, bijvoorbeeld "Wordt: Zuid-Nederland
+  Zakelijk | okt 2026" (`datamodel.md`, Naam van een Meting). Aanpassen kan
+  achteraf bij Wijzigen.
+- **Dezelfde combinatie**: Bestaat er al een Meting met dit onderdeel, dit
+  Assessment en deze meetdatum, dan staat onder de velden een waarschuwing met
+  de Meting die er al is. Opslaan blijft mogelijk.
+- **Uitlijning**: Assessment-type, Onderdeel en Meetdatum staan met hun labels
+  op één lijn, en "+ Meting plannen" staat op de hoogte van de velden. De regel
   "Wordt: …" verschuift niets in de rij (`stylesheet.md`, Formulieren,
   Veldenrij met labels en een knop).
 
-**Lijst Metingen in het organisatie-detail** (gebouwd op 13 oktober 2026): De lijst is gegroepeerd
-per ronde, de nieuwste bovenaan. Elke ronde heeft een kop met de naam, de
-voortgang van alle Metingen erin ("3 van 3 afgerond") en de knoppen "+ Meting
-aan deze ronde" en "Gemiddelde van deze ronde" (zie Samengestelde Meting). Eronder
-staat per Meting een rij met het label, het Assessment, het aantal Respondenten
-en "Bekijk", zoals nu. Metingen zonder ronde staan onderaan onder "Zonder ronde".
-Boven de lijst staat een oranje knop "Nieuwe ronde starten" (`.btn-or
-.btn-compact`).
+**Lijst Metingen in het organisatie-detail**: Eén lijst, op meetdatum, de
+nieuwste bovenaan. Per Meting een rij met de naam, het Assessment, de
+meetdatum, het aantal Respondenten en "Bekijk". Een Meting zonder meetdatum
+staat onderaan met "Datum ontbreekt" op de plek van de datum. Een samengestelde
+Meting heeft de badge "Gemiddelde". Boven de lijst staan de knop "Gemiddelde
+maken" (zie Samengestelde Meting) en, voor een Admin, "Importeren" (punt 8).
+Selecteer je één of meer Metingen, dan komen daar de acties "Meetdatum
+instellen…" en, voor het samenvoegen van losse Metingen, "Samenbrengen in één
+Meting…" (punt 6b) bij.
 
-**Nieuwe ronde starten** (gebouwd op 13 oktober 2026): Admin en Consultant (bij zijn eigen
-organisaties, `metingen.plannen`). Het formulier opent als modal.
+**Meetdatum instellen…** (voorstel): Opent een modal met één datumveld en de
+lijst van de geselecteerde Metingen, die de datum allemaal krijgen. Bedoeld
+voor de bestaande Metingen die na het wegvallen van de rondes nog geen
+meetdatum hebben. Gelogd als `meting.meetdatumGewijzigd` (`datamodel.md`,
+Audit), één gebeurtenis per Meting.
 
-- **Naam**: De naam van de nieuwe ronde, verplicht (bijv. "Nameting 2027").
-- **Vanuit**: De vorige ronde, standaard de nieuwste, te wijzigen. Eronder de
-  Metingen van die ronde, elk met een selectievakje en het onderdeel en het
-  Assessment erbij, standaard allemaal aan. Een onderdeel dat niet meedoet,
-  vink je uit.
-- **Samengestelde Metingen**: Staan in dezelfde lijst met de badge "Gemiddelde".
-  Een samengestelde Meting is alleen aan te vinken als al haar onderliggende
-  Metingen aanstaan, met de reden erbij als dat niet zo is.
-- **Respondenten meenemen**: Een apart vinkje, standaard uit. Staat het aan,
-  dan krijgt elke nieuwe Meting dezelfde Respondenten als de Meting waaruit ze
-  komt, met de status "uitgenodigd" en een eigen persoonlijke link. De
-  Respondent wordt hergebruikt en niet opnieuw aangemaakt.
-- **Opslaan**: Maakt de ronde en per vinkje een Meting aan, met hetzelfde
-  onderdeel en Assessment, het gegenereerde label en `rondeId` van de nieuwe
-  ronde. Daarna opent het organisatie-detail met de nieuwe ronde bovenaan.
-  Gelogd als `ronde.aangemaakt` (`datamodel.md`, Audit).
+**Wijzigen**: Een potlood naast de naam van de Meting in het Meting-overzicht.
+Het opent op dezelfde plek de velden Onderdeel, Meetdatum en Naam, met Opslaan
+en Annuleren, en verder niets. Naam is voorgevuld met de huidige naam. Pas je
+de naam aan, dan volgt hij onderdeel en meetdatum niet meer
+(`Meting.labelHandmatig`). Een knop "Standaardnaam herstellen" naast het veld
+zet hem terug. Het assessment-type ligt vast na aanmaken, want achteraf wijzigen
+zou de al ingevulde antwoorden inconsistent maken met een ander scan-type. Voor
+een ander scan-type maak je een nieuwe Meting aan. Een samengestelde Meting
+heeft geen eigen meetdatum om te wijzigen (zie hieronder).
 
-**Rondes beheren** (gebouwd op 13 oktober 2026):
-- **Hernoemen**: Het potlood naast de naam in de rondekop. Gelogd als
-  `ronde.hernoemd`. Labels die nog het gegenereerde label zijn, volgen de nieuwe
-  naam.
-- **Naar ronde…** (aangescherpt en gebouwd op 13 oktober 2026): In de lijst Metingen
-  selecteer je één of meer Metingen, waarna "Naar ronde…" een modal opent. Dit is
-  de manier om bestaande en geïmporteerde Metingen zonder ronde onder te brengen.
-  Ook het Meting-overzicht heeft de actie, voor die ene Meting. De modal heeft
-  twee delen:
-  1. **Ronde** bovenaan: Een bestaande ronde of "Nieuwe ronde" met een naam.
-  2. **Eén regel per Meting** met alleen het veld Onderdeel, voorgevuld uit het
-     oude label (`datamodel.md`, Onderdeel uit het label voorstellen). Zo zet je
-     alle onderdelen in één stap goed. Ernaast staat alleen ter controle wat de
-     naam wordt.
-  **Controle vóór opslaan**: De knop is pas actief als in de gekozen ronde geen
-  twee Metingen hetzelfde onderdeel en Assessment hebben, ook niet met Metingen
-  die er al in staan. Een regel die botst krijgt een rode melding in de regel zelf
-  ("In {ronde} staat voor dit onderdeel en Assessment al {Meting}. Geef deze
-  Meting een ander onderdeel."). Een knop die niets doet zonder uitleg komt niet
-  voor.
-  **Alles of niets**: Alle regels gaan in één keer naar de ronde, of geen. Na
-  afloop noemt de melding het aantal Metingen en de ronde.
-- **Een lege ronde** verdwijnt vanzelf.
+**Overgang van wat op 13 oktober 2026 is gebouwd.**
 
-**Wijzigen** (gebouwd op 13 oktober 2026): Een potlood naast de naam van de Meting
-in het Meting-overzicht. Het opent op dezelfde plek de twee velden Onderdeel en
-Ronde, met Opslaan en Annuleren, en verder niets. De naam volgt vanzelf. Het
-assessment-type ligt vast na aanmaken, want achteraf wijzigen zou de al
-ingevulde antwoorden inconsistent maken met een ander scan-type. Voor een ander
-scan-type maak je een nieuwe Meting aan. Een botsing krijgt de melding uit
-"Naar ronde…".
+- De entiteit Ronde, het veld `rondeId`, "Nieuwe ronde starten", "Naar ronde…",
+  het hernoemen van een ronde en het overzicht van een ronde vervallen.
+- Bestaande Metingen houden hun naam, onderdeel en samenstelling. Hun
+  meetdatum is leeg en staat als "Datum ontbreekt" onderaan de lijst, tot de
+  Admin of Consultant hem invult met Wijzigen of "Meetdatum instellen…".
+- Zonder meetdatum doet een Meting niet mee aan een samenstelling of aan een
+  vergelijking tussen Metingen. Ze blijft wel zichtbaar en bruikbaar voor
+  resultaten en uitnodigen.
 
 **Meting-overzicht** (eigen pagina, bereikbaar via "Bekijk" bij een
 Meting in het organisatie-detail en via het Meting-label in de lijst
@@ -993,7 +971,7 @@ delen is binnen beheer. Zelfde bereik als de organisatie: Een Admin ziet
 alle Metingen, een Consultant die van zijn eigen organisaties.
 
 - **Kop**: Naam van de Meting met een potlood erachter (Wijzigen, hierboven),
-  Assessment, de organisatie (met link terug naar het organisatie-detail) en
+  Assessment, onderdeel, meetdatum, de organisatie (met link terug naar het organisatie-detail) en
   voortgang ("x van y afgerond").
 - **Scans in deze Meting**: Eén rij per Respondent in deze Meting. Kolommen:
   Naam, Rol/Team, Status, Voortgang, Gestart, Aangemaakt
@@ -1013,28 +991,33 @@ alle Metingen, een Consultant die van zijn eigen organisaties.
 - **Resultaten**: De link "Naar resultaten →" (Organisatie-resultaten,
   punt 4), zodra er minstens 1 afgeronde scan is.
 - **Leads**: Welke Leads welke weergaven van deze Meting hebben
-  (`LeadToegang`, punt 6a), alleen als weergave. Beheren gebeurt in de tabel
-  Leads van de organisatie.
-- **Acties**: De Meting "Naar ronde…" hangen (hierboven), responsen naar een andere
+  (`LeadToegang`, punt 6a), alleen als weergave. Beheren gebeurt in het
+  Leads-venster van de organisatie.
+- **Acties**: Responsen naar een andere
   Meting verplaatsen via selectie in de lijst (zelfde actie als punt 6b,
   "Respons naar andere Meting verplaatsen") en de Meting verwijderen (de
   bestaande verwijderfunctie, ook voor een lege import-Meting).
 
-**Samengestelde Meting** (gebouwd op 13 oktober 2026, `benchmark.md`, Onderdeel en
-samengestelde Meting): Een gemiddelde over meerdere Metingen van één
-organisatie in één ronde, bruikbaar als één deelnemer in een benchmark tussen
-organisaties. Admin en Consultant (bij zijn eigen organisaties,
+**Samengestelde Meting** (gebouwd op 13 oktober 2026, aangepast in het voorstel van
+14 oktober 2026; `benchmark.md`, Onderdeel en samengestelde Meting): Een
+gemiddelde over meerdere Metingen van één organisatie en één Assessment,
+bruikbaar als één deelnemer in een benchmark tussen organisaties en in een
+vergelijking tussen Metingen. Admin en Consultant (bij zijn eigen organisaties,
 `metingen.plannen`).
 
-- **Aanmaken**: Met de knop "Gemiddelde van deze ronde" in de rondekop. Het
-  formulier vraagt alleen het Assessment en het onderdeel (voorgevuld met
-  "Hele organisatie"). De naam maakt de app. Daaronder staan de Metingen van die ronde voor dat
-  Assessment, elk met een selectievakje, het onderdeel en het aantal afgeronde
-  scans, standaard allemaal aan. Een Meting met te weinig scans
-  (`benchmarkMinScans`) is uitgeschakeld, met de reden erbij. Opslaan kan pas bij
-  minstens twee Metingen. Een samengestelde Meting hoort bij die ronde.
-- **Metingen zonder ronde**: Ze staan niet in de lijst. Koppel ze eerst aan een
-  ronde met "Naar ronde…".
+- **Aanmaken**: Met de knop "Gemiddelde maken" boven de lijst Metingen. Het
+  formulier vraagt het Assessment en het onderdeel (voorgevuld met "Hele
+  organisatie"). De naam maakt de app. Daaronder staan de Metingen van deze
+  organisatie voor dat Assessment, op meetdatum, elk met een selectievakje, het
+  onderdeel, de meetdatum en het aantal afgeronde scans. Standaard staat er
+  niets aan, omdat de Metingen van verschillende momenten kunnen zijn. Een
+  Meting met te weinig scans (`benchmarkMinScans`) of zonder meetdatum is
+  uitgeschakeld, met de reden erbij. Opslaan kan pas bij minstens twee Metingen.
+- **Waarschuwing**: Staan in de selectie twee Metingen met hetzelfde onderdeel
+  en Assessment, dan staat onder de lijst: "Een gemiddelde over twee momenten van
+  hetzelfde onderdeel zegt weinig over de ontwikkeling." Opslaan blijft mogelijk.
+- **Meetdatum**: Volgt de selectie. Het is de laatste meetdatum van de
+  geselecteerde Metingen, en niet los te wijzigen.
 - **In de lijst**: De badge "Gemiddelde", het aantal onderliggende Metingen en
   geen knop "Respondent uitnodigen".
 - **Meting-overzicht**: Zelfde kop als hierboven, maar zonder het blok
@@ -1046,6 +1029,9 @@ organisaties. Admin en Consultant (bij zijn eigen organisaties,
   "Gemiddelde van {n} Metingen, elk even zwaar". Voor de Admin staat eronder de
   matrix met de onderliggende Metingen als kolommen
   (`visualisatie-scores.md`, onderdeel E).
+- **Vergelijken**: Een samengestelde Meting kan lid zijn van een vergelijking
+  tussen Metingen, bijvoorbeeld samenstelling 1 naast samenstelling 2
+  (`benchmark.md`, Niveau 2).
 - **Verwijderen van een onderliggende Meting**: De Meting valt uit de
   samenstelling. De bevestiging noemt de samengestelde Metingen waarin ze zit en
   dat het gemiddelde daardoor verandert.
@@ -1064,8 +1050,8 @@ zelf kan proberen zonder eerst te plakken.
 meteen ook de Lead-rol toe aan deze respondent, met Resultaten aan voor de
 Meting waarvoor wordt uitgenodigd (punt 6a). Puur een snelkoppeling voor het
 geval iemand tegelijk moet invullen én Lead moet worden. De twee blijven
-onafhankelijke acties. Meer weergaven voor deze Lead vink je aan in de tabel
-Leads (punt 6a).
+onafhankelijke acties. Meer weergaven voor deze Lead vink je aan in het
+Leads-venster (punt 6a).
 
 #### 6a. Leads: Toegang per weergave
 
@@ -1074,46 +1060,81 @@ Leads (punt 6a).
 `leadVoorOrganisatie` en het toewijzen van benchmarkviews op de views zelf.
 Wat daarvan op 13 oktober 2026 was gebouwd, is omgezet (zie Overgang onder dit
 punt).
+De tabel Leads is gebouwd als blok op de pagina van het organisatie-detail. Het
+blok Leads met het Leads-venster (modal) is een voorstel van 14 oktober 2026 en
+vervangt die tabel op de pagina.
 
 Lead worden en een vragenlijst krijgen zijn twee losse acties. Een Lead is een
 Respondent met de Lead-rol (`RespondentRol`, `datamodel.md` deel 2) en hoeft
 geen enkele `ScanInvulling` te hebben. Wat een Lead mag zien, staat op één
-plek: De tabel Leads in het organisatie-detail.
+plek: Het Leads-venster van de organisatie.
 
-**Tabel Leads.** Alleen voor een Admin, als eigen blok in het
-organisatie-detail, onder het blok Respondenten. Een Consultant ziet het blok
-niet.
+**Blok Leads en Leads-venster.** Alleen voor een Admin. Een Consultant ziet
+het blok en het venster niet. De tabel is breed (vijf kolommen per Meting),
+daarom staat ze niet op de pagina zelf maar in een eigen venster.
 
+- **Blok op het organisatie-detail**: Compact, onder het blok Respondenten.
+  Eén regel per Lead met de naam, de samenvatting "Ziet 3 weergaven" (of "Ziet
+  nog niets") en "Bekijk", dat het Respondent-overzicht opent (punt 6b). In
+  de kop van het blok staat de knop "Leads beheren" (`.btn-outline
+  .btn-compact`), die het Leads-venster opent. Zijn het meer dan 5 Leads, dan
+  staan er 5 en eronder de link "Alle Leads beheren →", die hetzelfde venster
+  opent. Zonder Leads staat er "Nog geen Leads" met de knop "+ Lead
+  toevoegen", die het venster opent met het formulier al open.
+- **Leads-venster (modal)**: De Overzichtsmodal (`stylesheet.md`) in de
+  brede variant `.modal-box--vol`, zodat de tabel zo veel mogelijk op het
+  scherm past. De adresbalk krijgt `?leads=<organisatieId>`. Sluiten kan met
+  het kruisje, Esc, een klik naast het venster of de terugknop van de browser.
+  Zijn er niet-opgeslagen vinkjes, dan vraagt de app eerst "Sluiten zonder
+  op te slaan?" met "Terug" en "Sluiten". Zolang het venster open staat valt
+  de Organisatie onder het Bewerkslot (`datamodel.md`).
+- **Opbouw van het venster**: Van boven naar beneden de kop (organisatienaam
+  en "Leads"), een regel uitleg ("Vink per Lead aan welke weergaven hij
+  ziet. Een nieuwe Lead en een nieuwe Meting beginnen zonder vinkjes."), de
+  melding van de overgang als die er is (met "Sluiten"), een keuzelijst
+  "Assessment", de tabel, daaronder "+ Lead toevoegen", en onderaan een vaste
+  voettekst met "Opslaan" en "Annuleren". Alleen de tabel scrolt, de kop en de
+  voettekst blijven staan.
+- **Keuzelijst Assessment**: Alleen als de organisatie Metingen van meer dan
+  één Assessment heeft. Standaard staat ze op alle Assessments. Een keuze
+  beperkt de Meting-kolommen tot dat Assessment. Vinkjes in verborgen
+  kolommen blijven staan en worden bij Opslaan gewoon bewaard. De
+  benchmarkkolommen blijven altijd zichtbaar.
 - **Rijen**: Eén rij per Lead van deze organisatie, met naam en e-mailadres.
   Achteraan staat de knop "Bekijk", die het Respondent-overzicht opent
   (punt 6b).
 - **Kolommen**: Elke weergave die een Lead kan krijgen is een kolom.
   - Per Meting vijf kolommen onder één kop met het label van de Meting:
     Resultaten, Spreiding, Antwoorden, Uitnodigen en Exporteren. De Metingen
-    staan gegroepeerd per ronde, de nieuwste links, zoals in de lijst
+    staan op meetdatum, de nieuwste links, zoals in de lijst
     Metingen. Een samengestelde Meting heeft de badge "Gemiddelde" en alleen
     de kolom Resultaten, want ze heeft geen scans en geen Respondenten.
   - Per benchmark waar deze organisatie in zit één kolom, met de naam van de
     benchmark.
 - **Cellen**: Een selectievakje. Aan betekent dat de Lead die weergave ziet.
-  Een nieuwe Lead en een nieuwe Meting beginnen zonder vinkjes, ook bij
-  "Nieuwe ronde starten". Er wordt niets meegenomen of vanzelf aangezet.
+  Een nieuwe Lead en een nieuwe Meting beginnen zonder vinkjes. Er wordt niets
+  meegenomen of vanzelf aangezet.
 - **Opslaan**: De Admin zet vinkjes en klikt onderaan op "Opslaan", met
   "Annuleren" ernaast. Beide zijn uitgeschakeld zolang er niets is gewijzigd.
-  Zo verandert toegang nooit door één verkeerde klik. Gelogd als
+  Na Opslaan blijft het venster open met de melding "Opgeslagen". Annuleren
+  zet de vinkjes terug en laat het venster open. Zo verandert toegang nooit
+  door één verkeerde klik. Gelogd als
   `lead.toegangGewijzigd` (`datamodel.md`, Audit), één gebeurtenis per
   gewijzigde cel.
-- **Veel kolommen**: De tabel scrolt horizontaal, met een vaste eerste kolom
-  en kolomkoppen die bij het scrollen blijven staan.
+- **Veel kolommen en veel Leads**: De tabel scrolt binnen het venster, met een
+  vaste eerste kolom (de naam van de Lead) en twee vaste kopregels, bovenaan
+  het label van de Meting en daaronder de weergave. Bij het scrollen blijven
+  ze staan. Meting-kolommen staan per Meting onder een gedeelde kop, met een
+  dunne lijn tussen twee Metingen.
 - **Lege toestand**: Een Lead zonder vinkjes ziet niets. De rij zegt dat
   ("Ziet nog niets").
 
 **Wat elke kolom geeft.**
 
 - **Resultaten (per Meting)**: De resultatenpagina van de Meting, met
-  Overzicht, Per bouwblok en de knop "Vergelijk met vorige ronde"
-  (`visualisatie-scores.md`, Navigatie). De vergelijking is er alleen met een
-  eerdere Meting waarvoor deze Lead ook Resultaten heeft.
+  Overzicht, Per bouwblok en de knop "Vergelijking"
+  (`visualisatie-scores.md`, Navigatie). De vergelijking is er alleen als de Lead
+  de benchmark heeft aangevinkt en Resultaten heeft op de Metingen daarin.
 - **Spreiding (per Meting)**: Weergave B zonder ring (`visualisatie-scores.md`,
   onderdeel B), een stip per scan per bouwblok met de spreiding. De stippen
   hebben geen naam en geen tooltip. Het is een extra weergave op de
@@ -1129,8 +1150,8 @@ niet.
   Antwoorden.
 - **Benchmark**: De view die in die benchmark bij deze Lead hoort. Bij niveau
   1 is dat de view van de organisatie tegenover de rest van de groep. Bij
-  niveau 2 is dat, voor elke Meting waarvoor de Lead Resultaten heeft, de view
-  van die Meting tegenover de overige Metingen. De Lead ziet dus nooit meer
+  niveau 2 is dat de vergelijking tussen de Metingen in die benchmark waarvoor
+  de Lead Resultaten heeft. De Lead ziet dus nooit meer
   dan zijn eigen Metingen (`benchmark.md`, View voor een Lead).
 
 De weergave Positie in de Meting, de ring op de scan van één Respondent, is er
@@ -1152,8 +1173,8 @@ een Info-icoon (`info.leadToegangCel`, de tekst volgt de reden).
 - Een benchmarkkolom is grijs als in die benchmark geen enkele groep aan de
   drempel van zijn niveau voldoet (`benchmark.md`, Drempels). Bij een
   benchmark binnen een organisatie (niveau 2) is de kolom ook grijs als de
-  Lead voor geen enkele lid-Meting Resultaten heeft, want die view hoort bij
-  een Meting. Bij een benchmark tussen organisaties (niveau 1) is Resultaten
+  Lead voor minder dan twee lid-Metingen Resultaten heeft, want dan is er
+  niets te vergelijken. Bij een benchmark tussen organisaties (niveau 1) is Resultaten
   niet nodig, omdat de view de scores van de eigen organisatie zelf al toont.
   Voldoet maar één Assessment aan de drempel, dan ziet de Lead alleen die
   sectie.
@@ -1182,18 +1203,21 @@ Info-icoon (`info.antwoordenMetNamen`).
 - Een Admin en een Consultant zien altijd de namen.
 
 **Lead toevoegen.** Een oranje knop "+ Lead toevoegen" (`.btn-or
-.btn-compact`) onder de tabel, links uitgelijnd. Een klik opent eronder een
-formulier met twee keuzes, een bestaande Respondent van deze organisatie
+.btn-compact`) in het Leads-venster, onder de tabel, links uitgelijnd. Een klik
+opent eronder in het venster een formulier met twee keuzes, een bestaande Respondent van deze organisatie
 (keuzelijst) of een nieuwe (naam en e-mailadres). Opslaan geeft de Respondent
 de Lead-rol. Een nieuwe Respondent krijgt meteen een persoonlijke link zonder
 `ScanInvulling`, met "Kopieer link" en "Openen" zoals bij Respondenten
-uitnodigen (punt 6). De nieuwe rij verschijnt zonder vinkjes.
+uitnodigen (punt 6). De nieuwe rij verschijnt zonder vinkjes. Dit is een
+eigen actie, los van "Opslaan" van de vinkjes, en verandert de vinkjes die
+al zijn gezet niet.
 
 **Op een bestaande respondent.** Het blok Toegang van het Respondent-overzicht
 (punt 6b) houdt het selectievakje "Lead", zonder keuze van een bereik.
-Aanvinken geeft de Respondent een rij in de tabel. De samenvatting zegt "Geen
-Lead" of "Lead, ziet 3 weergaven", met een verwijzing naar de tabel van de
-organisatie. De vinkjes zelf staan alleen in de tabel. Uitvinken trekt de
+Aanvinken geeft de Respondent een rij in het Leads-venster. De samenvatting
+zegt "Geen Lead" of "Lead, ziet 3 weergaven", met de link "Leads beheren", die
+het Leads-venster van de organisatie opent (in dezelfde modal, de inhoud
+wordt vervangen). De vinkjes zelf staan alleen in dat venster. Uitvinken trekt de
 Lead-rol in, na een bevestiging die zegt dat alle vinkjes van deze Lead
 verdwijnen. Gelogd.
 
@@ -1211,8 +1235,8 @@ en daarnaast de knop "Vragenlijst sturen". Metingen waarin de Respondent al een
 een Lead veranderen er niet door.
 
 **Wie dit mag**: Alleen een Admin (`respondenten.leadToekennen`, `datamodel.md`
-deel 2, Rechtenmatrix). Een Consultant ziet de tabel niet en kan geen Lead
-aanmaken. Een Lead ziet de tabel nooit.
+deel 2, Rechtenmatrix). Een Consultant ziet het blok en het venster niet en kan
+geen Lead aanmaken. Een Lead ziet ze nooit.
 
 **Wat de persoonlijke link laat zien (de landingspagina van een Lead)**:
 "Mijn metingen" (CLAUDE.md, schermflow punt 4) toont voor een Lead alleen wat
@@ -1221,7 +1245,7 @@ een Admin heeft aangevinkt.
 - **Kop**: De naam van de organisatie. Een Lead die geen respondent is, ziet
   geen intake, geen vragenlijst en geen lijst met eigen scans.
 - **Metingen**: Eén kaart per Meting waarvoor minstens één vinkje aan staat,
-  gegroepeerd per ronde, de nieuwste bovenaan. Op de kaart staan alleen de
+  op meetdatum, de nieuwste bovenaan. Op de kaart staan alleen de
   knoppen van de weergaven die aan staan: Resultaten, Spreiding, Antwoorden en
   Uitnodigen. Exporteren staat op de resultatenpagina zelf. Een Meting zonder
   vinkje staat er niet.
@@ -1282,7 +1306,7 @@ afhangt van de status van zijn eigen `ScanInvulling`:
 De eigen scan blijft dus altijd bereikbaar, ook als hij nog niet is
 afgerond. Alleen "Bekijk jouw resultaten" vervalt zolang de scan niet is
 afgerond. Heeft de Lead voor die Meting helemaal geen eigen
-`ScanInvulling` (alleen vinkjes in de tabel Leads), dan staat er alleen
+`ScanInvulling` (alleen vinkjes in het Leads-venster), dan staat er alleen
 "Bekijk de resultaten van de hele meting", net als bij elke andere Meting
 met Resultaten aan.
 
@@ -1328,7 +1352,7 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   3. **Toegang**: De persoonlijke link in een alleen-lezen veld met de
      knop "Kopieer" er direct achter, en ernaast de knop "Openen". Daaronder het selectievakje "Lead" met de samenvatting
      "Geen Lead" of "Lead, ziet 3 weergaven". Aanvinken geeft de Respondent
-     een rij in de tabel Leads van de organisatie (punt 6a). De vinkjes
+     een rij in het Leads-venster van de organisatie (punt 6a). De vinkjes
      staan alleen daar, niet in dit blok. Er is geen aparte knop "Beheren" en
      geen tweede venster. "Blokkade
      opheffen" staat alleen in het blok als de Respondent geblokkeerd is.
@@ -1473,7 +1497,7 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
 
   **Doel-Meting**: Kiezen uit de Metingen van dezelfde organisatie met
   hetzelfde Assessment-type als de huidige Meting, of in dezelfde stap een
-  nieuwe Meting aanmaken met een onderdeel en een ronde (zoals bij punt 5,
+  nieuwe Meting aanmaken met een onderdeel en een meetdatum (zoals bij punt 5,
   zonder label). Organisatie,
   Respondent en antwoorden blijven ongewijzigd.
 
@@ -1537,7 +1561,7 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   Respondent hangen, in één keer in één Meting en koppelt ze aan de juiste
   Respondent. Het voorbeeld is een import van tien bestanden waarin steeds
   dezelfde medewerker de invuller is en de echte persoon in de notitie
-  staat. Het gewenste eindresultaat is één Meting in één ronde met tien
+  staat. Het gewenste eindresultaat is één Meting met tien
   Respondenten. De bestaande acties "Respons naar andere Meting verplaatsen"
   en "Andere Respondent koppelen" kunnen dit ook, maar dan scan voor scan en
   met een conflictmelding bij elke scan na de eerste, omdat één Respondent
@@ -1552,14 +1576,15 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   **Het scherm** (modal, twee delen):
   1. **Doel-Meting** bovenaan: Kiezen uit bestaande Metingen van dezelfde
      organisatie en hetzelfde Assessment, of "Nieuwe Meting" met de velden
-     Onderdeel en Ronde (bestaande ronde kiezen of een nieuwe aanmaken, zoals bij
-     punt 5), zonder Label. Voor het voorbeeld: Ronde "0-meting", Onderdeel
-     "Team Service". Het onderdeel is voorgevuld uit het oude label van de eerste
+     Onderdeel en Meetdatum (zoals bij punt 5), zonder Label. Voor het
+     voorbeeld: Meetdatum 14-01-2026, Onderdeel "Team Service". De meetdatum
+     is voorgevuld met de oudste meetdatum van de geselecteerde Metingen. Het
+     onderdeel is voorgevuld uit het oude label van de eerste
      geselecteerde Meting (`datamodel.md`, Onderdeel uit het label voorstellen),
-     niet blind met "Hele organisatie". De uniciteitsregel van de ronde geldt
-     (`datamodel.md`, Ronde en onderdeel). Bestaat de combinatie al, dan noemt de
-     melding beide uitwegen: "Kies die Meting hierboven, of geef de nieuwe Meting
-     een ander onderdeel."
+     niet blind met "Hele organisatie". Bestaat de combinatie van onderdeel,
+     Assessment en meetdatum al, dan staat er een waarschuwing met de Meting
+     die er al is, en kan de beheerder die Meting hierboven kiezen of toch
+     doorgaan (`datamodel.md`, Meting).
   2. **Tabel met één regel per scan**: Kolommen Huidige Meting, Notitie
      (van de scan), Huidige Respondent en Respondent in de doel-Meting. De
      laatste kolom is een keuzelijst met "Dezelfde Respondent houden", "Nieuwe
@@ -1581,8 +1606,8 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   `organisatieLidId`, zie "Twee verwijzingen per scan"). Antwoorden en
   organisatie blijven ongewijzigd.
 
-  **Na afloop**: De melding noemt het aantal scans, de doel-Meting en de
-  ronde. De bron-Metingen die leeg zijn, blijven staan (zie "Lege Meting"),
+  **Na afloop**: De melding noemt het aantal scans en de doel-Meting.
+  De bron-Metingen die leeg zijn, blijven staan (zie "Lege Meting"),
   met in de melding het aantal lege Metingen en een knop "Lege Metingen
   verwijderen" die de bestaande verwijderfunctie gebruikt na bevestiging.
 
@@ -1651,7 +1676,8 @@ Bij "Oude tool" kies je een map met losse CSV's (één bestand per scan) of
 losse bestanden. Een bestand mag ook rijen van andere organisaties bevatten:
 Die koppel je in de voorbeeldweergave aan deze organisatie of sla je over
 (`import-scans.md`, Organisatie-matching). Elke import maakt nieuwe Metingen aan
-met "import" in het label, in rondes die de import zelf aanmaakt. De beheerder
+met "import" in het label en de meetdatum uit het bestand
+(`import-scans.md`, Meetdatum). De beheerder
 hangt de responsen daarna om naar de juiste Meting (punt 6b, "Respons naar
 andere Meting verplaatsen"). Elke scan krijgt een Respondent met de gegevens
 uit het bestand (naam, e-mailadres, functie, team en notitie), die de
@@ -1670,47 +1696,30 @@ Werkwijze in beheer, punt 6).
 scans en de hoofdlink Benchmark. Zie Overgang onder dit punt.
 
 Alles wat uit ingevulde scans komt, staat onder één hoofdlink: Resultaten. Een
-Admin ziet alles, een Consultant alleen de Rondes en Metingen van zijn eigen
+Admin ziet alles, een Consultant alleen de Metingen van zijn eigen
 organisaties (`datamodel.md` deel 2, Rechtenmatrix, `resultaten.inzien`).
 Benchmarks zijn alleen voor een Admin (`benchmark.beheren`). De hoofdlink staat
 in `.nav-right` na Organisaties.
 
-De tabs lopen van grof naar fijn, en elke lijst opent met een klik op de rij
-het volgende niveau. Dat is hetzelfde patroon als de benchmarkniveaus
-(`benchmark.md`): Een lijst van deelnemers, en per deelnemer een view een
-niveau dieper.
+De tabs zijn Metingen en, voor een Admin, Benchmarks. Heeft een gebruiker maar
+één tab, zoals een Consultant, dan toont de pagina geen tabbalk. Elke lijst
+opent met een klik op de rij het volgende niveau, hetzelfde patroon als de
+benchmarkniveaus (`benchmark.md`): Een lijst van deelnemers, en per deelnemer
+een view een niveau dieper.
 
-- **Rondes**: Eén rij per ronde van een organisatie. Kolommen: Organisatie,
-  Ronde, Metingen (aantal), Afgeronde scans ("x van y") en "Bekijk". Filters:
-  Organisatie en een zoekveld op de naam van de ronde. De nieuwste ronde staat
-  bovenaan, alle kolommen zijn sorteerbaar. Een klik opent het Ronde-overzicht.
-- **Metingen**: Eén rij per Meting. Kolommen: Organisatie, Ronde, Onderdeel,
-  Assessment, Afgeronde scans ("x van y") en "Bekijk". Een Meting zonder ronde
-  staat er ook, met een lege cel bij Ronde. Een samengestelde Meting heeft de
-  badge "Gemiddelde". Filters: Organisatie, Ronde en Assessment. Een klik opent
-  het Meting-overzicht (punt 5).
-- **Benchmarks** (alleen Admin): De benchmarks, punt 14.
-
-**Ronde-overzicht** (eigen pagina, kruimelpad Resultaten › {Organisatie} ›
-{Ronde}): De resultaten van één ronde van één organisatie.
-
-- **Kop**: Naam van de ronde, de organisatie (met link naar het
-  organisatie-detail) en voortgang ("x van y afgerond").
-- **Metingen in deze ronde**: Eén rij per Meting, met Onderdeel, Assessment,
-  Afgeronde scans, de badge "Gemiddelde" waar die hoort, "Resultaten →"
-  (Organisatie-resultaten, punt 4, zodra de Meting minstens één afgeronde scan
-  heeft) en "Bekijk" (Meting-overzicht, punt 5). De rij is klikbaar en opent het
-  Meting-overzicht.
-- **Knoppen in de kop**: "Gemiddelde van deze ronde" (punt 5) en "Vergelijk met
-  vorige ronde" met de regel uit `visualisatie-scores.md`, Navigatie. De knop is
-  alleen actief als een vergelijking mogelijk is. Het zijn dezelfde knoppen als
-  in de rondekop van het organisatie-detail, uit één component.
-- **Selectie**: Selectievakje per rij, met de actie "Exporteren" voor de
-  afgeronde scans van de geselecteerde Metingen (zie Export hieronder).
-
-**Het niveau daaronder** is het Meting-overzicht (punt 5). Daar staat de lijst
-met scans van die Meting, met het Scan-overzicht (modal) en de resultaten van
-één scan. Je komt dus altijd van organisatie via ronde en Meting bij de scan.
+- **Metingen**: Eén rij per Meting, op meetdatum, de nieuwste bovenaan.
+  Kolommen: Organisatie, Meting (de naam), Onderdeel, Assessment, Meetdatum,
+  Afgeronde scans ("x van y") en "Bekijk". Een Meting zonder meetdatum staat
+  onderaan met "Datum ontbreekt". Een samengestelde Meting heeft de badge
+  "Gemiddelde". Filters: Organisatie, Assessment en een periode op meetdatum.
+  Alle kolommen zijn sorteerbaar. Een klik op de rij opent het Meting-overzicht
+  (punt 5), met de lijst scans, het Scan-overzicht en de resultaten van één
+  scan. Je komt dus altijd van organisatie via Meting bij de scan.
+- **Benchmarks** (alleen Admin): De benchmarks, punt 14. Daaronder vallen ook
+  de vergelijkingen tussen Metingen (`benchmark.md`, Niveau 2).
+- **Selectie**: Selectievakje per rij, met de acties "Exporteren" voor de
+  afgeronde scans van de geselecteerde Metingen (zie Export hieronder) en
+  "Samenbrengen in één Meting…" (punt 6b).
 
 **Waar de functies van de oude pagina Ingevulde scans zijn gebleven.**
 
@@ -1719,8 +1728,8 @@ met scans van die Meting, met het Scan-overzicht (modal) en de resultaten van
 - Zoeken op naam of e-mailadres over alle organisaties: Dat kan in de lijst
   Respondenten (punt 6b).
 - Exporteren, Verwijderen en "Naar andere Meting" op een selectie scans: Die
-  staan in het Meting-overzicht. Exporteren op een selectie Metingen of
-  rondes staat in deze lijsten.
+  staan in het Meting-overzicht. Exporteren op een selectie Metingen staat in
+  de lijst hierboven.
 - "Samenbrengen in één Meting…": Staat op een selectie in de lijst Metingen
   (punt 6b).
 - Het Scan-overzicht blijft bestaan, hieronder.
@@ -1772,13 +1781,13 @@ met scans van die Meting, met het Scan-overzicht (modal) en de resultaten van
   Rechten per actie zijn gelijk aan die op deze lijst en het resultaten-
   en exportbereik uit `datamodel.md` deel 2, Rechtenmatrix.
 - **Export**: Eén gedeelde exportfunctie voor een selectie scans (Meting-overzicht),
-  een selectie Metingen of rondes (deze lijsten) en de resultatenpagina (één
-  scan), zie `export-csv.md` voor de exacte kolommen. Een selectie Metingen of
-  rondes exporteert de afgeronde scans daarin. **Bulk-CSV (meerdere scans in één
+  een selectie Metingen (deze lijst) en de resultatenpagina (één
+  scan), zie `export-csv.md` voor de exacte kolommen. Een selectie Metingen
+  exporteert de afgeronde scans daarin. **Bulk-CSV (meerdere scans in één
   export) alleen binnen één organisatie**, in verband met datavermenging, zie
-  `export-csv.md`. Horen alle geselecteerde Metingen of rondes bij dezelfde
-  organisatie, dan werkt "Exporteren" ook in de lijsten Rondes en Metingen
-  zonder eerst te filteren. Bevat de selectie Metingen of rondes van meer dan
+  `export-csv.md`. Horen alle geselecteerde Metingen bij dezelfde
+  organisatie, dan werkt "Exporteren" ook in de lijst Metingen
+  zonder eerst te filteren. Bevat de selectie Metingen van meer dan
   één organisatie, dan is "Exporteren" uitgeschakeld, met een Info-icoon ernaast
   (`info.bulkExportOrganisatie`, register in punt 2a). PDF en de InDesign-export
   (XML) zijn sowieso alleen beschikbaar bij precies één scan (Meting-overzicht
@@ -1795,13 +1804,13 @@ komt ook op de lijst van organisaties, de metingen en de respondenten.
   De oude adressen verwijzen door.
 - De pagina Ingevulde scans en de tab Import vervallen. Het oude adres van
   Ingevulde scans verwijst door naar Resultaten › Metingen.
+- De rondekop in het organisatie-detail en de knop "Overzicht" daarin vervallen
+  met de ronde (`beheerpagina.md`, punt 5, Overgang).
 - Het Scan-overzicht, de filters in de URL en de bulk-export blijven
   werken zoals nu, op de nieuwe plekken.
 
 **Open punten.**
 
-- In de gebouwde rondekop staat een knop "Overzicht" die in geen enkele spec
-  staat. Sander legt uit wat hij doet, of haalt hem weg.
 - Een Consultant ziet geen Benchmarks. Verruimen kan later (`benchmark.md`).
 
 #### 14. Benchmarks
@@ -1846,7 +1855,7 @@ en is voorstel.
   van de groep (`benchmark.md`, View per organisatie). Het groepsgemiddelde
   staat in het staafdiagram als tweede, neutrale balk.
 - **Leads**: Op de view staat geen blok meer om een Lead te kiezen. Wie de
-  view ziet, vink je aan in de tabel Leads van de organisatie (punt 6a). Onder
+  view ziet, vink je aan in het Leads-venster van de organisatie (punt 6a). Onder
   de view staat alleen een lijst van de Leads die hem nu zien, met per Lead de
   knop "Bekijk" (Respondent-overzicht, punt 6b) en een verwijzing naar de
   tabel. Gebouwd op 14 oktober 2026, dit vervangt het blok "Toewijzen aan een
@@ -1855,13 +1864,16 @@ en is voorstel.
   meegaan.
 
 **Niveau 2 en 3 (voorstel).** Niveau 2 gebruikt dezelfde schermen met een
-andere keuzelijst: Eerst één organisatie, dan de Metingen daarvan (minstens
-twee per Assessment, zonder vlag), en de view per Meting naast het gemiddelde
-van de overige Metingen, met de namen van de Metingen. Niveau 3 is een view
+andere keuzelijst: Eerst één organisatie, dan één Assessment, dan de Metingen
+daarvan (de eerste versie precies twee, zonder vlag). Elke Meting heeft een
+meetdatum en minimaal `benchmarkMinScans` afgeronde scans, en ook een
+samengestelde Meting mag meedoen. In het detail staan de Metingen op
+meetdatum, met de matrix, bij twee Metingen een kolom Verschil en weergave C
+(`benchmark.md`, Niveau 2). Er is geen groepsgemiddelde. Niveau 3 is een view
 op één Meting: De scan van een Respondent naast het gemiddelde van de andere
 scans in die Meting. De spreiding en de hoge en lage scores zijn nog niet
-ontworpen (`benchmark.md`, Niveau 3). De view van een Meting (niveau 2) geeft
-de Admin via de tabel Leads aan een Lead met Resultaten op die Meting. De
+ontworpen (`benchmark.md`, Niveau 3). De vergelijking (niveau 2) geeft
+de Admin via het Leads-venster aan een Lead met Resultaten op de Metingen daarin. De
 spreiding binnen een Meting (niveau 3) krijgt een Lead als kolom Spreiding
 (punt 6a). De view op één scan blijft voor de Admin.
 

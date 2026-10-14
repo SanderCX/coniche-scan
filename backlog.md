@@ -94,28 +94,19 @@ Bewust nog niet opgepakt. Geen prioritering.
   Organisatie-resultaten). Een maat voor afwijking/spreiding tussen
   respondenten daarbovenop is ontworpen (besloten op 12 oktober 2026, nog te
   bouwen): `visualisatie-scores.md`, onderdeel A en B.
-- **Trend tussen Metingen van dezelfde organisatie**: De aggregatie
-  (`beheerpagina.md`, Organisatie-resultaten) werkt nu alleen bínnen
-  één Meting. "Zijn we vooruitgegaan sinds de nulmeting" — twee of meer
-  Metingen van dezelfde organisatie naast elkaar, per categorie/
-  bouwblok — is ontworpen voor twee Metingen (besloten op 12 oktober 2026,
-  nog te bouwen): `visualisatie-scores.md`, onderdeel C. Voor drie of meer
-  Metingen is er nog geen ontwerp.
-- **Ronde en onderdeel (gebouwd op 13 oktober 2026)**: Een Meting is één
-  onderdeel in één ronde voor één Assessment. Gebouwd: `Ronde` als record,
-  `Meting.rondeId` en `Meting.onderdeel`, de lijst Metingen gegroepeerd per
-  ronde, "Nieuwe ronde starten", "Naar ronde…" voor bestaande Metingen, de
-  afleiding bij import en de kolommen `ronde` en `onderdeel` in de
-  CSV-export. Zie `datamodel.md`, Ronde en onderdeel, `beheerpagina.md`, punt 5,
-  `import-scans.md` en `benchmark.md`, Onderdeel en samengestelde Meting. Open:
-  Of bij een nieuwe ronde de Respondenten mee kunnen (voorstel is een vinkje,
-  standaard uit).
-- **Peildatum op een ronde**: De volgorde van rondes volgt
-  `Ronde.aangemaaktOp`. Wie een 0-meting en een nameting importeert,
-  importeert de oudste eerst, en binnen één bestand sorteert de import zelf.
-  Pas als de ontwikkeling in de tijd wordt gevolgd, bijvoorbeeld bij drie of
-  meer rondes, is een eigen peildatum nodig. Besloten op 13 oktober 2026 om dit
-  nu te laten.
+- **Vergelijking tussen Metingen (besloten op 14 oktober 2026)**: Dit item
+  "Trend tussen Metingen van dezelfde organisatie" en de ronde (13 oktober 2026)
+  zijn vervangen. Een Meting heeft een onderdeel en een meetdatum, en een
+  vergelijking tussen Metingen is een benchmark binnen een organisatie
+  (niveau 2) die de Admin zelf aanmaakt, eerst met twee Metingen:
+  `benchmark.md`, Niveau 2, `visualisatie-scores.md`, onderdeel C, E,
+  `datamodel.md`, Meting en `beheerpagina.md`, punt 5 en 14. Nog niet
+  ontworpen: De weergave bij drie of meer Metingen, bijvoorbeeld een lijn per
+  bouwblok over de meetdata.
+- **Kopiëren van een Meting naar een nieuwe meetdatum (bewust niet opgepakt, 14
+  oktober 2026)**: Een functie die onderdeel en Assessment van een eerdere
+  Meting overneemt, zoals "Nieuwe ronde starten" dat deed. Joost vond dit te
+  complex. Elke Meting wordt apart gepland.
 - **Benchmark, niveau 1 (tussen organisaties)**: Gebouwd (PR 61,
   `benchmark.md`). Daarbij nog niet gedekt: Export (PDF, CSV, InDesign) van
   een benchmark, rechten voor een Consultant, een vastgezette versie voor de
@@ -241,7 +232,7 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   bij verplaatsen en samenvoegen te loggen, zoals de spec voorschrijft.
 - **Content-pagina's** beheerbaar maken (punt 11) en **Organisatievelden**
   zelf beheerbaar met de tab Organisatievelden (punt 3).
-- **Paginering** van de lijsten Respondenten, Rondes en Metingen en de scanlijst in het Meting-overzicht.
+- **Paginering** van de lijsten Respondenten en Metingen en de scanlijst in het Meting-overzicht.
 - **Spec en code gelijktrekken**: `Assessment.bouwblokLabel` in de spec
   tegenover `bouwblokEenheidEnkelvoud`/`Meervoud` in de code, en
   `Bouwblok.centraleVraag` als echt veld tegenover de lookup-tabellen.
@@ -254,12 +245,16 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   tabel per organisatie waarin een Admin per Lead aanvinkt welke weergaven hij
   ziet (`beheerpagina.md`, punt 6a), met `LeadToegang` in plaats van
   `RespondentRolMeting`, `leadVoorOrganisatie` en `BenchmarkToewijzing`, en de
-  hoofdlink Resultaten met Rondes, Metingen en Benchmarks, zonder de pagina
-  Ingevulde scans en met Import op organisatieniveau (punt 7 en 8). Nog open:
-  Of een Lead de lijsten Rondes en Metingen ook krijgt, en hoe de kolommen van
-  de tabel Leads zich verhouden tot de weergaven onder Resultaten. Niveau 3
-  (view op één scan) staat nog in de beheerschermen van de Admin; een Lead
-  krijgt er geen kolom voor.
+  hoofdlink Resultaten met Metingen en Benchmarks, zonder de pagina Ingevulde
+  scans en met Import op organisatieniveau (punt 7 en 8). De tab Rondes, die er
+  op 14 oktober 2026 bij is gebouwd, vervalt als voorstel van 14 oktober 2026
+  met de ronde. Nog open: Of een Lead de lijst Metingen ook krijgt, en hoe de
+  kolommen van het Leads-venster zich verhouden tot de weergaven onder Resultaten.
+  Niveau 3 (view op één scan) staat nog in de beheerschermen van de Admin; een
+  Lead krijgt er geen kolom voor. De tabel staat nu op de pagina; het voorstel
+  van 14 oktober 2026 is een compact blok Leads met een Leads-venster (modal),
+  omdat de tabel breed is (`beheerpagina.md`, punt 6a, `stylesheet.md`,
+  `.modal-box--vol`).
 - **Andere Respondent koppelen vanuit het Scan-overzicht (gebouwd op 13 oktober 2026)**: Een
   naamwijziging via "Respondent bewerken" geldt voor alle scans van de
   Respondent. Nodig: De vaste regel "Deze wijziging geldt voor alle {n} scans"
@@ -384,7 +379,7 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   Meting zet. Ook nodig: Kolom Notitie in de scanlijst van het Meting-overzicht en het
   Scan-overzicht, kolom `scan_notitie` in de CSV-export (`export-csv.md`).
 - **Fout: "Naar ronde…" werkt niet voor Metingen met hetzelfde onderdeel**
-  (13 oktober 2026, hersteld): Geïmporteerde Metingen hebben allemaal het onderdeel "Hele
+  (13 oktober 2026, hersteld; op 14 oktober 2026 vervallen met de ronde): Geïmporteerde Metingen hebben allemaal het onderdeel "Hele
   organisatie", ook als het label een onderdeel noemt ("Zuid-Nederland |
   0-meting"). Ze botsen daardoor op de uniciteitsregel van de ronde, en de actie
   doet dan niets zonder melding. In "Scans samenbrengen" geeft het formulier
@@ -394,7 +389,7 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   vóór " | ", met controle per regel en alles of niets. Ook het Meting-overzicht
   krijgt "Naar ronde…". Meldingen bij een botsing noemen beide uitwegen
   (`datamodel.md`, Botsing).
-- **Label van een Meting verdwijnt als invoerveld** (13 oktober 2026, gebouwd): Het
+- **Label van een Meting verdwijnt als invoerveld** (13 oktober 2026, gebouwd; op 14 oktober 2026 aangepast, met onderdeel en meetdatum in plaats van onderdeel en ronde, en de naam is weer aan te passen): Het
   label was ambigu naast onderdeel en ronde, en verplicht op sommige schermen en
   leeg toegestaan op andere. Nu vult niemand het in. Een Meting heeft alleen
   Onderdeel en Ronde (plus Assessment bij aanmaken), de naam maakt de app
@@ -404,7 +399,9 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   zonder ronde houdt haar oude label. Nieuw: Info-icoon `info.metingBegrippen` met
   de begrippen boven de lijst Metingen (`beheerpagina.md`, punt 5, Begrippen).
 - **Overzicht per vraag op ronde-niveau, en de samengestelde Meting** (13
-  oktober 2026, nog uit te werken, besproken met Joost): Er is een nieuw overzicht
+  oktober 2026, nog uit te werken, besproken met Joost; op 14 oktober 2026 is
+  de ronde vervallen, dus "het bereik van een ronde" hieronder moet opnieuw
+  worden bekeken, bijvoorbeeld als de scans van een gekozen groep Metingen): Er is een nieuw overzicht
   op het laagste niveau, met alle scores per vraag per scan in één beeld. Het
   werkt bij één klant met één Meting en zes Respondenten (Eneco), maar niet bij
   een klant met zes Metingen van elk één scan (Univé), want daar zijn het zes
