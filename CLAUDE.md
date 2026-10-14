@@ -95,7 +95,7 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
 ## Terminologie
 
 In de interface en in alle specs: **Organisatie**, **Meting** (een
-geplande ronde van één scan-type bij één organisatie), **Respondent** (de
+afname van één scan-type bij één organisatie, voor één onderdeel op één meetdatum), **Respondent** (de
 persoon), **Ingevulde scan** (één invulling door één respondent binnen
 één meting). Niet "leden" of "scanuitvoering". In de code heten sommige
 typen nog anders; dat staat in het datamodel.
@@ -306,7 +306,7 @@ geen afwijking van de spec maar een gat erin.
    **Bij een Lead-rol** (`datamodel.md` deel 2) toont de pagina alleen wat een
    Admin voor deze Lead heeft aangevinkt (`beheerpagina.md`, punt 6a).
    Bovenaan staat de naam van de organisatie. Daaronder staat één kaart per
-   Meting waarvoor minstens één weergave aan staat, gegroepeerd per ronde met
+   Meting waarvoor minstens één weergave aan staat, op meetdatum, de nieuwste bovenaan, met
    de nieuwste bovenaan, met alleen de knoppen van de weergaven die aan staan
    (Resultaten, Spreiding, Antwoorden en Uitnodigen). Daaronder staat een
    kaart per benchmark die aan staat. Een Lead kan alleen een benchmark

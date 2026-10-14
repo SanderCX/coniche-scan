@@ -32,7 +32,7 @@ bij de PDF- en InDesign-export.
 datavermenging.** Concreet: Bulk-export (meerdere geselecteerde scans
 in één CSV) is mogelijk zodra alle geselecteerde scans bij dezelfde
 organisatie horen. Dat geldt zowel in het Meting-overzicht
-(`beheerpagina.md` punt 5) als in de lijsten Rondes en Metingen onder
+(`beheerpagina.md` punt 5) als in de lijst Metingen onder
 Resultaten (punt 7), ook als die niet zijn gefilterd. Bevat de selectie scans van meer dan één
 organisatie, dan is "Exporteren" uitgeschakeld, met het Info-icoon
 `info.bulkExportOrganisatie` ernaast. Een export van één scan
@@ -42,16 +42,18 @@ organisatie, dan is "Exporteren" uitgeschakeld, met het Info-icoon
 
 ### Basisgegevens
 
-De kolommen `ronde` en `onderdeel` zijn gebouwd op 13 oktober 2026
-(`datamodel.md`, Ronde en onderdeel). Ze staan direct na `meting_label`. De
-import leest kolommen op hun kopnaam, zodat een bestand zonder deze kolommen
-blijft werken (`import-scans.md`, Ronde en onderdeel).
+De kolom `onderdeel` is gebouwd op 13 oktober 2026 en de kolom
+`meting_meetdatum` is een voorstel van 14 oktober 2026 (`datamodel.md`, Meting).
+De kolom `ronde` van 13 oktober 2026 vervalt met de ronde. Ze staan direct na
+`meting_label`. De import leest kolommen op hun kopnaam, zodat een bestand zonder
+deze kolommen, of met een oude kolom `ronde`, blijft werken (`import-scans.md`,
+Meetdatum en onderdeel).
 
 | Kolom | Bron | Toelichting |
 |---|---|---|
 | `organisatie_naam` | `Organisatie.naam` | |
 | `meting_label` | `Meting.label` | bijv. "Nulmeting 2026" |
-| `ronde` | `Ronde.label` | bijv. "0-meting", leeg bij een Meting zonder ronde |
+| `meting_meetdatum` | `Meting.meetdatum` | ISO-datum, bijv. "2026-10-14", leeg bij een Meting zonder meetdatum |
 | `onderdeel` | `Meting.onderdeel` | bijv. "Team A", of "Hele organisatie" |
 | `assessment_naam` | `Assessment.naam` | bijv. "Klantcontact Volwassenheid" |
 | `respondent_naam` | `Respondent.naam` | leeg zolang de intake niet is gestart |

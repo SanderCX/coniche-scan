@@ -229,83 +229,79 @@ al ingevuld.
 
 ### Meting (in de code: `ScanUitvoering`)
 
-Eén geplande ronde van één scan-type bij één organisatie, bijv.
-"Nulmeting 2026" of een AI-scan naast een Klantcontact-scan. Met de ronde en het
-onderdeel (gebouwd op 13 oktober 2026, hieronder) is een Meting één cel: Eén onderdeel in één ronde
-voor één Assessment.
+Eén afname van één scan-type bij één organisatie, voor één onderdeel en op één
+meetdatum, bijv. "Zuid-Nederland Zakelijk | okt 2026". Een organisatie heeft
+meerdere Metingen, ook van verschillende Assessments. Wat Metingen van elkaar
+onderscheidt, zijn het onderdeel, het Assessment en de meetdatum. Een groepering
+daarboven bestaat niet. Wat bij elkaar hoort, kies je zelf bij een vergelijking
+of een gemiddelde (`benchmark.md`).
 
 ```
-Ronde {                             // gebouwd op 13 oktober 2026
-  id: string
-  organisatieId: string
-  label: string                     // bijv. "0-meting" of "Nameting 2027"
-  aangemaaktOp: datetime
-}
-
 Meting {
   id: string
   organisatieId: string
   assessmentId: string
-  rondeId?: string                  // gebouwd, ontbreekt bij een Meting zonder ronde
-  label: string
+  label: string                     // de naam, zie Naam van een Meting
+  labelHandmatig: boolean           // voorstel, standaard false
   onderdeel: string                 // gebouwd, standaard "Hele organisatie", bijv. "Team A"
+  meetdatum?: date                  // voorstel van 14 oktober 2026, zonder tijdstip
   samenstelling?: string[]          // gebouwd, metingIds, alleen bij een samengestelde Meting
   aangemaaktOp: datetime
 }
 ```
 
-**Ronde en onderdeel (gebouwd op 13 oktober 2026).** Een organisatie meet in
-rondes. Een ronde is een moment waarop de organisatie meet, bijvoorbeeld de
-0-meting of de nameting, met een Meting per onderdeel en per Assessment. Het
-onderdeel zegt over welk deel van de organisatie een Meting gaat, bijvoorbeeld
-"Team A", en is standaard "Hele organisatie". De oude tool kende geen van beide
-(`import-scans.md`, Ronde en onderdeel).
+**Onderdeel en meetdatum.** Het onderdeel zegt over welk deel van de
+organisatie een Meting gaat, bijvoorbeeld "Team A", en is standaard "Hele
+organisatie". De meetdatum is de dag waarop de Meting plaatsvindt. Respondenten
+mogen er daarna nog dagen over doen. Het is niet het moment waarop de Meting in
+de app is aangemaakt (`aangemaaktOp`) en niet het moment van importeren.
 
-- **Uniek.** Binnen een ronde is er hoogstens één Meting per combinatie van
-  onderdeel en Assessment. Een ronde mag Metingen van verschillende Assessments
-  bevatten, en niet elk onderdeel hoeft in elke ronde mee te doen.
-- **Ontwikkeling en gemiddelde.** Dezelfde combinatie van onderdeel en Assessment
-  in twee rondes is ontwikkeling, en die vergelijk je (`visualisatie-scores.md`,
-  onderdeel C). Verschillende onderdelen in dezelfde ronde zijn delen van een
-  geheel, en daarvan kan een samengestelde Meting het gemiddelde zijn
-  (`benchmark.md`, Onderdeel en samengestelde Meting).
-- **Volgorde.** Rondes staan in de volgorde van `Ronde.aangemaaktOp`. Een eigen
-  peildatum komt pas als er iets over de tijd gevolgd moet worden
-  (`backlog.md`). Bij importeren geldt: De oudste ronde eerst, en binnen één
-  bestand maakt de import de rondes zelf aan op volgorde van de oudste
-  `created_at`.
-- **Naam van een Meting (gebouwd op 13 oktober 2026).** Niemand vult het label
-  van een Meting nog in: De app maakt de naam uit onderdeel en ronde, "{onderdeel}
-  | {ronde}", bij het onderdeel "Hele organisatie" alleen de naam van de ronde.
-  Het veld `label` blijft bestaan als opslag van die naam. Verandert het
-  onderdeel of de ronde, of wordt de ronde hernoemd, dan volgt de naam. Een Meting
-  zonder ronde houdt haar oude label tot ze een ronde krijgt, en een geïmporteerd
-  label wordt bij "Naar ronde…" of Wijzigen vervangen door de gegenereerde naam.
-- **Zonder ronde.** Bestaande Metingen hebben geen ronde. Een Admin of
-  Consultant koppelt ze aan een ronde (`beheerpagina.md`, punt 5). Een Meting
-  zonder ronde krijgt het onderdeel "Hele organisatie".
+- **Meetdatum is verplicht** bij het aanmaken van een Meting, en is achteraf
+  te wijzigen. De datum geeft de volgorde in de tijd, en daarmee de volgorde
+  waarin Metingen in een vergelijking staan (`benchmark.md`, Niveau 2). Een
+  Meting zonder meetdatum, zoals een bestaande Meting uit de tijd van de rondes
+  (zie Overgang hieronder), toont "Datum ontbreekt". Ze kan pas in een
+  vergelijking of samenstelling als de datum is ingevuld.
+- **Bij een import** is de meetdatum de oudste `created_at` van de scans die in
+  de Meting komen (de oude tool), of de kolom `meting_meetdatum` van onze eigen
+  export (`import-scans.md`, Meetdatum, `export-csv.md`).
+- **Uniek.** Er is geen harde uniciteitsregel. Een Meting met dezelfde
+  organisatie, hetzelfde onderdeel, hetzelfde Assessment en dezelfde meetdatum
+  als een bestaande Meting geeft een waarschuwing bij opslaan, geen blokkade.
+- **Naam van een Meting.** De app maakt de naam uit onderdeel en meetdatum,
+  "{onderdeel} | {maand jaar}", bijvoorbeeld "Team A | okt 2026", en bij het
+  onderdeel "Hele organisatie" alleen "{maand jaar}". Het veld `label` is de
+  opslag van die naam. Verandert het onderdeel of de meetdatum, dan volgt de
+  naam. Een gebruiker kan de naam overschrijven, bijvoorbeeld als twee Metingen
+  in dezelfde maand voor hetzelfde onderdeel bestaan. `labelHandmatig` staat
+  dan op true en de naam volgt onderdeel en meetdatum niet meer. Een
+  geïmporteerd label blijft staan tot de beheerder het wijzigt.
 - **Onderdeel uit het label voorstellen (gebouwd op 13 oktober 2026).** Een
-  Meting zonder ronde heeft het onderdeel "Hele organisatie", ook als haar label
-  een onderdeel noemt (bijv. "Zuid-Nederland | 0-meting" na een import). Zulke
-  Metingen botsen dan in elke ronde op elkaar. Daarom stellen "Naar ronde…" en
-  "Scans samenbrengen" het onderdeel voor uit het label: De tekst vóór " | ",
-  anders "Hele organisatie". Het is een voorstel dat de beheerder ziet en kan
-  aanpassen, nooit een stille wijziging.
-- **Botsing.** Botst een Meting op de uniciteitsregel, dan zegt elke melding
-  waar het misgaat én beide uitwegen: Een andere Meting kiezen, of het onderdeel
-  of de ronde aanpassen. Een actie slaat nooit stilletjes iets over.
-- **Lege ronde.** Een ronde zonder Metingen verdwijnt vanzelf.
+  geïmporteerde Meting heeft het onderdeel "Hele organisatie", ook als haar
+  label een onderdeel noemt (bijv. "Zuid-Nederland | 0-meting" na een import).
+  "Scans samenbrengen" en Wijzigen stellen het onderdeel voor uit het label: De
+  tekst vóór " | ", anders "Hele organisatie". Het is een voorstel dat de
+  beheerder ziet en kan aanpassen, nooit een stille wijziging.
+- **Overgang van de rondes (voorstel van 14 oktober 2026).** `Ronde` en
+  `Meting.rondeId` vervallen. De Metingen houden hun `label`, onderdeel en
+  `samenstelling`. De meetdatum is leeg. Een Admin of Consultant vult hem in
+  per Meting. De audit-regels `ronde.aangemaakt` en `ronde.hernoemd` blijven
+  geldig voor wat al is gelogd.
 
-**Samengestelde Meting (gebouwd op 13 oktober 2026).** Een Meting met `samenstelling` is een
-gemiddelde over andere Metingen van dezelfde organisatie, hetzelfde Assessment en
-dezelfde ronde, minstens twee, elk hoogstens één keer en zelf niet samengesteld.
-Ze hoort bij die ronde en heeft standaard het onderdeel "Hele organisatie", zodat
-de uniekheid per ronde ook voor haar geldt. Ze
+**Samengestelde Meting (gebouwd op 13 oktober 2026, aangepast in het voorstel van
+14 oktober 2026).** Een Meting met `samenstelling` is een gemiddelde over andere
+Metingen van dezelfde organisatie en hetzelfde Assessment, minstens twee, elk
+hoogstens één keer en zelf niet samengesteld. De Metingen kiest de gebruiker
+zelf, zonder verdere grens. Ze heeft standaard het onderdeel "Hele
+organisatie". Haar meetdatum volgt de onderliggende Metingen: Het is de
+laatste meetdatum van de geselecteerde Metingen. Ze is dus niet los te
+wijzigen, en een geselecteerde Meting zonder datum blokkeert het opslaan. Ze
 heeft geen Respondenten en geen `ScanInvulling`s, en kopieert geen antwoorden:
 De scores worden berekend uit de onderliggende Metingen (Scoreberekening,
 Gemiddelde over een groep leden). Een samengestelde Meting is zelf een Meting,
 dus ze kan als `BenchmarkLid.metingId` meedoen aan een benchmark tussen
-organisaties.
+organisaties, en aan een vergelijking tussen Metingen. Zo is samenstelling 1 te
+vergelijken met samenstelling 2.
 
 ### ScanInvulling
 
@@ -736,7 +732,7 @@ bereik "hele organisatie" en toegang erft nergens van mee. Een Lead zonder
 
 **Wat een Lead is.** Een Respondent is Lead als hij de `RespondentRol` Lead
 heeft. Dat geldt overal waar de app dat vraagt: De badge "Lead", de lijsten en
-filters, de tabel Leads en de data-integriteitscontrole.
+filters, het Leads-venster en de data-integriteitscontrole.
 
 **Verplaatsen, samenvoegen en importeren.** De Lead-rol gaat niet mee naar een
 andere organisatie. Bij elke verplaatsing van een Respondent naar een andere
@@ -1100,10 +1096,10 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   van de organisatie en de nieuwe stand van de schakelaar.
 - `organisatie.benchmarkVlagGewijzigd`. `details` bevat de naam van de
   organisatie en de nieuwe stand van de vlag.
-- `ronde.aangemaakt` en `ronde.hernoemd` (gebouwd). `details` bevat bij
-  aanmaken het label en, bij "Nieuwe ronde starten", het label van de vorige
-  ronde en het aantal Metingen dat is meegenomen. Bij hernoemen staan de oude en
-  de nieuwe naam erin.
+- `ronde.aangemaakt` en `ronde.hernoemd` (gebouwd, vervallen op 14 oktober 2026
+  met de ronde). Wat al is gelogd, blijft staan.
+- `meting.meetdatumGewijzigd` (voorstel). `details` bevat het label van de
+  Meting en de oude en de nieuwe meetdatum.
 - `meting.samengesteldAangemaakt`, `meting.samengesteldGewijzigd` en
   `meting.samengesteldVerwijderd` (gebouwd). `details` bevat het label en de
   labels van de onderliggende Metingen zoals ze op dat moment waren.
@@ -1138,7 +1134,7 @@ Een streepje betekent geen toegang.
 | `organisaties.verwijderen` | alle | eigen | - | - |
 | `metingen.plannen` | alle | eigen | - | - |
 | `respondenten.uitnodigen` | alle | eigen | aangevinkte Metingen (Uitnodigen) | - |
-| `respondenten.leadToekennen` (de tabel Leads en de Lead-rol) | alle | - | - | - |
+| `respondenten.leadToekennen` (het Leads-venster en de Lead-rol) | alle | - | - | - |
 | `respondenten.verwijderen` | alle | eigen | - | - |
 | `scans.verwijderen` | alle | eigen | - | - |
 | `scan.invullen` | - | - | zelf | zelf |
@@ -1158,8 +1154,8 @@ Antwoorden (`antwoorden.inzien`), Uitnodigen (`respondenten.uitnodigen`) en
 Exporteren (`export.uitvoeren`). De beperkingen blijven: Geen bulk-export,
 niets van andere organisaties, geen Lead-rollen toekennen
 (`respondenten.leadToekennen`) en geen beheerrechten. Antwoorden toont namen
-of is anoniem volgens `Organisatie.antwoordenMetNamen`. De Consultant heeft geen recht op de
-tabel Leads, omdat die alleen voor een Admin is.
+of is anoniem volgens `Organisatie.antwoordenMetNamen`. De Consultant heeft geen recht op het
+Leads-venster, omdat die alleen voor een Admin is.
 
 **`export.uitvoeren`, bereik van een Lead/Respondent**: Bewust smaller dan
 `resultaten.inzien` hierboven. Een Respondent en een Lead kunnen alleen
@@ -1284,7 +1280,7 @@ Globale instellingen, door een Admin te bepalen in beheer
 (`beheerpagina.md`, punt 10, Drempels en termijnen). `benchmarkMinOrganisaties` (startwaarde 5,
 niveau 1) en `benchmarkMinScans` (startwaarde 3) zijn gebouwd. Voorstel: Per
 niveau een eigen drempel voor het aanvinken van een view voor een Lead,
-`benchmarkMinMetingen` (niveau 2, startwaarde 3) en `benchmarkMinRespondenten`
+`benchmarkMinRespondenten`
 (startwaarde 5, het minimale aantal afgeronde scans in een Meting voor
 Spreiding, voor anonieme Antwoorden en voor de lijn van laagste tot hoogste score bij een Lead). De
 betekenis staat in `benchmark.md`, Drempels en View voor een Lead.
