@@ -1257,10 +1257,12 @@ een Admin heeft aangevinkt.
 - **Kop**: De naam van de organisatie. Een Lead die geen respondent is, ziet
   geen intake, geen vragenlijst en geen lijst met eigen scans.
 - **Metingen**: Eén kaart per Meting waarvoor minstens één vinkje aan staat,
-  op meetdatum, de nieuwste bovenaan. Op de kaart staan alleen de
-  knoppen van de weergaven die aan staan: Resultaten, Spreiding, Antwoorden en
-  Uitnodigen. Exporteren staat op de resultatenpagina zelf. Een Meting zonder
-  vinkje staat er niet.
+  op meetdatum, de nieuwste bovenaan. Op de kaart staan alleen
+  de knoppen Resultaten en Uitnodigen, voor zover ze aan staan. Spreiding,
+  Antwoorden en Exporteren staan niet op de kaart. Ze zitten in de schakelaar
+  en op de resultatenpagina van de Meting, voor zover de Admin ze heeft
+  aangevinkt (punt 6a, Wat elke kolom geeft). Een Meting zonder vinkje staat er
+  niet.
 - **Benchmarks**: Onder de Metingen een kaart per benchmark die aan staat. Een
   Lead kan een benchmark hebben zonder een enkele Meting, en dan bestaat de
   pagina alleen uit die kaart. Wat hij ziet en wanneer, staat in
@@ -1311,7 +1313,7 @@ afhangt van de status van zijn eigen `ScanInvulling`:
   - `"bezig"`: "Ga verder met de scan".
   - `"afgerond"`: "Bekijk jouw resultaten" → zijn eigen `ScanInvulling`
     (zoals een gewone respondent).
-- **"Bekijk de resultaten van de hele meting"** → de
+- **"Resultaten hele meting"** → de
   organisatie-resultaten van die Meting (het gemiddelde van alle
   afgeronde scans, zie Organisatie-resultaten hierboven).
 
@@ -1319,8 +1321,7 @@ De eigen scan blijft dus altijd bereikbaar, ook als hij nog niet is
 afgerond. Alleen "Bekijk jouw resultaten" vervalt zolang de scan niet is
 afgerond. Heeft de Lead voor die Meting helemaal geen eigen
 `ScanInvulling` (alleen vinkjes in het Leads-venster), dan staat er alleen
-"Bekijk de resultaten van de hele meting", net als bij elke andere Meting
-met Resultaten aan.
+"Resultaten hele meting", net als bij elke andere Meting met Resultaten aan.
 
 #### 6b. Respondenten (lijst en overzicht)
 
