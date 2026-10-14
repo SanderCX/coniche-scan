@@ -502,21 +502,24 @@ is alleen herkomstinformatie, zie Sector-varianten). Staat het Assessment in
 (`Benchmark.meldingen`). De kaart op de publieke keuzepagina en de
 landingspagina van het Assessment verdwijnen.
 
-Een benchmark (deel 3) verwijst naar organisaties, metingen en Leads.
-Een benchmarkview kan alleen aan een Lead zijn toegewezen die voor het
-onderwerp van de view bereik heeft, zie `benchmark.md`, Bereik van een Lead.
-Verliest een Lead dat bereik, dan vervalt de toewijzing, op elk niveau. Alleen
-de niveau 1-toewijzingen die al bestonden toen het bereik werd ingevoerd,
-blijven eenmalig staan, met de melding uit `benchmark.md`, Bereik van een
-Lead. De Admin past dan het bereik aan of trekt de toewijzing in.
-Verdwijnt een van die records, dan verdwijnt ook de verwijzing. Een Meting
-weg haalt het lid uit de benchmark. Een Organisatie weg haalt haar leden en
-toewijzingen weg. Een Respondent met Lead-rol weg haalt zijn toewijzingen
-weg. Bij niveau 2 en 3 haalt een Meting weg ook de toewijzingen van die
-Meting weg, en een verwijderde Respondent of scan de toewijzingen met die
-Respondent als onderwerp. Verliest een Lead de rol op een Meting, dan
-vervalt zijn toewijzing voor die Meting. Een verwijderde ingevulde scan haalt geen lid weg maar verandert wel
-de cijfers. De benchmark zelf blijft bestaan.
+Een benchmark (deel 3) verwijst naar organisaties en Metingen. Een Lead
+krijgt een view van een benchmark via een `LeadToegang` met `weergave:
+"benchmark"` (`benchmark.md`, View voor een Lead). Verdwijnt een van die
+records, dan verdwijnt ook de verwijzing.
+
+- Een Meting weg haalt het lid uit de benchmark en haalt alle `LeadToegang` van
+  die Meting weg (`resultaten` en `antwoorden`).
+- Een Organisatie weg haalt haar leden weg en alle `LeadToegang` van haar
+  Leads.
+- Een Respondent met Lead-rol weg haalt zijn `LeadToegang` weg. Verliest een
+  Respondent de Lead-rol, dan vervalt ook al zijn `LeadToegang`.
+- Een Benchmark weg haalt de vinkjes van Leads voor die benchmark weg.
+- Verliest een Lead zijn `resultaten` voor een Meting, dan vervallen ook zijn
+  `spreiding`, `antwoorden` en `exporteren` voor die Meting. Was dat zijn laatste lid-Meting van een
+  benchmark binnen een organisatie (niveau 2), dan vervalt ook zijn vinkje
+  voor die benchmark.
+- Een verwijderde ingevulde scan haalt geen lid weg maar verandert wel de
+  cijfers. De benchmark zelf blijft bestaan.
 
 ### Content bewerken
 
@@ -680,75 +683,77 @@ samen met de backend en de database.
 |---|---|---|
 | Admin | Beheer | Alles, inclusief rechten toekennen en verwijderen |
 | Consultant | Beheer | Organisaties en metingen aanmaken, Lead en respondenten koppelen (en weer loskoppelen), resultaten inzien — voor organisaties die hij zelf aanmaakte of die een Admin aan hem toewees |
-| Lead | Organisatie | Respondenten uitnodigen voor en resultaten inzien van zijn bereik: Specifieke Metingen of de hele organisatie. Kan ook zelf invullen, maar hoeft niet |
+| Lead | Organisatie | De weergaven zien en doen die een Admin per Lead heeft aangevinkt: Resultaten, Spreiding, Antwoorden, Uitnodigen, Exporteren en benchmarkviews. Kan ook zelf invullen, maar hoeft niet |
 | (geen rol) | Organisatie | Gewone respondent: Eigen scans invullen en eigen resultaten zien |
 
-**Het bereik van een Lead.** Een Lead heeft een van twee bereiken.
-
-- **Specifieke Metingen** (standaard): Toegang wordt per Meting toegekend.
-  Een nieuwe Meting die later wordt aangemaakt, is niet zichtbaar voor deze
-  Lead, tenzij iemand die bewust koppelt. Een Lead kan aan meerdere Metingen
-  tegelijk gekoppeld zijn.
-- **Hele organisatie** (gebouwd op 13 oktober 2026): De Lead is Lead voor de organisatie van
-  zijn Respondent-record en ziet alle Metingen daarvan, ook Metingen die
-  later worden aangemaakt. Dit is een bewuste uitzondering op de regel
-  hierboven. Een Admin kiest het, en het scherm waarschuwt daarvoor (zie
-  `beheerpagina.md`, punt 6a).
-
-Het bereik hangt niet af van of de Lead zelf een scan heeft ingevuld.
-
-**Samengestelde Meting en bereik (gebouwd op 13 oktober 2026).** Een `RespondentRolMeting` mag
-naar een samengestelde Meting verwijzen. De Lead ziet dan alleen het gemiddelde.
-Toegang erft niet mee: Een koppeling met een onderliggende Meting geeft geen
-toegang tot de samengestelde Meting, en andersom. "Hele organisatie" dekt wel
-alle Metingen, dus ook de samengestelde. Een benchmarkview van niveau 1 volgt
-het bereik op de lid-Meting, zie `benchmark.md`, Bereik van een Lead.
+**Wat een Lead mag zien (voorstel van 14 oktober 2026).** Dit vervangt het
+bereik van een Lead (Specifieke Metingen of Hele organisatie), de koppeling
+`RespondentRolMeting`, het veld `leadVoorOrganisatie` en de toewijzing van
+benchmarkviews (`BenchmarkToewijzing`). Wat daarvan op 13 oktober 2026 is
+gebouwd, wordt vervangen (`beheerpagina.md`, punt 6a, Overgang). Een Admin
+vinkt per Lead aan welke weergaven hij ziet, in één tabel per organisatie
+(`beheerpagina.md`, punt 6a).
 
 ```
-RespondentRolMeting {
-  respondentId: string
-  metingId: string               // een Meting waar deze Lead toegang toe heeft
+LeadToegang {
+  respondentId: string           // de Lead
+  weergave: "resultaten" | "spreiding" | "antwoorden" | "uitnodigen"
+            | "exporteren" | "benchmark"
+  metingId?: string              // bij alle weergaven behalve benchmark
+  benchmarkId?: string           // bij benchmark
+  toegekendDoor: string          // Admin
+  toegekendOp: datetime
 }
 ```
 
-Een Lead heeft op de Respondent een veld `leadVoorOrganisatie` (boolean,
-standaard `false`, gebouwd op 13 oktober 2026). Staat het aan, dan geldt het bereik "hele
-organisatie" en zijn er geen `RespondentRolMeting`-koppelingen nodig. Anders
-is minstens 1 koppeling verplicht bij het toekennen van de Lead-rol (zie
-`beheerpagina.md`, punt 6a): Geen Lead zonder minstens één toegewezen Meting
-of het bereik "hele organisatie". De Metingen die een Lead mag zien, zijn
-alle Metingen van zijn organisatie bij `leadVoorOrganisatie`, en anders de
-Metingen in `RespondentRolMeting` (in de code `leadMetingIds`).
+Een `LeadToegang` is uniek per combinatie van Respondent, weergave en Meting of
+benchmark.
 
-**Wat een Lead is.** Een Respondent is Lead als `leadVoorOrganisatie` aan
-staat of als hij minstens één `RespondentRolMeting` heeft. Dat geldt overal
-waar de app dat vraagt: De badge "Lead", de lijsten en filters, de keuzelijst
-bij het toewijzen van een benchmarkview en de data-integriteitscontrole. In
-de code staat nu alleen `leadMetingIds.length > 0`, dat wordt dus uitgebreid.
+- **Resultaten**: De resultatenpagina van de Meting, met Overzicht, Per
+  bouwblok en de vergelijking met een eerdere Meting waarvoor de Lead ook
+  Resultaten heeft. Een `LeadToegang` mag naar een samengestelde Meting
+  verwijzen. De Lead ziet dan alleen het gemiddelde.
+- **Spreiding**: Weergave B van die Meting, zonder ring
+  (`visualisatie-scores.md`, onderdeel B). Kan alleen als er een `resultaten`
+  voor dezelfde Meting is, en niet voor een samengestelde Meting.
+- **Uitnodigen**: Respondenten voor die Meting uitnodigen. Onafhankelijk van
+  `resultaten`.
+- **Exporteren**: De export van die Meting. Kan alleen als er een `resultaten`
+  voor dezelfde Meting is.
+- **Antwoorden**: Weergave G van die Meting (`visualisatie-scores.md`,
+  onderdeel G). Kan alleen als er een `resultaten` voor dezelfde Meting is, en
+  niet voor een samengestelde Meting. Of de Lead namen ziet, bepaalt
+  `Organisatie.antwoordenMetNamen` (deel 3).
+- **Benchmark**: De view of views die in die benchmark bij deze Lead horen
+  (`benchmark.md`, View voor een Lead). Bij een benchmark tussen organisaties
+  (niveau 1) kan het vinkje voor elke Lead van een organisatie in die
+  benchmark. Bij een benchmark binnen een organisatie (niveau 2) kan het alleen
+  als de Lead `resultaten` heeft voor een lid-Meting van die benchmark.
 
-**Wisselen van bereik.** Gaat een Admin van "Specifieke Metingen" naar "Hele
-organisatie" en weer terug, dan blijven de eerder aangevinkte Metingen
-bewaard. Zolang `leadVoorOrganisatie` aan staat, tellen ze niet mee en zijn
-ze niet te zien. Pas bij het intrekken van de Lead-rol worden ze gewist.
+Een nieuwe Meting of benchmark begint voor elke Lead zonder vinkje. Er is geen
+bereik "hele organisatie" en toegang erft nergens van mee. Een Lead zonder
+`LeadToegang` ziet niets.
+
+**Wat een Lead is.** Een Respondent is Lead als hij de `RespondentRol` Lead
+heeft. Dat geldt overal waar de app dat vraagt: De badge "Lead", de lijsten en
+filters, de tabel Leads en de data-integriteitscontrole.
 
 **Verplaatsen, samenvoegen en importeren.** De Lead-rol gaat niet mee naar een
 andere organisatie. Bij elke verplaatsing van een Respondent naar een andere
-organisatie worden `leadMetingIds` en `leadVoorOrganisatie` leeggemaakt
-(`false`), op alle plekken waar de code dat nu al voor `leadMetingIds` doet.
-Bij een samenvoeging behoudt de bestaande Respondent zijn eigen bereik; dat
-van de samengevoegde Respondent vervalt. Een Respondent die de import
+organisatie worden de Lead-rol en al zijn `LeadToegang` verwijderd. Bij een
+samenvoeging behoudt de bestaande Respondent zijn eigen rol en vinkjes, en die
+van de samengevoegde Respondent vervallen. Een Respondent die de import
 aanmaakt, is nooit Lead. Zonder deze regel blijft iemand Lead voor een
 organisatie waar hij niet meer hoort.
 
-**Wat de Lead op zijn eigen pagina ziet**: Zijn eigen vragenlijst,
-alleen als hij ook zelf respondent is (dus zelf invult); en sowieso de
-resultaten van elke Meting waar hij aan gekoppeld is, zodra daar
-minstens 1 scan binnen is afgerond, geen hoger minimum. Zelfde
-aggregatieweergave (gemiddelde per Meting) als de organisatie-resultaten
-in beheer, zie `beheerpagina.md`, Organisatie-resultaten.
-
-Daarnaast ziet een Lead de benchmarkviews die een Admin aan hem heeft
-toegewezen (`BenchmarkToewijzing`, deel 3).
+**Wat de Lead op zijn eigen pagina ziet**: Zijn eigen vragenlijst, alleen als
+hij ook zelf respondent is (dus zelf invult), en de resultaten van elke Meting
+waarvoor `resultaten` aan staat, zodra daar minstens 1 scan is afgerond, geen
+hoger minimum. Zelfde aggregatieweergave (gemiddelde per Meting) als de
+organisatie-resultaten in beheer, zie `beheerpagina.md`,
+Organisatie-resultaten. Daarnaast Spreiding, Antwoorden en Uitnodigen voor elke Meting waarvoor die
+aan staan, en de views van de benchmarks die aan staan (`benchmark.md`, View voor
+een Lead).
 
 ---
 
@@ -896,7 +901,7 @@ Permissie {
 RolPermissie {
   rolId: string
   permissieId: string
-  bereik: "alle" | "eigen" | "toegewezen metingen" | "toegewezen benchmarkviews" | "zelf"
+  bereik: "alle" | "eigen" | "aangevinkte Metingen" | "aangevinkte benchmarks" | "zelf"
 }
 
 GebruikerRol {
@@ -914,9 +919,9 @@ RespondentRol {
 }
 ```
 
-Bij de Lead-rol komt hier `RespondentRolMeting` bij (zie Rollen
-hierboven): Welke specifieke Metingen deze Lead mag zien, niet
-automatisch de hele organisatie.
+Bij de Lead-rol komt hier `LeadToegang` bij (zie Rollen hierboven): Welke
+weergaven deze Lead mag zien, per Meting en per benchmark. Niets is automatisch
+zichtbaar.
 
 Betekenis van `bereik`:
 - `alle`: Alle records (Admin).
@@ -924,11 +929,11 @@ Betekenis van `bereik`:
   óf die een Admin expliciet aan hem toewees (`OrganisatieToegang`),
   met alles wat daaronder hangt (Consultant). Zie Eigenaarschap en
   toegang van/tot organisaties hierboven.
-- `toegewezen metingen`: Alleen de Metingen die via `RespondentRolMeting`
-  expliciet aan deze Lead zijn gekoppeld, of alle Metingen van de organisatie
-  bij `leadVoorOrganisatie` (Lead).
-- `toegewezen benchmarkviews`: Alleen de views die een Admin via
-  `BenchmarkToewijzing` aan deze Lead heeft gekoppeld (Lead, deel 3).
+- `aangevinkte Metingen`: Alleen de Metingen waarvoor een Admin een
+  `LeadToegang` met `resultaten` of `antwoorden` heeft aangevinkt (Lead).
+- `aangevinkte benchmarks`: Alleen de views van de benchmarks waarvoor een
+  Admin een `LeadToegang` met `weergave: "benchmark"` heeft aangevinkt (Lead,
+  deel 3).
 - `zelf`: Alleen de eigen ingevulde scans (respondent).
 
 Een respondent zonder RespondentRol is een gewone respondent.
@@ -1086,10 +1091,13 @@ gebeurtenis, zonder persoonsgegevens uit scans.
 - `benchmark.aangemaakt`, `benchmark.gewijzigd` en `benchmark.verwijderd`.
   `details` bevat de naam van de benchmark en de namen van de Assessments
   en organisaties zoals ze op dat moment waren.
-- `benchmark.toegewezen` en `benchmark.toewijzingIngetrokken`. `details`
-  bevat de benchmark en de organisatie (bij niveau 2 en 3 het niveau en de
-  Meting, bij niveau 3 zonder naam van de Respondent), zonder naam of
-  e-mailadres van de Lead.
+- `lead.toegangGewijzigd` (voorstel van 14 oktober 2026). `details` bevat de
+  organisatie, de weergave (resultaten, antwoorden of benchmark), de Meting of
+  de benchmark en of het vinkje aan of uit is gezet, zonder naam of
+  e-mailadres van de Lead. De gebeurtenissen `benchmark.toegewezen` en
+  `benchmark.toewijzingIngetrokken` blijven geldig voor wat al is gelogd.
+- `organisatie.antwoordenNamenGewijzigd` (voorstel). `details` bevat de naam
+  van de organisatie en de nieuwe stand van de schakelaar.
 - `organisatie.benchmarkVlagGewijzigd`. `details` bevat de naam van de
   organisatie en de nieuwe stand van de vlag.
 - `ronde.aangemaakt` en `ronde.hernoemd` (gebouwd). `details` bevat bij
@@ -1129,37 +1137,40 @@ Een streepje betekent geen toegang.
 | `organisaties.bewerken` (incl. kenmerken) | alle | eigen | te bevestigen | - |
 | `organisaties.verwijderen` | alle | eigen | - | - |
 | `metingen.plannen` | alle | eigen | - | - |
-| `respondenten.uitnodigen` | alle | eigen | toegewezen metingen | - |
-| `respondenten.leadToekennen` | alle | eigen | - | - |
+| `respondenten.uitnodigen` | alle | eigen | aangevinkte Metingen (Uitnodigen) | - |
+| `respondenten.leadToekennen` (de tabel Leads en de Lead-rol) | alle | - | - | - |
 | `respondenten.verwijderen` | alle | eigen | - | - |
 | `scans.verwijderen` | alle | eigen | - | - |
 | `scan.invullen` | - | - | zelf | zelf |
-| `resultaten.inzien` | alle | eigen | toegewezen metingen | zelf |
-| `export.uitvoeren` | alle | eigen | zelf, of toegewezen Metingen | zelf |
+| `resultaten.inzien` | alle | eigen | aangevinkte Metingen (Resultaten) | zelf |
+| `spreiding.inzien` (weergave B, voorstel) | alle | eigen | aangevinkte Metingen (Spreiding) | - |
+| `antwoorden.inzien` (weergave G, voorstel) | alle | eigen | aangevinkte Metingen (Antwoorden) | - |
+| `export.uitvoeren` | alle | eigen | zelf, of aangevinkte Metingen (Exporteren) | zelf |
 | `benchmark.beheren` | alle | - | - | - |
-| `benchmark.inzien` | alle | - | toegewezen benchmarkviews | - |
+| `benchmark.inzien` | alle | - | aangevinkte benchmarks | - |
 
 Een Lead die zelf invult, doet dat met het bereik `zelf`, net als elke
 respondent.
 
-**Lead voor de hele organisatie.** Dit bereik geldt voor alle Metingen van de
-organisatie, ook voor Metingen die later worden aangemaakt. Voor die Metingen
-mag hij dus Respondenten uitnodigen (`respondenten.uitnodigen`), resultaten
-inzien (`resultaten.inzien`) en per Meting exporteren (`export.uitvoeren`),
-zoals een Lead dat voor een afzonderlijke Meting mag. De beperkingen blijven:
-Geen bulk-export, niets van andere organisaties, geen Lead-rollen toekennen
-(`respondenten.leadToekennen`) en geen beheerrechten.
+**Wat een Lead met een vinkje mag.** Elke weergave is een eigen vinkje per
+Meting: Resultaten (`resultaten.inzien`), Spreiding (`spreiding.inzien`),
+Antwoorden (`antwoorden.inzien`), Uitnodigen (`respondenten.uitnodigen`) en
+Exporteren (`export.uitvoeren`). De beperkingen blijven: Geen bulk-export,
+niets van andere organisaties, geen Lead-rollen toekennen
+(`respondenten.leadToekennen`) en geen beheerrechten. Antwoorden toont namen
+of is anoniem volgens `Organisatie.antwoordenMetNamen`. De Consultant heeft geen recht op de
+tabel Leads, omdat die alleen voor een Admin is.
 
 **`export.uitvoeren`, bereik van een Lead/Respondent**: Bewust smaller dan
 `resultaten.inzien` hierboven. Een Respondent en een Lead kunnen alleen
 exporteren wat ze ook al zelf op hun eigen scherm zien: een Respondent zijn
 eigen ingevulde scan (resultatenpagina, bereik `zelf`), een Lead daarnaast
-ook de Metingen waarvoor hij Lead is (`respondent.leadMetingIds`, of alle Metingen van zijn organisatie bij `leadVoorOrganisatie`) — dus
+ook de Metingen waarvoor hij Exporteren heeft (`LeadToegang`), dus
 niet elke Meting die hij toevallig kan *inzien* via een andere weg. Geen
 bulk-export en geen toegang tot exports van andere organisaties/Metingen,
 ook niet "te bevestigen": dat was hier eerder nog open, nu vastgelegd. Voor
 Admin en Consultant blijft dit ongewijzigd: bereik `alle`/`eigen`, zoals de
-rest van deze matrix, inclusief de bulk-acties in `beheerpagina.md` punt 7.
+rest van deze matrix, inclusief de bulk-acties in `beheerpagina.md` punt 5 en 7.
 
 `content.beheren` is Admin-only: Assessment-types en Content
 (bouwblokken, vragen, categorieën) zitten in beheer onder de link
@@ -1172,11 +1183,11 @@ metingen en respondenten, niet de scaninhoud zelf.
 `benchmark.beheren` is Admin-only, zoals `content.beheren`. Een benchmark
 rekent over organisaties die een Consultant niet beheert, dus het bereik
 `eigen` past er niet bij. Een Consultant heeft er vooralsnog geen toegang
-toe. `benchmark.inzien` geldt voor een Lead alleen voor de views die een
-Admin aan hem heeft toegewezen (deel 3 en `benchmark.md`). Het prototype kent
+toe. `benchmark.inzien` geldt voor een Lead alleen voor de benchmarks die een
+Admin voor hem heeft aangevinkt (deel 3 en `benchmark.md`). Het prototype kent
 `benchmark.inzien` nog niet als aparte regel in `lib/rechten.ts`: Daar loopt de
-toegang van de Lead via de toewijzing en de Metingen waarop hij Lead is
-(`leadMetingIds`), net als bij `export.uitvoeren`. De regel in de matrix is
+toegang van de Lead via de toewijzing en `leadMetingIds`, net als bij
+`export.uitvoeren`, tot de overgang naar `LeadToegang`. De regel in de matrix is
 het doel voor de rolrechten die met de database komen.
 
 ---
@@ -1224,23 +1235,15 @@ BenchmarkLid {
   assessmentId: string              // een van assessmentIds
   metingId: string                  // een Meting van deze organisatie en dit Assessment
 }
-
-BenchmarkToewijzing {
-  id: string
-  benchmarkId: string
-  organisatieId: string             // de organisatie waarvan de view is (bij niveau 2 en 3: de organisatie van de Meting)
-  metingId?: string                 // voorstel: niveau 2 en 3, de Meting van de view
-  onderwerpRespondentId?: string    // voorstel: niveau 3, de Respondent van wie de scan de view is
-  respondentId: string              // de Lead
-  toegewezenDoor: string            // Admin
-  toegewezenOp: datetime
-}
 ```
 
+`BenchmarkToewijzing` (gebouwd op 13 oktober 2026) vervalt in het voorstel van
+14 oktober 2026. Een view voor een Lead is een `LeadToegang` met `weergave:
+"benchmark"` (deel 2). Bestaande toewijzingen worden daarbij overgezet
+(`beheerpagina.md`, punt 6a, Overgang).
+
 Op niveau "organisaties" heeft een organisatie per benchmark per Assessment
-hoogstens één lid. Een toewijzing is uniek per combinatie van benchmark,
-onderwerp (organisatie, bij niveau 2 en 3 ook de Meting en bij niveau 3 de
-Respondent) en Lead. Het sectorfilter bij het samenstellen wordt niet
+hoogstens één lid. Het sectorfilter bij het samenstellen wordt niet
 opgeslagen.
 
 **`meldingen`** (gebouwd) is wel opgeslagen, maar geen inhoud van de
@@ -1259,11 +1262,20 @@ bestaan zolang de benchmark bestaat.
 - `metingen`: Alle leden hebben dezelfde `organisatieId`. Per Assessment zijn
   er meerdere leden, elk met een andere Meting.
 - `scans`: Eén lid, de Meting waarin de scans worden vergeleken. De scans
-  zelf zijn geen leden, want ze volgen uit de Meting.
+  zelf zijn geen leden, want ze volgen uit de Meting. Voorstel van 14 oktober
+  2026: Deze waarde vervalt, want een view op een scan wordt niet meer aan een
+  Lead gegeven (`benchmark.md`, View voor een Lead). Niveau 3 blijft een
+  weergave voor de Admin.
 
 ### Uitbreiding op Organisatie
 
-`Organisatie` krijgt `benchmarkToegestaan` (boolean, standaard false). Een
+`Organisatie` krijgt `antwoordenMetNamen` (boolean, standaard false, voorstel
+van 14 oktober 2026). Staat hij aan, dan ziet een Lead bij Antwoorden de namen
+van de respondenten, en anders R1 tot en met Rn (`beheerpagina.md`, punt 6a).
+Een Admin zet hem na afstemming met de opdrachtgever. De intake en het
+toestemmingsvakje veranderen er niet door.
+
+`Organisatie` krijgt ook `benchmarkToegestaan` (boolean, standaard false). Een
 Admin zet de vlag nadat dit met de organisatie is afgesproken. Alleen
 organisaties met de vlag kunnen in een benchmark worden opgenomen. Zie
 `benchmark.md`, Toestemming en privacy.
@@ -1273,7 +1285,8 @@ organisaties met de vlag kunnen in een benchmark worden opgenomen. Zie
 Globale instellingen, door een Admin te bepalen in beheer
 (`beheerpagina.md`, punt 10, Drempels en termijnen). `benchmarkMinOrganisaties` (startwaarde 5,
 niveau 1) en `benchmarkMinScans` (startwaarde 3) zijn gebouwd. Voorstel: Per
-niveau een eigen drempel voor het toewijzen van een view aan een Lead,
+niveau een eigen drempel voor het aanvinken van een view voor een Lead,
 `benchmarkMinMetingen` (niveau 2, startwaarde 3) en `benchmarkMinRespondenten`
-(niveau 3, startwaarde 5). De betekenis staat in `benchmark.md`, Drempels en
-Toewijzen aan een Lead op alle niveaus.
+(startwaarde 5, het minimale aantal afgeronde scans in een Meting voor
+Spreiding, voor anonieme Antwoorden en voor de lijn van laagste tot hoogste score bij een Lead). De
+betekenis staat in `benchmark.md`, Drempels en View voor een Lead.

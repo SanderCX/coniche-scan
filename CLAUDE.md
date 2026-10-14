@@ -61,7 +61,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 ## Status
 
 De doorloopflow en de beheeromgeving (Organisaties, Metingen,
-Ingevulde scans) zijn gebouwd, met de content van de Klantcontact
+Ingevulde scans, die Resultaten worden, `beheerpagina.md` punt 7) zijn gebouwd, met de content van de Klantcontact
 Volwassenheidsscan, de AI-volwassenheidsscan en de Zorgscan (sector-variant
 van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
 
@@ -86,7 +86,8 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
 - **Export**: Als PDF (`export-pdf-visual-volwassenheidsscan.md` e.v.),
   als CSV (`export-csv.md`) en voor InDesign als XML (`export-indesign.md`)
   zijn alle drie gebouwd, vanuit dezelfde Exporteren-dropdown op de
-  resultatenpagina en bij Ingevulde scans (`beheerpagina.md` punt 7).
+  resultatenpagina, in het Meting-overzicht en in de lijsten onder Resultaten
+  (`beheerpagina.md`, punt 5 en 7).
 - **Benchmark**: Het niveau tussen organisaties is gebouwd (PR 61,
   `benchmark.md`). De niveaus binnen een organisatie en binnen een Meting
   zijn besproken en nog niet gebouwd.
@@ -190,8 +191,8 @@ De nav heeft een vast deel links (logo) en een contextueel deel rechts
    "Naar resultaten →" op de doorloopflow zodra de scan afgerond is,
    "← Terug naar de scan" samen met "Exporteren" op de resultatenpagina,
    geen scheidingslijn tussen die twee onderling, in beheer:
-   "Assessments", "Organisaties" en "Benchmark" voor een Admin, alleen
-   "Organisaties" voor een Consultant; "Instellingen" staat in het Accountmenu, zie `beheerpagina.md`, Wat
+   "Assessments", "Organisaties" en "Resultaten" voor een Admin,
+   "Organisaties" en "Resultaten" voor een Consultant; "Instellingen" staat in het Accountmenu, zie `beheerpagina.md`, Wat
    beheerbaar is). Geen
    apart concept meer voor een terug- versus een vooruit-actie binnen
    hetzelfde scherm: Beide staan hier, uiterst links, ongeacht de
@@ -302,11 +303,18 @@ geen afwijking van de spec maar een gat erin.
    introtekst uit `mijnMetingenIntro` (`datamodel.md`, Algemene
    teksten) — beheerbaar, geen vaste tekst in de code.
 
-   **Bij een Lead-rol** (`datamodel.md` deel 2) komen hier ook de
-   resultaten van en de uitnodigen-actie voor zijn toegewezen Metingen
-   bij (niet de hele organisatie), ongeacht of de Lead zelf invullingen
-   heeft — zie `beheerpagina.md`, punt 6a. Ook de benchmarkviews die een
-   Admin aan hem heeft toegewezen staan hier (`benchmark.md`).
+   **Bij een Lead-rol** (`datamodel.md` deel 2) toont de pagina alleen wat een
+   Admin voor deze Lead heeft aangevinkt (`beheerpagina.md`, punt 6a).
+   Bovenaan staat de naam van de organisatie. Daaronder staat één kaart per
+   Meting waarvoor minstens één weergave aan staat, gegroepeerd per ronde met
+   de nieuwste bovenaan, met alleen de knoppen van de weergaven die aan staan
+   (Resultaten, Spreiding, Antwoorden en Uitnodigen). Daaronder staat een
+   kaart per benchmark die aan staat. Een Lead kan alleen een benchmark
+   hebben, en dan bestaat de pagina alleen uit die kaart. Is de Lead ook
+   respondent, dan komen zijn eigen scans erbij. Een Lead die geen respondent
+   is, ziet geen intake, geen vragenlijst en geen lijst met eigen scans. Heeft
+   een Lead niets aan staan en geen scans, dan staat er een korte melding dat
+   er nog niets voor hem klaarstaat (`beheerpagina.md`, punt 6a).
 
    **In de header van "Mijn metingen" staan de 4 vaste content-links**
    (zie de Globale layout hierboven, punt 1 van `.nav-right`), elk naar

@@ -544,6 +544,21 @@ flex-start` op de rij, elk veld met label in een eigen kolom). Alleen met
 gelijke veldhoogte en gelijke labelhoogte lijnen de titels van beide
 elementen boven netjes uit.
 
+**Veldenrij met labels en een knop.** Dit geldt voor elke rij waarin velden met
+een label erboven naast elkaar staan, met of zonder knop erachter, zoals het
+plannen van een Meting (Assessment-type, Ronde, Onderdeel en "+ Meting
+plannen"). De rij heeft `align-items: flex-start`, nooit `flex-end` of
+`center`, en elk veld staat met zijn label in een eigen kolom. Alle labels
+hebben dezelfde hoogte, dus alle velden beginnen op dezelfde bovenrand. Een
+knop in de rij krijgt bovenaan een lege ruimte ter hoogte van een label
+(`padding-top` of een lege labelregel), zodat hij op de hoogte van de velden
+staat en niet op die van de labels. Hulptekst onder één veld, zoals "Wordt:
+0-meting" onder Ronde, maakt de rij niet hoger en duwt de andere velden niet
+omlaag. Hij staat onder de rij, of absoluut gepositioneerd onder zijn eigen
+veld, zodat de kolom van dat veld niet hoger wordt dan de andere. Bij `flex-end`
+zakken anders alle velden zonder hulptekst naar beneden, en staat Assessment-type
+lager dan Ronde en Onderdeel.
+
 **Dropdowns (`select.field`, `.admin-field select` en de compacte select in
 een knoppenrij).** De pijl van de browser staat uit (`appearance: none`).
 In plaats daarvan staat er een eigen chevron als achtergrondafbeelding,
@@ -731,8 +746,8 @@ een klik naast de modal of de terugknop van de browser.
 
 ### Vervolgstappen
 
-Een actie die meer vraagt dan één klik (verplaatsen, samenvoegen,
-Lead-toegang beheren) vervangt de inhoud van dezelfde Overzichtsmodal door
+Een actie die meer vraagt dan één klik (verplaatsen, samenvoegen)
+vervangt de inhoud van dezelfde Overzichtsmodal door
 een korte stap, geen tweede modal erbovenop. Bovenaan "← Terug"
 (`.overzicht-stap-terug`), dan een kop, een korte uitleg, de keuzes en
 onderaan een `.btn-rij` met "Annuleren" (`.btn-outline`) en de

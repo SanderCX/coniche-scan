@@ -50,13 +50,13 @@ formaat anders is.
 
 ## Waar dit component een plek krijgt
 
-Nieuw punt in `beheerpagina.md`, als losse actie (niet gekoppeld
-aan één specifieke organisatie vooraf: De organisatie wordt per rij in
-de CSV bepaald, zie hieronder). Alleen voor een Admin. Een Consultant ziet
-alleen zijn eigen Organisaties en kan dus niet beoordelen of een
-Organisatie die de import nieuw aanmaakt zomaar toegevoegd mag worden. Hij
-krijgt op de tab Import een melding in plaats van de importfunctie
-(`beheerpagina.md`, punt 8).
+Een knop "Importeren" in het organisatie-detail (`beheerpagina.md`, punt 8),
+alleen voor een Admin. De import hoort bij die ene organisatie: Alle scans
+komen daar terecht. Een bestand kan rijen van andere organisaties bevatten;
+die koppel je aan deze organisatie of sla je over (zie Organisatie-matching).
+Een Consultant ziet de knop niet en krijgt bij de importroute een melding in
+plaats van de importfunctie. Tot 14 oktober 2026 was dit een tab Import met
+de organisatie per rij; die tab vervalt.
 
 ## Bronformaat "oude tool"
 
@@ -209,7 +209,7 @@ wordt vanzelf een extra keuze zolang een Respondent hem heeft.
   Respondent hebben. Dit was de fout bij het importeren van meerdere
   bestanden: Dezelfde Respondent kreeg alle notities als één tekst. De
   notitie is zichtbaar in de voorbeeldweergave van de import, in het
-  Scan-overzicht en in de lijst Ingevulde scans (kolom Notitie), en hij gaat
+  Scan-overzicht en in de scanlijst van het Meting-overzicht (kolom Notitie), en hij gaat
   mee naar een andere Meting en naar een andere Respondent samen met de scan
   (`beheerpagina.md`, "Scans samenbrengen in één Meting").
 - **Geen e-mailadres in de rij**: Het e-mailadres is verplicht, dus de rij
@@ -236,6 +236,16 @@ aan een bestaande organisatie (bijv. "<Organisatie> Zuid-Nederland" en
 "<Organisatie>" zijn mogelijk dezelfde klant, anders gespeld) of een
 nieuwe aanmaken. **Geen automatische fuzzy-match**: Dat risico (twee
 losse klanten samen laten vallen) is groter dan het gemak.
+
+**Vanuit een organisatie (voorstel van 14 oktober 2026).** De import start in
+het organisatie-detail, dus de doelorganisatie ligt vast. Per unieke
+organisatienaam in het bestand zijn er twee keuzes: Koppelen aan deze
+organisatie (de standaard bij een exacte match met de naam van deze
+organisatie) of overslaan. "Nieuw aanmaken" en koppelen aan een andere
+bestaande organisatie bestaan niet meer. Staan er in een bestand rijen van
+meerdere klanten, dan importeer je het bestand per organisatie opnieuw, elke
+keer vanuit die organisatie. Een nieuwe organisatie maak je eerst aan met
+"Aanmaken" (`beheerpagina.md`, punt 4).
 
 Gaat dit een keer toch mis, bijvoorbeeld twee net iets anders gespelde
 namen blijken achteraf dezelfde klant en zijn als twee losse
@@ -491,8 +501,8 @@ hoort.
    (bestaand, nieuw, nog te kiezen), aantal rijen per Assessment-type en
    aantal rijen met een probleem.
 4. **Organisaties koppelen**: Per unieke organisatienaam één keuze
-   (koppelen, nieuw aanmaken of overslaan), zie "Over rijen heen in één
-   bestand".
+   (koppelen aan de organisatie waarvanuit je importeert, of overslaan), zie
+   "Organisatie-matching" en "Over rijen heen in één bestand".
 5. **Voorbeeldweergave per rij** vóór het definitief importeren:
    Bestandsnaam, gedetecteerd of opgegeven Assessment-type, gevonden of
    nieuwe organisatie, gevonden of nieuwe respondent, aantal gematchte/niet-

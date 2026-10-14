@@ -2,7 +2,7 @@
 
 Legt de kolommen van de "Als CSV"-optie in de Exporteren-dropdown
 volledig vast (resultatenpagina, één scan, en `beheerpagina.md`
-punt 7, Ingevulde scans, één of meerdere scans — zelfde kolomstructuur
+punt 5 en 7, Meting-overzicht en Resultaten, één of meerdere scans — zelfde kolomstructuur
 in beide gevallen, alleen het aantal rijen verschilt). Vergelijkbaar
 van opzet met de CSV die we importeren (`import-scans.md`),
 maar dan met onze eigen velden, correct volgens `datamodel.md`, en
@@ -14,8 +14,8 @@ risico op een tweede, afwijkende bron van waarheid.
 ## Waar dit een plek krijgt
 
 Bestaande "Als CSV"-optie in de Exporteren-dropdown: Resultatenpagina
-(één scan) en `beheerpagina.md` punt 7, Ingevulde scans (één of
-meerdere geselecteerde scans). Zelfde exportfunctie, zelfde kolommen,
+(één scan) en `beheerpagina.md` punt 5 en 7, het Meting-overzicht en de lijsten onder
+Resultaten (één of meerdere geselecteerde scans). Zelfde exportfunctie, zelfde kolommen,
 of het nu 1 of N rijen oplevert.
 
 ## Grain: één rij per ingevulde scan
@@ -31,10 +31,9 @@ bij de PDF- en InDesign-export.
 **Geen bulk-CSV-export over meerdere organisaties heen, in verband met
 datavermenging.** Concreet: Bulk-export (meerdere geselecteerde scans
 in één CSV) is mogelijk zodra alle geselecteerde scans bij dezelfde
-organisatie horen. Dat geldt zowel op de organisatie-gefilterde
-"Ingevulde scans"-lijst op de organisatie-detailpagina
-(`beheerpagina.md` punt 4) als op het globale overzicht (punt 7),
-ook als dat niet is gefilterd. Bevat de selectie scans van meer dan één
+organisatie horen. Dat geldt zowel in het Meting-overzicht
+(`beheerpagina.md` punt 5) als in de lijsten Rondes en Metingen onder
+Resultaten (punt 7), ook als die niet zijn gefilterd. Bevat de selectie scans van meer dan één
 organisatie, dan is "Exporteren" uitgeschakeld, met het Info-icoon
 `info.bulkExportOrganisatie` ernaast. Een export van één scan
 (één rij) kan altijd, ook op het globale overzicht.
@@ -168,7 +167,7 @@ deze afwijkingen:
 
 - **Eén scan** (resultatenpagina): `<Organisatie> - <Respondent> -
   <Meting>.csv`.
-- **Meerdere scans** (Ingevulde scans, bulk): `Ingevulde scans export
+- **Meerdere scans** (bulk, Meting-overzicht en Resultaten): `Ingevulde scans export
   <datum>.csv`.
 
 ## CSV-formaat
