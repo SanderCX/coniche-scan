@@ -129,6 +129,7 @@ export default function LeadResultatenPage({
             scanUitvoering={scanUitvoering}
             overzicht={<ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />}
             spreidingToegestaan={false}
+            antwoordenToegestaan={false}
             bereikAltijd={false}
             toonBenchmarkLink={false}
             toegestaneMetingIds={toegestaneIds}

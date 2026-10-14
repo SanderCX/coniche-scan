@@ -5,7 +5,9 @@ import { alleVragen } from "./assessment-structuur";
 import { bouwblokScore, overallScore } from "./scoring";
 import type { Assessment, ScanInvulling } from "./types";
 import {
+  antwoordenPerVraag,
   eenMeting,
+  initialenVan,
   groepStatistiek,
   klasseVan,
   kwantiel,
@@ -256,5 +258,66 @@ describe("E. Matrix", () => {
     expect(w.rijen).toHaveLength(8);
     expect(w.rijen.every((r) => r.rij.groepNaam === null || typeof r.rij.groepNaam === "string")).toBe(true);
     expect(w.totaal).toBe(bouwblokScore(ai.bouwblokken![0], scan("s", 4, "afgerond", ai).antwoorden));
+  });
+});
+
+describe("G. Antwoorden per vraag", () => {
+  const namen: Record<string, string> = { s1: "Jan de Vries", s2: "Anna Bakker", s3: "Jeroen Visser", s4: "Piet" };
+  const naamVan = (i: ScanInvulling) => namen[i.id] ?? i.id;
+
+  it("heeft een kolom per afgeronde scan, alfabetisch op achternaam, met initialen die te onderscheiden zijn", () => {
+    const w = antwoordenPerVraag(a, [scan("s1", 3), scan("s2", 4), scan("s3", 5), scan("s4", 2), scan("s5", 1, "bezig")], naamVan);
+    // Bakker, Piet (de hele naam als achternaam), Visser, de Vries: op het laatste woord.
+    expect(w.kolommen.map((k) => k.naam)).toEqual(["Anna Bakker", "Piet", "Jeroen Visser", "Jan de Vries"]);
+    expect(w.aantalRespondenten).toBe(4);
+    // JV (Jeroen Visser) en JV (Jan de Vries) hebben dezelfde initialen: Het tweede krijgt een volgnummer.
+    expect(w.kolommen.map((k) => k.initialen)).toEqual(["AB", "PI", "JV", "JV2"]);
+    expect(initialenVan("Jan")).toBe("JA");
+    expect(initialenVan("")).toBe("?");
+  });
+
+  it("toont per vraag de antwoorden, per bouwblok de score van de respondent, en de gemiddelden en N", () => {
+    const w = antwoordenPerVraag(a, [scan("s1", 2), scan("s2", 4)], naamVan);
+    expect(w.rijen).toHaveLength(15);
+    const eerste = w.rijen[0];
+    expect(eerste.vragen).toHaveLength(4);
+    expect(eerste.vragen[0].nummer).toBe(`${eerste.rij.bouwblok.volgnummer}.1`);
+    // Volgorde: s2 Anna Bakker (4), s1 Jan de Vries (2).
+    expect(eerste.vragen[0].antwoorden).toEqual([4, 2]);
+    expect(eerste.vragen[0].gemiddelde).toBe(3);
+    expect(eerste.vragen[0].n).toBe(2);
+    expect(eerste.scores).toEqual([4, 2]);
+    expect(eerste.gemiddelde).toBe(3);
+    expect(eerste.n).toBe(8);
+    expect(w.beantwoord).toBe(w.mogelijk);
+  });
+
+  it("de totaalscore per respondent en de Meting komt uit de gedeelde scorefunctie met de gewichten", () => {
+    const s1 = scan("s1", (i) => (i % 3) + 1);
+    const s2 = scan("s2", 4);
+    const w = antwoordenPerVraag(a, [s1, s2], naamVan);
+    expect(w.totaal).toEqual([overallScore(a, s2.antwoorden), overallScore(a, s1.antwoorden)]);
+    // De totaalscore van de Meting is die van het gemiddelde antwoord per vraag, gelijk aan weergave A.
+    expect(w.totaalGemiddelde).toBe(eenMeting(a, [s1, s2]).totaal);
+  });
+
+  it("een onbeantwoorde vraag is een lege cel en telt niet mee in N, het gemiddelde of het percentage", () => {
+    const s1 = scan("s1", 4);
+    const eersteVraag = alleVragen(a)[0].id;
+    delete s1.antwoorden[eersteVraag];
+    const w = antwoordenPerVraag(a, [s1, scan("s2", 2)], naamVan);
+    const vraag = w.rijen[0].vragen[0];
+    // s2 (Anna Bakker) staat eerst: 2, en s1 (Jan de Vries) heeft geen antwoord.
+    expect(vraag.antwoorden).toEqual([2, null]);
+    expect(vraag.n).toBe(1);
+    expect(vraag.gemiddelde).toBe(2);
+    expect(w.beantwoord).toBe(w.mogelijk - 1);
+  });
+
+  it("een Meting zonder afgeronde scans geeft een lege weergave, en de laagste en hoogste vraag volgen uit de gemiddelden", () => {
+    expect(antwoordenPerVraag(a, [scan("s1", 3, "bezig")], naamVan).kolommen).toHaveLength(0);
+    const w = antwoordenPerVraag(a, [scan("s1", (i) => (i === 0 ? 1 : 5)), scan("s2", (i) => (i === 0 ? 1 : 5))], naamVan);
+    expect(w.laagsteVraag).toMatchObject({ score: 1 });
+    expect(w.hoogsteVraag).toMatchObject({ score: 5 });
   });
 });

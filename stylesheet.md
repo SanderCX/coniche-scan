@@ -685,7 +685,7 @@ een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
   een link, het laatste deel staat in `var(--ink)` en is niet klikbaar. Een
   link krijgt bij hover `var(--or)`.
 - **Weergave-schakelaar** (`.weergave-wissel`, besloten op
-  12 oktober 2026, gebouwd op 13 oktober 2026 voor 2 tot 3 knoppen, de vierde knop Antwoorden is voorstel): Een rij van 2 tot 4 knoppen aan elkaar
+  12 oktober 2026, gebouwd op 13 oktober 2026, ook met de vierde knop Antwoorden): Een rij van 2 tot 4 knoppen aan elkaar
   op een resultatenpagina, onder de kop en boven de inhoud. Hij is bedoeld
   voor het wisselen van weergave binnen één pagina en dus niet voor
   navigatie, de bestaande tabbalk blijft voor lijstpagina's. Gezamenlijke

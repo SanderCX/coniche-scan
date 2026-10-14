@@ -13,15 +13,16 @@ import {
   vergelijkbareMetingen,
   voldoetAanMinScans,
 } from "@/lib/rondes";
-import { eenMeting, spreiding, tussenMetingen } from "@/lib/visualisatie";
+import { antwoordenPerVraag, eenMeting, spreiding, tussenMetingen } from "@/lib/visualisatie";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { WeergaveWissel } from "./WeergaveWissel";
 import { WeergaveBouwblok } from "./WeergaveBouwblok";
 import { WeergaveSpreiding } from "./WeergaveSpreiding";
+import { WeergaveAntwoorden } from "./WeergaveAntwoorden";
 import { WeergaveVergelijking } from "./WeergaveVergelijking";
 import { STANDAARD_ONDERDEEL } from "@/lib/rondes";
 
-type Weergave = "overzicht" | "bouwblok" | "spreiding";
+type Weergave = "overzicht" | "bouwblok" | "spreiding" | "antwoorden";
 
 /**
  * De weergaven op de resultatenpagina van een Meting (`visualisatie-scores.md`, Navigatie): Overzicht (de bestaande pagina,
@@ -29,7 +30,8 @@ type Weergave = "overzicht" | "bouwblok" | "spreiding";
  * staat in de adresbalk (`?weergave=bouwblok|spreiding`, `?vergelijk=<metingId>`), zodat de terugknop werkt en de link te
  * delen is. Wisselen is een knop en geen link.
  *
- * Een Lead krijgt Overzicht en Per bouwblok en de vergelijking. Spreiding is er voor hem alleen als een Admin die heeft
+ * Admin en Consultant zien daarnaast Antwoorden (G, `antwoordenToegestaan`): De antwoorden per vraag en per respondent, met naam.
+ * Een Lead ziet die weergave nooit. Een Lead krijgt Overzicht en Per bouwblok en de vergelijking. Spreiding is er voor hem alleen als een Admin die heeft
  * toegewezen (`benchmark.md`), dus `spreidingToegestaan` is dan uit. Voor een Lead staat de lijn van laagste tot hoogste
  * score pas aan vanaf `benchmarkMinRespondenten` (`toonBereik`).
  */
@@ -49,6 +51,8 @@ interface Props {
   overzicht: React.ReactNode;
   /** Wie de weergave Spreiding mag zien: Admin en Consultant ja, een Lead alleen via een toegewezen view. */
   spreidingToegestaan: boolean;
+  /** Wie de weergave Antwoorden (G) mag zien: Alleen een Admin en Consultant, nooit een Lead, ook niet bij een toewijzing. */
+  antwoordenToegestaan: boolean;
   /** De lijn van laagste tot hoogste score: Voor een Admin altijd, voor een Lead pas vanaf `benchmarkMinRespondenten`. */
   bereikAltijd: boolean;
   /**
@@ -66,6 +70,7 @@ function MetingWeergavenInhoud({
   scanUitvoering,
   overzicht,
   spreidingToegestaan,
+  antwoordenToegestaan,
   bereikAltijd,
   toegestaneMetingIds,
   toonBenchmarkLink,
@@ -78,7 +83,11 @@ function MetingWeergavenInhoud({
 
   const weergaveParam = zoek.get("weergave");
   const weergave: Weergave =
-    weergaveParam === "bouwblok" || (weergaveParam === "spreiding" && spreidingToegestaan) ? weergaveParam : "overzicht";
+    weergaveParam === "bouwblok" ||
+    (weergaveParam === "spreiding" && spreidingToegestaan) ||
+    (weergaveParam === "antwoorden" && antwoordenToegestaan && !isSamengesteld(scanUitvoering))
+      ? weergaveParam
+      : "overzicht";
   const vergelijkId = zoek.get("vergelijk");
 
   const huidigeScans = aantalAfgerondInMeting(organisatie, scanUitvoering);
@@ -169,6 +178,8 @@ function MetingWeergavenInhoud({
     { waarde: "overzicht", label: "Overzicht" },
     { waarde: "bouwblok", label: "Per bouwblok" },
     ...(spreidingToegestaan ? [{ waarde: "spreiding" as Weergave, label: "Spreiding" }] : []),
+    // Een samengestelde Meting heeft geen scans en dus geen antwoorden per respondent.
+    ...(antwoordenToegestaan && !isSamengesteld(scanUitvoering) ? [{ waarde: "antwoorden" as Weergave, label: "Antwoorden" }] : []),
   ];
 
   return (
@@ -204,6 +215,16 @@ function MetingWeergavenInhoud({
       )}
       {weergave === "spreiding" && (
         <WeergaveSpreiding assessment={assessment} weergave={spreiding(assessment, scanUitvoering.invullingen)} />
+      )}
+
+      {weergave === "antwoorden" && (
+        <WeergaveAntwoorden
+          assessment={assessment}
+          weergave={antwoordenPerVraag(assessment, scanUitvoering.invullingen, (i) => {
+            const lid = organisatie.leden.find((l) => l.id === i.organisatieLidId);
+            return lid ? lid.naam || lid.email : "Onbekende respondent";
+          })}
+        />
       )}
 
       {benchmarkLinks.length > 0 && (

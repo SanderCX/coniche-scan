@@ -377,3 +377,112 @@
   min-width: 11rem;
   background: var(--bg);
 }
+
+/* Antwoorden per vraag (G, visualisatie-scores.md): Eén kolom per respondent, de bouwblokken uitklapbaar tot hun vragen. De
+   kaart scrolt zelf, met de kolomkop en de linkerkolom vast. De cellen hebben de vijf scorekleuren (stylesheet.md,
+   Scorekleuren), met witte tekst op 1 en 5 en donkere tekst op 2, 3 en 4. */
+.vis-antw-kaart {
+  max-height: 72vh;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.vis-antw {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--fs-s);
+}
+.vis-antw th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0.5rem 0.3rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink-m);
+}
+.vis-antw td {
+  padding: 0;
+  border-bottom: 1px solid var(--border);
+}
+.vis-antw th.vis-antw-naam,
+.vis-antw td.vis-antw-naam {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 18rem;
+  max-width: 26rem;
+  text-align: left;
+  background: var(--bg);
+}
+.vis-antw th.vis-antw-naam {
+  z-index: 3;
+  padding-left: 0.8rem;
+}
+.vis-antw-blok td.vis-antw-naam {
+  background: var(--bg-warm);
+  border-left: 4px solid var(--accent, var(--or));
+  font-weight: 700;
+  color: var(--ink);
+}
+.vis-antw-blok td {
+  height: 30px;
+  background: var(--bg-warm);
+}
+.vis-antw-vraag td {
+  height: 50px;
+}
+.vis-antw-vraagtekst {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  padding: 0.3rem 0.8rem 0.3rem 1.6rem;
+  font-weight: 400;
+  color: var(--ink-m);
+}
+.vis-antw-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.2rem 0.8rem 0.2rem 0.5rem;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.vis-antw-pijl {
+  width: 1rem;
+  color: var(--ink-s);
+}
+.vis-antw-cel {
+  min-width: 2.6rem;
+  text-align: center;
+  font-weight: 700;
+}
+.vis-antw td.vis-antw-cel--1 { background: var(--score-1); color: #fff; }
+.vis-antw td.vis-antw-cel--2 { background: var(--score-2); color: var(--ink); }
+.vis-antw td.vis-antw-cel--3 { background: var(--score-3); color: var(--ink); }
+.vis-antw td.vis-antw-cel--4 { background: var(--score-4); color: var(--ink); }
+.vis-antw td.vis-antw-cel--5 { background: var(--score-5); color: #fff; }
+.vis-antw td.vis-antw-cel--leeg {
+  background: var(--bg);
+}
+.vis-antw-zij {
+  min-width: 3rem;
+  text-align: center;
+  color: var(--ink-m);
+  white-space: nowrap;
+}
+.vis-antw-totaal td {
+  height: 36px;
+  border-top: 2px solid var(--border-d);
+}
