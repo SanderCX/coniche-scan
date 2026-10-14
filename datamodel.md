@@ -686,7 +686,7 @@ samen met de backend en de database.
 | Lead | Organisatie | De weergaven zien en doen die een Admin per Lead heeft aangevinkt: Resultaten, Spreiding, Antwoorden, Uitnodigen, Exporteren en benchmarkviews. Kan ook zelf invullen, maar hoeft niet |
 | (geen rol) | Organisatie | Gewone respondent: Eigen scans invullen en eigen resultaten zien |
 
-**Wat een Lead mag zien (voorstel van 14 oktober 2026).** Dit vervangt het
+**Wat een Lead mag zien (gebouwd op 14 oktober 2026).** Dit vervangt het
 bereik van een Lead (Specifieke Metingen of Hele organisatie), de koppeling
 `RespondentRolMeting`, het veld `leadVoorOrganisatie` en de toewijzing van
 benchmarkviews (`BenchmarkToewijzing`). Wat daarvan op 13 oktober 2026 is
@@ -1091,7 +1091,7 @@ gebeurtenis, zonder persoonsgegevens uit scans.
 - `benchmark.aangemaakt`, `benchmark.gewijzigd` en `benchmark.verwijderd`.
   `details` bevat de naam van de benchmark en de namen van de Assessments
   en organisaties zoals ze op dat moment waren.
-- `lead.toegangGewijzigd` (voorstel van 14 oktober 2026). `details` bevat de
+- `lead.toegangGewijzigd` (gebouwd op 14 oktober 2026). `details` bevat de
   organisatie, de weergave (resultaten, antwoorden of benchmark), de Meting of
   de benchmark en of het vinkje aan of uit is gezet, zonder naam of
   e-mailadres van de Lead. De gebeurtenissen `benchmark.toegewezen` en
@@ -1237,8 +1237,7 @@ BenchmarkLid {
 }
 ```
 
-`BenchmarkToewijzing` (gebouwd op 13 oktober 2026) vervalt in het voorstel van
-14 oktober 2026. Een view voor een Lead is een `LeadToegang` met `weergave:
+`BenchmarkToewijzing` (gebouwd op 13 oktober 2026) is op 14 oktober 2026 vervallen. Een view voor een Lead is een `LeadToegang` met `weergave:
 "benchmark"` (deel 2). Bestaande toewijzingen worden daarbij overgezet
 (`beheerpagina.md`, punt 6a, Overgang).
 
@@ -1262,15 +1261,14 @@ bestaan zolang de benchmark bestaat.
 - `metingen`: Alle leden hebben dezelfde `organisatieId`. Per Assessment zijn
   er meerdere leden, elk met een andere Meting.
 - `scans`: Eén lid, de Meting waarin de scans worden vergeleken. De scans
-  zelf zijn geen leden, want ze volgen uit de Meting. Voorstel van 14 oktober
-  2026: Deze waarde vervalt, want een view op een scan wordt niet meer aan een
-  Lead gegeven (`benchmark.md`, View voor een Lead). Niveau 3 blijft een
-  weergave voor de Admin.
+  zelf zijn geen leden, want ze volgen uit de Meting. Sinds 14 oktober 2026
+  wordt een view op een scan niet meer aan een Lead gegeven (`benchmark.md`,
+  View voor een Lead). Niveau 3 blijft bestaan als weergave voor de Admin.
 
 ### Uitbreiding op Organisatie
 
-`Organisatie` krijgt `antwoordenMetNamen` (boolean, standaard false, voorstel
-van 14 oktober 2026). Staat hij aan, dan ziet een Lead bij Antwoorden de namen
+`Organisatie` krijgt `antwoordenMetNamen` (boolean, standaard false, gebouwd
+op 14 oktober 2026). Staat hij aan, dan ziet een Lead bij Antwoorden de namen
 van de respondenten, en anders R1 tot en met Rn (`beheerpagina.md`, punt 6a).
 Een Admin zet hem na afstemming met de opdrachtgever. De intake en het
 toestemmingsvakje veranderen er niet door.

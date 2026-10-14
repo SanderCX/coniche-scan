@@ -15,12 +15,12 @@ import {
 } from "@/lib/rondes";
 import { antwoordenPerVraag, eenMeting, spreiding, tussenMetingen } from "@/lib/visualisatie";
 import { DropdownKnop } from "@/components/DropdownKnop";
+import { InfoIcoon } from "@/components/InfoIcoon";
 import { WeergaveWissel } from "./WeergaveWissel";
 import { WeergaveBouwblok } from "./WeergaveBouwblok";
 import { WeergaveSpreiding } from "./WeergaveSpreiding";
 import { WeergaveAntwoorden } from "./WeergaveAntwoorden";
 import { WeergaveVergelijking } from "./WeergaveVergelijking";
-import { STANDAARD_ONDERDEEL } from "@/lib/rondes";
 
 type Weergave = "overzicht" | "bouwblok" | "spreiding" | "antwoorden";
 
@@ -31,7 +31,8 @@ type Weergave = "overzicht" | "bouwblok" | "spreiding" | "antwoorden";
  * delen is. Wisselen is een knop en geen link.
  *
  * Admin en Consultant zien daarnaast Antwoorden (G, `antwoordenToegestaan`): De antwoorden per vraag en per respondent, met naam.
- * Een Lead ziet die weergave nooit. Een Lead krijgt Overzicht en Per bouwblok en de vergelijking. Spreiding is er voor hem alleen als een Admin die heeft
+ * Een Lead ziet die weergave alleen met het vinkje Antwoorden (en zonder namen als de organisatie dat niet heeft afgesproken,
+ * `antwoordenAnoniem`). Een Lead krijgt Overzicht en Per bouwblok en de vergelijking. Spreiding is er voor hem alleen als een Admin die heeft
  * toegewezen (`benchmark.md`), dus `spreidingToegestaan` is dan uit. Voor een Lead staat de lijn van laagste tot hoogste
  * score pas aan vanaf `benchmarkMinRespondenten` (`toonBereik`).
  */
@@ -51,8 +52,10 @@ interface Props {
   overzicht: React.ReactNode;
   /** Wie de weergave Spreiding mag zien: Admin en Consultant ja, een Lead alleen via een toegewezen view. */
   spreidingToegestaan: boolean;
-  /** Wie de weergave Antwoorden (G) mag zien: Alleen een Admin en Consultant, nooit een Lead, ook niet bij een toewijzing. */
+  /** Wie de weergave Antwoorden (G) mag zien: Een Admin en Consultant, en een Lead met het vinkje in de tabel Leads. */
   antwoordenToegestaan: boolean;
+  /** Antwoorden zonder namen (R1 tot en met Rn): Voor een Lead als `Organisatie.antwoordenMetNamen` uit staat. */
+  antwoordenAnoniem?: boolean;
   /** De lijn van laagste tot hoogste score: Voor een Admin altijd, voor een Lead pas vanaf `benchmarkMinRespondenten`. */
   bereikAltijd: boolean;
   /**
@@ -71,6 +74,7 @@ function MetingWeergavenInhoud({
   overzicht,
   spreidingToegestaan,
   antwoordenToegestaan,
+  antwoordenAnoniem = false,
   bereikAltijd,
   toegestaneMetingIds,
   toonBenchmarkLink,
@@ -91,13 +95,14 @@ function MetingWeergavenInhoud({
   const vergelijkId = zoek.get("vergelijk");
 
   const huidigeScans = aantalAfgerondInMeting(organisatie, scanUitvoering);
-  // De voorgestelde vorige Meting staat bovenaan: Dezelfde combinatie van onderdeel en Assessment in de vorige ronde
-  // (`visualisatie-scores.md`, C). Beide Metingen moeten aan `benchmarkMinScans` voldoen.
+  // "Vergelijk met vorige ronde" (`visualisatie-scores.md`, C): Alleen dezelfde combinatie van onderdeel en Assessment in een
+  // eerdere ronde, de meest recente bovenaan. Beide Metingen moeten aan `benchmarkMinScans` voldoen.
   const vergelijkbaar = useMemo(
     () =>
       voldoetAanMinScans(organisatie, scanUitvoering, instellingen.benchmarkMinScans)
         ? vergelijkbareMetingen(organisatie, scanUitvoering).filter(
             (v) =>
+              v.ontwikkeling &&
               voldoetAanMinScans(organisatie, v.meting, instellingen.benchmarkMinScans) &&
               (!toegestaneMetingIds || toegestaneMetingIds.includes(v.meting.id))
           )
@@ -191,18 +196,24 @@ function MetingWeergavenInhoud({
           waarde={weergave}
           onChange={(w) => zet({ weergave: w === "overzicht" ? null : w })}
         />
+        {vergelijkbaar.length === 0 && (
+          <span className="knop-met-icoon">
+            <button type="button" className="btn btn-outline btn-compact" disabled>
+              Vergelijk met vorige ronde
+            </button>
+            <InfoIcoon sleutel="info.vergelijkRonde" naastVeld />
+          </span>
+        )}
         {vergelijkbaar.length === 1 && (
           <button type="button" className="btn btn-outline btn-compact" onClick={() => zet({ vergelijk: vergelijkbaar[0].meting.id })}>
-            Vergelijk met vorige Meting
+            Vergelijk met vorige ronde
           </button>
         )}
         {vergelijkbaar.length > 1 && (
           <DropdownKnop
-            label="Vergelijk met vorige Meting"
+            label="Vergelijk met vorige ronde"
             opties={vergelijkbaar.map((v) => ({
-              label: [v.meting.label, v.ronde?.label, v.onderdeel !== STANDAARD_ONDERDEEL ? v.onderdeel : null]
-                .filter((x, i, a) => x && a.indexOf(x) === i)
-                .join(" · "),
+              label: v.ronde?.label ?? v.meting.label,
               onClick: () => zet({ vergelijk: v.meting.id }),
             }))}
           />
@@ -220,10 +231,15 @@ function MetingWeergavenInhoud({
       {weergave === "antwoorden" && (
         <WeergaveAntwoorden
           assessment={assessment}
-          weergave={antwoordenPerVraag(assessment, scanUitvoering.invullingen, (i) => {
-            const lid = organisatie.leden.find((l) => l.id === i.organisatieLidId);
-            return lid ? lid.naam || lid.email : "Onbekende respondent";
-          })}
+          weergave={antwoordenPerVraag(
+            assessment,
+            scanUitvoering.invullingen,
+            (i) => {
+              const lid = organisatie.leden.find((l) => l.id === i.organisatieLidId);
+              return lid ? lid.naam || lid.email : "Onbekende respondent";
+            },
+            { anoniem: antwoordenAnoniem }
+          )}
         />
       )}
 

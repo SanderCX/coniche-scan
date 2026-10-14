@@ -6,7 +6,6 @@ import { zoekScanInvulling } from "./scans";
 import { genereerUniekeToegangscode } from "./respondenten";
 import { logAudit, nieuweGroepId } from "../audit-store";
 import { metingContext, organisatieContext } from "../audit-context";
-import { verwijderToewijzingenVanRespondenten } from "../benchmark-store";
 
 /** Respondenten en scans verplaatsen of samenvoegen: binnen een organisatie, tussen organisaties en bij een e-mailconflict (beheerpagina.md, punt 6b). */
 
@@ -255,16 +254,15 @@ export function verplaatsRespondentNaarOrganisatie(
   // verwijzen naar Metingen van de oude organisatie en vervallen.
   if (!doelLid) {
     bronOrganisatie.leden = bronOrganisatie.leden.filter((l) => l.id !== lidId);
-    doelOrganisatie.leden.push({ ...lid, organisatieId: doelOrganisatie.id, leadMetingIds: [], leadVoorOrganisatie: false });
+    doelOrganisatie.leden.push({ ...lid, organisatieId: doelOrganisatie.id, lead: undefined });
   } else if (resultaat.overgeslagen.length === 0) {
     bronOrganisatie.leden = bronOrganisatie.leden.filter((l) => l.id !== lidId);
     resultaat.respondentVerwijderd = true;
   }
 
+  // De Lead-rol gaat niet mee naar een andere organisatie: De vinkjes bij de bronorganisatie vallen weg in `slaAlles`
+  // (`ruimLeadToegangOp`, `datamodel.md`, Verplaatsen, samenvoegen en importeren).
   slaAlles(alles);
-  // Een verplaatste of samengevoegde Respondent verliest zijn Lead-rol bij de bronorganisatie, dus ook zijn
-  // benchmarktoewijzingen daar (`datamodel.md`, Verwijderen en datakoppelingen).
-  if (resultaat.respondentVerwijderd || resultaat.ok) verwijderToewijzingenVanRespondenten([lidId]);
   const metingNaam = (organisatie: Organisatie, id: string) =>
     organisatie.scanUitvoeringen.find((s) => s.id === id)?.label ?? null;
   logAudit({
@@ -352,8 +350,6 @@ export function verplaatsResponsNaarOrganisatie(
       team: bronLid.team,
       notities: bronLid.notities,
       toegangscode: genereerUniekeToegangscode(alles),
-      leadMetingIds: [],
-      leadVoorOrganisatie: false,
       aangemaaktOp: new Date().toISOString(),
     };
     doelOrganisatie.leden.push(doelLid);

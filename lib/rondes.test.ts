@@ -41,7 +41,7 @@ const inv = (id: string, metingId: string, lidId: string, waarde: number, status
 const meting = (id: string, extra: Partial<ScanUitvoering> = {}): ScanUitvoering => ({
   id, organisatieId: "O", assessmentId: A.id, label: id, aangemaaktOp: "2026-01-01T00:00:00.000Z", invullingen: [], ...extra,
 });
-const lid = (id: string) => ({ id, organisatieId: "O", email: `${id}@x.nl`, naam: id, functie: "", team: "", notities: "", toegangscode: `c${id}`, leadMetingIds: [], aangemaaktOp: "x" });
+const lid = (id: string) => ({ id, organisatieId: "O", email: `${id}@x.nl`, naam: id, functie: "", team: "", notities: "", toegangscode: `c${id}`, aangemaaktOp: "x" });
 const org = (extra: Partial<Organisatie> = {}): Organisatie => ({
   id: "O", naam: "Org", kenmerken: {}, leden: [lid("L1"), lid("L2")], scanUitvoeringen: [], rondes: [], aangemaaktDoor: null, toegewezenAan: [],
   benchmarkToegestaan: false, aangemaaktOp: "x", gewijzigdOp: "x", ...extra,

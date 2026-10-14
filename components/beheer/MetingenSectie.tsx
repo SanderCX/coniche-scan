@@ -18,13 +18,17 @@ import { Modal } from "@/components/Modal";
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { SamengesteldeMetingFormulier } from "@/components/beheer/SamengesteldeMetingFormulier";
 import { NaarRondeModal } from "@/components/beheer/NaarRondeModal";
+import { RondeKnoppen } from "@/components/beheer/RondeKnoppen";
 import {
   OnderdeelRondeVelden,
   OnderdeelRondeWaarde,
   beginWaarde,
+  metingNaam,
   rondeDoel,
 } from "@/components/beheer/OnderdeelRondeVelden";
 import { InfoIcoon } from "@/components/InfoIcoon";
+import { useIngelogdeGebruiker } from "@/lib/admin-auth";
+import { magImporteren } from "@/lib/rechten";
 
 /**
  * De Metingen van een organisatie, gegroepeerd per ronde (`beheerpagina.md`, punt 5, "Lijst Metingen in het
@@ -34,6 +38,7 @@ import { InfoIcoon } from "@/components/InfoIcoon";
  */
 export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
   const router = useRouter();
+  const ingelogd = useIngelogdeGebruiker();
   const assessments = useAssessments();
   const rondes = rondesNieuwsteEerst(organisatie);
   const assessmentNaam = (id: string) => assessments.find((a) => a.id === id)?.naam ?? "Onbekend type";
@@ -129,11 +134,9 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
           <button type="button" className="btn btn-outline btn-compact" onClick={() => { setConcept({ ...waarde, ronde: r.id }); document.getElementById("meting-plannen")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}>
             + Meting aan deze ronde
           </button>
-          <button type="button" className="btn btn-outline btn-compact" onClick={() => setGemiddeldeRondeId(r.id)}>
-            Gemiddelde van deze ronde
-          </button>
+          <RondeKnoppen organisatie={organisatie} ronde={r} onGemiddelde={() => setGemiddeldeRondeId(r.id)} />
           <Link href={`/beheer/rondes/${r.id}`} className="btn btn-outline btn-compact">
-            Overzicht
+            Resultaten van deze ronde →
           </Link>
         </span>
       </div>
@@ -156,9 +159,22 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
         <button type="button" className="btn btn-or btn-compact" disabled={rondes.length === 0} onClick={() => setNieuweRondeOpen(true)}>
           Nieuwe ronde starten
         </button>
+        {/* Importeren (`beheerpagina.md`, punt 8): Rechts in de kop, alleen voor een Admin. */}
+        {magImporteren(ingelogd) && (
+          <button
+            type="button"
+            className="btn btn-outline btn-compact"
+            style={{ marginLeft: "auto" }}
+            onClick={() => router.push(`/beheer/organisaties/${organisatie.id}/import`)}
+          >
+            Importeren
+          </button>
+        )}
       </div>
 
-      <form id="meting-plannen" onSubmit={plan} className="filter-rij flex flex-wrap items-end gap-3 mb-4" style={{ marginTop: "1rem" }}>
+      {/* Veldenrij met labels en een knop (`stylesheet.md`, Formulieren): `items-start`, elk veld met zijn label in een eigen
+          kolom, de knop met een lege labelregel erboven. De regel "Wordt: …" staat onder de rij en duwt geen veld omlaag. */}
+      <form id="meting-plannen" onSubmit={plan} className="filter-rij flex flex-wrap items-start gap-3" style={{ marginTop: "1rem" }}>
         <div className="admin-field" style={{ marginBottom: 0 }}>
           <label>Assessment-type</label>
           <select value={keuzeAssessment} onChange={(e) => setAssessmentId(e.target.value)}>
@@ -169,13 +185,21 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
             ))}
           </select>
         </div>
-        <div style={{ flex: "1 1 auto" }}>
-          <OnderdeelRondeVelden organisatie={organisatie} waarde={waarde} onChange={setConcept} idPrefix="meting-plannen" />
+        <OnderdeelRondeVelden organisatie={organisatie} waarde={waarde} onChange={setConcept} idPrefix="meting-plannen" inRij />
+        <div className="admin-field" style={{ marginBottom: 0 }}>
+          <label aria-hidden="true" style={{ visibility: "hidden" }}>
+            &nbsp;
+          </label>
+          <button type="submit" className="btn btn-or btn-compact">
+            + Meting plannen
+          </button>
         </div>
-        <button type="submit" className="btn btn-or btn-compact">
-          + Meting plannen
-        </button>
       </form>
+      {metingNaam(organisatie, waarde) && (
+        <p className="text-sm text-ink-m" style={{ margin: "0.5rem 0 1rem" }}>
+          Wordt: <strong>{metingNaam(organisatie, waarde)}</strong>
+        </p>
+      )}
       {fout && <p className="overzicht-melding fout">{fout}</p>}
 
       {gekozen.length > 0 && (

@@ -2,7 +2,6 @@ import { Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering, ScanWeergav
 import { laadAlles, slaAlles, useOrganisaties } from "./store";
 import { logAudit, nieuweGroepId } from "../audit-store";
 import { metingContext } from "../audit-context";
-import { verwijderToewijzingenVanScans } from "../benchmark-store";
 
 /** Ingevulde scans (`ScanInvulling`): opzoeken, bijwerken, intake, bewaartermijn, verwijderen en de integriteitscontrole. */
 
@@ -169,5 +168,4 @@ export function verwijderScanInvullingen(scanInvullingIds: string[]): void {
   slaAlles(alles);
   logAudit(gelogd);
   // Niveau 3: De toewijzingen met de Respondent van een verwijderde scan als onderwerp vervallen (`datamodel.md`).
-  verwijderToewijzingenVanScans(verwijderdeScans);
 }

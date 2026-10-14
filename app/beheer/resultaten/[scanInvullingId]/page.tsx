@@ -11,6 +11,8 @@ import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { ExporterenNavKnop } from "@/components/beheer/ExporterenNavKnop";
 import { useBeheerNavActions } from "@/components/beheer/BeheerNavActions";
 import { useInstellingen } from "@/lib/instellingen-store";
+import { kruimelsVoorMeting, VIA_RESULTATEN } from "@/lib/resultaten-nav";
+import { rondeVan } from "@/lib/rondes";
 import { aantalAfgerond } from "@/lib/benchmark";
 import { spreiding } from "@/lib/visualisatie";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
@@ -29,6 +31,7 @@ export default function BeheerResultatenPage({ params }: { params: Promise<{ sca
   const gegevens = useScanInvulling(scanInvullingId);
   const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
   const ingelogd = useIngelogdeGebruiker();
+  const via = useSearchParams().get("via") === VIA_RESULTATEN;
 
   useBeheerNavActions(<ExporterenNavKnop scanInvullingId={scanInvullingId} />);
 
@@ -56,12 +59,7 @@ export default function BeheerResultatenPage({ params }: { params: Promise<{ sca
   return (
     <div className="admin-main admin-main--breed">
       <Kruimelpad
-        delen={[
-          { label: "Organisaties", href: "/beheer/organisaties" },
-          { label: organisatie.naam, href: `/beheer/organisaties/${organisatie.id}` },
-          { label: scanUitvoering.label, href: `/beheer/metingen/${scanUitvoering.id}` },
-          { label: `Resultaten van ${naam}` },
-        ]}
+        delen={kruimelsVoorMeting(organisatie, scanUitvoering, rondeVan(organisatie, scanUitvoering), via, `Resultaten van ${naam}`)}
       />
       {invulling.status !== "afgerond" ? (
         <p className="admin-notice">De scan van {naam} is nog niet afgerond, er zijn nog geen resultaten.</p>

@@ -237,7 +237,7 @@ aan een bestaande organisatie (bijv. "<Organisatie> Zuid-Nederland" en
 nieuwe aanmaken. **Geen automatische fuzzy-match**: Dat risico (twee
 losse klanten samen laten vallen) is groter dan het gemak.
 
-**Vanuit een organisatie (voorstel van 14 oktober 2026).** De import start in
+**Vanuit een organisatie (gebouwd op 14 oktober 2026).** De import start in
 het organisatie-detail, dus de doelorganisatie ligt vast. Per unieke
 organisatienaam in het bestand zijn er twee keuzes: Koppelen aan deze
 organisatie (de standaard bij een exacte match met de naam van deze

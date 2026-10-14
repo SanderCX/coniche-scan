@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { metVia, VIA_RESULTATEN } from "@/lib/resultaten-nav";
 import { verwijderScanInvullingen } from "@/lib/db";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magScanVerwijderen } from "@/lib/rechten";
@@ -43,6 +45,7 @@ export function ScanOverzicht({
   onOpenRespondent: () => void;
 }) {
   const ingelogd = useIngelogdeGebruiker();
+  const via = useSearchParams().get("via") === VIA_RESULTATEN;
   const [naarMeting, setNaarMeting] = useState(false);
   const [andereRespondent, setAndereRespondent] = useState(false);
   const [verwijderenOpen, setVerwijderenOpen] = useState(false);
@@ -185,7 +188,7 @@ export function ScanOverzicht({
               </div>
               <div className="overzicht-acties">
                 {afgerond && (
-                  <Link href={`/beheer/resultaten/${invulling.id}`} className="btn btn-outline btn-compact">
+                  <Link href={metVia(`/beheer/resultaten/${invulling.id}`, via)} className="btn btn-outline btn-compact">
                     Resultaten bekijken
                   </Link>
                 )}

@@ -4,7 +4,7 @@ import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAssessment } from "@/lib/assessment-store";
-import { nodigLidUit, useScanUitvoering, verwijderLeden, verwijderMeting } from "@/lib/db";
+import { nodigLidUit, useScanUitvoering, verwijderMeting, verwijderScanInvullingen } from "@/lib/db";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magOrganisatieToegang } from "@/lib/rechten";
 import { aantalBenchmarksMetMeting } from "@/lib/benchmark-store";
@@ -12,7 +12,9 @@ import { voortgang } from "@/lib/scoring";
 import { maakPubliekeLink } from "@/lib/uitnodiging-link";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { useBulkSelect } from "@/lib/useBulkSelect";
-import { useBeheerOverzicht } from "@/lib/beheer-url";
+import { useBeheerOverzicht, useUrlParams } from "@/lib/beheer-url";
+import { kruimelsVoorMeting, metVia, VIA_RESULTATEN } from "@/lib/resultaten-nav";
+import { rolTeamTekst } from "@/components/beheer/overzicht-helpers";
 import { CsvRijContext } from "@/lib/csv-export";
 import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/scan-export";
 import { IndeterminateCheckbox } from "@/components/beheer/IndeterminateCheckbox";
@@ -24,7 +26,8 @@ import { NaarAndereMetingStap, ScanVerplaatsResultaat } from "@/components/behee
 import { conflictActies } from "@/components/beheer/ConflictHost";
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { STATUS_LABEL } from "@/components/beheer/overzicht-helpers";
-import { heeftBereikOpMeting, isLead } from "@/lib/lead";
+import { isLead } from "@/lib/lead";
+import { leadsMetToegangTotMeting } from "@/lib/lead-toegang";
 import { STANDAARD_ONDERDEEL, isSamengesteld, onderdeelVan, rondeVan } from "@/lib/rondes";
 import { MetingWijzigenFormulier } from "@/components/beheer/MetingWijzigenFormulier";
 import { SamengesteldMetingOverzicht } from "@/components/beheer/SamengesteldMetingOverzicht";
@@ -35,6 +38,18 @@ import { NaarRondeModal } from "@/components/beheer/NaarRondeModal";
  * één plek. Een eigen pagina en geen modal, omdat er een lijst op staat
  * die op zijn beurt het Respondent-overzicht opent.
  */
+type ScanKolom = "naam" | "rolTeam" | "status" | "voortgang" | "gestart" | "aangemaakt" | "notitie";
+
+const SCAN_KOLOMMEN: { key: ScanKolom; label: string }[] = [
+  { key: "naam", label: "Naam" },
+  { key: "rolTeam", label: "Rol / team" },
+  { key: "status", label: "Status" },
+  { key: "voortgang", label: "Voortgang" },
+  { key: "gestart", label: "Gestart" },
+  { key: "aangemaakt", label: "Aangemaakt" },
+  { key: "notitie", label: "Notitie" },
+];
+
 export default function MetingOverzichtPage({ params }: { params: Promise<{ metingId: string }> }) {
   const { metingId } = use(params);
   const gegevens = useScanUitvoering(metingId);
@@ -42,6 +57,8 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
   const ingelogd = useIngelogdeGebruiker();
   const router = useRouter();
   const { open } = useBeheerOverzicht();
+  const { get: urlGet, set: urlSet } = useUrlParams();
+  const viaResultaten = urlGet("via") === VIA_RESULTATEN;
 
   const invullingen = gegevens?.scanUitvoering.invullingen ?? [];
   const bulk = useBulkSelect(invullingen.map((i) => i.id));
@@ -52,7 +69,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
   const [labelBewerken, setLabelBewerken] = useState(false);
   const [naarRondeOpen, setNaarRondeOpen] = useState(false);
   const [metingVerwijderenOpen, setMetingVerwijderenOpen] = useState(false);
-  const [respondentenVerwijderenOpen, setRespondentenVerwijderenOpen] = useState(false);
+  const [scansVerwijderenOpen, setScansVerwijderenOpen] = useState(false);
   const [naarMetingOpen, setNaarMetingOpen] = useState(false);
   const [pdfBezig, setPdfBezig] = useState(false);
 
@@ -82,7 +99,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
   }
 
   const afgerond = invullingen.filter((i) => i.status === "afgerond").length;
-  const leads = organisatie.leden.filter((l) => heeftBereikOpMeting(l, organisatie.id, scanUitvoering.id));
+  const leads = leadsMetToegangTotMeting(organisatie, scanUitvoering.id);
   const benchmarksMetMeting = aantalBenchmarksMetMeting(scanUitvoering.id);
 
   async function kopieer(id: string, url: string) {
@@ -124,10 +141,41 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
     else window.alert("Het exporteren als PDF is mislukt. Probeer het opnieuw.");
   }
 
-  function handleRespondentenVerwijderd() {
-    verwijderLeden(geselecteerdeInvullingen.map((i) => i.organisatieLidId));
+  function handleScansVerwijderd() {
+    verwijderScanInvullingen(geselecteerdeInvullingen.map((i) => i.id));
     bulk.clear();
-    setRespondentenVerwijderenOpen(false);
+    setScansVerwijderenOpen(false);
+  }
+
+  // Alle kolommen zijn sorteerbaar (`beheerpagina.md`, punt 5, Scans in deze Meting): Standaard op Naam.
+  const sortKolom = urlGet("sort", "naam") as ScanKolom;
+  const sortRichting = urlGet("dir", "asc") === "desc" ? "desc" : "asc";
+  const scanRijen = invullingen.flatMap((invulling) => {
+    const lid = organisatie.leden.find((l) => l.id === invulling.organisatieLidId);
+    if (!lid) return [];
+    return [
+      {
+        invulling,
+        lid,
+        naam: lid.naam || lid.email,
+        rolTeam: rolTeamTekst(lid),
+        status: invulling.status,
+        voortgang: voortgang(assessment!, invulling.antwoorden).percentage,
+        gestart: invulling.gestartOp ?? "",
+        aangemaakt: invulling.aangemaaktOp,
+        notitie: invulling.notitie ?? "",
+      },
+    ];
+  });
+  const gesorteerdeRijen = [...scanRijen].sort((a, b) => {
+    const va = a[sortKolom];
+    const vb = b[sortKolom];
+    const cmp = typeof va === "number" && typeof vb === "number" ? va - vb : String(va).localeCompare(String(vb), "nl");
+    return sortRichting === "asc" ? cmp : -cmp;
+  });
+  function handleSort(kolom: ScanKolom) {
+    if (kolom === sortKolom) urlSet({ dir: sortRichting === "asc" ? "desc" : "asc" });
+    else urlSet({ sort: kolom, dir: "asc" });
   }
 
   function handleVerplaatst(r: ScanVerplaatsResultaat) {
@@ -146,13 +194,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
 
   return (
     <div className="admin-main admin-main--breed">
-      <Kruimelpad
-        delen={[
-          { label: "Organisaties", href: "/beheer/organisaties" },
-          { label: organisatie.naam, href: `/beheer/organisaties/${organisatie.id}` },
-          { label: scanUitvoering.label },
-        ]}
-      />
+      <Kruimelpad delen={kruimelsVoorMeting(organisatie, scanUitvoering, rondeVan(organisatie, scanUitvoering), viaResultaten)} />
 
       {labelBewerken ? (
         <MetingWijzigenFormulier organisatie={organisatie} meting={scanUitvoering} onKlaar={() => setLabelBewerken(false)} />
@@ -178,7 +220,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
 
       <div className="overzicht-acties" style={{ margin: "1rem 0 0.5rem" }}>
         {afgerond > 0 && (
-          <Link href={`/beheer/rapportage/${scanUitvoering.id}`} className="btn btn-outline btn-compact">
+          <Link href={metVia(`/beheer/rapportage/${scanUitvoering.id}`, viaResultaten)} className="btn btn-outline btn-compact">
             Naar resultaten →
           </Link>
         )}
@@ -192,7 +234,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
 
       {leads.length > 0 && (
         <p className="text-sm text-ink-m" style={{ marginTop: "0.8rem" }}>
-          Leads met toegang tot deze Meting:{" "}
+          Leads die weergaven van deze Meting zien (tabel Leads van de organisatie):{" "}
           {leads.map((l, i) => (
             <span key={l.id}>
               {i > 0 && ", "}
@@ -204,7 +246,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
         </p>
       )}
 
-      <h2>Respondenten in deze Meting</h2>
+      <h2>Scans in deze Meting</h2>
       <form onSubmit={handleUitnodigen} className="flex items-stretch gap-3" style={{ maxWidth: "44rem" }}>
         <div className="admin-field flex-1" style={{ marginBottom: 0 }}>
           <input
@@ -248,8 +290,8 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
           <div className="mt-4" />
           <BulkToolbar
             aantal={bulk.selected.size}
-            onVerwijderen={() => setRespondentenVerwijderenOpen(true)}
-            verwijderLabel="Respondenten verwijderen"
+            onVerwijderen={() => setScansVerwijderenOpen(true)}
+            verwijderLabel="Verwijderen"
             onExporteren={() => {
               exporteerScansCsv(rijenVoorExport);
               bulk.clear();
@@ -267,12 +309,12 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
             onNaarAndereMeting={() => setNaarMetingOpen(true)}
           />
           <BevestigModal
-            open={respondentenVerwijderenOpen}
-            titel="Respondenten verwijderen"
-            bericht={`${bulk.selected.size} respondent(en) definitief verwijderen, met al hun ingevulde scans? Dit kan niet ongedaan gemaakt worden.`}
-            bevestigLabel="Respondenten verwijderen"
-            onBevestigen={handleRespondentenVerwijderd}
-            onAnnuleren={() => setRespondentenVerwijderenOpen(false)}
+            open={scansVerwijderenOpen}
+            titel="Scans verwijderen"
+            bericht={`${bulk.selected.size} scan(s) definitief verwijderen, met antwoorden en opmerkingen? De Respondenten zelf en hun scans in andere Metingen blijven bestaan. Dit kan niet ongedaan gemaakt worden.`}
+            bevestigLabel="Scans verwijderen"
+            onBevestigen={handleScansVerwijderd}
+            onAnnuleren={() => setScansVerwijderenOpen(false)}
           />
           <table className="admin-table">
             <thead>
@@ -284,36 +326,44 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
                     onChange={bulk.toggleAll}
                   />
                 </th>
-                <th>Naam</th>
-                <th>Status</th>
-                <th>Voortgang</th>
+                {SCAN_KOLOMMEN.map((k) => (
+                  <th key={k.key}>
+                    <button type="button" className="admin-sort-btn" onClick={() => handleSort(k.key)}>
+                      {k.label}
+                      {sortKolom === k.key ? (sortRichting === "asc" ? " ▲" : " ▼") : ""}
+                    </button>
+                  </th>
+                ))}
                 <th>Persoonlijke link</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              {invullingen.map((invulling) => {
-                const lid = organisatie.leden.find((l) => l.id === invulling.organisatieLidId);
-                if (!lid) return null;
-                const { percentage } = voortgang(assessment, invulling.antwoorden);
+              {gesorteerdeRijen.map(({ invulling, lid, naam, rolTeam, voortgang: percentage, notitie }) => {
                 const link = maakPubliekeLink(window.location.origin, lid);
                 return (
-                  <tr key={invulling.id} className="admin-table-rij-klikbaar" onClick={() => open("respondent", lid.id)}>
+                  <tr key={invulling.id} className="admin-table-rij-klikbaar" onClick={() => open("scan", invulling.id)}>
                     <td onClick={(e) => e.stopPropagation()}>
                       <input type="checkbox" checked={bulk.isSelected(invulling.id)} onChange={() => bulk.toggle(invulling.id)} />
                     </td>
                     <td>
-                      {lid.naam || <em className="text-ink-s">{lid.email}</em>}{" "}
+                      {lid.naam ? naam : <em className="text-ink-s">{naam}</em>}{" "}
                       {isLead(lid) && <span className="lead-badge">Lead</span>}
                     </td>
+                    <td>{rolTeam}</td>
                     <td>
                       <span className={`admin-badge status-${invulling.status}`}>{STATUS_LABEL[invulling.status]}</span>
                     </td>
                     <td>{percentage}%</td>
+                    <td>{invulling.gestartOp ? new Date(invulling.gestartOp).toLocaleDateString("nl-NL") : ""}</td>
+                    <td>{new Date(invulling.aangemaaktOp).toLocaleDateString("nl-NL")}</td>
+                    <td className="cel-notitie" title={notitie || undefined}>
+                      {notitie}
+                    </td>
                     <td onClick={(e) => e.stopPropagation()}>
                       <div className="knoppenrij">
                         <button type="button" className="btn btn-outline btn-compact" onClick={() => kopieer(invulling.id, link)}>
-                        {kopieerStatus?.id === invulling.id ? (kopieerStatus.gelukt ? "Gekopieerd!" : "Mislukt, opnieuw") : "Kopieer link"}
+                          {kopieerStatus?.id === invulling.id ? (kopieerStatus.gelukt ? "Gekopieerd!" : "Mislukt, opnieuw") : "Kopieer link"}
                         </button>
                         <a href={link} target="_blank" rel="noreferrer" className="btn btn-outline btn-compact">
                           Openen
@@ -321,7 +371,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
                       </div>
                     </td>
                     <td className="cel-knop">
-                      <button type="button" className="btn btn-outline btn-compact" onClick={() => open("respondent", lid.id)}>
+                      <button type="button" className="btn btn-outline btn-compact" onClick={() => open("scan", invulling.id)}>
                         Bekijk
                       </button>
                     </td>

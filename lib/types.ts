@@ -222,6 +222,15 @@ export interface Organisatie {
   scanUitvoeringen: ScanUitvoering[];
   /** De rondes van deze organisatie (`datamodel.md`, Ronde en onderdeel). Ontbreekt bij data van vóór dit veld. */
   rondes?: Ronde[];
+  /** Wat elke Lead van deze organisatie ziet (`beheerpagina.md`, punt 6a). Ontbreekt bij data van vóór dit veld. */
+  leadToegang?: LeadToegang[];
+  /**
+   * Of een Lead bij Antwoorden de namen van de respondenten ziet (`datamodel.md` deel 3, Uitbreiding op Organisatie). Standaard
+   * `false`: Dan staan er R1 tot en met Rn. Een Admin zet het na afstemming met de opdrachtgever.
+   */
+  antwoordenMetNamen?: boolean;
+  /** Een melding aan de Admin over de omzetting van het bereik van een Lead naar vinkjes (`beheerpagina.md`, punt 6a, Overgang). */
+  leadOvergangMelding?: string | null;
   /**
    * `gebruikerId` van de Consultant/Admin die deze organisatie aanmaakte —
    * samen met `toegewezenAan` het bereik "eigen" in de rechtenmatrix
@@ -274,21 +283,37 @@ export interface OrganisatieLid {
   /** Uniek over alle organisaties heen, zie lib/toegangscode.ts. */
   toegangscode: string;
   /**
-   * `ScanUitvoering.id`'s (van deze organisatie) waar dit lid Lead-toegang
-   * toe heeft — `datamodel.md` deel 2, `RespondentRolMeting`. Leeg = geen
-   * Lead. Bewust genest hier in plaats van een losse
-   * `RespondentRolMeting`-tabel/-array: een Lead bestaat per definitie niet
-   * zonder minstens 1 gekoppelde Meting (`beheerpagina.md` punt 6a), dus is
-   * er ook geen apart "is Lead"-veld nodig.
+   * De Lead-rol (`RespondentRol`, `datamodel.md` deel 2, Wat een Lead mag zien). Wat een Lead ziet, staat in
+   * `Organisatie.leadToegang`. Gebruik `isLead` uit `lib/lead.ts`.
    */
-  leadMetingIds: string[];
+  lead?: boolean;
   /**
-   * Lead voor de hele organisatie (`datamodel.md` deel 2, Het bereik van een Lead): De Lead ziet alle Metingen van zijn
-   * organisatie, ook Metingen die later worden aangemaakt. Dan zijn er geen `leadMetingIds` nodig. Ontbreekt bij data van
-   * vóór dit veld en geldt dan als `false`. Gebruik `isLead` en `leadMetingIdsVan` uit `lib/lead.ts`.
+   * Alleen in data van vóór de tabel Leads (14 oktober 2026): Het bereik van een Lead. Het laden zet ze om in `lead` en
+   * `Organisatie.leadToegang` en laat ze vallen (`beheerpagina.md`, punt 6a, Overgang). Nooit meer zelf zetten.
    */
+  leadMetingIds?: string[];
   leadVoorOrganisatie?: boolean;
   aangemaaktOp: string;
+}
+
+/** Een weergave die een Lead kan krijgen (`datamodel.md` deel 2, `LeadToegang`). */
+export type LeadWeergave = "resultaten" | "spreiding" | "antwoorden" | "uitnodigen" | "exporteren" | "benchmark";
+
+/**
+ * Eén vinkje in de tabel Leads (`beheerpagina.md`, punt 6a): De Lead ziet deze weergave van deze Meting of deze benchmark.
+ * Uniek per combinatie van Respondent, weergave en Meting of benchmark. Een nieuwe Meting of benchmark begint voor elke Lead
+ * zonder vinkje en toegang erft nergens van mee.
+ */
+export interface LeadToegang {
+  respondentId: string;
+  weergave: LeadWeergave;
+  /** Bij alle weergaven behalve `benchmark`. */
+  metingId?: string;
+  /** Bij `benchmark`. */
+  benchmarkId?: string;
+  /** `Gebruiker.id` van de Admin. */
+  toegekendDoor: string;
+  toegekendOp: string;
 }
 
 /**
@@ -407,7 +432,10 @@ export interface BenchmarkLid {
   metingId: string;
 }
 
-/** Een view van een benchmark voor een Lead van de organisatie waarvan de view is. */
+/**
+ * Alleen voor de overgang naar `LeadToegang` (14 oktober 2026): Een view van een benchmark die op 13 oktober 2026 aan een
+ * Lead is toegewezen. Bestaande toewijzingen worden bij het laden vinkjes in de tabel Leads en daarna gewist.
+ */
 export interface BenchmarkToewijzing {
   id: string;
   benchmarkId: string;

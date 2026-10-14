@@ -23,13 +23,13 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
   },
   {
     sleutel: "info.importBestanden",
-    plek: "Import, bij \"Bestanden kiezen\"",
+    plek: "Importeren (organisatie-detail), bij \"Bestanden kiezen\"",
     tekst:
       "Meerdere bestanden tegelijk mogen: Houd Cmd/Ctrl (of Shift voor een reeks) ingedrukt bij het selecteren, of kies direct een hele map met losse CSV's. Elk bestand mag een ander bronformaat hebben, dat wordt per bestand apart herkend.",
   },
   {
     sleutel: "info.importRijen",
-    plek: "Import, bij \"rijen importeren\"",
+    plek: "Importeren (organisatie-detail), bij \"rijen importeren\"",
     tekst:
       "Rijen met een 95%+-vraagtekstmatch (niet 100%) tellen pas mee na een expliciete goedkeuring per rij, met de knop \"Goedkeuren\" in de tabel hierboven.",
   },
@@ -107,12 +107,12 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
   },
   {
     sleutel: "info.scansSamenbrengen",
-    plek: "Ingevulde scans, achter de uitgeschakelde knop \"Samenbrengen in één Meting…\" bij een selectie met meer dan één Assessment",
-    tekst: "Samenbrengen kan alleen voor scans van hetzelfde Assessment, binnen één organisatie. Selecteer alleen scans van één Assessment.",
+    plek: "Resultaten, lijst Metingen, achter de uitgeschakelde knop \"Samenbrengen in één Meting…\" bij een selectie met meer dan één Assessment of meer dan één organisatie",
+    tekst: "Samenbrengen kan alleen voor Metingen van hetzelfde Assessment, binnen één organisatie. Selecteer alleen Metingen van één Assessment.",
   },
   {
     sleutel: "info.bulkExportOrganisatie",
-    plek: "Ingevulde scans, achter de uitgeschakelde knop \"Exporteren\" bij een selectie over meer dan één organisatie",
+    plek: "Resultaten, lijsten Rondes en Metingen, achter de uitgeschakelde knop \"Exporteren\" bij een selectie over meer dan één organisatie",
     tekst: "Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie.",
   },
   {
@@ -145,12 +145,6 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks.",
   },
   {
-    sleutel: "info.benchmarkToewijzen",
-    plek: "Benchmark, view per organisatie, achter de uitgeschakelde knop \"Toewijzen\"",
-    tekst:
-      "Toewijzen kan pas als er een Lead is en de groep aan de drempel van dit niveau voldoet. Anders zou een Lead een vergelijking zien met te weinig anderen om anoniem te blijven.",
-  },
-  {
     sleutel: "info.benchmarkAanmaken",
     plek: "Benchmark aanmaken of wijzigen, achter de uitgeschakelde knop",
     tekst:
@@ -169,8 +163,26 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Een benchmark binnen een Meting heeft een naam nodig, een organisatie, een Assessment en een Meting. Een Meting is alleen te kiezen met genoeg afgeronde scans.",
   },
   {
+    sleutel: "info.vergelijkRonde",
+    plek: "Resultaten van een Meting en de kop van een ronde, naast de uitgeschakelde knop \"Vergelijk met vorige ronde\"",
+    tekst:
+      "Vergelijken kan pas als deze organisatie een eerdere ronde heeft met hetzelfde onderdeel en hetzelfde Assessment, en met genoeg afgeronde scans. Start eerst een tweede ronde, of koppel een bestaande Meting aan een ronde.",
+  },
+  {
+    sleutel: "info.leadToegangCel",
+    plek: "Organisatie-detail, tabel Leads, in een grijze cel",
+    tekst:
+      "De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark.",
+  },
+  {
+    sleutel: "info.antwoordenMetNamen",
+    plek: "Organisatie-detail, bij de schakelaar \"Namen tonen bij Antwoorden\"",
+    tekst:
+      "Uit: Leads zien de antwoorden als R1 tot en met Rn. Aan: Leads zien de namen van de respondenten. Stem dit af met de opdrachtgever voordat je het aanzet. Het geldt voor alle Leads van deze organisatie.",
+  },
+  {
     sleutel: "info.exportEenScan",
-    plek: "Ingevulde scans en organisatie-detail, achter de uitgeschakelde opties \"Als PDF\" en \"Voor InDesign (XML)\"",
+    plek: "Meting-overzicht en de lijsten onder Resultaten, achter de uitgeschakelde opties \"Als PDF\" en \"Voor InDesign (XML)\"",
     tekst: "Beschikbaar bij precies één scan.",
   },
 ];

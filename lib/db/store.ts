@@ -5,7 +5,8 @@ import { demoOrganisatie } from "@/data/demo-organisatie";
 import { haalServerKopieOp, stuurNaarServer } from "../server-sync";
 import { migreerTechstackOndersteuning } from "@/lib/techstack";
 import { ruimOrganisatieOp } from "@/lib/rondes";
-import { haalMetingenUitBenchmarks } from "@/lib/benchmark-store";
+import { getBenchmarks, haalMetingenUitBenchmarks, legeToewijzingen, wisOmgezetteToewijzingen } from "@/lib/benchmark-store";
+import { ruimLeadToegangOp, toegangSleutel, zetLegacyBereikOm } from "@/lib/lead-toegang";
 import { techstackCategorieIdsMetLijst } from "@/data/organisatie-velden";
 
 const KEY = "coniche-scan:organisaties";
@@ -46,7 +47,12 @@ function getServerSnapshot(): string {
 // ophalen zodat elke browser op dit apparaat met dezelfde data start
 // (lib/server-sync.ts).
 if (typeof window !== "undefined") {
-  haalServerKopieOp(SERVER_SLEUTEL, KEY, emitChange);
+  // Na het ophalen van de serverkopie loopt de overgang van de toewijzingen opnieuw: De organisaties kunnen nu pas bekend zijn.
+  haalServerKopieOp(SERVER_SLEUTEL, KEY, () => {
+    voerLeadOvergangUit();
+    emitChange();
+  });
+  voerLeadOvergangUit();
 }
 
 /**
@@ -61,7 +67,7 @@ if (typeof window !== "undefined") {
  * op `organisatie.leden`. Geen migratie van de inhoud, alleen de vorm.
  */
 function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
-  return {
+  const organisatie: Organisatie = {
     ...ruw,
     // Het oude veld zelf/extern wordt "Ondersteund door" bij de techstack-categorieën met een lijst (`lib/techstack.ts`).
     kenmerken: migreerTechstackOndersteuning(
@@ -76,9 +82,10 @@ function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
       ? ruw.leden.map((l) => ({
           ...l,
           email: normaliseerEmail(l.email),
-          leadMetingIds: Array.isArray(l.leadMetingIds) ? l.leadMetingIds : [],
-          // Ontbreekt bij data van vóór het bereik van een Lead: Dan geldt "Specifieke Metingen".
-          leadVoorOrganisatie: l.leadVoorOrganisatie === true,
+          // Het bereik van een Lead van vóór de tabel Leads: `zetLegacyBereikOm` hieronder zet het om en laat het vallen.
+          ...(Array.isArray(l.leadMetingIds) ? { leadMetingIds: l.leadMetingIds } : {}),
+          ...(l.leadVoorOrganisatie === true ? { leadVoorOrganisatie: true } : {}),
+          lead: l.lead === true ? true : undefined,
         }))
       : [],
     // Ontbreekt bij data van vóór de rondes (`datamodel.md`, Ronde en onderdeel).
@@ -107,7 +114,14 @@ function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
     toegewezenAan: Array.isArray(ruw.toegewezenAan) ? ruw.toegewezenAan : [],
     // Ontbreekt bij data van vóór de benchmark: Geen toestemming vastgelegd, dus niet toegestaan.
     benchmarkToegestaan: ruw.benchmarkToegestaan === true,
+    // Ontbreken bij data van vóór de tabel Leads: Niemand ziet iets, de namen staan uit en er is geen melding.
+    leadToegang: Array.isArray(ruw.leadToegang) ? ruw.leadToegang : [],
+    antwoordenMetNamen: ruw.antwoordenMetNamen === true,
+    leadOvergangMelding: ruw.leadOvergangMelding ?? null,
   };
+  zetLegacyBereikOm(organisatie);
+  ruimLeadToegangOp(organisatie);
+  return organisatie;
 }
 
 function parseSnapshot(snapshot: string): Organisatie[] {
@@ -135,6 +149,10 @@ export function slaAlles(alles: Organisatie[]): void {
     for (const id of r.verwijderdeSamengesteldeIds) verdwenen.push({ metingId: id, organisatieNaam: organisatie.naam });
   }
   if (verdwenen.length > 0) haalMetingenUitBenchmarks(verdwenen);
+  // De vinkjes van Leads kloppend houden: Een benchmark die er niet meer is of waar de organisatie geen lid meer van is, en
+  // alles wat van een verdwenen Meting of Lead was (`datamodel.md`, Verwijderen en datakoppelingen).
+  const benchmarks = getBenchmarks();
+  for (const organisatie of alles) ruimLeadToegangOp(organisatie, benchmarks);
   const json = JSON.stringify(alles);
   window.localStorage.setItem(KEY, json);
   emitChange();
@@ -144,4 +162,52 @@ export function slaAlles(alles: Organisatie[]): void {
 export function useOrganisaties(): Organisatie[] {
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   return parseSnapshot(snapshot);
+}
+
+/**
+ * De overgang van het toewijzen van benchmarkviews naar vinkjes in de tabel Leads (`beheerpagina.md`, punt 6a, Overgang): Een
+ * `BenchmarkToewijzing` op niveau 1 of 2 wordt het vinkje voor die benchmark, een toewijzing op niveau 3 wordt Spreiding voor
+ * die Meting, zonder ring op de scan, met een melding aan de Admin. Wat is omgezet, wordt gewist. Een toewijzing van een Lead
+ * die (nog) niet bekend is, blijft staan tot de organisaties er zijn. Idempotent.
+ */
+export function voerLeadOvergangUit(): void {
+  if (typeof window === "undefined") return;
+  const oud = legeToewijzingen();
+  if (oud.length === 0) return;
+  const alles = laadAlles();
+  if (alles.length === 0) return;
+  const benchmarks = getBenchmarks();
+  const nu = new Date().toISOString();
+  const omgezet: string[] = [];
+  for (const t of oud) {
+    const organisatie = alles.find((o) => o.leden.some((l) => l.id === t.respondentId));
+    const lid = organisatie?.leden.find((l) => l.id === t.respondentId);
+    if (!organisatie || !lid) continue;
+    lid.lead = true;
+    const benchmark = benchmarks.find((b) => b.id === t.benchmarkId);
+    const niveau = benchmark?.niveau ?? "organisaties";
+    const toegang =
+      niveau === "scans" && t.metingId
+        ? { respondentId: lid.id, weergave: "spreiding" as const, metingId: t.metingId }
+        : benchmark
+          ? { respondentId: lid.id, weergave: "benchmark" as const, benchmarkId: t.benchmarkId }
+          : null;
+    if (toegang) {
+      const bestaand = new Set((organisatie.leadToegang ?? []).map(toegangSleutel));
+      if (!bestaand.has(toegangSleutel(toegang))) {
+        organisatie.leadToegang = [...(organisatie.leadToegang ?? []), { ...toegang, toegekendDoor: t.toegewezenDoor || "systeem", toegekendOp: nu }];
+      }
+    }
+    if (niveau === "scans") {
+      const tekst =
+        "Een view op één scan is omgezet in Spreiding voor die Meting, zonder ring op de scan. Controleer de tabel Leads.";
+      if (!organisatie.leadOvergangMelding?.includes(tekst)) {
+        organisatie.leadOvergangMelding = organisatie.leadOvergangMelding ? `${organisatie.leadOvergangMelding} ${tekst}` : tekst;
+      }
+    }
+    omgezet.push(t.id);
+  }
+  if (omgezet.length === 0) return;
+  slaAlles(alles);
+  wisOmgezetteToewijzingen(omgezet);
 }

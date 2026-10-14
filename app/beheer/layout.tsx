@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { devAutoLogin, useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { BeheerLoginForm } from "@/components/beheer/BeheerLoginForm";
 import { BeheerChrome } from "@/components/beheer/BeheerChrome";
@@ -21,5 +21,10 @@ export default function BeheerLayout({ children }: { children: React.ReactNode }
     return <BeheerLoginForm />;
   }
 
-  return <BeheerChrome>{children}</BeheerChrome>;
+  // De chrome leest `?via=` (de hoofdlink waarlangs je kwam), en `useSearchParams` vraagt een Suspense-grens.
+  return (
+    <Suspense fallback={null}>
+      <BeheerChrome>{children}</BeheerChrome>
+    </Suspense>
+  );
 }

@@ -10,7 +10,6 @@ import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { BenchmarkOrganisatieView } from "@/components/benchmark/BenchmarkOrganisatieView";
-import { ToewijzenBlok } from "@/components/benchmark/ToewijzenBlok";
 
 /**
  * Benchmark binnen een Meting, de view van één scan (`benchmark.md`, Niveau 3): De scan van een Respondent naast het gemiddelde
@@ -56,7 +55,8 @@ export default function BenchmarkScanPage({ params }: { params: Promise<{ benchm
     <div className="admin-main admin-main--breed">
       <Kruimelpad
         delen={[
-          { label: "Benchmark", href: "/beheer/benchmark" },
+          { label: "Resultaten", href: "/beheer/resultaten/rondes" },
+          { label: "Benchmarks", href: "/beheer/benchmark" },
           { label: benchmark.naam, href: `/beheer/benchmark/${benchmark.id}` },
           { label: scan.naam },
         ]}
@@ -71,12 +71,6 @@ export default function BenchmarkScanPage({ params }: { params: Promise<{ benchm
           {instellingen.benchmarkMinRespondenten}: Een vergelijking is dan te herleiden naar personen. Jij ziet deze view, een Lead niet.
         </p>
       )}
-      <ToewijzenBlok
-        benchmark={benchmark}
-        onderwerp={{ organisatie: sectie.organisatie, meting: sectie.meting, respondent: scan.lid }}
-        voldoetAanDrempel={view.voldoetAanDrempel}
-        gebruikerId={gebruiker!.id}
-      />
       <BenchmarkOrganisatieView view={view} organisatieNaam={scan.naam} peildatum={new Date()} niveau="scans" />
     </div>
   );

@@ -72,8 +72,6 @@ export function koppelScanAanAndereRespondent(
       team: keuze.invoer.team,
       notities: keuze.invoer.notities,
       toegangscode: genereerUniekeToegangscode(alles),
-      leadMetingIds: [],
-      leadVoorOrganisatie: false,
       aangemaaktOp: new Date().toISOString(),
     };
     organisatie.leden.push(doelLid);

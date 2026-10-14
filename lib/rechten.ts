@@ -113,12 +113,17 @@ export function magScanVerwijderen(
   return magOrganisatieToegang(gebruiker, organisatie);
 }
 
-/** `respondenten.leadToekennen`: alle (Admin) / eigen (Consultant). */
+/**
+ * `respondenten.leadToekennen`: Alleen een Admin (`datamodel.md` deel 2, Rechtenmatrix). De tabel Leads, de Lead-rol en de
+ * vinkjes zijn niet voor een Consultant, ook niet bij zijn eigen organisaties.
+ */
 export function magLeadToekennen(
   gebruiker: Gebruiker | null,
-  organisatie: Pick<Organisatie, "aangemaaktDoor" | "toegewezenAan">
+  // Behouden voor de aanroepers: Het recht hangt niet meer af van de organisatie.
+  _organisatie?: Pick<Organisatie, "aangemaaktDoor" | "toegewezenAan">
 ): boolean {
-  return magOrganisatieToegang(gebruiker, organisatie);
+  void _organisatie;
+  return isAdmin(gebruiker);
 }
 
 /**

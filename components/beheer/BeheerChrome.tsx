@@ -2,13 +2,14 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { BeheerNavActionsProvider, useBeheerNavActionsValue } from "@/components/beheer/BeheerNavActions";
 import { logout, useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren, magContentBeheren, magGebruikersBeheren } from "@/lib/rechten";
+import { VIA_RESULTATEN } from "@/lib/resultaten-nav";
 import { ROL_KLEUR } from "@/lib/colors";
 import { BeheerMeldingBalk } from "@/components/beheer/BeheerMelding";
 import { BeheerOverzichten } from "@/components/beheer/BeheerOverzichten";
@@ -28,11 +29,11 @@ import { MijnAccountModal } from "@/components/beheer/MijnAccountModal";
  * "Uitloggen" als enige manier om beheer te verlaten).
  *
  * Drie hoofdlinks (beheerpagina.md, "Wat beheerbaar is"): **Assessments** (Assessment-types, Content, Admin-only),
- * **Organisaties** (Organisatievelden, Organisaties, Metingen, Respondenten, Lead-rol, Ingevulde scans, Import, ook voor
- * een Consultant, bereik "eigen") en **Benchmark** (Admin-only). **Instellingen** (voorheen Applicatie: Gebruikers,
+ * **Organisaties** (Organisaties, Respondenten, ook voor een Consultant, bereik "eigen") en **Resultaten** (Rondes en
+ * Metingen voor Admin en Consultant, Benchmarks alleen voor de Admin). **Instellingen** (voorheen Applicatie: Gebruikers,
  * Drempels en termijnen, Algemene teksten, Content-pagina's, Audit-log, Data-integriteit) staat niet in de nav maar als
- * rij in het Accountmenu, alleen voor een Admin. Elke link wijst naar één hub-pagina voor die sectie; onderdelen zonder
- * eigen top-navlink (Ingevulde scans, Import) zijn vanaf de Organisaties-hub bereikbaar.
+ * rij in het Accountmenu, alleen voor een Admin. Elke link wijst naar één hub-pagina voor die sectie. De import is een knop
+ * in het organisatie-detail en de pagina Ingevulde scans bestaat niet meer (beheerpagina.md, punt 7 en 8).
  *
  * **Scherm-specifieke acties vóór deze drie links** (CLAUDE.md sectie 3,
  * Globale layout, punt 1 — "Ingevulde scans →"/"Import van scans →" op de
@@ -52,23 +53,27 @@ const INSTELLINGEN_PADEN = [
   "/beheer/data-integriteit",
 ];
 
-const PAD_PER_SECTIE: { sectie: "assessments" | "organisaties" | "benchmark"; paden: string[] }[] = [
-  { sectie: "assessments", paden: ["/beheer/assessments", "/beheer/content"] },
-  { sectie: "benchmark", paden: ["/beheer/benchmark"] },
-  {
-    sectie: "organisaties",
-    paden: [
-      "/beheer/organisaties",
-      "/beheer/respondenten",
-      "/beheer/scans",
-      "/beheer/import",
-      "/beheer/metingen",
-      "/beheer/resultaten",
-      "/beheer/rapportage",
-      "/beheer/rondes",
-    ],
-  },
-];
+type Sectie = "assessments" | "organisaties" | "resultaten";
+
+/**
+ * Welke hoofdlink actief is. Het Meting-overzicht, de resultatenpagina's en het Ronde-overzicht horen bij de hoofdlink
+ * waarlangs je kwam: Met `?via=resultaten` is dat Resultaten, anders Organisaties. De rondes en de benchmarkpagina's zijn
+ * altijd Resultaten.
+ */
+function sectieVoor(pathname: string, via: boolean): Sectie {
+  if (pathname.startsWith("/beheer/assessments") || pathname.startsWith("/beheer/content")) return "assessments";
+  if (pathname.startsWith("/beheer/benchmark") || pathname.startsWith("/beheer/rondes")) return "resultaten";
+  if (pathname.startsWith("/beheer/resultaten/rondes") || pathname.startsWith("/beheer/resultaten/metingen")) return "resultaten";
+  if (
+    via &&
+    (pathname.startsWith("/beheer/metingen") ||
+      pathname.startsWith("/beheer/rapportage") ||
+      pathname.startsWith("/beheer/resultaten"))
+  ) {
+    return "resultaten";
+  }
+  return "organisaties";
+}
 
 /**
  * Tabbalk met de onderdelen van "Organisaties" (beheerpagina.md,
@@ -79,9 +84,14 @@ const PAD_PER_SECTIE: { sectie: "assessments" | "organisaties" | "benchmark"; pa
 const ORGANISATIE_TABS = [
   { href: "/beheer/organisaties", label: "Organisaties" },
   { href: "/beheer/respondenten", label: "Respondenten" },
-  { href: "/beheer/scans", label: "Ingevulde scans" },
-  { href: "/beheer/import", label: "Import" },
 ];
+
+/** Tabbalk van Resultaten (beheerpagina.md, punt 7): Rondes en Metingen, voor een Admin aangevuld met Benchmarks. */
+const RESULTATEN_TABS = [
+  { href: "/beheer/resultaten/rondes", label: "Rondes" },
+  { href: "/beheer/resultaten/metingen", label: "Metingen" },
+];
+const BENCHMARKS_TAB = { href: "/beheer/benchmark", label: "Benchmarks" };
 
 /**
  * Tabbalk van Instellingen (beheerpagina.md, "Navigatie in beheer"): Gebruikers is de landingstab. Alleen zichtbaar op de
@@ -106,6 +116,7 @@ export function BeheerChrome({ children }: { children: React.ReactNode }) {
 
 function BeheerChromeInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const via = useSearchParams().get("via") === VIA_RESULTATEN;
   const gebruiker = useIngelogdeGebruiker();
   const navActions = useBeheerNavActionsValue();
   const router = useRouter();
@@ -118,13 +129,14 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
       ? [{ sectie: "assessments" as const, href: "/beheer/content", label: "Assessments" }]
       : []),
     { sectie: "organisaties" as const, href: "/beheer/organisaties", label: "Organisaties" },
-    ...(magBenchmarkBeheren(gebruiker)
-      ? [{ sectie: "benchmark" as const, href: "/beheer/benchmark", label: "Benchmark" }]
-      : []),
+    { sectie: "resultaten" as const, href: "/beheer/resultaten/rondes", label: "Resultaten" },
   ];
+  const huidigeSectie = sectieVoor(pathname, via);
+  const resultatenTabs = [...RESULTATEN_TABS, ...(magBenchmarkBeheren(gebruiker) ? [BENCHMARKS_TAB] : [])];
 
   const rolInfo = gebruiker ? ROL_KLEUR[gebruiker.rol] : undefined;
   const toonTabs = ORGANISATIE_TABS.some((t) => pathname === t.href);
+  const toonResultatenTabs = resultatenTabs.some((t) => pathname === t.href);
   const toonInstellingenTabs = heeftInstellingen && INSTELLINGEN_TABS.some((t) => pathname === t.href);
 
   return (
@@ -137,8 +149,7 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
             {navActions}
             {navActions && <span className="nav-divider" />}
             {links.map((link) => {
-              const sectiePaden = PAD_PER_SECTIE.find((p) => p.sectie === link.sectie)?.paden ?? [link.href];
-              const actief = sectiePaden.some((p) => pathname.startsWith(p));
+              const actief = huidigeSectie === link.sectie;
               return (
                 <Link key={link.href} href={link.href} className={actief ? "actief" : ""}>
                   {link.label}
@@ -168,6 +179,17 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
         <div className="beheer-tabs">
           <nav className="beheer-tabs-inner" aria-label="Onderdelen van Organisaties">
             {ORGANISATIE_TABS.map((tab) => (
+              <Link key={tab.href} href={tab.href} className={`beheer-tab ${pathname === tab.href ? "actief" : ""}`}>
+                {tab.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      )}
+      {toonResultatenTabs && (
+        <div className="beheer-tabs">
+          <nav className="beheer-tabs-inner" aria-label="Onderdelen van Resultaten">
+            {resultatenTabs.map((tab) => (
               <Link key={tab.href} href={tab.href} className={`beheer-tab ${pathname === tab.href ? "actief" : ""}`}>
                 {tab.label}
               </Link>

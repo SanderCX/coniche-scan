@@ -41,7 +41,8 @@ export function BulkToolbar({
   samenbrengenUitgeschakeld,
 }: {
   aantal: number;
-  onVerwijderen: () => void;
+  /** Weglaten verbergt de knop Verwijderen: De lijsten Rondes en Metingen onder Resultaten verwijderen niets. */
+  onVerwijderen?: () => void;
   verwijderLabel?: string;
   /** Reden waarom Verwijderen nu uitgeschakeld is (bijv. ontbrekend recht, `lib/rechten.ts`). */
   verwijderenDisabledReden?: string;
@@ -133,16 +134,18 @@ export function BulkToolbar({
             {exporterenOverMeerdereOrganisaties && <InfoIcoon sleutel="info.bulkExportOrganisatie" naastVeld />}
           </>
         )}
-        <button
-          type="button"
-          disabled={Boolean(verwijderenDisabledReden)}
-          title={verwijderenDisabledReden}
-          onClick={onVerwijderen}
-          className="btn btn-danger btn-compact flex items-center justify-center gap-2"
-        >
-          <TrashIcon />
-          {verwijderLabel}
-        </button>
+        {onVerwijderen && (
+          <button
+            type="button"
+            disabled={Boolean(verwijderenDisabledReden)}
+            title={verwijderenDisabledReden}
+            onClick={onVerwijderen}
+            className="btn btn-danger btn-compact flex items-center justify-center gap-2"
+          >
+            <TrashIcon />
+            {verwijderLabel}
+          </button>
+        )}
       </div>
     </div>
   );

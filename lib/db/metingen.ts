@@ -74,9 +74,10 @@ export function verwijderMeting(scanUitvoeringId: string): void {
     // ze zelf (`slaAlles`): Dat staat ook in het log (`benchmark.md`, Verwijderen van een onderliggende Meting).
     const geraakt = samengesteldeMetingenMet({ scanUitvoeringen: [...organisatie.scanUitvoeringen, meting] }, meting.id);
     const verdwijnt = geraakt.filter((s) => s.samenstelling!.every((id) => id === meting.id));
-    slaAlles(alles);
-    // Het lid met deze Meting verdwijnt uit elke benchmark waarin het meedoet (`datamodel.md`).
+    // Het lid met deze Meting verdwijnt uit elke benchmark waarin het meedoet (`datamodel.md`). Eerst uit de benchmarks, dan
+    // opslaan: `slaAlles` laat de vinkjes van Leads voor die benchmark en voor deze Meting vervallen.
     haalMetingenUitBenchmarks([{ metingId: meting.id, organisatieNaam: organisatie.naam }]);
+    slaAlles(alles);
     logAudit([
       {
         actie: isSamengesteld(meting) ? "meting.samengesteldVerwijderd" : "meting.verwijderd",

@@ -204,7 +204,8 @@ Resultaten van de Meting.
   `VeldDefinitieEditor` staat klaar, maar geen pagina gebruikt hem. En
   Het verwijderen van een Assessment (punt 1), gespecificeerd op 8 oktober
   2026. En Content-pagina's (punt 11), na overleg. De spec is leidend. Verder de
-  hoofdlink Resultaten met de tabs Rondes en Metingen (punt 7, voorstel van 14
+  hoofdlink Resultaten met de tabs Rondes en Metingen (punt 7, gebouwd op
+  14
   oktober 2026) en de Benchmark (punt 14, `benchmark.md`): Het niveau tussen organisaties is
   gebouwd (PR 61). De niveaus binnen een organisatie en binnen een Meting zijn
   besproken en nog niet gebouwd.
@@ -1068,11 +1069,11 @@ Leads (punt 6a).
 
 #### 6a. Leads: Toegang per weergave
 
-**Status.** Voorstel van 14 oktober 2026. Dit vervangt het bereik van een Lead
+**Status.** Gebouwd op 14 oktober 2026. Dit verving het bereik van een Lead
 (Specifieke Metingen of Hele organisatie), `RespondentRolMeting`,
 `leadVoorOrganisatie` en het toewijzen van benchmarkviews op de views zelf.
-Wat daarvan op 13 oktober 2026 is gebouwd, wordt vervangen (zie Overgang onder
-dit punt).
+Wat daarvan op 13 oktober 2026 was gebouwd, is omgezet (zie Overgang onder dit
+punt).
 
 Lead worden en een vragenlijst krijgen zijn twee losse acties. Een Lead is een
 Respondent met de Lead-rol (`RespondentRol`, `datamodel.md` deel 2) en hoeft
@@ -1665,9 +1666,8 @@ Werkwijze in beheer, punt 6).
 
 #### 7. Resultaten
 
-**Status.** Voorstel van 14 oktober 2026. Dit vervangt de pagina Ingevulde
-scans en de hoofdlink Benchmark. Gebouwd zijn nu nog de lijst Ingevulde scans
-en het benchmarkoverzicht van niveau 1. Zie Overgang onder dit punt.
+**Status.** Gebouwd op 14 oktober 2026. Dit verving de pagina Ingevulde
+scans en de hoofdlink Benchmark. Zie Overgang onder dit punt.
 
 Alles wat uit ingevulde scans komt, staat onder één hoofdlink: Resultaten. Een
 Admin ziet alles, een Consultant alleen de Rondes en Metingen van zijn eigen
@@ -1849,7 +1849,7 @@ en is voorstel.
   view ziet, vink je aan in de tabel Leads van de organisatie (punt 6a). Onder
   de view staat alleen een lijst van de Leads die hem nu zien, met per Lead de
   knop "Bekijk" (Respondent-overzicht, punt 6b) en een verwijzing naar de
-  tabel. Voorstel van 14 oktober 2026, dit vervangt het blok "Toewijzen aan een
+  tabel. Gebouwd op 14 oktober 2026, dit vervangt het blok "Toewijzen aan een
   Lead" (`benchmark.md`, View voor een Lead).
 - **Verwijderen**: Met een bevestiging die noemt hoeveel vinkjes van Leads
   meegaan.

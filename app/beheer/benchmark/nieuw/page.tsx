@@ -48,7 +48,8 @@ export default function NieuweBenchmarkPage() {
 
   return (
     <div className="admin-main admin-main--breed">
-      <Kruimelpad delen={[{ label: "Benchmark", href: "/beheer/benchmark" }, { label: "Nieuwe benchmark" }]} />
+      <Kruimelpad delen={[{ label: "Resultaten", href: "/beheer/resultaten/rondes" },
+          { label: "Benchmarks", href: "/beheer/benchmark" }, { label: "Nieuwe benchmark" }]} />
       <h1>Nieuwe benchmark</h1>
 
       <h2>Niveau</h2>

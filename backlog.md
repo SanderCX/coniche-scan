@@ -250,41 +250,16 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
 - **Opsplitsen** van de Import-pagina (590 regels).
 - **Meer tests**: Import (parsen en valideren van rijen), `scan-slot`, de
   overige stores.
-- **Tabel Leads (voorstel van 14 oktober 2026)**: Eén tabel per organisatie
-  waarin een Admin per Lead aanvinkt welke weergaven hij ziet
-  (`beheerpagina.md`, punt 6a). Te bouwen: Het record `LeadToegang`
-  (`datamodel.md` deel 2) in plaats van `RespondentRolMeting`,
-  `leadVoorOrganisatie` en `BenchmarkToewijzing`; de overgang van bestaande
-  gegevens (`beheerpagina.md`, punt 6a, Overgang); de tabel met kolommen per
-  Meting (Resultaten, Spreiding, Antwoorden, Uitnodigen en Exporteren) en per
-  benchmark, met grijze cellen en "Opslaan"; weergave G en weergave B zonder
-  ring voor een Lead, met R1 tot Rn of namen volgens
-  `Organisatie.antwoordenMetNamen`; het blok "Toewijzen aan een Lead" op de
-  benchmarkviews vervangen door een lijst; positie in de Meting alleen nog voor
-  de Admin; de tabel Admin-only en `respondenten.leadToekennen` zonder
-  Consultant.
-- **Hoofdlink Resultaten (voorstel van 14 oktober 2026)**: Rondes, Metingen en
-  Benchmarks onder één hoofdlink, met de lijst Ingevulde scans als pagina
-  vervallen en Import als knop op organisatieniveau (`beheerpagina.md`,
-  punt 7 en 8). Nog te bespreken: Of een Lead de lijsten Rondes en Metingen ook
-  krijgt, en hoe de kolommen van de tabel Leads zich verhouden tot de
-  weergaven onder Resultaten.
-- **Bereik van een Lead (gebouwd op 13 oktober 2026, in het voorstel van 14
-  oktober 2026 vervangen door de tabel Leads)**: Een Lead krijgt bereik op specifieke
-  Metingen of op de hele organisatie, los van of hij zelf een scan heeft
-  gedaan (`benchmark.md`, Bereik van een Lead). Te bouwen: het veld
-  `leadVoorOrganisatie` op de Respondent; de keuze van het bereik in "Lead
-  toevoegen" en "Lead-toegang beheren" met de waarschuwing "Deze Lead ziet ook
-  Metingen die later worden aangemaakt"; in `lib/benchmark.ts` het filter
-  `viewsVoorLead` vervangen door een controle op bereik; de keuzelijst bij het
-  toewijzen beperken tot Leads met bereik, met "+ Lead toevoegen"; bestaande
-  toewijzingen zonder bereik eenmalig laten staan met de melding "Deze Lead
-  heeft geen bereik op deze organisatie", nieuwe laten vervallen; "Lead" is
-  `leadVoorOrganisatie` of minstens één Meting (badge, lijsten, filters,
-  integriteitscontrole); `leadMetingIds` en `leadVoorOrganisatie` leegmaken op
-  alle plekken in `lib/db/verplaatsen.ts` (vier) en bij samenvoegen; het
-  voorgekozen bereik in "+ Lead toevoegen" (modal). Optioneel: Een blok "Leads" op organisatie-detail
-  en Meting-overzicht.
+- **Tabel Leads en hoofdlink Resultaten (gebouwd op 14 oktober 2026)**: Eén
+  tabel per organisatie waarin een Admin per Lead aanvinkt welke weergaven hij
+  ziet (`beheerpagina.md`, punt 6a), met `LeadToegang` in plaats van
+  `RespondentRolMeting`, `leadVoorOrganisatie` en `BenchmarkToewijzing`, en de
+  hoofdlink Resultaten met Rondes, Metingen en Benchmarks, zonder de pagina
+  Ingevulde scans en met Import op organisatieniveau (punt 7 en 8). Nog open:
+  Of een Lead de lijsten Rondes en Metingen ook krijgt, en hoe de kolommen van
+  de tabel Leads zich verhouden tot de weergaven onder Resultaten. Niveau 3
+  (view op één scan) staat nog in de beheerschermen van de Admin; een Lead
+  krijgt er geen kolom voor.
 - **Andere Respondent koppelen vanuit het Scan-overzicht (gebouwd op 13 oktober 2026)**: Een
   naamwijziging via "Respondent bewerken" geldt voor alle scans van de
   Respondent. Nodig: De vaste regel "Deze wijziging geldt voor alle {n} scans"

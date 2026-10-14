@@ -301,6 +301,21 @@ describe("G. Antwoorden per vraag", () => {
     expect(w.totaalGemiddelde).toBe(eenMeting(a, [s1, s2]).totaal);
   });
 
+  it("anoniem heten de kolommen R1 tot en met Rn zonder naam, in een vaste volgorde die de naam niet volgt", () => {
+    const scans = [scan("s1", 3), scan("s2", 4), scan("s3", 5), scan("s4", 2)];
+    const w = antwoordenPerVraag(a, scans, naamVan, { anoniem: true });
+    expect(w.kolommen.map((k) => k.initialen)).toEqual(["R1", "R2", "R3", "R4"]);
+    expect(w.kolommen.every((k) => k.naam === "")).toBe(true);
+    expect(JSON.stringify(w)).not.toMatch(/Vries|Bakker|Visser|Piet/);
+    // Dezelfde volgorde bij elke aanroep en bij een andere invoervolgorde.
+    const omgekeerd = antwoordenPerVraag(a, [...scans].reverse(), naamVan, { anoniem: true });
+    expect(omgekeerd.kolommen.map((k) => k.invullingId)).toEqual(w.kolommen.map((k) => k.invullingId));
+    // De cijfers zelf zijn dezelfde als met namen.
+    const metNamen = antwoordenPerVraag(a, scans, naamVan);
+    expect(w.totaalGemiddelde).toBe(metNamen.totaalGemiddelde);
+    expect([...w.totaal].sort()).toEqual([...metNamen.totaal].sort());
+  });
+
   it("een onbeantwoorde vraag is een lege cel en telt niet mee in N, het gemiddelde of het percentage", () => {
     const s1 = scan("s1", 4);
     const eersteVraag = alleVragen(a)[0].id;
