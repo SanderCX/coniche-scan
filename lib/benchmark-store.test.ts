@@ -27,7 +27,7 @@ beforeEach(() => opslag.clear());
 
 type Rij = Record<string, unknown>;
 const lid = (id: string, orgId: string, extra: Rij = {}) => ({
-  id, organisatieId: orgId, email: `${id}@x.nl`, naam: id, functie: "", team: "", notities: "", toegangscode: `c${id}`, leadMetingIds: [], aangemaaktOp: "x", ...extra,
+  id, organisatieId: orgId, email: `${id}@x.nl`, naam: id, functie: "", team: "", notities: "", toegangscode: `c${id}`, aangemaaktOp: "x", ...extra,
 });
 const org = (id: string, leden: Rij[], metingen: Rij[], vlag = true) => ({
   id, naam: `Org ${id}`, kenmerken: {}, aangemaaktOp: "x", aangemaaktDoor: null, toegewezenAan: [], benchmarkToegestaan: vlag, leden, scanUitvoeringen: metingen,
@@ -36,10 +36,10 @@ const meting = (id: string, orgId: string) => ({ id, organisatieId: orgId, asses
 const zet = (orgs: Rij[]) => opslag.set(ORG_KEY, JSON.stringify(orgs));
 const namen = { assessmentNamen: ["A"], organisatieNamen: [] as string[] };
 
-/** Een benchmark met organisaties O1 en O2, en een toewijzing van de view van O1 aan Lead L1. */
+/** Een benchmark met organisaties O1 en O2, en het vinkje voor de view van die benchmark voor Lead L1 van O1. */
 function opzet() {
   zet([
-    org("O1", [lid("L1", "O1", { leadMetingIds: ["M1"] })], [meting("M1", "O1")]),
+    org("O1", [lid("L1", "O1", { lead: true })], [meting("M1", "O1")]),
     org("O2", [lid("L2", "O2")], [meting("M2", "O2")]),
   ]);
   const b = store.maakBenchmark(
@@ -49,41 +49,57 @@ function opzet() {
     ] },
     namen
   );
-  store.wijsBenchmarkToe({ benchmarkId: b.id, organisatieId: "O1", respondentId: "L1", toegewezenDoor: "g1" }, { benchmarkNaam: "Test", organisatieNaam: "Org O1" });
+  db.slaLeadToegangOp("O1", [{ respondentId: "L1", weergave: "benchmark", benchmarkId: b.id, aan: true }], "g1");
   return b;
 }
 const huidig = () => store.getBenchmarks()[0];
-const toewijzingen = () => (JSON.parse(opslag.get("coniche-scan:benchmarks")!) as { toewijzingen: unknown[] }).toewijzingen;
+/** Alle vinkjes van alle organisaties, zoals opgeslagen. */
+const vinkjes = () =>
+  (JSON.parse(opslag.get(ORG_KEY) ?? "[]") as { leadToegang?: { respondentId: string; weergave: string; metingId?: string; benchmarkId?: string }[] }[]).flatMap(
+    (o) => o.leadToegang ?? []
+  );
+const benchmarkVinkjes = () => vinkjes().filter((t) => t.weergave === "benchmark");
 const audit = () => (JSON.parse(opslag.get("coniche-scan:audit") ?? "[]") as { actie: string; details: Record<string, unknown> | null }[]).map((e) => e.actie);
 
 describe("benchmark-opslag", () => {
-  it("een toewijzing is uniek per combinatie van benchmark, organisatie en Lead", () => {
+  it("een vinkje is uniek per combinatie van benchmark en Lead", () => {
     const b = opzet();
-    store.wijsBenchmarkToe({ benchmarkId: b.id, organisatieId: "O1", respondentId: "L1", toegewezenDoor: "g1" }, { benchmarkNaam: "Test", organisatieNaam: "Org O1" });
-    expect(toewijzingen()).toHaveLength(1);
+    db.slaLeadToegangOp("O1", [{ respondentId: "L1", weergave: "benchmark", benchmarkId: b.id, aan: true }], "g1");
+    expect(benchmarkVinkjes()).toHaveLength(1);
   });
 
-  it("een Meting verwijderen haalt het lid uit de benchmark, met een melding en de toewijzing van die organisatie", () => {
+  it("een vinkje kan alleen voor een benchmark waar de organisatie lid van is", () => {
+    opzet();
+    zet([org("O1", [lid("L1", "O1", { lead: true })], [meting("M1", "O1")]), org("O3", [], [])]);
+    const b = store.maakBenchmark(
+      { naam: "Zonder O1", assessmentIds: ["A"], aangemaaktDoor: "g1", leden: [{ organisatieId: "O3", assessmentId: "A", metingId: "M3" }] },
+      namen
+    );
+    db.slaLeadToegangOp("O1", [{ respondentId: "L1", weergave: "benchmark", benchmarkId: b.id, aan: true }], "g1");
+    expect(benchmarkVinkjes()).toHaveLength(0);
+  });
+
+  it("een Meting verwijderen haalt het lid uit de benchmark, met een melding en het vinkje van die organisatie", () => {
     opzet();
     db.verwijderMeting("M1");
     expect(huidig().leden.map((l) => l.organisatieId)).toEqual(["O2"]);
     expect(huidig().meldingen[0].tekst).toContain("Org O1");
-    expect(toewijzingen()).toHaveLength(0);
+    expect(benchmarkVinkjes()).toHaveLength(0);
     expect(audit()).toContain("benchmark.gewijzigd");
   });
 
-  it("een Organisatie verwijderen haalt haar leden en toewijzingen weg, de benchmark zelf blijft", () => {
+  it("een Organisatie verwijderen haalt haar leden en vinkjes weg, de benchmark zelf blijft", () => {
     opzet();
     db.verwijderOrganisaties(["O2"]);
     expect(store.getBenchmarks()).toHaveLength(1);
     expect(huidig().leden.map((l) => l.organisatieId)).toEqual(["O1"]);
-    expect(toewijzingen()).toHaveLength(1); // De toewijzing van O1 blijft: O1 bestaat nog.
+    expect(benchmarkVinkjes()).toHaveLength(1); // Het vinkje van O1 blijft: O1 bestaat nog.
   });
 
-  it("een Respondent met Lead-rol verwijderen haalt zijn toewijzingen weg", () => {
+  it("een Respondent met Lead-rol verwijderen haalt zijn vinkjes weg", () => {
     opzet();
     db.verwijderLeden(["L1"]);
-    expect(toewijzingen()).toHaveLength(0);
+    expect(benchmarkVinkjes()).toHaveLength(0);
     expect(huidig().leden).toHaveLength(2);
   });
 
@@ -92,26 +108,29 @@ describe("benchmark-opslag", () => {
     expect(store.aantalBenchmarksMetOrganisatie("O1")).toBe(1);
     db.zetBenchmarkVlag("O1", false);
     expect(store.aantalBenchmarksMetOrganisatie("O1")).toBe(0);
-    expect(toewijzingen()).toHaveLength(0);
+    expect(benchmarkVinkjes()).toHaveLength(0);
     expect(audit()).toContain("organisatie.benchmarkVlagGewijzigd");
     // Aanzetten verandert niets aan de samenstelling.
     db.zetBenchmarkVlag("O1", true);
     expect(huidig().leden).toHaveLength(1);
   });
 
-  it("een benchmark verwijderen haalt ook zijn toewijzingen weg, organisaties en metingen blijven bestaan", () => {
+  it("een benchmark verwijderen laat geen benchmark over waar een vinkje naar verwijst, organisaties en metingen blijven bestaan", () => {
     const b = opzet();
     store.verwijderBenchmark(b.id, namen);
     expect(store.getBenchmarks()).toHaveLength(0);
-    expect(toewijzingen()).toHaveLength(0);
+    // Een vinkje dat naar een verdwenen benchmark wijst, valt zodra de vinkjes worden opgeruimd.
+    db.ruimBenchmarkVinkjesOp();
+    expect(benchmarkVinkjes()).toHaveLength(0);
     expect((JSON.parse(opslag.get(ORG_KEY)!) as unknown[]).length).toBe(2);
   });
 
   it("de audit-log bevat geen naam of e-mailadres van de Lead", () => {
     opzet();
     const log = JSON.parse(opslag.get("coniche-scan:audit")!) as { actie: string; details: unknown }[];
-    const toegewezen = log.find((e) => e.actie === "benchmark.toegewezen");
-    expect(JSON.stringify(toegewezen?.details)).not.toMatch(/L1|@x\.nl/);
+    const gewijzigd = log.filter((e) => e.actie === "lead.toegangGewijzigd");
+    expect(gewijzigd.length).toBeGreaterThan(0);
+    expect(JSON.stringify(gewijzigd.map((e) => e.details))).not.toMatch(/L1|@x\.nl/);
   });
 });
 
@@ -172,15 +191,18 @@ describe("benchmark-opslag per niveau", () => {
   });
 });
 
-describe("toewijzen op niveau 2 en 3", () => {
+describe("vinkjes op niveau 2 en 3", () => {
   const lidMetScans = (id: string, extra: Rij = {}) => lid(id, "O1", extra);
   const metingMetScans = (id: string, respondenten: string[]) => ({
     ...meting(id, "O1"),
     invullingen: respondenten.map((r) => ({ id: `i-${id}-${r}`, scanUitvoeringId: id, organisatieLidId: r, status: "afgerond", antwoorden: {}, opmerkingenPerBouwblok: {}, aangemaaktOp: "x", uitgenodigdOp: "x", gestartOp: null, afgerondOp: null, bewaarVerlengdTot: null })),
   });
-  /** Een Lead (L1) op M1, een Respondent (R1) met een scan in M1, een benchmark binnen een organisatie en een binnen een Meting. */
+  const aan = (respondentId: string, weergave: string, id: string) =>
+    ({ respondentId, weergave, aan: true, ...(weergave === "benchmark" ? { benchmarkId: id } : { metingId: id }) }) as Parameters<Db["slaLeadToegangOp"]>[1][number];
+
+  /** Een Lead (L1), een Respondent (R1) met een scan in M1 en M2, een benchmark binnen een organisatie en een binnen een Meting. */
   function opzet() {
-    zet([org("O1", [lidMetScans("L1", { leadMetingIds: ["M1"] }), lidMetScans("R1")], [metingMetScans("M1", ["R1"]), metingMetScans("M2", ["R1"])])]);
+    zet([org("O1", [lidMetScans("L1", { lead: true }), lidMetScans("R1")], [metingMetScans("M1", ["R1"]), metingMetScans("M2", ["R1"])])]);
     const n2 = store.maakBenchmark(
       { naam: "Binnen", niveau: "metingen", assessmentIds: ["A"], aangemaaktDoor: "g1", leden: [
         { organisatieId: "O1", assessmentId: "A", metingId: "M1" },
@@ -192,59 +214,98 @@ describe("toewijzen op niveau 2 en 3", () => {
       { naam: "Scans", niveau: "scans", assessmentIds: ["A"], aangemaaktDoor: "g1", leden: [{ organisatieId: "O1", assessmentId: "A", metingId: "M1" }] },
       namen
     );
-    const t2 = store.wijsBenchmarkToe({ benchmarkId: n2.id, organisatieId: "O1", metingId: "M1", respondentId: "L1", toegewezenDoor: "g1" }, { benchmarkNaam: "Binnen", organisatieNaam: "Org O1", niveau: "metingen", metingLabel: "M1" });
-    const t3 = store.wijsBenchmarkToe({ benchmarkId: n3.id, organisatieId: "O1", metingId: "M1", onderwerpRespondentId: "R1", respondentId: "L1", toegewezenDoor: "g1" }, { benchmarkNaam: "Scans", organisatieNaam: "Org O1", niveau: "scans", metingLabel: "M1" });
-    return { n2, n3, t2: t2!, t3: t3! };
+    return { n2, n3 };
   }
 
-  it("een toewijzing is uniek per benchmark, onderwerp en Lead: Dezelfde Lead mag meerdere Metingen of scans krijgen", () => {
+  it("niveau 2 vraagt Resultaten op een lid-Meting, niveau 3 heeft geen kolom voor een Lead", () => {
+    const { n2, n3 } = opzet();
+    db.slaLeadToegangOp("O1", [aan("L1", "benchmark", n2.id), aan("L1", "benchmark", n3.id)], "g1");
+    expect(benchmarkVinkjes()).toHaveLength(0);
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2.id), aan("L1", "benchmark", n3.id)], "g1");
+    expect(benchmarkVinkjes().map((t) => t.benchmarkId)).toEqual([n2.id]);
+  });
+
+  it("Resultaten uitzetten haalt het vinkje van een benchmark op niveau 2 mee, als er geen andere lid-Meting met Resultaten is", () => {
     const { n2 } = opzet();
-    expect(toewijzingen()).toHaveLength(2);
-    store.wijsBenchmarkToe({ benchmarkId: n2.id, organisatieId: "O1", metingId: "M1", respondentId: "L1", toegewezenDoor: "g1" }, { benchmarkNaam: "Binnen", organisatieNaam: "Org O1" });
-    expect(toewijzingen()).toHaveLength(2);
-    store.wijsBenchmarkToe({ benchmarkId: n2.id, organisatieId: "O1", metingId: "M2", respondentId: "L1", toegewezenDoor: "g1" }, { benchmarkNaam: "Binnen", organisatieNaam: "Org O1" });
-    expect(toewijzingen()).toHaveLength(3);
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2.id)], "g1");
+    db.slaLeadToegangOp("O1", [{ ...aan("L1", "resultaten", "M1"), aan: false }], "g1");
+    expect(vinkjes()).toHaveLength(0);
   });
 
-  it("het audit-log noemt het niveau en de Meting, bij niveau 3 geen Respondentnaam en nooit de Lead", () => {
-    opzet();
-    const log = JSON.parse(opslag.get("coniche-scan:audit")!) as { actie: string; details: Record<string, unknown> }[];
-    const regels = log.filter((e) => e.actie === "benchmark.toegewezen");
-    expect(regels.map((e) => e.details.niveau)).toEqual(["metingen", "scans"]);
-    expect(regels[1].details.metingLabel).toBe("M1");
-    expect(JSON.stringify(regels)).not.toMatch(/L1|R1|@x\.nl/);
-  });
-
-  it("een Meting verwijderen haalt de toewijzingen van die Meting weg, niveau 2 en 3", () => {
-    opzet();
+  it("een Meting verwijderen haalt de vinkjes van die Meting weg, ook het benchmarkvinkje dat erop leunde", () => {
+    const { n2 } = opzet();
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "uitnodigen", "M1"), aan("L1", "benchmark", n2.id)], "g1");
     db.verwijderMeting("M1");
-    expect(toewijzingen()).toHaveLength(0);
+    expect(vinkjes()).toHaveLength(0);
   });
 
-  it("de Respondent van een niveau-3-view verwijderen, of zijn scan, haalt die toewijzing weg", () => {
-    opzet();
-    db.verwijderScanInvullingen(["i-M1-R1"]);
-    expect(toewijzingen()).toHaveLength(1); // Alleen de toewijzing van niveau 2 blijft.
-    opslag.clear();
-    opzet();
-    db.verwijderLeden(["R1"]);
-    expect(toewijzingen()).toHaveLength(1);
-  });
-
-  it("de Lead verwijderen, of zijn Lead-rol op de Meting verliezen, haalt zijn toewijzingen weg", () => {
-    opzet();
-    db.zetLeadMetingen("L1", ["M2"]);
-    expect(toewijzingen()).toHaveLength(0);
-    opslag.clear();
-    opzet();
-    db.verwijderLeden(["L1"]);
-    expect(toewijzingen()).toHaveLength(0);
-  });
-
-  it("een benchmark wijzigen zodat een Meting niet meer meedoet haalt de toewijzing van die Meting weg", () => {
+  it("de Respondent van een scan verwijderen raakt de vinkjes van de Lead niet", () => {
     const { n2 } = opzet();
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2.id)], "g1");
+    db.verwijderLeden(["R1"]);
+    expect(vinkjes()).toHaveLength(2);
+  });
+
+  it("de Lead verwijderen, of zijn rol intrekken, haalt zijn vinkjes weg", () => {
+    const { n2 } = opzet();
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2.id)], "g1");
+    db.zetLeadRol("L1", false);
+    expect(vinkjes()).toHaveLength(0);
+    opslag.clear();
+    const { n2: n2b } = opzet();
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2b.id)], "g1");
+    db.verwijderLeden(["L1"]);
+    expect(vinkjes()).toHaveLength(0);
+  });
+
+  it("een benchmark wijzigen zodat de Meting met Resultaten niet meer meedoet haalt het benchmarkvinkje weg", () => {
+    const { n2 } = opzet();
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2.id)], "g1");
     store.wijzigBenchmark(n2.id, { naam: "Binnen", assessmentIds: ["A"], leden: [{ organisatieId: "O1", assessmentId: "A", metingId: "M2" }] }, namen);
-    expect(toewijzingen()).toHaveLength(1); // Alleen de toewijzing van niveau 3 blijft.
+    db.ruimBenchmarkVinkjesOp();
+    expect(benchmarkVinkjes()).toHaveLength(0);
+    expect(vinkjes().map((t) => t.weergave)).toEqual(["resultaten"]);
   });
 });
 
+describe("de overgang van toewijzingen naar vinkjes", () => {
+  const toewijzing = (id: string, benchmarkId: string, extra: Rij = {}) => ({
+    id, benchmarkId, organisatieId: "O1", respondentId: "L1", toegewezenDoor: "g1", toegewezenOp: "x", ...extra,
+  });
+  const zetOud = (benchmarks: Rij[], toewijzingen: Rij[]) =>
+    opslag.set("coniche-scan:benchmarks", JSON.stringify({ benchmarks, toewijzingen }));
+  const bm = (id: string, niveau: string, metingId = "M1") => ({
+    id, naam: id, niveau, assessmentIds: ["A"], meldingen: [], aangemaaktOp: "x", aangemaaktDoor: "g1",
+    leden: [{ organisatieId: "O1", assessmentId: "A", metingId }],
+  });
+  const orgs = () => JSON.parse(opslag.get(ORG_KEY)!) as { leden: { id: string; lead?: boolean }[]; leadToegang?: Rij[]; leadOvergangMelding?: string | null }[];
+
+  it("zet een toewijzing om in een vinkje en maakt de Respondent Lead, en wist de toewijzing", () => {
+    zet([org("O1", [lid("L1", "O1")], [meting("M1", "O1")])]);
+    zetOud([bm("B1", "organisaties")], [toewijzing("t1", "B1")]);
+    db.voerLeadOvergangUit();
+    const o = orgs()[0];
+    expect(o.leden[0].lead).toBe(true);
+    expect(o.leadToegang).toMatchObject([{ respondentId: "L1", weergave: "benchmark", benchmarkId: "B1" }]);
+    expect(store.legeToewijzingen()).toHaveLength(0);
+  });
+
+  it("zet een view op één scan om in Spreiding voor die Meting, met een melding aan de Admin", () => {
+    zet([org("O1", [lid("L1", "O1")], [meting("M1", "O1")])]);
+    zetOud([bm("B3", "scans")], [toewijzing("t3", "B3", { metingId: "M1", onderwerpRespondentId: "R1" })]);
+    db.voerLeadOvergangUit();
+    const o = orgs()[0];
+    // Spreiding hangt af van Resultaten: Zonder dat vinkje valt het bij het opruimen, de melding blijft.
+    expect(o.leadOvergangMelding).toContain("Spreiding");
+  });
+
+  it("laat een toewijzing van een nog onbekende Lead staan, en een tweede keer draaien verandert niets", () => {
+    zet([org("O1", [lid("L1", "O1")], [meting("M1", "O1")])]);
+    zetOud([bm("B1", "organisaties")], [toewijzing("t1", "B1"), toewijzing("t2", "B1", { respondentId: "ONBEKEND" })]);
+    db.voerLeadOvergangUit();
+    expect(store.legeToewijzingen().map((t) => t.id)).toEqual(["t2"]);
+    db.voerLeadOvergangUit();
+    expect(orgs()[0].leadToegang).toHaveLength(1);
+    expect(store.legeToewijzingen().map((t) => t.id)).toEqual(["t2"]);
+  });
+});

@@ -970,3 +970,75 @@ body:has(.admin-main) {
   color: var(--ink);
   background: var(--bg-mid);
 }
+
+/* De tabel Leads (beheerpagina.md, punt 6a): Eén rij per Lead, per Meting vijf kolommen gegroepeerd per ronde en per benchmark
+   één kolom. De kaart scrolt zelf, met een vaste eerste kolom en een kolomkop die blijft staan. Een cel die niet aan te vinken is,
+   is grijs met de reden in een Info-icoon. */
+.lead-tabel-kaart {
+  max-height: 70vh;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.lead-tabel {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--fs-s);
+  width: 100%;
+}
+.lead-tabel th,
+.lead-tabel td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  white-space: nowrap;
+  background: var(--bg);
+}
+.lead-tabel thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.lead-tabel thead th {
+  font-weight: 700;
+  color: var(--ink-m);
+  background: var(--bg-warm);
+}
+.lead-tabel th.lead-tabel-groep {
+  border-left: 1px solid var(--border-d);
+}
+.lead-tabel th.lead-tabel-meting {
+  border-left: 1px solid var(--border);
+}
+.lead-tabel th.lead-tabel-weergave {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+.lead-tabel .lead-tabel-naam {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 14rem;
+  text-align: left;
+  background: var(--bg);
+}
+.lead-tabel thead th.lead-tabel-naam {
+  z-index: 3;
+  background: var(--bg-warm);
+}
+.lead-tabel-sub {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  color: var(--ink-s);
+}
+.lead-tabel td.lead-tabel-cel {
+  min-width: 4rem;
+}
+.lead-tabel td.lead-tabel-cel--grijs {
+  background: var(--bg-mid);
+}
+.lead-tabel td.lead-tabel-cel input[type="checkbox"] {
+  vertical-align: middle;
+}

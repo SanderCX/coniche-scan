@@ -66,7 +66,7 @@ Deze regels gelden voor alle weergaven. G wijkt af in de kleuren en heeft geen b
 
 **Lead**
 
-- Op zijn eigen resultaten ziet een Lead de schakelaar met Overzicht en Per bouwblok, de knop voor de vergelijking met de vorige ronde, en Spreiding en Antwoorden als die vinkjes in de tabel Leads aan staan (`beheerpagina.md`, punt 6a). Spreiding is er voor een Lead zonder ring (voorstel van 14 oktober 2026). Positie in de Meting is er niet voor een Lead. Benchmarkviews staan als kaart op zijn pagina "Mijn metingen", zoals nu al gespecificeerd.
+- Op zijn eigen resultaten ziet een Lead de schakelaar met Overzicht en Per bouwblok, de knop voor de vergelijking met de vorige ronde, en Spreiding en Antwoorden als die vinkjes in de tabel Leads aan staan (`beheerpagina.md`, punt 6a). Spreiding is er voor een Lead zonder ring (gebouwd op 14 oktober 2026). Positie in de Meting is er niet voor een Lead. Benchmarkviews staan als kaart op zijn pagina "Mijn metingen", zoals nu al gespecificeerd.
 
 ## A. Eén meting
 
@@ -199,7 +199,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Tegels.** Aantal respondenten, percentage beantwoorde vragen (met het totaal), laagste vraag (score, bouwblok en vraagnummer) en hoogste vraag.
 
-**Privacy.** Dit zijn de antwoorden van individuele personen. Een Lead ziet deze weergave alleen als een Admin in de tabel Leads het vinkje Antwoorden voor die Meting heeft aangevinkt (voorstel van 14 oktober 2026, `beheerpagina.md`, punt 6a). Of hij daarbij namen ziet, bepaalt `Organisatie.antwoordenMetNamen`. Staat die uit, dan heten de kolommen R1 tot en met Rn, zonder tooltip met een naam, in een vaste volgorde die niet de naam of het moment van afronden volgt. Bij anonieme namen is de weergave voor een Lead pas aan te vinken vanaf `benchmarkMinRespondenten` afgeronde scans in de Meting. Een samengestelde Meting heeft geen Antwoorden. De opmerkingen per bouwblok staan niet in deze weergave.
+**Privacy.** Dit zijn de antwoorden van individuele personen. Een Lead ziet deze weergave alleen als een Admin in de tabel Leads het vinkje Antwoorden voor die Meting heeft aangevinkt (gebouwd op 14 oktober 2026, `beheerpagina.md`, punt 6a). Of hij daarbij namen ziet, bepaalt `Organisatie.antwoordenMetNamen`. Staat die uit, dan heten de kolommen R1 tot en met Rn, zonder tooltip met een naam, in een vaste volgorde die niet de naam of het moment van afronden volgt. Bij anonieme namen is de weergave voor een Lead pas aan te vinken vanaf `benchmarkMinRespondenten` afgeronde scans in de Meting. Een samengestelde Meting heeft geen Antwoorden. De opmerkingen per bouwblok staan niet in deze weergave.
 
 ## Gebouwd
 

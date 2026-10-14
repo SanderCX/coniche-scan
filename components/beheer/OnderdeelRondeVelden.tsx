@@ -49,6 +49,7 @@ export function OnderdeelRondeVelden({
   onChange,
   metZonderRonde = false,
   idPrefix = "meting",
+  inRij = false,
 }: {
   organisatie: Pick<Organisatie, "rondes" | "scanUitvoeringen">;
   waarde: OnderdeelRondeWaarde;
@@ -56,47 +57,56 @@ export function OnderdeelRondeVelden({
   /** Alleen voor een bestaande Meting die nog geen ronde heeft: Dan kan ze zonder ronde blijven. */
   metZonderRonde?: boolean;
   idPrefix?: string;
+  /**
+   * De velden staan direct in de rij van de aanroeper (`stylesheet.md`, Veldenrij met labels en een knop): Geen eigen rij en
+   * geen regel "Wordt: …", die staat dan onder de rij van de aanroeper (`metingNaam`), zodat hij geen veld omlaag duwt.
+   */
+  inRij?: boolean;
 }) {
   const rondes = rondesNieuwsteEerst(organisatie);
   const onderdelen = useMemo(() => bestaandeOnderdelen(organisatie), [organisatie]);
   const naam = metingNaam(organisatie, waarde);
   const lijstId = `${idPrefix}-onderdelen`;
+  const velden = (
+    <>
+      <div className="admin-field" style={{ marginBottom: 0 }}>
+        <label>Ronde</label>
+        <select value={waarde.ronde} onChange={(e) => onChange({ ...waarde, ronde: e.target.value })}>
+          {metZonderRonde && <option value={GEEN_RONDE}>Zonder ronde</option>}
+          {rondes.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.label}
+            </option>
+          ))}
+          <option value={NIEUWE_RONDE}>Nieuwe ronde</option>
+        </select>
+      </div>
+      {waarde.ronde === NIEUWE_RONDE && (
+        <div className="admin-field" style={{ marginBottom: 0 }}>
+          <label>Naam van de ronde</label>
+          <input
+            type="text"
+            value={waarde.nieuweRonde}
+            placeholder="0-meting"
+            onChange={(e) => onChange({ ...waarde, nieuweRonde: e.target.value })}
+          />
+        </div>
+      )}
+      <div className="admin-field" style={{ marginBottom: 0 }}>
+        <label>Onderdeel</label>
+        <input type="text" list={lijstId} value={waarde.onderdeel} onChange={(e) => onChange({ ...waarde, onderdeel: e.target.value })} />
+        <datalist id={lijstId}>
+          {onderdelen.map((o) => (
+            <option key={o} value={o} />
+          ))}
+        </datalist>
+      </div>
+    </>
+  );
+  if (inRij) return velden;
   return (
     <>
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="admin-field" style={{ marginBottom: 0 }}>
-          <label>Ronde</label>
-          <select value={waarde.ronde} onChange={(e) => onChange({ ...waarde, ronde: e.target.value })}>
-            {metZonderRonde && <option value={GEEN_RONDE}>Zonder ronde</option>}
-            {rondes.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.label}
-              </option>
-            ))}
-            <option value={NIEUWE_RONDE}>Nieuwe ronde</option>
-          </select>
-        </div>
-        {waarde.ronde === NIEUWE_RONDE && (
-          <div className="admin-field" style={{ marginBottom: 0 }}>
-            <label>Naam van de ronde</label>
-            <input
-              type="text"
-              value={waarde.nieuweRonde}
-              placeholder="0-meting"
-              onChange={(e) => onChange({ ...waarde, nieuweRonde: e.target.value })}
-            />
-          </div>
-        )}
-        <div className="admin-field" style={{ marginBottom: 0 }}>
-          <label>Onderdeel</label>
-          <input type="text" list={lijstId} value={waarde.onderdeel} onChange={(e) => onChange({ ...waarde, onderdeel: e.target.value })} />
-          <datalist id={lijstId}>
-            {onderdelen.map((o) => (
-              <option key={o} value={o} />
-            ))}
-          </datalist>
-        </div>
-      </div>
+      <div className="flex flex-wrap items-start gap-3">{velden}</div>
       {naam && (
         <p className="text-sm text-ink-m" style={{ margin: "0.5rem 0 0" }}>
           Wordt: <strong>{naam}</strong>

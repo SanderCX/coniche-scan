@@ -271,6 +271,7 @@ export function ScansSamenbrengenModal({
         <div className="overzicht-blok-kop">
           <h3>Scans en Respondenten</h3>
         </div>
+        {scans.length === 0 && <p className="admin-notice">De geselecteerde Metingen bevatten nog geen scans.</p>}
         <table className="admin-table">
           <thead>
             <tr>

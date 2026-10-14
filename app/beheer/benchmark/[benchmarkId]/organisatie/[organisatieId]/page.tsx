@@ -9,7 +9,7 @@ import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
-import { ToewijzenBlok } from "@/components/benchmark/ToewijzenBlok";
+import { LeadsOpView } from "@/components/benchmark/LeadsOpView";
 import { BenchmarkOrganisatieView } from "@/components/benchmark/BenchmarkOrganisatieView";
 
 /**
@@ -51,16 +51,13 @@ export default function BenchmarkOrganisatiePage({
     .map((s) => bouwOrganisatieView(s, organisatie.id, instellingen.benchmarkMinOrganisaties))
     .filter((v) => v !== null);
   const peildatum = new Date();
-  const voldoet = views.some((v) => v.voldoetAanDrempel);
-  // De lid-Metingen van deze organisatie waarvan de groep aan de drempel voldoet: Een Lead ziet alleen die secties.
-  const voldoendeMetingIds = views.filter((v) => v.voldoetAanDrempel).map((v) => v.rij.meting.id);
-
 
   return (
     <div className="admin-main admin-main--breed">
       <Kruimelpad
         delen={[
-          { label: "Benchmark", href: "/beheer/benchmark" },
+          { label: "Resultaten", href: "/beheer/resultaten/rondes" },
+          { label: "Benchmarks", href: "/beheer/benchmark" },
           { label: benchmark.naam, href: `/beheer/benchmark/${benchmark.id}` },
           { label: organisatie.naam },
         ]}
@@ -70,14 +67,6 @@ export default function BenchmarkOrganisatiePage({
         De view van deze organisatie tegenover de rest van de groep in {benchmark.naam}. Je ziet hem zoals een Lead hem ziet, zonder namen
         van andere organisaties.
       </p>
-
-      <ToewijzenBlok
-        benchmark={benchmark}
-        onderwerp={{ organisatie }}
-        voldoetAanDrempel={voldoet}
-        voldoendeMetingIds={voldoendeMetingIds}
-        gebruikerId={gebruiker!.id}
-      />
 
       {views.length === 0 ? (
         <p className="admin-notice" style={{ marginTop: "1.5rem" }}>
@@ -96,6 +85,8 @@ export default function BenchmarkOrganisatiePage({
           </div>
         ))
       )}
+
+      <LeadsOpView organisatie={organisatie} benchmark={benchmark} />
     </div>
   );
 }

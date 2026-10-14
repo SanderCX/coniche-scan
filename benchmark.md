@@ -18,7 +18,7 @@ Scores worden berekend en nooit opgeslagen (`datamodel.md`, Scoreberekening). Da
 
 ## Plek in beheer
 
-**Gebouwd.** Een hoofdlink "Benchmark" in `.nav-right` voor een Admin, naast Assessments en Organisaties. Voorstel van 14 oktober 2026: Dit wordt de tab Benchmarks onder de hoofdlink Resultaten (`beheerpagina.md`, punt 7). Een benchmark hoort bij een groep en dus niet onder één organisatie. Ook de niveaus 2 en 3 komen hier te staan, zodat alle vergelijkingen op één plek zitten. Bij het aanmaken kiest de Admin eerst het niveau.
+**Gebouwd.** Een hoofdlink "Benchmark" in `.nav-right` voor een Admin, naast Assessments en Organisaties. Sinds 14 oktober 2026 is dit de tab Benchmarks onder de hoofdlink Resultaten (`beheerpagina.md`, punt 7). Een benchmark hoort bij een groep en dus niet onder één organisatie. Ook de niveaus 2 en 3 komen hier te staan, zodat alle vergelijkingen op één plek zitten. Bij het aanmaken kiest de Admin eerst het niveau.
 
 **Besloten.** Vooralsnog kan alleen een Admin erbij. Er is een eigen permissie `benchmark.beheren`, alleen voor Admin, zodat een Consultant er later bij kan zonder dat de rechtenmatrix om moet. De schermen staan in `beheerpagina.md`, punt 14.
 
@@ -101,7 +101,7 @@ De view toont nooit de namen van andere organisaties. De Admin bekijkt de view e
 
 ### View voor een Lead op niveau 1
 
-**Voorstel van 14 oktober 2026, vervangt "Toewijzen aan een Lead" (gebouwd, `BenchmarkToewijzing`).** De Admin wijst de view niet meer toe op de view zelf. Voor de Lead is het een kolom in de tabel Leads van de organisatie (`beheerpagina.md`, punt 6a), met een vinkje per Lead. De Lead ziet de view naast zijn eigen resultaten op zijn pagina. Wat de Lead ziet:
+**Gebouwd op 14 oktober 2026, vervangt "Toewijzen aan een Lead" (gebouwd, `BenchmarkToewijzing`).** De Admin wijst de view niet meer toe op de view zelf. Voor de Lead is het een kolom in de tabel Leads van de organisatie (`beheerpagina.md`, punt 6a), met een vinkje per Lead. De Lead ziet de view naast zijn eigen resultaten op zijn pagina. Wat de Lead ziet:
 
 - Geen automatische toegang. Een nieuwe benchmark is voor elke Lead een lege kolom.
 - De view gaat over de Meting van de organisatie die als lid in de benchmark zit. Het vinkje kan voor elke Lead van die organisatie, ook voor een Lead zonder Resultaten, want de view toont de scores van de eigen organisatie zelf al. Van de Lead zelf speelt niets mee, ook niet zijn eigen scan.
@@ -181,7 +181,7 @@ Een Meting die verwijst naar andere Metingen (`Meting.samenstelling`) en daarvan
 
 ## View voor een Lead
 
-**Voorstel van 14 oktober 2026.** Dit vervangt de onderdelen "Bereik van een Lead" en "Toewijzen aan een Lead op alle niveaus" (niveau 1 gebouwd op 13 oktober 2026, niveau 2 en 3 voorstel). Eén tabel Leads per organisatie bepaalt wat een Lead ziet (`beheerpagina.md`, punt 6a). Voor benchmarks is dat één kolom per benchmark waar de organisatie in zit, met een vinkje per Lead. Een Lead heeft geen bereik meer en een view wordt niet meer op de view zelf toegewezen.
+**Gebouwd op 14 oktober 2026.** Dit vervangt de onderdelen "Bereik van een Lead" en "Toewijzen aan een Lead op alle niveaus" (niveau 1 gebouwd op 13 oktober 2026, niveau 2 en 3 voorstel). Eén tabel Leads per organisatie bepaalt wat een Lead ziet (`beheerpagina.md`, punt 6a). Voor benchmarks is dat één kolom per benchmark waar de organisatie in zit, met een vinkje per Lead. Een Lead heeft geen bereik meer en een view wordt niet meer op de view zelf toegewezen.
 
 - **Niveau 1.** De Lead krijgt de view van de organisatie tegenover de rest van de groep, als de organisatie in de benchmark zit. Resultaten is niet nodig, omdat de view de scores van de eigen organisatie zelf al toont. De lid-Meting kan per Assessment een andere zijn, en is vaak een samengestelde Meting (Onderdeel en samengestelde Meting). De Lead ziet alleen de secties die aan de drempel voldoen.
 - **Niveau 2.** Voor elke Meting M die lid is van de benchmark en waarvoor de Lead Resultaten heeft, ziet hij de view van M tegenover de overige Metingen. Een Lead met Resultaten op alleen een samengestelde Meting krijgt geen view van niveau 2, want de samengestelde Meting is daar geen lid.

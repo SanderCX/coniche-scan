@@ -70,7 +70,7 @@ export function WeergaveAntwoorden({ assessment, weergave }: { assessment: Asses
             <tr>
               <th className="vis-antw-naam">{assessment.bouwblokLabel}</th>
               {kolommen.map((k) => (
-                <th key={k.invullingId} title={k.naam}>
+                <th key={k.invullingId} title={k.naam || undefined}>
                   {k.initialen}
                 </th>
               ))}
@@ -143,8 +143,8 @@ export function WeergaveAntwoorden({ assessment, weergave }: { assessment: Asses
         </table>
       </div>
       <p className="vis-onderschrift">
-        Elke kolom is een respondent, met de naam in een tooltip. Een bouwblokcel toont de bouwblokscore van die respondent, een
-        lege cel is een onbeantwoorde vraag. Alleen zichtbaar voor een Admin en Consultant.
+        Elke kolom is een respondent{kolommen.some((k) => k.naam) ? ", met de naam in een tooltip" : " (anoniem, in een vaste volgorde)"}.
+        Een bouwblokcel toont de bouwblokscore van die respondent, een lege cel is een onbeantwoorde vraag.
       </p>
     </div>
   );

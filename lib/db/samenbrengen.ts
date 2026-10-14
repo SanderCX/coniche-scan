@@ -164,8 +164,6 @@ export function brengScansSamen(
           team: regel.respondent.team.trim(),
           notities: "",
           toegangscode: genereerUniekeToegangscode(alles),
-          leadMetingIds: [],
-          leadVoorOrganisatie: false,
           aangemaaktOp: new Date().toISOString(),
         };
         organisatie.leden.push(doelLid);

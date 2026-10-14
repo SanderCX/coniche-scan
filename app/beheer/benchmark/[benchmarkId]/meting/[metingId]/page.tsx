@@ -10,7 +10,7 @@ import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { BenchmarkOrganisatieView } from "@/components/benchmark/BenchmarkOrganisatieView";
-import { ToewijzenBlok } from "@/components/benchmark/ToewijzenBlok";
+import { LeadsOpView } from "@/components/benchmark/LeadsOpView";
 
 /**
  * Benchmark binnen een organisatie, de view van één Meting (`benchmark.md`, Niveau 2): De Meting naast het gemiddelde van de
@@ -56,7 +56,8 @@ export default function BenchmarkMetingPage({ params }: { params: Promise<{ benc
     <div className="admin-main admin-main--breed">
       <Kruimelpad
         delen={[
-          { label: "Benchmark", href: "/beheer/benchmark" },
+          { label: "Resultaten", href: "/beheer/resultaten/rondes" },
+          { label: "Benchmarks", href: "/beheer/benchmark" },
           { label: benchmark.naam, href: `/beheer/benchmark/${benchmark.id}` },
           { label: meting.meting.label },
         ]}
@@ -65,12 +66,6 @@ export default function BenchmarkMetingPage({ params }: { params: Promise<{ benc
       <p className="text-sm text-ink-m">
         De view van deze Meting van {meting.organisatie.naam} tegenover de overige Metingen in {benchmark.naam}.
       </p>
-      <ToewijzenBlok
-        benchmark={benchmark}
-        onderwerp={{ organisatie: meting.organisatie, meting: meting.meting }}
-        voldoetAanDrempel={views.some((v) => v.voldoetAanDrempel)}
-        gebruikerId={gebruiker!.id}
-      />
       {views.map((v) => (
         <div key={v.assessment.id}>
           {!v.voldoetAanDrempel && (
@@ -84,6 +79,8 @@ export default function BenchmarkMetingPage({ params }: { params: Promise<{ benc
           <BenchmarkOrganisatieView view={v} organisatieNaam={meting.meting.label} peildatum={peildatum} niveau="metingen" />
         </div>
       ))}
+
+      <LeadsOpView organisatie={meting.organisatie} benchmark={benchmark} metingId={meting.meting.id} />
     </div>
   );
 }

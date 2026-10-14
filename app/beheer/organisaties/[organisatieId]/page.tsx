@@ -2,16 +2,14 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
-import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisatie, updateOrganisatie, hernoemOrganisatie } from "@/lib/db";
 import { maakPubliekeLink } from "@/lib/uitnodiging-link";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
-import { voortgang } from "@/lib/scoring";
 import { organisatieVelden } from "@/data/organisatie-velden";
 import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
 import { BenchmarkVlag } from "@/components/beheer/BenchmarkVlag";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
-import { RespondentStatusBadge, STATUS_LABEL } from "@/components/beheer/overzicht-helpers";
+import { RespondentStatusBadge } from "@/components/beheer/overzicht-helpers";
 import { Organisatie } from "@/lib/types";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren, magOrganisatieToegang, magOrganisatieToewijzen, magLeadToekennen } from "@/lib/rechten";
@@ -20,15 +18,16 @@ import { useBeheerOverzicht } from "@/lib/beheer-url";
 import { MetBewerkslot } from "@/components/beheer/MetBewerkslot";
 import { LeadToevoegenFormulier } from "@/components/beheer/LeadToevoegenFormulier";
 import { MetingenSectie } from "@/components/beheer/MetingenSectie";
+import { LeadsTabel } from "@/components/beheer/LeadsTabel";
+import { AntwoordenNamenSchakelaar } from "@/components/beheer/AntwoordenNamenSchakelaar";
 import { isLead } from "@/lib/lead";
 
 /** Aantal rijen per lijst op de detailpagina (beheerpagina.md, punt 4, "Lange lijsten"). */
 const MAX_RIJEN = 5;
 
 /**
- * "+ Lead toevoegen" (beheerpagina.md punt 6a): nieuwe actie op organisatieniveau. Bestaande Leads staan in de lijst
- * Respondenten (met het label Lead), hun toegang beheer je in het Respondent-overzicht. Het formulier staat in
- * `LeadToevoegenFormulier`, ook voor de modal op een benchmarkview.
+ * "+ Lead toevoegen" (beheerpagina.md punt 6a): Een oranje knop onder de tabel Leads, links uitgelijnd. Een klik opent eronder
+ * het formulier (`LeadToevoegenFormulier`): Een bestaande Respondent of een nieuwe. De nieuwe rij verschijnt zonder vinkjes.
  */
 function LeadToevoegen({ organisatie }: { organisatie: Organisatie }) {
   const [open, setOpen] = useState(false);
@@ -153,7 +152,6 @@ export default function OrganisatieDetailPage({ params }: { params: Promise<{ or
 
 function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
   const organisatie = useOrganisatie(organisatieId);
-  const assessments = useAssessments();
   const ingelogd = useIngelogdeGebruiker();
   const alleGebruikers = useGebruikers();
   const { open } = useBeheerOverzicht();
@@ -179,8 +177,6 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
     );
   }
 
-  const assessmentNaam = (id: string) => assessments.find((a) => a.id === id)?.naam ?? "Onbekend type";
-
   function handleKenmerkenOpslaan(kenmerken: Record<string, unknown>) {
     updateOrganisatie(organisatieId, (o) => ({ ...o, kenmerken }));
     setKenmerkenOpgeslagen(true);
@@ -200,15 +196,8 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
     (g) => g.actief && g.rol === "consultant" && g.id !== organisatie.aangemaaktDoor
   );
 
-  const scans = organisatie.scanUitvoeringen.flatMap((meting) =>
-    meting.invullingen.flatMap((invulling) => {
-      const lid = organisatie.leden.find((l) => l.id === invulling.organisatieLidId);
-      return lid ? [{ meting, invulling, lid }] : [];
-    })
-  );
-
   return (
-    <div className="admin-main">
+    <div className="admin-main admin-main--breed">
       <Kruimelpad delen={[{ label: "Organisaties", href: "/beheer/organisaties" }, { label: organisatie.naam }]} />
       <OrganisatieNaam organisatieId={organisatie.id} naam={organisatie.naam} />
       <p className="text-sm text-ink-m">
@@ -278,48 +267,16 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
           )}
         </>
       )}
-      {magLeadToekennen(ingelogd, organisatie) && <LeadToevoegen organisatie={organisatie} />}
-
-      <h2>Ingevulde scans</h2>
-      {scans.length === 0 ? (
-        <p className="admin-notice">Nog geen scans.</p>
-      ) : (
+      {magLeadToekennen(ingelogd) && (
         <>
-          <table className="admin-table">
-            <tbody>
-              {scans.slice(0, MAX_RIJEN).map(({ meting, invulling, lid }) => {
-                const assessment = assessments.find((a) => a.id === meting.assessmentId);
-                const { percentage } = assessment ? voortgang(assessment, invulling.antwoorden) : { percentage: 0 };
-                return (
-                  <tr key={invulling.id} className="admin-table-rij-klikbaar" onClick={() => open("scan", invulling.id)}>
-                    <td>{lid.naam || <em className="text-ink-s">{lid.email}</em>}</td>
-                    <td>
-                      {meting.label} <span className="text-ink-s">— {assessmentNaam(meting.assessmentId)}</span>
-                    </td>
-                    <td>
-                      <span className={`admin-badge status-${invulling.status}`}>{STATUS_LABEL[invulling.status]}</span>
-                    </td>
-                    <td>{percentage}%</td>
-                    <td className="cel-knop">
-                      <button type="button" className="btn btn-outline btn-compact" onClick={() => open("scan", invulling.id)}>
-                        Bekijk
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {scans.length > MAX_RIJEN && (
-            <Link href={`/beheer/scans?organisatie=${organisatie.id}`} className="lijst-meer-link">
-              Alle ingevulde scans van deze organisatie →
-            </Link>
-          )}
+          <LeadsTabel organisatie={organisatie} gebruikerId={ingelogd!.id} />
+          <LeadToevoegen organisatie={organisatie} />
         </>
       )}
 
       <h2>Organisatiekenmerken</h2>
       {magBenchmarkBeheren(ingelogd) && <BenchmarkVlag organisatie={organisatie} />}
+      {magLeadToekennen(ingelogd) && <AntwoordenNamenSchakelaar organisatie={organisatie} />}
       {organisatieVelden.length === 0 ? (
         <p className="admin-notice">Geen organisatievelden gedefinieerd.</p>
       ) : (

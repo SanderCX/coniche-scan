@@ -165,7 +165,7 @@ export function zetBenchmarkVlag(organisatieId: string, toegestaan: boolean): vo
   if (!organisatie || organisatie.benchmarkToegestaan === toegestaan) return;
   organisatie.benchmarkToegestaan = toegestaan;
   organisatie.gewijzigdOp = new Date().toISOString();
-  slaAlles(alles);
+  // Eerst uit de benchmarks, dan opslaan: `slaAlles` laat de vinkjes van Leads voor die benchmarks vervallen.
   if (!toegestaan) {
     haalOrganisatiesUitBenchmarks(
       [{ organisatieId: organisatie.id, organisatieNaam: organisatie.naam }],
@@ -173,6 +173,7 @@ export function zetBenchmarkVlag(organisatieId: string, toegestaan: boolean): vo
       true
     );
   }
+  slaAlles(alles);
   logAudit({
     actie: "organisatie.benchmarkVlagGewijzigd",
     entiteitType: "organisatie",
@@ -180,4 +181,47 @@ export function zetBenchmarkVlag(organisatieId: string, toegestaan: boolean): vo
     entiteitNaam: organisatie.naam,
     details: { ...organisatieContext(organisatie), benchmarkToegestaan: toegestaan },
   });
+}
+
+/**
+ * "Namen tonen bij Antwoorden" (`beheerpagina.md`, punt 4 en punt 6a, Namen bij Antwoorden; `datamodel.md` deel 3): Een Admin zet
+ * het aan na afstemming met de opdrachtgever. Uit: Een Lead ziet bij Antwoorden R1 tot en met Rn. Wijzigen wordt gelogd
+ * (`organisatie.antwoordenNamenGewijzigd`). Dit zegt niets over de toestemming van de respondent: De intake verandert niet.
+ */
+export function zetAntwoordenMetNamen(organisatieId: string, aan: boolean): void {
+  const alles = laadAlles();
+  const organisatie = alles.find((o) => o.id === organisatieId);
+  if (!organisatie || (organisatie.antwoordenMetNamen === true) === aan) return;
+  organisatie.antwoordenMetNamen = aan;
+  organisatie.gewijzigdOp = new Date().toISOString();
+  slaAlles(alles);
+  logAudit({
+    actie: "organisatie.antwoordenNamenGewijzigd",
+    entiteitType: "organisatie",
+    entiteitId: organisatie.id,
+    entiteitNaam: organisatie.naam,
+    details: { ...organisatieContext(organisatie), antwoordenMetNamen: aan },
+  });
+}
+
+/** Sluit de melding aan de Admin over de omzetting van het bereik van een Lead (`beheerpagina.md`, punt 6a, Overgang). */
+export function sluitLeadOvergangMelding(organisatieId: string): void {
+  const alles = laadAlles();
+  const organisatie = alles.find((o) => o.id === organisatieId);
+  if (!organisatie || !organisatie.leadOvergangMelding) return;
+  organisatie.leadOvergangMelding = null;
+  slaAlles(alles);
+}
+
+/**
+ * Laat de vinkjes van Leads kloppen met de benchmarks zoals ze nu zijn: Na het verwijderen of wijzigen van een benchmark vallen
+ * de vinkjes voor die benchmark weg als de organisatie er geen lid van is, of bij niveau 2 geen Resultaten heeft op een
+ * lid-Meting. Dat ruimt `slaAlles` bij elke opslag op, dit zorgt dat het meteen gebeurt. Geeft het aantal vervallen vinkjes.
+ */
+export function ruimBenchmarkVinkjesOp(): number {
+  const alles = laadAlles();
+  const voor = alles.reduce((n, o) => n + (o.leadToegang?.length ?? 0), 0);
+  slaAlles(alles);
+  const na = laadAlles().reduce((n, o) => n + (o.leadToegang?.length ?? 0), 0);
+  return voor - na;
 }

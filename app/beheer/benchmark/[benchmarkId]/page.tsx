@@ -4,8 +4,8 @@ import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
-import { useOrganisaties } from "@/lib/db";
-import { sluitBenchmarkMeldingen, useBenchmark, useBenchmarkToewijzingen, verwijderBenchmark } from "@/lib/benchmark-store";
+import { ruimBenchmarkVinkjesOp, useOrganisaties } from "@/lib/db";
+import { sluitBenchmarkMeldingen, useBenchmark, verwijderBenchmark } from "@/lib/benchmark-store";
 import { benchmarkNamen, bouwBenchmarkSecties, bouwScanSectie, niveauVan } from "@/lib/benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
@@ -29,7 +29,6 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
   const { benchmarkId } = use(params);
   const gebruiker = useIngelogdeGebruiker();
   const benchmark = useBenchmark(benchmarkId);
-  const toewijzingen = useBenchmarkToewijzingen();
   const organisaties = useOrganisaties();
   const assessments = useAssessments();
   const instellingen = useInstellingen();
@@ -54,11 +53,21 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
   const niveau = niveauVan(benchmark);
   const secties = niveau === "scans" ? [] : bouwBenchmarkSecties(benchmark, assessments, organisaties);
   const scanSectie = niveau === "scans" ? bouwScanSectie(benchmark, assessments, organisaties) : null;
-  const aantalToewijzingen = toewijzingen.filter((t) => t.benchmarkId === benchmark.id).length;
+  // Het aantal vinkjes van Leads voor deze benchmark: Ze gaan mee als de benchmark wordt verwijderd.
+  const aantalVinkjes = organisaties.reduce(
+    (n, o) => n + (o.leadToegang ?? []).filter((t) => t.weergave === "benchmark" && t.benchmarkId === benchmark.id).length,
+    0
+  );
 
   return (
     <div className="admin-main admin-main--breed">
-      <Kruimelpad delen={[{ label: "Benchmark", href: "/beheer/benchmark" }, { label: benchmark.naam }]} />
+      <Kruimelpad
+        delen={[
+          { label: "Resultaten", href: "/beheer/resultaten/rondes" },
+          { label: "Benchmarks", href: "/beheer/benchmark" },
+          { label: benchmark.naam },
+        ]}
+      />
       <h1>{benchmark.naam}</h1>
       <p className="text-sm text-ink-m">
         {NIVEAU_TEKST[niveau]} · aangemaakt op {datumFormat.format(new Date(benchmark.aangemaaktOp))} · cijfers berekend op{" "}
@@ -117,12 +126,13 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
         open={verwijderenOpen}
         titel="Benchmark verwijderen"
         bericht={`${benchmark.naam} verwijderen? ${
-          aantalToewijzingen > 0
-            ? `${aantalToewijzingen} toewijzing${aantalToewijzingen === 1 ? "" : "en"} aan Leads ${aantalToewijzingen === 1 ? "gaat" : "gaan"} mee. `
+          aantalVinkjes > 0
+            ? `${aantalVinkjes} vinkje${aantalVinkjes === 1 ? "" : "s"} van Leads ${aantalVinkjes === 1 ? "gaat" : "gaan"} mee. `
             : ""
         }Organisaties, Metingen en scans blijven bestaan. Dit kan niet ongedaan gemaakt worden.`}
         onBevestigen={() => {
           verwijderBenchmark(benchmark.id, benchmarkNamen(benchmark.assessmentIds, benchmark.leden, organisaties, assessments, niveau));
+          ruimBenchmarkVinkjesOp();
           router.push("/beheer/benchmark");
         }}
         onAnnuleren={() => setVerwijderenOpen(false)}

@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useAssessments } from "@/lib/assessment-store";
-import { maakMeting, nodigLidUit, zetLeadBereik } from "@/lib/db";
-import { isLead as lidIsLead, leadSamenvatting } from "@/lib/lead";
-import { LEAD_HELE_ORGANISATIE_WAARSCHUWING } from "@/components/beheer/LeadToevoegenFormulier";
+import { maakMeting, nodigLidUit, zetLeadRol } from "@/lib/db";
+import { isLead as lidIsLead } from "@/lib/lead";
+import { leadSamenvatting } from "@/lib/lead-toegang";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { Organisatie, OrganisatieLid } from "@/lib/types";
 import { isSamengesteld } from "@/lib/rondes";
@@ -48,61 +48,23 @@ export function ToegangBlok({
   }
 
   /* ---------- Lead ---------- */
-  // Het bereik (`datamodel.md` deel 2, Het bereik van een Lead): Specifieke Metingen of de hele organisatie. Wisselen
-  // naar "Hele organisatie" en terug laat de gekozen Metingen staan (Wisselen van bereik).
+  // Het vakje "Lead" geeft de Respondent een rij in de tabel Leads van de organisatie (`beheerpagina.md`, punt 6a). De vinkjes
+  // zelf staan alleen daar. Uitvinken trekt de rol in, na een bevestiging die zegt dat alle vinkjes van deze Lead verdwijnen.
   const isLead = lidIsLead(lid);
-  const opgeslagenOrganisatie = lid.leadVoorOrganisatie === true;
-  const [leadOpen, setLeadOpen] = useState(false); // vakje aangevinkt voor een nieuwe Lead, nog niet opgeslagen
-  const [gekozen, setGekozen] = useState<string[] | null>(null); // concept van de Metingen, `null` = de opgeslagen keuze
-  const [bereikConcept, setBereikConcept] = useState<"metingen" | "organisatie" | null>(null); // `null` = opgeslagen
   const [intrekkenOpen, setIntrekkenOpen] = useState(false);
-  const actueel = gekozen ?? lid.leadMetingIds;
-  const bereik: "metingen" | "organisatie" = bereikConcept ?? (opgeslagenOrganisatie ? "organisatie" : "metingen");
-  const vakjeAan = isLead || leadOpen;
-  const metingenGewijzigd = gekozen !== null && [...gekozen].sort().join() !== [...lid.leadMetingIds].sort().join();
-  const bereikGewijzigd = bereik !== (opgeslagenOrganisatie ? "organisatie" : "metingen");
-  const gewijzigd = metingenGewijzigd || bereikGewijzigd;
-  const kanOpslaan = bereik === "organisatie" ? !isLead || gewijzigd : actueel.length > 0 && (!isLead || gewijzigd);
 
   function onVakje(aan: boolean) {
     if (aan) {
-      setLeadOpen(true);
-      setGekozen(lid.leadMetingIds);
-      setBereikConcept(null);
-    } else if (isLead) {
+      zetLeadRol(lid.id, true);
+      onMelding("Deze Respondent is nu Lead. Vink in de tabel Leads aan wat hij ziet.");
+    } else {
       setIntrekkenOpen(true);
-    } else {
-      setLeadOpen(false);
-      setGekozen(null);
-      setBereikConcept(null);
     }
-  }
-  function toggleMeting(id: string, aan: boolean) {
-    setGekozen(aan ? [...actueel, id] : actueel.filter((x) => x !== id));
-  }
-  function ruimConceptOp() {
-    setLeadOpen(false);
-    setGekozen(null);
-    setBereikConcept(null);
-  }
-  function slaLeadOp() {
-    if (bereik === "organisatie") {
-      zetLeadBereik(lid.id, { soort: "organisatie" });
-      onMelding("Lead-toegang opgeslagen: de hele organisatie.");
-    } else {
-      zetLeadBereik(lid.id, { soort: "metingen", metingIds: actueel });
-      onMelding(`Lead-toegang opgeslagen: ${actueel.length} ${actueel.length === 1 ? "Meting" : "Metingen"}.`);
-    }
-    ruimConceptOp();
-  }
-  function annuleerLead() {
-    ruimConceptOp();
   }
   function trekLeadIn() {
-    zetLeadBereik(lid.id, { soort: "ingetrokken" });
+    zetLeadRol(lid.id, false);
     setIntrekkenOpen(false);
-    ruimConceptOp();
-    onMelding("Lead-rol ingetrokken.");
+    onMelding("Lead-rol ingetrokken, met alle vinkjes van deze Lead.");
   }
 
   /* ---------- Vragenlijst sturen ---------- */
@@ -136,8 +98,8 @@ export function ToegangBlok({
       metingId = r.meting.id;
       label = r.meting.label;
     }
-    // Is de Respondent Lead, dan geeft dezelfde stap hem ook toegang tot die Meting.
-    const resultaat = nodigLidUit(metingId, lid.email, isLead);
+    // Alleen de ScanInvulling: De vinkjes van een Lead veranderen er niet door (`beheerpagina.md`, punt 6a).
+    const resultaat = nodigLidUit(metingId, lid.email);
     if (!resultaat) {
       onMelding("Versturen is niet gelukt.", true);
       return;
@@ -145,7 +107,7 @@ export function ToegangBlok({
     setMetingKeuze("");
     setNieuwAssessment("");
     setNieuwConcept(null);
-    onMelding(`Vragenlijst gestuurd voor Meting "${label}"${isLead ? ", met Lead-toegang tot die Meting" : ""}.`);
+    onMelding(`Vragenlijst gestuurd voor Meting "${label}".`);
   }
 
   return (
@@ -166,66 +128,13 @@ export function ToegangBlok({
 
         <div style={{ marginTop: "0.9rem" }}>
           <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={vakjeAan}
-              disabled={!magLead}
-              onChange={(e) => onVakje(e.target.checked)}
-            />
+            <input type="checkbox" checked={isLead} disabled={!magLead} onChange={(e) => onVakje(e.target.checked)} />
             <span className="font-semibold text-ink">Lead</span>
           </label>
           <p className="text-sm text-ink-m" style={{ margin: "0.2rem 0 0 1.6rem" }}>
-            {leadSamenvatting(lid)}
+            {leadSamenvatting(organisatie, lid)}
+            {isLead && " (de vinkjes staan in de tabel Leads van de organisatie)"}
           </p>
-
-          {vakjeAan && (
-            <div style={{ margin: "0.7rem 0 0 1.6rem" }}>
-              <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
-                <legend className="text-sm font-medium text-ink">Bereik</legend>
-                <label className="flex items-center gap-2 text-sm" style={{ padding: "0.25rem 0" }}>
-                  <input type="radio" name={`bereik-${lid.id}`} checked={bereik === "metingen"} onChange={() => setBereikConcept("metingen")} />
-                  Specifieke Metingen
-                </label>
-                <label className="flex items-center gap-2 text-sm" style={{ padding: "0.25rem 0" }}>
-                  <input type="radio" name={`bereik-${lid.id}`} checked={bereik === "organisatie"} onChange={() => setBereikConcept("organisatie")} />
-                  Hele organisatie
-                </label>
-              </fieldset>
-
-              {bereik === "organisatie" && <p className="admin-notice" style={{ margin: "0.5rem 0 0" }}>{LEAD_HELE_ORGANISATIE_WAARSCHUWING}</p>}
-
-              {bereik === "metingen" &&
-                (metingen.length === 0 ? (
-                  <p className="overzicht-melding fout">Plan eerst een Meting voordat je Lead-toegang tot Metingen kunt geven.</p>
-                ) : (
-                  <div style={{ marginTop: "0.4rem", maxHeight: metingen.length > 5 ? "10.5rem" : undefined, overflowY: metingen.length > 5 ? "auto" : undefined }}>
-                    {metingen.map((m) => (
-                      <label key={m.id} className="flex items-center gap-2 text-sm" style={{ padding: "0.25rem 0" }}>
-                        <input type="checkbox" checked={actueel.includes(m.id)} onChange={(e) => toggleMeting(m.id, e.target.checked)} />
-                        <span>
-                          {m.label} <span className="text-ink-s">— {assessmentNaam(m.assessmentId)}</span>
-                          {isSamengesteld(m) && (
-                            <>
-                              <span className="admin-badge status-uitgenodigd" style={{ marginLeft: "0.4rem" }}>Gemiddelde</span>
-                              <span className="text-ink-s"> — Ziet alleen het gemiddelde</span>
-                            </>
-                          )}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                ))}
-
-              <div className="knoppenrij" style={{ marginTop: "0.7rem" }}>
-                <button type="button" className="btn btn-or btn-compact" disabled={!kanOpslaan} onClick={slaLeadOp}>
-                  Opslaan
-                </button>
-                <button type="button" className="btn btn-outline btn-compact" onClick={annuleerLead}>
-                  Annuleren
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </section>
 
@@ -273,7 +182,7 @@ export function ToegangBlok({
       <BevestigModal
         open={intrekkenOpen}
         titel="Lead-rol intrekken"
-        bericht="Deze Respondent is dan geen Lead meer en ziet de resultaten en uitnodigingen van die Metingen niet meer. Zijn eigen scans blijven bestaan."
+        bericht="Deze Respondent is dan geen Lead meer en alle vinkjes van deze Lead in de tabel Leads verdwijnen. Zijn eigen scans blijven bestaan."
         bevestigLabel="Lead-rol intrekken"
         onBevestigen={trekLeadIn}
         onAnnuleren={() => setIntrekkenOpen(false)}

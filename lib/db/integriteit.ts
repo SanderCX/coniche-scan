@@ -119,8 +119,14 @@ export function controleerIntegriteit(alles: Organisatie[] = laadAlles()): Contr
           aantalScans: scans,
         });
       }
-      for (const metingId of l.leadMetingIds) {
-        if (!metingIds.has(metingId)) {
+      // De vinkjes van een Lead (`LeadToegang`) die naar een Meting verwijzen die er niet meer is.
+      const dode = new Set(
+        (o.leadToegang ?? [])
+          .filter((t) => t.respondentId === l.id && t.metingId && !metingIds.has(t.metingId))
+          .map((t) => t.metingId as string)
+      );
+      for (const metingId of dode) {
+        {
           uit["lead-zonder-meting"].push({
             ...basis,
             controle: "lead-zonder-meting",
@@ -252,7 +258,7 @@ export function koppelWeesMetingAanOrganisatie(metingId: string, organisatieId: 
         if (!lid || doel.leden.some((l) => l.id === lid.id)) continue;
         const zelfdeEmail = doel.leden.find((l) => l.email === lid.email);
         if (zelfdeEmail) i.organisatieLidId = zelfdeEmail.id;
-        else doel.leden.push({ ...lid, organisatieId: doel.id, leadMetingIds: [], leadVoorOrganisatie: false });
+        else doel.leden.push({ ...lid, organisatieId: doel.id, lead: undefined });
       }
     }
     meting.organisatieId = doel.id;
@@ -269,9 +275,9 @@ export function verwijderLeadVerwijzing(lidId: string, metingId: string): ActieR
     const o = alles.find((x) => x.leden.some((l) => l.id === lidId));
     const lid: OrganisatieLid | undefined = o?.leden.find((l) => l.id === lidId);
     if (!o || !lid) return { ok: false, reden: "Respondent niet gevonden." };
-    lid.leadMetingIds = lid.leadMetingIds.filter((id) => id !== metingId);
+    o.leadToegang = (o.leadToegang ?? []).filter((t) => !(t.respondentId === lidId && t.metingId === metingId));
     slaAlles(alles);
-    logAudit({ actie: "respondent.leadVerwijzingVerwijderd", entiteitType: "respondent", entiteitId: lidId, details: { ...organisatieContext(o), aantalMetingenNa: lid.leadMetingIds.length } });
+    logAudit({ actie: "respondent.leadVerwijzingVerwijderd", entiteitType: "respondent", entiteitId: lidId, details: { ...organisatieContext(o) } });
     return { ok: true };
   });
 }

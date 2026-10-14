@@ -7,7 +7,7 @@ import type { Assessment, Organisatie, OrganisatieLid, ScanInvulling } from "./t
 
 const lid: OrganisatieLid = {
   id: "L1", organisatieId: "O1", email: "jan@x.nl", naam: "Jan", functie: "Manager", team: "Zorg", notities: "Let op",
-  toegangscode: "abc", leadMetingIds: [], aangemaaktOp: "2026-01-01T00:00:00.000Z",
+  toegangscode: "abc", aangemaaktOp: "2026-01-01T00:00:00.000Z",
 };
 const scan = (assessment: Assessment, status: ScanInvulling["status"] = "afgerond"): ScanInvulling => ({
   id: "I1", scanUitvoeringId: "M1", organisatieLidId: "L1", status, aangemaaktOp: "2026-02-01T10:00:00.000Z", uitgenodigdOp: "2026-01-01", gestartOp: "2026-01-02",

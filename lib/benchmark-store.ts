@@ -2,11 +2,12 @@ import { useSyncExternalStore } from "react";
 import { Benchmark, BenchmarkLid, BenchmarkNiveau, BenchmarkToewijzing } from "./types";
 import { nieuwId } from "./id";
 import { logAudit } from "./audit-store";
-import { heeftBereikOpLidMeting, heeftBereikOpMeting, LeadBereikLid } from "./lead";
 
 /**
- * Opslag van benchmarks en hun toewijzingen (`datamodel.md` deel 3, `benchmark.md`). Alleen de samenstelling staat
- * hier, nooit scores: Die worden berekend (`lib/benchmark.ts`). Zelfde localStorage-patroon als de audit-log: Eén sleutel,
+ * Opslag van benchmarks (`datamodel.md` deel 3, `benchmark.md`). Alleen de samenstelling staat hier, nooit scores: Die worden
+ * berekend (`lib/benchmark.ts`). Wie een view ziet, staat niet hier maar in `Organisatie.leadToegang` (`lib/lead-toegang.ts`):
+ * De toewijzingen van vóór 14 oktober 2026 staan hier nog tot de overgang ze heeft omgezet (`legeToewijzingen`). Zelfde
+ * localStorage-patroon als de audit-log: Eén sleutel,
  * alleen in deze browser. De serveropslag (`/api/store/[key]`) kent deze sleutel nog niet, dus er is geen synchronisatie
  * tot de database er is (`azure-plan.md`).
  *
@@ -85,10 +86,6 @@ export function useBenchmark(id: string): Benchmark | undefined {
   return useBenchmarks().find((b) => b.id === id);
 }
 
-export function useBenchmarkToewijzingen(): BenchmarkToewijzing[] {
-  return gecached(useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)).toewijzingen;
-}
-
 export function getBenchmarks(): Benchmark[] {
   return parse(getSnapshot()).benchmarks;
 }
@@ -132,31 +129,17 @@ export function maakBenchmark(
 export function wijzigBenchmark(
   id: string,
   input: { naam: string; assessmentIds: string[]; leden: BenchmarkLid[] },
-  namen: BenchmarkNamen,
-  /**
-   * Heeft de Lead van een toewijzing nog bereik op het onderwerp na de wijziging? Niveau 1 volgt het bereik op de lid-Meting:
-   * Wordt dat een andere Meting buiten het bereik van de Lead, dan vervalt de toewijzing (`benchmark.md`, Bereik van een
-   * Lead, Wisselt het lid). De store kent geen Respondenten, dus de aanroeper levert deze controle.
-   */
-  heeftBereik?: (toewijzing: BenchmarkToewijzing, leden: BenchmarkLid[]) => boolean
+  namen: BenchmarkNamen
 ): void {
   const opslag = laad();
   const benchmark = opslag.benchmarks.find((b) => b.id === id);
   if (!benchmark) return;
-  const oudeLeden = benchmark.leden;
   benchmark.naam = input.naam;
   benchmark.assessmentIds = input.assessmentIds;
   benchmark.leden = input.leden.filter((l) => input.assessmentIds.includes(l.assessmentId));
   benchmark.meldingen = [];
-  // Een toewijzing voor een lid dat niet meer meedoet, heeft geen view meer om te tonen.
-  ruimToewijzingenOp(opslag, benchmark);
-  if (heeftBereik && isTussenOrganisaties(benchmark)) {
-    const leden = benchmark.leden;
-    // Alleen een toewijzing die bereik had en het door deze wijziging verliest. Eén zonder bereik van vóór de regel blijft staan.
-    opslag.toewijzingen = opslag.toewijzingen.filter(
-      (t) => t.benchmarkId !== benchmark.id || !heeftBereik(t, oudeLeden) || heeftBereik(t, leden)
-    );
-  }
+  // De vinkjes van Leads voor een organisatie die niet meer meedoet, vallen bij het volgende opslaan van de organisaties weg
+  // (`ruimLeadToegangOp`) en tellen intussen niet meer mee (`benchmarkGeldigVoorOrganisatie`).
   bewaar(opslag);
   logAudit({
     actie: "benchmark.gewijzigd",
@@ -175,12 +158,11 @@ export function sluitBenchmarkMeldingen(id: string): void {
   bewaar(opslag);
 }
 
-/** Verwijdert de benchmark met zijn toewijzingen. Organisaties, Metingen en scans blijven bestaan. */
+/** Verwijdert de benchmark. De vinkjes van Leads voor deze benchmark vallen weg, organisaties, Metingen en scans blijven bestaan. */
 export function verwijderBenchmark(id: string, namen: BenchmarkNamen): void {
   const opslag = laad();
   const benchmark = opslag.benchmarks.find((b) => b.id === id);
   if (!benchmark) return;
-  const aantalToewijzingen = opslag.toewijzingen.filter((t) => t.benchmarkId === id).length;
   opslag.benchmarks = opslag.benchmarks.filter((b) => b.id !== id);
   opslag.toewijzingen = opslag.toewijzingen.filter((t) => t.benchmarkId !== id);
   bewaar(opslag);
@@ -189,100 +171,13 @@ export function verwijderBenchmark(id: string, namen: BenchmarkNamen): void {
     entiteitType: "benchmark",
     entiteitId: id,
     entiteitNaam: benchmark.naam,
-    details: { benchmarkNaam: benchmark.naam, niveau: benchmark.niveau ?? "organisaties", ...namen, aantalToewijzingen },
-  });
-}
-
-/** Namen voor het audit-log van een toewijzing. Nooit de naam van de Lead of, op niveau 3, van de Respondent van de view. */
-export interface ToewijzingNamen {
-  benchmarkNaam: string;
-  organisatieNaam: string;
-  niveau?: BenchmarkNiveau;
-  /** Niveau 2 en 3: Het label van de Meting (bij niveau 3 de Meting, geen Respondentnaam). */
-  metingLabel?: string;
-}
-
-function toewijzingDetails(namen: ToewijzingNamen): Record<string, unknown> {
-  return {
-    benchmarkNaam: namen.benchmarkNaam,
-    niveau: namen.niveau ?? "organisaties",
-    organisatieNaam: namen.organisatieNaam,
-    ...(namen.metingLabel ? { metingLabel: namen.metingLabel } : {}),
-  };
-}
-
-/**
- * Wijst een view toe aan een Lead (`benchmark.md`, Toewijzen aan een Lead op alle niveaus): De view van een organisatie
- * (niveau 1), een Meting (niveau 2) of een scan (niveau 3). Uniek per combinatie van benchmark, onderwerp en Lead.
- */
-export function wijsBenchmarkToe(
-  input: {
-    benchmarkId: string;
-    organisatieId: string;
-    metingId?: string;
-    onderwerpRespondentId?: string;
-    respondentId: string;
-    toegewezenDoor: string;
-  },
-  namen: ToewijzingNamen
-): BenchmarkToewijzing | null {
-  const opslag = laad();
-  const bestaand = opslag.toewijzingen.find(
-    (t) =>
-      t.benchmarkId === input.benchmarkId &&
-      t.organisatieId === input.organisatieId &&
-      (t.metingId ?? null) === (input.metingId ?? null) &&
-      (t.onderwerpRespondentId ?? null) === (input.onderwerpRespondentId ?? null) &&
-      t.respondentId === input.respondentId
-  );
-  if (bestaand) return bestaand;
-  const toewijzing: BenchmarkToewijzing = { id: nieuwId(), ...input, toegewezenOp: new Date().toISOString() };
-  opslag.toewijzingen.push(toewijzing);
-  bewaar(opslag);
-  // Geen naam of e-mailadres van de Lead in de log (`datamodel.md`, Audit).
-  logAudit({
-    actie: "benchmark.toegewezen",
-    entiteitType: "benchmark",
-    entiteitId: input.benchmarkId,
-    entiteitNaam: namen.benchmarkNaam,
-    details: toewijzingDetails(namen),
-  });
-  return toewijzing;
-}
-
-export function trekBenchmarkToewijzingIn(toewijzingId: string, namen: ToewijzingNamen): void {
-  const opslag = laad();
-  const toewijzing = opslag.toewijzingen.find((t) => t.id === toewijzingId);
-  if (!toewijzing) return;
-  opslag.toewijzingen = opslag.toewijzingen.filter((t) => t.id !== toewijzingId);
-  bewaar(opslag);
-  logAudit({
-    actie: "benchmark.toewijzingIngetrokken",
-    entiteitType: "benchmark",
-    entiteitId: toewijzing.benchmarkId,
-    entiteitNaam: namen.benchmarkNaam,
-    details: toewijzingDetails(namen),
+    details: { benchmarkNaam: benchmark.naam, niveau: benchmark.niveau ?? "organisaties", ...namen },
   });
 }
 
 /* ---------- Opruimen bij verwijderen en intrekken (datamodel.md, Verwijderen en datakoppelingen) ---------- */
 
 const isTussenOrganisaties = (b: Benchmark): boolean => (b.niveau ?? "organisaties") === "organisaties";
-
-/**
- * Heeft een toewijzing nog een view om te tonen? Niveau 1: De organisatie moet nog lid zijn. Niveau 2 en 3: De Meting van de
- * view moet nog lid zijn. Een toewijzing voor een lid dat uit de benchmark is gevallen, vervalt (`benchmark.md`, Verwijderen
- * en intrekken).
- */
-function toewijzingGeldig(b: Benchmark, t: BenchmarkToewijzing): boolean {
-  if (isTussenOrganisaties(b)) return b.leden.some((l) => l.organisatieId === t.organisatieId);
-  return Boolean(t.metingId) && b.leden.some((l) => l.metingId === t.metingId);
-}
-
-/** Ruimt de toewijzingen van één benchmark op nadat zijn leden zijn gewijzigd. */
-function ruimToewijzingenOp(opslag: Opslag, benchmark: Benchmark): void {
-  opslag.toewijzingen = opslag.toewijzingen.filter((t) => t.benchmarkId !== benchmark.id || toewijzingGeldig(benchmark, t));
-}
 
 /**
  * Aantal benchmarks waarin een organisatie meedoet, voor de bevestiging bij het uitzetten van de vlag of verwijderen. De
@@ -317,8 +212,6 @@ function haalLedenWeg(
     const op = new Date().toISOString();
     const noemer = [...new Set(weg.map(naamVan))].join(", ");
     benchmark.meldingen.push({ tekst: `${noemer} is uit de benchmark gehaald: ${reden}.`, op });
-    // Een toewijzing voor een lid dat niet meer meedoet, heeft geen view meer.
-    ruimToewijzingenOp(opslag, benchmark);
     logAudit({
       actie: "benchmark.gewijzigd",
       entiteitType: "benchmark",
@@ -336,7 +229,7 @@ export function haalMetingenUitBenchmarks(metingen: { metingId: string; organisa
   haalLedenWeg((l) => naam.has(l.metingId), "de Meting is verwijderd", (l) => naam.get(l.metingId) ?? "Een organisatie");
 }
 
-/** Organisaties zijn verwijderd of hebben de vlag verloren: Hun leden en toewijzingen verdwijnen uit de benchmarks. */
+/** Organisaties zijn verwijderd of hebben de vlag verloren: Hun leden verdwijnen uit de benchmarks. */
 export function haalOrganisatiesUitBenchmarks(
   organisaties: { organisatieId: string; organisatieNaam: string }[],
   reden: string,
@@ -345,54 +238,6 @@ export function haalOrganisatiesUitBenchmarks(
 ): void {
   const naam = new Map(organisaties.map((o) => [o.organisatieId, o.organisatieNaam]));
   haalLedenWeg((l) => naam.has(l.organisatieId), reden, (l) => naam.get(l.organisatieId) ?? "Een organisatie", alleenTussenOrganisaties);
-  // Ook een toewijzing zonder lid (bijv. alle leden al weg) gaat mee.
-  const opslag = laad();
-  const voor = opslag.toewijzingen.length;
-  opslag.toewijzingen = opslag.toewijzingen.filter((t) => !naam.has(t.organisatieId));
-  if (opslag.toewijzingen.length !== voor) bewaar(opslag);
-}
-
-/** Respondenten met een Lead-rol zijn verwijderd of verplaatst: Hun toewijzingen verdwijnen. */
-export function verwijderToewijzingenVanRespondenten(respondentIds: string[]): void {
-  const ids = new Set(respondentIds);
-  const opslag = laad();
-  const voor = opslag.toewijzingen.length;
-  // Zowel de Lead als, op niveau 3, de Respondent van wie de scan de view is.
-  opslag.toewijzingen = opslag.toewijzingen.filter((t) => !ids.has(t.respondentId) && !(t.onderwerpRespondentId && ids.has(t.onderwerpRespondentId)));
-  if (opslag.toewijzingen.length !== voor) bewaar(opslag);
-}
-
-/** Een scan is verwijderd (niveau 3): De toewijzingen met die Respondent als onderwerp in die Meting vervallen. */
-export function verwijderToewijzingenVanScans(scans: { metingId: string; respondentId: string }[]): void {
-  if (scans.length === 0) return;
-  const opslag = laad();
-  const voor = opslag.toewijzingen.length;
-  opslag.toewijzingen = opslag.toewijzingen.filter(
-    (t) => !(t.onderwerpRespondentId && scans.some((s) => s.metingId === t.metingId && s.respondentId === t.onderwerpRespondentId))
-  );
-  if (opslag.toewijzingen.length !== voor) bewaar(opslag);
-}
-
-/**
- * Een Lead heeft zijn bereik gewijzigd (`benchmark.md`, Bereik van een Lead): Verliest hij het bereik op het onderwerp van
- * een view, dan vervalt de toewijzing, op elk niveau. Niveau 1 vraagt bereik op de lid-Meting van de organisatie in de
- * benchmark. Niveau 2 en 3 vragen bereik op de Meting van de view, via de hele organisatie of via die Meting.
- *
- * Een niveau 1-toewijzing die al bestond toen het bereik werd ingevoerd, aan een Lead zonder organisatiebereik, blijft
- * staan zolang het bereik van die Lead niet wordt gewijzigd (de overgangsregel). De Admin ziet dan de melding in het blok
- * Toewijzen. Deze functie draait pas bij een wijziging van het bereik van die ene Lead.
- */
-export function verwijderToewijzingenZonderBereik(lead: LeadBereikLid & { id: string }): void {
-  const opslag = laad();
-  const voor = opslag.toewijzingen.length;
-  opslag.toewijzingen = opslag.toewijzingen.filter((t) => {
-    if (t.respondentId !== lead.id) return true;
-    if (t.metingId) return heeftBereikOpMeting(lead, t.organisatieId, t.metingId);
-    // Niveau 1: Bereik op de lid-Meting van de organisatie in deze benchmark.
-    const benchmark = opslag.benchmarks.find((b) => b.id === t.benchmarkId);
-    return !!benchmark && heeftBereikOpLidMeting(lead, benchmark.leden, t.organisatieId);
-  });
-  if (opslag.toewijzingen.length !== voor) bewaar(opslag);
 }
 
 /**
@@ -408,9 +253,24 @@ export function haalAssessmentUitBenchmarks(assessmentId: string, assessmentNaam
     benchmark.assessmentIds = benchmark.assessmentIds.filter((id) => id !== assessmentId);
     benchmark.leden = benchmark.leden.filter((l) => l.assessmentId !== assessmentId);
     benchmark.meldingen.push({ tekst: `${assessmentNaam} is uit de benchmark gehaald: het Assessment is verwijderd.`, op: new Date().toISOString() });
-    ruimToewijzingenOp(opslag, benchmark);
   }
   if (geraakt.length > 0) bewaar(opslag);
   return geraakt;
 }
 
+
+/* ---------- De overgang van de toewijzingen (14 oktober 2026) ---------- */
+
+/** De toewijzingen van vóór de tabel Leads die nog niet zijn omgezet in vinkjes. Leeg zodra de overgang ze heeft verwerkt. */
+export function legeToewijzingen(): BenchmarkToewijzing[] {
+  return parse(getSnapshot()).toewijzingen;
+}
+
+/** Verwijdert de toewijzingen die zijn omgezet in vinkjes, en laat de rest staan tot hun organisatie bekend is. */
+export function wisOmgezetteToewijzingen(ids: string[]): void {
+  if (ids.length === 0) return;
+  const opslag = laad();
+  const weg = new Set(ids);
+  opslag.toewijzingen = opslag.toewijzingen.filter((t) => !weg.has(t.id));
+  bewaar(opslag);
+}

@@ -1,5 +1,54 @@
 # Coniche Scan — Changelog
 
+## 2026-10-14 — Specs van Joost, PR 97: hoofdlink Resultaten, tabel Leads en import vanuit de organisatie
+
+Op uitdrukkelijk verzoek van Sander volledig gebouwd, zonder eerst een backup van de opslag te maken (de data zet Sander zo
+nodig later terug).
+
+**Gedaan, deel 1: Resultaten** (`beheerpagina.md`, punt 5, 7 en 8):
+- **Hoofdlink Resultaten** met de tabs Rondes, Metingen en (alleen Admin) Benchmarks. De hoofdlink Benchmark en de pagina
+  Ingevulde scans vervallen: `/beheer/scans` en `/beheer/import` sturen door. Het kruimelpad en de actieve hoofdlink volgen de
+  weg waarlangs je een Meting bereikte (`?via=resultaten`, `lib/resultaten-nav.ts`).
+- **Ronde-overzicht** (`/beheer/rondes/[rondeId]`) met de Metingen van de ronde, "Gemiddelde van deze ronde" en "Vergelijk
+  met vorige ronde" (uitgeschakeld met `info.vergelijkRonde` zolang er geen vergelijkbare eerdere ronde is).
+- **Scanlijst in het Meting-overzicht**: Sorteerbaar (`sort` en `dir` in de adresbalk), met bulk Exporteren, Naar andere
+  Meting en Verwijderen, en een rij die het Scan-overzicht opent.
+- **Metingen plannen** als veldenrij op de organisatiepagina, met "Wordt: …" onder de rij.
+- **Importeren vanuit de organisatie** (`ImportScans`, Admin-only): De doelorganisatie ligt vast, per organisatienaam in het
+  bestand is het koppelen of overslaan. "Nieuw aanmaken" bestaat niet meer.
+
+**Gedaan, deel 2: Leads** (`beheerpagina.md`, punt 6a, `benchmark.md`, `datamodel.md` deel 2):
+- **Tabel Leads** op het organisatie-detail (`LeadsTabel`): Per Lead een vinkje per weergave (Resultaten, Spreiding,
+  Antwoorden, Uitnodigen, Exporteren) per Meting, en per benchmark een kolom. Grijze cellen met reden in een Info-icoon,
+  concept tot "Opslaan", afhankelijkheden (Spreiding, Antwoorden en Exporteren vragen Resultaten; een samengestelde Meting
+  heeft alleen Resultaten; niveau 2 vraagt Resultaten op een lid-Meting; niveau 3 heeft geen kolom).
+- **`LeadToegang`** in plaats van `RespondentRolMeting`, `leadVoorOrganisatie` en `BenchmarkToewijzing` (`lib/lead-toegang.ts`).
+  `Respondent.lead` is de rol. Vinkjes vallen weg als de Lead zijn rol verliest, de Meting of benchmark verdwijnt, of een
+  vinkje waar het vorige van afhangt wordt uitgezet (`ruimLeadToegangOp`, bij elke opslag en na het wijzigen of verwijderen
+  van een benchmark via `ruimBenchmarkVinkjesOp`).
+- **Overgang** (`voerLeadOvergangUit`, `zetLegacyBereikOm`): Een Lead met Metingen krijgt Resultaten, Uitnodigen en
+  Exporteren voor die Metingen. "Hele organisatie" is omgezet voor de Metingen die er nu zijn, met een melding aan de Admin.
+  Een toewijzing op niveau 1 of 2 is een benchmarkvinkje, een view op één scan is Spreiding voor die Meting. Idempotent.
+- **Lead toevoegen**: Een bestaande of nieuwe Respondent, zonder verplichte Meting. "Lead" is ook los van een vragenlijst.
+- **Lead-landingspagina** (`/s/[code]`): Kaarten per Meting per ronde met alleen de aangevinkte knoppen, benchmarkkaarten en
+  de eigen scans. Alle weergaven op de Lead-pagina volgen de vinkjes.
+- **Namen bij Antwoorden** (`Organisatie.antwoordenMetNamen`): Uit betekent R1 tot en met Rn zonder tooltip, in een vaste
+  volgorde uit een hash van het scan-id (`antwoordenPerVraag(..., { anoniem })`).
+- **Benchmarkviews zonder toewijzen**: Het blok "Toewijzen" is vervangen door een lijst van Leads die de view zien
+  (`LeadsOpView`). `info.benchmarkToewijzen` is vervallen.
+
+**Keuzes waar de spec open liet**:
+- Niveau 3 (view op één scan) blijft bestaan als beheerweergave voor de Admin, de Lead krijgt er geen kolom voor.
+- Een vinkje voor een verdwenen benchmark of Meting valt direct, niet pas bij de eerstvolgende opslag.
+- "Lead zonder vinkjes" toont "Ziet nog niets" in de tabel.
+
+**Tests**: 248 (was 230): De Lead-rol en vinkjes, afhankelijkheden, de omzetting van het oude bereik, de grijze cellen,
+`leadViewsVoorBenchmark`, de overgang van toewijzingen, Lead toevoegen, uitnodigen en verplaatsen, anonieme Antwoorden en de
+kruimelpaden.
+
+**Open**: Of een Lead de lijsten Rondes en Metingen ook krijgt (`backlog.md`). De tests voor de lijsten Rondes en Metingen
+zelf en voor het bestandsimport met een doelorganisatie volgen nog.
+
 ## 2026-10-13 (6) — Specs van Joost, PR 93: Weergave G, Antwoorden per vraag
 
 **Gedaan**:

@@ -1,6 +1,7 @@
 "use client";
 
 import { use } from "react";
+import { useSearchParams } from "next/navigation";
 import { useScanUitvoering } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
@@ -16,9 +17,11 @@ import {
   isSamengesteld,
   onderdeelVan,
   onderliggendeMetingen,
+  rondeVan,
   vergelijkbareMetingen,
 } from "@/lib/rondes";
 import { VergelijkingEyebrow } from "@/components/visualisatie/VergelijkingEyebrow";
+import { kruimelsVoorMeting, VIA_RESULTATEN } from "@/lib/resultaten-nav";
 
 /**
  * Rapportage over één meting: het gemiddelde per vraag over alle
@@ -36,6 +39,7 @@ export default function RapportagePage({
   const gegevens = useScanUitvoering(scanUitvoeringId);
   const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
   const ingelogd = useIngelogdeGebruiker();
+  const via = useSearchParams().get("via") === VIA_RESULTATEN;
 
   if (!gegevens || !assessment) {
     return (
@@ -69,12 +73,7 @@ export default function RapportagePage({
     return (
       <div className="admin-main">
         <Kruimelpad
-          delen={[
-            { label: "Organisaties", href: "/beheer/organisaties" },
-            { label: organisatie.naam, href: `/beheer/organisaties/${organisatie.id}` },
-            { label: scanUitvoering.label, href: `/beheer/metingen/${scanUitvoering.id}` },
-            { label: "Resultaten van de Meting" },
-          ]}
+          delen={kruimelsVoorMeting(organisatie, scanUitvoering, rondeVan(organisatie, scanUitvoering), via, "Resultaten van de Meting")}
         />
         <span className="eyebrow">{scanUitvoering.label}</span>
         <h1>{assessment.naam}</h1>
@@ -93,14 +92,13 @@ export default function RapportagePage({
   return (
     <div className="admin-main admin-main--breed">
       <Kruimelpad
-        delen={[
-          { label: "Organisaties", href: "/beheer/organisaties" },
-          { label: organisatie.naam, href: `/beheer/organisaties/${organisatie.id}` },
-          { label: scanUitvoering.label, href: `/beheer/metingen/${scanUitvoering.id}` },
-          { label: "Resultaten van de Meting" },
-        ]}
+        delen={kruimelsVoorMeting(organisatie, scanUitvoering, rondeVan(organisatie, scanUitvoering), via, "Resultaten van de Meting")}
       />
-      <VergelijkingEyebrow label={scanUitvoering.label} eerdereMetingen={eerdereMetingen} />
+      <VergelijkingEyebrow
+        label={scanUitvoering.label}
+        eerdereMetingen={eerdereMetingen}
+        rondeLabelVan={(m) => rondeVan(organisatie, m)?.label}
+      />
       <h1>{assessment.naam}</h1>
       <p className="text-sm text-ink-m">
         {samengesteld

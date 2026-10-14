@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAssessment } from "@/lib/assessment-store";
 import { verwijderMeting } from "@/lib/db";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { isAdmin } from "@/lib/rechten";
-import { heeftBereikOpMeting } from "@/lib/lead";
+import { leadsMetToegangTotMeting } from "@/lib/lead-toegang";
 import {
   aantalAfgerondInMeting,
   onderdeelVan,
@@ -22,6 +22,7 @@ import { SamengesteldeMetingFormulier } from "@/components/beheer/SamengesteldeM
 import { MetingWijzigenFormulier } from "@/components/beheer/MetingWijzigenFormulier";
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { aantalBenchmarksMetMeting } from "@/lib/benchmark-store";
+import { kruimelsVoorMeting, metVia, VIA_RESULTATEN } from "@/lib/resultaten-nav";
 
 /**
  * Meting-overzicht van een samengestelde Meting (`beheerpagina.md`, punt 5, Samengestelde Meting): Dezelfde kop als een gewone
@@ -31,6 +32,7 @@ import { aantalBenchmarksMetMeting } from "@/lib/benchmark-store";
  */
 export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisatie: Organisatie; meting: ScanUitvoering }) {
   const router = useRouter();
+  const via = useSearchParams().get("via") === VIA_RESULTATEN;
   const assessment = useAssessment(meting.assessmentId);
   const ingelogd = useIngelogdeGebruiker();
   const [wijzigenOpen, setWijzigenOpen] = useState(false);
@@ -39,7 +41,7 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
 
   const onder = onderliggendeMetingen(organisatie, meting);
   const ronde = rondeVan(organisatie, meting);
-  const leads = organisatie.leden.filter((l) => heeftBereikOpMeting(l, organisatie.id, meting.id));
+  const leads = leadsMetToegangTotMeting(organisatie, meting.id);
   const inBenchmarks = aantalBenchmarksMetMeting(meting.id);
   const scans = aantalAfgerondInMeting(organisatie, meting);
 
@@ -51,13 +53,7 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
 
   return (
     <div className="admin-main admin-main--breed">
-      <Kruimelpad
-        delen={[
-          { label: "Organisaties", href: "/beheer/organisaties" },
-          { label: organisatie.naam, href: `/beheer/organisaties/${organisatie.id}` },
-          { label: meting.label },
-        ]}
-      />
+      <Kruimelpad delen={kruimelsVoorMeting(organisatie, meting, ronde, via)} />
       {labelBewerken ? (
         <MetingWijzigenFormulier organisatie={organisatie} meting={meting} onKlaar={() => setLabelBewerken(false)} />
       ) : (
@@ -90,7 +86,7 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
 
       <div className="overzicht-acties" style={{ margin: "1rem 0 0.5rem" }}>
         {scans > 0 && (
-          <Link href={`/beheer/rapportage/${meting.id}`} className="btn btn-outline btn-compact">
+          <Link href={metVia(`/beheer/rapportage/${meting.id}`, via)} className="btn btn-outline btn-compact">
             Naar resultaten →
           </Link>
         )}
@@ -128,8 +124,8 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
       <h2>Leads</h2>
       {leads.length === 0 ? (
         <p className="admin-notice">
-          Geen Lead heeft bereik op deze Meting. Toegang erft niet mee van de onderliggende Metingen: Vink haar aan bij de Lead
-          (Lead-toegang beheren).
+          Geen Lead ziet deze Meting. Toegang erft niet mee van de onderliggende Metingen: Vink Resultaten van deze Meting aan in
+          de tabel Leads van de organisatie.
         </p>
       ) : (
         <ul className="text-sm text-ink-m" style={{ listStyle: "disc", paddingLeft: "1.2rem" }}>

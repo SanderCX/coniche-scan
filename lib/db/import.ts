@@ -198,8 +198,6 @@ export function voerLegacyImportUit(
         team: rij.respondentTeam,
         notities: "",
         toegangscode: genereerUniekeToegangscode(alles),
-        leadMetingIds: [],
-        leadVoorOrganisatie: false,
         aangemaaktOp: new Date().toISOString(),
       };
       organisatie.leden.push(lid);

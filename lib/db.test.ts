@@ -1,4 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import type { LeadWeergave } from "./types";
 
 // db.ts leest en schrijft localStorage en roept `fetch` aan voor de serversync:
 // Beide worden vervangen door een in-memory versie, vóór het importeren.
@@ -26,7 +27,7 @@ beforeEach(() => opslag.clear());
 type Rij = Record<string, unknown>;
 const lid = (id: string, orgId: string, email: string, extra: Rij = {}) => ({
   id, organisatieId: orgId, email, naam: email, functie: "", team: "", notities: "",
-  toegangscode: `c${id}`, leadMetingIds: [], aangemaaktOp: "2026-01-01", ...extra,
+  toegangscode: `c${id}`, aangemaaktOp: "2026-01-01", ...extra,
 });
 const inv = (id: string, metingId: string, lidId: string) => ({
   id, scanUitvoeringId: metingId, organisatieLidId: lidId, status: "afgerond", antwoorden: {},
@@ -75,7 +76,7 @@ describe("import alleen voor een Admin", () => {
 });
 
 describe("data-integriteit", () => {
-  // Beschadigde data: O1 heeft een scan zonder Respondent, een scan zonder Meting, een Respondent en een Meting zonder Organisatie en een Lead met een onbestaande Meting.
+  // Beschadigde data: O1 heeft een scan zonder Respondent, een scan zonder Meting, een Respondent en een Meting zonder Organisatie en een Lead (oude vorm) met een onbestaande Meting.
   const beschadigd = () =>
     zet([
       org("O1", [lid("L1", "O1", "a@x.nl", { leadMetingIds: ["M1", "WEG"] }), lid("L2", "GEENORG", "b@x.nl")], [
@@ -94,9 +95,10 @@ describe("data-integriteit", () => {
       "scan-zonder-meting": 0,
       "respondent-zonder-organisatie": 1,
       "meting-zonder-organisatie": 1,
-      "lead-zonder-meting": 1,
+      // Het vinkje voor een verdwenen Meting valt al bij het laden weg (`ruimLeadToegangOp`), net als een scanverwijzing.
+      "lead-zonder-meting": 0,
     });
-    expect(db.totaalVondsten(db.controleerIntegriteit())).toBe(4);
+    expect(db.totaalVondsten(db.controleerIntegriteit())).toBe(3);
   });
 
   it("gezonde data heeft geen vondsten", () => {
@@ -202,9 +204,9 @@ describe("audit-log bij beheeracties", () => {
 });
 
 describe("hele respondent verplaatsen", () => {
-  it("neemt alle scans mee, maakt een ontbrekende Meting aan en wist Lead-koppelingen", () => {
+  it("neemt alle scans mee, maakt een ontbrekende Meting aan en wist de Lead-rol", () => {
     zet([
-      org("O1", [lid("L1", "O1", "a@x.nl", { leadMetingIds: ["M1"] })], [
+      org("O1", [lid("L1", "O1", "a@x.nl", { lead: true })], [
         meting("M1", "O1", "Nulmeting", [inv("I1", "M1", "L1")]),
         meting("M2", "O1", "Vervolg", [inv("I2", "M2", "L1")]),
       ]),
@@ -215,7 +217,7 @@ describe("hele respondent verplaatsen", () => {
     const o = laad();
     expect(o[0].leden).toHaveLength(0);
     expect(o[1].leden).toHaveLength(1);
-    expect(o[1].leden[0].leadMetingIds).toEqual([]);
+    expect(o[1].leden[0]).not.toMatchObject({ lead: true });
     expect(o[1].scanUitvoeringen.find((s) => s.id === "D1")!.invullingen).toHaveLength(1);
     expect(o[1].scanUitvoeringen).toHaveLength(2);
     expect(o[0].scanUitvoeringen.every((s) => (s.invullingen as unknown[]).length === 0)).toBe(true);
@@ -638,108 +640,113 @@ describe("scans samenbrengen in één Meting", () => {
 });
 
 
-describe("het bereik van een Lead", () => {
-  const benchmarks = () => JSON.parse(opslag.get("coniche-scan:benchmarks") ?? '{"benchmarks":[],"toewijzingen":[]}') as { toewijzingen: { id: string; respondentId: string; metingId?: string }[] };
-  // Benchmark B tussen organisaties met M1 van O1 als lid-Meting: Niveau 1 volgt het bereik op de lid-Meting.
-  const benchmarkB = { id: "B", naam: "B", niveau: "organisaties", assessmentIds: ["A"], leden: [{ organisatieId: "O1", assessmentId: "A", metingId: "M1" }], meldingen: [], aangemaaktOp: "x", aangemaaktDoor: "a1" };
-  const zetToewijzingen = (toewijzingen: Rij[]) => opslag.set("coniche-scan:benchmarks", JSON.stringify({ benchmarks: [benchmarkB], toewijzingen }));
+describe("de tabel Leads", () => {
   const basis = () =>
     zet([
-      org("O1", [lid("L1", "O1", "a@x.nl", { leadMetingIds: ["M1", "M2"] })], [meting("M1", "O1", "Nul", []), meting("M2", "O1", "Vervolg", [])]),
+      org("O1", [lid("L1", "O1", "a@x.nl", { lead: true }), lid("R1", "O1", "r@x.nl")], [meting("M1", "O1", "Nul", []), meting("M2", "O1", "Vervolg", [])]),
     ]);
+  const vinkjes = () => (laad()[0] as unknown as { leadToegang?: Rij[] }).leadToegang ?? [];
+  const aan = (respondentId: string, weergave: string, metingId: string) => ({ respondentId, weergave: weergave as LeadWeergave, metingId, aan: true });
 
-  it("een nieuwe Lead voor de hele organisatie heeft geen Metingen nodig", () => {
+  it("een nieuwe Lead heeft geen Meting nodig en ziet nog niets", () => {
     zet([org("O1", [], [meting("M1", "O1", "Nul", [])])]);
-    const nieuw = db.voegLeadToe("O1", { naam: "N", email: "n@x.nl", bereik: { soort: "organisatie" } })!;
-    expect(nieuw.leadVoorOrganisatie).toBe(true);
-    expect(nieuw.leadMetingIds).toEqual([]);
-    expect(laad()[0].leden[0]).toMatchObject({ leadVoorOrganisatie: true });
+    const nieuw = db.voegLeadToe("O1", { naam: "N", email: "n@x.nl" })!;
+    expect(nieuw.lead).toBe(true);
+    expect(laad()[0].leden[0]).toMatchObject({ lead: true });
+    expect(vinkjes()).toHaveLength(0);
   });
 
-  it("weigert specifieke Metingen zonder een Meting", () => {
-    zet([org("O1", [], [meting("M1", "O1", "Nul", [])])]);
-    expect(db.voegLeadToe("O1", { naam: "", email: "n@x.nl", bereik: { soort: "metingen", metingIds: [] } })).toBeNull();
-  });
-
-  it("wisselen naar de hele organisatie en terug bewaart de gekozen Metingen", () => {
+  it("een bestaande Respondent wordt Lead en houdt zijn scans, een e-mailadres dat al bestaat maakt geen tweede Respondent", () => {
     basis();
-    db.zetLeadBereik("L1", { soort: "organisatie" });
-    expect(laad()[0].leden[0]).toMatchObject({ leadVoorOrganisatie: true, leadMetingIds: ["M1", "M2"] });
-    db.zetLeadBereik("L1", { soort: "metingen", metingIds: ["M1", "M2"] });
-    expect(laad()[0].leden[0]).toMatchObject({ leadVoorOrganisatie: false, leadMetingIds: ["M1", "M2"] });
+    expect(db.voegLeadToe("O1", { respondentId: "R1" })!.id).toBe("R1");
+    expect(db.voegLeadToe("O1", { email: " R@x.nl " })!.id).toBe("R1");
+    expect(laad()[0].leden).toHaveLength(2);
+    expect(db.voegLeadToe("O1", { respondentId: "ONBEKEND" })).toBeNull();
+    expect(db.voegLeadToe("O1", { naam: "Zonder mail", email: "  " })).toBeNull();
   });
 
-  it("intrekken wist de Lead-rol en de bewaarde Metingen", () => {
+  it("slaLeadToegangOp zet vinkjes aan en uit, en telt alleen echte wijzigingen", () => {
     basis();
-    db.zetLeadBereik("L1", { soort: "organisatie" });
-    db.zetLeadBereik("L1", { soort: "ingetrokken" });
-    expect(laad()[0].leden[0]).toMatchObject({ leadVoorOrganisatie: false, leadMetingIds: [] });
+    expect(db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "uitnodigen", "M2")], "a1")).toBe(2);
+    expect(vinkjes()).toHaveLength(2);
+    expect(db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1")], "a1")).toBe(0);
+    expect(db.slaLeadToegangOp("O1", [{ ...aan("L1", "uitnodigen", "M2"), aan: false }], "a1")).toBe(1);
+    expect(vinkjes().map((t) => t.weergave)).toEqual(["resultaten"]);
   });
 
-  it("een toewijzing vervalt op elk niveau zodra de Lead zijn bereik verliest", () => {
+  it("zet geen vinkje voor een Respondent die geen Lead is, en Spreiding zonder Resultaten niet", () => {
     basis();
-    zetToewijzingen([
-      { id: "t1", benchmarkId: "B", organisatieId: "O1", respondentId: "L1" },
-      { id: "t2", benchmarkId: "B", organisatieId: "O1", metingId: "M1", respondentId: "L1" },
-      { id: "t3", benchmarkId: "B", organisatieId: "O1", metingId: "M2", respondentId: "L1" },
-      { id: "t4", benchmarkId: "B", organisatieId: "O1", metingId: "M1", respondentId: "ANDER" },
-    ]);
-    // Alleen M2 houden: De niveau 1-toewijzing (lid-Meting M1) en die van M1 vervallen, die van M2 blijft.
-    db.zetLeadBereik("L1", { soort: "metingen", metingIds: ["M2"] });
-    expect(benchmarks().toewijzingen.map((t) => t.id).sort()).toEqual(["t3", "t4"]);
+    expect(db.slaLeadToegangOp("O1", [aan("R1", "resultaten", "M1"), aan("L1", "spreiding", "M1")], "a1")).toBe(0);
+    expect(vinkjes()).toHaveLength(0);
   });
 
-  it("een niveau 1-toewijzing zonder bereik op de lid-Meting blijft staan zolang het bereik van de Lead niet wordt gewijzigd (overgangsregel)", () => {
+  it("Resultaten uitzetten haalt Spreiding, Antwoorden en Exporteren van die Meting mee, Uitnodigen blijft", () => {
     basis();
-    zetToewijzingen([{ id: "t1", benchmarkId: "B", organisatieId: "O1", respondentId: "L1" }]);
-    // L1 heeft bereik op M2 en niet op de lid-Meting M1. Een andere Respondent wijzigen raakt deze toewijzing niet.
+    db.slaLeadToegangOp("O1", ["resultaten", "spreiding", "antwoorden", "exporteren", "uitnodigen"].map((w) => aan("L1", w, "M1")), "a1");
+    expect(vinkjes()).toHaveLength(5);
+    db.slaLeadToegangOp("O1", [{ ...aan("L1", "resultaten", "M1"), aan: false }], "a1");
+    expect(vinkjes().map((t) => t.weergave)).toEqual(["uitnodigen"]);
+  });
+
+  it("de Lead-rol intrekken wist zijn vinkjes, toekennen laat ze leeg", () => {
+    basis();
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1")], "a1");
+    db.zetLeadRol("L1", false);
+    expect(laad()[0].leden[0]).not.toMatchObject({ lead: true });
+    expect(vinkjes()).toHaveLength(0);
+    db.zetLeadRol("L1", true);
+    expect(laad()[0].leden[0]).toMatchObject({ lead: true });
+    expect(vinkjes()).toHaveLength(0);
+  });
+
+  it("een Lead uitnodigen voor een Meting geeft het vinkje Resultaten, zonder Lead alleen de uitnodiging", () => {
+    basis();
+    db.nodigLidUit("M1", "nieuw@x.nl", true);
+    const nieuw = laad()[0].leden.find((l) => l.email === "nieuw@x.nl")!;
+    expect(nieuw).toMatchObject({ lead: true });
+    expect(vinkjes()).toMatchObject([{ respondentId: nieuw.id, weergave: "resultaten", metingId: "M1" }]);
+    db.nodigLidUit("M1", "gewoon@x.nl");
+    expect(laad()[0].leden.find((l) => l.email === "gewoon@x.nl")).not.toMatchObject({ lead: true });
+    expect(vinkjes()).toHaveLength(1);
+  });
+
+  it("een Meting verwijderen haalt de vinkjes van die Meting weg", () => {
+    basis();
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "resultaten", "M2")], "a1");
+    db.verwijderMeting("M1");
+    expect(vinkjes().map((t) => t.metingId)).toEqual(["M2"]);
+  });
+
+  it("verplaatsen naar een andere organisatie maakt de Respondent geen Lead meer en wist zijn vinkjes", () => {
     zet([
-      org("O1", [lid("L1", "O1", "a@x.nl", { leadMetingIds: ["M2"] }), lid("L2", "O1", "b@x.nl")], [meting("M1", "O1", "Nul", []), meting("M2", "O1", "Vervolg", [])]),
-    ]);
-    db.zetLeadBereik("L2", { soort: "organisatie" });
-    expect(benchmarks().toewijzingen.map((t) => t.id)).toEqual(["t1"]);
-    // Wijzigen van het bereik van die Lead zelf: De toewijzing heeft geen bereik op de lid-Meting en vervalt.
-    db.zetLeadBereik("L1", { soort: "metingen", metingIds: ["M2"] });
-    expect(benchmarks().toewijzingen).toHaveLength(0);
-  });
-
-  it("een Lead met bereik op de lid-Meting houdt zijn niveau 1-toewijzing, ook zonder de hele organisatie", () => {
-    basis();
-    zetToewijzingen([{ id: "t1", benchmarkId: "B", organisatieId: "O1", respondentId: "L1" }]);
-    db.zetLeadBereik("L1", { soort: "metingen", metingIds: ["M1"] });
-    expect(benchmarks().toewijzingen).toHaveLength(1);
-  });
-
-  it("een Lead voor de hele organisatie houdt zijn niveau 1-toewijzing en die van elke Meting", () => {
-    basis();
-    zetToewijzingen([
-      { id: "t1", benchmarkId: "B", organisatieId: "O1", respondentId: "L1" },
-      { id: "t2", benchmarkId: "B", organisatieId: "O1", metingId: "M2", respondentId: "L1" },
-    ]);
-    db.zetLeadBereik("L1", { soort: "organisatie" });
-    expect(benchmarks().toewijzingen).toHaveLength(2);
-  });
-
-  it("verplaatsen naar een andere organisatie maakt het bereik leeg", () => {
-    zet([
-      org("O1", [lid("L1", "O1", "a@x.nl", { leadMetingIds: ["M1"], leadVoorOrganisatie: true })], [meting("M1", "O1", "Nul", [inv("I1", "M1", "L1")])]),
+      org("O1", [lid("L1", "O1", "a@x.nl", { lead: true })], [meting("M1", "O1", "Nul", [inv("I1", "M1", "L1")])]),
       org("O2", [], [meting("D1", "O2", "Nul", [])]),
     ]);
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1")], "a1");
     db.verplaatsRespondentNaarOrganisatie("L1", "O2", []);
-    expect(laad()[1].leden[0]).toMatchObject({ leadMetingIds: [], leadVoorOrganisatie: false });
+    const o = laad();
+    expect(o[1].leden[0]).not.toMatchObject({ lead: true });
+    expect((o[0] as unknown as { leadToegang?: Rij[] }).leadToegang ?? []).toHaveLength(0);
   });
 
-  it("data van vóór het bereik wordt als specifieke Metingen geladen", () => {
+  it("data van vóór de tabel Leads wordt omgezet: Een Lead met Metingen krijgt vinkjes, de oude velden verdwijnen", () => {
     zet([org("O1", [lid("L1", "O1", "a@x.nl", { leadMetingIds: ["M1"] })], [meting("M1", "O1", "Nul", [])])]);
-    expect(db.laadAlles()[0].leden[0].leadVoorOrganisatie).toBe(false);
+    const l = db.laadAlles()[0];
+    expect(l.leden[0].lead).toBe(true);
+    expect(l.leden[0].leadMetingIds).toBeUndefined();
+    expect(l.leadToegang?.map((t) => `${t.weergave}:${t.metingId}`).sort()).toEqual(["exporteren:M1", "resultaten:M1", "uitnodigen:M1"]);
   });
 
-  it("Mijn metingen toont bij de hele organisatie ook een Meting die later is aangemaakt", () => {
-    zet([org("O1", [lid("L1", "O1", "a@x.nl", { leadVoorOrganisatie: true })], [meting("M1", "O1", "Nul", [])])]);
+  it("Mijn metingen toont de Metingen met een vinkje, ook als die later zijn aangemaakt en aangevinkt", () => {
+    zet([org("O1", [lid("L1", "O1", "a@x.nl", { lead: true })], [meting("M1", "O1", "Nul", [])])]);
+    expect(db.zoekRespondentPerToegangscode(db.laadAlles(), "cL1")!.leadMetingen).toEqual([]);
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1")], "a1");
     expect(db.zoekRespondentPerToegangscode(db.laadAlles(), "cL1")!.leadMetingen.map((m) => m.id)).toEqual(["M1"]);
     const o = laad();
     o[0].scanUitvoeringen.push(meting("M2", "O1", "Later", []));
     zet(o);
+    expect(db.zoekRespondentPerToegangscode(db.laadAlles(), "cL1")!.leadMetingen.map((m) => m.id)).toEqual(["M1"]);
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M2")], "a1");
     expect(db.zoekRespondentPerToegangscode(db.laadAlles(), "cL1")!.leadMetingen.map((m) => m.id)).toEqual(["M1", "M2"]);
   });
 });

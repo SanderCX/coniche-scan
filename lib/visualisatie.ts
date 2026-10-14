@@ -481,6 +481,16 @@ export function initialenVan(naam: string): string {
   return (woorden[0][0] + woorden[woorden.length - 1][0]).toUpperCase();
 }
 
+/** Een eenvoudige, stabiele hash (FNV-1a) van een tekst: Alleen voor een vaste volgorde, nooit voor iets beveiligends. */
+function hash(tekst: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < tekst.length; i++) {
+    h ^= tekst.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h >>> 0;
+}
+
 /** Sorteersleutel: De achternaam (het laatste woord), daarna de hele naam. Het e-mailadres staat voor wie geen naam heeft. */
 function achternaamSleutel(naam: string): [string, string] {
   const woorden = naam.trim().split(/\s+/).filter(Boolean);
@@ -496,17 +506,27 @@ function achternaamSleutel(naam: string): [string, string] {
 export function antwoordenPerVraag(
   assessment: Assessment,
   invullingen: ScanInvulling[],
-  naamVan: (invulling: ScanInvulling) => string
+  naamVan: (invulling: ScanInvulling) => string,
+  opties: {
+    /**
+     * Een Lead zonder namen (`Organisatie.antwoordenMetNamen` uit): De kolommen heten R1 tot en met Rn, zonder naam in een
+     * tooltip, in een vaste volgorde uit een hash van het scan-id. Die volgorde volgt dus niet de naam en niet het moment van
+     * afronden, zodat ze geen aanwijzing geeft (`beheerpagina.md`, punt 6a, Namen bij Antwoorden).
+     */
+    anoniem?: boolean;
+  } = {}
 ): AntwoordenWeergave {
-  const scans = afgerond(invullingen)
-    .map((i) => ({ invulling: i, naam: naamVan(i) }))
-    .sort((a, b) => {
-      const [aa, an] = achternaamSleutel(a.naam);
-      const [ba, bn] = achternaamSleutel(b.naam);
-      return aa.localeCompare(ba, "nl") || an.localeCompare(bn, "nl");
-    });
+  const afgeronde = afgerond(invullingen).map((i) => ({ invulling: i, naam: opties.anoniem ? "" : naamVan(i) }));
+  const scans = opties.anoniem
+    ? afgeronde.sort((a, b) => hash(a.invulling.id) - hash(b.invulling.id) || a.invulling.id.localeCompare(b.invulling.id))
+    : afgeronde.sort((a, b) => {
+        const [aa, an] = achternaamSleutel(a.naam);
+        const [ba, bn] = achternaamSleutel(b.naam);
+        return aa.localeCompare(ba, "nl") || an.localeCompare(bn, "nl");
+      });
   const gebruikt = new Map<string, number>();
-  const kolommen: AntwoordenKolom[] = scans.map((s) => {
+  const kolommen: AntwoordenKolom[] = scans.map((s, i) => {
+    if (opties.anoniem) return { invullingId: s.invulling.id, naam: "", initialen: `R${i + 1}` };
     const basis = initialenVan(s.naam);
     const keer = (gebruikt.get(basis) ?? 0) + 1;
     gebruikt.set(basis, keer);
