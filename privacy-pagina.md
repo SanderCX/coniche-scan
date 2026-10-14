@@ -113,10 +113,11 @@ concrete termijn noemen.
 - Respondenten: Alleen hun eigen scan-invulling(en).
 - Coniche-beheerders: Organisaties en respondenten die zij zelf
   beheren, of, met de rol Admin, alles (`datamodel.md` deel 2).
-- Een Lead (zodra gebouwd): Resultaten van de eigen organisatie
-  (`datamodel.md` deel 2), en een vergelijking met de anonieme
-  gemiddelden van andere organisaties als een Admin die heeft toegewezen
-  (`benchmark.md`).
+- Een Lead (zodra gebouwd): De weergaven die een Admin voor hem heeft
+  aangevinkt (`datamodel.md` deel 2): De resultaten van die Metingen, de
+  antwoorden per vraag (anoniem, of met namen als dat met de organisatie is
+  afgesproken) en een vergelijking met de anonieme gemiddelden van andere
+  organisaties (`benchmark.md`).
 - Geen derden, behalve waar dat nodig is voor de techniek zelf
   (hosting, e-mailverzending).
 

@@ -145,11 +145,11 @@ Bewust nog niet opgepakt. Geen prioritering.
   één deelnemer meedoet aan een benchmark tussen organisaties. De
   samengestelde Meting verwijst naar de Metingen waaruit ze bestaat en
   kopieert geen antwoorden. Ze staat in de lijst Metingen met een badge
-  "Gemiddelde", heeft geen respondenten en is niet invulbaar. Een Lead kan Lead
-  worden op een samengestelde Meting (`RespondentRolMeting`) en ziet dan alleen
-  het gemiddelde, niet de onderliggende Metingen. Dat bereik stelt de Admin
-  expliciet in en erft niet mee (besloten op 13 oktober 2026, `benchmark.md`,
-  Bereik van een Lead). Besloten en gebouwd: Wat er
+  "Gemiddelde", heeft geen respondenten en is niet invulbaar. Een Lead krijgt
+  Resultaten op een samengestelde Meting (`LeadToegang`) en ziet dan alleen het
+  gemiddelde, niet de onderliggende Metingen. Dat vinkje zet de Admin expliciet
+  en erft niet mee (besloten op 13 oktober 2026, aangepast op 14 oktober 2026,
+  `benchmark.md`, View voor een Lead). Besloten en gebouwd: Wat er
   gebeurt als een onderliggende Meting wordt verwijderd. Blokkeren kan niet,
   want verwijderen moet altijd kunnen (bewaartermijn, AVG-verzoek). Zo is het
   gebouwd: De Meting valt uit de samenstelling, de bevestiging noemt de samengestelde
@@ -241,7 +241,7 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   bij verplaatsen en samenvoegen te loggen, zoals de spec voorschrijft.
 - **Content-pagina's** beheerbaar maken (punt 11) en **Organisatievelden**
   zelf beheerbaar met de tab Organisatievelden (punt 3).
-- **Paginering** van de lijsten Respondenten en Ingevulde scans.
+- **Paginering** van de lijsten Respondenten, Rondes en Metingen en de scanlijst in het Meting-overzicht.
 - **Spec en code gelijktrekken**: `Assessment.bouwblokLabel` in de spec
   tegenover `bouwblokEenheidEnkelvoud`/`Meervoud` in de code, en
   `Bouwblok.centraleVraag` als echt veld tegenover de lookup-tabellen.
@@ -250,7 +250,27 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
 - **Opsplitsen** van de Import-pagina (590 regels).
 - **Meer tests**: Import (parsen en valideren van rijen), `scan-slot`, de
   overige stores.
-- **Bereik van een Lead (gebouwd op 13 oktober 2026)**: Een Lead krijgt bereik op specifieke
+- **Tabel Leads (voorstel van 14 oktober 2026)**: Eén tabel per organisatie
+  waarin een Admin per Lead aanvinkt welke weergaven hij ziet
+  (`beheerpagina.md`, punt 6a). Te bouwen: Het record `LeadToegang`
+  (`datamodel.md` deel 2) in plaats van `RespondentRolMeting`,
+  `leadVoorOrganisatie` en `BenchmarkToewijzing`; de overgang van bestaande
+  gegevens (`beheerpagina.md`, punt 6a, Overgang); de tabel met kolommen per
+  Meting (Resultaten, Spreiding, Antwoorden, Uitnodigen en Exporteren) en per
+  benchmark, met grijze cellen en "Opslaan"; weergave G en weergave B zonder
+  ring voor een Lead, met R1 tot Rn of namen volgens
+  `Organisatie.antwoordenMetNamen`; het blok "Toewijzen aan een Lead" op de
+  benchmarkviews vervangen door een lijst; positie in de Meting alleen nog voor
+  de Admin; de tabel Admin-only en `respondenten.leadToekennen` zonder
+  Consultant.
+- **Hoofdlink Resultaten (voorstel van 14 oktober 2026)**: Rondes, Metingen en
+  Benchmarks onder één hoofdlink, met de lijst Ingevulde scans als pagina
+  vervallen en Import als knop op organisatieniveau (`beheerpagina.md`,
+  punt 7 en 8). Nog te bespreken: Of een Lead de lijsten Rondes en Metingen ook
+  krijgt, en hoe de kolommen van de tabel Leads zich verhouden tot de
+  weergaven onder Resultaten.
+- **Bereik van een Lead (gebouwd op 13 oktober 2026, in het voorstel van 14
+  oktober 2026 vervangen door de tabel Leads)**: Een Lead krijgt bereik op specifieke
   Metingen of op de hele organisatie, los van of hij zelf een scan heeft
   gedaan (`benchmark.md`, Bereik van een Lead). Te bouwen: het veld
   `leadVoorOrganisatie` op de Respondent; de keuze van het bereik in "Lead
@@ -386,7 +406,7 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   die scans opnieuw importeren. Daarbij hoort de actie "Scans samenbrengen in
   één Meting" (`beheerpagina.md`, bij "Respons naar andere Meting verplaatsen"):
   Eén scherm dat per scan de Respondent koppelt en alles in één ronde en
-  Meting zet. Ook nodig: Kolom Notitie in de lijst Ingevulde scans en het
+  Meting zet. Ook nodig: Kolom Notitie in de scanlijst van het Meting-overzicht en het
   Scan-overzicht, kolom `scan_notitie` in de CSV-export (`export-csv.md`).
 - **Fout: "Naar ronde…" werkt niet voor Metingen met hetzelfde onderdeel**
   (13 oktober 2026, hersteld): Geïmporteerde Metingen hebben allemaal het onderdeel "Hele
@@ -408,6 +428,35 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   aanmaken, Wijzigen, Samengestelde Meting en Scans samenbrengen. Een Meting
   zonder ronde houdt haar oude label. Nieuw: Info-icoon `info.metingBegrippen` met
   de begrippen boven de lijst Metingen (`beheerpagina.md`, punt 5, Begrippen).
+- **Overzicht per vraag op ronde-niveau, en de samengestelde Meting** (13
+  oktober 2026, nog uit te werken, besproken met Joost): Er is een nieuw overzicht
+  op het laagste niveau, met alle scores per vraag per scan in één beeld. Het
+  werkt bij één klant met één Meting en zes Respondenten (Eneco), maar niet bij
+  een klant met zes Metingen van elk één scan (Univé), want daar zijn het zes
+  onderdelen. Vraag: Kunnen die scans ook in één Meting? Technisch kan dat met
+  "Scans samenbrengen", maar het kost structuur:
+  - Eén Meting heeft één onderdeel. De onderdelen vallen weg en moeten op de
+    Respondent (veld Team) terecht komen.
+  - Ontwikkeling per onderdeel (Zuid-Nederland tegen Zuid-Nederland in de
+    nameting) verdwijnt, en niveau 2 (tussen Metingen binnen een organisatie)
+    ook. Alleen de ontwikkeling van het geheel blijft.
+  - Een scan hoort bij één Meting. Na samenbrengen zijn de oorspronkelijke
+    Metingen leeg en kan de samengestelde Meting niets meer middelen.
+  - Het gemiddelde blijft gelijk zolang elke Meting precies één scan had (elke
+    Meting even zwaar is dan hetzelfde als elke scan even zwaar).
+  Richting om morgen uit te werken: Het overzicht per vraag niet aan één Meting
+  koppelen maar aan het bereik van een ronde (alle scans van dezelfde ronde en
+  hetzelfde Assessment). Eneco toont dan zes Respondenten uit één Meting, Univé
+  zes scans uit zes Metingen met het onderdeel als kopje. Onderdelen, ontwikkeling
+  en gemiddelde blijven bestaan. Sluit aan op "Overzicht van een ronde" in
+  `visualisatie-scores.md`.
+  Te beslissen:
+  - Wie mag individuele scans zien. Een samengestelde Meting heeft nu geen
+    Respondenten en een Lead ziet alleen het gemiddelde. Voorstel: Het overzicht
+    per scan alleen voor Admin en Consultant.
+  - Hoe een samengestelde Meting zich hiertoe verhoudt (doorlezen naar de scans
+    van haar Metingen, of alleen via de ronde).
+  - Waar het overzicht staat (Meting-overzicht, rondekop of beide).
 - **Assessment verwijderen** (`beheerpagina.md`, punt 1, `datamodel.md`,
   Verwijderen en datakoppelingen): Gespecificeerd, nog niet gebouwd. Alleen
   mogelijk als er geen Meting van het Assessment bestaat, met een
@@ -511,7 +560,7 @@ screenshots van de draaiende app. Niets is besloten of gebouwd.
   "opgeslagen"-indicator en een korte uitleg boven de grafieken.
 - **Beheertabellen**: Duidelijkere rijhover of zebra-strepen, sticky
   tabelkoppen bij lange lijsten, en filters en sortering onthouden bij
-  Ingevulde scans en Respondenten.
+  de lijsten onder Resultaten en Respondenten.
 - **Merkafwerking**: Footer-logo (witte variant) en Source Serif 4 voor een
   citaat, beide al open punt in `stylesheet.md`. Daarnaast iconen of
   illustraties op lege pagina's in de stijl van de Assessment-iconen.

@@ -112,16 +112,16 @@ een andere gebruiker wijzigt, staat bij Gebruikers (punt 9).
 ### Navigatie in beheer
 
 Beheer heeft drie niveaus: De hoofdlinks in de nav (Assessments,
-Organisaties, Benchmark) en Instellingen, dat via het Accountmenu opent,
+Organisaties, Resultaten) en Instellingen, dat via het Accountmenu opent,
 daaronder de onderdelen van die link, en
 daaronder de detailpagina's van één organisatie, Meting of Respondent.
 Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
 
 - **Onderdelen binnen een hoofdlink**: Onder de nav staat een tabbalk
   met de onderdelen van de gekozen hoofdlink. Bij Organisaties zijn dat
-  Organisaties, Respondenten, Ingevulde scans en Import, voor een Admin
-  aangevuld met Organisatievelden. Een Consultant ziet de tab Import
-  wel, maar daar staat de importfunctie niet (punt 8). Bij Instellingen zijn
+  Organisaties en Respondenten, voor een Admin aangevuld met
+  Organisatievelden. Bij Resultaten zijn dat Rondes en Metingen, voor een
+  Admin aangevuld met Benchmarks (punt 7). Bij Instellingen zijn
   dat Gebruikers, Drempels en termijnen, Algemene teksten, Content-pagina's,
   Audit-log en Data-integriteit. De tabbalk is zichtbaar op de
   lijstpagina's, niet op een detailpagina. Metingen en uitnodigen hebben
@@ -134,15 +134,15 @@ Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
   klikgeschiedenis. Een Respondent-overzicht en een Scan-overzicht zijn
   modals en staan dus niet in het pad.
 - **Klikken op een rij**: In elke lijst met Respondenten of ingevulde
-  scans (de lijsten Respondenten en Ingevulde scans, het
-  organisatie-detail en het Meting-overzicht) is de hele rij klikbaar en
+  scans (de lijst Respondenten, het organisatie-detail en het
+  Meting-overzicht) is de hele rij klikbaar en
   opent het overzicht (modal) van die Respondent of scan. Een rij met
   een "Bekijk" heeft die als compacte knop erbij voor wie het zoekt,
   met dezelfde werking. Een selectievakje, "Kopieer link" of een
   Meting-label in de rij opent de modal niet maar doet alleen zijn eigen
   werk. Er bestaat geen aparte detailpagina meer per scan.
-- **Scan-overzicht (modal)**: Opent vanuit de lijst Ingevulde scans, het
-  organisatie-detail, het Meting-overzicht en de scanregel in het
+- **Scan-overzicht (modal)**: Opent vanuit het Meting-overzicht en de
+  scanregel in het
   Respondent-overzicht. De adresbalk krijgt `?scan=<id>`; sluiten,
   terugkeren en delen werken zoals hieronder bij het Respondent-overzicht.
   Vanuit het Scan-overzicht opent "Bekijk Respondent" het
@@ -155,14 +155,14 @@ Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
   waar je was, met dezelfde filters, sortering en scrollpositie. Een
   gedeelde link met `?respondent=<id>` opent de pagina met de modal erop,
   mits de ontvanger bij die Respondent mag (zelfde bereik als de lijst).
-- **Filters in de URL**: De lijst Respondenten en de lijst Ingevulde
-  scans bewaren hun filters, sortering en pagina in de adresbalk (zoals
+- **Filters in de URL**: De lijsten Respondenten, Rondes en Metingen
+  bewaren hun filters, sortering en pagina in de adresbalk (zoals
   de audit-log, punt 12), zodat terugkeren uit een detailpagina of
   modal dezelfde lijst toont.
 
 **Wat er gebeurt na een actie in het Respondent-overzicht**:
 
-- Bewerken, Lead-toegang of een scan naar een andere Meting: De modal
+- Bewerken, de Lead-rol aan- of uitzetten of een scan naar een andere Meting: De modal
   blijft open en het getoonde blok ververst, met een korte bevestiging
   bovenin de modal.
 - Verplaatsen naar een andere organisatie, samenvoegen of verwijderen van
@@ -177,7 +177,9 @@ Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
 Scan-overzicht of "Bekijk resultaten" in een scanregel van het
 Respondent-overzicht): Het resultatenscherm (CLAUDE.md, scherm 6) toont in
 beheer de gewone beheer-nav met het kruimelpad Organisaties › Organisatie
-› Meting › Resultaten van {Respondent}, en niet de respondentacties
+› Meting › Resultaten van {Respondent} (via Resultaten: Resultaten › Organisatie
+› Ronde › Meting › Resultaten van {Respondent}; de hoofdlink waarlangs je kwam
+bepaalt het begin van het pad), en niet de respondentacties
 "Terug naar de scan" en "Terug naar Mijn metingen". Wel de dropdown
 "Exporteren". Terug gaat via het kruimelpad. Dat wordt het Meting-overzicht
 en niet de Respondent-modal, want die is niet meer open. Boven de resultaten
@@ -191,8 +193,8 @@ Resultaten van de Meting.
 ## Status
 
 - **Gebouwd**: Organisaties (lijst, aanmaken, detail), metingen per
-  organisatie, respondenten uitnodigen, Ingevulde scans met filters, Import,
-  Assessments, Content, Gebruikersbeheer (punt 9), Drempels en termijnen (punt 10),
+  organisatie, respondenten uitnodigen, Ingevulde scans met filters, Import
+  (beide op 14 oktober 2026 omgezet, zie punt 7 en 8), Assessments, Content, Gebruikersbeheer (punt 9), Drempels en termijnen (punt 10),
   Audit-log (punt 12) en Data-integriteit (punt 13). Ook gebouwd zijn de
   resultatenpagina's in beheer: de Organisatie-resultaten per Meting
   (punt 4) en de resultaten van één scan, met het kruimelpad hierboven en
@@ -202,7 +204,8 @@ Resultaten van de Meting.
   `VeldDefinitieEditor` staat klaar, maar geen pagina gebruikt hem. En
   Het verwijderen van een Assessment (punt 1), gespecificeerd op 8 oktober
   2026. En Content-pagina's (punt 11), na overleg. De spec is leidend. Verder de
-  Benchmark (punt 14, `benchmark.md`): Het niveau tussen organisaties is
+  hoofdlink Resultaten met de tabs Rondes en Metingen (punt 7, voorstel van 14
+  oktober 2026) en de Benchmark (punt 14, `benchmark.md`): Het niveau tussen organisaties is
   gebouwd (PR 61). De niveaus binnen een organisatie en binnen een Meting zijn
   besproken en nog niet gebouwd.
 
@@ -211,10 +214,11 @@ Resultaten van de Meting.
 ## Wat beheerbaar is
 
 Vier hoofdonderdelen: Drie links in `.nav-right`, **Assessments**,
-**Organisaties** en **Benchmark**, en **Instellingen** (voorheen
+**Organisaties** en **Resultaten**, en **Instellingen** (voorheen
 Applicatie), dat niet in de nav staat maar opent vanuit het Accountmenu
-(zie Accountmenu bovenaan). Voor een Admin alle vier zichtbaar; een
-Consultant ziet alleen **Organisaties** (bereik `eigen`) — de andere drie gaan over dingen die voor de hele omgeving
+(zie Accountmenu bovenaan). Voor een Admin alle vier zichtbaar. Een
+Consultant ziet **Organisaties** en **Resultaten**, beide met bereik `eigen`.
+Assessments en Instellingen gaan over dingen die voor de hele omgeving
 gelden, niet over het eigen werk van één Consultant. "Overzicht" als apart
 dashboardscherm vervalt: Er is geen aparte dashboardlink, je landt direct
 op een van de hoofdlinks.
@@ -229,8 +233,8 @@ onderdelen (2a, 11 en 12). Benchmark is nummer 14.
 |---|---|
 | **Instellingen** (Admin-only, via het Accountmenu) | 9. Gebruikers, 10. Drempels en termijnen, 2a. Algemene teksten, 11. Content-pagina's, 12. Audit-log, 13. Data-integriteit |
 | **Assessments** (Admin-only) | 1. Assessment-types, 2. Content |
-| **Organisaties** (Admin: alle, Consultant: eigen) | 3. Organisatievelden, 4. Organisaties, 5. Metingen, 6. Respondenten uitnodigen, 6a. Lead-rol toekennen, 6b. Respondenten, 7. Ingevulde scans, 8. Import (alleen voor een Admin, een Consultant ziet een melding) |
-| **Benchmark** (Admin-only) | 14. Benchmark |
+| **Organisaties** (Admin: alle, Consultant: eigen) | 3. Organisatievelden, 4. Organisaties, 5. Metingen, 6. Respondenten uitnodigen, 6a. Leads (toegang per weergave, Admin-only), 6b. Respondenten, 8. Import (knop in het organisatie-detail, alleen voor een Admin) |
+| **Resultaten** (Admin: alle, Consultant: eigen) | 7. Resultaten (tabs Rondes en Metingen), 14. Benchmarks (tab, Admin-only) |
 
 ### Instellingen (Admin-only)
 
@@ -314,8 +318,8 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
   "Verlengen" (punt 4).
 - **Minimale groepsgrootte benchmark** (`benchmarkMinOrganisaties`,
   startwaarde 5): Het minimale aantal organisaties per Assessment in een
-  benchmark, inclusief de organisatie van de view, om die view aan een Lead
-  te mogen toewijzen. Eén getal voor deze drempel van niveau 1. De betekenis
+  benchmark, inclusief de organisatie van de view, om die view voor een Lead
+  aan te kunnen vinken in de tabel Leads. Eén getal voor deze drempel van niveau 1. De betekenis
   staat in `benchmark.md`, Drempels. Het privacy statement noemt dezelfde
   waarde (`privacy-pagina.md`, sectie 3a).
 - **Minimaal aantal scans per Meting in een benchmark**
@@ -325,11 +329,13 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
 - **Minimale groepsgrootte niveau 2** (`benchmarkMinMetingen`, voorstel,
   startwaarde 3): Het minimale aantal Metingen per Assessment in een
   benchmark binnen een organisatie, inclusief de Meting van de view, om die
-  view aan een Lead te mogen toewijzen.
-- **Minimaal aantal scans niveau 3** (`benchmarkMinRespondenten`, voorstel,
-  startwaarde 5): Het minimale aantal afgeronde scans in de Meting,
-  inclusief de scan van de view, om die view aan een Lead te mogen
-  toewijzen.
+  view voor een Lead aan te kunnen vinken.
+- **Minimaal aantal scans per Meting voor een Lead**
+  (`benchmarkMinRespondenten`, voorstel, startwaarde 5): Het minimale aantal
+  afgeronde scans in een Meting om de kolom Antwoorden bij anonieme namen voor
+  een Lead aan te kunnen vinken (punt 6a), om Spreiding voor een Lead aan te kunnen vinken en om voor een Lead de lijn van
+  laagste tot hoogste score aan te zetten (`visualisatie-scores.md`,
+  onderdeel A).
 
 #### 2a. Algemene teksten
 
@@ -371,8 +377,8 @@ standaardteksten zoals ze nu in de app staan):
 | Sleutel | Plek | Tekst |
 |---|---|---|
 | `info.bewaartermijn` | Instellingen, Drempels en termijnen, formulier Bewaartermijn ingevulde scans | Zonder ingestelde bewaartermijn verschijnt hier nooit een scan: Er is geen automatische verwijdering, alleen een melding zodra jij een termijn instelt. |
-| `info.importBestanden` | Import, bij "Bestanden kiezen" | Meerdere bestanden tegelijk mogen: Houd Cmd/Ctrl (of Shift voor een reeks) ingedrukt bij het selecteren, of kies direct een hele map met losse CSV's. Elk bestand mag een ander bronformaat hebben, dat wordt per bestand apart herkend. |
-| `info.importRijen` | Import, bij "rijen importeren" | Rijen met een 95%+-vraagtekstmatch (niet 100%) tellen pas mee na een expliciete goedkeuring per rij, met de knop "Goedkeuren" in de tabel hierboven. |
+| `info.importBestanden` | Importeren (organisatie-detail), bij "Bestanden kiezen" | Meerdere bestanden tegelijk mogen: Houd Cmd/Ctrl (of Shift voor een reeks) ingedrukt bij het selecteren, of kies direct een hele map met losse CSV's. Elk bestand mag een ander bronformaat hebben, dat wordt per bestand apart herkend. |
+| `info.importRijen` | Importeren (organisatie-detail), bij "rijen importeren" | Rijen met een 95%+-vraagtekstmatch (niet 100%) tellen pas mee na een expliciete goedkeuring per rij, met de knop "Goedkeuren" in de tabel hierboven. |
 | `info.respondentBewerken` | Respondent-overzicht, bewerkformulier | De persoonlijke link blijft ongewijzigd, ook na een nieuw e-mailadres. Een wijziging geldt voor alle scans van deze Respondent. |
 | `info.algemeneTeksten` | Algemene teksten, bij het tekstveld | Staat direct onder de titel op de persoonlijke link van elke respondent/Lead. |
 | `info.contentIcoon` | Content, veld Icoon | Een emoji die op de kaart van dit assessment staat, bijvoorbeeld 🩺. |
@@ -385,19 +391,21 @@ standaardteksten zoals ze nu in de app staan):
 | `info.conflictOplossen` | Conflict oplossen, naast de titel van de modal | Een Respondent heeft per Meting één scan. Hang één van de twee scans aan een andere Respondent. Alleen die scan gaat mee, de oorspronkelijke Respondent blijft bestaan met de andere scan. |
 | `info.dataIntegriteit` | Instellingen, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
 | `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
-| `info.bulkExportOrganisatie` | Ingevulde scans, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie. |
+| `info.bulkExportOrganisatie` | Resultaten, lijsten Rondes en Metingen, achter de uitgeschakelde knop "Exporteren" bij een selectie over meer dan één organisatie | Bulk-export kan alleen binnen één organisatie. Filter eerst op Organisatie. |
 | `info.metingBegrippen` | Organisatie-detail, naast de kop "Metingen" | Ronde: een meetmoment van de organisatie, zoals "0-meting" of "Nameting 2027". Een ronde bevat meerdere Metingen en rondes vergelijk je met elkaar. Onderdeel: welk deel van de organisatie gemeten wordt, zoals "Zuid-Nederland Zakelijk", of "Hele organisatie". Assessment: de vragenlijst. Meting: één onderdeel in één ronde met één Assessment, de Respondenten horen bij een Meting. De naam van de Meting maakt de app uit onderdeel en ronde, je typt hem niet. |
-| `info.scansSamenbrengen` | Ingevulde scans, achter de uitgeschakelde knop "Samenbrengen in één Meting…" bij een selectie met meer dan één Assessment | Samenbrengen kan alleen voor scans van hetzelfde Assessment, binnen één organisatie. Selecteer alleen scans van één Assessment. |
+| `info.scansSamenbrengen` | Resultaten, lijst Metingen, achter de uitgeschakelde knop "Samenbrengen in één Meting…" bij een selectie met meer dan één Assessment of meer dan één organisatie | Samenbrengen kan alleen voor Metingen van hetzelfde Assessment, binnen één organisatie. Selecteer alleen Metingen van één Assessment. |
 | `info.assessmentVerwijderen` | Assessments, op de kaart en het detail, naast de uitgeschakelde knop "Verwijderen" | Verwijder eerst alle Metingen van dit Assessment, bij alle organisaties. Daarna kan het Assessment worden verwijderd. Dit kan niet ongedaan worden gemaakt. De tekst begint altijd met het aantal Metingen en organisaties, die zin maakt de app zelf. |
+| `info.vergelijkRonde` | Resultaten van een Meting, naast de uitgeschakelde knop "Vergelijk met vorige ronde" | Vergelijken kan pas als deze organisatie een eerdere ronde heeft met hetzelfde onderdeel en hetzelfde Assessment, en met genoeg afgeronde scans. Start eerst een tweede ronde, of koppel een bestaande Meting aan een ronde. |
 | `info.positieMeting` | Resultaten van één scan, naast de uitgeschakelde weergave "Positie in de Meting" | De positie van een scan tegenover de andere scans in de Meting is er pas bij voldoende afgeronde scans. Bij minder is een scan te herleiden naar een persoon. Het minimum staat bij Drempels en termijnen (aantal respondenten per Meting). |
 | `info.mijnAccountWachtwoord` | Mijn account, naast de uitgeschakelde knop "Wachtwoord wijzigen" | Wachtwoord wijzigen komt met de echte inlog. Tot die tijd vraag je een Admin om je wachtwoord te wijzigen. |
 | `info.benchmarkInstellingen` | Instellingen, Drempels en termijnen, formulier Benchmark | Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. |
 | `info.benchmarkVlag` | Organisatie-detail, bij de schakelaar "Doet mee aan benchmark" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks. |
-| `info.benchmarkToewijzen` | Benchmark, view per organisatie, achter de uitgeschakelde knop "Toewijzen" | Toewijzen kan pas als er een Lead is en de groep aan de drempel van dit niveau voldoet. Anders zou een Lead een vergelijking zien met te weinig anderen om anoniem te blijven. |
+| `info.leadToegangCel` | Organisatie-detail, tabel Leads, in een grijze cel | De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark. |
+| `info.antwoordenMetNamen` | Organisatie-detail, bij de schakelaar "Namen tonen bij Antwoorden" | Uit: Leads zien de antwoorden als R1 tot en met Rn. Aan: Leads zien de namen van de respondenten. Stem dit af met de opdrachtgever voordat je het aanzet. Het geldt voor alle Leads van deze organisatie. |
 | `info.benchmarkAanmaken` | Benchmark aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark heeft een naam nodig, minstens één Assessment en minstens één organisatie die je hebt aangevinkt. Een organisatie staat alleen in de lijst als ze meedoet aan benchmarks en een Meting heeft van een gekozen Assessment met genoeg afgeronde scans. |
 | `info.benchmarkAanmakenMetingen` | Benchmark binnen een organisatie aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark binnen een organisatie heeft een naam nodig, een organisatie en minstens één Assessment waarvoor je minstens twee Metingen hebt aangevinkt. Een Meting is alleen te kiezen met genoeg afgeronde scans. |
 | `info.benchmarkAanmakenScans` | Benchmark binnen een Meting aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark binnen een Meting heeft een naam nodig, een organisatie, een Assessment en een Meting. Een Meting is alleen te kiezen met genoeg afgeronde scans. |
-| `info.exportEenScan` | Ingevulde scans en organisatie-detail, achter de uitgeschakelde opties "Als PDF" en "Voor InDesign (XML)" | Beschikbaar bij precies één scan. |
+| `info.exportEenScan` | Meting-overzicht en de lijsten onder Resultaten, achter de uitgeschakelde opties "Als PDF" en "Voor InDesign (XML)" | Beschikbaar bij precies één scan. |
 
 Elk nieuw Info-icoon krijgt hier een regel en een regel in
 `data/info-teksten.ts`. Een standaardtekst bevat geen verwijzing naar een
@@ -753,8 +761,8 @@ het antwoord daarom zelf kunnen vastleggen.
   Op de organisatiedetailpagina, naast Kenmerken, één of meer
   Consultants toevoegen die deze organisatie ook mogen zien en
   beheren, bovenop de eigenaar. Zelfde soort multi-select-patroon als
-  Lead-toegang beheren (punt 6a) — nu op Gebruikers in plaats van
-  Respondenten. Intrekken van een toewijzing is de spiegel van
+  de selectievakjes in de tabel Leads (punt 6a), nu op Gebruikers in plaats
+  van Respondenten. Intrekken van een toewijzing is de spiegel van
   toewijzen, geen aparte permissie. Dit scherm toont ook, los van de
   toewijs-actie zelf, wie de eigenaar is (`aangemaaktDoor`) en wie
   toegewezen is — die twee blijven zichtbaar als apart onderscheid,
@@ -769,13 +777,21 @@ het antwoord daarom zelf kunnen vastleggen.
   meedoet. De leden van de organisatie vallen dan uit die benchmarks.
   Wijzigen wordt gelogd (`organisatie.benchmarkVlagGewijzigd`). Zie
   `benchmark.md`, Toestemming en privacy.
+- **Namen tonen bij Antwoorden** (Admin-only): Op het organisatie-detail,
+  naast de Benchmark-vlag, een schakelaar (`Organisatie.antwoordenMetNamen`,
+  `datamodel.md` deel 3). Hij staat uit bij een nieuwe organisatie. Uit: Leads
+  zien bij Antwoorden R1 tot en met Rn. Aan: Ze zien de namen. Een Admin zet
+  hem aan na afstemming met de opdrachtgever. Aanzetten gaat na een
+  bevestiging die zegt dat de Leads van deze organisatie dan namen zien,
+  uitzetten kan zonder bevestiging. Wijzigen wordt gelogd
+  (`organisatie.antwoordenNamenGewijzigd`). Zie punt 6a, Namen bij Antwoorden.
 - **Naam wijzigen** (`organisaties.bewerken`, dus Admin voor alle
   organisaties en Consultant voor zijn eigen): Op het organisatie-detail
   staat de naam in de kop met een potlood ernaast. Een klik maakt van de
   naam een invoerveld met "Opslaan" en "Annuleren". Er gelden dezelfde
   regels als bij Aanmaken: De naam is verplicht en wordt getrimd. Na opslaan
   staat de nieuwe naam direct in de kop, het kruimelpad, de lijst en overal
-  waar de organisatie wordt genoemd (Respondent-overzicht, Ingevulde scans,
+  waar de organisatie wordt genoemd (Respondent-overzicht, Resultaten,
   benchmarks). Het `id` en de koppelingen blijven gelijk, dus er verandert
   niets aan Metingen, Respondenten of scans. Het wijzigen wordt gelogd als
   `organisatie.hernoemd`, met de oude en de nieuwe naam in `details`
@@ -783,14 +799,15 @@ het antwoord daarom zelf kunnen vastleggen.
   bij het loggen.
 - **Detail**: Kenmerken (altijd bewerkbaar), "Aangemaakt door" (zie
   hierboven), de metingen van deze organisatie met "Bekijk" naar het
-  Meting-overzicht (punt 5), en de respondenten met hun status, elk met
-  alleen "Bekijk" dat het Respondent-overzicht opent (punt 6b), en de
-  ingevulde scans van de organisatie (punt 7).
-  **Lange lijsten**: Respondenten en ingevulde scans tonen op de detailpagina
-  maximaal 5 rijen. Zijn het er meer, dan staat onder de lijst een link
-  "Alle respondenten van deze organisatie →" respectievelijk "Alle
-  ingevulde scans van deze organisatie →". Die opent het tabblad
-  Respondenten (punt 6b) respectievelijk Ingevulde scans (punt 7) met het
+  Meting-overzicht (punt 5), per ronde met in de rondekop "Resultaten van
+  deze ronde →" naar het Ronde-overzicht (punt 7), en de respondenten met hun
+  status, elk met alleen "Bekijk" dat het Respondent-overzicht opent
+  (punt 6b). Voor een Admin staat in de kop van het blok Metingen ook de knop
+  "Importeren" (punt 8). De ingevulde scans staan niet op deze pagina: Die
+  staan per Meting in het Meting-overzicht.
+  **Lange lijsten**: Respondenten tonen op de detailpagina maximaal 5 rijen.
+  Zijn het er meer, dan staat onder de lijst een link "Alle respondenten van
+  deze organisatie →". Die opent het tabblad Respondenten (punt 6b) met het
   filter Organisatie al ingesteld op deze organisatie (in de URL, zoals de
   andere filters). Zijn het er 5 of minder, dan is er geen link. Er komt
   geen link naar de lijst over alle organisaties heen.
@@ -836,9 +853,11 @@ het antwoord daarom zelf kunnen vastleggen.
   inhoud staat een weergave-schakelaar (`stylesheet.md`, Weergave-schakelaar)
   met Overzicht, Per bouwblok en Spreiding, en voor een Admin en Consultant ook Antwoorden (de antwoorden per vraag en per respondent, gebouwd op 13 oktober 2026). Overzicht is de standaard en de
   opbouw hierboven, die ongewijzigd blijft. Rechts van de schakelaar staat de
-  knop "Vergelijk met vorige Meting". De weergaven, de knop en de
+  knop "Vergelijk met vorige ronde". De weergaven, de knop en de
   adresbalkparameters staan in `visualisatie-scores.md`, Navigatie. Een Lead
-  ziet Overzicht en Per bouwblok, en de vergelijking.
+  ziet Overzicht en Per bouwblok, de vergelijking met een eerdere Meting
+  waarvoor hij Resultaten heeft, en Spreiding en Antwoorden als die vinkjes in
+  de tabel Leads aan staan (punt 6a).
 
   **Eén kop.** De pagina heeft één kop. Bovenaan staat het Meting-label als
   eyebrow ("Nulmeting"), daaronder de naam van het Assessment als titel, en
@@ -851,7 +870,7 @@ het antwoord daarom zelf kunnen vastleggen.
   organisatieresultaat. De bestaande exports blijven per één scan, zie
   `export-pdf-visual-volwassenheidsscan.md`, "Export van één scan, geen
   aggregatie". Zodra dit gebouwd wordt: een Lead ziet die export alleen op
-  zíjn eigen toegewezen Metingen (`respondent.leadMetingIds`), niet op elke
+  Metingen waarvoor hij Resultaten heeft (`LeadToegang`), niet op elke
   Meting die hij verder kan bereiken — zie `datamodel.md` deel 2,
   Rechtenmatrix, `export.uitvoeren`, en `export-indesign.md`, "Waar dit een
   plek krijgt".
@@ -898,6 +917,10 @@ staan naast het assessment-type de velden "Ronde" en "Onderdeel".
 - **Naam van de Meting**: Geen invoerveld. Onder de velden staat alleen
   ter controle wat het wordt, bijvoorbeeld "Wordt: Zuid-Nederland Zakelijk |
   0-meting" (`datamodel.md`, Naam van een Meting).
+- **Uitlijning**: Assessment-type, Ronde en Onderdeel staan met hun labels op
+  één lijn, en "+ Meting plannen" staat op de hoogte van de velden. De regel
+  "Wordt: …" verschuift niets in de rij (`stylesheet.md`, Formulieren,
+  Veldenrij met labels en een knop).
 
 **Lijst Metingen in het organisatie-detail** (gebouwd op 13 oktober 2026): De lijst is gegroepeerd
 per ronde, de nieuwste bovenaan. Elke ronde heeft een kop met de naam, de
@@ -971,15 +994,26 @@ alle Metingen, een Consultant die van zijn eigen organisaties.
 - **Kop**: Naam van de Meting met een potlood erachter (Wijzigen, hierboven),
   Assessment, de organisatie (met link terug naar het organisatie-detail) en
   voortgang ("x van y afgerond").
-- **Respondenten in deze Meting**: Lijst met Naam, Status, Voortgang en
-  de persoonlijke link ("Kopieer link", "Openen"), elk met "Bekijk"
-  naar het Respondent-overzicht (punt 6b). Hier staat ook "Respondent
-  uitnodigen" (punt 6).
+- **Scans in deze Meting**: Eén rij per Respondent in deze Meting. Kolommen:
+  Naam, Rol/Team, Status, Voortgang, Gestart, Aangemaakt
+  (`ScanInvulling.aangemaaktOp`, bij een import het importmoment, zodat je
+  geïmporteerde scans kunt terugvinden en groeperen), Notitie
+  (`ScanInvulling.notitie`, afgekapt op één regel met de volledige tekst bij
+  hover, leeg als er geen is), de persoonlijke link ("Kopieer link",
+  "Openen") en "Bekijk". Rol/Team toont alleen wat er is: Is de rol leeg, dan
+  staat er alleen het team, is het team leeg alleen de rol, en zijn ze allebei
+  leeg dan blijft de cel leeg. Nooit een los streepje of puntje. Alle kolommen
+  zijn sorteerbaar. De hele rij is klikbaar en opent het Scan-overzicht
+  (punt 7), en bij een Respondent zonder scan, zoals een Lead, het
+  Respondent-overzicht (punt 6b). Selectievakje per rij en "alles
+  selecteren" in de koprij, met de acties "Exporteren", "Naar andere Meting"
+  (punt 6b) en "Verwijderen" (compacte knoppen, gelijke breedte). Hier staat
+  ook "Respondent uitnodigen" (punt 6).
 - **Resultaten**: De link "Naar resultaten →" (Organisatie-resultaten,
   punt 4), zodra er minstens 1 afgeronde scan is.
-- **Leads**: Welke Leads toegang hebben tot deze Meting
-  (`RespondentRolMeting`, punt 6a), alleen als weergave. Beheren gebeurt
-  in het Respondent-overzicht.
+- **Leads**: Welke Leads welke weergaven van deze Meting hebben
+  (`LeadToegang`, punt 6a), alleen als weergave. Beheren gebeurt in de tabel
+  Leads van de organisatie.
 - **Acties**: De Meting "Naar ronde…" hangen (hierboven), responsen naar een andere
   Meting verplaatsen via selectie in de lijst (zelfde actie als punt 6b,
   "Respons naar andere Meting verplaatsen") en de Meting verwijderen (de
@@ -1026,101 +1060,198 @@ diezelfde link direct in een nieuw tabblad, zodat de beheerder 'm meteen
 zelf kan proberen zonder eerst te plakken.
 
 **Vinkje "Ook Lead maken"**, naast het e-mailveld hierboven: Kent
-meteen ook de Lead-rol toe aan deze respondent, met toegang tot precies
-de Meting waarvoor wordt uitgenodigd (zie hieronder). Puur een
-snelkoppeling voor het geval iemand tegelijk moet invullen én Lead moet
-worden — de twee blijven onafhankelijke acties, zie hieronder. Extra
-Metingen voor deze Lead erbij: via "Lead-toegang beheren" hieronder.
+meteen ook de Lead-rol toe aan deze respondent, met Resultaten aan voor de
+Meting waarvoor wordt uitgenodigd (punt 6a). Puur een snelkoppeling voor het
+geval iemand tegelijk moet invullen én Lead moet worden. De twee blijven
+onafhankelijke acties. Meer weergaven voor deze Lead vink je aan in de tabel
+Leads (punt 6a).
 
-#### 6a. Lead-rol toekennen — los van uitnodigen voor een meting
+#### 6a. Leads: Toegang per weergave
 
-Lead-worden (identiteit en toegang) en een vragenlijst krijgen
-(uitgenodigd worden voor een Meting) zijn twee losse acties, geen
-automatisme. Een Lead-rol is een `RespondentRol` op een `Respondent`
-(`datamodel.md` deel 2); die respondent hoeft geen enkele
-`ScanInvulling` te hebben. Een Lead heeft een bereik: **Specifieke
-Metingen** (standaard) of de **hele organisatie** (`datamodel.md` deel 2,
-Het bereik van een Lead). Bij specifieke Metingen ziet hij niet automatisch
-alle Metingen van de organisatie. Welke hij mag zien, wordt per Meting
-toegekend (`RespondentRolMeting`), met minstens 1 verplicht. Het bereik
-bepaalt ook welke benchmarkviews hij kan krijgen (`benchmark.md`, Bereik van
-een Lead). Een samengestelde Meting (gebouwd, punt 5) staat in die lijst met
-de badge "Gemiddelde" en met de regel "Ziet alleen het gemiddelde". Ze is
-altijd een bewuste keuze en staat nooit vanzelf aan: Toegang erft niet mee van
-de onderliggende Metingen en gaat er ook niet naartoe.
+**Status.** Voorstel van 14 oktober 2026. Dit vervangt het bereik van een Lead
+(Specifieke Metingen of Hele organisatie), `RespondentRolMeting`,
+`leadVoorOrganisatie` en het toewijzen van benchmarkviews op de views zelf.
+Wat daarvan op 13 oktober 2026 is gebouwd, wordt vervangen (zie Overgang onder
+dit punt).
 
-- **Lead toevoegen** (nieuwe actie op organisatieniveau, niet per
-  Meting): Een oranje knop "+ Lead toevoegen" (`.btn-or .btn-compact`,
-  zoals de andere +-knoppen, bijv. "+ Meting plannen"), geen
-  tekstlink en geen uitklapbox met driehoekje. De knop staat in het
-  blok Respondenten van het organisatie-detail, direct onder de lijst
-  met Respondenten, links uitgelijnd. Pas na een klik op de knop klapt
-  het formulier eronder open: Naam +
-  e-mailadres invoeren, plus een **verplichte keuze
-  van het bereik**: Specifieke Metingen (1 of meer Metingen van deze
-  organisatie) of de hele organisatie. Dezelfde keuze als bij "Lead-toegang
-  beheren" hieronder. Maakt een `Respondent` met Lead-rol aan, met meteen een
-  werkende persoonlijke link/toegangscode, zonder `ScanInvulling`. Net
-  als bij "Respondenten uitnodigen" hierboven: de knoppen "Kopieer
-  link" en "Openen" (nieuw tabblad), zodat de link direct zelf te
-  testen is.
-- **Lead-toegang beheren op een bestaande respondent**: Direct in het
-  blok "Toegang" van het Respondent-overzicht (punt 6b), zonder tweede
-  venster. Het blok heeft een selectievakje "Lead". Aanvinken klapt in
-  hetzelfde blok een keuze voor het bereik open: "Specifieke Metingen" of
-  "Hele organisatie". Bij "Specifieke Metingen" volgt de lijst met Metingen
-  van deze organisatie, elk met een selectievakje, en moet minstens één
-  Meting aan staan voordat de keuze kan worden opgeslagen. Bij "Hele
-  organisatie" staat direct onder de keuze een waarschuwing in een
-  `.admin-notice`: "Deze Lead ziet ook Metingen die later worden aangemaakt."
-  De tekst is vast, komt van de app en is niet aanpasbaar. De waarschuwing
-  staat er zolang "Hele organisatie" is gekozen en vraagt geen aparte
-  bevestiging bij het opslaan. Het is een gevolg en geen uitleg, dus geen
-  Info-icoon. Wisselt de Admin naar "Hele organisatie" en weer terug, dan
-  staan de eerder gekozen Metingen er nog (`datamodel.md`, Wisselen van
-  bereik). Het bereik hangt niet af van of de Lead zelf een scan heeft
-  ingevuld.
-  Uitvinken van "Lead" trekt de rol in, na een bevestiging. Aanvinken geeft
-  ook toegang als de respondent al `ScanInvullingen` heeft. Bij meer dan
-  vijf Metingen scrolt de lijst. Onder het vakje staat als samenvatting
-  "Geen Lead", "Lead voor 2 Metingen" of "Lead voor de hele organisatie". "Kopieer link" en "Openen" staan
-  er zoals altijd.
-- **Vinkje "Ook Lead maken" bij het uitnodigen** (punt 6 hierboven):
-  Snelkoppeling die in één stap zowel de `ScanInvulling` (uitnodiging
-  voor de vragenlijst) als de Lead-rol aanmaakt, met toegang tot precies
-  die ene Meting.
-- **Alsnog een vragenlijst sturen aan een bestaande Respondent**: Een eigen
-  deel in het Respondent-overzicht (punt 6b), onder het blok "Toegang" en
-  los van de Lead-rol. Het geldt voor elke Respondent, ook een gewone. Een
-  keuzelijst met de Metingen van deze organisatie (of "Nieuwe Meting", zelfde
-  patroon als punt 5) en daarnaast de knop "Vragenlijst sturen". Metingen
-  waarin de Respondent al een `ScanInvulling` heeft, zijn niet te kiezen.
-  De actie maakt de `ScanInvulling` aan zoals "Respondenten uitnodigen"
-  hierboven. Is de Respondent Lead, dan geeft dezelfde stap hem ook toegang
-  tot die Meting (voegt 'm toe aan `RespondentRolMeting`), zonder aparte
-  tweede actie.
+Lead worden en een vragenlijst krijgen zijn twee losse acties. Een Lead is een
+Respondent met de Lead-rol (`RespondentRol`, `datamodel.md` deel 2) en hoeft
+geen enkele `ScanInvulling` te hebben. Wat een Lead mag zien, staat op één
+plek: De tabel Leads in het organisatie-detail.
 
-**Wie dit mag**: Admin en Consultant (bij de Consultant: bereik
-`eigen`, zelfde als de andere respondent-acties). Niet de Lead
-zelf. Zie Rechtenmatrix (`datamodel.md` deel 2,
-`respondenten.leadToekennen`).
+**Tabel Leads.** Alleen voor een Admin, als eigen blok in het
+organisatie-detail, onder het blok Respondenten. Een Consultant ziet het blok
+niet.
 
-**Wat de persoonlijke link laat zien**: "Mijn metingen" (CLAUDE.md,
-schermflow punt 4) toont voor een Lead altijd, naast de eigen metingen
-(indien aanwezig), de resultaten van en de uitnodigen-actie voor **elke
-Meting waar hij toegang toe heeft** (`RespondentRolMeting`) — niet de
-hele organisatie (zie Organisatie-resultaten, punt 4 hierboven). Heeft
-de Lead zelf geen enkele `ScanInvulling`, dan is de lijst met eigen
-metingen leeg en staan alleen die toegewezen Metingen er — geen intake,
-geen vragenlijst. Krijgt de Lead later alsnog een `ScanInvulling` (via
-"Vragenlijst sturen" hierboven), dan verschijnt die gewoon als extra
-item in dezelfde lijst, met de bestaande status-routing
-(uitgenodigd/bezig/afgerond).
+- **Rijen**: Eén rij per Lead van deze organisatie, met naam en e-mailadres.
+  Achteraan staat de knop "Bekijk", die het Respondent-overzicht opent
+  (punt 6b).
+- **Kolommen**: Elke weergave die een Lead kan krijgen is een kolom.
+  - Per Meting vijf kolommen onder één kop met het label van de Meting:
+    Resultaten, Spreiding, Antwoorden, Uitnodigen en Exporteren. De Metingen
+    staan gegroepeerd per ronde, de nieuwste links, zoals in de lijst
+    Metingen. Een samengestelde Meting heeft de badge "Gemiddelde" en alleen
+    de kolom Resultaten, want ze heeft geen scans en geen Respondenten.
+  - Per benchmark waar deze organisatie in zit één kolom, met de naam van de
+    benchmark.
+- **Cellen**: Een selectievakje. Aan betekent dat de Lead die weergave ziet.
+  Een nieuwe Lead en een nieuwe Meting beginnen zonder vinkjes, ook bij
+  "Nieuwe ronde starten". Er wordt niets meegenomen of vanzelf aangezet.
+- **Opslaan**: De Admin zet vinkjes en klikt onderaan op "Opslaan", met
+  "Annuleren" ernaast. Beide zijn uitgeschakeld zolang er niets is gewijzigd.
+  Zo verandert toegang nooit door één verkeerde klik. Gelogd als
+  `lead.toegangGewijzigd` (`datamodel.md`, Audit), één gebeurtenis per
+  gewijzigde cel.
+- **Veel kolommen**: De tabel scrolt horizontaal, met een vaste eerste kolom
+  en kolomkoppen die bij het scrollen blijven staan.
+- **Lege toestand**: Een Lead zonder vinkjes ziet niets. De rij zegt dat
+  ("Ziet nog niets").
 
-**Benchmarkview voor een Lead**: Heeft een Admin een benchmarkview aan de
-Lead toegewezen (punt 14), dan staat die op "Mijn metingen" naast de
-resultaten van zijn Metingen. Wat hij ziet en wanneer, staat in
-`benchmark.md`, Bereik van een Lead en Toewijzen aan een Lead.
+**Wat elke kolom geeft.**
+
+- **Resultaten (per Meting)**: De resultatenpagina van de Meting, met
+  Overzicht, Per bouwblok en de knop "Vergelijk met vorige ronde"
+  (`visualisatie-scores.md`, Navigatie). De vergelijking is er alleen met een
+  eerdere Meting waarvoor deze Lead ook Resultaten heeft.
+- **Spreiding (per Meting)**: Weergave B zonder ring (`visualisatie-scores.md`,
+  onderdeel B), een stip per scan per bouwblok met de spreiding. De stippen
+  hebben geen naam en geen tooltip. Het is een extra weergave op de
+  resultatenpagina van die Meting.
+- **Uitnodigen (per Meting)**: Respondenten voor deze Meting uitnodigen,
+  met "Kopieer link" en "Openen" zoals bij punt 6. Dit hangt niet af van
+  Resultaten.
+- **Exporteren (per Meting)**: De exportknop op de resultatenpagina van deze
+  Meting (`datamodel.md`, Rechtenmatrix, `export.uitvoeren`). Geen bulk-export.
+- **Antwoorden (per Meting)**: Weergave G, de antwoorden per vraag en per
+  respondent (`visualisatie-scores.md`, onderdeel G). Het is een extra
+  weergave op de resultatenpagina van die Meting. Voor de namen zie Namen bij
+  Antwoorden.
+- **Benchmark**: De view die in die benchmark bij deze Lead hoort. Bij niveau
+  1 is dat de view van de organisatie tegenover de rest van de groep. Bij
+  niveau 2 is dat, voor elke Meting waarvoor de Lead Resultaten heeft, de view
+  van die Meting tegenover de overige Metingen. De Lead ziet dus nooit meer
+  dan zijn eigen Metingen (`benchmark.md`, View voor een Lead).
+
+De weergave Positie in de Meting, de ring op de scan van één Respondent, is er
+niet voor een Lead en blijft voor de Admin. Spreiding is er wel, als eigen
+kolom, zonder ring.
+
+**Grijze cellen.** Een cel die niet aan te vinken is, is grijs, met de reden in
+een Info-icoon (`info.leadToegangCel`, de tekst volgt de reden).
+
+- Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van
+  dezelfde Meting aan staat. Zet de Admin Resultaten uit, dan gaan ze mee uit.
+  Uitnodigen is onafhankelijk.
+- Een samengestelde Meting heeft alleen de kolom Resultaten.
+- Spreiding is grijs zolang de Meting minder afgeronde scans heeft dan
+  `benchmarkMinRespondenten` (voorstel, startwaarde 5), want met weinig
+  stippen is een scan te herleiden tot een persoon.
+- Bij anonieme namen (zie hieronder) geldt dezelfde drempel voor Antwoorden.
+  Bij namen geldt de drempel voor Antwoorden niet.
+- Een benchmarkkolom is grijs als in die benchmark geen enkele groep aan de
+  drempel van zijn niveau voldoet (`benchmark.md`, Drempels). Bij een
+  benchmark binnen een organisatie (niveau 2) is de kolom ook grijs als de
+  Lead voor geen enkele lid-Meting Resultaten heeft, want die view hoort bij
+  een Meting. Bij een benchmark tussen organisaties (niveau 1) is Resultaten
+  niet nodig, omdat de view de scores van de eigen organisatie zelf al toont.
+  Voldoet maar één Assessment aan de drempel, dan ziet de Lead alleen die
+  sectie.
+
+Toegang erft niet mee. Een samengestelde Meting en haar onderliggende Metingen
+zijn elk een eigen kolom.
+
+**Namen bij Antwoorden.** Per organisatie een schakelaar "Namen tonen bij
+Antwoorden" (`Organisatie.antwoordenMetNamen`, standaard uit), alleen voor een
+Admin, op het organisatie-detail naast de Benchmark-vlag (punt 4), met een
+Info-icoon (`info.antwoordenMetNamen`).
+
+- **Uit**: Een Lead ziet de kolommen R1 tot en met Rn, zonder naam in een
+  tooltip. De volgorde volgt niet de naam en niet het moment van afronden,
+  zodat die geen aanwijzing geeft (voorstel: Een vaste volgorde uit een hash
+  van het scan-id, per Meting).
+- **Aan**: Een Lead ziet dezelfde kolomkoppen als een Admin, de initialen met
+  de volledige naam in een tooltip.
+- **Afstemming**: Of namen getoond mogen worden, stemmen Coniche en de
+  opdrachtgever onderling af. De app legt dat niet vast bij de respondent. De
+  intake en het toestemmingsvakje veranderen niet, en de schakelaar is ook na
+  de eerste scan te wijzigen. Wel logt de app elke wijziging
+  (`organisatie.antwoordenNamenGewijzigd`), en de bevestiging bij aanzetten
+  noemt dat de Leads van deze organisatie dan namen zien. In de kop van de
+  kolom Antwoorden staat "met namen" zolang de schakelaar aan staat.
+- Een Admin en een Consultant zien altijd de namen.
+
+**Lead toevoegen.** Een oranje knop "+ Lead toevoegen" (`.btn-or
+.btn-compact`) onder de tabel, links uitgelijnd. Een klik opent eronder een
+formulier met twee keuzes, een bestaande Respondent van deze organisatie
+(keuzelijst) of een nieuwe (naam en e-mailadres). Opslaan geeft de Respondent
+de Lead-rol. Een nieuwe Respondent krijgt meteen een persoonlijke link zonder
+`ScanInvulling`, met "Kopieer link" en "Openen" zoals bij Respondenten
+uitnodigen (punt 6). De nieuwe rij verschijnt zonder vinkjes.
+
+**Op een bestaande respondent.** Het blok Toegang van het Respondent-overzicht
+(punt 6b) houdt het selectievakje "Lead", zonder keuze van een bereik.
+Aanvinken geeft de Respondent een rij in de tabel. De samenvatting zegt "Geen
+Lead" of "Lead, ziet 3 weergaven", met een verwijzing naar de tabel van de
+organisatie. De vinkjes zelf staan alleen in de tabel. Uitvinken trekt de
+Lead-rol in, na een bevestiging die zegt dat alle vinkjes van deze Lead
+verdwijnen. Gelogd.
+
+**Vinkje "Ook Lead maken" bij het uitnodigen** (punt 6): Snelkoppeling die de
+Lead-rol toekent en voor deze Meting Resultaten aanvinkt. Antwoorden en de
+rest blijven uit.
+
+**Alsnog een vragenlijst sturen aan een bestaande Respondent**: Een eigen deel
+in het Respondent-overzicht (punt 6b), onder het blok Toegang en los van de
+Lead-rol. Het geldt voor elke Respondent, ook een gewone. Een keuzelijst met de
+Metingen van deze organisatie (of "Nieuwe Meting", zelfde patroon als punt 5)
+en daarnaast de knop "Vragenlijst sturen". Metingen waarin de Respondent al een
+`ScanInvulling` heeft, zijn niet te kiezen. De actie maakt alleen de
+`ScanInvulling` aan, zoals "Respondenten uitnodigen" hierboven. De vinkjes van
+een Lead veranderen er niet door.
+
+**Wie dit mag**: Alleen een Admin (`respondenten.leadToekennen`, `datamodel.md`
+deel 2, Rechtenmatrix). Een Consultant ziet de tabel niet en kan geen Lead
+aanmaken. Een Lead ziet de tabel nooit.
+
+**Wat de persoonlijke link laat zien (de landingspagina van een Lead)**:
+"Mijn metingen" (CLAUDE.md, schermflow punt 4) toont voor een Lead alleen wat
+een Admin heeft aangevinkt.
+
+- **Kop**: De naam van de organisatie. Een Lead die geen respondent is, ziet
+  geen intake, geen vragenlijst en geen lijst met eigen scans.
+- **Metingen**: Eén kaart per Meting waarvoor minstens één vinkje aan staat,
+  gegroepeerd per ronde, de nieuwste bovenaan. Op de kaart staan alleen de
+  knoppen van de weergaven die aan staan: Resultaten, Spreiding, Antwoorden en
+  Uitnodigen. Exporteren staat op de resultatenpagina zelf. Een Meting zonder
+  vinkje staat er niet.
+- **Benchmarks**: Onder de Metingen een kaart per benchmark die aan staat. Een
+  Lead kan een benchmark hebben zonder een enkele Meting, en dan bestaat de
+  pagina alleen uit die kaart. Wat hij ziet en wanneer, staat in
+  `benchmark.md`, View voor een Lead.
+- **Eigen scans**: Is de Lead ook respondent, dan staan zijn eigen scans erbij
+  met de bestaande status-routing (uitgenodigd, bezig of afgerond). Valt een
+  eigen Meting samen met een Meting op zijn pagina, dan is het één kaart (zie
+  hieronder). Krijgt de Lead later alsnog een `ScanInvulling` (via
+  "Vragenlijst sturen" hierboven), dan verschijnt die als extra item.
+- **Lege toestand**: Een Lead zonder vinkjes en zonder eigen scans ziet de
+  melding "Er staat nog niets voor je klaar. Neem contact op met Coniche als
+  je dit niet verwacht."
+
+**Overgang van wat op 13 oktober 2026 is gebouwd.**
+
+- Een Lead met `leadMetingIds` krijgt Resultaten, Uitnodigen en Exporteren aan
+  voor die Metingen, want dat kon hij al.
+- Een Lead met `leadVoorOrganisatie` krijgt die drie aan voor alle Metingen
+  die nu bestaan, en niet voor latere. De Admin krijgt op de organisatie een
+  melding dat dit zo is omgezet.
+- Elke `BenchmarkToewijzing` op niveau 1 of 2 wordt een aangevinkte
+  benchmarkkolom voor die Lead. Een toewijzing op niveau 3 wordt Spreiding aan
+  voor die Meting, zonder ring op de scan, met een melding aan de Admin.
+
+**Open punten.**
+
+- Een Consultant heeft in deze opzet geen enkele rol bij Leads. Dat volgt uit
+  "alles Admin-only", en kan later worden verruimd.
 
 **Verificatie-blokkade opheffen**: Na 3 mislukte pogingen op een
 verificatiecode raakt die geblokkeerd (`datamodel.md` deel 2, Toegang
@@ -1131,9 +1262,9 @@ Consultant (bereik `eigen`) de blokkade voor deze respondent expliciet
 opheffen, actie in het Respondent-overzicht (punt 6b). Analoog aan de
 2FA-reset bij Gebruikers (punt 9), maar dan aan de organisatiekant.
 
-**Valt een eigen Meting samen met een toegewezen Meting** (de Lead is
-zelf ook respondent binnen een Meting waar hij ook Lead-toegang toe
-heeft — het gebruikelijke geval): **Eén kaart voor die Meting, niet
+**Valt een eigen Meting samen met een Meting waarvoor de Lead Resultaten
+heeft** (de Lead is zelf ook respondent binnen een Meting waar hij ook het
+vinkje Resultaten voor heeft, het gebruikelijke geval): **Eén kaart voor die Meting, niet
 twee.** Op die kaart staan naast elkaar twee knoppen, waarvan de eerste
 afhangt van de status van zijn eigen `ScanInvulling`:
 
@@ -1150,8 +1281,9 @@ afhangt van de status van zijn eigen `ScanInvulling`:
 De eigen scan blijft dus altijd bereikbaar, ook als hij nog niet is
 afgerond. Alleen "Bekijk jouw resultaten" vervalt zolang de scan niet is
 afgerond. Heeft de Lead voor die Meting helemaal geen eigen
-`ScanInvulling` (puur toegewezen), dan staat er alleen "Bekijk de
-resultaten van de hele meting", net als bij elke andere toegewezen Meting.
+`ScanInvulling` (alleen vinkjes in de tabel Leads), dan staat er alleen
+"Bekijk de resultaten van de hele meting", net als bij elke andere Meting
+met Resultaten aan.
 
 #### 6b. Respondenten (lijst en overzicht)
 
@@ -1163,8 +1295,8 @@ staan. Dit vervangt de losse acties per rij in het organisatie-detail
 Respondenten over alle organisaties heen, een Consultant alleen die van
 zijn eigen organisaties (`datamodel.md` deel 2, Rechtenmatrix).
 
-Het verschil met Ingevulde scans (punt 7): Die lijst gaat over de scan,
-met resultaten en export. Deze lijst gaat over de persoon, met zijn
+Het verschil met de scanlijst in het Meting-overzicht (punt 5): Die lijst gaat
+over de scan, met resultaten en export. Deze lijst gaat over de persoon, met zijn
 gegevens, toegang en alle scans op één plek. Een Respondent zonder
 scan, zoals een Lead zonder vragenlijst of een leeggeraakte Respondent
 na het verplaatsen van zijn laatste respons, staat alleen hier.
@@ -1177,7 +1309,7 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   alle scans, met de status per Meting in het overzicht. Alle kolommen
   sorteerbaar.
 - **Filters**: Organisatie, Meting, Status en een zoekveld op naam en
-  e-mailadres. Zelfde patroon als bij Ingevulde scans (punt 7). Voor een
+  e-mailadres. Zelfde patroon als de lijsten onder Resultaten (punt 7). Voor een
   Consultant bevat de Organisatie-keuze alleen zijn eigen organisaties.
 - **Overzicht (modal)**: Opent door op een rij te klikken. Eén modal,
   die ook opent via "Bekijk" bij een Respondent in het
@@ -1194,9 +1326,10 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
      blijft dan staan.
   3. **Toegang**: De persoonlijke link in een alleen-lezen veld met de
      knop "Kopieer" er direct achter, en ernaast de knop "Openen". Daaronder het selectievakje "Lead" met de samenvatting
-     "Geen Lead" of "Lead voor 2 Metingen". Aanvinken toont in dit blok de
-     Metingen met selectievakjes, met "Opslaan" en "Annuleren" (punt 6a).
-     Er is geen aparte knop "Beheren" en geen tweede venster. "Blokkade
+     "Geen Lead" of "Lead, ziet 3 weergaven". Aanvinken geeft de Respondent
+     een rij in de tabel Leads van de organisatie (punt 6a). De vinkjes
+     staan alleen daar, niet in dit blok. Er is geen aparte knop "Beheren" en
+     geen tweede venster. "Blokkade
      opheffen" staat alleen in het blok als de Respondent geblokkeerd is.
      Onder het blok staat het deel "Vragenlijst sturen" (punt 6a), met een
      keuzelijst met Metingen en de knop "Vragenlijst sturen".
@@ -1213,7 +1346,8 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
 - **Selectie**: Er is nog geen selectie van meerdere Respondenten. Zie
   `backlog.md` voor de later bedoelde toewijsactie.
 - **Rechten**: Elke actie in het overzicht heeft dezelfde rechten als
-  voorheen (Admin en Consultant met bereik `eigen`, niet de Lead), zie
+  voorheen (Admin en Consultant met bereik `eigen`, niet de Lead), behalve
+  het selectievakje Lead, dat alleen een Admin mag zetten (punt 6a), zie
   `datamodel.md` deel 2, Rechtenmatrix.
 
 **Acties in het overzicht** (de regels van voorheen, nu hier):
@@ -1299,10 +1433,10 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   organisatie.
 
   **Lead-rol bij verplaatsen**: De Lead-rol gaat niet mee naar een andere
-  organisatie. Bij het verplaatsen van een Respondent worden zijn Metingen
-  (`leadMetingIds`) en `leadVoorOrganisatie` leeggemaakt. Bij een
-  samenvoeging behoudt de bestaande Respondent zijn eigen bereik (`datamodel.md`,
-  Verplaatsen, samenvoegen en importeren).
+  organisatie. Bij het verplaatsen van een Respondent worden de Lead-rol en al
+  zijn `LeadToegang` verwijderd. Bij een samenvoeging behoudt de bestaande
+  Respondent zijn eigen vinkjes (`datamodel.md`, Verplaatsen, samenvoegen en
+  importeren).
 
   **Twee verwijzingen per scan**: Een ScanInvulling heeft een verwijzing naar
   zijn Respondent (`organisatieLidId`) en naar zijn Meting
@@ -1333,7 +1467,7 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   1. **Eén respons** (actie per ingevulde scan in het blok "Scans"
      van het overzicht, naast "Eén losse respons verplaatsen" hierboven).
   2. **Meerdere responsen tegelijk** (actie op de selectie in de
-     organisatie-gefilterde lijst Ingevulde scans, punt 7). Alle
+     scanlijst van het Meting-overzicht, punt 5). Alle
      geselecteerde scans gaan naar dezelfde doel-Meting.
 
   **Doel-Meting**: Kiezen uit de Metingen van dezelfde organisatie met
@@ -1408,10 +1542,11 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   met een conflictmelding bij elke scan na de eerste, omdat één Respondent
   maar één scan per Meting kan hebben. Deze actie doet het in één scherm.
 
-  **Waar**: Actie "Samenbrengen in één Meting…" op de selectie in de
-  organisatie-gefilterde lijst Ingevulde scans (punt 7). Alle geselecteerde scans
-  hebben dezelfde organisatie en hetzelfde Assessment, anders is de actie
-  uitgeschakeld met een Info-icoon dat zegt waarom.
+  **Waar**: Actie "Samenbrengen in één Meting…" op de selectie in de lijst
+  Metingen (Resultaten, punt 7). Het gaat om alle scans van de geselecteerde
+  Metingen. Alle geselecteerde Metingen hebben dezelfde organisatie en
+  hetzelfde Assessment, anders is de actie uitgeschakeld met een Info-icoon dat
+  zegt waarom (`info.scansSamenbrengen`).
 
   **Het scherm** (modal, twee delen):
   1. **Doel-Meting** bovenaan: Kiezen uit bestaande Metingen van dezelfde
@@ -1491,29 +1626,106 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
     Respondent, de oorspronkelijke Respondent houdt zijn naam en zijn andere
     scans.
 
-#### 7. Ingevulde scans
+#### 8. Import van historische scans (CSV)
 
-Overzicht van alle ingevulde scans, met daarnaast een gefilterde versie
-op de detailpagina van elke organisatie. Er is altijd een pad van
-organisatie via meting en respondent naar de scan. **Zelfde bereik als de
-rest van dit onderdeel** (zie het kopje "Organisaties" bovenaan dit
-document): een Admin ziet dit overzicht over alle organisaties heen, een
-Consultant alleen de scans binnen zijn eigen organisaties
-(`datamodel.md` deel 2, Rechtenmatrix, `resultaten.inzien`) — geen scans
-van organisaties waar hij geen eigenaar of toegewezen Consultant van is,
-ook niet hier op het globale overzicht.
+Eenmalige of periodieke import van ingevulde scans uit de oude,
+stopgezette tool, zodat historische klantdata behouden blijft. Volledige
+spec, inclusief veldmapping en matchingregels: `import-scans.md`.
 
-- **Kolommen**: Naam, Organisatie, Meting, Assessment, Rol/Team, Status,
-  Voortgang, Gestart, Aangemaakt (`ScanInvulling.aangemaaktOp`, bij een
-  import het importmoment, zodat je geïmporteerde scans kunt terugvinden
-  en groeperen), Notitie (gebouwd op 13 oktober 2026: `ScanInvulling.notitie`,
-  afgekapt op één regel met de volledige tekst bij hover, leeg als er geen is),
-  en "Bekijk" als compacte knop. De hele rij is
-  klikbaar en opent het Scan-overzicht (hieronder). Rol/Team toont alleen
-  wat er is: Is de rol leeg, dan staat er alleen het team, is het team
-  leeg alleen de rol, en zijn ze allebei leeg dan blijft de cel leeg.
-  Nooit een los streepje of puntje. Alle kolommen sorteerbaar.
-- **Filters**: Aanwezig, zoals gebouwd.
+**Alleen voor een Admin, op organisatieniveau.** De import start vanuit het
+organisatie-detail (punt 4) met de knop "Importeren" (`.btn-compact`), in de
+kop van het blok Metingen, rechts. De import hoort dan bij die ene organisatie:
+Alle scans komen in die organisatie terecht. Er is geen aparte tab Import meer
+en geen import over organisaties heen. Een Consultant ziet de knop niet. Opent
+hij de importroute rechtstreeks, dan toont de pagina een melding in dezelfde
+opmaak als de melding bij een lege lijst, zoals "Nog geen organisatie
+aangemaakt" (een `.admin-notice`, zie `stylesheet.md`), met de tekst: "Vraag de
+beheerder om bestanden te importeren." De tekst staat vast in de code en hoort
+niet in het register van Algemene teksten (punt 2a). Een importverzoek van een
+Consultant wordt geweigerd. Reden: Een Consultant kan niet vaststellen of een
+import in een organisatie hoort die hij zelf niet mag zien, en de import kan
+Respondenten en Metingen aanmaken.
+
+Bij "Oude tool" kies je een map met losse CSV's (één bestand per scan) of
+losse bestanden. Een bestand mag ook rijen van andere organisaties bevatten:
+Die koppel je in de voorbeeldweergave aan deze organisatie of sla je over
+(`import-scans.md`, Organisatie-matching). Elke import maakt nieuwe Metingen aan
+met "import" in het label, in rondes die de import zelf aanmaakt. De beheerder
+hangt de responsen daarna om naar de juiste Meting (punt 6b, "Respons naar
+andere Meting verplaatsen"). Elke scan krijgt een Respondent met de gegevens
+uit het bestand (naam, e-mailadres, functie, team en notitie), die de
+beheerder daarna kan bewerken (punt 6b, "Respondent bewerken").
+
+Importeren gaat met één knop, "N rijen importeren", voor de hele set. Rijen
+met een waarschuwing (een 95%+-match) tellen pas mee na een expliciete
+goedkeuring per rij; er is geen import per rij (`import-scans.md`,
+Werkwijze in beheer, punt 6).
+
+### Resultaten (Admin: alle, Consultant: eigen)
+
+#### 7. Resultaten
+
+**Status.** Voorstel van 14 oktober 2026. Dit vervangt de pagina Ingevulde
+scans en de hoofdlink Benchmark. Gebouwd zijn nu nog de lijst Ingevulde scans
+en het benchmarkoverzicht van niveau 1. Zie Overgang onder dit punt.
+
+Alles wat uit ingevulde scans komt, staat onder één hoofdlink: Resultaten. Een
+Admin ziet alles, een Consultant alleen de Rondes en Metingen van zijn eigen
+organisaties (`datamodel.md` deel 2, Rechtenmatrix, `resultaten.inzien`).
+Benchmarks zijn alleen voor een Admin (`benchmark.beheren`). De hoofdlink staat
+in `.nav-right` na Organisaties.
+
+De tabs lopen van grof naar fijn, en elke lijst opent met een klik op de rij
+het volgende niveau. Dat is hetzelfde patroon als de benchmarkniveaus
+(`benchmark.md`): Een lijst van deelnemers, en per deelnemer een view een
+niveau dieper.
+
+- **Rondes**: Eén rij per ronde van een organisatie. Kolommen: Organisatie,
+  Ronde, Metingen (aantal), Afgeronde scans ("x van y") en "Bekijk". Filters:
+  Organisatie en een zoekveld op de naam van de ronde. De nieuwste ronde staat
+  bovenaan, alle kolommen zijn sorteerbaar. Een klik opent het Ronde-overzicht.
+- **Metingen**: Eén rij per Meting. Kolommen: Organisatie, Ronde, Onderdeel,
+  Assessment, Afgeronde scans ("x van y") en "Bekijk". Een Meting zonder ronde
+  staat er ook, met een lege cel bij Ronde. Een samengestelde Meting heeft de
+  badge "Gemiddelde". Filters: Organisatie, Ronde en Assessment. Een klik opent
+  het Meting-overzicht (punt 5).
+- **Benchmarks** (alleen Admin): De benchmarks, punt 14.
+
+**Ronde-overzicht** (eigen pagina, kruimelpad Resultaten › {Organisatie} ›
+{Ronde}): De resultaten van één ronde van één organisatie.
+
+- **Kop**: Naam van de ronde, de organisatie (met link naar het
+  organisatie-detail) en voortgang ("x van y afgerond").
+- **Metingen in deze ronde**: Eén rij per Meting, met Onderdeel, Assessment,
+  Afgeronde scans, de badge "Gemiddelde" waar die hoort, "Resultaten →"
+  (Organisatie-resultaten, punt 4, zodra de Meting minstens één afgeronde scan
+  heeft) en "Bekijk" (Meting-overzicht, punt 5). De rij is klikbaar en opent het
+  Meting-overzicht.
+- **Knoppen in de kop**: "Gemiddelde van deze ronde" (punt 5) en "Vergelijk met
+  vorige ronde" met de regel uit `visualisatie-scores.md`, Navigatie. De knop is
+  alleen actief als een vergelijking mogelijk is. Het zijn dezelfde knoppen als
+  in de rondekop van het organisatie-detail, uit één component.
+- **Selectie**: Selectievakje per rij, met de actie "Exporteren" voor de
+  afgeronde scans van de geselecteerde Metingen (zie Export hieronder).
+
+**Het niveau daaronder** is het Meting-overzicht (punt 5). Daar staat de lijst
+met scans van die Meting, met het Scan-overzicht (modal) en de resultaten van
+één scan. Je komt dus altijd van organisatie via ronde en Meting bij de scan.
+
+**Waar de functies van de oude pagina Ingevulde scans zijn gebleven.**
+
+- De lijst met scans en de kolommen Rol/Team, Gestart, Aangemaakt en Notitie:
+  Die staan per Meting in het Meting-overzicht (punt 5).
+- Zoeken op naam of e-mailadres over alle organisaties: Dat kan in de lijst
+  Respondenten (punt 6b).
+- Exporteren, Verwijderen en "Naar andere Meting" op een selectie scans: Die
+  staan in het Meting-overzicht. Exporteren op een selectie Metingen of
+  rondes staat in deze lijsten.
+- "Samenbrengen in één Meting…": Staat op een selectie in de lijst Metingen
+  (punt 6b).
+- Het Scan-overzicht blijft bestaan, hieronder.
+- Import: Een knop in het organisatie-detail (punt 8).
+
 - **Scan-overzicht (modal)**: Vervangt de vroegere detailpagina per
   scan. Eén modal volgens het patroon Overzichtsmodal in `stylesheet.md`,
   met dezelfde navigatieregels als het Respondent-overzicht (Navigatie in
@@ -1559,73 +1771,44 @@ ook niet hier op het globale overzicht.
      naar een andere organisatie staat alleen in het Respondent-overzicht.
   Rechten per actie zijn gelijk aan die op deze lijst en het resultaten-
   en exportbereik uit `datamodel.md` deel 2, Rechtenmatrix.
-- **Selectie**: Selectievakje per rij en "alles selecteren" in de koprij.
-- **Acties op de selectie**: Exporteren en Verwijderen (compacte knoppen,
-  gelijke breedte). In de organisatie-gefilterde versie komt daar "Naar
-  andere Meting" bij (punt 6b, "Respons naar andere Meting verplaatsen"),
-  niet op het globale overzicht, omdat de doel-Meting bij dezelfde
-  organisatie hoort.
-- **Export**: Eén gedeelde exportfunctie voor dit overzicht (meerdere
-  scans) en de resultatenpagina (één scan), zie `export-csv.md` voor de
-  exacte kolommen. **Bulk-CSV (meerdere scans in één export) alleen
-  binnen één organisatie**, in verband met datavermenging, zie
-  `export-csv.md`. Dat geldt op het globale overzicht en op de
-  organisatie-gefilterde versie (punt 4, organisatie-detailpagina). Horen
-  alle geselecteerde scans bij dezelfde organisatie, dan werkt
-  "Exporteren" ook op het globale overzicht, zonder eerst te filteren.
-  Bevat de selectie scans van meer dan één organisatie, dan is
-  "Exporteren" uitgeschakeld, met een Info-icoon ernaast
-  (`info.bulkExportOrganisatie`, register in punt 2a). Een selectie
-  binnen één organisatie blijft dus toegestaan, ook als het overzicht niet
-  op die organisatie is gefilterd. PDF en de InDesign-export (XML) zijn
-  sowieso alleen beschikbaar bij precies één scan (hier, org-gefilterd,
-  of op de resultatenpagina), zie
-  `export-pdf-visual-volwassenheidsscan.md`, Export van één scan, geen
-  aggregatie, en `export-indesign.md`.
+- **Export**: Eén gedeelde exportfunctie voor een selectie scans (Meting-overzicht),
+  een selectie Metingen of rondes (deze lijsten) en de resultatenpagina (één
+  scan), zie `export-csv.md` voor de exacte kolommen. Een selectie Metingen of
+  rondes exporteert de afgeronde scans daarin. **Bulk-CSV (meerdere scans in één
+  export) alleen binnen één organisatie**, in verband met datavermenging, zie
+  `export-csv.md`. Horen alle geselecteerde Metingen of rondes bij dezelfde
+  organisatie, dan werkt "Exporteren" ook in de lijsten Rondes en Metingen
+  zonder eerst te filteren. Bevat de selectie Metingen of rondes van meer dan
+  één organisatie, dan is "Exporteren" uitgeschakeld, met een Info-icoon ernaast
+  (`info.bulkExportOrganisatie`, register in punt 2a). PDF en de InDesign-export
+  (XML) zijn sowieso alleen beschikbaar bij precies één scan (Meting-overzicht
+  of resultatenpagina), zie `export-pdf-visual-volwassenheidsscan.md`, Export
+  van één scan, geen aggregatie, en `export-indesign.md`.
 
 Selecteren en verwijderen is een terugkerend patroon: Dezelfde component
 komt ook op de lijst van organisaties, de metingen en de respondenten.
 
-#### 8. Import van historische scans (CSV)
+**Overgang van wat op 13 oktober 2026 is gebouwd.**
 
-Eenmalige of periodieke import van ingevulde scans uit de oude,
-stopgezette tool, zodat historische klantdata behouden blijft. Volledige
-spec, inclusief veldmapping en matchingregels: `import-scans.md`.
+- De hoofdlink Benchmark heet Resultaten. De bestaande benchmarkschermen staan
+  onder de tab Benchmarks, met het kruimelpad Resultaten › Benchmarks › {naam}.
+  De oude adressen verwijzen door.
+- De pagina Ingevulde scans en de tab Import vervallen. Het oude adres van
+  Ingevulde scans verwijst door naar Resultaten › Metingen.
+- Het Scan-overzicht, de filters in de URL en de bulk-export blijven
+  werken zoals nu, op de nieuwe plekken.
 
-**Alleen voor een Admin.** Een Consultant kan geen scans importeren. Op
-de tab Import toont hij in plaats van de importfunctie een melding in
-dezelfde opmaak als de melding bij een lege lijst, zoals "Nog geen
-organisatie aangemaakt" (een `.admin-notice`, zie `stylesheet.md`), met de
-tekst: "Vraag de beheerder om bestanden te importeren." De tekst staat
-vast in de code en hoort niet in het register van Algemene teksten (punt
-2a). Reden: Een Consultant ziet alleen zijn eigen Organisaties, dus hij
-kan niet vaststellen of een Organisatie die een import nieuw aanmaakt al
-bestaat of door hem zomaar toegevoegd mag worden. De beperking geldt ook
-voor de route zelf en voor de actie "N rijen importeren": Een Consultant
-die de importpagina rechtstreeks opent, krijgt dezelfde melding, en een
-importverzoek van een Consultant wordt geweigerd.
+**Open punten.**
 
-Bij "Oude tool" kies je een map met losse CSV's (één bestand per scan) of
-losse bestanden; een bestand mag ook scans van meerdere organisaties en
-beide scantypes bevatten. Elke import maakt nieuwe Metingen aan met
-"import" in het label; de beheerder hangt de responsen daarna om naar de
-juiste Meting (punt 6b, "Respons naar andere Meting verplaatsen"). Elke scan
-krijgt een Respondent met de gegevens uit het bestand (naam, e-mailadres,
-functie, team en notitie), die de beheerder daarna kan bewerken (punt 6b,
-"Respondent bewerken").
+- In de gebouwde rondekop staat een knop "Overzicht" die in geen enkele spec
+  staat. Sander legt uit wat hij doet, of haalt hem weg.
+- Een Consultant ziet geen Benchmarks. Verruimen kan later (`benchmark.md`).
 
-Importeren gaat met één knop, "N rijen importeren", voor de hele set. Rijen
-met een waarschuwing (een 95%+-match) tellen pas mee na een expliciete
-goedkeuring per rij; er is geen import per rij (`import-scans.md`,
-Werkwijze in beheer, punt 6).
+#### 14. Benchmarks
 
-### Benchmark (Admin-only)
-
-#### 14. Benchmark
-
-Vierde hoofdlink in `.nav-right`, alleen zichtbaar voor een Admin
+De tab Benchmarks onder Resultaten (punt 7), alleen zichtbaar voor een Admin
 (`benchmark.beheren`, `datamodel.md` deel 2, Rechtenmatrix). Een Consultant
-ziet de link niet. Het gedrag staat in `benchmark.md`, de records in
+ziet de tab niet. Tot 14 oktober 2026 was dit een eigen hoofdlink Benchmark. Het gedrag staat in `benchmark.md`, de records in
 `datamodel.md` deel 3. Hier staan de schermen.
 
 Alle drie de niveaus staan op deze plek (`benchmark.md`, Wat het is). De
@@ -1646,7 +1829,7 @@ en is voorstel.
   met de reden. De knop "Benchmark aanmaken" is uitgeschakeld tot de benchmark een naam,
   een Assessment en een organisatie heeft, met de reden in
   `info.benchmarkAanmaken`. Voorstel: Eerst een keuze voor het niveau.
-- **Detail**: Kruimelpad Benchmark › {naam}. Per Assessment een sectie met
+- **Detail**: Kruimelpad Resultaten › Benchmarks › {naam}. Per Assessment een sectie met
   de teller "X van Y organisaties", de gemiddelden van de groep en per
   organisatie het aantal afgeronde scans. De Admin ziet hier de namen van
   de organisaties, ook van de organisaties die in een Assessment
@@ -1662,16 +1845,13 @@ en is voorstel.
   deelnemende organisatie een view met die organisatie tegenover de rest
   van de groep (`benchmark.md`, View per organisatie). Het groepsgemiddelde
   staat in het staafdiagram als tweede, neutrale balk.
-- **Toewijzen**: Op de view van een organisatie kiest de Admin een
-  bestaande Lead van die organisatie. Voorstel: De keuzelijst toont de Leads met
-  bereik op de Meting van die organisatie die in de benchmark zit, en niet meer
-  alleen de Leads voor de hele organisatie (`benchmark.md`, Bereik van een
-  Lead). Per toegewezen Lead staan een rij met de
-  datum en de knoppen "Bekijk" (nog niet gebouwd) en "Intrekken". "Bekijk"
-  opent het Respondent-overzicht van die Lead (punt 6b) over de pagina heen.
-  Hetzelfde blok staat op elk niveau (`benchmark.md`, Toewijzen aan een Lead
-  op alle niveaus).
-- **Verwijderen**: Met een bevestiging die noemt hoeveel toewijzingen
+- **Leads**: Op de view staat geen blok meer om een Lead te kiezen. Wie de
+  view ziet, vink je aan in de tabel Leads van de organisatie (punt 6a). Onder
+  de view staat alleen een lijst van de Leads die hem nu zien, met per Lead de
+  knop "Bekijk" (Respondent-overzicht, punt 6b) en een verwijzing naar de
+  tabel. Voorstel van 14 oktober 2026, dit vervangt het blok "Toewijzen aan een
+  Lead" (`benchmark.md`, View voor een Lead).
+- **Verwijderen**: Met een bevestiging die noemt hoeveel vinkjes van Leads
   meegaan.
 
 **Niveau 2 en 3 (voorstel).** Niveau 2 gebruikt dezelfde schermen met een
@@ -1680,9 +1860,10 @@ twee per Assessment, zonder vlag), en de view per Meting naast het gemiddelde
 van de overige Metingen, met de namen van de Metingen. Niveau 3 is een view
 op één Meting: De scan van een Respondent naast het gemiddelde van de andere
 scans in die Meting. De spreiding en de hoge en lage scores zijn nog niet
-ontworpen (`benchmark.md`, Niveau 3). De view van een Meting (niveau 2) en van
-een scan (niveau 3) kan, net als die van een organisatie, aan een Lead op die
-Meting worden toegewezen, met hetzelfde blok "Toewijzen aan een Lead".
+ontworpen (`benchmark.md`, Niveau 3). De view van een Meting (niveau 2) geeft
+de Admin via de tabel Leads aan een Lead met Resultaten op die Meting. De
+spreiding binnen een Meting (niveau 3) krijgt een Lead als kolom Spreiding
+(punt 6a). De view op één scan blijft voor de Admin.
 
 ---
 
@@ -1696,8 +1877,8 @@ Wat er precies wordt verwijderd, staat in `datamodel.md` onder
 - **Respondent**: De persoon met al zijn ingevulde scans.
 - **Meting**: De meting met alle ingevulde scans daarin.
 - **Organisatie**: Alles wat eronder hangt.
-- **Benchmark**: De benchmark met zijn toewijzingen. Organisaties,
-  Metingen en scans blijven bestaan.
+- **Benchmark**: De benchmark met de vinkjes van Leads voor die benchmark.
+  Organisaties, Metingen en scans blijven bestaan.
 
 Zit een Meting of Organisatie in een benchmark, dan noemt de bevestiging
 dat ook, omdat het lid dan uit die benchmark verdwijnt (`datamodel.md`,

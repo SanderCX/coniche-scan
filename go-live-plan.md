@@ -240,11 +240,11 @@ verandert.
   het organisatie-detail; die verhuist naar het Respondent-overzicht en
   krijgt de keuze per bron-Meting bij "hele respondent verplaatsen".
 - [ ] Verplaatsfunctie "Respons naar andere Meting" (`beheerpagina.md`,
-  punt 6b en punt 7), ook voor meerdere responsen tegelijk. De import zet
+  punt 6b en punt 5), ook voor meerdere responsen tegelijk. De import zet
   alles in nieuwe import-Metingen, dus deze functie moet af zijn vóór de
   definitieve import (aanvulling). Een eerste versie is gebouwd, los en
   als bulkactie; de bulkactie verhuist naar het Meting-overzicht en de
-  scanlijst van een organisatie (punt 7).
+  scanlijst van het Meting-overzicht (punt 5).
 - [ ] Beheeractie "Respondent bewerken" (`beheerpagina.md`, punt 6b). De
   import maakt per scan een Respondent uit de gegevens in het bestand,
   en de beheerder past die daarna aan (aanvulling). Een
