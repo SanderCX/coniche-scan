@@ -6,7 +6,15 @@ import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
 import { ruimBenchmarkVinkjesOp, useOrganisaties } from "@/lib/db";
 import { sluitBenchmarkMeldingen, useBenchmark, verwijderBenchmark } from "@/lib/benchmark-store";
-import { benchmarkNamen, bouwBenchmarkSecties, bouwMetingenVergelijkingen, bouwScanSectie, niveauVan } from "@/lib/benchmark";
+import {
+  benchmarkNamen,
+  bouwBenchmarkSecties,
+  bouwMetingenVergelijkingen,
+  bouwScanSectie,
+  LEZING_KEUZE,
+  lezingVan,
+  niveauVan,
+} from "@/lib/benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
@@ -75,7 +83,8 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
       />
       <h1>{benchmark.naam}</h1>
       <p className="text-sm text-ink-m">
-        {NIVEAU_TEKST[niveau]} · aangemaakt op {datumFormat.format(new Date(benchmark.aangemaaktOp))} · cijfers berekend op{" "}
+        {NIVEAU_TEKST[niveau]}
+        {niveau === "metingen" && ` · ${LEZING_KEUZE[lezingVan(benchmark, organisaties)].titel}`} · aangemaakt op {datumFormat.format(new Date(benchmark.aangemaaktOp))} · cijfers berekend op{" "}
         {datumFormat.format(new Date())}
       </p>
 

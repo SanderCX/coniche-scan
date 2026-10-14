@@ -23,6 +23,7 @@ export default function DrempelsEnTermijnenPage() {
   const [minOrgInput, setMinOrgInput] = useState<string | null>(null);
   const [minScansInput, setMinScansInput] = useState<string | null>(null);
   const [minRespondentenInput, setMinRespondentenInput] = useState<string | null>(null);
+  const [maxDagenInput, setMaxDagenInput] = useState<string | null>(null);
   const [benchmarkOpgeslagen, setBenchmarkOpgeslagen] = useState(false);
 
   if (!magGebruikersBeheren(gebruiker)) {
@@ -39,8 +40,9 @@ export default function DrempelsEnTermijnenPage() {
   const minOrg = minOrgInput ?? String(instellingen.benchmarkMinOrganisaties);
   const minScans = minScansInput ?? String(instellingen.benchmarkMinScans);
   const minRespondenten = minRespondentenInput ?? String(instellingen.benchmarkMinRespondenten);
+  const maxDagen = maxDagenInput ?? String(instellingen.benchmarkMaxDagenTussenMetingen);
   const geheelGetalVanMinstens1 = (v: string) => v.trim() !== "" && Number.isInteger(Number(v)) && Number(v) >= 1;
-  const benchmarkGeldig = [minOrg, minScans, minRespondenten].every(geheelGetalVanMinstens1);
+  const benchmarkGeldig = [minOrg, minScans, minRespondenten, maxDagen].every(geheelGetalVanMinstens1);
 
   function handleBenchmarkOpslaan(e: React.FormEvent) {
     e.preventDefault();
@@ -49,10 +51,12 @@ export default function DrempelsEnTermijnenPage() {
       benchmarkMinOrganisaties: Number(minOrg),
       benchmarkMinScans: Number(minScans),
       benchmarkMinRespondenten: Number(minRespondenten),
+      benchmarkMaxDagenTussenMetingen: Number(maxDagen),
     });
     setMinOrgInput(null);
     setMinScansInput(null);
     setMinRespondentenInput(null);
+    setMaxDagenInput(null);
     setBenchmarkOpgeslagen(true);
     setTimeout(() => setBenchmarkOpgeslagen(false), 1600);
   }
@@ -124,6 +128,10 @@ export default function DrempelsEnTermijnenPage() {
         <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem", minWidth: 0 }}>
           <label>Scans per gekozen Meting</label>
           <input type="number" min={1} step={1} value={minScans} onChange={(e) => setMinScansInput(e.target.value)} />
+        </div>
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem", minWidth: 0 }}>
+          <label>Dagen tussen Metingen, naast elkaar</label>
+          <input type="number" min={1} step={1} value={maxDagen} onChange={(e) => setMaxDagenInput(e.target.value)} />
         </div>
         <span className="knop-met-icoon">
           <button type="submit" className="btn btn-or btn-compact" disabled={!benchmarkGeldig}>

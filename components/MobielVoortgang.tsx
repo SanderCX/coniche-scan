@@ -18,7 +18,7 @@ export function MobielVoortgang({
   assessment: Assessment;
   respondent: ScanWeergave;
 }) {
-  const { percentage, beantwoord, totaal } = voortgang(assessment, respondent.antwoorden);
+  const { percentage, beantwoord, totaal } = voortgang(assessment, respondent.antwoorden, respondent.relevantie);
 
   return (
     <div className="flow-mobiel-voortgang">

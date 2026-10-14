@@ -136,7 +136,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     sleutel: "info.benchmarkInstellingen",
     plek: "Instellingen, Drempels en termijnen, formulier Benchmark",
     tekst:
-      "Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden.",
+      "Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. Het aantal dagen tussen Metingen is voor een vergelijking met de lezing Naast elkaar: Liggen de meetdata verder uit elkaar, dan krijg je bij het opslaan een waarschuwing. Opslaan blijft mogelijk.",
   },
   {
     sleutel: "info.benchmarkVlag",

@@ -1,4 +1,5 @@
 import { Assessment } from "@/lib/types";
+import { alleBouwblokkenMetGroep } from "@/lib/assessment-structuur";
 import {
   STANDAARD_WEGINGTEKST,
   STANDAARD_WEGINGTITEL,
@@ -15,6 +16,10 @@ import {
 export function WegingKaart({ assessment }: { assessment: Assessment }) {
   const bouwblokken = bouwblokkenMetAfwijkendGewicht(assessment);
   if (bouwblokken.length === 0) return null;
+  // Bij de Quickscan komt elke dimensienaam bij elke afdeling terug: Daar staat de afdeling voor de naam
+  // (`content-ziekenhuis-quickscan.md`, open punt 3).
+  const metAfdeling = assessment.antwoordType === "ja-nee-weetniet";
+  const groepNaamVan = new Map(alleBouwblokkenMetGroep(assessment).map((b) => [b.bouwblok.id, b.groepNaam]));
   return (
     <div className="card card-warm weging-kaart">
       <svg className="weging-icoon" width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -34,6 +39,7 @@ export function WegingKaart({ assessment }: { assessment: Assessment }) {
         <div className="tags-rij" style={{ marginTop: "0.8rem" }}>
           {bouwblokken.map((b) => (
             <span key={b.id} className="g-badge">
+              {metAfdeling && groepNaamVan.get(b.id) ? `${groepNaamVan.get(b.id)} · ` : ""}
               {b.naam} ({gewichtMarkering(b)})
             </span>
           ))}

@@ -21,6 +21,11 @@ import {
   organisatiesVoorScansBenchmark,
   standaardMetingId,
   viewsVoorLead,
+  dagenTussenMeetdata,
+  gelijkeMeetdata,
+  lezingVan,
+  redenOntwikkeling,
+  voorstelLezing,
 } from "./benchmark";
 import type { Assessment, Benchmark, Organisatie, ScanInvulling } from "./types";
 
@@ -319,5 +324,56 @@ describe("de view van een Lead op alle niveaus", () => {
     o5.leden = o.leden;
     const b = metingenBenchmark(["m0"], "scans");
     expect(leadViewsVoorBenchmark(b, [assessment], [o5], o5, ["m0"], drempels)).toEqual([]);
+  });
+});
+
+describe("niveau 2: de lezing", () => {
+  const meting = (onderdeel: string, meetdatum?: string) => ({ onderdeel, meetdatum });
+
+  it("stelt Ontwikkeling over tijd voor bij hetzelfde onderdeel en verschillende meetdata, anders Naast elkaar", () => {
+    expect(voorstelLezing([meting("Team A", "2026-10-01"), meting("Team A", "2027-10-01")])).toBe("ontwikkeling");
+    expect(voorstelLezing([meting("Team A", "2026-10-01"), meting("Team B", "2026-10-01")])).toBe("naastElkaar");
+    expect(voorstelLezing([meting("Team A", "2026-10-01"), meting("Team A", "2026-10-01")])).toBe("naastElkaar");
+    expect(voorstelLezing([meting("Team A", "2026-10-01")])).toBe("naastElkaar");
+    expect(voorstelLezing([meting("Team A"), meting("Team A", "2026-10-01")])).toBe("naastElkaar");
+  });
+
+  it("een benchmark zonder lezing volgt haar leden, een opgeslagen lezing wint", () => {
+    const o = orgMetMetingen([3, 3]);
+    o.scanUitvoeringen[0].onderdeel = "Team A";
+    o.scanUitvoeringen[1].onderdeel = "Team A";
+    expect(lezingVan(metingenBenchmark(["m0", "m1"]), [o])).toBe("ontwikkeling");
+    expect(lezingVan({ ...metingenBenchmark(["m0", "m1"]), lezing: "naastElkaar" }, [o])).toBe("naastElkaar");
+    o.scanUitvoeringen[1].onderdeel = "Team B";
+    expect(lezingVan(metingenBenchmark(["m0", "m1"]), [o])).toBe("naastElkaar");
+  });
+
+  it("Ontwikkeling over tijd staat alleen een Meting met hetzelfde onderdeel toe en geen gelijke meetdata", () => {
+    expect(redenOntwikkeling(meting("Team B"), [])).toBeNull();
+    expect(redenOntwikkeling(meting("Team A"), [meting("Team A")])).toBeNull();
+    expect(redenOntwikkeling(meting("Team B"), [meting("Team A")])).toContain("Team A");
+    expect(gelijkeMeetdata([meting("A", "2026-10-01"), meting("A", "2026-10-01")])).toBe(true);
+    expect(gelijkeMeetdata([meting("A", "2026-10-01"), meting("A", "2026-10-02")])).toBe(false);
+    expect(gelijkeMeetdata([meting("A"), meting("A")])).toBe(false);
+  });
+
+  it("telt de dagen tussen de oudste en de nieuwste meetdatum", () => {
+    expect(dagenTussenMeetdata([meting("A", "2026-01-01"), meting("B", "2026-04-01")])).toBe(90);
+    expect(dagenTussenMeetdata([meting("A", "2026-01-01"), meting("B", "2026-04-02")])).toBe(91);
+    expect(dagenTussenMeetdata([meting("A", "2026-01-01"), meting("B")])).toBeNull();
+  });
+
+  it("bij Naast elkaar staan de Metingen op naam, bij Ontwikkeling op meetdatum", () => {
+    const o = orgMetMetingen([3, 3]);
+    o.scanUitvoeringen[0].label = "Team Z";
+    o.scanUitvoeringen[0].meetdatum = "2026-01-01";
+    o.scanUitvoeringen[1].label = "Team A";
+    o.scanUitvoeringen[1].meetdatum = "2026-06-01";
+    const naast = bouwMetingenVergelijkingen({ ...metingenBenchmark(["m0", "m1"]), lezing: "naastElkaar" }, [assessment], [o])[0];
+    expect(naast.lezing).toBe("naastElkaar");
+    expect(naast.metingen.map((m) => m.meting.label)).toEqual(["Team A", "Team Z"]);
+    const ontw = bouwMetingenVergelijkingen({ ...metingenBenchmark(["m0", "m1"]), lezing: "ontwikkeling" }, [assessment], [o])[0];
+    expect(ontw.lezing).toBe("ontwikkeling");
+    expect(ontw.metingen.map((m) => m.meting.label)).toEqual(["Team Z", "Team A"]);
   });
 });

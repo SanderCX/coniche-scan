@@ -12,6 +12,7 @@ import {
   klasseVan,
   kwantiel,
   matrix,
+  naastElkaarUitAntwoorden,
   spreiding,
   spreidingsLabel,
   sorteerOpSpreiding,
@@ -23,7 +24,7 @@ import {
 const a: Assessment = zorgscan; // Met gewichten (4, 10 en 11 op 2): De scherpste test van de gedeelde scorefunctie.
 
 /** Een scan waarin elke vraag dezelfde waarde heeft. */
-const scan = (id: string, waarde: number | ((vraagIndex: number) => number), status: ScanInvulling["status"] = "afgerond", ass = a): ScanInvulling => ({
+const scan = (id: string, waarde: number | ((vraagIndex: number) => number), status: ScanInvulling["status"] = "afgerond", ass = a): ScanInvulling & { antwoorden: Record<string, number> } => ({
   id, scanUitvoeringId: "m", organisatieLidId: id, status, aangemaaktOp: "x", uitgenodigdOp: "x", gestartOp: null, afgerondOp: null,
   antwoorden: Object.fromEntries(alleVragen(ass).map((v, i) => [v.id, typeof waarde === "function" ? waarde(i) : waarde])),
   opmerkingenPerBouwblok: {}, bewaarVerlengdTot: null,
@@ -383,5 +384,53 @@ describe("G. Antwoorden per vraag", () => {
     const w = antwoordenPerVraag(a, [scan("s1", (i) => (i === 0 ? 1 : 5)), scan("s2", (i) => (i === 0 ? 1 : 5))], naamVan);
     expect(w.laagsteVraag).toMatchObject({ score: 1 });
     expect(w.hoogsteVraag).toMatchObject({ score: 5 });
+  });
+});
+
+describe("H. Metingen naast elkaar", () => {
+  it("toont het verschil als getal zonder teken en welke Meting hoger scoort", () => {
+    const w = naastElkaarUitAntwoorden(a, scan("x", 2).antwoorden, scan("y", 3).antwoorden);
+    expect(w.totaalEerste).toBe(2);
+    expect(w.totaalTweede).toBe(3);
+    for (const r of w.rijen) {
+      expect(r.verschil).toBe(1);
+      expect(r.hoger).toBe("tweede");
+    }
+    expect(w.tweedeHoger).toBe(15);
+    expect(w.eersteHoger).toBe(0);
+    const omgekeerd = naastElkaarUitAntwoorden(a, scan("x", 4).antwoorden, scan("y", 3).antwoorden);
+    expect(omgekeerd.rijen[0].verschil).toBe(1);
+    expect(omgekeerd.rijen[0].hoger).toBe("eerste");
+  });
+
+  it("bij gelijke getoonde waarden is het Gelijk, met verschil 0,0", () => {
+    const w = naastElkaarUitAntwoorden(a, scan("x", 3).antwoorden, scan("y", 3).antwoorden);
+    expect(w.gelijk).toBe(15);
+    expect(w.rijen[0].hoger).toBe("gelijk");
+    expect(w.rijen[0].verschil).toBe(0);
+  });
+
+  it("de matrix heeft bij Naast elkaar een kolom Hoogste in plaats van Verschil", () => {
+    const kolom = (label: string, waarde: number) => ({ label, aantalScans: 4, antwoorden: scan(label, waarde).antwoorden });
+    const naast = matrix(a, [kolom("A", 2), kolom("B", 4)], { groepsvergelijking: false, lezing: "naastElkaar" });
+    expect(naast.metHoogste).toBe(true);
+    expect(naast.metVerschil).toBe(false);
+    expect(naast.rijen[0].hogerKolom).toBe("tweede");
+    expect(naast.rijen[0].verschilTweeMetingen).toBeNull();
+    expect(naast.groepRijen.every((g) => g.hogerKolom === "tweede")).toBe(true);
+    expect(naast.totaalHoger).toBe("tweede");
+    const ontw = matrix(a, [kolom("A", 2), kolom("B", 4)], { groepsvergelijking: false, lezing: "ontwikkeling" });
+    expect(ontw.metVerschil).toBe(true);
+    expect(ontw.metHoogste).toBe(false);
+    expect(ontw.rijen[0].verschilTweeMetingen).toBe(2);
+    const gelijk = matrix(a, [kolom("A", 3), kolom("B", 3)], { groepsvergelijking: false, lezing: "naastElkaar" });
+    expect(gelijk.totaalHoger).toBe("gelijk");
+  });
+
+  it("er komt geen extra kolom bij meer dan twee Metingen", () => {
+    const kolom = (label: string, waarde: number) => ({ label, aantalScans: 4, antwoorden: scan(label, waarde).antwoorden });
+    const m = matrix(a, [kolom("A", 2), kolom("B", 3), kolom("C", 4)], { groepsvergelijking: false, lezing: "naastElkaar" });
+    expect(m.metHoogste).toBe(false);
+    expect(m.metVerschil).toBe(false);
   });
 });

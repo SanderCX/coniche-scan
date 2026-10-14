@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAssessments } from "@/lib/assessment-store";
+import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { maakSamengesteldeMeting, wijzigSamengesteldeMeting } from "@/lib/db";
 import {
@@ -45,7 +46,11 @@ export function SamengesteldeMetingFormulier({
   const assessments = useAssessments();
   const { benchmarkMinScans } = useInstellingen();
   const metingen = organisatie.scanUitvoeringen.filter((m) => !isSamengesteld(m));
-  const assessmentIds = [...new Set(metingen.map((m) => m.assessmentId))];
+  // Een gemiddelde over Metingen bestaat niet voor Ja / Nee / Weet ik niet (`backlog.md`, Quickscan Ziekenhuis).
+  const assessmentIds = [...new Set(metingen.map((m) => m.assessmentId))].filter((id) => {
+    const a = assessments.find((x) => x.id === id);
+    return !a || !isJaNeeWeetNiet(a);
+  });
 
   const [assessmentId, setAssessmentId] = useState(bestaande?.assessmentId ?? assessmentIds[0] ?? "");
   const [onderdeel, setOnderdeel] = useState(bestaande ? onderdeelVan(bestaande) : STANDAARD_ONDERDEEL);

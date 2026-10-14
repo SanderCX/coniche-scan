@@ -112,7 +112,7 @@ function groepsScoresVeld(type: "categorie" | "bouwblok", groepen: CsvGroepScore
 
 function bouwRijRecord(ctx: CsvRijContext): Record<string, string> {
   const { organisatie, scanUitvoering, lid, invulling, assessment } = ctx;
-  const { beantwoord, totaal } = voortgang(assessment, invulling.antwoorden);
+  const { beantwoord, totaal } = voortgang(assessment, invulling.antwoorden, invulling.relevantie);
 
   let overallVeld = "";
   let groepen = "";
@@ -156,8 +156,8 @@ function bouwRijRecord(ctx: CsvRijContext): Record<string, string> {
         bouwblokNaam: bouwblok.naam,
         vraagId: v.id,
         vraagTekst: v.tekst,
-        score: invulling.antwoorden[v.id],
-        schaalLabel: labelVoorSchaal(assessment, invulling.antwoorden[v.id]),
+        score: invulling.antwoorden[v.id] as number,
+        schaalLabel: labelVoorSchaal(assessment, invulling.antwoorden[v.id] as number),
       }))
   );
   const antwoordenVeld = JSON.stringify(antwoordItems);

@@ -50,7 +50,7 @@ export function addCategorie(assessmentId: string) {
 export function patchCategorie(
   assessmentId: string,
   categorieId: string,
-  patch: Partial<{ naam: string; kleur: string }>
+  patch: Partial<{ naam: string; kleur: string; omschrijving: string | null; optioneel: boolean }>
 ) {
   updateAssessment(assessmentId, (a) => ({
     ...a,

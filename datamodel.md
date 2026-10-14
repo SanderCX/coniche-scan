@@ -786,7 +786,7 @@ samen met de backend en de database.
 | Lead | Organisatie | De weergaven zien en doen die een Admin per Lead heeft aangevinkt: Resultaten, Spreiding, Antwoorden, Uitnodigen, Exporteren en benchmarkviews. Kan ook zelf invullen, maar hoeft niet |
 | (geen rol) | Organisatie | Gewone respondent: Eigen scans invullen en eigen resultaten zien |
 
-**Wat een Lead mag zien (voorstel van 14 oktober 2026).** Dit vervangt het
+**Wat een Lead mag zien (gebouwd op 14 oktober 2026).** Dit vervangt het
 bereik van een Lead (Specifieke Metingen of Hele organisatie), de koppeling
 `RespondentRolMeting`, het veld `leadVoorOrganisatie` en de toewijzing van
 benchmarkviews (`BenchmarkToewijzing`). Wat daarvan op 13 oktober 2026 is
@@ -1191,7 +1191,7 @@ gebeurtenis, zonder persoonsgegevens uit scans.
 - `benchmark.aangemaakt`, `benchmark.gewijzigd` en `benchmark.verwijderd`.
   `details` bevat de naam van de benchmark en de namen van de Assessments
   en organisaties zoals ze op dat moment waren.
-- `lead.toegangGewijzigd` (voorstel van 14 oktober 2026). `details` bevat de
+- `lead.toegangGewijzigd` (gebouwd op 14 oktober 2026). `details` bevat de
   organisatie, de weergave (resultaten, antwoorden of benchmark), de Meting of
   de benchmark en of het vinkje aan of uit is gezet, zonder naam of
   e-mailadres van de Lead. De gebeurtenissen `benchmark.toegewezen` en
@@ -1327,7 +1327,7 @@ Benchmark {
   niveau?: "organisaties" | "metingen" | "scans"
                                     // voorstel, ontbreekt = "organisaties"
   lezing?: "ontwikkeling" | "naastElkaar"
-                                    // voorstel, alleen bij niveau "metingen", daar verplicht
+                                    // gebouwd op 14 oktober 2026, alleen bij niveau "metingen"; ontbreekt het veld, dan volgt ze uit de leden (zie hieronder)
   aangemaaktOp: datetime
   aangemaaktDoor: string            // Gebruiker
 }
@@ -1339,8 +1339,8 @@ BenchmarkLid {
 }
 ```
 
-`BenchmarkToewijzing` (gebouwd op 13 oktober 2026) vervalt in het voorstel van
-14 oktober 2026. Een view voor een Lead is een `LeadToegang` met `weergave:
+`BenchmarkToewijzing` (gebouwd op 13 oktober 2026) is op 14 oktober 2026
+vervallen. Een view voor een Lead is een `LeadToegang` met `weergave:
 "benchmark"` (deel 2). Bestaande toewijzingen worden daarbij overgezet
 (`beheerpagina.md`, punt 6a, Overgang).
 
@@ -1369,7 +1369,7 @@ bestaan zolang de benchmark bestaat.
   Lead gegeven (`benchmark.md`, View voor een Lead). Niveau 3 blijft een
   weergave voor de Admin.
 
-**`lezing`** (voorstel van 14 oktober 2026) zegt hoe de leden van een benchmark
+**`lezing`** (gebouwd op 14 oktober 2026) zegt hoe de leden van een benchmark
 op niveau `metingen` gelezen worden (`benchmark.md`, Niveau 2, Lezing). Bij
 niveau `organisaties` en `scans` ontbreekt ze.
 
@@ -1380,11 +1380,15 @@ niveau `organisaties` en `scans` ontbreekt ze.
   liggen geven een waarschuwing bij opslaan, geen blokkade.
 
 De Admin kan de lezing achteraf wijzigen. De controles lopen dan opnieuw.
+Een benchmark die van vóór de lezing is en het veld niet heeft, krijgt haar
+lezing uit de leden volgens het voorstel van de app: Hetzelfde onderdeel en
+verschillende meetdata geven `ontwikkeling`, in elk ander geval `naastElkaar`.
+De opgeslagen waarde wint altijd.
 
 ### Uitbreiding op Organisatie
 
-`Organisatie` krijgt `antwoordenMetNamen` (boolean, standaard false, voorstel
-van 14 oktober 2026). Staat hij aan, dan ziet een Lead bij Antwoorden de namen
+`Organisatie` krijgt `antwoordenMetNamen` (boolean, standaard false, gebouwd
+op 14 oktober 2026). Staat hij aan, dan ziet een Lead bij Antwoorden de namen
 van de respondenten, en anders R1 tot en met Rn (`beheerpagina.md`, punt 6a).
 Een Admin zet hem na afstemming met de opdrachtgever. De intake en het
 toestemmingsvakje veranderen er niet door.
@@ -1403,6 +1407,7 @@ niveau een eigen drempel voor het aanvinken van een view voor een Lead,
 `benchmarkMinRespondenten`
 (startwaarde 5, het minimale aantal afgeronde scans in een Meting voor
 Spreiding, voor anonieme Antwoorden en voor de lijn van laagste tot hoogste score bij een Lead).
-Voorstel: `benchmarkMaxDagenTussenMetingen` (startwaarde 90), het aantal dagen
-waarboven een vergelijking met de lezing Naast elkaar een waarschuwing geeft. De
+Gebouwd op 14 oktober 2026: `benchmarkMaxDagenTussenMetingen` (startwaarde 90),
+het aantal dagen waarboven een vergelijking met de lezing Naast elkaar een
+waarschuwing geeft. De
 betekenis staat in `benchmark.md`, Drempels en View voor een Lead.

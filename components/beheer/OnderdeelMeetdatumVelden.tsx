@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { STANDAARD_ONDERDEEL, bestaandeOnderdelen, genereerLabel, isGeldigeDatum } from "@/lib/metingen";
+import { STANDAARD_ONDERDEEL, bestaandeOnderdelen, genereerLabel, isGeldigeDatum, toonMeetdatum } from "@/lib/metingen";
 import { Organisatie } from "@/lib/types";
 
 /**
@@ -66,17 +66,28 @@ export function OnderdeelMeetdatumVelden({
           ))}
         </datalist>
       </div>
-      <div className="admin-field" style={{ marginBottom: 0 }}>
-        <label htmlFor={`${idPrefix}-meetdatum`}>Meetdatum</label>
-        <input
-          id={`${idPrefix}-meetdatum`}
-          type="date"
-          required
-          disabled={meetdatumUitgeschakeld}
-          value={waarde.meetdatum}
-          onChange={(e) => onChange({ ...waarde, meetdatum: e.target.value })}
-        />
-      </div>
+      {meetdatumUitgeschakeld ? (
+        // Een samengestelde Meting: De datum is alleen-lezen en volgt de nieuwste Meting in de samenstelling
+        // (`datamodel.md`, Samengestelde Meting). Geen invoerveld, want er is niets in te vullen.
+        <div className="admin-field" style={{ marginBottom: 0 }}>
+          <label>Meetdatum</label>
+          <p style={{ margin: 0, minHeight: "var(--control-h)", display: "flex", alignItems: "center" }}>
+            <span className={isGeldigeDatum(waarde.meetdatum) ? undefined : "text-ink-s"}>{toonMeetdatum(waarde.meetdatum)}</span>
+          </p>
+          <span className="text-xs text-ink-s">Volgt de nieuwste Meting in de samenstelling</span>
+        </div>
+      ) : (
+        <div className="admin-field" style={{ marginBottom: 0 }}>
+          <label htmlFor={`${idPrefix}-meetdatum`}>Meetdatum</label>
+          <input
+            id={`${idPrefix}-meetdatum`}
+            type="date"
+            required
+            value={waarde.meetdatum}
+            onChange={(e) => onChange({ ...waarde, meetdatum: e.target.value })}
+          />
+        </div>
+      )}
     </>
   );
   if (inRij) return velden;

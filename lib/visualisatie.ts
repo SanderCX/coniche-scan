@@ -7,7 +7,7 @@
  * Getoonde waarden zijn op één decimaal afgerond (half-away-from-zero). Posities, spreiding en kwartielen rekenen met de
  * ruwe waarde, zodat bij vier vragen per bouwblok de stappen van 0,25 behouden blijven.
  */
-import { Assessment, Bouwblok, Classificatie, ScanInvulling } from "./types";
+import { Assessment, BenchmarkLezing, Bouwblok, Classificatie, ScanInvulling } from "./types";
 import { alleBouwblokkenMetGroep } from "./assessment-structuur";
 import {
   bouwblokScore,
@@ -275,6 +275,72 @@ export function tussenMetingenUitAntwoorden(
   };
 }
 
+/* ---------- H. Metingen naast elkaar ---------- */
+
+/** Welke van twee Metingen hoger scoort op een rij: De eerste, de tweede, of gelijk bij gelijke getoonde waarden. */
+export type HogerKant = "eerste" | "tweede" | "gelijk";
+
+/** Welke Meting hoger scoort, op de getoonde waarden (één decimaal). `null` als een van beide ontbreekt. */
+export function hogerKant(eerste: number | null, tweede: number | null): HogerKant | null {
+  if (eerste === null || tweede === null) return null;
+  const a = rond1(eerste);
+  const b = rond1(tweede);
+  return a === b ? "gelijk" : a > b ? "eerste" : "tweede";
+}
+
+export interface RijNaastElkaar {
+  rij: BouwblokRij;
+  eerste: number | null;
+  tweede: number | null;
+  /** Het verschil als getal zonder teken: De getoonde waarden van beide Metingen, de ene min de andere. */
+  verschil: number | null;
+  hoger: HogerKant | null;
+  eersteKlasse: Classificatie | null;
+  tweedeKlasse: Classificatie | null;
+}
+
+export interface NaastElkaarWeergave {
+  rijen: RijNaastElkaar[];
+  totaalEerste: number | null;
+  totaalTweede: number | null;
+  /** Het aantal bouwblokken waar de eerste Meting (de cirkel) hoger scoort, waar de tweede (de ruit) hoger scoort, en gelijk. */
+  eersteHoger: number;
+  tweedeHoger: number;
+  gelijk: number;
+}
+
+/**
+ * Weergave H uit twee antwoordensets, het gemiddelde per vraag van elke Meting (`visualisatie-scores.md`, H). Zonder richting:
+ * Er is geen "vorige" en "huidige", alleen de eerste en de tweede Meting in de volgorde van de lezing (op naam).
+ */
+export function naastElkaarUitAntwoorden(
+  assessment: Assessment,
+  eerste: Record<string, number>,
+  tweede: Record<string, number>
+): NaastElkaarWeergave {
+  const rijen: RijNaastElkaar[] = bouwblokRijen(assessment).map((rij) => {
+    const a = bouwblokScore(rij.bouwblok, eerste);
+    const b = bouwblokScore(rij.bouwblok, tweede);
+    return {
+      rij,
+      eerste: a,
+      tweede: b,
+      verschil: a !== null && b !== null ? rond1(Math.abs(a - b)) : null,
+      hoger: hogerKant(a, b),
+      eersteKlasse: klasseVan(a),
+      tweedeKlasse: klasseVan(b),
+    };
+  });
+  return {
+    rijen,
+    totaalEerste: overallScore(assessment, eerste),
+    totaalTweede: overallScore(assessment, tweede),
+    eersteHoger: rijen.filter((r) => r.hoger === "eerste").length,
+    tweedeHoger: rijen.filter((r) => r.hoger === "tweede").length,
+    gelijk: rijen.filter((r) => r.hoger === "gelijk").length,
+  };
+}
+
 /* ---------- D. Tussen organisaties ---------- */
 
 export interface GroepStatistiek {
@@ -385,6 +451,8 @@ export interface MatrixRij {
   verschil: number | null;
   /** Bij precies twee kolommen op niveau 2: De tweede min de eerste kolom (de nieuwere Meting min de oudere). */
   verschilTweeMetingen: number | null;
+  /** Bij precies twee kolommen met de lezing Naast elkaar: Welke kolom hoger scoort, of gelijk. */
+  hogerKolom: HogerKant | null;
 }
 
 /** Een categorie in de matrix op niveau 2 met twee Metingen: Eigen scores per kolom en het verschil. */
@@ -396,6 +464,7 @@ export interface MatrixGroepRij {
   naRij: number;
   cellen: MatrixCel[];
   verschilTweeMetingen: number | null;
+  hogerKolom: HogerKant | null;
 }
 export interface MatrixWeergave {
   kolommen: { label: string; sublabel?: string; aantalScans: number; totaal: number | null; totaalKlasse: Classificatie | null }[];
@@ -409,8 +478,14 @@ export interface MatrixWeergave {
    * nieuwere Meting min de oudere, per bouwblok, per categorie en voor de totaalscore. De kolommen staan dan op meetdatum.
    */
   metVerschil: boolean;
+  /**
+   * Bij precies twee Metingen met de lezing Naast elkaar (voorstel): Een kolom Hoogste in plaats van Verschil, met het symbool
+   * van de Meting die op die rij hoger scoort en "Gelijk" bij gelijke getoonde waarden. De kolommen staan op naam.
+   */
+  metHoogste: boolean;
   groepRijen: MatrixGroepRij[];
   totaalVerschil: number | null;
+  totaalHoger: HogerKant | null;
 }
 
 /** Een afwijking van deze grootte of meer van het rijgemiddelde krijgt een rand (`visualisatie-scores.md`, E). */
@@ -425,10 +500,13 @@ export const MATRIX_AFWIJKING = 0.5;
 export function matrix(
   assessment: Assessment,
   kolommen: MatrixKolomInvoer[],
-  opties: { groepsvergelijking?: boolean } = {}
+  opties: { groepsvergelijking?: boolean; lezing?: BenchmarkLezing } = {}
 ): MatrixWeergave {
   const groepsvergelijking = opties.groepsvergelijking ?? true;
-  const metVerschil = !groepsvergelijking && kolommen.length === 2;
+  const tweeKolommen = !groepsvergelijking && kolommen.length === 2;
+  const naastElkaar = opties.lezing === "naastElkaar";
+  const metVerschil = tweeKolommen && !naastElkaar;
+  const metHoogste = tweeKolommen && naastElkaar;
   const verschilTussen = (a: number | null, b: number | null) => (a !== null && b !== null ? rond1(b - a) : null);
   const bouwRijen = bouwblokRijen(assessment);
   const rijen: MatrixRij[] = bouwRijen.map((rij) => {
@@ -451,11 +529,12 @@ export function matrix(
       hoogste,
       verschil: laagste !== null && hoogste !== null ? rond1(hoogste - laagste) : null,
       verschilTweeMetingen: metVerschil ? verschilTussen(scores[0], scores[1]) : null,
+      hogerKolom: metHoogste ? hogerKant(scores[0], scores[1]) : null,
     };
   });
   // Per categorie (alleen bij een Assessment met categorielaag) de score en het verschil, onder het laatste bouwblok.
   const groepRijen: MatrixGroepRij[] = [];
-  if (metVerschil) {
+  if (metVerschil || metHoogste) {
     bouwRijen.forEach((rij, i) => {
       if (rij.groepNaam === null) return;
       const laatsteVanGroep = i === bouwRijen.length - 1 || bouwRijen[i + 1].groepId !== rij.groepId;
@@ -468,7 +547,8 @@ export function matrix(
         kleur: rij.groepKleur,
         naRij: i,
         cellen: scores.map((score) => ({ score, klasse: klasseVan(score), afwijkend: false })),
-        verschilTweeMetingen: verschilTussen(scores[0], scores[1]),
+        verschilTweeMetingen: metVerschil ? verschilTussen(scores[0], scores[1]) : null,
+        hogerKolom: metHoogste ? hogerKant(scores[0], scores[1]) : null,
       });
     });
   }
@@ -493,8 +573,10 @@ export function matrix(
     grootsteVerschil: grootste && grootste.verschil !== null ? { naam: grootste.rij.bouwblok.naam, verschil: grootste.verschil } : null,
     aantalAfwijkend: rijen.reduce((n, r) => n + r.cellen.filter((c) => c.afwijkend).length, 0),
     metVerschil,
+    metHoogste,
     groepRijen,
     totaalVerschil: metVerschil ? verschilTussen(totalen[0], totalen[1]) : null,
+    totaalHoger: metHoogste ? hogerKant(totalen[0], totalen[1]) : null,
   };
 }
 

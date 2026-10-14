@@ -137,6 +137,16 @@
   border-radius: 50%;
   background: var(--vis-kleur, var(--ink-s));
 }
+/* Weergave H: De tweede Meting is een gevulde ruit, de eerste een gevulde cirkel. De vorm onderscheidt, niet de kleur. */
+.vis-stip--ruit {
+  border-radius: 2px;
+  transform: rotate(45deg) scale(0.85);
+}
+.vis-symbool {
+  display: inline-block;
+  font-size: 0.95em;
+  line-height: 1;
+}
 .vis-stip--ring {
   background: var(--bg);
   border: 2px solid var(--vis-kleur, var(--ink-s));

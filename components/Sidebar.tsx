@@ -1,5 +1,5 @@
 import { Assessment, ScanWeergave } from "@/lib/types";
-import { bouwblokStatus, voortgang } from "@/lib/scoring";
+import { bouwblokStatus, categorieVanToepassing, voortgang } from "@/lib/scoring";
 import { actieveGroepen } from "@/lib/assessment-structuur";
 import { CATEGORIE_COLORS } from "@/lib/colors";
 import { gewichtMarkering } from "@/lib/weging";
@@ -15,7 +15,7 @@ export function Sidebar({
   actieveBouwblokId: string;
   onSelecteer: (bouwblokId: string) => void;
 }) {
-  const { percentage, beantwoord, totaal } = voortgang(assessment, respondent.antwoorden);
+  const { percentage, beantwoord, totaal } = voortgang(assessment, respondent.antwoorden, respondent.relevantie);
 
   return (
     <aside className="flow-sidebar">
@@ -34,18 +34,23 @@ export function Sidebar({
         <nav>
           {actieveGroepen(assessment).map((groep) => {
             const kleur = groep.kleur ? CATEGORIE_COLORS[groep.kleur] : undefined;
+            // Een afdeling die niet van toepassing is: Grijs met "n.v.t.", alleen het eerste bouwblok blijft kiesbaar zodat de
+            // keuze nog te wijzigen is (`content-ziekenhuis-quickscan.md`, Doorloop per afdeling).
+            const nietVanToepassing = !categorieVanToepassing(assessment, groep.id, respondent.relevantie);
+            const zichtbareBouwblokken = nietVanToepassing ? groep.bouwblokken.slice(0, 1) : groep.bouwblokken;
             return (
-              <div key={groep.id} className="sidebar-categorie">
+              <div key={groep.id} className={`sidebar-categorie ${nietVanToepassing ? "sidebar-categorie--nvt" : ""}`}>
                 {groep.naam && (
                   <p
                     className="sidebar-categorie-naam"
                     style={kleur ? ({ ["--accent" as string]: kleur.hex } as React.CSSProperties) : undefined}
                   >
                     {groep.naam}
+                    {nietVanToepassing && <span className="nvt-label">n.v.t.</span>}
                   </p>
                 )}
                 <ul className="list-none m-0 p-0">
-                  {groep.bouwblokken.map((bouwblok) => {
+                  {zichtbareBouwblokken.map((bouwblok) => {
                     const { status, beantwoord: bbBeantwoord, totaal: bbTotaal } = bouwblokStatus(
                       bouwblok,
                       respondent.antwoorden
@@ -56,13 +61,15 @@ export function Sidebar({
                         <button
                           type="button"
                           onClick={() => onSelecteer(bouwblok.id)}
-                          className={`sidebar-bouwblok status-${status === "nog-niet-begonnen" ? "onbegonnen" : status} w-full border-0 bg-transparent ${
-                            actief ? "actief" : ""
-                          }`}
+                          className={`sidebar-bouwblok status-${
+                            nietVanToepassing ? "nvt" : status === "nog-niet-begonnen" ? "onbegonnen" : status
+                          } w-full border-0 bg-transparent ${actief ? "actief" : ""}`}
                           style={kleur ? ({ ["--accent" as string]: kleur.hex } as React.CSSProperties) : undefined}
                         >
                           <span className="status-icoon">
-                            {status === "afgerond" ? (
+                            {nietVanToepassing ? (
+                              "–"
+                            ) : status === "afgerond" ? (
                               <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
                                 <path
                                   d="M1 4L3.5 6.5L9 1"
@@ -82,7 +89,7 @@ export function Sidebar({
                           {gewichtMarkering(bouwblok) && (
                             <span className="gewicht-chip">{gewichtMarkering(bouwblok)}</span>
                           )}
-                          {status === "bezig" && (
+                          {!nietVanToepassing && status === "bezig" && (
                             <span className="text-xs text-ink-s">
                               {bbBeantwoord}/{bbTotaal}
                             </span>

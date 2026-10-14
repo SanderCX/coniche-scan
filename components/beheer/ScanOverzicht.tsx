@@ -1,5 +1,6 @@
 "use client";
 
+import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -56,7 +57,7 @@ export function ScanOverzicht({
   const naam = lid.naam || lid.email;
   const link = typeof window === "undefined" ? "" : maakPubliekeLink(window.location.origin, lid);
   const afgerond = invulling.status === "afgerond";
-  const { beantwoord, totaal, percentage } = voortgang(assessment, invulling.antwoorden);
+  const { beantwoord, totaal, percentage } = voortgang(assessment, invulling.antwoorden, invulling.relevantie);
   const score = afgerond
     ? overallScore(assessment, invulling.antwoorden)
     : null;
@@ -192,14 +193,16 @@ export function ScanOverzicht({
                     Resultaten bekijken
                   </Link>
                 )}
-                <DropdownKnop
-                  label={pdfBezig ? "Bezig…" : "Exporteren"}
-                  opties={[
-                    { label: "Als PDF", onClick: handlePdf, disabled: pdfBezig },
-                    { label: "Als CSV", onClick: () => exporteerScansCsv([context]) },
-                    { label: "Voor InDesign (XML)", onClick: () => exporteerScanIndesign(context) },
-                  ]}
-                />
+                {!isJaNeeWeetNiet(assessment) && (
+                  <DropdownKnop
+                    label={pdfBezig ? "Bezig…" : "Exporteren"}
+                    opties={[
+                      { label: "Als PDF", onClick: handlePdf, disabled: pdfBezig },
+                      { label: "Als CSV", onClick: () => exporteerScansCsv([context]) },
+                      { label: "Voor InDesign (XML)", onClick: () => exporteerScanIndesign(context) },
+                    ]}
+                  />
+                )}
                 <button type="button" className="btn btn-outline btn-compact" onClick={() => setNaarMeting(true)}>
                   Naar andere Meting
                 </button>

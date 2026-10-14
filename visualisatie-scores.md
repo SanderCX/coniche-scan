@@ -123,7 +123,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Tegels.** Totaalscore van de vorige en huidige Meting ("2,9 → 3,1"), aantal bouwblokken gestegen, aantal gedaald, aantal van klasse gewisseld.
 
-**Meetdatum en onderdeel (voorstel van 14 oktober 2026, ter vervanging van de gebouwde waarschuwing bij een ander onderdeel).** De volgorde komt uit de meetdatum (`datamodel.md`, Meting). De Admin kiest zelf welke twee Metingen een vergelijking vormen, dus er is geen automatisch voorgestelde vorige Meting. Twee Metingen met een ander onderdeel komen hier niet voor: Die zijn te vergelijken met de lezing Naast elkaar (weergave H). Een samengestelde Meting is te vergelijken met een andere samengestelde Meting, zodat "Hele organisatie 2025" naast "Hele organisatie 2026" kan staan.
+**Meetdatum en onderdeel (gebouwd op 14 oktober 2026, ter vervanging van de eerdere waarschuwing bij een ander onderdeel).** De volgorde komt uit de meetdatum (`datamodel.md`, Meting). De Admin kiest zelf welke twee Metingen een vergelijking vormen, dus er is geen automatisch voorgestelde vorige Meting. Twee Metingen met een ander onderdeel komen hier niet voor: Die zijn te vergelijken met de lezing Naast elkaar (weergave H). Een samengestelde Meting is te vergelijken met een andere samengestelde Meting, zodat "Hele organisatie 2025" naast "Hele organisatie 2026" kan staan.
 
 **Meer dan twee Metingen.** Hier is nog geen ontwerp voor. Voorstel voor later is een lijn per bouwblok over de Metingen heen.
 
@@ -169,7 +169,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Samengestelde Meting (gebouwd op 13 oktober 2026).** De matrix onder een samengestelde Meting (`benchmark.md`, Onderdeel en samengestelde Meting) heeft de onderliggende Metingen als kolommen. Alleen voor de Admin, om dezelfde reden als op niveau 2.
 
-**Volgorde van de kolommen (gebouwd op 14 oktober 2026 met de kolom Verschil bij twee Metingen, ter vervanging van de groepering per onderdeel; de lezing Naast elkaar met de kolom Hoogste is voorstel van 14 oktober 2026).** De kolommen staan op meetdatum, de oudste links. De kolomkop toont de naam van de Meting en haar meetdatum. Bij precies twee Metingen komt er rechts een kolom bij, afhankelijk van de lezing. Bij Ontwikkeling over tijd is dat Verschil, de nieuwere min de oudere, met dezelfde opbouw als weergave C. Bij Naast elkaar staan de kolommen op de naam van de Meting in plaats van op meetdatum, en is de extra kolom Hoogste, met het symbool of de naam van de Meting die op die rij hoger scoort en "Gelijk" bij gelijke getoonde waarden. Bij meer dan twee Metingen is er nog geen extra kolom.
+**Volgorde van de kolommen (gebouwd op 14 oktober 2026, ter vervanging van de groepering per onderdeel, met de kolom Verschil bij Ontwikkeling over tijd en de kolom Hoogste bij Naast elkaar).** De kolommen staan op meetdatum, de oudste links. De kolomkop toont de naam van de Meting en haar meetdatum. Bij precies twee Metingen komt er rechts een kolom bij, afhankelijk van de lezing. Bij Ontwikkeling over tijd is dat Verschil, de nieuwere min de oudere, met dezelfde opbouw als weergave C. Bij Naast elkaar staan de kolommen op de naam van de Meting in plaats van op meetdatum, en is de extra kolom Hoogste, met het symbool of de naam van de Meting die op die rij hoger scoort en "Gelijk" bij gelijke getoonde waarden. Bij meer dan twee Metingen is er nog geen extra kolom.
 
 **Overzicht van een ronde (gebouwd op 13 oktober 2026, vervalt met de ronde).** Dit overzicht en de knop in de rondekop vervallen. Voor het zien van meerdere onderdelen naast elkaar maakt de Admin een vergelijking tussen Metingen.
 
@@ -204,7 +204,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 ## H. Metingen naast elkaar (niveau 2)
 
-**Voorstel van 14 oktober 2026.** Weergave voor een benchmark binnen een organisatie met de lezing Naast elkaar (`benchmark.md`, Niveau 2, Lezing). Ze beantwoordt de vraag hoe twee onderdelen of samenstellingen scoren ten opzichte van elkaar, op een vergelijkbaar meetmoment. Ze is geen ontwikkeling en toont dus geen richting.
+**Gebouwd op 14 oktober 2026.** Weergave voor een benchmark binnen een organisatie met de lezing Naast elkaar (`benchmark.md`, Niveau 2, Lezing). Ze beantwoordt de vraag hoe twee onderdelen of samenstellingen scoren ten opzichte van elkaar, op een vergelijkbaar meetmoment. Ze is geen ontwikkeling en toont dus geen richting.
 
 **Plek.** De view van de benchmark, voor een Admin en, bij een aangevinkte benchmark en Resultaten op beide Metingen, voor een Lead. Onder de weergave staat dezelfde matrix als bij C (onderdeel E).
 
@@ -230,7 +230,10 @@ Gebouwd op 13 oktober 2026. De berekeningen staan in `lib/visualisatie.ts` (met 
 - A en B: `MetingWeergaven` op de resultatenpagina van een Meting in beheer en voor de Lead
   (`/s/[code]/resultaten/[scanUitvoeringId]`). B op niveau 3 staat ook in de view van een scan (benchmark) en in
   "Positie in de Meting" op de resultatenpagina van één scan.
-- C: De view van een benchmark binnen een organisatie (niveau 2) bij twee Metingen.
+- C: De view van een benchmark binnen een organisatie (niveau 2) met de lezing Ontwikkeling over tijd bij twee Metingen.
+- H: Dezelfde view met de lezing Naast elkaar bij twee Metingen (`naastElkaarUitAntwoorden`, `WeergaveNaastElkaar`). De matrix
+  eronder heeft dan de kolom Hoogste. Een benchmark die van vóór de lezing is, volgt haar lezing uit de leden
+  (`datamodel.md`, Benchmark, `lezing`).
 - D: De view per organisatie (niveau 1) van de benchmark, ook voor een Lead.
 - E: de matrix in de sectie van een benchmark op niveau 2 (kolommen met Metingen) en op niveau 1 (kolommen met organisaties,
   met het label van de Meting en het aantal scans onder de naam), alleen voor de Admin. Bij veel kolommen scrolt de matrix
@@ -263,7 +266,7 @@ Gebouwd op 13 oktober 2026. De berekeningen staan in `lib/visualisatie.ts` (met 
 **Nog niet gebouwd**
 
 - Export van deze weergaven naar PDF, CSV en InDesign.
-- Meer dan twee Metingen in C en H, en de weergave H zelf.
+- Meer dan twee Metingen in C en H.
 - Een kolom met het verschil binnen een groep per onderdeel in E (open, zie Volgorde van de kolommen).
 - Een eigen drempel voor de band en de kwartielen in D.
 

@@ -6,6 +6,10 @@ import { haalServerKopieOp, stuurNaarServer } from "./server-sync";
 import { verrijkAssessment } from "./assessment-migratie";
 
 const KEY = "coniche-scan:assessments";
+/** De id's van seed-Assessments die een Admin in deze browser heeft verwijderd, zodat een verwijderd Assessment niet terugkomt. */
+const VERWIJDERD_KEY = "coniche-scan:assessments-verwijderd";
+/** De seeds die er al waren vóór er seeds werden bijgevoegd: Die komen nooit terug, ook als ze zijn verwijderd. */
+const EERDERE_SEEDS = ["klantcontact-volwassenheid", "ai-volwassenheid", "zorgscan"];
 const SERVER_SLEUTEL = "assessments";
 const SERVER_SENTINEL = "__server__";
 
@@ -22,8 +26,43 @@ function subscribe(listener: Listener): () => void {
 /** Leest de ruwe snapshot-string; zaait localStorage bij het eerste gebruik. Puur op basis
  * van deze string, zodat de hook hieronder tijdens hydration exact hetzelfde oplevert als
  * de server (die altijd SERVER_SENTINEL ziet). */
+/**
+ * Voegt een nieuw seed-Assessment toe aan opgeslagen data (bijvoorbeeld de Quickscan Ziekenhuis): De opslag wordt alleen bij het
+ * allereerste gebruik met de seeds gevuld, dus zonder dit mist een bestaande browser of serverkopie elk later toegevoegd
+ * Assessment. Een seed dat de Admin heeft verwijderd, komt niet terug: Wat is verwijderd, wordt niet opnieuw toegevoegd.
+ * Eén keer per paginalading (en na het ophalen van de serverkopie).
+ */
+let seedsGecontroleerd = false;
+function leesVerwijderd(): string[] {
+  try {
+    const lijst = JSON.parse(window.localStorage.getItem(VERWIJDERD_KEY) ?? "[]");
+    return Array.isArray(lijst) ? lijst.filter((x): x is string => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+}
+function voegNieuweSeedsToe(): void {
+  if (seedsGecontroleerd) return;
+  seedsGecontroleerd = true;
+  const ruw = window.localStorage.getItem(KEY);
+  if (!ruw) return;
+  try {
+    const lijst = JSON.parse(ruw) as Assessment[];
+    const verwijderd = leesVerwijderd();
+    const nieuw = seedAssessments.filter(
+      (a) => !EERDERE_SEEDS.includes(a.id) && !verwijderd.includes(a.id) && !lijst.some((x) => x.id === a.id)
+    );
+    if (nieuw.length > 0) {
+      window.localStorage.setItem(KEY, JSON.stringify([...lijst, ...structuredClone(nieuw)]));
+    }
+  } catch {
+    // Beschadigde opslag: parseSnapshot valt terug op de seeds.
+  }
+}
+
 function getSnapshot(): string {
   if (typeof window === "undefined") return SERVER_SENTINEL;
+  voegNieuweSeedsToe();
   const ruw = window.localStorage.getItem(KEY);
   if (ruw) return ruw;
   // Niet meteen pushen naar de server, zie dezelfde kanttekening in
@@ -40,7 +79,10 @@ function getServerSnapshot(): string {
 // ophalen zodat elke browser op dit apparaat met dezelfde data start
 // (lib/server-sync.ts).
 if (typeof window !== "undefined") {
-  haalServerKopieOp(SERVER_SLEUTEL, KEY, emitChange);
+  haalServerKopieOp(SERVER_SLEUTEL, KEY, () => {
+    seedsGecontroleerd = false;
+    emitChange();
+  });
 }
 
 function parseSnapshot(snapshot: string): Assessment[] {
@@ -191,12 +233,16 @@ export function verwijderAssessmentRecord(id: string): { afgeleid: string[] } | 
       return { ...a, afgeleidVanAssessmentId: null };
     });
   slaAlles(rest);
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem(VERWIJDERD_KEY, JSON.stringify([...new Set([...leesVerwijderd(), id])]));
+  }
   return { afgeleid };
 }
 
 export function resetAssessments(): void {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(KEY);
+  window.localStorage.removeItem(VERWIJDERD_KEY);
   emitChange();
 }
 

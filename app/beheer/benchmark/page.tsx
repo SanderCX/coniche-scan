@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties } from "@/lib/db";
 import { useBenchmarks } from "@/lib/benchmark-store";
-import { bouwBenchmarkSecties, bouwScanSectie, niveauVan } from "@/lib/benchmark";
+import { bouwBenchmarkSecties, bouwScanSectie, LEZING_NAAM, lezingVan, niveauVan } from "@/lib/benchmark";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
 
@@ -63,7 +63,10 @@ export default function BenchmarkLijstPage() {
                   <td>
                     <strong>{b.naam}</strong>
                   </td>
-                  <td>{NIVEAU_TEKST[niveau]}</td>
+                  <td>
+                    {NIVEAU_TEKST[niveau]}
+                    {niveau === "metingen" && <span className="text-ink-s"> · {LEZING_NAAM[lezingVan(b, organisaties)]}</span>}
+                  </td>
                   <td>
                     {scanSectie && (
                       <div>

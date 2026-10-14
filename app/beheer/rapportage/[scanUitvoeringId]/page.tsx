@@ -1,5 +1,6 @@
 "use client";
 
+import { LEZING_NAAM, lezingVan } from "@/lib/benchmark";
 import { use } from "react";
 import { useSearchParams } from "next/navigation";
 import { useScanUitvoering } from "@/lib/db";
@@ -21,6 +22,7 @@ import {
   toonMeetdatum,
 } from "@/lib/metingen";
 import { useBenchmarks } from "@/lib/benchmark-store";
+import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { kruimelsVoorMeting, VIA_RESULTATEN } from "@/lib/resultaten-nav";
 
 /**
@@ -65,6 +67,21 @@ export default function RapportagePage({
       </div>
     );
   }
+  // Het gemiddelde over de scans van een Meting is er nog niet voor Ja / Nee / Weet ik niet (`backlog.md`, Quickscan Ziekenhuis):
+  // De resultaten staan bij elke scan zelf.
+  if (isJaNeeWeetNiet(assessment)) {
+    return (
+      <div className="admin-main">
+        <Kruimelpad delen={kruimelsVoorMeting(organisatie, scanUitvoering, via, "Resultaten van de Meting")} />
+        <span className="eyebrow">{scanUitvoering.label}</span>
+        <h1>{assessment.naam}</h1>
+        <p className="admin-notice">
+          Voor een Assessment met Ja / Nee / Weet ik niet is het resultaat van een hele Meting (het gemiddelde over de scans) nog niet
+          uitgewerkt. Het resultaat van elke afgeronde scan staat bij de scan zelf, via het Meting-overzicht.
+        </p>
+      </div>
+    );
+  }
   const samengesteld = isSamengesteld(scanUitvoering);
   const onderliggend = onderliggendeMetingen(organisatie, scanUitvoering);
   // Bij een samengestelde Meting zijn de afgeronde scans die van de onderliggende Metingen.
@@ -92,7 +109,7 @@ export default function RapportagePage({
   const vergelijkingen = isAdmin(ingelogd)
     ? benchmarks
         .filter((b) => b.niveau === "metingen" && b.leden.some((l) => l.metingId === scanUitvoering.id))
-        .map((b) => ({ id: b.id, naam: b.naam, href: `/beheer/benchmark/${b.id}` }))
+        .map((b) => ({ id: b.id, naam: `${b.naam} (${LEZING_NAAM[lezingVan(b, [organisatie])]})`, href: `/beheer/benchmark/${b.id}` }))
     : undefined;
 
   return (

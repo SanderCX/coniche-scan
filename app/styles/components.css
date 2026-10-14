@@ -1198,3 +1198,142 @@ select.veld-compact:focus {
   gap: 0.75rem;
   white-space: nowrap;
 }
+
+/* De twee kaarten boven de vragen van een afdeling (Quickscan, `content-ziekenhuis-quickscan.md`, Doorloop per afdeling). */
+.afdeling-kaarten {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.afdeling-kaart {
+  padding: 1.2rem 1.4rem;
+}
+.sidebar-bouwblok.status-nvt {
+  color: var(--ink-s);
+}
+.sidebar-bouwblok.status-nvt .status-icoon {
+  background: var(--bg-mid);
+  color: var(--ink-s);
+}
+.sidebar-categorie-naam .nvt-label {
+  font-weight: 400;
+  color: var(--ink-s);
+  margin-left: 0.4rem;
+}
+.sidebar-categorie--nvt .sidebar-categorie-naam {
+  color: var(--ink-s);
+  text-decoration: line-through;
+}
+
+/* Resultatenscherm van de Quickscan (`content-ziekenhuis-quickscan.md`, Resultaten). */
+.qs-totaal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: space-between;
+  align-items: center;
+}
+.qs-totaal-percentage {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0.2rem 0 0;
+}
+.qs-totaal-punten {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ink-m);
+}
+.qs-totaal-klasse {
+  font-weight: 700;
+  margin: 0.3rem 0 0;
+}
+.qs-totaal-rechts {
+  min-width: 11rem;
+}
+.qs-afdelingen {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.qs-afdeling-kaart--nvt {
+  background: var(--bg-mid);
+  border-color: var(--border);
+}
+.qs-afdeling-kop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.qs-badge {
+  color: #fff;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  padding: 0.15rem 0.6rem;
+  border-radius: 100px;
+}
+.qs-punten {
+  font-size: 1.6rem;
+  margin: 0.6rem 0 0;
+}
+.qs-punten span {
+  font-size: 1rem;
+  color: var(--ink-m);
+}
+.qs-punten .qs-percentage {
+  font-weight: 800;
+}
+.qs-tellingen {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: var(--fs-s);
+  font-weight: 700;
+  margin: 0.4rem 0 0;
+}
+.qs-kopje {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+  margin: 1.2rem 0 0.4rem;
+}
+.qs-dimensie {
+  margin-bottom: 0.5rem;
+}
+.qs-dimensie-kop {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: var(--fs-s);
+}
+.qs-chips {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+.qs-chip {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  padding: 0.15rem 0.7rem;
+  border-radius: 100px;
+  border: 1.5px solid;
+}
+.qs-chip--aandacht {
+  color: #dc2626;
+  border-color: #dc2626;
+}
+.qs-chip--sterk {
+  color: #15803d;
+  border-color: #15803d;
+}
+.qs-uitgelicht {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}

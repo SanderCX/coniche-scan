@@ -1,5 +1,6 @@
 import { Assessment } from "@/lib/types";
-import { KLASSE_LABEL, MatrixWeergave } from "@/lib/visualisatie";
+import { HogerKant, KLASSE_LABEL, MatrixWeergave } from "@/lib/visualisatie";
+import { SYMBOOL_EERSTE, SYMBOOL_TWEEDE } from "./WeergaveNaastElkaar";
 import { Tegels, toon } from "./gedeeld";
 
 /**
@@ -31,6 +32,20 @@ export function WeergaveMatrix({
       {n === null ? "–" : `${teken(n)}${toon(Math.abs(n))}`}
     </td>
   );
+  // Naast elkaar: Het symbool van de kolom met de hoogste score in plaats van een verschil met teken.
+  const hoogsteCel = (h: HogerKant | null, sleutel: string) => (
+    <td key={sleutel} className="vis-matrix-zij">
+      {h === null ? (
+        "–"
+      ) : h === "gelijk" ? (
+        "Gelijk"
+      ) : (
+        <span className="vis-symbool" title={kolommen[h === "eerste" ? 0 : 1]?.label}>
+          {h === "eerste" ? SYMBOOL_EERSTE : SYMBOOL_TWEEDE}
+        </span>
+      )}
+    </td>
+  );
   return (
     <div className="vis" data-weergave="matrix">
       <Tegels
@@ -54,6 +69,7 @@ export function WeergaveMatrix({
               <th className="vis-matrix-naam">{assessment.bouwblokLabel}</th>
               {kolommen.map((k, i) => (
                 <th key={i}>
+                  {weergave.metHoogste && <span className="vis-symbool">{i === 0 ? SYMBOOL_EERSTE : SYMBOOL_TWEEDE} </span>}
                   {k.label}
                   {k.sublabel && <span className="vis-matrix-aantal">{k.sublabel}</span>}
                   <span className="vis-matrix-aantal">
@@ -64,6 +80,7 @@ export function WeergaveMatrix({
               {groep && <th>Gemiddelde</th>}
               {groep && <th>Bereik</th>}
               {weergave.metVerschil && <th>Verschil</th>}
+              {weergave.metHoogste && <th>Hoogste</th>}
             </tr>
           </thead>
           <tbody>
@@ -89,6 +106,7 @@ export function WeergaveMatrix({
                   </td>
                 )}
                 {weergave.metVerschil && verschilCel(r.verschilTweeMetingen, "verschil")}
+                {weergave.metHoogste && hoogsteCel(r.hogerKolom, "hoogste")}
               </tr>,
               ...weergave.groepRijen
                 .filter((g) => g.naRij === index)
@@ -100,7 +118,8 @@ export function WeergaveMatrix({
                         {toon(c.score)}
                       </td>
                     ))}
-                    {verschilCel(g.verschilTweeMetingen, "verschil")}
+                    {weergave.metVerschil && verschilCel(g.verschilTweeMetingen, "verschil")}
+                    {weergave.metHoogste && hoogsteCel(g.hogerKolom, "hoogste")}
                   </tr>
                 )),
             ])}
@@ -114,6 +133,7 @@ export function WeergaveMatrix({
               {groep && <td />}
               {groep && <td />}
               {weergave.metVerschil && verschilCel(weergave.totaalVerschil, "verschil")}
+              {weergave.metHoogste && hoogsteCel(weergave.totaalHoger, "hoogste")}
             </tr>
           </tbody>
         </table>
@@ -122,6 +142,7 @@ export function WeergaveMatrix({
         Elke {soort} telt even zwaar mee, ongeacht het aantal respondenten.
         {groep && " Een zwarte rand betekent: 0,5 of meer van het gemiddelde van de rij."}
         {weergave.metVerschil && " Het verschil is de nieuwere Meting min de oudere."}
+        {weergave.metHoogste && ` ${SYMBOOL_EERSTE} is de eerste kolom, ${SYMBOOL_TWEEDE} de tweede: Het symbool staat bij de Meting die hoger scoort.`}
       </p>
     </div>
   );

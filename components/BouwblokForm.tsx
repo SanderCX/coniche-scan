@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Bouwblok, ScanWeergave, SchaalLabel } from "@/lib/types";
+import { Antwoord, Bouwblok, Categorie, ScanWeergave, SchaalLabel } from "@/lib/types";
 import { CATEGORIE_COLORS } from "@/lib/colors";
 import { toelichtingVoor } from "@/lib/bouwblok-info";
 import { gewichtMarkering } from "@/lib/weging";
 import { ScaleRadio } from "./ScaleRadio";
+import { JaNeeRadio } from "./JaNeeRadio";
+import { AfdelingKaarten } from "./AfdelingKaarten";
 import { Modal } from "./Modal";
 
 export function BouwblokForm({
@@ -15,6 +17,10 @@ export function BouwblokForm({
   schaal,
   respondent,
   isLaatsteBouwblok,
+  jaNee = false,
+  instructieregel,
+  afdeling,
+  kanAfronden = true,
   onAntwoord,
   onOpmerking,
   onVolgende,
@@ -29,7 +35,23 @@ export function BouwblokForm({
   schaal: SchaalLabel[];
   respondent: ScanWeergave;
   isLaatsteBouwblok: boolean;
-  onAntwoord: (vraagId: string, waarde: number) => void;
+  /** Bij antwoordType "ja-nee-weetniet": Drie keuzes per vraag in plaats van de 1–5-schaal. */
+  jaNee?: boolean;
+  /** `Assessment.instructieregel`. Leeg: De standaardtekst voor de 1–5-schaal. */
+  instructieregel?: string | null;
+  /**
+   * Alleen bij het eerste bouwblok van een optionele categorie: De kaarten met de definitie en de relevantievraag. Pas na Ja
+   * staan de vragen er (`content-ziekenhuis-quickscan.md`, Doorloop per afdeling).
+   */
+  afdeling?: {
+    categorie: Categorie;
+    relevantieVraag: string;
+    relevantie: boolean | undefined;
+    onRelevantie: (relevant: boolean) => void;
+  };
+  /** Op het laatste bouwblok: Mag de scan nu worden afgerond? Anders staat de knop uit. */
+  kanAfronden?: boolean;
+  onAntwoord: (vraagId: string, waarde: Antwoord) => void;
   onOpmerking: (tekst: string) => void;
   onVolgende: () => void;
 }) {
@@ -37,9 +59,10 @@ export function BouwblokForm({
   const accentStyle = kleur
     ? ({ ["--accent" as string]: kleur.hex } as React.CSSProperties)
     : undefined;
-  const alleBeantwoord = bouwblok.vragen.every(
-    (v) => typeof respondent.antwoorden[v.id] === "number"
-  );
+  const toonVragen = !afdeling || afdeling.relevantie === true;
+  const alleBeantwoord = toonVragen
+    ? bouwblok.vragen.every((v) => respondent.antwoorden[v.id] !== undefined)
+    : afdeling.relevantie === false;
   const [toelichtingOpen, setToelichtingOpen] = useState(false);
 
   const toelichtingInfo = toelichtingVoor(bouwblok, {
@@ -61,13 +84,23 @@ export function BouwblokForm({
     }, 250);
   }
 
-  function handleAntwoord(vraagId: string, waarde: number) {
+  function handleAntwoord(vraagId: string, waarde: Antwoord) {
     onAntwoord(vraagId, waarde);
     scrollNaarVolgende(vraagId);
   }
 
   return (
     <div>
+      {afdeling && (
+        <AfdelingKaarten
+          categorie={afdeling.categorie}
+          relevantieVraag={afdeling.relevantieVraag}
+          relevantie={afdeling.relevantie}
+          onRelevantie={afdeling.onRelevantie}
+        />
+      )}
+      {toonVragen && (
+      <>
       <div className="bouwblok-kop" style={accentStyle}>
         <p className="eyebrow" style={accentStyle}>
           {eenheid} {bouwblok.volgnummer}
@@ -75,16 +108,18 @@ export function BouwblokForm({
         <div className="bouwblok-kop-titelrij">
           <h2>{bouwblok.naam}</h2>
           {gewichtMarkering(bouwblok) && <span className="gewicht-chip">{gewichtMarkering(bouwblok)}</span>}
-          <button
-            type="button"
-            onClick={() => setToelichtingOpen(true)}
-            aria-label={`Meer uitleg over ${bouwblok.naam}`}
-            title="Meer uitleg"
-            className="toelichting-link"
-            style={accentStyle}
-          >
-            ⓘ
-          </button>
+          {toelichtingInfo && (
+            <button
+              type="button"
+              onClick={() => setToelichtingOpen(true)}
+              aria-label={`Meer uitleg over ${bouwblok.naam}`}
+              title="Meer uitleg"
+              className="toelichting-link"
+              style={accentStyle}
+            >
+              ⓘ
+            </button>
+          )}
         </div>
         <p className="bouwblok-omschrijving">{bouwblok.omschrijving}</p>
         <div className="tags-rij" style={{ marginTop: "0.8rem" }}>
@@ -130,8 +165,8 @@ export function BouwblokForm({
       </Modal>
 
       <div className="instructievlak">
-        Beantwoord op basis van wat aantoonbaar geregeld is (documenten, ritmes, tooling,
-        afspraken).
+        {instructieregel?.trim() ||
+          "Beantwoord op basis van wat aantoonbaar geregeld is (documenten, ritmes, tooling, afspraken)."}
       </div>
 
       {bouwblok.vragen.map((vraag) => (
@@ -139,13 +174,22 @@ export function BouwblokForm({
           <p className="vraag-tekst">
             {vraag.volgnummer}. {vraag.tekst}
           </p>
-          <ScaleRadio
-            naam={vraag.id}
-            schaal={schaal}
-            waarde={respondent.antwoorden[vraag.id]}
-            onChange={(waarde) => handleAntwoord(vraag.id, waarde)}
-            accentHex={kleur?.hex}
-          />
+          {jaNee ? (
+            <JaNeeRadio
+              naam={vraag.id}
+              waarde={respondent.antwoorden[vraag.id]}
+              onChange={(waarde) => handleAntwoord(vraag.id, waarde)}
+              accentHex={kleur?.hex}
+            />
+          ) : (
+            <ScaleRadio
+              naam={vraag.id}
+              schaal={schaal}
+              waarde={typeof respondent.antwoorden[vraag.id] === "number" ? (respondent.antwoorden[vraag.id] as number) : undefined}
+              onChange={(waarde) => handleAntwoord(vraag.id, waarde)}
+              accentHex={kleur?.hex}
+            />
+          )}
         </div>
       ))}
 
@@ -159,11 +203,14 @@ export function BouwblokForm({
         />
       </div>
 
-      <div className="flow-actions" style={{ justifyContent: "flex-end" }}>
+      </>
+      )}
+
+      <div className="flow-actions" style={{ justifyContent: "flex-end" }} id={toonVragen ? undefined : "bouwblok-einde"}>
         <button
           type="button"
           className="btn btn-or"
-          disabled={!alleBeantwoord}
+          disabled={!alleBeantwoord || (isLaatsteBouwblok && !kanAfronden)}
           onClick={onVolgende}
         >
           {isLaatsteBouwblok ? "Bekijk resultaten" : "Volgende"}

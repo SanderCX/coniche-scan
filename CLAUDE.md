@@ -91,12 +91,14 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   (`beheerpagina.md`, punt 5 en 7).
 - **Benchmark**: Alle drie de niveaus zijn gebouwd: Tussen organisaties
   (PR 61), binnen een organisatie (een vergelijking van twee Metingen, 14
-  oktober 2026) en binnen een Meting (`benchmark.md`). De lezing Naast
-  elkaar bij niveau 2 (weergave H) is een voorstel van 14 oktober 2026.
-- **Quickscan Ziekenhuis**: Gespecificeerd
-  (`content-ziekenhuis-quickscan.md`), nog niet gebouwd. Het eerste
-  Assessment met antwoordType Ja / Nee / Weet ik niet. PDF, CSV,
-  InDesign en import volgen later (`backlog.md`).
+  oktober 2026) en binnen een Meting (`benchmark.md`). Bij niveau 2 kiest
+  de Admin de lezing Ontwikkeling over tijd (weergave C) of Naast elkaar
+  (weergave H), gebouwd op 14 oktober 2026.
+- **Quickscan Ziekenhuis**: Gebouwd op 14 oktober 2026
+  (`content-ziekenhuis-quickscan.md`): Het eerste Assessment met
+  antwoordType Ja / Nee / Weet ik niet, met doorloopflow en eigen
+  resultaatscherm. PDF, CSV, InDesign, import, het gemiddelde over een
+  Meting, spreiding en benchmark volgen later (`backlog.md`).
 
 ## Terminologie
 
@@ -493,9 +495,13 @@ geen afwijking van de spec maar een gat erin.
    van toepassing is staat er grijs en doorgestreept, en doet niet mee in
    de totaalscore of in "Sterkste afdeling" en "Meeste ontwikkelruimte". Uitwerking in `content-ziekenhuis-quickscan.md`,
    Resultaten. De Exporteren-dropdown toont voorlopig alleen de opties
-   die voor dit type bestaan, dus nu geen. Hoe de bestaande schermen
-   omgaan met antwoorden zonder 1–5-schaal (Spreiding, Benchmark,
-   Organisatie-resultaten) beslist Sander bij het bouwen.
+   die voor dit type bestaan, dus nu geen. De bestaande schermen die uitgaan
+   van een 1–5-schaal zijn voor dit type bewust uit (besloten bij het bouwen,
+   14 oktober 2026): Het gemiddelde van een Meting en de weergaven Per
+   bouwblok, Spreiding en Antwoorden tonen een melding dat het nog niet is
+   uitgewerkt, een benchmark en een samengestelde Meting bieden dit
+   Assessment niet aan, en in het Leads-venster is alleen Uitnodigen te
+   kiezen. Het resultaat van elke afgeronde scan staat bij de scan zelf.
 
    **Weging in de resultaten**: Een bouwblok met een gewicht ongelijk
    aan 1 toont zijn factor ("2×") bij de naam, in de radar-legenda en de
@@ -540,7 +546,7 @@ geen afwijking van de spec maar een gat erin.
 - **Klantcontact Quickscan – Ziekenhuis**:
   `content-ziekenhuis-quickscan.md` (4 categorieën die de afdelingen
   zijn, 10 bouwblokken die de dimensies zijn, 60 vragen met Ja / Nee /
-  Weet ik niet, standalone Assessment). Gespecificeerd, nog niet gebouwd.
+  Weet ik niet, standalone Assessment). Gebouwd op 14 oktober 2026.
 - **Adoptiescan**: Nog niet gestart
 
 Elk contentbestand volgt dezelfde structuur: Per categorie de
@@ -560,8 +566,9 @@ bouwblokken met naam, omschrijving, tags en vragen.
   en 11 op 2) zijn besloten: de spec is leidend. De seed staat op 2. De
   opgeslagen data moeten daarop staan.
 - Quickscan Ziekenhuis: De open punten staan bovenaan
-  `content-ziekenhuis-quickscan.md`. Ze zijn klein (een minimum voor een
-  chip, of de radar wegblijft, namen in de wegingskaart en de
-  voorstelteksten). De scan zelf heeft rework nodig (`backlog.md`).
+  `content-ziekenhuis-quickscan.md`, met per punt wat er is gebouwd. Ze
+  zijn klein (een minimum voor een chip, of de radar wegblijft, namen in de
+  wegingskaart en de voorstelteksten). De scan zelf heeft rework nodig
+  (`backlog.md`).
 - Rol/functie bij de respondent: Vrij tekstveld of vaste lijst.
 - Focus- en error-states in formulieren (zie `stylesheet.md`).
