@@ -9,7 +9,7 @@ Een benchmark zet de scores van een zelf gekozen groep naast elkaar. Een Admin s
 | Niveau | Wat wordt vergeleken | Een lid is | Status |
 |---|---|---|---|
 | 1. Tussen organisaties | Een groep organisaties | Een organisatie met één Meting per Assessment | Gebouwd |
-| 2. Binnen een organisatie, tussen Metingen | Twee of meer Metingen van één organisatie, bijvoorbeeld voor en na een verbetertraject of twee onderdelen | Een Meting | Besloten op 14 oktober 2026, nog niet gebouwd |
+| 2. Binnen een organisatie, tussen Metingen | Twee of meer Metingen van één organisatie, bijvoorbeeld voor en na een verbetertraject of twee onderdelen | Een Meting | Gebouwd op 14 oktober 2026 |
 | 3. Binnen een Meting | De scans in één Meting | Een afgeronde scan | Voorstel, ontwerp volgt |
 
 Een benchmark kan één of meer Assessments omvatten, bijvoorbeeld de Klantcontact Volwassenheidsscan en de AI-volwassenheidsscan. De resultaten van elk Assessment staan in een eigen sectie. Scores van verschillende Assessments worden niet samengevoegd, omdat de bouwblokken verschillen.
@@ -157,7 +157,7 @@ Een Meting die verwijst naar andere Metingen (`Meting.samenstelling`) en daarvan
 
 ## Niveau 2: Binnen een organisatie, tussen Metingen
 
-**Besloten op 14 oktober 2026.** Een vergelijking van twee of meer Metingen van één organisatie. De vraag die ermee beantwoord wordt is hoe de ene Meting scoort ten opzichte van de andere: De ontwikkeling van een onderdeel tussen twee meetdata, twee onderdelen naast elkaar, of een samenstelling naast een andere. Deze vergelijking bestaat alleen als iemand haar als benchmark heeft aangemaakt. Er is geen vorige-Meting-knop op de resultatenpagina die zelf een vergelijking maakt.
+**Besloten en gebouwd op 14 oktober 2026.** Een vergelijking van twee of meer Metingen van één organisatie. De vraag die ermee beantwoord wordt is hoe de ene Meting scoort ten opzichte van de andere: De ontwikkeling van een onderdeel tussen twee meetdata, twee onderdelen naast elkaar, of een samenstelling naast een andere. Deze vergelijking bestaat alleen als iemand haar als benchmark heeft aangemaakt. Er is geen vorige-Meting-knop op de resultatenpagina die zelf een vergelijking maakt.
 
 - **Samenstellen.** De Admin kiest bij het aanmaken het niveau "Binnen een organisatie", daarna één organisatie, één Assessment en de Metingen. Er geldt geen vlag `benchmarkToegestaan`, omdat de gegevens de organisatie niet verlaten. De eerste versie vergelijkt precies twee Metingen. Het ontwerp en het datamodel kennen meer dan twee, dus uitbreiden vraagt geen herbouw.
 - **Welke Metingen.** Elke Meting van die organisatie met dit Assessment, mits ze een meetdatum heeft en minimaal `benchmarkMinScans` afgeronde scans (een samengestelde Meting voldoet als haar onderliggende Metingen voldoen). Het onderdeel mag verschillen. Een Meting kan hoogstens één keer meedoen. Doen een samengestelde Meting en een van haar onderliggende Metingen allebei mee, dan staat bij het opslaan een waarschuwing, omdat dezelfde scans dan twee keer meetellen in de vergelijking.

@@ -209,7 +209,7 @@ Resultaten van de Meting.
   `VeldDefinitieEditor` staat klaar, maar geen pagina gebruikt hem. En
   Het verwijderen van een Assessment (punt 1), gespecificeerd op 8 oktober
   2026. En Content-pagina's (punt 11), na overleg. De spec is leidend. Verder de
-  hoofdlink Resultaten met de tab Metingen (punt 7, voorstel van 14
+  hoofdlink Resultaten met de tab Metingen (punt 7, gebouwd op 14
   oktober 2026) en de Benchmark (punt 14, `benchmark.md`): Het niveau tussen organisaties is
   gebouwd (PR 61). De niveaus binnen een organisatie en binnen een Meting zijn
   besproken en nog niet gebouwd.
@@ -404,7 +404,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.leadToegangCel` | Leads-venster van de organisatie, in een grijze cel | De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark. |
 | `info.antwoordenMetNamen` | Organisatie-detail, bij de schakelaar "Namen tonen bij Antwoorden" | Uit: Leads zien de antwoorden als R1 tot en met Rn. Aan: Leads zien de namen van de respondenten. Stem dit af met de opdrachtgever voordat je het aanzet. Het geldt voor alle Leads van deze organisatie. |
 | `info.benchmarkAanmaken` | Benchmark aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark heeft een naam nodig, minstens één Assessment en minstens één organisatie die je hebt aangevinkt. Een organisatie staat alleen in de lijst als ze meedoet aan benchmarks en een Meting heeft van een gekozen Assessment met genoeg afgeronde scans. |
-| `info.benchmarkAanmakenMetingen` | Benchmark binnen een organisatie aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark binnen een organisatie heeft een naam nodig, een organisatie en minstens één Assessment waarvoor je minstens twee Metingen hebt aangevinkt. Een Meting is alleen te kiezen met genoeg afgeronde scans. |
+| `info.benchmarkAanmakenMetingen` | Benchmark binnen een organisatie aanmaken of wijzigen, achter de uitgeschakelde knop | Een vergelijking tussen Metingen heeft een naam nodig, een organisatie, een Assessment en precies twee Metingen. Een Meting is alleen te kiezen met een meetdatum en genoeg afgeronde scans. |
 | `info.benchmarkAanmakenScans` | Benchmark binnen een Meting aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark binnen een Meting heeft een naam nodig, een organisatie, een Assessment en een Meting. Een Meting is alleen te kiezen met genoeg afgeronde scans. |
 | `info.exportEenScan` | Meting-overzicht en de lijsten onder Resultaten, achter de uitgeschakelde opties "Als PDF" en "Voor InDesign (XML)" | Beschikbaar bij precies één scan. |
 
@@ -887,7 +887,7 @@ Vanuit de organisatie: Een Meting aanmaken met een assessment-type, een
 onderdeel en een meetdatum. Een organisatie kan meerdere Metingen hebben, ook
 van verschillende scan-types.
 
-**Status.** Besloten door Joost op 14 oktober 2026, nog niet gebouwd. De ronde
+**Status.** Besloten door Joost en gebouwd op 14 oktober 2026. De ronde
 vervalt. Wat op 13 oktober 2026 met rondes is gebouwd (rondekoppen, "Nieuwe
 ronde starten", "Naar ronde…", het overzicht van een ronde) wordt vervangen
 door wat hieronder staat. Zie Overgang aan het eind van dit punt.
@@ -935,7 +935,7 @@ Selecteer je één of meer Metingen, dan komen daar de acties "Meetdatum
 instellen…" en, voor het samenvoegen van losse Metingen, "Samenbrengen in één
 Meting…" (punt 6b) bij.
 
-**Meetdatum instellen…** (voorstel): Opent een modal met één datumveld en de
+**Meetdatum instellen…** (gebouwd op 14 oktober 2026): Opent een modal met één datumveld en de
 lijst van de geselecteerde Metingen, die de datum allemaal krijgen. Bedoeld
 voor de bestaande Metingen die na het wegvallen van de rondes nog geen
 meetdatum hebben. Gelogd als `meting.meetdatumGewijzigd` (`datamodel.md`,
@@ -1060,9 +1060,9 @@ Leads-venster (punt 6a).
 `leadVoorOrganisatie` en het toewijzen van benchmarkviews op de views zelf.
 Wat daarvan op 13 oktober 2026 was gebouwd, is omgezet (zie Overgang onder dit
 punt).
-De tabel Leads is gebouwd als blok op de pagina van het organisatie-detail. Het
-blok Leads met het Leads-venster (modal) is een voorstel van 14 oktober 2026 en
-vervangt die tabel op de pagina.
+De tabel Leads stond als blok op de pagina van het organisatie-detail. Het
+blok Leads met het Leads-venster (modal) is gebouwd op 14 oktober 2026 en
+verving die tabel op de pagina.
 
 Lead worden en een vragenlijst krijgen zijn twee losse acties. Een Lead is een
 Respondent met de Lead-rol (`RespondentRol`, `datamodel.md` deel 2) en hoeft
@@ -1863,7 +1863,7 @@ en is voorstel.
 - **Verwijderen**: Met een bevestiging die noemt hoeveel vinkjes van Leads
   meegaan.
 
-**Niveau 2 en 3 (voorstel).** Niveau 2 gebruikt dezelfde schermen met een
+**Niveau 2 en 3 (niveau 2 gebouwd op 14 oktober 2026).** Niveau 2 gebruikt dezelfde schermen met een
 andere keuzelijst: Eerst één organisatie, dan één Assessment, dan de Metingen
 daarvan (de eerste versie precies twee, zonder vlag). Elke Meting heeft een
 meetdatum en minimaal `benchmarkMinScans` afgeronde scans, en ook een

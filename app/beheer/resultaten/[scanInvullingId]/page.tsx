@@ -12,7 +12,6 @@ import { ExporterenNavKnop } from "@/components/beheer/ExporterenNavKnop";
 import { useBeheerNavActions } from "@/components/beheer/BeheerNavActions";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { kruimelsVoorMeting, VIA_RESULTATEN } from "@/lib/resultaten-nav";
-import { rondeVan } from "@/lib/rondes";
 import { aantalAfgerond } from "@/lib/benchmark";
 import { spreiding } from "@/lib/visualisatie";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
@@ -59,7 +58,7 @@ export default function BeheerResultatenPage({ params }: { params: Promise<{ sca
   return (
     <div className="admin-main admin-main--breed">
       <Kruimelpad
-        delen={kruimelsVoorMeting(organisatie, scanUitvoering, rondeVan(organisatie, scanUitvoering), via, `Resultaten van ${naam}`)}
+        delen={kruimelsVoorMeting(organisatie, scanUitvoering, via, `Resultaten van ${naam}`)}
       />
       {invulling.status !== "afgerond" ? (
         <p className="admin-notice">De scan van {naam} is nog niet afgerond, er zijn nog geen resultaten.</p>

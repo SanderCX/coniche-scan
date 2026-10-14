@@ -246,14 +246,10 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   ziet (`beheerpagina.md`, punt 6a), met `LeadToegang` in plaats van
   `RespondentRolMeting`, `leadVoorOrganisatie` en `BenchmarkToewijzing`, en de
   hoofdlink Resultaten met Metingen en Benchmarks, zonder de pagina Ingevulde
-  scans en met Import op organisatieniveau (punt 7 en 8). De tab Rondes, die er
-  op 14 oktober 2026 bij is gebouwd, vervalt als voorstel van 14 oktober 2026
-  met de ronde. Nog open: Of een Lead de lijst Metingen ook krijgt, en hoe de
-  kolommen van het Leads-venster zich verhouden tot de weergaven onder Resultaten.
-  Niveau 3 (view op één scan) staat nog in de beheerschermen van de Admin; een
-  Lead krijgt er geen kolom voor. De tabel staat nu op de pagina; het voorstel
-  van 14 oktober 2026 is een compact blok Leads met een Leads-venster (modal),
-  omdat de tabel breed is (`beheerpagina.md`, punt 6a, `stylesheet.md`,
+  scans en met Import op organisatieniveau (punt 7 en 8). De tab Rondes en de
+  ronde zelf zijn op 14 oktober 2026 vervallen, de Meting heeft een meetdatum.
+  De tabel staat als compact blok Leads met een Leads-venster (modal) omdat de
+  tabel breed is (`beheerpagina.md`, punt 6a, `stylesheet.md`,
   `.modal-box--vol`).
 - **Andere Respondent koppelen vanuit het Scan-overzicht (gebouwd op 13 oktober 2026)**: Een
   naamwijziging via "Respondent bewerken" geldt voor alle scans van de

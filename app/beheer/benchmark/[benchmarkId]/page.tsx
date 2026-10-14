@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
 import { ruimBenchmarkVinkjesOp, useOrganisaties } from "@/lib/db";
 import { sluitBenchmarkMeldingen, useBenchmark, verwijderBenchmark } from "@/lib/benchmark-store";
-import { benchmarkNamen, bouwBenchmarkSecties, bouwScanSectie, niveauVan } from "@/lib/benchmark";
+import { benchmarkNamen, bouwBenchmarkSecties, bouwMetingenVergelijkingen, bouwScanSectie, niveauVan } from "@/lib/benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
@@ -14,6 +14,8 @@ import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { BenchmarkGroepSectie } from "@/components/benchmark/BenchmarkGroepSectie";
 import { BenchmarkScanSectie } from "@/components/benchmark/BenchmarkScanSectie";
+import { MetingenVergelijkingView } from "@/components/benchmark/MetingenVergelijkingView";
+import { LeadsOpView } from "@/components/benchmark/LeadsOpView";
 
 const datumFormat = new Intl.DateTimeFormat("nl-NL", { dateStyle: "long" });
 
@@ -51,7 +53,10 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
   }
 
   const niveau = niveauVan(benchmark);
-  const secties = niveau === "scans" ? [] : bouwBenchmarkSecties(benchmark, assessments, organisaties);
+  const secties = niveau === "organisaties" ? bouwBenchmarkSecties(benchmark, assessments, organisaties) : [];
+  const vergelijkingen = niveau === "metingen" ? bouwMetingenVergelijkingen(benchmark, assessments, organisaties) : [];
+  // Binnen een organisatie hebben alle leden dezelfde organisatie: Daar staat de lijst met Leads die de vergelijking zien.
+  const leadOrganisatie = niveau === "metingen" ? organisaties.find((o) => o.id === benchmark.leden[0]?.organisatieId) : undefined;
   const scanSectie = niveau === "scans" ? bouwScanSectie(benchmark, assessments, organisaties) : null;
   // Het aantal vinkjes van Leads voor deze benchmark: Ze gaan mee als de benchmark wordt verwijderd.
   const aantalVinkjes = organisaties.reduce(
@@ -63,7 +68,7 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
     <div className="admin-main admin-main--breed">
       <Kruimelpad
         delen={[
-          { label: "Resultaten", href: "/beheer/resultaten/rondes" },
+          { label: "Resultaten", href: "/beheer/resultaten/metingen" },
           { label: "Benchmarks", href: "/beheer/benchmark" },
           { label: benchmark.naam },
         ]}
@@ -106,6 +111,24 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
             De Meting van deze benchmark bestaat niet meer.
           </p>
         )
+      ) : niveau === "metingen" ? (
+        <>
+          {vergelijkingen.length === 0 ? (
+            <p className="admin-notice" style={{ marginTop: "1.5rem" }}>
+              Deze benchmark heeft geen Metingen meer. Een benchmark met minder dan twee leden geeft geen vergelijking.
+            </p>
+          ) : (
+            vergelijkingen.map((v) => (
+              <MetingenVergelijkingView
+                key={v.assessment.id}
+                vergelijking={v}
+                beheer
+                metingHref={(metingId) => `/beheer/metingen/${metingId}?via=resultaten`}
+              />
+            ))
+          )}
+          {leadOrganisatie && <LeadsOpView organisatie={leadOrganisatie} benchmark={benchmark} />}
+        </>
       ) : secties.length === 0 ? (
         <p className="admin-notice" style={{ marginTop: "1.5rem" }}>
           Deze benchmark heeft geen Assessments meer.
@@ -117,7 +140,6 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
             sectie={s}
             benchmarkId={benchmark.id}
             minOrganisaties={instellingen.benchmarkMinOrganisaties}
-            niveau={niveau === "metingen" ? "metingen" : "organisaties"}
           />
         ))
       )}

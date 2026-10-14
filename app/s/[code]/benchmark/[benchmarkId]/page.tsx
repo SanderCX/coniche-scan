@@ -10,12 +10,13 @@ import { useInstellingen } from "@/lib/instellingen-store";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { BenchmarkOrganisatieView } from "@/components/benchmark/BenchmarkOrganisatieView";
+import { MetingenVergelijkingView } from "@/components/benchmark/MetingenVergelijkingView";
 
 /**
  * De benchmarkview van een Lead (`benchmark.md`, View voor een Lead): Zijn eigen organisatie naast het gemiddelde van de rest
- * van de groep (niveau 1), of voor elke Meting waarvoor hij Resultaten heeft die Meting naast de overige Metingen (niveau 2),
- * per Assessment waarvan de groep groot genoeg is. Nooit de namen van andere leden, en ook niet de naam van de benchmark zelf,
- * want die is vrije tekst van een Admin. Alleen bereikbaar voor een Lead met het vinkje voor deze benchmark.
+ * van de groep (niveau 1), of de vergelijking van de Metingen waarvoor hij Resultaten heeft (niveau 2, weergave C), per
+ * Assessment. Nooit de namen van andere leden, en ook niet de naam van de benchmark zelf, want die is vrije tekst van een
+ * Admin. Alleen bereikbaar voor een Lead met het vinkje voor deze benchmark.
  */
 export default function LeadBenchmarkPage({ params }: { params: Promise<{ code: string; benchmarkId: string }> }) {
   const { code, benchmarkId } = use(params);
@@ -50,12 +51,11 @@ export default function LeadBenchmarkPage({ params }: { params: Promise<{ code: 
     metingIdsMetWeergave(gegevens.organisatie, gegevens.lid.id, "resultaten"),
     {
       minOrganisaties: instellingen.benchmarkMinOrganisaties,
-      minMetingen: instellingen.benchmarkMinMetingen,
       minRespondenten: instellingen.benchmarkMinRespondenten,
     }
   );
   const niveau = resultaten[0]?.niveau ?? (benchmark.niveau === "metingen" ? "metingen" : "organisaties");
-  const kop = niveau === "metingen" ? "Jouw Meting tegenover de overige Metingen" : "Jouw organisatie tegenover de groep";
+  const kop = niveau === "metingen" ? "Jouw Metingen naast elkaar" : "Jouw organisatie tegenover de groep";
 
   return (
     <PageWithChrome logoHref={`/s/${code}`} code={code} toonTerug identiteitMenu={<MijnGegevensMenu lid={gegevens.lid} />}>
@@ -66,15 +66,17 @@ export default function LeadBenchmarkPage({ params }: { params: Promise<{ code: 
           <p className="mt-4">Er is op dit moment geen vergelijking beschikbaar.</p>
         ) : (
           resultaten.flatMap((r) =>
-            r.views.map((v) => (
-              <BenchmarkOrganisatieView
-                key={`${r.eigenNaam}-${v.assessment.id}`}
-                view={v}
-                organisatieNaam={r.eigenNaam}
-                peildatum={new Date()}
-                niveau={r.niveau}
-              />
-            ))
+            r.niveau === "metingen"
+              ? r.vergelijkingen.map((v) => <MetingenVergelijkingView key={v.assessment.id} vergelijking={v} beheer={false} />)
+              : r.views.map((v) => (
+                  <BenchmarkOrganisatieView
+                    key={`${r.eigenNaam}-${v.assessment.id}`}
+                    view={v}
+                    organisatieNaam={r.eigenNaam}
+                    peildatum={new Date()}
+                    niveau="organisaties"
+                  />
+                ))
           )
         )}
       </div>

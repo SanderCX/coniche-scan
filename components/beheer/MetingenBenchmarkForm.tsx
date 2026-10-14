@@ -3,21 +3,26 @@
 import { useMemo, useState } from "react";
 import { Assessment, Benchmark, BenchmarkLid, Organisatie } from "@/lib/types";
 import {
-  aantalAfgerond,
   assessmentsVoorMetingenBenchmark,
-  KandidaatMeting,
+  dubbelTellendeMetingen,
+  metingenVoorVergelijking,
   MIN_METINGEN_PER_ASSESSMENT,
   organisatiesVoorMetingenBenchmark,
 } from "@/lib/benchmark";
+import { onderdeelVan, toonMeetdatum } from "@/lib/metingen";
 import { InfoIcoon } from "@/components/InfoIcoon";
 
 const scansTekst = (n: number) => `${n} ${n === 1 ? "afgeronde scan" : "afgeronde scans"}`;
 
+/** De eerste versie vergelijkt precies twee Metingen (`benchmark.md`, Niveau 2, Samenstellen). */
+const AANTAL_METINGEN = 2;
+
 /**
- * Samenstellen of wijzigen van een benchmark binnen een organisatie (`benchmark.md`, Niveau 2; `beheerpagina.md`, punt 14,
- * Niveau 2 en 3): Eerst één organisatie, dan de Assessments en de Metingen daarvan, minstens twee per Assessment. Er geldt
- * geen vlag `benchmarkToegestaan`, want de gegevens verlaten de organisatie niet. Een Meting moet minimaal
- * `benchmarkMinScans` afgeronde scans hebben, om dezelfde reden als tussen organisaties.
+ * Samenstellen of wijzigen van een vergelijking tussen Metingen, een benchmark binnen een organisatie (`benchmark.md`,
+ * Niveau 2; `beheerpagina.md`, punt 14): Eén organisatie, één Assessment en precies twee Metingen. Er geldt geen vlag
+ * `benchmarkToegestaan`, want de gegevens verlaten de organisatie niet. Een Meting heeft een meetdatum en minimaal
+ * `benchmarkMinScans` afgeronde scans, ook een samengestelde Meting mag meedoen. Het onderdeel mag verschillen. Doen een
+ * samengestelde Meting en een van haar onderliggende Metingen allebei mee, dan staat er een waarschuwing.
  */
 export interface MetingenBenchmarkWaarden {
   naam: string;
@@ -40,14 +45,19 @@ export function MetingenBenchmarkForm({
   bevestigLabel: string;
   onOpslaan: (waarden: MetingenBenchmarkWaarden) => void;
 }) {
+  // Een benchmark uit de tijd van de groepsgemiddelden kan meer Assessments of Metingen hebben. Wijzigen maakt er een
+  // vergelijking van twee Metingen van: Het eerste Assessment en de oudste twee Metingen staan voorgekozen.
+  const beginLeden = useMemo(() => {
+    if (!begin) return [];
+    const eerste = begin.leden[0]?.assessmentId;
+    return begin.leden.filter((l) => l.assessmentId === eerste).slice(0, AANTAL_METINGEN);
+  }, [begin]);
+  const afwijkendeVorm = Boolean(begin) && (begin!.assessmentIds.length > 1 || begin!.leden.length !== AANTAL_METINGEN);
+
   const [naam, setNaam] = useState(begin?.naam ?? "");
   const [organisatieId, setOrganisatieId] = useState(begin?.leden[0]?.organisatieId ?? "");
-  // Per gekozen Assessment de gekozen Metingen. Een Assessment dat een sleutel heeft, doet mee.
-  const [gekozen, setGekozen] = useState<Record<string, string[]>>(() => {
-    const uit: Record<string, string[]> = {};
-    for (const lid of begin?.leden ?? []) (uit[lid.assessmentId] ??= []).push(lid.metingId);
-    return uit;
-  });
+  const [assessmentId, setAssessmentId] = useState(beginLeden[0]?.assessmentId ?? "");
+  const [gekozen, setGekozen] = useState<string[]>(beginLeden.map((l) => l.metingId));
 
   const organisatieLijst = useMemo(() => {
     const lijst = organisatiesVoorMetingenBenchmark(organisaties, minScans);
@@ -57,73 +67,59 @@ export function MetingenBenchmarkForm({
   }, [organisaties, minScans, begin]);
   const organisatie = organisaties.find((o) => o.id === organisatieId);
 
-  // De Assessments en Metingen van deze organisatie. Bij wijzigen blijven de huidige leden zichtbaar, ook als hun Meting
-  // inmiddels onder het minimum zakte, anders valt ze ongemerkt weg bij opslaan.
-  const keuze = useMemo(() => {
+  // De Assessments van deze organisatie met genoeg bruikbare Metingen. Bij wijzigen blijft het huidige Assessment zichtbaar.
+  const assessmentLijst = useMemo(() => {
     if (!organisatie) return [];
-    const per = assessmentsVoorMetingenBenchmark(organisatie, minScans).map((p) => ({ assessmentId: p.assessmentId, metingen: [...p.metingen] }));
-    for (const lid of begin?.leden ?? []) {
-      if (lid.organisatieId !== organisatie.id) continue;
-      const meting = organisatie.scanUitvoeringen.find((m) => m.id === lid.metingId);
-      if (!meting) continue;
-      let p = per.find((x) => x.assessmentId === lid.assessmentId);
-      if (!p) {
-        p = { assessmentId: lid.assessmentId, metingen: [] };
-        per.push(p);
-      }
-      if (!p.metingen.some((m) => m.meting.id === meting.id)) p.metingen.push({ meting, aantalAfgerond: aantalAfgerond(meting) });
-    }
-    return per;
-  }, [organisatie, minScans, begin]);
+    const ids = assessmentsVoorMetingenBenchmark(organisatie, minScans).map((p) => p.assessmentId);
+    if (assessmentId && !ids.includes(assessmentId)) ids.push(assessmentId);
+    return ids;
+  }, [organisatie, minScans, assessmentId]);
+
+  const metingen = useMemo(
+    () => (organisatie && assessmentId ? metingenVoorVergelijking(organisatie, assessmentId, minScans) : []),
+    [organisatie, assessmentId, minScans]
+  );
+  const dubbel = organisatie ? dubbelTellendeMetingen(organisatie, gekozen) : [];
 
   function kiesOrganisatie(id: string) {
     setOrganisatieId(id);
-    setGekozen({});
+    setAssessmentId("");
+    setGekozen([]);
   }
 
-  function wisselAssessment(assessmentId: string, metingen: KandidaatMeting[]) {
-    setGekozen((h) => {
-      const nieuw = { ...h };
-      if (nieuw[assessmentId]) delete nieuw[assessmentId];
-      else nieuw[assessmentId] = metingen.map((m) => m.meting.id); // Voorgekozen: Alle bruikbare Metingen.
-      return nieuw;
-    });
+  function kiesAssessment(id: string) {
+    setAssessmentId(id);
+    setGekozen([]);
   }
 
-  function wisselMeting(assessmentId: string, metingId: string) {
-    setGekozen((h) => {
-      const huidig = h[assessmentId] ?? [];
-      return { ...h, [assessmentId]: huidig.includes(metingId) ? huidig.filter((m) => m !== metingId) : [...huidig, metingId] };
-    });
+  function wisselMeting(metingId: string) {
+    setGekozen((huidig) => (huidig.includes(metingId) ? huidig.filter((m) => m !== metingId) : [...huidig, metingId]));
   }
 
-  const assessmentIds = Object.keys(gekozen);
-  const leden: BenchmarkLid[] = assessmentIds.flatMap((assessmentId) =>
-    (gekozen[assessmentId] ?? []).map((metingId) => ({ organisatieId, assessmentId, metingId }))
-  );
-  const kanOpslaan =
-    naam.trim() !== "" &&
-    organisatieId !== "" &&
-    assessmentIds.length > 0 &&
-    assessmentIds.every((a) => (gekozen[a] ?? []).length >= MIN_METINGEN_PER_ASSESSMENT);
+  const kanOpslaan = naam.trim() !== "" && organisatieId !== "" && assessmentId !== "" && gekozen.length === AANTAL_METINGEN;
 
   function handleOpslaan(e: React.FormEvent) {
     e.preventDefault();
     if (!kanOpslaan) return;
-    onOpslaan({ naam: naam.trim(), assessmentIds, leden });
+    onOpslaan({
+      naam: naam.trim(),
+      assessmentIds: [assessmentId],
+      leden: gekozen.map((metingId) => ({ organisatieId, assessmentId, metingId })),
+    });
   }
 
   return (
     <form onSubmit={handleOpslaan}>
       <div className="admin-field" style={{ maxWidth: "28rem" }}>
         <label htmlFor="benchmark-naam">Naam</label>
-        <input id="benchmark-naam" type="text" value={naam} onChange={(e) => setNaam(e.target.value)} placeholder="Bijv. Bedrijfsonderdelen 2026" />
+        <input id="benchmark-naam" type="text" value={naam} onChange={(e) => setNaam(e.target.value)} placeholder="Bijv. Team A, okt 2026 naast apr 2027" />
       </div>
 
       <h2>1. Organisatie</h2>
       {organisatieLijst.length === 0 ? (
         <p className="admin-notice">
-          Er is geen organisatie met minstens {MIN_METINGEN_PER_ASSESSMENT} Metingen van hetzelfde Assessment met elk minstens {minScans} afgeronde scans.
+          Er is geen organisatie met minstens {MIN_METINGEN_PER_ASSESSMENT} Metingen van hetzelfde Assessment met een meetdatum en elk
+          minstens {minScans} afgeronde scans.
         </p>
       ) : (
         <div className="admin-field" style={{ maxWidth: "28rem" }}>
@@ -140,48 +136,60 @@ export function MetingenBenchmarkForm({
 
       {organisatie && (
         <>
-          <h2>2. Assessments en Metingen</h2>
-          <div className="benchmark-organisaties">
-            {keuze.map((p) => {
-              const aan = Boolean(gekozen[p.assessmentId]);
-              const aantal = gekozen[p.assessmentId]?.length ?? 0;
-              const naamA = assessments.find((a) => a.id === p.assessmentId)?.naam ?? "Onbekend Assessment";
+          <h2>2. Assessment</h2>
+          {assessmentLijst.length === 0 ? (
+            <p className="admin-notice">
+              Deze organisatie heeft geen Assessment met {MIN_METINGEN_PER_ASSESSMENT} Metingen met een meetdatum en minstens {minScans}{" "}
+              afgeronde scans.
+            </p>
+          ) : (
+            <div className="admin-field" style={{ maxWidth: "28rem" }}>
+              <select aria-label="Assessment" value={assessmentId} onChange={(e) => kiesAssessment(e.target.value)}>
+                <option value="">Kies een Assessment</option>
+                {assessmentLijst.map((id) => (
+                  <option key={id} value={id}>
+                    {assessments.find((a) => a.id === id)?.naam ?? "Onbekend Assessment"}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </>
+      )}
+
+      {organisatie && assessmentId && (
+        <>
+          <h2>3. Metingen (kies er {AANTAL_METINGEN})</h2>
+          {afwijkendeVorm && (
+            <p className="admin-notice">
+              Deze benchmark is gemaakt met meer Metingen of Assessments. Een vergelijking heeft nu precies {AANTAL_METINGEN} Metingen
+              van één Assessment: Opslaan vervangt de samenstelling.
+            </p>
+          )}
+          <div className="benchmark-metingen">
+            {metingen.map((m) => {
+              const gekozenNu = gekozen.includes(m.meting.id);
+              const vol = gekozen.length >= AANTAL_METINGEN && !gekozenNu;
+              // Bij wijzigen blijft een huidig lid kiesbaar, ook als zijn Meting inmiddels onder het minimum zakte.
+              const nee = m.reden && !gekozenNu ? m.reden : null;
               return (
-                <div key={p.assessmentId} className="benchmark-organisatie" data-gekozen={aan || undefined}>
-                  <label className="benchmark-organisatie-kop">
-                    <input type="checkbox" checked={aan} onChange={() => wisselAssessment(p.assessmentId, p.metingen)} />
-                    <strong>{naamA}</strong>
-                    {aan && (
-                      <span className="benchmark-teller" data-onder-drempel={aantal < MIN_METINGEN_PER_ASSESSMENT || undefined}>
-                        <strong>
-                          {aantal} {aantal === 1 ? "Meting" : "Metingen"}
-                        </strong>
-                      </span>
-                    )}
-                  </label>
-                  {aan && (
-                    <div className="benchmark-metingen">
-                      {p.metingen.map((m) => (
-                        <label key={m.meting.id} className="benchmark-keuze" style={{ fontWeight: 400 }}>
-                          <input
-                            type="checkbox"
-                            checked={(gekozen[p.assessmentId] ?? []).includes(m.meting.id)}
-                            onChange={() => wisselMeting(p.assessmentId, m.meting.id)}
-                          />
-                          {m.meting.label} · {scansTekst(m.aantalAfgerond)}
-                        </label>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <label key={m.meting.id} className="benchmark-keuze" style={{ fontWeight: 400, opacity: nee || vol ? 0.6 : 1 }}>
+                  <input type="checkbox" checked={gekozenNu} disabled={Boolean(nee) || vol} onChange={() => wisselMeting(m.meting.id)} />
+                  {m.meting.label} · {onderdeelVan(m.meting)} · {toonMeetdatum(m.meting.meetdatum)} · {scansTekst(m.aantalAfgerond)}
+                  {nee && <span className="text-ink-s"> · {nee}</span>}
+                </label>
               );
             })}
-            {keuze.length === 0 && (
-              <p className="admin-notice">
-                Deze organisatie heeft geen Assessment met {MIN_METINGEN_PER_ASSESSMENT} Metingen van minstens {minScans} afgeronde scans.
-              </p>
-            )}
           </div>
+          <p className="text-sm text-ink-m" style={{ marginTop: "0.6rem" }}>
+            {gekozen.length} van {AANTAL_METINGEN} Metingen gekozen. De volgorde in de vergelijking volgt de meetdatum.
+          </p>
+          {dubbel.length > 0 && (
+            <p className="overzicht-melding">
+              &ldquo;{dubbel[0].label}&rdquo; is een gemiddelde van een Meting die ook meedoet: Dezelfde scans tellen dan twee keer
+              mee in de vergelijking. Opslaan kan.
+            </p>
+          )}
         </>
       )}
 
@@ -194,4 +202,3 @@ export function MetingenBenchmarkForm({
     </form>
   );
 }
-

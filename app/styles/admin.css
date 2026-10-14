@@ -971,12 +971,55 @@ body:has(.admin-main) {
   background: var(--bg-mid);
 }
 
-/* De tabel Leads (beheerpagina.md, punt 6a): Eén rij per Lead, per Meting vijf kolommen gegroepeerd per ronde en per benchmark
-   één kolom. De kaart scrolt zelf, met een vaste eerste kolom en een kolomkop die blijft staan. Een cel die niet aan te vinken is,
-   is grijs met de reden in een Info-icoon. */
-.lead-tabel-kaart {
-  max-height: 70vh;
+/* Het Leads-venster (stylesheet.md, Overzichtsmodal, `.modal-box--vol`): Breed, het venster zelf scrolt niet. Drie vlakken
+   onder elkaar: De kop, het scrollvlak met de vinkjestabel en een vaste voettekst met Opslaan en Annuleren. Op een scherm
+   smaller dan 720px vult het venster het hele scherm. */
+.modal-box--vol {
+  width: min(96vw, 1600px);
+  max-width: none;
+  max-height: 90vh;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.modal-box--vol .overzicht-kop {
+  padding: 1.5rem 4rem 0.6rem 1.8rem;
+}
+.vol-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: auto;
+  padding: 0 1.8rem 1rem;
+}
+.vol-voet {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--border);
+  padding: 0.8rem 1.8rem;
+  background: var(--bg);
+}
+.vol-voet .btn-rij {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin: 0;
+  max-width: none;
+}
+.vol-voet .btn-rij .btn {
+  flex: 0 0 auto;
+}
+@media (max-width: 720px) {
+  .modal-box--vol {
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+}
+
+/* De vinkjestabel (stylesheet.md): Eén rij per Lead, per Meting vijf kolommen en per benchmark één kolom. De eerste kolom is
+   vast, de twee kopregels blijven staan bij het scrollen. Een cel die niet aan te vinken is, is grijs met een Info-icoon. */
+.lead-tabel-kaart {
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--bg);
@@ -1005,10 +1048,11 @@ body:has(.admin-main) {
   color: var(--ink-m);
   background: var(--bg-warm);
 }
-.lead-tabel th.lead-tabel-groep {
-  border-left: 1px solid var(--border-d);
-}
 .lead-tabel th.lead-tabel-meting {
+  border-left: 1px solid var(--border);
+}
+.lead-tabel td.lead-tabel-begin,
+.lead-tabel th.lead-tabel-begin {
   border-left: 1px solid var(--border);
 }
 .lead-tabel th.lead-tabel-weergave {

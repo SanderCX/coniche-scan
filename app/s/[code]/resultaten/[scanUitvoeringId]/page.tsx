@@ -14,9 +14,9 @@ import {
   aantalAfgerondInMeting,
   gemiddeldeAntwoordenVoorMetingMetSamenstelling,
   isSamengesteld,
-  vergelijkbareMetingen,
-} from "@/lib/rondes";
-import { VergelijkingEyebrow } from "@/components/visualisatie/VergelijkingEyebrow";
+} from "@/lib/metingen";
+import { useBenchmarks } from "@/lib/benchmark-store";
+import { benchmarkGeldigVoorOrganisatie, heeftBenchmarkToegang } from "@/lib/lead-toegang";
 
 /**
  * Resultaten van één Meting, voor een Lead die het vinkje Resultaten voor deze Meting heeft (beheerpagina.md punt 6a,
@@ -39,6 +39,7 @@ export default function LeadResultatenPage({
     gegevens?.lid.lead === true ? gegevens.leadMetingen.find((s) => s.id === scanUitvoeringId && resultatenIds.includes(s.id)) : undefined;
   const assessment = useAssessment(scanUitvoering?.assessmentId ?? "");
   const [pdfBezig, setPdfBezig] = useState(false);
+  const benchmarks = useBenchmarks();
 
   if (!gegevens || !scanUitvoering || !assessment) {
     return (
@@ -72,11 +73,18 @@ export default function LeadResultatenPage({
   }
 
   const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, gegevens.organisatie, scanUitvoering);
-  // Alleen een eerdere Meting waarvoor de Lead ook Resultaten heeft (`visualisatie-scores.md`, C).
-  const toegestaneIds = resultatenIds;
-  const eerdereMetingen = vergelijkbareMetingen(gegevens.organisatie, scanUitvoering)
-    .map((v) => v.meting)
-    .filter((m) => toegestaneIds.includes(m.id));
+  // De knop "Vergelijking" (`benchmark.md`, Niveau 2): De benchmarks binnen een organisatie waarvan deze Meting lid is, met het
+  // vinkje voor de Lead en Resultaten op minstens twee van de leden. De vergelijking zelf staat op zijn benchmarkpagina.
+  const vergelijkingen = benchmarks
+    .filter(
+      (b) =>
+        b.niveau === "metingen" &&
+        b.leden.some((l) => l.metingId === scanUitvoering.id) &&
+        benchmarkGeldigVoorOrganisatie(b, gegevens.organisatie.id) &&
+        heeftBenchmarkToegang(gegevens.organisatie, gegevens.lid.id, b.id) &&
+        b.leden.filter((l) => resultatenIds.includes(l.metingId)).length >= 2
+    )
+    .map((b) => ({ id: b.id, naam: "Vergelijking", href: `/s/${code}/benchmark/${b.id}` }));
 
   // export.uitvoeren voor een Lead (datamodel.md deel 2, Rechtenmatrix): Alleen met het vinkje Exporteren voor deze Meting.
   // Mag exporteren wat hij hier al ziet, dus het gemiddelde van deze Meting
@@ -121,11 +129,7 @@ export default function LeadResultatenPage({
       identiteitMenu={<MijnGegevensMenu lid={gegevens.lid} />}
     >
       <div className="container section" style={{ maxWidth: "64rem" }}>
-        <VergelijkingEyebrow
-          label={scanUitvoering.label}
-          eerdereMetingen={eerdereMetingen}
-          rondeLabelVan={(m) => gegevens.organisatie.rondes?.find((r) => r.id === m.rondeId)?.label}
-        />
+        <span className="eyebrow">{scanUitvoering.label}</span>
         <h1>{assessment.naam}</h1>
         <p className="text-sm text-ink-m">
           {samengesteld
@@ -142,8 +146,8 @@ export default function LeadResultatenPage({
             antwoordenToegestaan={magAntwoorden}
             antwoordenAnoniem={gegevens.organisatie.antwoordenMetNamen !== true}
             bereikAltijd={false}
+            vergelijkingen={vergelijkingen}
             toonBenchmarkLink={false}
-            toegestaneMetingIds={toegestaneIds}
           />
         </div>
       </div>

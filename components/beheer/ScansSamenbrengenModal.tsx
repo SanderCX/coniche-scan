@@ -4,19 +4,26 @@ import { useEffect, useMemo, useState } from "react";
 import { useAssessments } from "@/lib/assessment-store";
 import { brengScansSamen, SamenbrengResultaat, verwijderMeting } from "@/lib/db";
 import { RespondentKeuze, controleerSamenbrengen, lidNaam } from "@/lib/samenbrengen";
-import { STANDAARD_ONDERDEEL, botsingTekst, isSamengesteld, onderdeelVan, stelOnderdeelVoor } from "@/lib/rondes";
+import {
+  STANDAARD_ONDERDEEL,
+  dubbeleCombinatieTekst,
+  isGeldigeDatum,
+  isSamengesteld,
+  metingMetCombinatie,
+  oudsteEerst,
+  meetdatumVan,
+  stelOnderdeelVoor,
+} from "@/lib/metingen";
 import { SlotType, useBewerkslot } from "@/lib/bewerkslot";
 import { Organisatie } from "@/lib/types";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { RespondentFunctieKeuze } from "@/components/RespondentFunctieKeuze";
 import {
-  NIEUWE_RONDE,
-  OnderdeelRondeVelden,
-  OnderdeelRondeWaarde,
+  OnderdeelMeetdatumVelden,
+  OnderdeelMeetdatumWaarde,
   beginWaarde,
-  rondeDoel,
-} from "@/components/beheer/OnderdeelRondeVelden";
+} from "@/components/beheer/OnderdeelMeetdatumVelden";
 
 const NIEUWE_METING = "__nieuw__";
 const HOUDEN = "__houden__";
@@ -103,10 +110,12 @@ export function ScansSamenbrengenModal({
   /* ---------- Doel ---------- */
   const doelMetingen = organisatie.scanUitvoeringen.filter((m) => m.assessmentId === assessmentId && !isSamengesteld(m));
   const [doelKeuze, setDoelKeuze] = useState<string>(NIEUWE_METING);
-  // Het onderdeel van de nieuwe Meting: Voorgesteld uit het oude label van de eerste scan, nooit blind "Hele organisatie".
-  const [nieuw, setNieuw] = useState<OnderdeelRondeWaarde | null>(null); // `null`: De beginwaarde
+  // Het onderdeel van de nieuwe Meting: Voorgesteld uit het oude label van de eerste scan, nooit blind "Hele organisatie". De
+  // meetdatum is voorgevuld met de oudste meetdatum van de Metingen waaruit de scans komen (`beheerpagina.md`, punt 6b).
+  const [nieuw, setNieuw] = useState<OnderdeelMeetdatumWaarde | null>(null); // `null`: De beginwaarde
   const voorstelOnderdeel = scans[0] ? stelOnderdeelVoor(scans[0].meting) : STANDAARD_ONDERDEEL;
-  const waarde = nieuw ?? beginWaarde(organisatie, voorstelOnderdeel);
+  const voorstelDatum = oudsteEerst(scans.map((s) => s.meting)).map(meetdatumVan).find((d) => d !== null) ?? "";
+  const waarde = nieuw ?? beginWaarde(voorstelOnderdeel, voorstelDatum);
   const nieuweMeting = doelKeuze === NIEUWE_METING;
 
   /* ---------- Regels ---------- */
@@ -122,15 +131,10 @@ export function ScansSamenbrengenModal({
     return { soort: "bestaand", respondentId: r.keuze };
   };
 
-  // Een nieuwe Meting in een bestaande ronde: Staat daar voor dit onderdeel en Assessment al een Meting, dan is die te kiezen.
+  // Bestaat de combinatie van onderdeel, Assessment en meetdatum al, dan is dat een waarschuwing met de Meting die er is:
+  // De beheerder kiest die Meting hierboven, of gaat toch door (`datamodel.md`, Uniek).
   const onderdeelNaam = waarde.onderdeel.trim() || STANDAARD_ONDERDEEL;
-  const botsendeMeting =
-    nieuweMeting && waarde.ronde !== NIEUWE_RONDE
-      ? organisatie.scanUitvoeringen.find(
-          (m) => m.rondeId === waarde.ronde && m.assessmentId === assessmentId && onderdeelVan(m) === onderdeelNaam
-        )
-      : undefined;
-  const botsendeRonde = botsendeMeting ? organisatie.rondes?.find((r) => r.id === waarde.ronde) : undefined;
+  const botsendeMeting = nieuweMeting ? metingMetCombinatie(organisatie, onderdeelNaam, assessmentId, waarde.meetdatum) : undefined;
 
   const fouten = useMemo(
     () =>
@@ -144,9 +148,7 @@ export function ScansSamenbrengenModal({
     [organisatie, scans, regels, doelKeuze, nieuweMeting]
   );
 
-  const doelGeldig = nieuweMeting
-    ? !botsendeMeting && (waarde.ronde !== NIEUWE_RONDE || waarde.nieuweRonde.trim() !== "")
-    : doelMetingen.some((m) => m.id === doelKeuze);
+  const doelGeldig = nieuweMeting ? isGeldigeDatum(waarde.meetdatum) : doelMetingen.some((m) => m.id === doelKeuze);
   const kanOpslaan = scans.length > 0 && doelGeldig && Object.keys(fouten).length === 0 && !bezet && !controleren;
 
   const [fout, setFout] = useState<string | null>(null);
@@ -159,7 +161,7 @@ export function ScansSamenbrengenModal({
     const uitkomst = brengScansSamen(
       organisatie.id,
       nieuweMeting
-        ? { soort: "nieuw", onderdeel: onderdeelNaam, ...rondeDoel(waarde) }
+        ? { soort: "nieuw", onderdeel: onderdeelNaam, meetdatum: waarde.meetdatum }
         : { soort: "bestaand", metingId: doelKeuze },
       scans.map((s) => ({ invullingId: s.invulling.id, respondent: keuzeVan(s.invulling.id) }))
     );
@@ -182,8 +184,7 @@ export function ScansSamenbrengenModal({
       <OverzichtModal label="Scans samengebracht" onSluit={onSluit} escUitgeschakeld={legeVerwijderenOpen}>
         <h2 className="mb-3 text-lg font-bold text-ink">Scans samengebracht</h2>
         <p className="overzicht-melding">
-          {klaar.aantal} {klaar.aantal === 1 ? "scan" : "scans"} samengebracht in Meting &quot;{klaar.doelLabel}&quot;
-          {klaar.rondeLabel ? `, ronde "${klaar.rondeLabel}"` : ""}.
+          {klaar.aantal} {klaar.aantal === 1 ? "scan" : "scans"} samengebracht in Meting &quot;{klaar.doelLabel}&quot;.
         </p>
         {klaar.legeMetingen.length > 0 && !legeGeruimd && (
           <>
@@ -254,15 +255,12 @@ export function ScansSamenbrengenModal({
         </div>
         {nieuweMeting && (
           <div style={{ marginTop: "0.7rem" }}>
-            <OnderdeelRondeVelden organisatie={organisatie} waarde={waarde} onChange={setNieuw} idPrefix="samenbrengen" />
+            <OnderdeelMeetdatumVelden organisatie={organisatie} waarde={waarde} onChange={setNieuw} idPrefix="samenbrengen" />
           </div>
         )}
         {botsendeMeting && (
-          <p className="overzicht-melding fout">
-            {botsingTekst(botsendeRonde?.label ?? "deze ronde", botsendeMeting.label, "nieuw").replace(
-              "Kies die Meting,",
-              "Kies die Meting hierboven,"
-            )}
+          <p className="overzicht-melding">
+            {dubbeleCombinatieTekst(botsendeMeting.label)} Kies die Meting hierboven, of ga door met een nieuwe Meting.
           </p>
         )}
       </section>

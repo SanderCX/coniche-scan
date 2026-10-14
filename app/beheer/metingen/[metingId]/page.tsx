@@ -28,10 +28,9 @@ import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { STATUS_LABEL } from "@/components/beheer/overzicht-helpers";
 import { isLead } from "@/lib/lead";
 import { leadsMetToegangTotMeting } from "@/lib/lead-toegang";
-import { STANDAARD_ONDERDEEL, isSamengesteld, onderdeelVan, rondeVan } from "@/lib/rondes";
+import { STANDAARD_ONDERDEEL, isSamengesteld, onderdeelVan, toonMeetdatum } from "@/lib/metingen";
 import { MetingWijzigenFormulier } from "@/components/beheer/MetingWijzigenFormulier";
 import { SamengesteldMetingOverzicht } from "@/components/beheer/SamengesteldMetingOverzicht";
-import { NaarRondeModal } from "@/components/beheer/NaarRondeModal";
 
 /**
  * Meting-overzicht (beheerpagina.md punt 5): alles binnen één Meting op
@@ -67,7 +66,6 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
   const [nieuweLink, setNieuweLink] = useState<string | null>(null);
   const [kopieerStatus, setKopieerStatus] = useState<{ id: string; gelukt: boolean } | null>(null);
   const [labelBewerken, setLabelBewerken] = useState(false);
-  const [naarRondeOpen, setNaarRondeOpen] = useState(false);
   const [metingVerwijderenOpen, setMetingVerwijderenOpen] = useState(false);
   const [scansVerwijderenOpen, setScansVerwijderenOpen] = useState(false);
   const [naarMetingOpen, setNaarMetingOpen] = useState(false);
@@ -194,14 +192,14 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
 
   return (
     <div className="admin-main admin-main--breed">
-      <Kruimelpad delen={kruimelsVoorMeting(organisatie, scanUitvoering, rondeVan(organisatie, scanUitvoering), viaResultaten)} />
+      <Kruimelpad delen={kruimelsVoorMeting(organisatie, scanUitvoering, viaResultaten)} />
 
       {labelBewerken ? (
         <MetingWijzigenFormulier organisatie={organisatie} meting={scanUitvoering} onKlaar={() => setLabelBewerken(false)} />
       ) : (
         <div className="titel-rij">
           <h1>{scanUitvoering.label}</h1>
-          <button type="button" className="titel-potlood" aria-label="Meting wijzigen (onderdeel en ronde)" title="Meting wijzigen (onderdeel en ronde)" onClick={() => setLabelBewerken(true)}>
+          <button type="button" className="titel-potlood" aria-label="Meting wijzigen (onderdeel, meetdatum en naam)" title="Meting wijzigen (onderdeel, meetdatum en naam)" onClick={() => setLabelBewerken(true)}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -213,7 +211,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
         <Link href={`/beheer/organisaties/${organisatie.id}`} style={{ color: "var(--or)" }}>
           {organisatie.naam}
         </Link>
-        {rondeVan(organisatie, scanUitvoering) && ` · ${rondeVan(organisatie, scanUitvoering)!.label}`}
+        {` · meetdatum ${toonMeetdatum(scanUitvoering.meetdatum)}`}
         {onderdeelVan(scanUitvoering) !== STANDAARD_ONDERDEEL && ` · onderdeel ${onderdeelVan(scanUitvoering)}`} · {afgerond} van{" "}
         {invullingen.length} afgerond
       </p>
@@ -224,9 +222,6 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
             Naar resultaten →
           </Link>
         )}
-        <button type="button" className="btn btn-outline btn-compact" onClick={() => setNaarRondeOpen(true)}>
-          Naar ronde…
-        </button>
         <button type="button" className="btn btn-danger btn-compact" onClick={() => setMetingVerwijderenOpen(true)}>
           Meting verwijderen
         </button>
@@ -234,7 +229,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
 
       {leads.length > 0 && (
         <p className="text-sm text-ink-m" style={{ marginTop: "0.8rem" }}>
-          Leads die weergaven van deze Meting zien (tabel Leads van de organisatie):{" "}
+          Leads die weergaven van deze Meting zien (Leads-venster van de organisatie):{" "}
           {leads.map((l, i) => (
             <span key={l.id}>
               {i > 0 && ", "}
@@ -404,17 +399,6 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
             onKlaar={handleVerplaatst}
           />
         </OverzichtModal>
-      )}
-      {naarRondeOpen && (
-        <NaarRondeModal
-          organisatie={organisatie}
-          metingIds={[scanUitvoering.id]}
-          onSluit={() => setNaarRondeOpen(false)}
-          onKlaar={(tekst) => {
-            setNaarRondeOpen(false);
-            zetBeheerMelding({ tekst });
-          }}
-        />
       )}
     </div>
   );

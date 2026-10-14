@@ -4,7 +4,7 @@ import { normaliseerEmail } from "../email";
 import { demoOrganisatie } from "@/data/demo-organisatie";
 import { haalServerKopieOp, stuurNaarServer } from "../server-sync";
 import { migreerTechstackOndersteuning } from "@/lib/techstack";
-import { ruimOrganisatieOp } from "@/lib/rondes";
+import { ruimOrganisatieOp } from "@/lib/metingen";
 import { getBenchmarks, haalMetingenUitBenchmarks, legeToewijzingen, wisOmgezetteToewijzingen } from "@/lib/benchmark-store";
 import { ruimLeadToegangOp, toegangSleutel, zetLegacyBereikOm } from "@/lib/lead-toegang";
 import { techstackCategorieIdsMetLijst } from "@/data/organisatie-velden";
@@ -66,7 +66,10 @@ if (typeof window !== "undefined") {
  * hier gemeld als "Cannot read properties of undefined (reading 'find')"
  * op `organisatie.leden`. Geen migratie van de inhoud, alleen de vorm.
  */
-function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
+function normaliseerOrganisatie(invoer: Organisatie): Organisatie {
+  // `rondes` bestaat niet meer (`datamodel.md`, Overgang van de rondes): Het veld valt hier weg uit de opgeslagen data.
+  const ruw = { ...invoer } as Organisatie & { rondes?: unknown };
+  delete ruw.rondes;
   const organisatie: Organisatie = {
     ...ruw,
     // Het oude veld zelf/extern wordt "Ondersteund door" bij de techstack-categorieën met een lijst (`lib/techstack.ts`).
@@ -82,17 +85,22 @@ function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
       ? ruw.leden.map((l) => ({
           ...l,
           email: normaliseerEmail(l.email),
-          // Het bereik van een Lead van vóór de tabel Leads: `zetLegacyBereikOm` hieronder zet het om en laat het vallen.
+          // Het bereik van een Lead van vóór het Leads-venster: `zetLegacyBereikOm` hieronder zet het om en laat het vallen.
           ...(Array.isArray(l.leadMetingIds) ? { leadMetingIds: l.leadMetingIds } : {}),
           ...(l.leadVoorOrganisatie === true ? { leadVoorOrganisatie: true } : {}),
           lead: l.lead === true ? true : undefined,
         }))
       : [],
-    // Ontbreekt bij data van vóór de rondes (`datamodel.md`, Ronde en onderdeel).
-    rondes: Array.isArray(ruw.rondes) ? ruw.rondes : [],
     scanUitvoeringen: Array.isArray(ruw.scanUitvoeringen)
-      ? ruw.scanUitvoeringen.map((s) => ({
+      ? ruw.scanUitvoeringen.map((meting) => {
+          // Overgang van de rondes (`datamodel.md`, Overgang van de rondes): De ronde bestaat niet meer. De Meting houdt haar
+          // naam, onderdeel en samenstelling, de meetdatum blijft leeg tot een Admin of Consultant hem invult. Haar naam
+          // volgt onderdeel en meetdatum pas als de gebruiker "Standaardnaam herstellen" kiest.
+          const s = { ...meting } as typeof meting & { rondeId?: string };
+          delete s.rondeId;
+          return {
           ...s,
+          labelHandmatig: s.labelHandmatig ?? s.meetdatum === undefined,
           invullingen: Array.isArray(s.invullingen)
             ? s.invullingen.map((i) => ({
                 ...i,
@@ -105,7 +113,8 @@ function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
                 aangemaaktOp: i.aangemaaktOp ?? i.uitgenodigdOp,
               }))
             : [],
-        }))
+          };
+        })
       : [],
     // Ontbreekt bij data van vóór dit veld (localStorage uit een eerdere
     // sessie) — behandeld als "geen bekende aanmaker", zie Organisatie in
@@ -114,7 +123,7 @@ function normaliseerOrganisatie(ruw: Organisatie): Organisatie {
     toegewezenAan: Array.isArray(ruw.toegewezenAan) ? ruw.toegewezenAan : [],
     // Ontbreekt bij data van vóór de benchmark: Geen toestemming vastgelegd, dus niet toegestaan.
     benchmarkToegestaan: ruw.benchmarkToegestaan === true,
-    // Ontbreken bij data van vóór de tabel Leads: Niemand ziet iets, de namen staan uit en er is geen melding.
+    // Ontbreken bij data van vóór het Leads-venster: Niemand ziet iets, de namen staan uit en er is geen melding.
     leadToegang: Array.isArray(ruw.leadToegang) ? ruw.leadToegang : [],
     antwoordenMetNamen: ruw.antwoordenMetNamen === true,
     leadOvergangMelding: ruw.leadOvergangMelding ?? null,
@@ -141,8 +150,8 @@ export function laadAlles(): Organisatie[] {
 
 export function slaAlles(alles: Organisatie[]): void {
   if (typeof window === "undefined") return;
-  // Houdt rondes en samenstellingen kloppend na elke wijziging: Een lege ronde of een samengestelde Meting zonder
-  // onderliggende Metingen verdwijnt vanzelf (`datamodel.md`, Lege ronde). Eén plek, zodat geen schrijfactie het vergeet.
+  // Houdt samenstellingen kloppend na elke wijziging: Een samengestelde Meting zonder
+  // onderliggende Metingen verdwijnt vanzelf (`datamodel.md`, Samengestelde Meting). Eén plek, zodat geen schrijfactie het vergeet.
   const verdwenen: { metingId: string; organisatieNaam: string }[] = [];
   for (const organisatie of alles) {
     const r = ruimOrganisatieOp(organisatie);
@@ -165,7 +174,7 @@ export function useOrganisaties(): Organisatie[] {
 }
 
 /**
- * De overgang van het toewijzen van benchmarkviews naar vinkjes in de tabel Leads (`beheerpagina.md`, punt 6a, Overgang): Een
+ * De overgang van het toewijzen van benchmarkviews naar vinkjes in het Leads-venster (`beheerpagina.md`, punt 6a, Overgang): Een
  * `BenchmarkToewijzing` op niveau 1 of 2 wordt het vinkje voor die benchmark, een toewijzing op niveau 3 wordt Spreiding voor
  * die Meting, zonder ring op de scan, met een melding aan de Admin. Wat is omgezet, wordt gewist. Een toewijzing van een Lead
  * die (nog) niet bekend is, blijft staan tot de organisaties er zijn. Idempotent.
@@ -200,7 +209,7 @@ export function voerLeadOvergangUit(): void {
     }
     if (niveau === "scans") {
       const tekst =
-        "Een view op één scan is omgezet in Spreiding voor die Meting, zonder ring op de scan. Controleer de tabel Leads.";
+        "Een view op één scan is omgezet in Spreiding voor die Meting, zonder ring op de scan. Controleer het Leads-venster.";
       if (!organisatie.leadOvergangMelding?.includes(tekst)) {
         organisatie.leadOvergangMelding = organisatie.leadOvergangMelding ? `${organisatie.leadOvergangMelding} ${tekst}` : tekst;
       }

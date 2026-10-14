@@ -7,15 +7,14 @@ import { isLead as lidIsLead } from "@/lib/lead";
 import { leadSamenvatting } from "@/lib/lead-toegang";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { Organisatie, OrganisatieLid } from "@/lib/types";
-import { isSamengesteld } from "@/lib/rondes";
+import { useBeheerOverzicht } from "@/lib/beheer-url";
+import { isGeldigeDatum, isSamengesteld, nieuwsteEerst } from "@/lib/metingen";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import {
-  NIEUWE_RONDE,
-  OnderdeelRondeVelden,
-  OnderdeelRondeWaarde,
+  OnderdeelMeetdatumVelden,
+  OnderdeelMeetdatumWaarde,
   beginWaarde,
-  rondeDoel,
-} from "@/components/beheer/OnderdeelRondeVelden";
+} from "@/components/beheer/OnderdeelMeetdatumVelden";
 
 const NIEUWE_METING = "__nieuw__";
 
@@ -38,6 +37,7 @@ export function ToegangBlok({
   onMelding: (tekst: string, fout?: boolean) => void;
 }) {
   const assessments = useAssessments();
+  const { vervang } = useBeheerOverzicht();
   const metingen = organisatie.scanUitvoeringen;
   const assessmentNaam = (id: string) => assessments.find((a) => a.id === id)?.naam ?? "Onbekend type";
 
@@ -48,7 +48,7 @@ export function ToegangBlok({
   }
 
   /* ---------- Lead ---------- */
-  // Het vakje "Lead" geeft de Respondent een rij in de tabel Leads van de organisatie (`beheerpagina.md`, punt 6a). De vinkjes
+  // Het vakje "Lead" geeft de Respondent een rij in het Leads-venster van de organisatie (`beheerpagina.md`, punt 6a). De vinkjes
   // zelf staan alleen daar. Uitvinken trekt de rol in, na een bevestiging die zegt dat alle vinkjes van deze Lead verdwijnen.
   const isLead = lidIsLead(lid);
   const [intrekkenOpen, setIntrekkenOpen] = useState(false);
@@ -56,7 +56,7 @@ export function ToegangBlok({
   function onVakje(aan: boolean) {
     if (aan) {
       zetLeadRol(lid.id, true);
-      onMelding("Deze Respondent is nu Lead. Vink in de tabel Leads aan wat hij ziet.");
+      onMelding("Deze Respondent is nu Lead. Vink in het Leads-venster aan wat hij ziet.");
     } else {
       setIntrekkenOpen(true);
     }
@@ -69,16 +69,16 @@ export function ToegangBlok({
 
   /* ---------- Vragenlijst sturen ---------- */
   // Een samengestelde Meting heeft geen Respondenten en is niet invulbaar (`benchmark.md`, Samengestelde Meting).
-  const beschikbaar = metingen.filter((m) => !isSamengesteld(m) && !m.invullingen.some((i) => i.organisatieLidId === lid.id));
+  const beschikbaar = nieuwsteEerst(metingen.filter((m) => !isSamengesteld(m) && !m.invullingen.some((i) => i.organisatieLidId === lid.id)));
   const [metingKeuze, setMetingKeuze] = useState("");
   const [nieuwAssessment, setNieuwAssessment] = useState("");
-  // Een nieuwe Meting heeft alleen Onderdeel en Ronde, de naam maakt de app (`beheerpagina.md`, punt 5).
-  const [nieuwConcept, setNieuwConcept] = useState<OnderdeelRondeWaarde | null>(null);
-  const nieuwWaarde = nieuwConcept ?? beginWaarde(organisatie);
+  // Een nieuwe Meting heeft alleen Onderdeel en Meetdatum, de naam maakt de app (`beheerpagina.md`, punt 5).
+  const [nieuwConcept, setNieuwConcept] = useState<OnderdeelMeetdatumWaarde | null>(null);
+  const nieuwWaarde = nieuwConcept ?? beginWaarde();
   const keuze = metingKeuze || (beschikbaar[0]?.id ?? NIEUWE_METING);
   const nieuweMeting = keuze === NIEUWE_METING;
   const kanSturen = nieuweMeting
-    ? nieuwAssessment !== "" && (nieuwWaarde.ronde !== NIEUWE_RONDE || nieuwWaarde.nieuweRonde.trim() !== "")
+    ? nieuwAssessment !== "" && isGeldigeDatum(nieuwWaarde.meetdatum)
     : beschikbaar.some((m) => m.id === keuze);
 
   function stuur() {
@@ -89,7 +89,7 @@ export function ToegangBlok({
       const r = maakMeting(organisatie.id, {
         assessmentId: nieuwAssessment,
         onderdeel: nieuwWaarde.onderdeel,
-        ...rondeDoel(nieuwWaarde),
+        meetdatum: nieuwWaarde.meetdatum,
       });
       if (!r.ok) {
         onMelding(r.reden, true);
@@ -133,8 +133,14 @@ export function ToegangBlok({
           </label>
           <p className="text-sm text-ink-m" style={{ margin: "0.2rem 0 0 1.6rem" }}>
             {leadSamenvatting(organisatie, lid)}
-            {isLead && " (de vinkjes staan in de tabel Leads van de organisatie)"}
           </p>
+          {isLead && magLead && (
+            <div style={{ margin: "0.5rem 0 0 1.6rem" }}>
+              <button type="button" className="btn btn-outline btn-compact" onClick={() => vervang("leads", organisatie.id)}>
+                Leads beheren
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -173,7 +179,7 @@ export function ToegangBlok({
               </select>
             </div>
             <div style={{ marginTop: "0.6rem" }}>
-              <OnderdeelRondeVelden organisatie={organisatie} waarde={nieuwWaarde} onChange={setNieuwConcept} idPrefix="toegang-meting" />
+              <OnderdeelMeetdatumVelden organisatie={organisatie} waarde={nieuwWaarde} onChange={setNieuwConcept} idPrefix="toegang-meting" />
             </div>
           </>
         )}
@@ -182,7 +188,7 @@ export function ToegangBlok({
       <BevestigModal
         open={intrekkenOpen}
         titel="Lead-rol intrekken"
-        bericht="Deze Respondent is dan geen Lead meer en alle vinkjes van deze Lead in de tabel Leads verdwijnen. Zijn eigen scans blijven bestaan."
+        bericht="Deze Respondent is dan geen Lead meer en alle vinkjes van deze Lead in het Leads-venster verdwijnen. Zijn eigen scans blijven bestaan."
         bevestigLabel="Lead-rol intrekken"
         onBevestigen={trekLeadIn}
         onAnnuleren={() => setIntrekkenOpen(false)}

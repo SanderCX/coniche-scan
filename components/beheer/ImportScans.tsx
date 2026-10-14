@@ -74,8 +74,8 @@ interface OrgKeuze {
  * naam. Een exacte match met de naam van deze organisatie staat standaard op koppelen, de rest op overslaan.
  *
  * **Binnen één beheersessie delen rijen met dezelfde organisatie, Assessment en Meting-label één Meting**, ook over meerdere
- * afzonderlijke bevestigingen heen (import-scans.md, "Meting"). `metingIdPerSleutel` en `rondeIdPerOrganisatie` onthouden
- * daarvoor wat deze sessie al is aangemaakt, zodat een latere `voerLegacyImportUit`-aanroep het echte id meekrijgt.
+ * afzonderlijke bevestigingen heen (import-scans.md, "Meting"). `metingIdPerSleutel` onthoudt daarvoor wat deze sessie al is
+ * aangemaakt, zodat een latere `voerLegacyImportUit`-aanroep het echte id meekrijgt.
  *
  * Alleen voor een Admin: De pagina die dit toont, controleert dat (`magImporteren`).
  */
@@ -92,9 +92,10 @@ export function ImportScans({ doel }: { doel: Organisatie }) {
   const [orgIdPerNaam, setOrgIdPerNaam] = useState<Record<string, string>>({});
   // Per doelorganisatie, Assessment en bronnaam de Metingen die deze import al aanmaakte, per label (`LegacyImportKeuze.bekendeMetingen`).
   const [metingIdPerSleutel, setMetingIdPerSleutel] = useState<Record<string, Record<string, string>>>({});
-  // Per doelorganisatie de rondes die deze import al aanmaakte, per label (`LegacyImportKeuze.bekendeRondes`).
-  const [rondeIdPerOrganisatie, setRondeIdPerOrganisatie] = useState<Record<string, Record<string, string>>>({});
-  // Het onderdeel per bronnaam, als de beheerder het aanpaste (`import-scans.md`, Ronde en onderdeel). Leeg = de bronnaam.
+  // De meetdatum per Meting in het bestand, als de beheerder die aanpaste (`import-scans.md`, Meetdatum en onderdeel). Zonder
+  // aanpassing geldt de afgeleide datum: De oudste datum van de scans die in de Meting komen.
+  const [meetdatumPerMeting, setMeetdatumPerMeting] = useState<Record<string, string>>({});
+  // Het onderdeel per bronnaam, als de beheerder het aanpaste (`import-scans.md`, Meetdatum en onderdeel). Leeg = de bronnaam.
   const [onderdeelPerBronnaam, setOnderdeelPerBronnaam] = useState<Record<string, string>>({});
   const [genegeerd, setGenegeerd] = useState<{ inSubmap: number; anderType: number }>({ inSubmap: 0, anderType: 0 });
   const [laatsteActie, setLaatsteActie] = useState<{ aantal: number } | null>(null);
@@ -303,7 +304,39 @@ export function ImportScans({ doel }: { doel: Organisatie }) {
     return perDoel;
   }, [rijen, keuzeVoorNaam, doelVan]);
 
-  /** Is er een organisatie met meerdere bronnamen, dan krijgt de koppeltabel een kolom "Onderdeel" (`import-scans.md`, Ronde en onderdeel). */
+  /** De sleutel van een Meting in het bestand: Assessment, bronnaam en importlabel (`import-scans.md`, Meting). */
+  const metingSleutelVan = (r: { assessmentId?: string | null; organisatieNaam: string; meetingLabel: string }) =>
+    `${r.assessmentId ?? ""}::${r.organisatieNaam.trim()}::${r.meetingLabel}`;
+
+  /**
+   * De Metingen die deze import aanmaakt, met de afgeleide meetdatum (de oudste datum van haar scans) en het aantal scans. Alleen
+   * rijen die meegaan: Niet overgeslagen, niet al geïmporteerd en zonder probleem.
+   */
+  const metingenInBestand = useMemo(() => {
+    const perSleutel = new Map<string, { sleutel: string; bronnaam: string; assessmentNaam: string; label: string; scans: number; afgeleid: string }>();
+    for (const r of rijen ?? []) {
+      if (!r.ok || keuzeVoorNaam(r.organisatieNaam).actie === "overslaan" || geimporteerdeSleutels.has(rijSleutel(r))) continue;
+      const sleutel = metingSleutelVan(r);
+      const bestaand = perSleutel.get(sleutel);
+      const datum = r.meetdatum ?? "";
+      if (!bestaand) {
+        perSleutel.set(sleutel, {
+          sleutel,
+          bronnaam: r.organisatieNaam.trim(),
+          assessmentNaam: r.assessmentNaam ?? "—",
+          label: r.meetingLabel,
+          scans: 1,
+          afgeleid: datum,
+        });
+      } else {
+        bestaand.scans += 1;
+        if (datum && (!bestaand.afgeleid || datum < bestaand.afgeleid)) bestaand.afgeleid = datum;
+      }
+    }
+    return [...perSleutel.values()];
+  }, [rijen, keuzeVoorNaam, geimporteerdeSleutels]);
+
+  /** Is er een organisatie met meerdere bronnamen, dan krijgt de koppeltabel een kolom "Onderdeel" (`import-scans.md`, Meetdatum en onderdeel). */
   const metOnderdelen = [...bronnamenPerDoel.values()].some((set) => set.size >= 2);
 
   /** Resolve't het organisatie-/Meting-id voor één rij, vóór het bouwen van een `LegacyImportKeuze` (zie de uitleg bij de Provider hierboven). */
@@ -313,10 +346,10 @@ export function ImportScans({ doel }: { doel: Organisatie }) {
     const bronnaam = rij.organisatieNaam.trim();
     const bekendeMetingen = organisatieId ? metingIdPerSleutel[`${organisatieId}::${rij.assessmentId}::${bronnaam}`] : undefined;
     const bronnaamInLabel = (bronnamenPerDoel.get(doelVan(rij.organisatieNaam))?.size ?? 0) >= 2;
-    const bekendeRondes = organisatieId ? rondeIdPerOrganisatie[organisatieId] : undefined;
     // Het onderdeel geldt alleen bij meerdere bronnamen: Bij één bronnaam is het "Hele organisatie" of de kolom `onderdeel`.
     const onderdeel = bronnaamInLabel ? onderdeelPerBronnaam[bronnaam]?.trim() || undefined : undefined;
-    return { rij, assessmentId: rij.assessmentId!, organisatieId, bronnaam, bronnaamInLabel, bekendeMetingen, bekendeRondes, onderdeel };
+    const meetdatum = meetdatumPerMeting[metingSleutelVan(rij)] || undefined;
+    return { rij, assessmentId: rij.assessmentId!, organisatieId, bronnaam, bronnaamInLabel, bekendeMetingen, meetdatum, onderdeel };
   }
 
   /** Na een geslaagde `voerLegacyImportUit`-aanroep: de org/Meting-geheugens bijwerken en de rijen als "geïmporteerd" markeren. */
@@ -337,13 +370,6 @@ export function ImportScans({ doel }: { doel: Organisatie }) {
         const { organisatieId, scanUitvoeringId, label, bronnaam } = resultaat.rijResultaten[i];
         const sleutel = `${organisatieId}::${rij.assessmentId}::${bronnaam}`;
         nieuw[sleutel] = { ...(nieuw[sleutel] ?? {}), [label]: scanUitvoeringId };
-      });
-      return nieuw;
-    });
-    setRondeIdPerOrganisatie((prev) => {
-      const nieuw = { ...prev };
-      resultaat.rijResultaten.forEach(({ organisatieId, rondeId, rondeLabel }) => {
-        if (rondeId) nieuw[organisatieId] = { ...(nieuw[organisatieId] ?? {}), [rondeLabel]: rondeId };
       });
       return nieuw;
     });
@@ -647,6 +673,46 @@ export function ImportScans({ doel }: { doel: Organisatie }) {
               })}
             </tbody>
           </table>
+
+          {metingenInBestand.length > 0 && (
+            <>
+              <h2>Metingen</h2>
+              <p className="text-sm text-ink-m">
+                De meetdatum is de oudste datum van de scans in de Meting, zoals ze in het bestand staan. Pas hem aan als dat niet de dag
+                is waarop gemeten is. Zonder datum staat de Meting in beheer als &ldquo;Datum ontbreekt&rdquo;.
+              </p>
+              <table className="admin-table" style={{ marginBottom: "1.5rem" }}>
+                <thead>
+                  <tr>
+                    <th>Bronnaam</th>
+                    <th>Assessment</th>
+                    <th>Meting</th>
+                    <th>Scans</th>
+                    <th>Meetdatum</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {metingenInBestand.map((m) => (
+                    <tr key={m.sleutel}>
+                      <td>{m.bronnaam}</td>
+                      <td>{m.assessmentNaam}</td>
+                      <td>{m.label}</td>
+                      <td>{m.scans}</td>
+                      <td>
+                        <input
+                          type="date"
+                          className="veld-compact"
+                          value={meetdatumPerMeting[m.sleutel] ?? m.afgeleid}
+                          aria-label={`Meetdatum voor ${m.label} van ${m.bronnaam}`}
+                          onChange={(e) => setMeetdatumPerMeting((prev) => ({ ...prev, [m.sleutel]: e.target.value }))}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
 
           <h2>Voorbeeldweergave</h2>
           <table className="admin-table" style={{ marginBottom: "1.5rem" }}>

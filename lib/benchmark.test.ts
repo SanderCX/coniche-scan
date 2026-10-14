@@ -7,7 +7,9 @@ import {
   assessmentsVoorMetingenBenchmark,
   leadViewsVoorBenchmark,
   bouwBenchmarkSecties,
-  bouwMetingView,
+  bouwMetingenVergelijkingen,
+  dubbelTellendeMetingen,
+  metingenVoorVergelijking,
   bouwOrganisatieView,
   bouwScanSectie,
   bouwScanView,
@@ -33,7 +35,7 @@ const invulling = (id: string, waarde: number, status: ScanInvulling["status"] =
 
 const org = (id: string, scans: number, vlag = true, aangemaaktOp = "2026-01-01"): Organisatie => ({
   id, naam: `Org ${id}`, kenmerken: {}, leden: [], aangemaaktDoor: null, toegewezenAan: [], benchmarkToegestaan: vlag, aangemaaktOp: "x", gewijzigdOp: "x",
-  scanUitvoeringen: [{ id: `m-${id}`, organisatieId: id, assessmentId: assessment.id, label: "Nulmeting", aangemaaktOp,
+  scanUitvoeringen: [{ id: `m-${id}`, organisatieId: id, assessmentId: assessment.id, label: "Nulmeting", aangemaaktOp, meetdatum: "2026-01-01",
     invullingen: Array.from({ length: scans }, (_, i) => invulling(`${id}-${i}`, i + id.charCodeAt(0))) }],
 });
 
@@ -71,9 +73,9 @@ describe("benchmark", () => {
     expect(sectie.rijen.map((r) => r.organisatie.id)).toEqual(["A", "B"]);
   });
 
-  it("de keuzelijst toont alleen organisaties met de vlag en genoeg afgeronde scans, met de meest recente Meting voorgekozen", () => {
+  it("de keuzelijst toont alleen organisaties met de vlag en genoeg afgeronde scans, met de Meting met de laatste meetdatum voorgekozen", () => {
     const metVlag = org("A", 3);
-    const nieuweMeting = { ...metVlag.scanUitvoeringen[0], id: "m-nieuw", aangemaaktOp: "2026-06-01" };
+    const nieuweMeting = { ...metVlag.scanUitvoeringen[0], id: "m-nieuw", aangemaaktOp: "2026-06-01", meetdatum: "2026-06-01" };
     metVlag.scanUitvoeringen.push(nieuweMeting);
     const lijst = kandidaatOrganisaties([metVlag, org("B", 3, false), org("C", 2)], [assessment.id], 3);
     expect(lijst.map((k) => k.organisatie.id)).toEqual(["A"]);
@@ -146,6 +148,7 @@ const orgMetMetingen = (aantalScansPerMeting: number[]): Organisatie => ({
   id: "X", naam: "Org X", kenmerken: {}, leden: [], aangemaaktDoor: null, toegewezenAan: [], benchmarkToegestaan: false, aangemaaktOp: "x", gewijzigdOp: "x",
   scanUitvoeringen: aantalScansPerMeting.map((n, i) => ({
     id: `m${i}`, organisatieId: "X", assessmentId: assessment.id, label: `Onderdeel ${i + 1}`, aangemaaktOp: `2026-01-0${i + 1}`,
+    meetdatum: `2026-02-0${i + 1}`,
     invullingen: Array.from({ length: n }, (_, k) => invulling(`x${i}-${k}`, i * 2 + k)),
   })),
 });
@@ -160,36 +163,75 @@ describe("niveau 2: binnen een organisatie", () => {
     expect(niveauVan({ niveau: "metingen" })).toBe("metingen");
   });
 
-  it("de keuzelijst vraagt geen vlag en minstens twee Metingen met genoeg afgeronde scans per Assessment", () => {
+  it("de keuzelijst vraagt geen vlag en minstens twee Metingen met een meetdatum en genoeg afgeronde scans per Assessment", () => {
     const genoeg = orgMetMetingen([3, 4, 1]); // De derde heeft te weinig scans.
+    // Nieuwste eerst.
     expect(assessmentsVoorMetingenBenchmark(genoeg, 3)[0].metingen.map((m) => m.meting.id)).toEqual(["m1", "m0"]);
     expect(organisatiesVoorMetingenBenchmark([genoeg], 3)).toHaveLength(1);
     expect(organisatiesVoorMetingenBenchmark([orgMetMetingen([3, 2])], 3)).toEqual([]);
     expect(genoeg.benchmarkToegestaan).toBe(false);
   });
 
-  it("elke Meting telt even zwaar, ongeacht het aantal scans, en de teller kent geen Y", () => {
-    const o = orgMetMetingen([2, 7, 3]);
-    const [sectie] = bouwBenchmarkSecties(metingenBenchmark(["m0", "m1", "m2"]), [assessment], [o]);
-    expect(sectie.rijen.map((r) => r.meting.id)).toEqual(["m0", "m1", "m2"]);
-    expect(sectie.teller).toEqual({ x: 3, y: 3 });
-    expect(sectie.ontbrekend).toEqual([]);
-    const vraag = alleVragen(assessment)[0].id;
-    const verwacht = sectie.rijen.reduce((s, r) => s + r.antwoorden[vraag], 0) / 3;
-    expect(sectie.groepAntwoorden[vraag]).toBeCloseTo(verwacht, 10);
+  it("een Meting zonder meetdatum doet niet mee en krijgt de reden erbij", () => {
+    const o = orgMetMetingen([3, 3, 3]);
+    delete o.scanUitvoeringen[2].meetdatum;
+    const lijst = metingenVoorVergelijking(o, assessment.id, 3);
+    expect(lijst.map((m) => [m.meting.id, m.reden === null])).toEqual([
+      ["m1", true],
+      ["m0", true],
+      ["m2", false],
+    ]);
+    expect(lijst[2].reden).toContain("meetdatum");
+    expect(assessmentsVoorMetingenBenchmark(o, 3)[0].metingen).toHaveLength(2);
   });
 
-  it("de view van een Meting zet haar naast de overige Metingen zonder zichzelf, met een ondergrens van twee Metingen", () => {
+  it("een samengestelde Meting mag meedoen als haar onderliggende Metingen voldoen", () => {
+    const o = orgMetMetingen([3, 3, 1]);
+    o.scanUitvoeringen.push({
+      id: "s1", organisatieId: "X", assessmentId: assessment.id, label: "Gemiddelde", aangemaaktOp: "x", meetdatum: "2026-03-01",
+      invullingen: [], samenstelling: ["m0", "m1"],
+    });
+    o.scanUitvoeringen.push({
+      id: "s2", organisatieId: "X", assessmentId: assessment.id, label: "Met weinig", aangemaaktOp: "x", meetdatum: "2026-03-01",
+      invullingen: [], samenstelling: ["m0", "m2"],
+    });
+    const lijst = metingenVoorVergelijking(o, assessment.id, 3);
+    expect(lijst.find((m) => m.meting.id === "s1")!.reden).toBeNull();
+    expect(lijst.find((m) => m.meting.id === "s2")!.reden).not.toBeNull();
+  });
+
+  it("waarschuwt als een samengestelde Meting en een van haar onderliggende Metingen allebei meedoen", () => {
+    const o = orgMetMetingen([3, 3]);
+    o.scanUitvoeringen.push({
+      id: "s1", organisatieId: "X", assessmentId: assessment.id, label: "Gemiddelde", aangemaaktOp: "x", meetdatum: "2026-03-01",
+      invullingen: [], samenstelling: ["m0", "m1"],
+    });
+    expect(dubbelTellendeMetingen(o, ["s1", "m0"]).map((m) => m.id)).toEqual(["s1"]);
+    expect(dubbelTellendeMetingen(o, ["m0", "m1"])).toEqual([]);
+  });
+
+  it("de Metingen staan op meetdatum met de oudste eerst, elke Meting telt even zwaar en er is geen groepsgemiddelde nodig", () => {
+    const o = orgMetMetingen([2, 7]);
+    const [v] = bouwMetingenVergelijkingen(metingenBenchmark(["m1", "m0"]), [assessment], [o]);
+    expect(v.metingen.map((m) => m.meting.id)).toEqual(["m0", "m1"]);
+    expect(v.metingen.map((m) => m.aantalAfgerond)).toEqual([2, 7]);
+    expect(v.metingen[0].overall).toBe(overallScore(assessment, v.metingen[0].antwoorden));
+  });
+
+  it("bij dezelfde meetdatum staat de Meting op naam", () => {
+    const o = orgMetMetingen([3, 3]);
+    o.scanUitvoeringen[0].meetdatum = "2026-05-05";
+    o.scanUitvoeringen[1].meetdatum = "2026-05-05";
+    const [sectie] = bouwBenchmarkSecties(metingenBenchmark(["m1", "m0"]), [assessment], [o]);
+    expect(sectie.rijen.map((r) => r.meting.label)).toEqual(["Onderdeel 1", "Onderdeel 2"]);
+  });
+
+  it("een Lead ziet alleen de Metingen waarvoor hij Resultaten heeft, en een sectie met minder dan twee valt weg", () => {
     const o = orgMetMetingen([3, 3, 3]);
-    const [sectie] = bouwBenchmarkSecties(metingenBenchmark(["m0", "m1", "m2"]), [assessment], [o]);
-    const view = bouwMetingView(sectie, "m1")!;
-    expect(view.aantalAnderen).toBe(2);
-    const zonderM1 = middelAntwoorden(sectie.rijen.filter((r) => r.meting.id !== "m1").map((r) => r.antwoorden), assessment);
-    expect(view.rest!.overall).toBe(overallScore(assessment, zonderM1));
-    expect(view.voldoetAanDrempel).toBe(true);
-    expect(bouwMetingView(sectie, "ONBEKEND")).toBeNull();
-    const [klein] = bouwBenchmarkSecties(metingenBenchmark(["m0"]), [assessment], [o]);
-    expect(bouwMetingView(klein, "m0")!.voldoetAanDrempel).toBe(false);
+    const b = metingenBenchmark(["m0", "m1", "m2"]);
+    expect(bouwMetingenVergelijkingen(b, [assessment], [o], { alleenMetingIds: ["m0", "m2"] })[0].metingen.map((m) => m.meting.id)).toEqual(["m0", "m2"]);
+    expect(bouwMetingenVergelijkingen(b, [assessment], [o], { alleenMetingIds: ["m0"] })).toEqual([]);
+    expect(bouwMetingenVergelijkingen(b, [assessment], [o])[0].metingen).toHaveLength(3);
   });
 });
 
@@ -239,29 +281,24 @@ describe("niveau 3: binnen een Meting", () => {
 });
 
 describe("de view van een Lead op alle niveaus", () => {
-  const drempels = { minOrganisaties: 5, minMetingen: 3, minRespondenten: 5 };
+  const drempels = { minOrganisaties: 5, minRespondenten: 5 };
   const o = orgMetMetingen([3, 3, 3]);
   o.leden = [0, 1, 2, 3, 4].map((k) => ({ id: `l${k}`, organisatieId: "X", email: `r${k}@x.nl`, naam: `R${k}`, functie: "", team: "", notities: "", toegangscode: `c${k}`, aangemaaktOp: "x" }));
   o.scanUitvoeringen.forEach((m, mi) => m.invullingen.forEach((i, k) => (i.organisatieLidId = `l${k + mi}`)));
 
-  it("niveau 2: Een view per lid-Meting met Resultaten, boven de drempel van Metingen, zonder de naam van een andere Meting", () => {
+  it("niveau 2: De vergelijking van de Metingen waarvoor hij Resultaten heeft, minstens twee", () => {
     const b = metingenBenchmark(["m0", "m1", "m2"]);
-    const r = leadViewsVoorBenchmark(b, [assessment], [o], o, ["m0"], drempels);
+    const r = leadViewsVoorBenchmark(b, [assessment], [o], o, ["m0", "m2"], drempels);
     expect(r).toHaveLength(1);
-    expect(r[0].eigenNaam).toBe("Onderdeel 1");
-    expect(r[0].metingLabel).toBe("Onderdeel 1");
-    expect(r[0].views[0].aantalAnderen).toBe(2);
-    expect(JSON.stringify(r)).not.toContain("Onderdeel 2");
-    // Resultaten op twee Metingen geeft twee views, op geen enkele geeft niets.
-    expect(leadViewsVoorBenchmark(b, [assessment], [o], o, ["m0", "m1"], drempels)).toHaveLength(2);
+    expect(r[0].niveau).toBe("metingen");
+    if (r[0].niveau !== "metingen") return;
+    expect(r[0].vergelijkingen[0].metingen.map((m) => m.meting.label)).toEqual(["Onderdeel 1", "Onderdeel 3"]);
+    // Een Meting waarvoor hij geen Resultaten heeft, staat er nergens in.
+    expect(JSON.stringify(r[0].vergelijkingen.map((v) => v.metingen.map((m) => m.meting.id)))).not.toContain("m1");
+    // Met Resultaten op één Meting, of op een Meting die geen lid is, is er niets te vergelijken en staat er niets.
+    expect(leadViewsVoorBenchmark(b, [assessment], [o], o, ["m0"], drempels)).toEqual([]);
     expect(leadViewsVoorBenchmark(b, [assessment], [o], o, [], drempels)).toEqual([]);
-    // Onder de drempel van Metingen staat er niets, ook geen lege kaart.
-    expect(leadViewsVoorBenchmark(b, [assessment], [o], o, ["m0"], { ...drempels, minMetingen: 4 })).toEqual([]);
-  });
-
-  it("niveau 2: Een Meting waarvoor de Lead Resultaten heeft maar die geen lid is, geeft geen view", () => {
-    const b = metingenBenchmark(["m0", "m1"]);
-    expect(leadViewsVoorBenchmark(b, [assessment], [o], o, ["m2"], { ...drempels, minMetingen: 2 })).toEqual([]);
+    expect(leadViewsVoorBenchmark(metingenBenchmark(["m0", "m1"]), [assessment], [o], o, ["m0", "m2"], drempels)).toEqual([]);
   });
 
   it("niveau 1: De view van de eigen organisatie, onder de drempel van organisaties of voor een organisatie die geen lid is staat er niets", () => {
@@ -269,8 +306,9 @@ describe("de view van een Lead op alle niveaus", () => {
     const b = benchmark(["A", "B", "C", "D", "E"]);
     const r = leadViewsVoorBenchmark(b, [assessment], orgs, orgs[0], [], drempels);
     expect(r).toHaveLength(1);
+    expect(r[0].niveau).toBe("organisaties");
+    if (r[0].niveau !== "organisaties") return;
     expect(r[0].eigenNaam).toBe("Org A");
-    expect(r[0].metingLabel).toBeNull();
     expect(r[0].views).toHaveLength(1);
     expect(leadViewsVoorBenchmark(b, [assessment], orgs, orgs[0], [], { ...drempels, minOrganisaties: 6 })).toEqual([]);
     expect(leadViewsVoorBenchmark(b, [assessment], [...orgs, org("Z", 3)], org("Z", 3), [], drempels)).toEqual([]);

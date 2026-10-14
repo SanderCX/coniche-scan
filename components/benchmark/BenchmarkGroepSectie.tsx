@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BenchmarkSectie, MIN_METINGEN_PER_ASSESSMENT, resultatenVan } from "@/lib/benchmark";
+import { BenchmarkSectie, resultatenVan } from "@/lib/benchmark";
 import { alleBouwblokkenMetGroep, isVlakkeAssessment } from "@/lib/assessment-structuur";
 import { classificatie } from "@/lib/scoring";
 import { gewichtMarkering } from "@/lib/weging";
@@ -9,7 +9,6 @@ import { RadarChartView } from "@/components/RadarChartView";
 import { CategoryBarChart } from "@/components/CategoryBarChart";
 import { WeergaveMatrix } from "@/components/visualisatie/WeergaveMatrix";
 import { matrix } from "@/lib/visualisatie";
-import { onderdeelVan, rondeVan, sorteerPerOnderdeel } from "@/lib/rondes";
 
 function Score({ waarde }: { waarde: number | null }) {
   if (waarde === null) return <span className="text-ink-s">–</span>;
@@ -21,9 +20,10 @@ function Score({ waarde }: { waarde: number | null }) {
 }
 
 /**
- * Eén sectie van een benchmark voor de Admin (`benchmark.md`, Weergave voor de Admin): Per Assessment de teller
- * "X van Y organisaties", de organisaties met hun aantal afgeronde scans, en de gemiddelden van de groep per
- * categorie, bouwblok en vraag, en overall. De Admin ziet de namen van de organisaties, ook van de organisaties die in dit
+ * Eén sectie van een benchmark tussen organisaties voor de Admin (`benchmark.md`, Weergave voor de Admin): Per Assessment de
+ * teller "X van Y organisaties", de organisaties met hun aantal afgeronde scans, en de gemiddelden van de groep per
+ * categorie, bouwblok en vraag, en overall. Een vergelijking tussen Metingen heeft een eigen weergave
+ * (`MetingenVergelijkingView`). De Admin ziet de namen van de organisaties, ook van de organisaties die in dit
  * Assessment ontbreken. Een zelfstandig onderdeel, zodat een latere PDF per Assessment een eigen deel kan krijgen.
  * Hergebruikt de resultaatcomponenten van het resultatenscherm.
  */
@@ -31,49 +31,44 @@ export function BenchmarkGroepSectie({
   sectie,
   benchmarkId,
   minOrganisaties,
-  niveau = "organisaties",
 }: {
   sectie: BenchmarkSectie;
   benchmarkId: string;
   minOrganisaties: number;
-  /** `metingen`: Binnen een organisatie (`benchmark.md`, Niveau 2): De leden zijn Metingen met hun label als naam. */
-  niveau?: "organisaties" | "metingen";
 }) {
   const { assessment, rijen, ontbrekend, teller } = sectie;
   const resultaten = resultatenVan(assessment, sectie.groepAntwoorden);
   const vlak = isVlakkeAssessment(assessment);
   const eenheid = assessment.bouwblokEenheidMeervoud;
-  const binnen = niveau === "metingen";
-  const onderDrempel = rijen.length < (binnen ? MIN_METINGEN_PER_ASSESSMENT : minOrganisaties);
+  const onderDrempel = rijen.length < minOrganisaties;
 
   return (
     <section className="benchmark-sectie" aria-label={assessment.naam}>
       <h2>{assessment.naam}</h2>
       <p className="benchmark-teller" data-onder-drempel={onderDrempel || undefined}>
-        <strong>{binnen ? `${teller.x} ${teller.x === 1 ? "Meting" : "Metingen"}` : `${teller.x} van ${teller.y} organisaties`}</strong>
-        {onderDrempel && !binnen && (
+        <strong>{`${teller.x} van ${teller.y} organisaties`}</strong>
+        {onderDrempel && (
           <span>
             {" "}
             · onder de minimale groepsgrootte van {minOrganisaties}: Een Lead ziet dit Assessment niet
           </span>
         )}
-        {onderDrempel && binnen && <span> · een benchmark heeft minstens {MIN_METINGEN_PER_ASSESSMENT} Metingen per Assessment</span>}
       </p>
-      {!binnen && ontbrekend.length > 0 && (
+      {ontbrekend.length > 0 && (
         <p className="text-sm text-ink-m">
           Ontbreekt in dit Assessment: {ontbrekend.map((o) => o.naam).join(", ")}.
         </p>
       )}
 
       {rijen.length === 0 ? (
-        <p className="admin-notice">{binnen ? "Nog geen Metingen in deze benchmark voor dit Assessment." : "Nog geen organisaties in deze benchmark voor dit Assessment."}</p>
+        <p className="admin-notice">Nog geen organisaties in deze benchmark voor dit Assessment.</p>
       ) : (
         <>
           <table className="admin-table" style={{ marginBottom: "1.5rem" }}>
             <thead>
               <tr>
-                <th>{binnen ? "Meting" : "Organisatie"}</th>
-                {!binnen && <th>Meting</th>}
+                <th>Organisatie</th>
+                <th>Meting</th>
                 <th>Afgeronde scans</th>
                 <th>Overall</th>
                 <th></th>
@@ -81,22 +76,15 @@ export function BenchmarkGroepSectie({
             </thead>
             <tbody>
               {rijen.map((r) => (
-                <tr key={binnen ? r.meting.id : r.organisatie.id}>
-                  <td>{binnen ? r.meting.label : r.organisatie.naam}</td>
-                  {!binnen && <td>{r.meting.label}</td>}
+                <tr key={r.organisatie.id}>
+                  <td>{r.organisatie.naam}</td>
+                  <td>{r.meting.label}</td>
                   <td>{r.aantalAfgerond}</td>
                   <td>
                     <Score waarde={r.overall} />
                   </td>
                   <td className="cel-knop">
-                    <Link
-                      href={
-                        binnen
-                          ? `/beheer/benchmark/${benchmarkId}/meting/${r.meting.id}`
-                          : `/beheer/benchmark/${benchmarkId}/organisatie/${r.organisatie.id}`
-                      }
-                      className="btn btn-outline btn-compact"
-                    >
+                    <Link href={`/beheer/benchmark/${benchmarkId}/organisatie/${r.organisatie.id}`} className="btn btn-outline btn-compact">
                       View
                     </Link>
                   </td>
@@ -105,28 +93,20 @@ export function BenchmarkGroepSectie({
             </tbody>
           </table>
 
-          {/* Weergave E (`visualisatie-scores.md`): De matrix met de bouwblokken als rijen. Op niveau 2 zijn de kolommen de
-              Metingen, op niveau 1 de organisaties (kop met naam, label van de Meting en aantal scans). Alleen voor de Admin. */}
-          <h3>{binnen ? `Per ${assessment.bouwblokEenheidEnkelvoud} en per Meting` : `Per ${assessment.bouwblokEenheidEnkelvoud} en per organisatie`}</h3>
+          {/* Weergave E (`visualisatie-scores.md`): De matrix met de bouwblokken als rijen en de organisaties als kolommen (kop
+              met naam, label van de Meting en aantal scans). Alleen voor de Admin. */}
+          <h3>{`Per ${assessment.bouwblokEenheidEnkelvoud} en per organisatie`}</h3>
           <WeergaveMatrix
             assessment={assessment}
-            kolomSoort={binnen ? "meting" : "organisatie"}
+            kolomSoort="organisatie"
             weergave={matrix(
               assessment,
-              // Bij verschillende onderdelen staan de kolommen per onderdeel bij elkaar, met onderdeel en ronde in de kop.
-              (binnen ? sorteerPerOnderdeel(rijen) : rijen).map((r) => {
-                const metOnderdelen = binnen && new Set(rijen.map((x) => onderdeelVan(x.meting))).size >= 2;
-                return {
-                  label: metOnderdelen ? onderdeelVan(r.meting) : binnen ? r.meting.label : r.organisatie.naam,
-                  ...(metOnderdelen
-                    ? { sublabel: rondeVan(r.organisatie, r.meting)?.label ?? r.meting.label }
-                    : binnen
-                      ? {}
-                      : { sublabel: r.meting.label }),
-                  aantalScans: r.aantalAfgerond,
-                  antwoorden: r.antwoorden,
-                };
-              })
+              rijen.map((r) => ({
+                label: r.organisatie.naam,
+                sublabel: r.meting.label,
+                aantalScans: r.aantalAfgerond,
+                antwoorden: r.antwoorden,
+              }))
             )}
           />
 
@@ -134,7 +114,7 @@ export function BenchmarkGroepSectie({
             {resultaten.overall !== null && (
               <ScoreCircle score={resultaten.overall} classificatie={classificatie(resultaten.overall)} />
             )}
-            <p className="mt-4 font-semibold text-ink-m">{binnen ? "Gemiddelde van de Metingen" : "Gemiddelde van de groep"}</p>
+            <p className="mt-4 font-semibold text-ink-m">Gemiddelde van de groep</p>
           </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">

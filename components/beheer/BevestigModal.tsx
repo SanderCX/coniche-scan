@@ -17,6 +17,7 @@ export function BevestigModal({
   bericht,
   bevestigLabel = "Verwijderen",
   bevestigVariant = "danger",
+  annuleerLabel = "Annuleren",
   onBevestigen,
   onAnnuleren,
 }: {
@@ -26,6 +27,8 @@ export function BevestigModal({
   bevestigLabel?: string;
   /** `danger` (rood) voor verwijderen, `primair` (oranje) voor een gewone bevestiging. */
   bevestigVariant?: "danger" | "primair";
+  /** Het label van de knop die niets doet, bijv. "Terug" bij "Sluiten zonder op te slaan?". */
+  annuleerLabel?: string;
   onBevestigen: () => void;
   onAnnuleren: () => void;
 }) {
@@ -49,7 +52,7 @@ export function BevestigModal({
         </div>
         <div className="btn-rij">
           <button type="button" className="btn btn-outline" onClick={onAnnuleren}>
-            Annuleren
+            {annuleerLabel}
           </button>
           <button type="button" className={`btn ${bevestigVariant === "primair" ? "btn-or" : "btn-danger"}`} onClick={onBevestigen}>
             {bevestigLabel}

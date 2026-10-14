@@ -1,5 +1,68 @@
 # Coniche Scan — Changelog
 
+## 2026-10-14 (2) — Specs van Joost, PR 100: Meetdatum vervangt de ronde, Leads-venster in plaats van tabel
+
+Op verzoek van Sander volledig gebouwd. De opgeslagen data blijft bruikbaar: Bestaande Metingen houden naam, onderdeel en
+samenstelling, de meetdatum is leeg tot een Admin of Consultant hem invult.
+
+**Gedaan, de ronde vervalt** (`datamodel.md`, Meting; `beheerpagina.md`, punt 5):
+- **Datamodel**: `Ronde`, `Meting.rondeId` en `Organisatie.rondes` zijn weg (`lib/types.ts`). Er komen `Meting.meetdatum` (een dag
+  zonder tijdstip, `JJJJ-MM-DD`) en `Meting.labelHandmatig`. Het laden haalt een oude ronde uit de data en zet `labelHandmatig`
+  bij een Meting zonder meetdatum, zodat de oude naam blijft staan tot "Standaardnaam herstellen".
+- **Pure functies** (`lib/metingen.ts`, voorheen `lib/rondes.ts`): Meetdatum valideren en tonen, de naam "{onderdeel} | okt
+  2026", sortering op meetdatum (nieuwste eerst, een Meting zonder datum onderaan), dezelfde combinatie van onderdeel,
+  Assessment en meetdatum, en de waarschuwing voor twee Metingen met hetzelfde onderdeel.
+- **Meting plannen en wijzigen** (`lib/db/meting-plannen.ts`): Assessment-type, Onderdeel en Meetdatum (verplicht). "Wordt: …"
+  onder de rij, een waarschuwing bij dezelfde combinatie en geen blokkade. Wijzigen heeft Onderdeel, Meetdatum en Naam met
+  "Standaardnaam herstellen". Nieuw: "Meetdatum instellen…" op een selectie, één gebeurtenis per Meting
+  (`meting.meetdatumGewijzigd`).
+- **Weg**: "Nieuwe ronde starten", "Naar ronde…", de rondekop, het Ronde-overzicht, de tab Rondes (het adres stuurt door) en
+  "Vergelijk met vorige ronde".
+- **Samengestelde Meting** ("Gemiddelde maken"): Metingen van één organisatie en één Assessment op elke meetdatum, standaard
+  niets aangevinkt, een Meting zonder meetdatum of met te weinig scans uitgeschakeld met reden, en de meetdatum is de laatste van
+  de selectie. De waarschuwing bij hetzelfde onderdeel staat onder de lijst.
+- **Resultaten**: Eén tab Metingen (en voor een Admin Benchmarks), een Consultant ziet geen tabbalk. Kolommen Organisatie,
+  Meting, Onderdeel, Assessment, Meetdatum en Afgeronde scans, filters op Organisatie, Assessment en een periode op meetdatum.
+- **Import**: De meetdatum is de oudste datum van de scans in de Meting, aanpasbaar per Meting in de voorbeeldweergave. Een
+  tweede scan van dezelfde Respondent krijgt een eigen Meting met haar eigen datum. De kolom `meting_meetdatum` van de eigen
+  export wordt gelezen, `ronde` genegeerd. De CSV-export heeft `meting_meetdatum` in plaats van `ronde`.
+
+**Gedaan, vergelijking tussen Metingen** (`benchmark.md`, Niveau 2; `visualisatie-scores.md`, C en E):
+- De benchmark binnen een organisatie vergelijkt precies twee Metingen van één Assessment, een samengestelde Meting mag meedoen.
+  De weergave is C (ring, stip en verschil) met daaronder de matrix (E) met kolom Verschil per bouwblok, per categorie en voor
+  de totaalscore. Geen groepsgemiddelde, geen gemiddelde en bereik per rij en geen zwarte rand. `benchmarkMinMetingen` vervalt.
+- Op de resultatenpagina staat de knop "Vergelijking": Eén benchmark opent direct, meer geven een keuzelijst, geen enkele een
+  uitgeschakelde knop met `info.vergelijkMetingen`. Een Consultant krijgt de knop niet. De view per Meting
+  (`/beheer/benchmark/.../meting/...`) vervalt.
+- Een Lead ziet de vergelijking van de Metingen waarvoor hij Resultaten heeft, en alleen bij minstens twee. Het benchmarkvinkje
+  vervalt als dat minder wordt.
+
+**Gedaan, Leads-venster** (`beheerpagina.md`, punt 6a; `stylesheet.md`, `.modal-box--vol`):
+- Op het organisatie-detail staat een compact blok Leads (naam, "Ziet 3 weergaven", "Bekijk", "Leads beheren", bij meer dan vijf
+  "Alle Leads beheren →", zonder Leads "+ Lead toevoegen"). De vinkjes staan in het venster (`?leads=<organisatieId>`).
+- Het venster heeft een vaste kop en voettekst, alleen de tabel scrolt, met een vaste eerste kolom en twee kopregels. Een
+  keuzelijst Assessment bij meer dan één Assessment, "Sluiten zonder op te slaan?" bij niet-opgeslagen vinkjes, en na Opslaan
+  blijft het venster open met een melding. Vanuit het Respondent-overzicht opent "Leads beheren" hetzelfde venster in dezelfde
+  modal. De organisatie valt eronder onder het Bewerkslot.
+
+**Keuzes waar de spec open liet**:
+- Eigen export zonder `meting_meetdatum`: De meetdatum blijft leeg (de eerste bullet van `import-scans.md`), ook al zegt de
+  laatste alinea dat dan de afleiding geldt. Een onbekende datum is veiliger dan een verkeerde.
+- Een Meting uit de tijd van de rondes houdt haar naam ook als ze een meetdatum krijgt ("Bestaande Metingen houden hun naam").
+  "Standaardnaam herstellen" laat de naam volgen.
+- Een benchmark binnen een organisatie met meer dan twee Metingen of meer Assessments blijft zichtbaar (tabel en matrix zonder
+  Verschil). Wijzigen maakt er een vergelijking van twee Metingen van.
+- "Per categorie" in de kolom Verschil is een rij per categorie onder het laatste bouwblok, alleen bij een Assessment met
+  categorielaag.
+- "Alle Leads beheren →" en "Leads beheren" zijn knoppen: Ze openen een venster en zijn dus een actie, geen navigatie.
+
+**Tests**: 274 (was 248): Meetdatum en naam, volgorde, dezelfde combinatie, Meting plannen en wijzigen, Meetdatum instellen,
+de overgang van de rondes, de samengestelde Meting zonder ronde, de import met meetdatum, de vergelijking van twee Metingen
+voor Admin en Lead en de kolom Verschil in de matrix.
+
+**Open**: Of een Lead de lijst Metingen ook krijgt (`backlog.md`). Er zijn geen tests voor de schermen zelf (Metingen-lijst,
+Leads-venster), alleen voor de berekeningen en opslag eronder.
+
 ## 2026-10-14 — Specs van Joost, PR 97: hoofdlink Resultaten, tabel Leads en import vanuit de organisatie
 
 Op uitdrukkelijk verzoek van Sander volledig gebouwd, zonder eerst een backup van de opslag te maken (de data zet Sander zo

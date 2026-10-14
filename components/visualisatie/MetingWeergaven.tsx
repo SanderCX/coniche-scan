@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Assessment, Organisatie, ScanInvulling, ScanUitvoering } from "@/lib/types";
@@ -10,31 +10,29 @@ import {
   aantalAfgerondInMeting,
   gemiddeldeAntwoordenVoorMetingMetSamenstelling,
   isSamengesteld,
-  vergelijkbareMetingen,
-  voldoetAanMinScans,
-} from "@/lib/rondes";
-import { antwoordenPerVraag, eenMeting, spreiding, tussenMetingen } from "@/lib/visualisatie";
+} from "@/lib/metingen";
+import { antwoordenPerVraag, eenMeting, spreiding } from "@/lib/visualisatie";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { WeergaveWissel } from "./WeergaveWissel";
 import { WeergaveBouwblok } from "./WeergaveBouwblok";
 import { WeergaveSpreiding } from "./WeergaveSpreiding";
 import { WeergaveAntwoorden } from "./WeergaveAntwoorden";
-import { WeergaveVergelijking } from "./WeergaveVergelijking";
 
 type Weergave = "overzicht" | "bouwblok" | "spreiding" | "antwoorden";
 
 /**
  * De weergaven op de resultatenpagina van een Meting (`visualisatie-scores.md`, Navigatie): Overzicht (de bestaande pagina,
- * ongewijzigd), Per bouwblok (A) en Spreiding (B), met rechts de knop "Vergelijk met vorige Meting" (C). De gekozen weergave
- * staat in de adresbalk (`?weergave=bouwblok|spreiding`, `?vergelijk=<metingId>`), zodat de terugknop werkt en de link te
- * delen is. Wisselen is een knop en geen link.
+ * ongewijzigd), Per bouwblok (A), Spreiding (B) en Antwoorden (G), met rechts de knop "Vergelijking". Die opent de benchmark
+ * binnen een organisatie waarvan de Meting lid is (`benchmark.md`, Niveau 2): De vergelijking zelf (C) staat in die benchmark
+ * en niet op deze pagina. De gekozen weergave staat in de adresbalk (`?weergave=bouwblok|spreiding|antwoorden`), zodat de
+ * terugknop werkt en de link te delen is. Wisselen is een knop en geen link.
  *
  * Admin en Consultant zien daarnaast Antwoorden (G, `antwoordenToegestaan`): De antwoorden per vraag en per respondent, met naam.
  * Een Lead ziet die weergave alleen met het vinkje Antwoorden (en zonder namen als de organisatie dat niet heeft afgesproken,
- * `antwoordenAnoniem`). Een Lead krijgt Overzicht en Per bouwblok en de vergelijking. Spreiding is er voor hem alleen als een Admin die heeft
- * toegewezen (`benchmark.md`), dus `spreidingToegestaan` is dan uit. Voor een Lead staat de lijn van laagste tot hoogste
- * score pas aan vanaf `benchmarkMinRespondenten` (`toonBereik`).
+ * `antwoordenAnoniem`). Een Lead krijgt Overzicht en Per bouwblok. Spreiding is er voor hem alleen met het vinkje in het
+ * Leads-venster (`spreidingToegestaan`). Voor een Lead staat de lijn van laagste tot hoogste score pas aan vanaf
+ * `benchmarkMinRespondenten` (`toonBereik`).
  */
 export function MetingWeergaven(props: Props) {
   return (
@@ -52,18 +50,20 @@ interface Props {
   overzicht: React.ReactNode;
   /** Wie de weergave Spreiding mag zien: Admin en Consultant ja, een Lead alleen via een toegewezen view. */
   spreidingToegestaan: boolean;
-  /** Wie de weergave Antwoorden (G) mag zien: Een Admin en Consultant, en een Lead met het vinkje in de tabel Leads. */
+  /** Wie de weergave Antwoorden (G) mag zien: Een Admin en Consultant, en een Lead met het vinkje in het Leads-venster. */
   antwoordenToegestaan: boolean;
   /** Antwoorden zonder namen (R1 tot en met Rn): Voor een Lead als `Organisatie.antwoordenMetNamen` uit staat. */
   antwoordenAnoniem?: boolean;
   /** De lijn van laagste tot hoogste score: Voor een Admin altijd, voor een Lead pas vanaf `benchmarkMinRespondenten`. */
   bereikAltijd: boolean;
   /**
-   * Alleen deze Metingen zijn te vergelijken (voor een Lead: De Metingen waarop hij ook bereik heeft). Zonder deze lijst zijn
-   * dat alle eerdere Metingen van hetzelfde Assessment in de organisatie.
+   * De knop "Vergelijking" (`benchmark.md`, Niveau 2, Op de resultatenpagina): De benchmarks binnen een organisatie waarvan
+   * deze Meting lid is en die de gebruiker mag openen. Eén opent direct, meer geven een keuzelijst, geen enkele een
+   * uitgeschakelde knop met `info.vergelijkMetingen`. Zonder deze prop (`undefined`) staat er geen knop, zoals bij een
+   * Consultant, die geen benchmarks opent.
    */
-  toegestaneMetingIds?: string[];
-  /** Alleen een Admin: De link "Bekijk in benchmark" als de organisatie of de Meting lid is van een benchmark. */
+  vergelijkingen?: { id: string; naam: string; href: string }[];
+  /** Alleen een Admin: De link "Bekijk in benchmark" als de organisatie lid is van een benchmark tussen organisaties. */
   toonBenchmarkLink: boolean;
 }
 
@@ -76,7 +76,7 @@ function MetingWeergavenInhoud({
   antwoordenToegestaan,
   antwoordenAnoniem = false,
   bereikAltijd,
-  toegestaneMetingIds,
+  vergelijkingen,
   toonBenchmarkLink,
 }: Props) {
   const router = useRouter();
@@ -92,25 +92,8 @@ function MetingWeergavenInhoud({
     (weergaveParam === "antwoorden" && antwoordenToegestaan && !isSamengesteld(scanUitvoering))
       ? weergaveParam
       : "overzicht";
-  const vergelijkId = zoek.get("vergelijk");
 
   const huidigeScans = aantalAfgerondInMeting(organisatie, scanUitvoering);
-  // "Vergelijk met vorige ronde" (`visualisatie-scores.md`, C): Alleen dezelfde combinatie van onderdeel en Assessment in een
-  // eerdere ronde, de meest recente bovenaan. Beide Metingen moeten aan `benchmarkMinScans` voldoen.
-  const vergelijkbaar = useMemo(
-    () =>
-      voldoetAanMinScans(organisatie, scanUitvoering, instellingen.benchmarkMinScans)
-        ? vergelijkbareMetingen(organisatie, scanUitvoering).filter(
-            (v) =>
-              v.ontwikkeling &&
-              voldoetAanMinScans(organisatie, v.meting, instellingen.benchmarkMinScans) &&
-              (!toegestaneMetingIds || toegestaneMetingIds.includes(v.meting.id))
-          )
-        : [],
-    [organisatie, scanUitvoering, toegestaneMetingIds, instellingen.benchmarkMinScans]
-  );
-  const gekozenVergelijking = vergelijkId ? vergelijkbaar.find((v) => v.meting.id === vergelijkId) ?? null : null;
-  const vorige = gekozenVergelijking?.meting ?? null;
 
   // Een samengestelde Meting heeft geen scans: Ze telt als één "scan" met het gemiddelde van de onderliggende Metingen.
   const invullingenVan = (m: ScanUitvoering): ScanInvulling[] =>
@@ -144,40 +127,14 @@ function MetingWeergavenInhoud({
 
   const toonBereik = bereikAltijd || huidigeScans >= instellingen.benchmarkMinRespondenten;
 
+  // "Bekijk in benchmark" (alleen een Admin): De benchmarks tussen organisaties waarin de organisatie met deze Meting meedoet.
   const benchmarkLinks = toonBenchmarkLink
     ? benchmarks.flatMap((b) => {
         const lid = b.leden.find((l) => l.metingId === scanUitvoering.id);
-        if (!lid) return [];
-        const niveau = b.niveau ?? "organisaties";
-        if (niveau === "scans") return [];
-        return [
-          {
-            label: b.naam,
-            href: niveau === "metingen" ? `/beheer/benchmark/${b.id}/meting/${scanUitvoering.id}` : `/beheer/benchmark/${b.id}/organisatie/${organisatie.id}`,
-          },
-        ];
+        if (!lid || (b.niveau ?? "organisaties") !== "organisaties") return [];
+        return [{ label: b.naam, href: `/beheer/benchmark/${b.id}/organisatie/${organisatie.id}` }];
       })
     : [];
-
-  /* ---------- C. Vergelijking ---------- */
-  if (vorige) {
-    const w = tussenMetingen(assessment, invullingenVan(vorige), invullingenVan(scanUitvoering));
-    return (
-      <div>
-        <div className="vis-acties">
-          <button type="button" className="btn btn-outline btn-compact" onClick={() => zet({ vergelijk: null })}>
-            Vergelijking sluiten
-          </button>
-        </div>
-        {gekozenVergelijking && !gekozenVergelijking.ontwikkeling && (
-          <p className="admin-notice" role="status">
-            Let op: Dit zijn verschillende onderdelen, het verschil is geen ontwikkeling.
-          </p>
-        )}
-        <WeergaveVergelijking assessment={assessment} weergave={w} vorigLabel={vorige.label} huidigLabel={scanUitvoering.label} />
-      </div>
-    );
-  }
 
   const opties: { waarde: Weergave; label: string; disabled?: boolean }[] = [
     { waarde: "overzicht", label: "Overzicht" },
@@ -196,26 +153,23 @@ function MetingWeergavenInhoud({
           waarde={weergave}
           onChange={(w) => zet({ weergave: w === "overzicht" ? null : w })}
         />
-        {vergelijkbaar.length === 0 && (
+        {vergelijkingen !== undefined && vergelijkingen.length === 0 && (
           <span className="knop-met-icoon">
             <button type="button" className="btn btn-outline btn-compact" disabled>
-              Vergelijk met vorige ronde
+              Vergelijking
             </button>
-            <InfoIcoon sleutel="info.vergelijkRonde" naastVeld />
+            <InfoIcoon sleutel="info.vergelijkMetingen" naastVeld />
           </span>
         )}
-        {vergelijkbaar.length === 1 && (
-          <button type="button" className="btn btn-outline btn-compact" onClick={() => zet({ vergelijk: vergelijkbaar[0].meting.id })}>
-            Vergelijk met vorige ronde
+        {vergelijkingen?.length === 1 && (
+          <button type="button" className="btn btn-outline btn-compact" onClick={() => router.push(vergelijkingen[0].href)}>
+            Vergelijking
           </button>
         )}
-        {vergelijkbaar.length > 1 && (
+        {vergelijkingen !== undefined && vergelijkingen.length > 1 && (
           <DropdownKnop
-            label="Vergelijk met vorige ronde"
-            opties={vergelijkbaar.map((v) => ({
-              label: v.ronde?.label ?? v.meting.label,
-              onClick: () => zet({ vergelijk: v.meting.id }),
-            }))}
+            label="Vergelijking"
+            opties={vergelijkingen.map((v) => ({ label: v.naam, onClick: () => router.push(v.href) }))}
           />
         )}
       </div>

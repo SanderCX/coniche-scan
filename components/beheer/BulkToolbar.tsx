@@ -41,7 +41,7 @@ export function BulkToolbar({
   samenbrengenUitgeschakeld,
 }: {
   aantal: number;
-  /** Weglaten verbergt de knop Verwijderen: De lijsten Rondes en Metingen onder Resultaten verwijderen niets. */
+  /** Weglaten verbergt de knop Verwijderen: De lijst Metingen onder Resultaten verwijdert niets. */
   onVerwijderen?: () => void;
   verwijderLabel?: string;
   /** Reden waarom Verwijderen nu uitgeschakeld is (bijv. ontbrekend recht, `lib/rechten.ts`). */

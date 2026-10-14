@@ -29,8 +29,8 @@ import { MijnAccountModal } from "@/components/beheer/MijnAccountModal";
  * "Uitloggen" als enige manier om beheer te verlaten).
  *
  * Drie hoofdlinks (beheerpagina.md, "Wat beheerbaar is"): **Assessments** (Assessment-types, Content, Admin-only),
- * **Organisaties** (Organisaties, Respondenten, ook voor een Consultant, bereik "eigen") en **Resultaten** (Rondes en
- * Metingen voor Admin en Consultant, Benchmarks alleen voor de Admin). **Instellingen** (voorheen Applicatie: Gebruikers,
+ * **Organisaties** (Organisaties, Respondenten, ook voor een Consultant, bereik "eigen") en **Resultaten** (Metingen voor Admin en
+ * Consultant, Benchmarks alleen voor de Admin). **Instellingen** (voorheen Applicatie: Gebruikers,
  * Drempels en termijnen, Algemene teksten, Content-pagina's, Audit-log, Data-integriteit) staat niet in de nav maar als
  * rij in het Accountmenu, alleen voor een Admin. Elke link wijst naar één hub-pagina voor die sectie. De import is een knop
  * in het organisatie-detail en de pagina Ingevulde scans bestaat niet meer (beheerpagina.md, punt 7 en 8).
@@ -56,14 +56,13 @@ const INSTELLINGEN_PADEN = [
 type Sectie = "assessments" | "organisaties" | "resultaten";
 
 /**
- * Welke hoofdlink actief is. Het Meting-overzicht, de resultatenpagina's en het Ronde-overzicht horen bij de hoofdlink
- * waarlangs je kwam: Met `?via=resultaten` is dat Resultaten, anders Organisaties. De rondes en de benchmarkpagina's zijn
- * altijd Resultaten.
+ * Welke hoofdlink actief is. Het Meting-overzicht en de resultatenpagina's horen bij de hoofdlink waarlangs je kwam: Met
+ * `?via=resultaten` is dat Resultaten, anders Organisaties. De benchmarkpagina's zijn altijd Resultaten.
  */
 function sectieVoor(pathname: string, via: boolean): Sectie {
   if (pathname.startsWith("/beheer/assessments") || pathname.startsWith("/beheer/content")) return "assessments";
-  if (pathname.startsWith("/beheer/benchmark") || pathname.startsWith("/beheer/rondes")) return "resultaten";
-  if (pathname.startsWith("/beheer/resultaten/rondes") || pathname.startsWith("/beheer/resultaten/metingen")) return "resultaten";
+  if (pathname.startsWith("/beheer/benchmark")) return "resultaten";
+  if (pathname.startsWith("/beheer/resultaten/metingen")) return "resultaten";
   if (
     via &&
     (pathname.startsWith("/beheer/metingen") ||
@@ -86,11 +85,8 @@ const ORGANISATIE_TABS = [
   { href: "/beheer/respondenten", label: "Respondenten" },
 ];
 
-/** Tabbalk van Resultaten (beheerpagina.md, punt 7): Rondes en Metingen, voor een Admin aangevuld met Benchmarks. */
-const RESULTATEN_TABS = [
-  { href: "/beheer/resultaten/rondes", label: "Rondes" },
-  { href: "/beheer/resultaten/metingen", label: "Metingen" },
-];
+/** Tabbalk van Resultaten (beheerpagina.md, punt 7): Metingen, voor een Admin aangevuld met Benchmarks. */
+const RESULTATEN_TABS = [{ href: "/beheer/resultaten/metingen", label: "Metingen" }];
 const BENCHMARKS_TAB = { href: "/beheer/benchmark", label: "Benchmarks" };
 
 /**
@@ -129,14 +125,15 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
       ? [{ sectie: "assessments" as const, href: "/beheer/content", label: "Assessments" }]
       : []),
     { sectie: "organisaties" as const, href: "/beheer/organisaties", label: "Organisaties" },
-    { sectie: "resultaten" as const, href: "/beheer/resultaten/rondes", label: "Resultaten" },
+    { sectie: "resultaten" as const, href: "/beheer/resultaten/metingen", label: "Resultaten" },
   ];
   const huidigeSectie = sectieVoor(pathname, via);
   const resultatenTabs = [...RESULTATEN_TABS, ...(magBenchmarkBeheren(gebruiker) ? [BENCHMARKS_TAB] : [])];
 
   const rolInfo = gebruiker ? ROL_KLEUR[gebruiker.rol] : undefined;
   const toonTabs = ORGANISATIE_TABS.some((t) => pathname === t.href);
-  const toonResultatenTabs = resultatenTabs.some((t) => pathname === t.href);
+  // Met maar één tab, zoals bij een Consultant, toont de pagina geen tabbalk (`beheerpagina.md`, punt 7).
+  const toonResultatenTabs = resultatenTabs.length > 1 && resultatenTabs.some((t) => pathname === t.href);
   const toonInstellingenTabs = heeftInstellingen && INSTELLINGEN_TABS.some((t) => pathname === t.href);
 
   return (

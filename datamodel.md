@@ -242,9 +242,9 @@ Meting {
   organisatieId: string
   assessmentId: string
   label: string                     // de naam, zie Naam van een Meting
-  labelHandmatig: boolean           // voorstel, standaard false
+  labelHandmatig: boolean           // gebouwd op 14 oktober 2026, standaard false
   onderdeel: string                 // gebouwd, standaard "Hele organisatie", bijv. "Team A"
-  meetdatum?: date                  // voorstel van 14 oktober 2026, zonder tijdstip
+  meetdatum?: date                  // gebouwd op 14 oktober 2026, zonder tijdstip
   samenstelling?: string[]          // gebouwd, metingIds, alleen bij een samengestelde Meting
   aangemaaktOp: datetime
 }
@@ -282,7 +282,7 @@ de app is aangemaakt (`aangemaaktOp`) en niet het moment van importeren.
   "Scans samenbrengen" en Wijzigen stellen het onderdeel voor uit het label: De
   tekst vóór " | ", anders "Hele organisatie". Het is een voorstel dat de
   beheerder ziet en kan aanpassen, nooit een stille wijziging.
-- **Overgang van de rondes (voorstel van 14 oktober 2026).** `Ronde` en
+- **Overgang van de rondes (gebouwd op 14 oktober 2026).** `Ronde` en
   `Meting.rondeId` vervallen. De Metingen houden hun `label`, onderdeel en
   `samenstelling`. De meetdatum is leeg. Een Admin of Consultant vult hem in
   per Meting. De audit-regels `ronde.aangemaakt` en `ronde.hernoemd` blijven
@@ -1098,7 +1098,7 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   organisatie en de nieuwe stand van de vlag.
 - `ronde.aangemaakt` en `ronde.hernoemd` (gebouwd, vervallen op 14 oktober 2026
   met de ronde). Wat al is gelogd, blijft staan.
-- `meting.meetdatumGewijzigd` (voorstel). `details` bevat het label van de
+- `meting.meetdatumGewijzigd` (gebouwd). `details` bevat het label van de
   Meting en de oude en de nieuwe meetdatum.
 - `meting.samengesteldAangemaakt`, `meting.samengesteldGewijzigd` en
   `meting.samengesteldVerwijderd` (gebouwd). `details` bevat het label en de

@@ -10,7 +10,7 @@ const NIEUW = "__nieuw__";
 /**
  * Het formulier "Lead toevoegen" (`beheerpagina.md`, punt 6a): Twee keuzes, een bestaande Respondent van deze organisatie
  * (keuzelijst) of een nieuwe (naam en e-mailadres). Opslaan geeft de Respondent de Lead-rol. Een nieuwe Respondent krijgt meteen
- * een persoonlijke link zonder `ScanInvulling`. De rij komt in de tabel Leads zonder vinkjes: Wat de Lead ziet, vink je daar aan.
+ * een persoonlijke link zonder `ScanInvulling`. De rij komt in het Leads-venster zonder vinkjes: Wat de Lead ziet, vink je daar aan.
  */
 export function LeadToevoegenFormulier({
   organisatie,

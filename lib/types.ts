@@ -220,8 +220,6 @@ export interface Organisatie {
   kenmerken: Record<string, unknown>;
   leden: OrganisatieLid[];
   scanUitvoeringen: ScanUitvoering[];
-  /** De rondes van deze organisatie (`datamodel.md`, Ronde en onderdeel). Ontbreekt bij data van vóór dit veld. */
-  rondes?: Ronde[];
   /** Wat elke Lead van deze organisatie ziet (`beheerpagina.md`, punt 6a). Ontbreekt bij data van vóór dit veld. */
   leadToegang?: LeadToegang[];
   /**
@@ -317,20 +315,25 @@ export interface LeadToegang {
 }
 
 /**
- * Eén geplande ronde van één scan-type bij één organisatie (bijv.
- * "Nulmeting 2026"). Geen status/openVanaf/sluitOp (nog): plannen van een
- * meetperiode is bewust nog niet gebouwd, zie backlog.md.
+ * Eén afname van één scan-type bij één organisatie, voor één onderdeel en op één meetdatum (`datamodel.md`, Meting).
+ * Geen status/openVanaf/sluitOp (nog): plannen van een meetperiode is bewust nog niet gebouwd, zie backlog.md.
  */
 export interface ScanUitvoering {
   id: string;
   organisatieId: string;
   assessmentId: string;
-  /** De ronde waarin deze Meting valt (`datamodel.md`, Ronde en onderdeel). Ontbreekt bij een Meting zonder ronde. */
-  rondeId?: string;
+  /** De naam van de Meting (`datamodel.md`, Naam van een Meting): Gemaakt uit onderdeel en meetdatum, tenzij `labelHandmatig`. */
   label: string;
+  /** De gebruiker heeft de naam zelf aangepast: Hij volgt onderdeel en meetdatum niet meer. */
+  labelHandmatig?: boolean;
+  /**
+   * De dag waarop gemeten wordt, `JJJJ-MM-DD` zonder tijdstip (`datamodel.md`, Onderdeel en meetdatum). Ontbreekt bij een Meting
+   * uit de tijd van de rondes: Ze toont "Datum ontbreekt" en doet niet mee aan een samenstelling of vergelijking.
+   */
+  meetdatum?: string;
   /**
    * Het deel van de organisatie waar de Meting over gaat, bijvoorbeeld "Team A". Ontbreekt bij data van vóór dit veld en
-   * geldt dan als "Hele organisatie" (`lib/rondes.ts`, `onderdeelVan`).
+   * geldt dan als "Hele organisatie" (`lib/metingen.ts`, `onderdeelVan`).
    */
   onderdeel?: string;
   /**
@@ -340,17 +343,6 @@ export interface ScanUitvoering {
   samenstelling?: string[];
   aangemaaktOp: string;
   invullingen: ScanInvulling[];
-}
-
-/**
- * Een moment waarop een organisatie meet, bijvoorbeeld de "0-meting" of de "Nameting 2027" (`datamodel.md`, Ronde en
- * onderdeel). Binnen een ronde is er hoogstens één Meting per combinatie van onderdeel en Assessment.
- */
-export interface Ronde {
-  id: string;
-  organisatieId: string;
-  label: string;
-  aangemaaktOp: string;
 }
 
 export type ScanInvullingStatus = "uitgenodigd" | "bezig" | "afgerond";

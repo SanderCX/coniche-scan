@@ -217,54 +217,68 @@ describe("vinkjes op niveau 2 en 3", () => {
     return { n2, n3 };
   }
 
-  it("niveau 2 vraagt Resultaten op een lid-Meting, niveau 3 heeft geen kolom voor een Lead", () => {
+  it("niveau 2 vraagt Resultaten op twee lid-Metingen, niveau 3 heeft geen kolom voor een Lead", () => {
     const { n2, n3 } = opzet();
     db.slaLeadToegangOp("O1", [aan("L1", "benchmark", n2.id), aan("L1", "benchmark", n3.id)], "g1");
     expect(benchmarkVinkjes()).toHaveLength(0);
-    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2.id), aan("L1", "benchmark", n3.id)], "g1");
+    // Met Resultaten op één lid-Meting is er niets te vergelijken.
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2.id)], "g1");
+    expect(benchmarkVinkjes()).toHaveLength(0);
+    db.slaLeadToegangOp(
+      "O1",
+      [aan("L1", "resultaten", "M1"), aan("L1", "resultaten", "M2"), aan("L1", "benchmark", n2.id), aan("L1", "benchmark", n3.id)],
+      "g1"
+    );
     expect(benchmarkVinkjes().map((t) => t.benchmarkId)).toEqual([n2.id]);
   });
 
-  it("Resultaten uitzetten haalt het vinkje van een benchmark op niveau 2 mee, als er geen andere lid-Meting met Resultaten is", () => {
+  it("Resultaten van een lid-Meting uitzetten haalt het vinkje van een benchmark op niveau 2 mee, want dan is er niets te vergelijken", () => {
     const { n2 } = opzet();
-    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2.id)], "g1");
-    db.slaLeadToegangOp("O1", [{ ...aan("L1", "resultaten", "M1"), aan: false }], "g1");
-    expect(vinkjes()).toHaveLength(0);
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "resultaten", "M2"), aan("L1", "benchmark", n2.id)], "g1");
+    expect(benchmarkVinkjes()).toHaveLength(1);
+    db.slaLeadToegangOp("O1", [{ ...aan("L1", "resultaten", "M2"), aan: false }], "g1");
+    expect(vinkjes().map((t) => t.weergave)).toEqual(["resultaten"]);
   });
 
   it("een Meting verwijderen haalt de vinkjes van die Meting weg, ook het benchmarkvinkje dat erop leunde", () => {
     const { n2 } = opzet();
-    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "uitnodigen", "M1"), aan("L1", "benchmark", n2.id)], "g1");
+    db.slaLeadToegangOp(
+      "O1",
+      [aan("L1", "resultaten", "M1"), aan("L1", "resultaten", "M2"), aan("L1", "uitnodigen", "M1"), aan("L1", "benchmark", n2.id)],
+      "g1"
+    );
     db.verwijderMeting("M1");
-    expect(vinkjes()).toHaveLength(0);
+    // Wat van M1 was valt weg. De benchmark is nog maar van één Meting en heeft geen vinkje meer.
+    expect(vinkjes().map((t) => `${t.weergave}:${t.metingId ?? ""}`)).toEqual(["resultaten:M2"]);
   });
 
   it("de Respondent van een scan verwijderen raakt de vinkjes van de Lead niet", () => {
     const { n2 } = opzet();
-    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2.id)], "g1");
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "resultaten", "M2"), aan("L1", "benchmark", n2.id)], "g1");
     db.verwijderLeden(["R1"]);
-    expect(vinkjes()).toHaveLength(2);
+    expect(vinkjes()).toHaveLength(3);
   });
 
   it("de Lead verwijderen, of zijn rol intrekken, haalt zijn vinkjes weg", () => {
     const { n2 } = opzet();
-    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2.id)], "g1");
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "resultaten", "M2"), aan("L1", "benchmark", n2.id)], "g1");
     db.zetLeadRol("L1", false);
     expect(vinkjes()).toHaveLength(0);
     opslag.clear();
     const { n2: n2b } = opzet();
-    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2b.id)], "g1");
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "resultaten", "M2"), aan("L1", "benchmark", n2b.id)], "g1");
     db.verwijderLeden(["L1"]);
     expect(vinkjes()).toHaveLength(0);
   });
 
-  it("een benchmark wijzigen zodat de Meting met Resultaten niet meer meedoet haalt het benchmarkvinkje weg", () => {
+  it("een benchmark wijzigen zodat een Meting met Resultaten niet meer meedoet haalt het benchmarkvinkje weg", () => {
     const { n2 } = opzet();
-    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "benchmark", n2.id)], "g1");
+    db.slaLeadToegangOp("O1", [aan("L1", "resultaten", "M1"), aan("L1", "resultaten", "M2"), aan("L1", "benchmark", n2.id)], "g1");
     store.wijzigBenchmark(n2.id, { naam: "Binnen", assessmentIds: ["A"], leden: [{ organisatieId: "O1", assessmentId: "A", metingId: "M2" }] }, namen);
+    // Het benchmarkvinkje valt zodra de vinkjes worden opgeruimd.
     db.ruimBenchmarkVinkjesOp();
     expect(benchmarkVinkjes()).toHaveLength(0);
-    expect(vinkjes().map((t) => t.weergave)).toEqual(["resultaten"]);
+    expect(vinkjes().map((t) => t.weergave).sort()).toEqual(["resultaten", "resultaten"]);
   });
 });
 
