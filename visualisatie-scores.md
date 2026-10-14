@@ -12,10 +12,11 @@ Een resultaat moet in één blik laten zien waar een organisatie hoog en laag sc
 |---|---|---|---|
 | A. Eén meting | Waar scoren we hoog en laag? | Geen benchmark, de Organisatie-resultaten (`beheerpagina.md`) | Admin, Consultant, Lead |
 | B. Spreiding | Zijn de respondenten het eens? | Niveau 3, binnen een Meting | Admin, Lead met vinkje (zonder ring) |
-| C. Tussen metingen | Wat is er veranderd tussen twee Metingen? | Niveau 2, binnen een organisatie, bij twee Metingen | Admin, Lead met vinkje |
+| C. Ontwikkeling tussen metingen | Wat is er veranderd tussen twee meetmomenten van hetzelfde onderdeel? | Niveau 2, binnen een organisatie, lezing Ontwikkeling over tijd, bij twee Metingen | Admin, Lead met vinkje |
 | D. Tussen organisaties | Waar zitten we boven of onder de groep? | Niveau 1, de view per organisatie | Admin, Lead met vinkje |
 | E. Matrix | Hoe verschillen de Metingen of organisaties per bouwblok? | Niveau 2, binnen een organisatie, en niveau 1, tussen organisaties | Alleen Admin |
 | G. Antwoorden per vraag | Wie antwoordde wat, per vraag en per bouwblok? | Het laagste niveau, binnen een Meting | Admin, Consultant, en een Lead met vinkje |
+| H. Metingen naast elkaar | Hoe scoren twee onderdelen of samenstellingen ten opzichte van elkaar? | Niveau 2, binnen een organisatie, lezing Naast elkaar, bij twee Metingen | Admin, Lead met vinkje |
 
 ## Gedeelde regels
 
@@ -49,7 +50,7 @@ Deze regels gelden voor alle weergaven. G wijkt af in de kleuren en heeft geen b
 **Resultatenpagina van een Meting** (`beheerpagina.md`, punt 4, Organisatie-resultaten)
 
 - Onder de kop staat de schakelaar met drie weergaven: Overzicht, Per bouwblok en Spreiding. Een Admin en een Consultant zien daarnaast Antwoorden (weergave G), en een Lead alleen als dat vinkje in het Leads-venster aan staat. Overzicht is de standaard en is de huidige pagina (classificatiecirkel, radar, staafdiagram per categorie, top 3, legenda). Per bouwblok is weergave A, Spreiding is weergave B zonder ring.
-- Rechts van de schakelaar staat de knop "Vergelijking". Hij is alleen actief als de Meting lid is van een benchmark binnen een organisatie (`benchmark.md`, Niveau 2) en opent die benchmark. Zit ze in meer dan één, dan wordt het een dropdown-knop met de benchmarks op naam. Zit ze in geen enkele, dan staat de knop uitgeschakeld, met de reden in een Info-icoon (`info.vergelijkMetingen`): Een Admin moet eerst een vergelijking aanmaken. De pagina maakt zelf geen vergelijking, ook niet met een eerdere Meting.
+- Rechts van de schakelaar staat de knop "Vergelijking". Hij is alleen actief als de Meting lid is van een benchmark binnen een organisatie (`benchmark.md`, Niveau 2) en opent die benchmark. Zit ze in meer dan één, dan wordt het een dropdown-knop met de benchmarks op naam en de lezing erbij ("ontwikkeling" of "naast elkaar"). Zit ze in geen enkele, dan staat de knop uitgeschakeld, met de reden in een Info-icoon (`info.vergelijkMetingen`): Een Admin moet eerst een vergelijking aanmaken. De pagina maakt zelf geen vergelijking, ook niet met een eerdere Meting.
 - De vergelijking zelf (weergave C) staat in de benchmark en niet op de resultatenpagina. Er is dus geen "Vergelijking sluiten" en geen eyebrow op deze pagina.
 - Een Admin ziet onder de weergave de link "Bekijk in benchmark" als de organisatie (niveau 1) lid is van een benchmark. Zit ze in meer dan één, dan is het een keuzelijst.
 
@@ -107,11 +108,11 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Privacy.** Geldt `benchmarkMinRespondenten` uit `benchmark.md`. De stippen hebben geen naam, geen tooltip en geen aanklikbaar gedrag voor een Lead. Voor een Admin blijft het anoniem, tenzij `beheerpagina.md` anders besluit (zie Open punten).
 
-## C. Tussen metingen
+## C. Ontwikkeling tussen metingen
 
-**Plek.** De view van een benchmark binnen een organisatie (`benchmark.md`, Niveau 2), voor een Admin en, bij een aangevinkte benchmark en Resultaten op beide Metingen, voor een Lead. Er is geen knop die op de resultatenpagina zelf een vergelijking maakt. Dit vervangt het item "Trend tussen Metingen van dezelfde organisatie" uit `backlog.md`.
+**Plek.** De view van een benchmark binnen een organisatie met de lezing Ontwikkeling over tijd (`benchmark.md`, Niveau 2, Lezing), voor een Admin en, bij een aangevinkte benchmark en Resultaten op beide Metingen, voor een Lead. Er is geen knop die op de resultatenpagina zelf een vergelijking maakt. Dit vervangt het item "Trend tussen Metingen van dezelfde organisatie" uit `backlog.md`.
 
-**Data.** Het gemiddelde per bouwblok van beide Metingen, berekend als bij A. De nieuwere Meting is die met de latere meetdatum. Het verschil is de getoonde waarde van de nieuwere Meting min de getoonde waarde van de oudere, zodat wat de lezer ziet optelt. Alleen Metingen van hetzelfde Assessment zijn te vergelijken. Beide Metingen moeten voldoen aan `benchmarkMinScans`.
+**Data.** Het gemiddelde per bouwblok van beide Metingen, berekend als bij A. De nieuwere Meting is die met de latere meetdatum. Beide Metingen hebben hetzelfde onderdeel, want de lezing dwingt dat af. Het verschil is de getoonde waarde van de nieuwere Meting min de getoonde waarde van de oudere, zodat wat de lezer ziet optelt. Alleen Metingen van hetzelfde Assessment zijn te vergelijken. Beide Metingen moeten voldoen aan `benchmarkMinScans`.
 
 **Opbouw.** Per bouwblok een rij met:
 
@@ -122,7 +123,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Tegels.** Totaalscore van de vorige en huidige Meting ("2,9 → 3,1"), aantal bouwblokken gestegen, aantal gedaald, aantal van klasse gewisseld.
 
-**Meetdatum en onderdeel (gebouwd op 14 oktober 2026).** De volgorde komt uit de meetdatum (`datamodel.md`, Meting). De Admin kiest zelf welke twee Metingen een vergelijking vormen, dus er is geen automatisch voorgestelde vorige Meting. Hebben de twee Metingen een ander onderdeel, dan staat boven de weergave de regel "Let op: Dit zijn verschillende onderdelen, het verschil is geen ontwikkeling." De weergave zelf blijft gelijk. Een samengestelde Meting is te vergelijken met een andere samengestelde Meting, zodat samenstelling 1 naast samenstelling 2 kan staan.
+**Meetdatum en onderdeel (voorstel van 14 oktober 2026, ter vervanging van de gebouwde waarschuwing bij een ander onderdeel).** De volgorde komt uit de meetdatum (`datamodel.md`, Meting). De Admin kiest zelf welke twee Metingen een vergelijking vormen, dus er is geen automatisch voorgestelde vorige Meting. Twee Metingen met een ander onderdeel komen hier niet voor: Die zijn te vergelijken met de lezing Naast elkaar (weergave H). Een samengestelde Meting is te vergelijken met een andere samengestelde Meting, zodat "Hele organisatie 2025" naast "Hele organisatie 2026" kan staan.
 
 **Meer dan twee Metingen.** Hier is nog geen ontwerp voor. Voorstel voor later is een lijn per bouwblok over de Metingen heen.
 
@@ -168,7 +169,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Samengestelde Meting (gebouwd op 13 oktober 2026).** De matrix onder een samengestelde Meting (`benchmark.md`, Onderdeel en samengestelde Meting) heeft de onderliggende Metingen als kolommen. Alleen voor de Admin, om dezelfde reden als op niveau 2.
 
-**Volgorde van de kolommen (gebouwd op 14 oktober 2026, ter vervanging van de groepering per onderdeel).** De kolommen staan op meetdatum, de oudste links. De kolomkop toont de naam van de Meting en haar meetdatum. Bij precies twee Metingen komt er rechts een kolom Verschil bij, de nieuwere min de oudere, met dezelfde opbouw als weergave C. Bij meer dan twee Metingen is er nog geen kolom met het verschil.
+**Volgorde van de kolommen (gebouwd op 14 oktober 2026 met de kolom Verschil bij twee Metingen, ter vervanging van de groepering per onderdeel; de lezing Naast elkaar met de kolom Hoogste is voorstel van 14 oktober 2026).** De kolommen staan op meetdatum, de oudste links. De kolomkop toont de naam van de Meting en haar meetdatum. Bij precies twee Metingen komt er rechts een kolom bij, afhankelijk van de lezing. Bij Ontwikkeling over tijd is dat Verschil, de nieuwere min de oudere, met dezelfde opbouw als weergave C. Bij Naast elkaar staan de kolommen op de naam van de Meting in plaats van op meetdatum, en is de extra kolom Hoogste, met het symbool of de naam van de Meting die op die rij hoger scoort en "Gelijk" bij gelijke getoonde waarden. Bij meer dan twee Metingen is er nog geen extra kolom.
 
 **Overzicht van een ronde (gebouwd op 13 oktober 2026, vervalt met de ronde).** Dit overzicht en de knop in de rondekop vervallen. Voor het zien van meerdere onderdelen naast elkaar maakt de Admin een vergelijking tussen Metingen.
 
@@ -200,6 +201,24 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 **Tegels.** Aantal respondenten, percentage beantwoorde vragen (met het totaal), laagste vraag (score, bouwblok en vraagnummer) en hoogste vraag.
 
 **Privacy.** Dit zijn de antwoorden van individuele personen. Een Lead ziet deze weergave alleen als een Admin in het Leads-venster het vinkje Antwoorden voor die Meting heeft aangevinkt (gebouwd op 14 oktober 2026, `beheerpagina.md`, punt 6a). Of hij daarbij namen ziet, bepaalt `Organisatie.antwoordenMetNamen`. Staat die uit, dan heten de kolommen R1 tot en met Rn, zonder tooltip met een naam, in een vaste volgorde die niet de naam of het moment van afronden volgt. Bij anonieme namen is de weergave voor een Lead pas aan te vinken vanaf `benchmarkMinRespondenten` afgeronde scans in de Meting. Een samengestelde Meting heeft geen Antwoorden. De opmerkingen per bouwblok staan niet in deze weergave.
+
+## H. Metingen naast elkaar (niveau 2)
+
+**Voorstel van 14 oktober 2026.** Weergave voor een benchmark binnen een organisatie met de lezing Naast elkaar (`benchmark.md`, Niveau 2, Lezing). Ze beantwoordt de vraag hoe twee onderdelen of samenstellingen scoren ten opzichte van elkaar, op een vergelijkbaar meetmoment. Ze is geen ontwikkeling en toont dus geen richting.
+
+**Plek.** De view van de benchmark, voor een Admin en, bij een aangevinkte benchmark en Resultaten op beide Metingen, voor een Lead. Onder de weergave staat dezelfde matrix als bij C (onderdeel E).
+
+**Data.** Het gemiddelde per bouwblok van beide Metingen, berekend als bij A. De volgorde is op de naam van de Meting. Het verschil is de getoonde waarde van de eerste Meting min die van de tweede, als getal zonder teken. Beide Metingen moeten voldoen aan `benchmarkMinScans`.
+
+**Opbouw.** Boven de weergave staat een legenda met per Meting het symbool, de naam en de meetdatum. Per bouwblok een rij met:
+
+- Een gevulde cirkel voor de eerste Meting en een gevulde ruit voor de tweede, beide gekleurd naar de klasse zoals bij A. De vorm onderscheidt de twee, niet de kleur.
+- Een dunne grijze lijn ertussen, zonder pijlpunt en zonder blauw of oranje (die kleuren staan bij C voor richting).
+- Rechts het verschil als getal met het symbool van de Meting die hoger scoort ("● 0,3" of "◆ 0,3"), en "Gelijk" bij 0,0.
+
+**Tegels.** De totaalscore van beide Metingen naast elkaar, gescheiden door een streep en zonder pijl ("2,9 | 3,1"), het aantal bouwblokken waar de cirkel hoger scoort, het aantal waar de ruit hoger scoort en het aantal gelijke.
+
+**Meer dan twee Metingen.** Hier is nog geen ontwerp voor. Voorstel voor later is een eigen symbool per Meting.
 
 ## Gebouwd
 
@@ -244,7 +263,7 @@ Gebouwd op 13 oktober 2026. De berekeningen staan in `lib/visualisatie.ts` (met 
 **Nog niet gebouwd**
 
 - Export van deze weergaven naar PDF, CSV en InDesign.
-- Meer dan twee Metingen in C.
+- Meer dan twee Metingen in C en H, en de weergave H zelf.
 - Een kolom met het verschil binnen een groep per onderdeel in E (open, zie Volgorde van de kolommen).
 - Een eigen drempel voor de band en de kwartielen in D.
 
@@ -274,7 +293,8 @@ Voorstel, op te nemen in `stylesheet.md` zodra ze zijn bevestigd:
 - Of de band en de kwartielen in D een eigen, hogere drempel krijgen dan `benchmarkMinOrganisaties`. Bij vijf leden in totaal bestaat de rest uit vier organisaties en zijn minimum en maximum dan vrij herleidbaar.
 - Of een Admin in B de naam van een respondent bij een stip kan zien.
 - Een extra uitsplitsing van B naar Rol, bijvoorbeeld management tegenover medewerkers. Zie `backlog.md`.
-- Meer dan twee Metingen in C.
+- Meer dan twee Metingen in C en H.
+- H: Of de symbolen cirkel en ruit genoeg onderscheid geven.
 - G: De volgorde van de kolommen (gebouwd op het laatste woord van de naam), sorteren of filteren op bouwblok, en een CSV-export van deze matrix naast de bestaande export per scan (`export-csv.md`).
 - G: Of de initialen in de kolomkop genoeg zijn bij respondenten met dezelfde initialen.
 - Export van deze weergaven naar PDF, CSV en InDesign.

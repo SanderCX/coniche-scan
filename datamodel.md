@@ -38,7 +38,10 @@ Assessment {
   categorieen: Categorie[] | null   // optioneel, zie hieronder
   bouwblokken: Bouwblok[] | null    // gebruikt als categorieen ontbreken
   scoresPerGroepGesorteerd: boolean // AI-scan sorteert op waarde, Klantcontact-scan niet
-  schaal: SchaalLabel[5]            // per Assessment, zie hieronder
+  schaal: SchaalLabel[5] | null     // per Assessment, zie hieronder; null bij antwoordType "ja-nee-weetniet"
+  antwoordType: "schaal" | "ja-nee-weetniet" // standaard "schaal" (1–5), zie Antwoordtype
+  instructieregel: string | null    // regel boven de vragen in de doorloopflow; leeg = de standaardtekst voor de 1–5-schaal
+  relevantieVraag: string | null    // alleen als een Categorie optioneel is: de Ja/Nee-vraag bovenaan die categorie, zie Optionele categorieën
   pdfContentSecties: { titel: string, bron: ContentBron } | null // zie export-pdf-visual-volwassenheidsscan.md
   afgeleidVanAssessmentId: string | null // zie Sector-varianten hieronder
   bouwblokLabel: string             // eyebrow in de Toelichtingsmodal; standaard "Bouwsteen" (Klantcontact, Zorg), "AI-domein" bij de AI-scan
@@ -103,6 +106,8 @@ Categorie {
   id: string
   naam: string                      // "Overkoepelend", "Organisatie", "Proces & Tech", "Mens", "Fundament"
   kleur: string                     // categoriekleur, waarde in stylesheet.md
+  omschrijving: string | null       // definitie onder de naam in de doorloopflow (Quickscan); leeg = niets tonen
+  optioneel: boolean                // standaard false; true = de respondent kan aangeven dat deze categorie niet van toepassing is, zie Optionele categorieën
   volgorde: number
   gearchiveerd: boolean             // standaard false, zie Content bewerken
   bouwblokken: Bouwblok[]
@@ -122,7 +127,8 @@ Bouwblok {
   tags: string[]                    // variabel aantal
   gewicht: number                   // standaard 1, zie toelichting hieronder
   gearchiveerd: boolean             // standaard false, zie Content bewerken
-  vragen: Vraag[]                   // nu steeds 4 (AI-scan: 5), niet hardcoded aannemen
+  aandachtZin: string | null        // alleen bij antwoordType "ja-nee-weetniet": zin onder de categoriekaart als dit bouwblok het grootste aandachtspunt is, zie content-ziekenhuis-quickscan.md
+  vragen: Vraag[]                   // nu steeds 4 (AI-scan: 5, Quickscan: 1 tot en met 12), niet hardcoded aannemen
 }
 ```
 
@@ -144,6 +150,10 @@ Bij Klantcontact Volwassenheid en AI-volwassenheid staat het overal op
 Klantcontact), 10 (Kanaalmanagement) en 11 (Performance Management), zie
 `content-zorgscan.md`. De bouwblok-nummers zijn de `volgnummer`s uit
 `visie-coniche.md`.
+
+Bij de Quickscan is een bouwblok een dimensie binnen een afdeling. Een
+afdeling zwaarder laten wegen betekent daar hetzelfde gewicht op al haar
+bouwblokken (`content-ziekenhuis-quickscan.md`).
 
 **Wijzigen kan altijd**, ook als er al ingevulde scans zijn. Scores
 worden nooit opgeslagen maar altijd berekend uit `antwoorden` en het
@@ -176,6 +186,53 @@ Een 1–5-schaal per Assessment. Voor de twee huidige scans identiek:
 ```
 
 De betekenis per niveau staat in `inhoudelijk-fundament.md` sectie 1.
+
+### Antwoordtype
+
+`Assessment.antwoordType` bepaalt hoe een vraag wordt beantwoord en hoe de
+score wordt berekend. Een Assessment heeft één antwoordType voor al zijn
+vragen.
+
+- `"schaal"` (standaard): Een antwoord van 1 tot en met 5 volgens
+  `Assessment.schaal`. De score is een gemiddelde (Scoreberekening).
+  Klantcontact Volwassenheid, AI-volwassenheid en de Zorgscan.
+- `"ja-nee-weetniet"`: Een antwoord is `"ja"`, `"nee"` of `"weet-niet"`.
+  Er is geen schaal (`schaal` is `null`). Ja is 1 punt, Nee en Weet ik niet
+  zijn 0 punten. Weet ik niet blijft als eigen antwoord bewaard, zodat het
+  resultaat per antwoord kan tellen. De score is een aantal punten en een
+  percentage (Scoreberekening). Klantcontact Quickscan – Ziekenhuis
+  (`content-ziekenhuis-quickscan.md`).
+
+Een vraag is beantwoord zodra er een waarde staat, ook `"weet-niet"`. De
+voortgang telt dus ook Weet ik niet mee.
+
+**Structuur van de Quickscan.** Dit Assessment gebruikt de bestaande
+lagen en voegt er geen toe. De 4 afdelingen zijn `Categorie`s, de
+dimensies (Organisatie, Processen en techniek, Mensen) zijn `Bouwblok`ken
+onder een afdeling, en de vragen hangen aan die bouwblokken. Een
+dimensie die in een afdeling geen vragen heeft, bestaat daar niet als
+bouwblok. Dezelfde dimensienaam komt daardoor in meerdere afdelingen
+terug als aparte bouwblokken.
+
+**Optionele categorieën.** Een Categorie met `optioneel: true` begint in
+de doorloopflow met de vraag uit `Assessment.relevantieVraag`, met Ja en
+Nee als antwoord, onder de `omschrijving` van de categorie. Het antwoord
+staat in `ScanInvulling.relevantie`.
+
+- Ja: De categorie is van toepassing en haar vragen worden gesteld.
+- Nee: De categorie is niet van toepassing. Haar bouwblokken en vragen
+  worden overgeslagen en ze doet in geen enkele score mee
+  (Scoreberekening). Antwoorden die er al stonden blijven bewaard en
+  tellen weer mee als de respondent terugkeert naar Ja.
+- Zolang de vraag niet beantwoord is, telt de categorie in de voortgang
+  mee als van toepassing.
+- Een scan is afgerond als elke optionele categorie een antwoord op de
+  relevantievraag heeft en alle vragen van de categorieën die van
+  toepassing zijn beantwoord zijn. Minstens één categorie moet van
+  toepassing zijn: Zijn ze allemaal Nee, dan is er niets te scoren en kan
+  de scan niet worden afgerond.
+- Bij `optioneel: false`, dus bij elk ander Assessment, verandert er
+  niets.
 
 ### Organisatie
 
@@ -295,8 +352,11 @@ hoogstens één keer en zelf niet samengesteld. De Metingen kiest de gebruiker
 zelf, zonder verdere grens. Ze heeft standaard het onderdeel "Hele
 organisatie". Haar meetdatum volgt de onderliggende Metingen: Het is de
 laatste meetdatum van de geselecteerde Metingen. Ze is dus niet los te
-wijzigen, en een geselecteerde Meting zonder datum blokkeert het opslaan. Ze
-heeft geen Respondenten en geen `ScanInvulling`s, en kopieert geen antwoorden:
+wijzigen, en een geselecteerde Meting zonder datum blokkeert het opslaan. Een
+bestaande samenstelling waarvan de leden geen datum hebben (uit de tijd van de
+rondes) toont "Datum ontbreekt". In de app staat de datum altijd alleen-lezen,
+zonder invoerveld, met de toelichting "Volgt de nieuwste Meting in de
+samenstelling". Ze heeft geen Respondenten en geen `ScanInvulling`s, en kopieert geen antwoorden:
 De scores worden berekend uit de onderliggende Metingen (Scoreberekening,
 Gemiddelde over een groep leden). Een samengestelde Meting is zelf een Meting,
 dus ze kan als `BenchmarkLid.metingId` meedoen aan een benchmark tussen
@@ -317,7 +377,8 @@ ScanInvulling {
   uitgenodigdOp: datetime
   gestartOp: datetime | null        // gezet bij het verzenden van de intake
   afgerondOp: datetime | null
-  antwoorden: { [vraagId: string]: number }            // 1-5
+  antwoorden: { [vraagId: string]: number | string }   // 1-5, of "ja" | "nee" | "weet-niet" bij antwoordType "ja-nee-weetniet"
+  relevantie: { [categorieId: string]: boolean }       // alleen bij optionele categorieën: true = van toepassing, false = niet van toepassing, ontbreekt = nog niet beantwoord
   opmerkingenPerBouwblok: { [bouwblokId: string]: string }
   notitie: string | null            // gebouwd op 13 oktober 2026, zie hieronder
   bewaarVerlengdTot: datetime | null        // zie Bewaartermijn ingevulde scans
@@ -341,7 +402,8 @@ opnieuw te importeren (`import-scans.md`, Notitie per scan).
 
 Status: `"uitgenodigd"` bij het uitnodigen, `"bezig"` zodra de intake is
 verzonden (ook al is de voortgang dan nog 0%), `"afgerond"` als alle
-vragen beantwoord zijn.
+vragen beantwoord zijn (bij optionele categorieën: Zie Antwoordtype,
+Optionele categorieën).
 
 ### Bewerkslot
 
@@ -400,6 +462,48 @@ Rekenvoorbeeld Zorgscan: Een invulling met som 172 over 60 vragen is
 ongewogen 2,87. Met de blokken 4, 10 en 11 op gewicht 2 komt de som op
 215 en de deler op 72, dus 2,99 (afgerond 3,0). Dit voorbeeld hoort in
 de test van de scorefunctie.
+
+**Antwoordtype `"ja-nee-weetniet"` (Quickscan).** Hier is de score een
+aantal punten en een percentage, geen gemiddelde van 1 tot 5. Met `p` het
+aantal Ja in een bouwblok, `n` het aantal vragen in dat blok en `g` het
+gewicht:
+
+- **Bouwblokscore** = `p` punten van `n`, als percentage `p / n`.
+  Ongewogen. Bij de Quickscan is dit de score van een dimensie binnen een
+  afdeling.
+- **Categoriescore** = `Σ(g × p) / Σ(g × n)` over de bouwblokken in die
+  categorie, als percentage. Dit wijkt af van het gemiddelde van de
+  bouwblokpercentages dat bij de schaal geldt, want dat laat een bouwblok
+  van 1 vraag even zwaar tellen als een bouwblok van 10. Poliklinieken
+  scoren op Organisatie 2 van 4, Processen en techniek 2 van 10 en Mensen
+  1 van 1: De afdeling staat op 5 van 15 (33%), het gemiddelde van de drie
+  percentages zou 57% zijn.
+- **Overall** = `Σ(g × p) / Σ(g × n)` als percentage. De getoonde punten
+  zijn `Σ(g × p)` van `Σ(g × n)`. Bij gewicht 1 overal is dat het aantal
+  Ja gedeeld door het aantal vragen (60 bij de Quickscan). Net als bij de
+  schaal komt de overall uit de ruwe antwoorden en niet uit afgeronde
+  bouwblokpercentages.
+- **Niet van toepassing.** Bouwblokken van een categorie met `relevantie`
+  op `false` doen niet mee. Overall en punten gaan dan over de overige
+  categorieën, bijvoorbeeld 14 van 15 punten (93%) als alleen
+  Patiëntenservice van toepassing is en daar 14 vragen met Ja zijn
+  beantwoord. De categorie zelf krijgt geen score en geen klasse.
+- **Tellingen** per bouwblok: Het aantal Ja, Nee en Weet ik niet, uit
+  `antwoorden`.
+- **Afronding**: Alleen op getoonde waarden, hele procenten,
+  half-away-from-zero. Klasse en kleur volgen het afgeronde percentage
+  (`CLAUDE.md`, sectie 1, Classificatie).
+
+Rekenvoorbeeld Quickscan (de fictieve proefscan uit de PDF): De vier
+afdelingen scoren 5, 3, 5 en 4 punten van 15, samen 17 van 60, dus 28%
+(28,3 afgerond). Krijgen de bouwblokken van de tweede afdeling gewicht 2, dan is het
+`Σ(g × p)` 5 + 6 + 5 + 4 = 20 en `Σ(g × n)` 15 + 30 + 15 + 15 = 75, dus
+27% (26,7 afgerond). Dit voorbeeld hoort in de test van de scorefunctie.
+
+Voor dit antwoordType gebruikt voorlopig alleen de resultatenpagina deze
+berekening. PDF, CSV, InDesign, import, het gemiddelde over meerdere
+Respondenten, spreiding en benchmark zijn er nog niet voor uitgewerkt
+(`backlog.md`).
 
 Vier plekken gebruiken dezelfde uitkomst, geen van alle een eigen
 herimplementatie: De resultatenpagina, de PDF-export
@@ -682,7 +786,7 @@ samen met de backend en de database.
 | Lead | Organisatie | De weergaven zien en doen die een Admin per Lead heeft aangevinkt: Resultaten, Spreiding, Antwoorden, Uitnodigen, Exporteren en benchmarkviews. Kan ook zelf invullen, maar hoeft niet |
 | (geen rol) | Organisatie | Gewone respondent: Eigen scans invullen en eigen resultaten zien |
 
-**Wat een Lead mag zien (gebouwd op 14 oktober 2026).** Dit vervangt het
+**Wat een Lead mag zien (voorstel van 14 oktober 2026).** Dit vervangt het
 bereik van een Lead (Specifieke Metingen of Hele organisatie), de koppeling
 `RespondentRolMeting`, het veld `leadVoorOrganisatie` en de toewijzing van
 benchmarkviews (`BenchmarkToewijzing`). Wat daarvan op 13 oktober 2026 is
@@ -1087,7 +1191,7 @@ gebeurtenis, zonder persoonsgegevens uit scans.
 - `benchmark.aangemaakt`, `benchmark.gewijzigd` en `benchmark.verwijderd`.
   `details` bevat de naam van de benchmark en de namen van de Assessments
   en organisaties zoals ze op dat moment waren.
-- `lead.toegangGewijzigd` (gebouwd op 14 oktober 2026). `details` bevat de
+- `lead.toegangGewijzigd` (voorstel van 14 oktober 2026). `details` bevat de
   organisatie, de weergave (resultaten, antwoorden of benchmark), de Meting of
   de benchmark en of het vinkje aan of uit is gezet, zonder naam of
   e-mailadres van de Lead. De gebeurtenissen `benchmark.toegewezen` en
@@ -1222,6 +1326,8 @@ Benchmark {
                                     // gebouwd: schermmeldingen, zie hieronder
   niveau?: "organisaties" | "metingen" | "scans"
                                     // voorstel, ontbreekt = "organisaties"
+  lezing?: "ontwikkeling" | "naastElkaar"
+                                    // voorstel, alleen bij niveau "metingen", daar verplicht
   aangemaaktOp: datetime
   aangemaaktDoor: string            // Gebruiker
 }
@@ -1233,7 +1339,8 @@ BenchmarkLid {
 }
 ```
 
-`BenchmarkToewijzing` (gebouwd op 13 oktober 2026) is op 14 oktober 2026 vervallen. Een view voor een Lead is een `LeadToegang` met `weergave:
+`BenchmarkToewijzing` (gebouwd op 13 oktober 2026) vervalt in het voorstel van
+14 oktober 2026. Een view voor een Lead is een `LeadToegang` met `weergave:
 "benchmark"` (deel 2). Bestaande toewijzingen worden daarbij overgezet
 (`beheerpagina.md`, punt 6a, Overgang).
 
@@ -1257,14 +1364,27 @@ bestaan zolang de benchmark bestaat.
 - `metingen`: Alle leden hebben dezelfde `organisatieId`. Per Assessment zijn
   er meerdere leden, elk met een andere Meting.
 - `scans`: Eén lid, de Meting waarin de scans worden vergeleken. De scans
-  zelf zijn geen leden, want ze volgen uit de Meting. Sinds 14 oktober 2026
-  wordt een view op een scan niet meer aan een Lead gegeven (`benchmark.md`,
-  View voor een Lead). Niveau 3 blijft bestaan als weergave voor de Admin.
+  zelf zijn geen leden, want ze volgen uit de Meting. Voorstel van 14 oktober
+  2026: Deze waarde vervalt, want een view op een scan wordt niet meer aan een
+  Lead gegeven (`benchmark.md`, View voor een Lead). Niveau 3 blijft een
+  weergave voor de Admin.
+
+**`lezing`** (voorstel van 14 oktober 2026) zegt hoe de leden van een benchmark
+op niveau `metingen` gelezen worden (`benchmark.md`, Niveau 2, Lezing). Bij
+niveau `organisaties` en `scans` ontbreekt ze.
+
+- `ontwikkeling`: Alle leden hebben hetzelfde onderdeel en verschillende
+  meetdata. De volgorde is op meetdatum.
+- `naastElkaar`: Geen regel voor het onderdeel. De volgorde is op de naam van
+  de Meting. Meetdata die meer dan `benchmarkMaxDagenTussenMetingen` dagen uit elkaar
+  liggen geven een waarschuwing bij opslaan, geen blokkade.
+
+De Admin kan de lezing achteraf wijzigen. De controles lopen dan opnieuw.
 
 ### Uitbreiding op Organisatie
 
-`Organisatie` krijgt `antwoordenMetNamen` (boolean, standaard false, gebouwd
-op 14 oktober 2026). Staat hij aan, dan ziet een Lead bij Antwoorden de namen
+`Organisatie` krijgt `antwoordenMetNamen` (boolean, standaard false, voorstel
+van 14 oktober 2026). Staat hij aan, dan ziet een Lead bij Antwoorden de namen
 van de respondenten, en anders R1 tot en met Rn (`beheerpagina.md`, punt 6a).
 Een Admin zet hem na afstemming met de opdrachtgever. De intake en het
 toestemmingsvakje veranderen er niet door.
@@ -1282,5 +1402,7 @@ niveau 1) en `benchmarkMinScans` (startwaarde 3) zijn gebouwd. Voorstel: Per
 niveau een eigen drempel voor het aanvinken van een view voor een Lead,
 `benchmarkMinRespondenten`
 (startwaarde 5, het minimale aantal afgeronde scans in een Meting voor
-Spreiding, voor anonieme Antwoorden en voor de lijn van laagste tot hoogste score bij een Lead). De
+Spreiding, voor anonieme Antwoorden en voor de lijn van laagste tot hoogste score bij een Lead).
+Voorstel: `benchmarkMaxDagenTussenMetingen` (startwaarde 90), het aantal dagen
+waarboven een vergelijking met de lezing Naast elkaar een waarschuwing geeft. De
 betekenis staat in `benchmark.md`, Drempels en View voor een Lead.
