@@ -7,6 +7,7 @@ import { RadarChartView } from "@/components/RadarChartView";
 import { CategoryBarChart } from "@/components/CategoryBarChart";
 import { WeergaveGroep } from "@/components/visualisatie/WeergaveGroep";
 import { WeergaveSpreiding } from "@/components/visualisatie/WeergaveSpreiding";
+import { QuickscanBenchmarkView } from "@/components/quickscan/QuickscanBenchmarkView";
 
 const datumFormat = new Intl.DateTimeFormat("nl-NL", { dateStyle: "long" });
 
@@ -54,6 +55,19 @@ export function BenchmarkOrganisatieView({
   const tekst = TEKSTEN[niveau];
   const { assessment, organisatie, rest } = view;
   const vlak = isVlakkeAssessment(assessment);
+  // Een Assessment met Ja / Nee / Weet ik niet heeft een eigen weergave in percentages (`visualisatie-quickscan.md`, 5).
+  if (view.quickscan) {
+    return (
+      <section className="benchmark-sectie" aria-label={assessment.naam}>
+        <h2>{assessment.naam}</h2>
+        {view.aantalAnderen === 0 ? (
+          <p className="admin-notice">{tekst.geenAnderen}</p>
+        ) : (
+          <QuickscanBenchmarkView view={view.quickscan} eigenNaam={organisatieNaam} peildatum={peildatum} />
+        )}
+      </section>
+    );
+  }
   if (!rest) {
     return (
       <section className="benchmark-sectie" aria-label={assessment.naam}>

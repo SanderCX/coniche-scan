@@ -12,6 +12,8 @@ import {
   voldoetAanMinScans,
 } from "./metingen";
 import { SpreidingWeergave, spreiding, tussenOrganisaties, TussenOrganisatiesWeergave } from "./visualisatie";
+import { isJaNeeWeetNiet } from "./quickscan";
+import { BenchmarkViewQs, QuickscanMeting, quickscanBenchmark, quickscanMeting, quickscanScansVan } from "./quickscan-groep";
 import {
   alleBouwblokResultaten,
   alleGroepResultaten,
@@ -133,6 +135,11 @@ export interface BenchmarkRij {
   /** Gemiddelde per vraag over de afgeronde scans van de Meting. */
   antwoorden: Record<string, number>;
   overall: number | null;
+  /**
+   * Alleen bij een Assessment met Ja / Nee / Weet ik niet: Het gemiddelde van de Meting in punten en procenten
+   * (`visualisatie-quickscan.md`, 5). `antwoorden` is dan leeg en `overall` `null`.
+   */
+  quickscan?: QuickscanMeting;
 }
 
 export interface BenchmarkSectie {
@@ -159,6 +166,7 @@ function bouwRij(lid: BenchmarkLid, assessment: Assessment, organisaties: Organi
     aantalAfgerond: aantalAfgerondInMeting(organisatie, meting),
     antwoorden,
     overall: overallScore(assessment, antwoorden),
+    ...(isJaNeeWeetNiet(assessment) ? { quickscan: quickscanMeting(assessment, quickscanScansVan(meting.invullingen)) } : {}),
   };
 }
 
@@ -256,6 +264,8 @@ export interface VergelijkingsView {
    * scan-view (`bouwScanView`). De stippen hebben geen naam.
    */
   spreiding?: SpreidingWeergave;
+  /** Weergave 5 voor een Assessment met Ja / Nee / Weet ik niet (`visualisatie-quickscan.md`, 5). De andere velden zijn dan leeg. */
+  quickscan?: BenchmarkViewQs;
 }
 
 export interface OrganisatieView extends VergelijkingsView {
@@ -302,10 +312,22 @@ export function bouwOrganisatieView(
   const rij = sectie.rijen.find((r) => r.organisatie.id === organisatieId);
   if (!rij) return null;
   const anderen = sectie.rijen.filter((r) => r.organisatie.id !== organisatieId);
-  return {
-    ...maakVergelijking(sectie.assessment, rij.antwoorden, anderen.map((r) => r.antwoorden), sectie.rijen.length, minOrganisaties),
-    rij,
-  };
+  const basis = maakVergelijking(sectie.assessment, rij.antwoorden, anderen.map((r) => r.antwoorden), sectie.rijen.length, minOrganisaties);
+  if (rij.quickscan) {
+    // Zonder 1–5-schaal: De rij rekent in percentages. De leden zonder score (geen afgeronde scan) doen niet mee.
+    const leden = anderen
+      .filter((r) => r.quickscan && r.quickscan.aantalScans > 0)
+      .map((r) => ({ organisatieId: r.organisatie.id, meting: r.quickscan as QuickscanMeting }));
+    return {
+      ...basis,
+      aantalAnderen: leden.length,
+      aantalInGroep: leden.length + 1,
+      voldoetAanDrempel: leden.length + 1 >= minOrganisaties && leden.length > 0,
+      quickscan: quickscanBenchmark(sectie.assessment, { organisatieId, meting: rij.quickscan }, leden, minOrganisaties),
+      rij,
+    };
+  }
+  return { ...basis, rij };
 }
 
 /** De organisaties die in minstens één sectie een lid hebben, voor de lijst op de detailpagina. */

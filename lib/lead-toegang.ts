@@ -199,14 +199,14 @@ export function metingCelReden(opts: {
   antwoordenMetNamen: boolean;
   drempels: LeadDrempels;
   /**
-   * Is de weergave voor het Assessment van deze Meting uitgewerkt? Niet bij Ja / Nee / Weet ik niet: Daar is alleen
-   * Uitnodigen beschikbaar (`backlog.md`, Quickscan Ziekenhuis). Standaard ja.
+   * Is de weergave voor het Assessment van deze Meting uitgewerkt? Bij Ja / Nee / Weet ik niet zijn Resultaten, Spreiding en
+   * Antwoorden er (`visualisatie-quickscan.md`), Exporteren nog niet (`backlog.md`, Quickscan Ziekenhuis). Standaard ja.
    */
   ondersteund?: boolean;
 }): string | null {
   const { weergave, meting, resultatenAan, afgerondeScans, antwoordenMetNamen, drempels, ondersteund = true } = opts;
-  if (!ondersteund && weergave !== "uitnodigen") {
-    return "Deze weergave is nog niet beschikbaar voor een Assessment met Ja / Nee / Weet ik niet.";
+  if (!ondersteund && weergave === "exporteren") {
+    return "De export is nog niet beschikbaar voor een Assessment met Ja / Nee / Weet ik niet.";
   }
   if (weergave === "resultaten") return null;
   if (weergave === "uitnodigen") {

@@ -34,7 +34,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `sbi-indeling.md` | Vaste optielijst voor Sector/Subsector (SBI2025, top 2 niveaus) |
 | `benchmark.md` | Benchmark op drie niveaus: Tussen organisaties (gebouwd, geaggregeerd en anoniem, met een view per organisatie voor een Lead), binnen een organisatie tussen Metingen, en binnen een Meting (beide voorstel) |
 | `visualisatie-scores.md` | Hoe hoge en lage scores getoond worden: één meting, spreiding binnen een Meting, tussen Metingen, tussen organisaties en de matrix over Metingen (besloten ontwerp, gebouwd op 13 oktober 2026) |
-| `visualisatie-quickscan.md` | Visualisaties van de Quickscan Ziekenhuis in percentages: eigen resultaat (twee standen), gemiddelde en spreiding, antwoorden per vraag en benchmark (richting besloten op 15 oktober 2026, nog niet gebouwd) |
+| `visualisatie-quickscan.md` | Visualisaties van de Quickscan Ziekenhuis in percentages: eigen resultaat (twee standen), gemiddelde en spreiding, antwoorden per vraag en benchmark (besloten op 15 oktober 2026, gebouwd) |
 | `backlog.md` | Bewust nog niet opgepakt |
 | `go-live-plan.md` | Actielijst naar productie |
 | `azure-plan.md` | Aanvulling op `go-live-plan.md` met de stappen voor de Azure-omgeving (Azure DevOps, Azure SQL, `coniche-scan.nl`) |
@@ -98,10 +98,11 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
 - **Quickscan Ziekenhuis**: Gebouwd op 14 oktober 2026
   (`content-ziekenhuis-quickscan.md`): Het eerste Assessment met
   antwoordType Ja / Nee / Weet ik niet, met doorloopflow en eigen
-  resultaatscherm. De visualisaties (eigen resultaat, groep, antwoorden per
-  vraag en benchmark) staan als voorstel in `visualisatie-quickscan.md`. PDF,
-  CSV, InDesign, import, het gemiddelde over een Meting, spreiding en
-  benchmark volgen later (`backlog.md`).
+  resultaatscherm. De visualisaties (eigen resultaat in twee standen, gemiddelde
+  en spreiding, antwoorden per vraag en benchmark tussen organisaties) zijn
+  gebouwd op 15 oktober 2026 (`visualisatie-quickscan.md`). PDF, CSV, InDesign
+  en import volgen later, evenals de vergelijking tussen Metingen en de
+  benchmark binnen een organisatie of een Meting (`backlog.md`).
 
 ## Terminologie
 
@@ -311,7 +312,11 @@ geen afwijking van de spec maar een gat erin.
    wordt later mogelijk een leadgenerator met "Toegang aanvragen"
    (`backlog.md`).
 3. **Voorbeeld-output**: Dezelfde resultaatcomponenten als scherm 6, met
-   vaste demodata. De resultaatcomponent wordt één keer gebouwd.
+   vaste demodata. De resultaatcomponent wordt één keer gebouwd. Bij de
+   Klantcontact Volwassenheidsscan, de AI-volwassenheidsscan en de Zorgscan staat daaronder de weergave Per bouwblok
+   van een Meting met zes demo-respondenten (`visualisatie-scores.md`, A), met
+   de uitleg dat de tool bij meerdere respondenten van dezelfde Meting en
+   organisatie ook het gemiddelde en de afwijking daarop toont.
 4. **Respondent-intake**: Naam, rol/functie, team en notities. Verplicht
    toestemmingsvakje ("Ik geef toestemming om mijn antwoorden te delen
    met Coniche"), met een link naar `privacy-pagina.md`. Alleen
@@ -498,13 +503,13 @@ geen afwijking van de spec maar een gat erin.
    van toepassing is staat er grijs en doorgestreept, en doet niet mee in
    de totaalscore of in "Sterkste afdeling" en "Meeste ontwikkelruimte". Uitwerking in `content-ziekenhuis-quickscan.md`,
    Resultaten. De Exporteren-dropdown toont voorlopig alleen de opties
-   die voor dit type bestaan, dus nu geen. De bestaande schermen die uitgaan
-   van een 1–5-schaal zijn voor dit type bewust uit (besloten bij het bouwen,
-   14 oktober 2026): Het gemiddelde van een Meting en de weergaven Per
-   bouwblok, Spreiding en Antwoorden tonen een melding dat het nog niet is
-   uitgewerkt, een benchmark en een samengestelde Meting bieden dit
-   Assessment niet aan, en in het Leads-venster is alleen Uitnodigen te
-   kiezen. Het resultaat van elke afgeronde scan staat bij de scan zelf.
+   die voor dit type bestaan, dus nu geen. Het scherm heeft de schakelaar
+   Per afdeling en Overzicht (`visualisatie-quickscan.md`, 1 en 2). De
+   resultatenpagina van een Meting heeft voor dit type de weergaven Overzicht
+   (het gemiddelde van de Meting), Gemiddelde en spreiding, en Antwoorden
+   (`visualisatie-quickscan.md`, 3 en 4). Een benchmark tussen organisaties
+   heeft weergave 5. Nog niet voor dit type: Een samengestelde Meting, een
+   benchmark binnen een organisatie of een Meting, en Exporteren.
 
    **Weging in de resultaten**: Een bouwblok met een gewicht ongelijk
    aan 1 toont zijn factor ("2×") bij de naam, in de radar-legenda en de

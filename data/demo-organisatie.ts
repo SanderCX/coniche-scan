@@ -84,7 +84,7 @@ export const demoOrganisatie: Organisatie = {
     techstack,
     fte: {
       "fte-klantcontact": { aantal: 240, "inhouse-percentage": 70, "bpo-percentage": 30 },
-      "fte-management-support": 28,
+      "fte-management-support": { aantal: 28 },
       "fte-it-devops": { aantal: 14, "digital-percentage": 60 },
     },
     kpis: { aht: 285, nps: 32, csat: 84, sla: 88, ftr: 76 },

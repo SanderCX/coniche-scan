@@ -503,3 +503,318 @@
   padding-top: 0.35rem;
   padding-bottom: 0.35rem;
 }
+
+/* Visualisaties van de Quickscan Ziekenhuis (`visualisatie-quickscan.md`, Nieuwe stijlwaarden). */
+.qv-kaart {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  margin-top: 1rem;
+}
+.qv-kaart h3 {
+  margin: 0 0 0.2rem;
+}
+.qv-kaart-sub {
+  font-size: var(--fs-s);
+  color: var(--ink-m);
+  margin: 0 0 0.9rem;
+}
+.qv-rij {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr) 8.5rem;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.35rem 0;
+}
+.qv-rij--nvt {
+  color: var(--ink-s);
+}
+.qv-naam {
+  font-size: var(--fs-s);
+  font-weight: 600;
+  color: var(--ink);
+}
+.qv-naam--nvt {
+  text-decoration: line-through;
+  color: var(--ink-s);
+}
+.qv-waarde {
+  font-size: var(--fs-s);
+  text-align: right;
+  white-space: nowrap;
+}
+.qv-bandnamen {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr) 8.5rem;
+  gap: 1rem;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--ink-s);
+}
+.qv-bandnamen > div {
+  display: flex;
+}
+.qv-bandnamen span {
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+/* Een balk van 0 tot 100% met drie banden op 50% en 80%. */
+.qv-spoor {
+  position: relative;
+  height: 1.7rem;
+  border-radius: 6px;
+  background: linear-gradient(
+    to right,
+    #fdecec 0,
+    #fdecec 50%,
+    #fdf2e3 50%,
+    #fdf2e3 80%,
+    #e7f6ef 80%,
+    #e7f6ef 100%
+  );
+  border: 1px solid var(--border);
+}
+.qv-spoor--neutraal {
+  background: var(--bg-warm);
+}
+.qv-spoor-hulp {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed var(--border-d);
+}
+.qv-bol {
+  position: absolute;
+  top: 50%;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: -0.6rem 0 0 -0.6rem;
+  border-radius: 50%;
+  background: var(--qv-kleur, var(--ink-s));
+  border: 2px solid #fff;
+  box-sizing: border-box;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+.qv-bol--groep {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: -0.75rem 0 0 -0.75rem;
+  background: rgba(93, 106, 120, 0.82);
+  color: #fff;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qv-bol--een {
+  width: 0.9rem;
+  height: 0.9rem;
+  margin: -0.45rem 0 0 -0.45rem;
+}
+.qv-streep {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--ink);
+}
+.qv-streep--totaal {
+  background: none;
+  border-left: 2px dashed var(--ink-m);
+  width: 0;
+}
+.qv-band {
+  position: absolute;
+  top: 25%;
+  bottom: 25%;
+  border-radius: 4px;
+}
+.qv-band--breed {
+  background: #ebf1fb;
+}
+.qv-band--smal {
+  background: #b9cde8;
+}
+.qv-streep--groep {
+  background: #225ba0;
+}
+.qv-bol--x {
+  background: var(--or);
+}
+.qv-label {
+  display: inline-block;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  border: 1.5px solid var(--border-d);
+  color: var(--ink-m);
+  border-radius: 100px;
+  padding: 0.05rem 0.55rem;
+  margin-left: 0.4rem;
+}
+.qv-label--verdeeld {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.qv-label--gestreept {
+  border-style: dashed;
+}
+.qv-label--boven {
+  color: #225ba0;
+  border-color: #225ba0;
+}
+.qv-label--onder {
+  color: var(--stat-amber);
+  border-color: var(--stat-amber);
+}
+.qv-klasse {
+  display: inline-block;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  border-radius: 100px;
+  padding: 0.1rem 0.6rem;
+  border: 1px solid;
+}
+.qv-matrix {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 4px;
+  font-size: var(--fs-s);
+}
+.qv-matrix th {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--ink-s);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 0.2rem 0.3rem;
+}
+.qv-matrix th:first-child,
+.qv-matrix td:first-child {
+  text-align: left;
+}
+.qv-cel {
+  text-align: center;
+  border-radius: 6px;
+  padding: 0.5rem 0.3rem;
+  font-weight: 700;
+}
+.qv-cel small {
+  display: block;
+  font-weight: 400;
+  font-size: var(--fs-xs);
+}
+.qv-cel--leeg {
+  background: repeating-linear-gradient(135deg, #faf9f7 0, #faf9f7 6px, #f2f0eb 6px, #f2f0eb 12px);
+  border: 1px dashed #d4d1ca;
+  color: var(--ink-s);
+  font-weight: 400;
+}
+.qv-cel--afdeling {
+  border: 2px solid;
+}
+.qv-lijst-rij {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr) 9rem;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.3rem 0;
+  font-size: var(--fs-s);
+}
+.qv-balk {
+  height: 0.9rem;
+  border-radius: 100px;
+  background: var(--bg-mid);
+  overflow: hidden;
+}
+.qv-balk > div {
+  height: 100%;
+  border-radius: 100px;
+}
+.qv-keuze {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 0;
+}
+.qv-keuze .actief {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.qv-stapel {
+  display: flex;
+  height: 1.5rem;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-mid);
+}
+.qv-stapel > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+.qv-vraag-rij {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) 15rem 5rem;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-s);
+}
+.qv-dimensie-kop {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.2rem;
+  font-weight: 700;
+  font-size: var(--fs-s);
+  color: var(--ink);
+}
+.qv-legenda {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  font-size: var(--fs-s);
+  color: var(--ink-m);
+  margin: 0.8rem 0;
+}
+.qv-legenda i {
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 3px;
+  margin-right: 0.35rem;
+  vertical-align: -0.05rem;
+}
+.qv-cel-antwoord {
+  text-align: center;
+  font-weight: 700;
+  min-width: 2rem;
+}
+
+/* De vergelijking tussen organisaties heeft rechts meer ruimte nodig: Percentage, verschil en positielabel. */
+.qv-rij--breed,
+.qv-bandnamen--breed {
+  grid-template-columns: 13rem minmax(0, 1fr) 14rem;
+}
+.qv-rij--breed .qv-waarde {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.2rem 0.4rem;
+  white-space: normal;
+}
+.qv-rij--breed .qv-waarde .qv-label {
+  margin-left: 0;
+}

@@ -448,11 +448,12 @@ voorbeeld-output in `data/demo-antwoorden-quickscan.ts`, de kaarten in `componen
   verschijnt daarom alleen als er een toelichting of centrale vraag is, bij elk Assessment.
 - **Bestaande data.** Een browser of serverkopie met opgeslagen Assessments krijgt de Quickscan er één keer bij. Een Admin die
   het Assessment verwijdert, ziet het niet terugkomen (per browser onthouden).
-- **Schermen die niet uitgewerkt zijn voor dit type** (besloten bij het bouwen, zie ook `backlog.md`):
-  - Resultaten van een Meting in beheer en voor een Lead: Een melding dat het gemiddelde nog niet is uitgewerkt. Het
-    resultaat van elke scan staat bij de scan zelf.
-  - Leads-venster: Alleen Uitnodigen is te kiezen, de andere vinkjes zijn grijs met de reden.
-  - Benchmark en samengestelde Meting: Het Assessment staat niet in de keuzelijst.
+- **Schermen die niet uitgewerkt zijn voor dit type** (besloten bij het bouwen, zie ook `backlog.md`). Het gemiddelde, de
+  spreiding, de antwoorden per vraag en de benchmark tussen organisaties zijn sinds 15 oktober 2026 gebouwd
+  (`visualisatie-quickscan.md`). Nog niet:
+  - Een samengestelde Meting en de benchmark binnen een organisatie of een Meting (de weergaven C, E en H in percentages):
+    Het Assessment staat niet in die keuzelijsten.
+  - Leads-venster: De vinkjes Resultaten, Spreiding, Antwoorden en Uitnodigen werken. Exporteren is grijs met de reden.
   - Exporteren: De dropdown ontbreekt op de resultatenpagina en in het Meting-overzicht. De CSV-bulkexport slaat deze scans
     over en meldt dat.
   - Het testknopje in de doorloopflow vult voor dit type Ja, Nee en Weet ik niet, waarbij het gekozen cijfer bepaalt hoeveel

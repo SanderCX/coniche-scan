@@ -18,6 +18,9 @@ import { WeergaveWissel } from "./WeergaveWissel";
 import { WeergaveBouwblok } from "./WeergaveBouwblok";
 import { WeergaveSpreiding } from "./WeergaveSpreiding";
 import { WeergaveAntwoorden } from "./WeergaveAntwoorden";
+import { QuickscanScan, QuickscanMeting } from "@/lib/quickscan-groep";
+import { QuickscanGemiddeldeSpreiding } from "@/components/quickscan/QuickscanGemiddeldeSpreiding";
+import { QuickscanAntwoorden } from "@/components/quickscan/QuickscanAntwoorden";
 
 type Weergave = "overzicht" | "bouwblok" | "spreiding" | "antwoorden";
 
@@ -65,6 +68,18 @@ interface Props {
   vergelijkingen?: { id: string; naam: string; href: string }[];
   /** Alleen een Admin: De link "Bekijk in benchmark" als de organisatie lid is van een benchmark tussen organisaties. */
   toonBenchmarkLink: boolean;
+  /**
+   * Een Meting van een Assessment met Ja / Nee / Weet ik niet (`visualisatie-quickscan.md`, 3 en 4): De schakelaar heeft dan
+   * Overzicht, "Gemiddelde en spreiding" en Antwoorden, in plaats van Per bouwblok en Spreiding. Overzicht is `overzicht`, met
+   * het gemiddelde van de Meting in de kaarten.
+   */
+  quickscan?: {
+    meting: QuickscanMeting;
+    scans: QuickscanScan[];
+    /** De naam per scan-id, voor Per respondent. */
+    namen: Record<string, string>;
+    uitgenodigd: number;
+  };
 }
 
 function MetingWeergavenInhoud({
@@ -78,6 +93,7 @@ function MetingWeergavenInhoud({
   bereikAltijd,
   vergelijkingen,
   toonBenchmarkLink,
+  quickscan,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -87,7 +103,7 @@ function MetingWeergavenInhoud({
 
   const weergaveParam = zoek.get("weergave");
   const weergave: Weergave =
-    weergaveParam === "bouwblok" ||
+    (weergaveParam === "bouwblok" && !quickscan) ||
     (weergaveParam === "spreiding" && spreidingToegestaan) ||
     (weergaveParam === "antwoorden" && antwoordenToegestaan && !isSamengesteld(scanUitvoering))
       ? weergaveParam
@@ -138,8 +154,10 @@ function MetingWeergavenInhoud({
 
   const opties: { waarde: Weergave; label: string; disabled?: boolean }[] = [
     { waarde: "overzicht", label: "Overzicht" },
-    { waarde: "bouwblok", label: "Per bouwblok" },
-    ...(spreidingToegestaan ? [{ waarde: "spreiding" as Weergave, label: "Spreiding" }] : []),
+    ...(quickscan ? [] : [{ waarde: "bouwblok" as Weergave, label: "Per bouwblok" }]),
+    ...(spreidingToegestaan
+      ? [{ waarde: "spreiding" as Weergave, label: quickscan ? "Gemiddelde en spreiding" : "Spreiding" }]
+      : []),
     // Een samengestelde Meting heeft geen scans en dus geen antwoorden per respondent.
     ...(antwoordenToegestaan && !isSamengesteld(scanUitvoering) ? [{ waarde: "antwoorden" as Weergave, label: "Antwoorden" }] : []),
   ];
@@ -175,14 +193,29 @@ function MetingWeergavenInhoud({
       </div>
 
       {weergave === "overzicht" && overzicht}
-      {weergave === "bouwblok" && (
+      {quickscan && weergave === "spreiding" && (
+        <QuickscanGemiddeldeSpreiding
+          meting={quickscan.meting}
+          uitgenodigd={quickscan.uitgenodigd}
+          minRespondenten={bereikAltijd ? undefined : instellingen.benchmarkMinRespondenten}
+        />
+      )}
+      {quickscan && weergave === "antwoorden" && (
+        <QuickscanAntwoorden
+          assessment={assessment}
+          scans={quickscan.scans}
+          namen={quickscan.namen}
+          anoniem={antwoordenAnoniem}
+        />
+      )}
+      {!quickscan && weergave === "bouwblok" && (
         <WeergaveBouwblok assessment={assessment} weergave={eenMeting(assessment, invullingenVan(scanUitvoering))} toonBereik={toonBereik && !isSamengesteld(scanUitvoering)} />
       )}
-      {weergave === "spreiding" && (
+      {!quickscan && weergave === "spreiding" && (
         <WeergaveSpreiding assessment={assessment} weergave={spreiding(assessment, scanUitvoering.invullingen)} />
       )}
 
-      {weergave === "antwoorden" && (
+      {!quickscan && weergave === "antwoorden" && (
         <WeergaveAntwoorden
           assessment={assessment}
           weergave={antwoordenPerVraag(

@@ -27,8 +27,8 @@ export default function NieuweBenchmarkPage() {
   const gebruiker = useIngelogdeGebruiker();
   const organisaties = useOrganisaties();
   const assessments = useAssessments();
-  // Een benchmark rekent met gemiddelden en spreiding van de 1–5-schaal: Voor Ja / Nee / Weet ik niet is dat nog niet uitgewerkt
-  // (`backlog.md`, Quickscan Ziekenhuis).
+  // Tussen organisaties (niveau 1) doet ook een Assessment met Ja / Nee / Weet ik niet mee (`visualisatie-quickscan.md`, 5). Binnen
+  // een organisatie en binnen een Meting rekenen de weergaven nog met de 1–5-schaal (`backlog.md`, Quickscan Ziekenhuis).
   const voorBenchmark = assessments.filter((a) => !isJaNeeWeetNiet(a));
   const instellingen = useInstellingen();
   const router = useRouter();
@@ -78,7 +78,7 @@ export default function NieuweBenchmarkPage() {
         <BenchmarkForm
           key="organisaties"
           organisaties={organisaties}
-          assessments={voorBenchmark}
+          assessments={assessments}
           minScans={instellingen.benchmarkMinScans}
           minOrganisaties={instellingen.benchmarkMinOrganisaties}
           bevestigLabel="Benchmark aanmaken"

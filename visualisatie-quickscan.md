@@ -1,6 +1,6 @@
 # Coniche Scan: Visualisaties van de Quickscan Ziekenhuis
 
-**Status.** Voorstel van 15 oktober 2026. Joost heeft de vijf weergaven als richting aangenomen. Nog niet gebouwd. Dit bestand beschrijft wat getoond wordt en hoe het berekend wordt voor de Klantcontact Quickscan – Ziekenhuis (`content-ziekenhuis-quickscan.md`). Het vult `visualisatie-scores.md` aan en vervangt het niet: De weergaven daar rekenen met scores op de schaal van 1 tot 5, de Quickscan rekent met punten en percentages (`datamodel.md`, Scoreberekening). De precieze opmaak volgt `stylesheet.md`. Waar dit bestand daar iets aan toevoegt, staat dat onder Nieuwe stijlwaarden.
+**Status.** Voorstel van 15 oktober 2026. Joost heeft de vijf weergaven als richting aangenomen. Gebouwd op 15 oktober 2026, met de keuzes onder Gebouwd. Dit bestand beschrijft wat getoond wordt en hoe het berekend wordt voor de Klantcontact Quickscan – Ziekenhuis (`content-ziekenhuis-quickscan.md`). Het vult `visualisatie-scores.md` aan en vervangt het niet: De weergaven daar rekenen met scores op de schaal van 1 tot 5, de Quickscan rekent met punten en percentages (`datamodel.md`, Scoreberekening). De precieze opmaak volgt `stylesheet.md`. Waar dit bestand daar iets aan toevoegt, staat dat onder Nieuwe stijlwaarden.
 
 **Visueel referentieontwerp.** Het canvas "Quickscan Ziekenhuis – voorstellen voor visualisaties" (vijf borden, voorbeeldgegevens van een fictief ziekenhuis) is een ontwerpschets en geen code. Waar schets en tekst verschillen, geldt de tekst. Het canvas is privé en moet door Joost gedeeld worden voordat Sander het kan openen.
 
@@ -157,3 +157,42 @@ Voorstel, op te nemen in `stylesheet.md` zodra ze zijn bevestigd:
 - Of een Admin in Gemiddelde en spreiding een naam bij een bol kan zien (open punt in `visualisatie-scores.md`).
 - Het minimum en maximum in de benchmark van één organisatie (zie D).
 - Export van deze weergaven naar PDF, CSV en InDesign (PDF-spec volgt later).
+
+## Gebouwd
+
+Gebouwd op 15 oktober 2026. De berekeningen staan in `lib/quickscan-groep.ts` (met tests in `lib/quickscan-groep.test.ts`), de
+weergaven in `components/quickscan/` en `components/QuickscanResultaten.tsx`.
+
+**Plekken**
+
+- 1 en 2: `QuickscanResultaten` met de schakelaar Per afdeling en Overzicht (`?weergave=overzicht`), op het resultaatscherm van de
+  respondent, de voorbeeld-output en de scan in beheer. "Positie in de Meting" (weergave B op niveau 3) is er voor dit type niet.
+- 3 en 4: `MetingWeergaven` op de resultatenpagina van een Meting, in beheer en voor een Lead. De schakelaar heeft Overzicht
+  (het gemiddelde van de Meting in dezelfde kaarten), "Gemiddelde en spreiding" en Antwoorden. Per bouwblok vervalt. De knop
+  Spreiding in het Leads-venster opent weergave 3.
+- 5: De view per organisatie van een benchmark tussen organisaties (`BenchmarkOrganisatieView`), voor een Admin en een Lead. In
+  de lijst van de benchmark staat per organisatie het totaal met de klasse.
+
+**Keuzes waar de spec open liet** (de open punten hierboven, met de gebouwde waarde)
+
+- De grenzen van het spreidingslabel staan als constante: 14 en 20 procentpunten, minstens 3 vragen en minstens 3 relevante scans
+  (`QS_SPREIDING_GRENZEN`).
+- Het totaal van een Meting is alle punten gedeeld door alle mogelijke punten van de relevante afdelingen, over alle scans. In de
+  kaart van de Meting staat bij het totaal geen aantal punten, omdat het maximum per scan verschilt als een afdeling niet
+  voor iedereen relevant is. Hetzelfde geldt voor de benchmark: Elk lid telt even zwaar met zijn totaal.
+- De respondent krijgt op scherm 6 de schakelaar Per afdeling en Overzicht.
+- "Onbekend bij x van y" staat vanaf 40% Weet ik niet en minstens drie respondenten (`QS_ONBEKEND_AANDEEL`, `QS_ONBEKEND_MIN`).
+- De stand Per respondent bij Antwoorden is gebouwd: Cellen J, N of ? met de namen en initialen van weergave G, voor een Lead
+  zonder namen R1 tot en met Rn.
+- Een Admin ziet in Gemiddelde en spreiding geen naam bij een bol (geen tooltip, niet aanklikbaar).
+- Het minimum en het maximum in de benchmark staan er zoals in de spec. Het risico dat één organisatie herleidbaar is, geldt
+  zoals bij weergave D (`visualisatie-scores.md`, Open punten).
+- Bij gelijkstand tonen de tegels "Minst vaak Ja" en "Vaakst Weet ik niet" de eerste vraag in de volgorde van het model.
+- De groep voor een rij in de benchmark telt alleen de leden met een afgeronde scan. Is de groep (X inbegrepen) kleiner dan
+  `benchmarkMinOrganisaties`, dan staat bij die rij "Te weinig ziekenhuizen" en geen band.
+
+**Nog niet gebouwd**
+
+- De weergaven C, E en H voor dit type (vergelijking tussen Metingen in percentages) en de samengestelde Meting.
+- De benchmark binnen een organisatie en binnen een Meting voor dit type.
+- Export van deze weergaven naar PDF, CSV en InDesign.

@@ -92,7 +92,7 @@ export function kenmerkenXml(kenmerken: Record<string, unknown>): string {
       inhousePercentage: pad(fte, "fte-klantcontact", "inhouse-percentage"),
       bpoPercentage: pad(fte, "fte-klantcontact", "bpo-percentage"),
     }),
-    el("fteKlantcontactManagementSupport", { waarde: pad(fte, "fte-management-support") }),
+    el("fteKlantcontactManagementSupport", { waarde: pad(fte, "fte-management-support", "aantal") }),
     el("fteItDevops", {
       waarde: pad(fte, "fte-it-devops", "aantal"),
       percentageDigital: pad(fte, "fte-it-devops", "digital-percentage"),

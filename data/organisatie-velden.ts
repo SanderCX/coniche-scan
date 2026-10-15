@@ -526,7 +526,8 @@ export const organisatieVelden: VeldDefinitie[] = [
       {
         id: "fte-management-support",
         label: "Klantcontact management & support",
-        type: "getal",
+        type: "groep",
+        subvelden: [{ id: "aantal", label: "Aantal FTE", type: "getal" }],
       },
       {
         id: "fte-it-devops",
