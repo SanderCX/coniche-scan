@@ -102,6 +102,7 @@ export function FilterMenu({
                     >
                       <span className="filtermenu-naam">{r.korte}</span>
                       <span className="filtermenu-n">
+                        {r.veld.id === KANALEN_ID && !al ? "alleen filteren · " : ""}
                         {al ? "toegevoegd" : `${r.aantal} van ${pool.length}`}
                       </span>
                     </button>

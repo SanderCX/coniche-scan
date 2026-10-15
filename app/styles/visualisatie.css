@@ -926,14 +926,48 @@
   height: 52px;
   margin-top: 0.6rem;
 }
-.vk-histogram > div {
+.vk-histogram > div,
+.vk-histogram > button {
   flex: 1;
   background: #cfccc5;
+  border: 0;
+  padding: 0;
   border-radius: 2px 2px 0 0;
   min-height: 2px;
 }
-.vk-histogram > div.focus {
+.vk-histogram > button {
+  cursor: pointer;
+}
+.vk-histogram > button:hover {
+  outline: 1px solid var(--or);
+}
+.vk-histogram > div.focus,
+.vk-histogram > button.focus {
   background: var(--or);
+}
+.vk-drempel-rij {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+.vk-drempel-invoer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.vk-drempel-invoer input {
+  width: 8rem;
+  height: var(--control-h);
+  box-sizing: border-box;
+  padding: 0 0.875rem;
+  border: 1.5px solid var(--border-d);
+  border-radius: var(--r);
+  font: inherit;
+  font-size: var(--fs-14);
+  background: var(--bg);
+  color: var(--ink);
 }
 .vk-slider {
   width: 100%;

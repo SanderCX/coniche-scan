@@ -301,7 +301,7 @@ export function maakGroepen(
     if (w === null) continue;
     (w <= groepering.drempel ? onder : boven).push(lid);
   }
-  const d = String(groepering.drempel).replace(".", ",");
+  const d = formatGetal(groepering.drempel, 1);
   const eenheid = veld.eenheid ? ` ${veld.eenheid}` : "";
   return [
     { sleutel: "onder", naam: `≤ ${d}${eenheid}`, leden: onder },
@@ -348,6 +348,84 @@ export interface GroeperDrempels {
 /** De startwaarden uit de spec, voor tests en voor een instelling die ontbreekt. */
 export const STANDAARD_GROEPER_DREMPELS: GroeperDrempels = { minPool: 6, maxGroepen: 12, minIngevuldPct: 40 };
 
+export const KANALEN_REDEN = "Kan niet groeperen: Een Organisatie kan meerdere kanalen hebben";
+
+/* ---------- Getallen tonen en de drempel instellen ---------- */
+
+/** Een getal met punten als duizendtalscheiding en een komma als decimaalteken ("3.932.600", "4,5"). */
+export function formatGetal(n: number, maxDecimalen = 2): string {
+  const afgerond = Number(n.toFixed(maxDecimalen));
+  const [geheel, decimalen] = String(Math.abs(afgerond)).split(".");
+  const groep = geheel.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `${afgerond < 0 ? "−" : ""}${groep}${decimalen ? `,${decimalen}` : ""}`;
+}
+
+/**
+ * De stap van de drempel-slider (`visualisatie-verkennen.md`, De drempel instellen): 1, 2 of 5 keer een macht van tien, zo
+ * gekozen dat er ongeveer 100 standen zijn. Bij een bereik tot 5.000.000 is de stap 50.000. Een kleiner bereik dan 100 geeft
+ * bij hele getallen stap 1.
+ */
+export function drempelStap(min: number, max: number, heleGetallen = true): number {
+  const bereik = Math.max(0, max - min);
+  const ruw = bereik / 100;
+  if (ruw <= 0) return 1;
+  const macht = Math.floor(Math.log10(ruw));
+  const kandidaten = [1, 2, 5, 10].map((m) => m * 10 ** macht);
+  const stap = kandidaten.find((k) => k >= ruw) ?? 10 ** (macht + 1);
+  const afgerond = Number(stap.toPrecision(6));
+  return heleGetallen ? Math.max(1, afgerond) : afgerond;
+}
+
+/** Een drempel op een waarde, afgerond op hele getallen of op één decimaal bij decimale waarden. */
+export function rondDrempel(w: number, heleGetallen: boolean): number {
+  return heleGetallen ? Math.round(w) : Math.round(w * 10) / 10;
+}
+
+export interface GroeperKenmerk {
+  id: string;
+  naam: string;
+  bruikbaarheid: Bruikbaarheid;
+}
+
+export interface GroeperingsBesluit {
+  /** Het kenmerk waarop gegroepeerd wordt, `null` als er geen pil gekozen is. */
+  gekozen: string | null;
+  /** De melding bij een terugval. Hij beschrijft één gebeurtenis en wordt bij de volgende wijziging opnieuw bepaald. */
+  melding: string | null;
+}
+
+/**
+ * Welke pil bij Groeperen op gekozen is na een wijziging van kenmerken, filters of keuze (`visualisatie-verkennen.md`, Groeperen
+ * en focus: Terugval, Levensduur van een melding en Herstel). `vorige` is het kenmerk dat gekozen was. Kan dat nog, dan blijft het
+ * staan. Kan het niet meer, dan volgt de eerste pil die wel kan, met een melding. Is er geen pil gekozen, dan wordt de eerste pil
+ * die kan gekozen, zonder melding: Zo ook bij het eerste bruikbare kenmerk en bij herstel. De melding verdwijnt doordat elke
+ * wijziging hem opnieuw bepaalt.
+ */
+export function besluitGroepering(invoer: {
+  vorige: string | null;
+  kenmerken: GroeperKenmerk[];
+  /** De naam van het vorige kenmerk, voor de melding als het is verwijderd. */
+  vorigeNaam?: string;
+  poolGrootte: number;
+  /** De pool zonder filters: Een te kleine pool door de filters is iets anders dan een te kleine pool. */
+  poolTotaal: number;
+  minPool: number;
+}): GroeperingsBesluit {
+  const eerste = invoer.kenmerken.find((k) => k.bruikbaarheid.ok);
+  if (invoer.vorige === null) return { gekozen: eerste?.id ?? null, melding: null };
+  const huidig = invoer.kenmerken.find((k) => k.id === invoer.vorige);
+  if (huidig?.bruikbaarheid.ok) return { gekozen: huidig.id, melding: null };
+  const reden = huidig ? (huidig.bruikbaarheid.reden ?? "Het kenmerk kan niet groeperen") : `${invoer.vorigeNaam ?? "Het kenmerk"} is verwijderd`;
+  if (eerste) return { gekozen: eerste.id, melding: `${reden}. De groepering staat nu op ${eerste.naam}.` };
+  if (invoer.poolGrootte < invoer.minPool && invoer.poolTotaal >= invoer.minPool) {
+    return {
+      gekozen: null,
+      melding: `Met deze filters zit er ${invoer.poolGrootte} ${invoer.poolGrootte === 1 ? "Organisatie" : "Organisaties"} in de pool. Dat is te weinig om te vergelijken. Haal een filter weg.`,
+    };
+  }
+  return { gekozen: null, melding: "Er is geen kenmerk meer om op te groeperen." };
+}
+
 export interface Bruikbaarheid {
   ok: boolean;
   /** De reden als het kenmerk niet kan groeperen. */
@@ -364,13 +442,23 @@ export function kanGroeperen(
   gefilterd: PoolLid[],
   drempels: GroeperDrempels = STANDAARD_GROEPER_DREMPELS
 ): Bruikbaarheid {
-  if (gefilterd.length < drempels.minPool) return { ok: false, reden: `Minder dan ${drempels.minPool} Organisaties in de pool` };
+  // Ingezette kanalen kan nooit groeperen: Een organisatie zet meerdere kanalen in en valt dan in meer dan één groep.
+  if (veld.id === KANALEN_ID) return { ok: false, reden: KANALEN_REDEN };
+  // De redenen noemen de instelling erachter, zodat een Admin meteen ziet waar hij de grens aanpast.
+  if (gefilterd.length < drempels.minPool) {
+    return { ok: false, reden: `Minder dan ${drempels.minPool} Organisaties in de pool (instelling Organisaties in de pool, minimum)` };
+  }
+  // Bij 0% geldt geen ondergrens voor hoe vaak een kenmerk is ingevuld.
   const minIngevuld = Math.ceil((drempels.minIngevuldPct / 100) * alle.length);
   const ingevuld = alle.length - zonderWaarde(alle, veld);
-  if (ingevuld < minIngevuld) return { ok: false, reden: `Minder dan ${minIngevuld} ingevulde waarden` };
+  if (ingevuld < minIngevuld) {
+    return { ok: false, reden: `Minder dan ${minIngevuld} ingevulde waarden (instelling Kenmerk ingevuld, minimum)` };
+  }
   if (veld.type === "select") {
     const aantal = selectOpties(gefilterd, veld).length;
-    if (aantal > drempels.maxGroepen) return { ok: false, reden: `Meer dan ${drempels.maxGroepen} verschillende waarden` };
+    if (aantal > drempels.maxGroepen) {
+      return { ok: false, reden: `Meer dan ${drempels.maxGroepen} waarden (instelling Waarden per kenmerk, maximum)` };
+    }
     if (aantal < 2) return { ok: false, reden: "Het filter laat één waarde over" };
     return { ok: true };
   }

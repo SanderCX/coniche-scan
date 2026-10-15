@@ -12,6 +12,8 @@ import {
   FilterStand,
   Groepering,
   KANALEN_ID,
+  besluitGroepering,
+  rondDrempel,
   LEGE_FILTERS,
   bouwPool,
   filterVelden,
@@ -61,6 +63,7 @@ export default function VerkennenPage() {
   const [filters, setFilters] = useState<FilterStand>(LEGE_FILTERS);
   const [kenmerken, setKenmerken] = useState<string[]>([]);
   const [gekozenOp, setGekozenOp] = useState<string | null>(null);
+  const [melding, setMelding] = useState<string | null>(null);
   const [drempel, setDrempel] = useState<number | null>(null);
   const [focusKeuze, setFocusKeuze] = useState<string | undefined>(undefined);
   const [weergave, setWeergave] = useState<Weergave>("groep");
@@ -81,45 +84,65 @@ export default function VerkennenPage() {
   };
   const korte = (id: string, label: string) => korteNaamVeld(instellingen.korteNamen, id, label);
 
-  // Welke kenmerken kunnen groeperen, en waarop er nu gegroepeerd wordt.
-  const groeperOpties: GroeperOptie[] = pool
-    ? kenmerken
-        .map((id) => velden.find((v) => v.id === id))
-        .filter((v): v is NonNullable<typeof v> => v !== undefined)
-        .map((veld) => {
-          const naam = korte(veld.id, veldLabelZonderGroep(veld));
-          return {
-            veld,
-            naam: veld.type === "getal" ? `${naam}-drempel` : naam,
-            bruikbaarheid: kanGroeperen(veld, pool.leden, gefilterd, drempels),
-          };
-        })
-    : [];
-  const eerstBruikbaar = groeperOpties.find((o) => o.bruikbaarheid.ok);
-  const gekozenOptie = groeperOpties.find((o) => o.veld.id === gekozenOp);
-  const effectiefOptie = gekozenOptie?.bruikbaarheid.ok ? gekozenOptie : eerstBruikbaar;
+  // Welke kenmerken kunnen groeperen: Elk toegevoegd kenmerk is een pil, ook Ingezette kanalen (altijd uitgeschakeld).
+  const optiesVoor = (ids: string[], gefilterdeLeden: typeof gefilterd): GroeperOptie[] =>
+    pool
+      ? ids
+          .map((id) => alleVelden.find((v) => v.id === id))
+          .filter((v): v is NonNullable<typeof v> => v !== undefined)
+          .map((veld) => {
+            const naam = veld.id === KANALEN_ID ? korte(KANALEN_ID, "Ingezette kanalen") : korte(veld.id, veldLabelZonderGroep(veld));
+            return {
+              veld,
+              naam: veld.type === "getal" ? `${naam}-drempel` : naam,
+              bruikbaarheid: kanGroeperen(veld, pool.leden, gefilterdeLeden, drempels),
+            };
+          })
+      : [];
+  const groeperOpties = optiesVoor(kenmerken, gefilterd);
+  const effectiefOptie = groeperOpties.find((o) => o.veld.id === gekozenOp && o.bruikbaarheid.ok);
   const effectief = effectiefOptie?.veld.id ?? null;
 
-  // De terugval (`visualisatie-verkennen.md`, Groeperen en focus): Een eerder gekozen kenmerk dat niet meer kan, met de reden.
-  let melding: string | null = null;
-  if (gekozenOp !== null && effectiefOptie?.veld.id !== gekozenOp) {
-    const gekozenVeld = velden.find((v) => v.id === gekozenOp);
-    const gekozenNaam = gekozenVeld ? korte(gekozenVeld.id, veldLabelZonderGroep(gekozenVeld)) : "Het kenmerk";
-    const reden = gekozenOptie ? (gekozenOptie.bruikbaarheid.reden ?? "Het kenmerk kan niet groeperen") : `${gekozenNaam} is verwijderd`;
-    if (effectiefOptie) melding = `${reden}. De groepering staat nu op ${effectiefOptie.naam}.`;
-    else if (gefilterd.length < drempels.minPool && pool && pool.leden.length >= drempels.minPool) {
-      melding = `Met deze filters zit er ${gefilterd.length} ${gefilterd.length === 1 ? "Organisatie" : "Organisaties"} in de pool. Dat is te weinig om te vergelijken. Haal een filter weg.`;
-    } else melding = "Er is geen kenmerk meer om op te groeperen.";
-  }
+  /**
+   * Elke wijziging van kenmerken, filters of keuze loopt hierdoor (`visualisatie-verkennen.md`, Terugval, Levensduur van een
+   * melding en Herstel): De groepering en de melding worden opnieuw bepaald. Een melding beschrijft zo één gebeurtenis en
+   * verdwijnt bij de volgende wijziging, en een kenmerk dat weer kan groeperen wordt zonder melding gekozen.
+   */
+  const wijzig = (verandering: { kenmerken?: string[]; filters?: FilterStand; gekozen?: string | null }) => {
+    if (!pool) return;
+    const nieuweKenmerken = verandering.kenmerken ?? kenmerken;
+    const nieuweFilters = verandering.filters ?? filters;
+    const nieuweGefilterd = pasFiltersToe(pool.leden, nieuweFilters, velden);
+    const nieuweOpties = optiesVoor(nieuweKenmerken, nieuweGefilterd);
+    const vorige = verandering.gekozen !== undefined ? verandering.gekozen : gekozenOp;
+    const vorigeVeld = vorige ? alleVelden.find((v) => v.id === vorige) : undefined;
+    const besluit = besluitGroepering({
+      vorige,
+      kenmerken: nieuweOpties.map((o) => ({ id: o.veld.id, naam: o.naam, bruikbaarheid: o.bruikbaarheid })),
+      vorigeNaam: vorigeVeld ? korte(vorigeVeld.id, veldLabelZonderGroep(vorigeVeld)) : undefined,
+      poolGrootte: nieuweGefilterd.length,
+      poolTotaal: pool.leden.length,
+      minPool: drempels.minPool,
+    });
+    setKenmerken(nieuweKenmerken);
+    setFilters(nieuweFilters);
+    setMelding(besluit.melding);
+    if (besluit.gekozen !== gekozenOp) {
+      setGekozenOp(besluit.gekozen);
+      setDrempel(null);
+      setFocusKeuze(undefined);
+    }
+  };
 
   const groeperVeld = effectiefOptie?.veld;
   const waardenVeld = groeperVeld && groeperVeld.type === "getal" ? getalWaarden(gefilterd, groeperVeld) : [];
   const mediaanVeld = mediaan(waardenVeld);
+  const heleGetallen = waardenVeld.every((w) => Number.isInteger(w));
   const gekozenGroepering: Groepering | null = !groeperVeld
     ? null
     : groeperVeld.type === "select"
       ? { soort: "select", veldId: groeperVeld.id }
-      : { soort: "drempel", veldId: groeperVeld.id, drempel: drempel ?? Math.round(mediaanVeld ?? 0) };
+      : { soort: "drempel", veldId: groeperVeld.id, drempel: drempel ?? rondDrempel(mediaanVeld ?? 0, heleGetallen) };
   const groepen = gekozenGroepering
     ? maakGroepen(gefilterd, gekozenGroepering, velden, (veldId, waarde) =>
         korteNaamWaarde(instellingen.korteNamen, veldId, waarde)
@@ -164,26 +187,19 @@ export default function VerkennenPage() {
 
   const voegToe = (id: string) => {
     if (kenmerken.includes(id)) return;
-    setKenmerken([...kenmerken, id]);
-    // Het eerste bruikbare kenmerk dat de Admin toevoegt, wordt automatisch de groepering. Een kenmerk dat niet kan, wist een
-    // oude (vervallen) keuze zodat de melding niet blijft staan.
-    const veld = velden.find((v) => v.id === id);
-    if (effectief === null && id !== KANALEN_ID && veld && kanGroeperen(veld, pool.leden, gefilterd, drempels).ok) {
-      setGekozenOp(id);
-      setDrempel(null);
-      setFocusKeuze(undefined);
-    } else if (effectief === null) {
-      setGekozenOp(null);
-    }
+    // Het eerste bruikbare kenmerk dat de Admin toevoegt, wordt automatisch de groepering (`besluitGroepering`).
+    wijzig({ kenmerken: [...kenmerken, id] });
   };
   const verwijder = (id: string) => {
-    setKenmerken(kenmerken.filter((k) => k !== id));
     // Het kruisje haalt ook het filter weg.
     const select = { ...filters.select };
     delete select[id];
     const bereik = { ...filters.bereik };
     delete bereik[id];
-    setFilters({ ...filters, select, bereik, kanalen: id === KANALEN_ID ? [] : filters.kanalen });
+    wijzig({
+      kenmerken: kenmerken.filter((k) => k !== id),
+      filters: { ...filters, select, bereik, kanalen: id === KANALEN_ID ? [] : filters.kanalen },
+    });
   };
 
   return (
@@ -208,6 +224,7 @@ export default function VerkennenPage() {
             setFilters(LEGE_FILTERS);
             setKenmerken([]);
             setGekozenOp(null);
+            setMelding(null);
             setDrempel(null);
             setFocusKeuze(undefined);
             setVerbandY("overall");
@@ -225,7 +242,7 @@ export default function VerkennenPage() {
         velden={alleVelden}
         kenmerken={kenmerken}
         stand={filters}
-        onStand={setFilters}
+        onStand={(f) => wijzig({ filters: f })}
         onToevoegen={voegToe}
         onVerwijder={verwijder}
         pool={pool.leden}
@@ -237,11 +254,7 @@ export default function VerkennenPage() {
         opties={groeperOpties}
         heeftKenmerken={kenmerken.length > 0}
         effectief={effectief}
-        onKies={(id) => {
-          setGekozenOp(id);
-          setDrempel(null);
-          setFocusKeuze(undefined);
-        }}
+        onKies={(id) => wijzig({ gekozen: id })}
         melding={melding}
         leden={gefilterd}
         drempel={drempel}

@@ -1450,7 +1450,7 @@ niveau een eigen drempel voor het aanvinken van een view voor een Lead,
 Spreiding, voor anonieme Antwoorden en voor de lijn van laagste tot hoogste score bij een Lead).
 Gebouwd op 15 oktober 2026 voor Verkennen: `verkennenMinGroep` (3), `verkennenMinVergelijking` (5),
 `verkennenMinPool` (6), `verkennenMaxGroepen` (12) en `verkennenMinIngevuldPct` (40),
-alle gehele getallen van minstens 1, het percentage tot en met 100 (`visualisatie-verkennen.md`, Drempels). `verkennenWaarschuwingGroep` is hernoemd naar `verkennenMinVergelijking`: Een opgeslagen waarde onder de oude naam wordt bij het lezen overgenomen. De startwaarden zijn de norm vanuit het ontwerp. Voorstel van 15 oktober 2026, nog niet gebouwd: Het percentage mag 0 zijn (geen ondergrens), dus voor het percentage geldt dan 0 tot en met 100.
+alle gehele getallen van minstens 1, het percentage tot en met 100 (`visualisatie-verkennen.md`, Drempels). `verkennenWaarschuwingGroep` is hernoemd naar `verkennenMinVergelijking`: Een opgeslagen waarde onder de oude naam wordt bij het lezen overgenomen. De startwaarden zijn de norm vanuit het ontwerp. Gebouwd op 15 oktober 2026: Het percentage mag 0 zijn (geen ondergrens), dus voor het percentage geldt 0 tot en met 100.
 Gebouwd op 14 oktober 2026: `benchmarkMaxDagenTussenMetingen` (startwaarde 90),
 het aantal dagen waarboven een vergelijking met de lezing Naast elkaar een
 waarschuwing geeft. De
