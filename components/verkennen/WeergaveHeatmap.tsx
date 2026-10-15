@@ -37,14 +37,16 @@ export function WeergaveHeatmap({
   heatmap,
   minGroep,
   onFocus,
+  hint,
 }: {
   assessment: Assessment;
   rijen: BouwblokRij[];
   heatmap: Heatmap;
   minGroep: number;
   onFocus: (sleutel: string) => void;
+  /** Zonder groepering staat er alleen de kolom Hele pool, met deze hint eronder (`visualisatie-verkennen.md`, Zonder groepering). */
+  hint?: string;
 }) {
-  if (heatmap.groepen.length === 0) return <p className="admin-notice">Er zijn geen groepen om naast elkaar te zetten.</p>;
   const toonCel = (sleutel: string, c: HeatmapCel, teKlein: boolean, titel: string) =>
     teKlein ? (
       <td key={sleutel} className="vk-heat vk-heat--klein" title="Te weinig Organisaties in de groep">
@@ -115,6 +117,7 @@ export function WeergaveHeatmap({
           </tbody>
         </table>
       </div>
+      {hint && <p className="vk-reden">{hint}</p>}
       <p className="vis-onderschrift">
         De eerste kolom is het gemiddelde van de hele pool, de andere kolommen tonen het verschil van de groep met dat gemiddelde:
         Blauw is hoger, donkeroranje lager. De groep telt zelf mee in het gemiddelde van de pool.

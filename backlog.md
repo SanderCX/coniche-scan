@@ -617,8 +617,7 @@ screenshots van de draaiende app. Niets is besloten of gebouwd.
   van 96px op één regel met een tooltip en `Organisatie.korteNaam`. De pil
   staat in de weergave-schakelaar, Verkennen en de antwoorden van de
   Quickscan. Nog niet: Een doorloop van de overige keuzeknoppen in de app
-  op de pil, en het gedrag van Kenmerken en Groeperen op uit het visual
-  design van Verkennen (versie 6, `visualisatie-verkennen.md`). De
+  op de pil. Het visual design van Verkennen (versie 6) is gebouwd. De
   PDF-export valt er niet onder.
 - **Vragenlijst en resultaten**: Duidelijkere actieve staat op de gekozen
   schaalwaarde, de hele antwoordrij klikbaar, een zichtbare

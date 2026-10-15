@@ -83,6 +83,8 @@ export interface VeldDefinitie {
    * Admin invult staan bij de instellingen (`Instellingen.korteNamen`), de definities zelf zijn vaste data.
    */
   korteNaam?: string;
+  /** Weergave-eenheid bij getal en percentage (bijv. "s"), gebruikt door Verkennen bij de drempel. Leeg bij een percentage is "%". */
+  eenheid?: string;
   type: VeldType;
   opties?: string[];
   /**

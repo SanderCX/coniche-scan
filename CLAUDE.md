@@ -104,9 +104,8 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   SBI-sectoren) houden de filterlijst en de pillen leesbaar, gebouwd op 15
   oktober 2026 (`visualisatie-verkennen.md`, Korte namen). Kenmerken
   (organisatievelden die je toevoegt en waarop je filtert en groepeert)
-  beginnen leeg, zonder groepering is de hele pool de focus. De kenmerken zijn
-  een voorstel van 15 oktober 2026 (visual design versie 6) en nog niet
-  gebouwd.
+  beginnen leeg, zonder groepering is de hele pool de focus. Gebouwd op 15
+  oktober 2026 (visual design versie 6).
 - **Opmaakronde**: Besloten door Joost en gebouwd op 15 oktober 2026
   (`stylesheet.md`). Acht lettergroottes in even px (12, 14, 16, 18,
   24, 32, 40, 48) in plaats van zo'n 17 maten, met de paginatitel op 32px.

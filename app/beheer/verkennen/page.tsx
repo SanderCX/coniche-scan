@@ -7,42 +7,50 @@ import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magVerkennen } from "@/lib/rechten";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { korteNaamVeld, korteNaamWaarde } from "@/lib/korte-namen";
 import {
   FilterStand,
+  Groepering,
+  KANALEN_ID,
   LEGE_FILTERS,
+  MIN_POOL_GROEPEREN,
   bouwPool,
   filterVelden,
   getalWaarde,
   getalWaarden,
   heatmap as bouwHeatmap,
+  kanGroeperen,
+  kanalenVeld,
   kenmerkWaarde,
   maakGroepen,
   mediaan,
   pasFiltersToe,
   splitsFocus,
   vergelijk,
+  veldLabelZonderGroep,
+  zonderWaarde,
 } from "@/lib/verkennen";
-import { korteNaamVeld, korteNaamWaarde } from "@/lib/korte-namen";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
-import { FilterPaneel } from "@/components/verkennen/FilterPaneel";
-import { AHT_VELD, GroeperenOp, Vergelijken, groepering } from "@/components/verkennen/Vergelijken";
+import { KenmerkenKaart } from "@/components/verkennen/KenmerkenKaart";
+import { GroeperOptie, Vergelijken } from "@/components/verkennen/Vergelijken";
 import { Sortering, WeergaveGroepRest } from "@/components/verkennen/WeergaveGroepRest";
 import { WeergaveHeatmap } from "@/components/verkennen/WeergaveHeatmap";
 import { WeergaveVerband, verbandPunten } from "@/components/verkennen/WeergaveVerband";
 
 type Weergave = "groep" | "spreiding" | "heatmap" | "verband";
 const VERBAND_X = [
-  { id: "kpis.aht", label: "AHT", eenheid: "seconden" },
-  { id: "kpis.ftr", label: "FTR", eenheid: "%" },
-  { id: "kpis.nps", label: "NPS", eenheid: undefined },
+  { id: "kpis.aht", label: "AHT" },
+  { id: "kpis.ftr", label: "FTR" },
+  { id: "kpis.nps", label: "NPS" },
 ];
 
 /**
  * Verkennen (`visualisatie-verkennen.md`, `beheerpagina.md`, punt 15): Alle Organisaties van één Assessment filteren, groeperen
- * en naast elkaar zetten, alleen voor een Admin. Het scherm slaat niets op: De stand verdwijnt als de Admin het scherm verlaat.
- * Een Assessment met Ja / Nee / Weet ik niet staat er nog niet in (`visualisatie-verkennen.md`, Later).
+ * en naast elkaar zetten, alleen voor een Admin. Het scherm begint leeg: De Admin voegt kenmerken toe, elk kenmerk is een filter
+ * en een mogelijke groepering. Het scherm slaat niets op: De stand verdwijnt als de Admin het scherm verlaat. Een Assessment met
+ * Ja / Nee / Weet ik niet staat er nog niet in (`visualisatie-verkennen.md`, Later).
  */
 export default function VerkennenPage() {
   const gebruiker = useIngelogdeGebruiker();
@@ -52,8 +60,8 @@ export default function VerkennenPage() {
 
   const [assessmentKeuze, setAssessmentKeuze] = useState<string>("");
   const [filters, setFilters] = useState<FilterStand>(LEGE_FILTERS);
-  const [toegevoegd, setToegevoegd] = useState<string[]>([]);
-  const [op, setOp] = useState<GroeperenOp>("crm");
+  const [kenmerken, setKenmerken] = useState<string[]>([]);
+  const [gekozenOp, setGekozenOp] = useState<string | null>(null);
   const [drempel, setDrempel] = useState<number | null>(null);
   const [focusKeuze, setFocusKeuze] = useState<string | undefined>(undefined);
   const [weergave, setWeergave] = useState<Weergave>("groep");
@@ -64,17 +72,59 @@ export default function VerkennenPage() {
   const assessment = assessments.find((a) => a.id === assessmentKeuze) ?? assessments[0];
   // Het scherm rekent bij elke wijziging opnieuw: De pool is klein en er wordt niets opgeslagen.
   const velden = filterVelden();
+  const alleVelden = [...velden, kanalenVeld()];
   const pool = assessment ? bouwPool(organisaties, assessment, instellingen.benchmarkMinScans) : null;
   const gefilterd = pool ? pasFiltersToe(pool.leden, filters, velden) : [];
-  const ahtVeld = velden.find((v) => v.id === AHT_VELD);
-  const ahtMediaan = ahtVeld ? mediaan(getalWaarden(gefilterd, ahtVeld)) : null;
-  const gekozenGroepering = groepering(op, drempel, ahtMediaan === null ? null : Math.round(ahtMediaan));
-  const groepen = maakGroepen(gefilterd, gekozenGroepering, velden, (veldId, waarde) =>
-    korteNaamWaarde(instellingen.korteNamen, veldId, waarde)
-  );
+  const korte = (id: string, label: string) => korteNaamVeld(instellingen.korteNamen, id, label);
+
+  // Welke kenmerken kunnen groeperen, en waarop er nu gegroepeerd wordt.
+  const groeperOpties: GroeperOptie[] = pool
+    ? kenmerken
+        .map((id) => velden.find((v) => v.id === id))
+        .filter((v): v is NonNullable<typeof v> => v !== undefined)
+        .map((veld) => {
+          const naam = korte(veld.id, veldLabelZonderGroep(veld));
+          return {
+            veld,
+            naam: veld.type === "getal" ? `${naam}-drempel` : naam,
+            bruikbaarheid: kanGroeperen(veld, pool.leden, gefilterd),
+          };
+        })
+    : [];
+  const eerstBruikbaar = groeperOpties.find((o) => o.bruikbaarheid.ok);
+  const gekozenOptie = groeperOpties.find((o) => o.veld.id === gekozenOp);
+  const effectiefOptie = gekozenOptie?.bruikbaarheid.ok ? gekozenOptie : eerstBruikbaar;
+  const effectief = effectiefOptie?.veld.id ?? null;
+
+  // De terugval (`visualisatie-verkennen.md`, Groeperen en focus): Een eerder gekozen kenmerk dat niet meer kan, met de reden.
+  let melding: string | null = null;
+  if (gekozenOp !== null && effectiefOptie?.veld.id !== gekozenOp) {
+    const gekozenVeld = velden.find((v) => v.id === gekozenOp);
+    const gekozenNaam = gekozenVeld ? korte(gekozenVeld.id, veldLabelZonderGroep(gekozenVeld)) : "Het kenmerk";
+    const reden = gekozenOptie ? (gekozenOptie.bruikbaarheid.reden ?? "Het kenmerk kan niet groeperen") : `${gekozenNaam} is verwijderd`;
+    if (effectiefOptie) melding = `${reden}. De groepering staat nu op ${effectiefOptie.naam}.`;
+    else if (gefilterd.length < MIN_POOL_GROEPEREN && pool && pool.leden.length >= MIN_POOL_GROEPEREN) {
+      melding = `Met deze filters zit er ${gefilterd.length} ${gefilterd.length === 1 ? "Organisatie" : "Organisaties"} in de pool. Dat is te weinig om te vergelijken. Haal een filter weg.`;
+    } else melding = "Er is geen kenmerk meer om op te groeperen.";
+  }
+
+  const groeperVeld = effectiefOptie?.veld;
+  const waardenVeld = groeperVeld && groeperVeld.type === "getal" ? getalWaarden(gefilterd, groeperVeld) : [];
+  const mediaanVeld = mediaan(waardenVeld);
+  const gekozenGroepering: Groepering | null = !groeperVeld
+    ? null
+    : groeperVeld.type === "select"
+      ? { soort: "select", veldId: groeperVeld.id }
+      : { soort: "drempel", veldId: groeperVeld.id, drempel: drempel ?? Math.round(mediaanVeld ?? 0) };
+  const groepen = gekozenGroepering
+    ? maakGroepen(gefilterd, gekozenGroepering, velden, (veldId, waarde) =>
+        korteNaamWaarde(instellingen.korteNamen, veldId, waarde)
+      )
+    : [];
   // Bij het wisselen van groepering wordt de grootste groep de focus: Een focus die niet (meer) bestaat valt terug op de eerste.
   const focus = groepen.find((g) => g.sleutel === focusKeuze) ?? groepen[0];
-  const { focus: focusLeden, rest: restLeden } = splitsFocus(gefilterd, focus);
+  const { focus: focusLeden, rest: restLeden } = splitsFocus(gefilterd, groepen, focus);
+  const zonderGroepering = gekozenGroepering === null;
 
   if (!magVerkennen(gebruiker)) {
     return (
@@ -95,6 +145,7 @@ export default function VerkennenPage() {
   const heat = bouwHeatmap(pool.rijen, gefilterd, groepen, instellingen.verkennenMinGroep);
   const focusIds = new Set(focusLeden.map((l) => l.organisatie.id));
   const xVeld = VERBAND_X.find((x) => x.id === verbandX) ?? VERBAND_X[0];
+  const xDef = velden.find((v) => v.id === xVeld.id);
   const yIndex = verbandY === "overall" ? -1 : pool.rijen.findIndex((r) => r.bouwblok.id === verbandY);
   const punten = verbandPunten(
     gefilterd,
@@ -103,6 +154,33 @@ export default function VerkennenPage() {
     (l) => (yIndex === -1 ? l.overall : l.scores[yIndex])
   );
   const yLabel = yIndex === -1 ? "Overall score" : pool.rijen[yIndex].bouwblok.naam;
+  // Zonder groepering is Grootste verschil uitgeschakeld: Er is geen rest om mee te vergelijken.
+  const grootsteVerschilKan = !(weergave === "groep" && zonderGroepering);
+  const sorteringNu: Sortering = sortering === "uitslag" && !grootsteVerschilKan ? "model" : sortering;
+
+  const voegToe = (id: string) => {
+    if (kenmerken.includes(id)) return;
+    setKenmerken([...kenmerken, id]);
+    // Het eerste bruikbare kenmerk dat de Admin toevoegt, wordt automatisch de groepering. Een kenmerk dat niet kan, wist een
+    // oude (vervallen) keuze zodat de melding niet blijft staan.
+    const veld = velden.find((v) => v.id === id);
+    if (effectief === null && id !== KANALEN_ID && veld && kanGroeperen(veld, pool.leden, gefilterd).ok) {
+      setGekozenOp(id);
+      setDrempel(null);
+      setFocusKeuze(undefined);
+    } else if (effectief === null) {
+      setGekozenOp(null);
+    }
+  };
+  const verwijder = (id: string) => {
+    setKenmerken(kenmerken.filter((k) => k !== id));
+    // Het kruisje haalt ook het filter weg.
+    const select = { ...filters.select };
+    delete select[id];
+    const bereik = { ...filters.bereik };
+    delete bereik[id];
+    setFilters({ ...filters, select, bereik, kanalen: id === KANALEN_ID ? [] : filters.kanalen });
+  };
 
   return (
     <div className="admin-main admin-main--breed">
@@ -124,7 +202,9 @@ export default function VerkennenPage() {
           onChange={(e) => {
             setAssessmentKeuze(e.target.value);
             setFilters(LEGE_FILTERS);
-            setToegevoegd([]);
+            setKenmerken([]);
+            setGekozenOp(null);
+            setDrempel(null);
             setFocusKeuze(undefined);
             setVerbandY("overall");
           }}
@@ -137,28 +217,33 @@ export default function VerkennenPage() {
         </select>
       </div>
 
-      <FilterPaneel
-        velden={velden}
+      <KenmerkenKaart
+        velden={alleVelden}
+        kenmerken={kenmerken}
         stand={filters}
-        onChange={setFilters}
-        toegevoegd={toegevoegd}
-        onToegevoegd={setToegevoegd}
+        onStand={setFilters}
+        onToevoegen={voegToe}
+        onVerwijder={verwijder}
         pool={pool.leden}
         gefilterd={gefilterd}
         zonderToestemming={pool.zonderToestemming}
       />
 
       <Vergelijken
-        velden={velden}
-        leden={gefilterd}
-        op={op}
-        onOp={(nieuw) => {
-          setOp(nieuw);
+        opties={groeperOpties}
+        heeftKenmerken={kenmerken.length > 0}
+        effectief={effectief}
+        onKies={(id) => {
+          setGekozenOp(id);
+          setDrempel(null);
           setFocusKeuze(undefined);
         }}
+        melding={melding}
+        leden={gefilterd}
         drempel={drempel}
         onDrempel={setDrempel}
         groepen={groepen}
+        zonderWaarde={groeperVeld ? zonderWaarde(gefilterd, groeperVeld) : 0}
         focusSleutel={focus?.sleutel}
         onFocus={setFocusKeuze}
         focusLeden={focusLeden}
@@ -172,7 +257,7 @@ export default function VerkennenPage() {
           <WeergaveWissel
             ariaLabel="Weergave van de resultaten"
             opties={[
-              { waarde: "groep", label: "Groep tegenover de rest" },
+              { waarde: "groep", label: zonderGroepering ? "De pool" : "Groep tegenover de rest" },
               { waarde: "spreiding", label: "Spreiding binnen de groep" },
               { waarde: "heatmap", label: "Alle groepen naast elkaar" },
               { waarde: "verband", label: "Verband met een kenmerk" },
@@ -181,18 +266,23 @@ export default function VerkennenPage() {
             onChange={setWeergave}
           />
           {(weergave === "groep" || weergave === "spreiding") && (
-            <>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", whiteSpace: "nowrap" }}>
               <span className="text-sm text-ink-m">Sorteren</span>
               <WeergaveWissel
                 ariaLabel="Sorteren"
                 opties={[
                   { waarde: "model", label: "Volgorde van het model" },
-                  { waarde: "uitslag", label: weergave === "groep" ? "Grootste verschil" : "Grootste spreiding" },
+                  {
+                    waarde: "uitslag",
+                    label: weergave === "groep" ? "Grootste verschil" : "Grootste spreiding",
+                    disabled: !grootsteVerschilKan,
+                    title: grootsteVerschilKan ? undefined : "Er is geen groepering om mee te vergelijken",
+                  },
                 ]}
-                waarde={sortering}
+                waarde={sorteringNu}
                 onChange={setSortering}
               />
-            </>
+            </span>
           )}
           {weergave === "verband" && (
             <>
@@ -201,7 +291,7 @@ export default function VerkennenPage() {
                 <select id="verband-x" value={verbandX} onChange={(e) => setVerbandX(e.target.value)}>
                   {VERBAND_X.map((x) => (
                     <option key={x.id} value={x.id}>
-                      {korteNaamVeld(instellingen.korteNamen, x.id, x.label)}
+                      {korte(x.id, x.label)}
                     </option>
                   ))}
                 </select>
@@ -229,14 +319,15 @@ export default function VerkennenPage() {
             rijen={pool.rijen}
             heatmap={heat}
             minGroep={instellingen.verkennenMinGroep}
+            hint={zonderGroepering ? "Kies een kenmerk om groepen naast elkaar te zetten" : undefined}
             onFocus={(sleutel) => {
               setFocusKeuze(sleutel);
               setWeergave("groep");
             }}
           />
         ) : weergave === "verband" ? (
-          <WeergaveVerband punten={punten} xLabel={korteNaamVeld(instellingen.korteNamen, xVeld.id, xVeld.label)} yLabel={yLabel} eenheidX={xVeld.eenheid} />
-        ) : focusLeden.length === 0 || restLeden.length === 0 ? (
+          <WeergaveVerband punten={punten} xLabel={korte(xVeld.id, xVeld.label)} yLabel={yLabel} eenheidX={xDef?.eenheid} />
+        ) : !zonderGroepering && (focusLeden.length === 0 || restLeden.length === 0) ? (
           <p className="admin-notice">
             {focusLeden.length === 0 ? "De focus is leeg." : "De rest is leeg."} Kies een andere focusgroep of pas de filters aan.
           </p>
@@ -245,8 +336,9 @@ export default function VerkennenPage() {
             assessment={assessment}
             vergelijking={vergelijking}
             modus={weergave}
-            sortering={sortering}
+            sortering={sorteringNu}
             focusNaam={focus?.naam ?? "de focus"}
+            zonderGroepering={zonderGroepering}
           />
         )}
       </section>

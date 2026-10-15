@@ -160,7 +160,13 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     sleutel: "info.verkennenGroeperen",
     plek: "Verkennen, naast het label Groeperen op",
     tekst:
-      "Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties.",
+      "Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties. Is er nog geen kenmerk, dan staat er: Er is nog geen kenmerk om op te groeperen. Voeg bij Kenmerken een kenmerk toe, dan kun je de Organisaties erop in groepen verdelen.",
+  },
+  {
+    sleutel: "info.verkennenKenmerken",
+    plek: "Verkennen, kaart Kenmerken, naast de titel",
+    tekst:
+      "Zet hier een kenmerk neer om op te filteren en om op te groeperen. Een kenmerk zonder gekozen waarde filtert niets. Filteren op bereik bij getallen volgt later.",
   },
   {
     sleutel: "info.korteNamen",

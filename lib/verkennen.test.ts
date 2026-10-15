@@ -6,8 +6,10 @@ import {
   LEGE_FILTERS,
   bouwPool,
   filterVelden,
+  MIN_POOL_GROEPEREN,
   heatmap,
   histogram,
+  kanGroeperen,
   kanaalIngezet,
   maakGroepen,
   mediaan,
@@ -123,27 +125,33 @@ describe("groeperen en vergelijken", () => {
   it("een drempel op een getalveld geeft twee groepen", () => {
     const groepen = maakGroepen(pool.leden, { soort: "drempel", veldId: "kpis.aht", drempel: 400 });
     expect(groepen.map((g) => [g.naam, g.leden.map((l) => l.organisatie.id)])).toEqual([
-      ["≤ 400", ["a", "b"]],
-      ["> 400", ["c", "d"]],
+      ["≤ 400 s", ["a", "b"]],
+      ["> 400 s", ["c", "d"]],
     ]);
   });
 
-  it("de rest is alle andere organisaties in de pool, ook zonder waarde", () => {
-    const [industrie] = maakGroepen(pool.leden, { soort: "select", veldId: "sector-subsector.sector" });
-    const { focus, rest } = splitsFocus(pool.leden, industrie);
+  it("de rest zijn de organisaties van de andere groepen, zonder wie geen waarde heeft", () => {
+    const groepen = maakGroepen(pool.leden, { soort: "select", veldId: "sector-subsector.sector" });
+    const { focus, rest } = splitsFocus(pool.leden, groepen, groepen[0]);
     expect(focus).toHaveLength(2);
-    expect(rest.map((l) => l.organisatie.id)).toEqual(["c", "d", "e"]);
+    expect(rest.map((l) => l.organisatie.id)).toEqual(["c", "d"]);
+  });
+
+  it("zonder groepering is de hele pool de focus en is er geen rest", () => {
+    const { focus, rest } = splitsFocus(pool.leden, [], undefined);
+    expect(focus).toHaveLength(5);
+    expect(rest).toEqual([]);
   });
 
   it("het verschil is het gemiddelde van de focus min dat van de rest, elke organisatie even zwaar", () => {
-    const [industrie] = maakGroepen(pool.leden, { soort: "select", veldId: "sector-subsector.sector" });
-    const { focus, rest } = splitsFocus(pool.leden, industrie);
+    const groepen = maakGroepen(pool.leden, { soort: "select", veldId: "sector-subsector.sector" });
+    const { focus, rest } = splitsFocus(pool.leden, groepen, groepen[0]);
     const v = vergelijk(pool.rijen, focus, rest);
     expect(v.rijen[0].focus.gemiddelde).toBe(4);
-    expect(v.rijen[0].rest.gemiddelde).toBeCloseTo(7 / 3, 5);
-    expect(v.rijen[0].verschil).toBe(1.7);
-    expect(v.overall.verschil).toBe(1.7);
-    expect(v.grootstePlus?.verschil).toBe(1.7);
+    expect(v.rijen[0].rest.gemiddelde).toBe(2);
+    expect(v.rijen[0].verschil).toBe(2);
+    expect(v.overall.verschil).toBe(2);
+    expect(v.grootstePlus?.verschil).toBe(2);
     expect(v.grootsteMin).toBeNull();
   });
 
@@ -164,6 +172,52 @@ describe("groeperen en vergelijken", () => {
     expect(h2.groepen[1].cellen[0].verschil).toBe(-1);
   });
 });
+
+describe("wanneer een kenmerk kan groeperen", () => {
+  const velden = filterVelden();
+  const sector = velden.find((v) => v.id === "sector-subsector.sector")!;
+  const aht = velden.find((v) => v.id === "kpis.aht")!;
+  const sectoren = ["Industrie", "Onderwijs", "Handel"];
+  const leden = (n: number, f: (i: number) => Organisatie["kenmerken"]) =>
+    bouwPool(Array.from({ length: n }, (_, i) => org(`o${i}`, 3, { kenmerken: f(i) })), assessment, 3).leden;
+
+  it("een pool onder de minimale grootte kan niet groeperen", () => {
+    const l = leden(MIN_POOL_GROEPEREN - 1, (i) => kenmerken(sectoren[i % 3], 300 + i));
+    const r = kanGroeperen(sector, l, l);
+    expect(r.ok).toBe(false);
+    expect(r.reden).toBe("Minder dan 6 Organisaties in de pool");
+  });
+
+  it("een select met twee of meer waarden kan, een met één waarde na filteren niet", () => {
+    const l = leden(10, (i) => kenmerken(sectoren[i % 2], 300 + i));
+    expect(kanGroeperen(sector, l, l).ok).toBe(true);
+    const een = l.filter((x) => kenmerkWaardeVan(x) === "Industrie");
+    expect(kanGroeperen(sector, l, een).reden).toBe("Minder dan 6 Organisaties in de pool");
+    const l2 = leden(10, (i) => kenmerken("Industrie", 300 + i));
+    expect(kanGroeperen(sector, l2, l2).reden).toBe("Het filter laat één waarde over");
+  });
+
+  it("een kenmerk dat bij minder dan 40% is ingevuld kan niet", () => {
+    const l = leden(10, (i) => (i < 3 ? kenmerken("Industrie", 300 + i) : kenmerken("Onderwijs")));
+    const r = kanGroeperen(aht, l, l);
+    expect(r.ok).toBe(false);
+    expect(r.reden).toBe("Minder dan 4 ingevulde waarden");
+  });
+
+  it("een getal met verschillende waarden kan", () => {
+    const l = leden(10, (i) => kenmerken("Industrie", 300 + i));
+    expect(kanGroeperen(aht, l, l).ok).toBe(true);
+  });
+
+  it("een select met meer dan 12 waarden kan niet", () => {
+    const l = leden(20, (i) => kenmerken(`Sector ${i}`, 300 + i));
+    expect(kanGroeperen(sector, l, l).reden).toBe("Meer dan 12 verschillende waarden");
+  });
+});
+
+function kenmerkWaardeVan(l: { organisatie: Organisatie }): unknown {
+  return (l.organisatie.kenmerken["sector-subsector"] as { sector: string }).sector;
+}
 
 describe("verband met een kenmerk", () => {
   it("rechte lijn en correlatie, minder dan drie punten geeft niets", () => {

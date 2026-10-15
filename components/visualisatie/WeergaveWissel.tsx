@@ -6,6 +6,8 @@ export interface WisselOptie<T extends string> {
   waarde: T;
   label: string;
   disabled?: boolean;
+  /** Tooltip bij de pil, bijvoorbeeld de reden waarom hij is uitgeschakeld. */
+  title?: string;
   /** Sleutel van een Info-icoon met de reden waarom de optie is uitgeschakeld. */
   infoSleutel?: string;
 }
@@ -49,6 +51,7 @@ export function WeergaveWissel<T extends string>({
             aria-selected={o.waarde === waarde}
             tabIndex={o.waarde === waarde ? 0 : -1}
             disabled={o.disabled}
+            title={o.title}
             className={o.waarde === waarde ? "actief" : ""}
             onClick={() => onChange(o.waarde)}
           >

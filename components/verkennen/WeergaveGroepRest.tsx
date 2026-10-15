@@ -22,12 +22,15 @@ export function WeergaveGroepRest({
   modus,
   sortering,
   focusNaam,
+  zonderGroepering = false,
 }: {
   assessment: Assessment;
   vergelijking: Vergelijking;
   modus: "groep" | "spreiding";
   sortering: Sortering;
   focusNaam: string;
+  /** Zonder groepering is de hele pool de focus en is er geen rest (`visualisatie-verkennen.md`, Zonder groepering). */
+  zonderGroepering?: boolean;
 }) {
   const { overall } = vergelijking;
   const rijen: RijVergelijking[] =
@@ -39,12 +42,28 @@ export function WeergaveGroepRest({
             : (b.focus.sd ?? -1) - (a.focus.sd ?? -1)
         );
   const groepen = sortering === "model" ? vorigeGroepen(rijen) : rijen.map((r) => r.rij.groepId);
+  const metScore = rijen.filter((r) => r.focus.gemiddelde !== null);
+  const hoogste = metScore.reduce<RijVergelijking | null>((m, r) => (m === null || (r.focus.gemiddelde as number) > (m.focus.gemiddelde as number) ? r : m), null);
+  const laagste = metScore.reduce<RijVergelijking | null>((m, r) => (m === null || (r.focus.gemiddelde as number) < (m.focus.gemiddelde as number) ? r : m), null);
   const verschilTekst = (v: number | null) => (v === null ? "–" : `${Math.abs(v) < 0.05 ? "" : teken(v)}${toon(Math.abs(v))}`);
 
   return (
     <div className="vis" data-weergave={`verkennen-${modus}`}>
       <Tegels
-        tegels={[
+        tegels={zonderGroepering ? [
+          { label: "Gemiddelde van de pool", waarde: toon(overall.focus.gemiddelde), sub: "Overall score" },
+          { label: "Organisaties", waarde: String(overall.focus.n), sub: "in de pool" },
+          {
+            label: `Hoogste ${assessment.bouwblokEenheidEnkelvoud}`,
+            waarde: hoogste ? toon(hoogste.focus.gemiddelde) : "–",
+            sub: hoogste?.rij.bouwblok.naam,
+          },
+          {
+            label: `Laagste ${assessment.bouwblokEenheidEnkelvoud}`,
+            waarde: laagste ? toon(laagste.focus.gemiddelde) : "–",
+            sub: laagste?.rij.bouwblok.naam,
+          },
+        ] : [
           { label: `Gemiddelde van ${focusNaam}`, waarde: toon(overall.focus.gemiddelde), sub: `${overall.focus.n} Organisaties` },
           { label: "Gemiddelde van de rest", waarde: toon(overall.rest.gemiddelde), sub: `${overall.rest.n} Organisaties` },
           {
@@ -59,7 +78,15 @@ export function WeergaveGroepRest({
           },
         ]}
       />
-      <Schaalkop rechts={modus === "groep" ? "Focus · rest · verschil" : "Mediaan · spreiding · bereik"} />
+      <Schaalkop
+        rechts={
+          modus === "groep"
+            ? zonderGroepering
+              ? "Gemiddelde"
+              : "Focus · rest · verschil"
+            : "Mediaan · spreiding · bereik"
+        }
+      />
       {rijen.map((r, i) => (
         <Rij
           key={r.rij.bouwblok.id}
@@ -72,8 +99,8 @@ export function WeergaveGroepRest({
             modus === "groep" ? (
               <>
                 <span className="vis-getal" style={{ color: "var(--or)" }}>{toon(r.focus.gemiddelde)}</span>
-                <span className="text-ink-m">{toon(r.rest.gemiddelde)}</span>
-                {r.verschil !== null && (
+                {!zonderGroepering && <span className="text-ink-m">{toon(r.rest.gemiddelde)}</span>}
+                {!zonderGroepering && r.verschil !== null && (
                   <span className={r.verschil > 0.04 ? "vis-stijging" : r.verschil < -0.04 ? "vis-daling" : ""}>
                     {r.verschil > 0.04 ? "▲" : r.verschil < -0.04 ? "▼" : "="} {verschilTekst(r.verschil)}
                   </span>
@@ -148,7 +175,11 @@ export function WeergaveGroepRest({
         </Rij>
       ))}
       <p className="vis-onderschrift">
-        {modus === "groep"
+        {zonderGroepering
+          ? modus === "groep"
+            ? "Elke stip is een Organisatie in de pool. De oranje streep is het gemiddelde van de pool. Elke Organisatie telt even zwaar. Kies bij Kenmerken een kenmerk om de pool in groepen te verdelen."
+            : "De stippen zijn de Organisaties van de pool. De oranje balk is de middelste helft van de pool, de streep de mediaan. σ is de standaardafwijking (n − 1)."
+          : modus === "groep"
           ? "Elke stip is een Organisatie: Oranje is de focus, grijs de rest. De oranje streep is het gemiddelde van de focus, de donkergrijze streep dat van de rest. Elke Organisatie telt even zwaar."
           : "De stippen zijn de Organisaties van de focus. De oranje balk is de middelste helft van de focus, de grijze balk daarachter de middelste helft van de rest, de streep de mediaan. σ is de standaardafwijking (n − 1)."}
       </p>

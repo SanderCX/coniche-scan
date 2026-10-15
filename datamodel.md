@@ -673,7 +673,7 @@ VeldDefinitie {
   optiesPerWaarde?: { [waarde: string]: string[] } // alleen "select-afhankelijk"
   subvelden?: VeldDefinitie[]       // voor herhalende structuren
   korteNaam?: string                // voorstel: weergavenaam van het veld in lijsten en grafieken, leeg betekent `label`
-  eenheid?: string                  // voorstel: weergave-eenheid bij getal en percentage, bijv. "s" of "%", gebruikt door Verkennen bij de drempel
+  eenheid?: string                  // gebouwd op 15 oktober 2026: weergave-eenheid bij getal en percentage, bijv. "s" of "%", gebruikt door Verkennen bij de drempel
 }
 ```
 

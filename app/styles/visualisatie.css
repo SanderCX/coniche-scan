@@ -1175,3 +1175,81 @@
 .kn-invoer[aria-invalid="true"] {
   border-color: var(--stat-red);
 }
+
+/* ---------- Kaart Kenmerken en Groeperen op (stylesheet.md, Kaart Kenmerken en volgende) ---------- */
+.vk-kenmerk {
+  padding: var(--sp-6) 0 0;
+}
+.vk-kenmerk + .vk-kenmerk {
+  margin-top: var(--sp-6);
+  border-top: 1px solid var(--border);
+}
+.vk-kenmerk .vk-kop-rij {
+  justify-content: space-between;
+}
+.vk-kenmerk .vk-kop-rij .vk-veldkop {
+  margin: 0;
+  flex: 1;
+}
+.vk-kenmerk .vk-potlood {
+  margin-top: 0;
+}
+.vk-kruis {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border-d);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--ink-m);
+  font-size: var(--fs-14);
+  line-height: 1;
+  cursor: pointer;
+}
+.vk-kruis:hover {
+  border-color: var(--or);
+  color: var(--ink);
+}
+.vk-leeg {
+  padding-top: var(--sp-2);
+}
+.vk-leeg .vk-chips {
+  margin-top: var(--sp-3);
+}
+.vk-acties {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin-top: var(--sp-6);
+}
+.filtermenu-rij:disabled {
+  cursor: not-allowed;
+}
+.filtermenu-rij:disabled:hover {
+  background: none;
+}
+.vk-reden {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.vk-melding {
+  margin: var(--sp-3) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  display: flex;
+  gap: var(--sp-2);
+  background: var(--stat-amber-faint);
+  border: 1px solid var(--stat-amber);
+  border-radius: var(--r);
+  font-size: var(--fs-14);
+  color: var(--ink);
+}
+.pil:disabled,
+.pil[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

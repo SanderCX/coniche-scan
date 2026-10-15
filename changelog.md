@@ -1,5 +1,23 @@
 # Coniche Scan — Changelog
 
+## 2026-10-15 (7) — Specs van Joost, PR 117: Kenmerken en Groeperen op bij Verkennen
+
+Op verzoek van Sander gebouwd (`visualisatie-verkennen.md`, Kenmerken en filters, Groeperen en focus, Zonder groepering).
+
+**Gedaan**:
+- **Kaart Kenmerken** (`components/verkennen/KenmerkenKaart.tsx`): Het scherm begint leeg, met "Snel beginnen" (CRM-pakket, Sector,
+  AHT) en het menu Kenmerk toevoegen (`FilterMenu.tsx`, uitgeschakeld met "toegevoegd" bij wat er al staat). Per kenmerk een rij
+  met korte naam, potlood, kruisje en pillen of de tekst "Getal, n van N ingevuld". Ingezette kanalen is een kenmerk dat alleen
+  filtert. Wis filters laat de kenmerken staan, het kruisje haalt kenmerk en filter weg.
+- **Groeperen op** (`Vergelijken.tsx`): Een pilvormige groep met een pil per kenmerk dat kan groeperen, de reden bij een
+  uitgeschakelde pil in een tooltip en onder de groep, de pil "Geen kenmerk", de terugval met melding, de drempel met eenheid
+  (`VeldDefinitie.eenheid`) en "n zonder waarde". `info.verkennenKenmerken` en de nieuwe tekst van `info.verkennenGroeperen`.
+- **Regels** (`lib/verkennen.ts`, 6 nieuwe tests): `kanGroeperen` (pool minstens 6, kenmerk bij minstens 40% ingevuld, select met 2
+  tot 12 waarden, getal met twee verschillende waarden) en `splitsFocus`: De rest zijn de Organisaties van de andere groepen.
+- **Zonder groepering**: De hele pool is de focus in alle vier de weergaven, Grootste verschil is uitgeschakeld.
+
+**Opmerking**: Met de seed (3 Organisaties met toestemming voor benchmark) kan niets groeperen. De reden staat onder Groeperen op.
+
 ## 2026-10-15 (6) — Specs van Joost, PR 116: opmaakronde en korte namen
 
 Op verzoek van Sander gebouwd (`stylesheet.md`, `visualisatie-verkennen.md`, `beheerpagina.md` punt 3, `datamodel.md`).

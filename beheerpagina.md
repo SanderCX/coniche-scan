@@ -1948,7 +1948,7 @@ spreiding binnen een Meting (niveau 3) krijgt een Lead als kolom Spreiding
 voorbeelddata, met filters en een vaste groepering. De korte namen op de pillen
 en het potlood naast de kop van een filter zijn gebouwd op 15 oktober 2026. De
 kaart Kenmerken en Groeperen op met pillen (het potlood naast de naam van een
-kenmerk) is voorstel van 15 oktober 2026 en nog niet gebouwd. Het gedrag staat in
+kenmerk) zijn gebouwd op 15 oktober 2026. Het gedrag staat in
 `visualisatie-verkennen.md`, hier staat de plek in beheer.
 
 De tab Verkennen onder Resultaten (punt 7), alleen zichtbaar voor een Admin
