@@ -8,6 +8,9 @@ Op verzoek van Sander gebouwd (`app/[assessmentId]/voorbeeld/page.tsx`).
 - Onder het voorbeeldresultaat staat bij de Klantcontact Volwassenheidsscan de weergave Per bouwblok van een Meting (`visualisatie-scores.md`,
   A) met zes demo-respondenten, onder de kop "Gemiddelde en afwijking" en de tekst dat de tool bij meerdere respondenten van dezelfde
   Meting en organisatie ook inzicht geeft in de gemiddelde scores en de afwijkingen daarop.
+- De kop van de pagina volgt de spec: Het label "Voorbeeld-output" is de oranje eyebrow, de titel de standaard h1 (`stylesheet.md`,
+  Koppen) en "← Terug" een `.btn .btn-outline .btn-compact`. Eerder stonden daar losse Tailwind-klassen (grijs label, kleine
+  titel, kale rand). De sectie eronder heeft ook een eyebrow.
 - De demo-scans staan in `data/demo-antwoorden-per-assessment.ts` (`getDemoMetingScans`): Afwijkingen van één punt op de vaste
   demo-antwoorden. Dezelfde sectie staat ook bij de AI-volwassenheidsscan en de Zorgscan. Voor de Quickscan is er (nog) geen demo van
   een Meting.
