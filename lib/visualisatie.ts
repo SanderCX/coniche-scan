@@ -430,6 +430,8 @@ export interface MatrixKolomInvoer {
   label: string;
   /** Onder de kop: Bij kolommen met organisaties het label van de Meting (`visualisatie-scores.md`, E, Niveau 1). */
   sublabel?: string;
+  /** De volledige naam als `label` de korte naam is (`datamodel.md`, Organisatie): Komt in de tooltip van de kop. */
+  volledigeNaam?: string;
   aantalScans: number;
   antwoorden: Record<string, number>;
 }
@@ -467,7 +469,7 @@ export interface MatrixGroepRij {
   hogerKolom: HogerKant | null;
 }
 export interface MatrixWeergave {
-  kolommen: { label: string; sublabel?: string; aantalScans: number; totaal: number | null; totaalKlasse: Classificatie | null }[];
+  kolommen: { label: string; sublabel?: string; volledigeNaam?: string; aantalScans: number; totaal: number | null; totaalKlasse: Classificatie | null }[];
   rijen: MatrixRij[];
   hoogsteMeting: { label: string; totaal: number } | null;
   laagsteMeting: { label: string; totaal: number } | null;
@@ -563,6 +565,7 @@ export function matrix(
     kolommen: kolommen.map((k, i) => ({
       label: k.label,
       sublabel: k.sublabel,
+      volledigeNaam: k.volledigeNaam,
       aantalScans: k.aantalScans,
       totaal: totalen[i],
       totaalKlasse: klasseVan(totalen[i]),

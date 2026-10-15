@@ -34,7 +34,7 @@ function GenummerdeLijst({ items }: { items: { titel: string; tekst: string | st
               background: "var(--or-faint)",
               color: "var(--or)",
               fontWeight: 800,
-              fontSize: "var(--fs-m)",
+              fontSize: "var(--fs-14)",
               flex: "none",
             }}
           >

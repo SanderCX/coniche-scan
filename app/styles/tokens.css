@@ -30,16 +30,32 @@
   --border: #e8e6e1;
   --border-d: #d4d1ca;
 
-  /* Lettergroottes voor interface-tekst (stylesheet.md, Typografie). Koppen
-     en lopende tekst hebben hun eigen maat in base.css. */
-  --fs-xs: 0.75rem;   /* labels, badges, tabelkoppen, kleine tekst */
-  --fs-s: 0.85rem;    /* tabellen, formulieren, nav, compacte knoppen */
-  --fs-m: 0.9rem;     /* standaardknoppen en invoer */
-  --fs-l: 1.15rem;    /* titel van modals en beheerblokken */
+  /* Lettergroottes (stylesheet.md, Lettergroottes): Eén schaal van acht maten in even px. Een nieuwe font-size buiten deze
+     lijst is een fout, geen variant. */
+  --fs-12: 12px;   /* eyebrow, labels, badges, tabelkoppen, hints, tekst in grafieken, tweede regel van een kolomkop */
+  --fs-14: 14px;   /* alle interface-tekst: tabellen, formulieren, knoppen, velden, nav, tabs, pillen, meldingen */
+  --fs-16: 16px;   /* lopende tekst */
+  --fs-18: 18px;   /* inleidende regel, h3, titel van modals en beheerblokken, h2 in beheer */
+  --fs-24: 24px;   /* kop van een bouwblok en van een Assessment-kaart */
+  --fs-32: 32px;   /* paginatitel, h2 op publieke pagina's */
+  --fs-40: 40px;   /* score in de classificatiecirkel */
+  --fs-48: 48px;   /* h1 op publieke pagina's */
+
+  /* Afstanden, raster van 4px (stylesheet.md, Afstanden) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-12: 48px;
+
+  /* Kolombreedte in tabellen en matrices (stylesheet.md, Kolomkop en rijkop) */
+  --kolom-b: 96px;
 
   /* Eén hoogte voor velden en compacte knoppen die samen in een rij staan:
      de hoogte van de dropdown (stylesheet.md, Formulieren). */
-  --control-h: 2.4rem;
+  --control-h: 2.5rem;
 
   --r: 6px;
 
@@ -71,4 +87,19 @@
   --score-4-faint: #eef7e6;
   --score-5: #15803d;
   --score-5-faint: #e6f2ea;
+
+  /* Celtinten voor cellen met een getal, met tekstkleur (stylesheet.md, Drie niveaus van scorekleur) */
+  --score-1-cel: #f7c6c1;
+  --score-1-cel-tekst: #7f1d1d;
+  --score-2-cel: #fde9c8;
+  --score-2-cel-tekst: #6b3a00;
+  --score-3-cel: #fbf0b8;
+  --score-3-cel-tekst: #5c4800;
+  --score-4-cel: #dcefc6;
+  --score-4-cel-tekst: #2f5a12;
+  --score-5-cel: #c3e6d2;
+  --score-5-cel-tekst: #0e4d30;
+
+  /* Verschil: boven is --bl, onder is --dal (stylesheet.md, Verschil en afwijking) */
+  --dal: #c2570c;
 }

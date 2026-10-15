@@ -68,12 +68,20 @@ export function WeergaveMatrix({
             <tr>
               <th className="vis-matrix-naam">{assessment.bouwblokLabel}</th>
               {kolommen.map((k, i) => (
-                <th key={i}>
-                  {weergave.metHoogste && <span className="vis-symbool">{i === 0 ? SYMBOOL_EERSTE : SYMBOOL_TWEEDE} </span>}
-                  {k.label}
-                  {k.sublabel && <span className="vis-matrix-aantal">{k.sublabel}</span>}
-                  <span className="vis-matrix-aantal">
-                    {k.aantalScans} {k.aantalScans === 1 ? "scan" : "scans"}
+                // Een kop breekt nooit over meerdere regels (`stylesheet.md`, Kolomkop en rijkop): De naam staat op één regel met
+                // een afkapping, een tweede regel van 12px (de meetdatum bij Metingen, anders "n = 5"). Al het andere staat in
+                // de tooltip.
+                <th
+                  key={i}
+                  className="vis-kolomkop"
+                  title={[k.volledigeNaam ?? k.label, k.sublabel, `${k.aantalScans} ${k.aantalScans === 1 ? "scan" : "scans"}`].filter(Boolean).join(" · ")}
+                >
+                  <span className="vis-kolomkop-naam">
+                    {weergave.metHoogste && <span className="vis-symbool">{i === 0 ? SYMBOOL_EERSTE : SYMBOOL_TWEEDE} </span>}
+                    {k.label}
+                  </span>
+                  <span className="vis-kolomkop-sub">
+                    {kolomSoort === "meting" && k.sublabel ? k.sublabel : `n = ${k.aantalScans}`}
                   </span>
                 </th>
               ))}
@@ -86,14 +94,16 @@ export function WeergaveMatrix({
           <tbody>
             {rijen.flatMap((r, index) => [
               <tr key={r.rij.bouwblok.id}>
-                <td className="vis-matrix-naam">
+                <td className="vis-matrix-naam" title={r.rij.bouwblok.naam}>
                   <span className="text-ink-s font-bold">{r.rij.bouwblok.volgnummer}</span> {r.rij.bouwblok.naam}
                   {r.rij.gewicht !== 1 && <span className="vis-factor"> {r.rij.gewicht.toString().replace(".", ",")}×</span>}
                 </td>
                 {r.cellen.map((c, i) => (
                   <td
                     key={i}
-                    className={`vis-cel ${c.klasse ? `vis-cel--${c.klasse}` : "vis-cel--leeg"} ${c.afwijkend ? "vis-cel--afwijkend" : ""}`}
+                    className={`vis-cel ${c.klasse ? `vis-cel--${c.klasse}` : "vis-cel--leeg"} ${
+                      c.afwijkend ? `vis-cel--afwijkend ${c.score !== null && r.gemiddelde !== null && c.score < r.gemiddelde ? "vis-cel--afwijkend-onder" : ""}` : ""
+                    }`}
                     title={c.klasse ? KLASSE_LABEL[c.klasse] : undefined}
                   >
                     {toon(c.score)}
@@ -140,7 +150,7 @@ export function WeergaveMatrix({
       </div>
       <p className="vis-onderschrift">
         Elke {soort} telt even zwaar mee, ongeacht het aantal respondenten.
-        {groep && " Een zwarte rand betekent: 0,5 of meer van het gemiddelde van de rij."}
+        {groep && " Een driehoekje in de hoek betekent: 0,5 of meer van het gemiddelde van de rij, blauw erboven en oranje eronder."}
         {weergave.metVerschil && " Het verschil is de nieuwere Meting min de oudere."}
         {weergave.metHoogste && ` ${SYMBOOL_EERSTE} is de eerste kolom, ${SYMBOOL_TWEEDE} de tweede: Het symbool staat bij de Meting die hoger scoort.`}
       </p>

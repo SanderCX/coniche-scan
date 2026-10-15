@@ -8,7 +8,7 @@
   --vis-oranje: var(--stat-amber);
   --vis-groen: var(--stat-green);
   --vis-stijging: var(--bl);
-  --vis-daling: #c2570c;
+  --vis-daling: var(--dal);
   --vis-spreiding: rgba(93, 106, 120, 0.75);
 }
 
@@ -26,7 +26,7 @@
   padding: 0.8rem 1rem;
 }
 .vis-tegel-label {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -34,14 +34,14 @@
 }
 .vis-tegel-waarde {
   margin-top: 0.2rem;
-  font-size: 1.5rem;
+  font-size: var(--fs-24);
   font-weight: 800;
   line-height: 1.2;
   color: var(--ink);
 }
 .vis-tegel-sub {
   margin-top: 0.1rem;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink-m);
 }
 
@@ -58,7 +58,7 @@
 }
 .vis-banden {
   display: flex;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   color: var(--ink-m);
 }
@@ -67,7 +67,7 @@
 }
 .vis-groep {
   margin: 0.9rem 0 0.15rem;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -80,7 +80,7 @@
   min-width: 0;
   padding-left: 0.6rem;
   border-left: 4px solid var(--accent, var(--or));
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   font-weight: 600;
   color: var(--ink);
 }
@@ -97,7 +97,7 @@
 }
 .vis-factor {
   flex: none;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   color: var(--ink-s);
 }
@@ -144,7 +144,7 @@
 }
 .vis-symbool {
   display: inline-block;
-  font-size: 0.95em;
+  font-size: 1em;
   line-height: 1;
 }
 .vis-stip--ring {
@@ -213,11 +213,11 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 0.3rem 0.6rem;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink-m);
 }
 .vis-getal {
-  font-size: var(--fs-m);
+  font-size: var(--fs-14);
   font-weight: 800;
   color: var(--ink);
 }
@@ -228,7 +228,7 @@
   padding: 0.05rem 0.5rem;
   border-radius: 100px;
   border: 1px solid var(--border-d);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   color: var(--ink-m);
   white-space: nowrap;
@@ -259,7 +259,7 @@
 
 .vis-onderschrift {
   margin-top: 1rem;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink-m);
 }
 .vis-acties {
@@ -275,7 +275,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 4px;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
 }
 .vis-matrix th {
   font-weight: 700;
@@ -289,12 +289,12 @@
 }
 .vis-matrix-aantal {
   display: block;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 400;
   color: var(--ink-s);
 }
 .vis-cel {
-  min-width: 4.5rem;
+  min-width: var(--kolom-b);
   padding: 0.5rem 0.4rem;
   border-radius: 6px;
   border: 2px solid transparent;
@@ -313,8 +313,22 @@
   background: #c3e6d2;
   color: #0e4d30;
 }
-.vis-cel--afwijkend {
-  border-color: #000;
+/* Afwijking van de groep (stylesheet.md, Verschil en afwijking): Een driehoek van 8px in de linkerbovenhoek van de cel, blauw
+   bij 0,5 of meer boven het gemiddelde van de rij en donkeroranje (--dal) bij 0,5 of meer eronder. Er is geen zwarte rand. */
+.vis-cel {
+  position: relative;
+}
+.vis-cel--afwijkend::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-style: solid;
+  border-width: 8px 8px 0 0;
+  border-color: var(--bl) transparent transparent transparent;
+}
+.vis-cel--afwijkend-onder::after {
+  border-top-color: var(--dal);
 }
 .vis-cel--leeg {
   background: var(--bg-warm);
@@ -334,7 +348,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   font-weight: 600;
   color: var(--ink-m);
 }
@@ -346,36 +360,97 @@
   align-items: center;
   gap: 0.5rem;
 }
-.weergave-wissel {
+/* Pilvormige groep (stylesheet.md, Keuzepil en pilvormige groep): Eén afgeronde houder om een rij pillen. Gekozen is massief
+   oranje. De pillen hebben geen eigen rand, zodat de maat gelijk blijft. */
+.weergave-wissel,
+.pil-groep {
   display: inline-flex;
-  border: 1.5px solid var(--border-d);
-  border-radius: 10px;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--border-d);
+  border-radius: 20px;
   background: var(--bg);
-  overflow: hidden;
 }
-.weergave-wissel button {
-  padding: 0.55rem 1.1rem;
-  border: 0;
+.weergave-wissel button,
+.pil-groep button {
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 16px;
   background: transparent;
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: var(--fs-14);
   font-weight: 600;
   color: var(--ink-m);
+  white-space: nowrap;
   cursor: pointer;
 }
-.weergave-wissel button + button {
-  border-left: 1.5px solid var(--border-d);
-}
-.weergave-wissel button:hover:not(.actief):not(:disabled) {
+.weergave-wissel button:hover:not(.actief):not(:disabled),
+.pil-groep button:hover:not(.actief):not(:disabled) {
   background: var(--bg-warm);
 }
-.weergave-wissel button.actief {
-  background: var(--ink);
+.weergave-wissel button.actief,
+.pil-groep button.actief {
+  background: var(--or);
+  border-color: var(--or);
   color: #fff;
 }
-.weergave-wissel button:disabled {
+.weergave-wissel button.actief:hover,
+.pil-groep button.actief:hover {
+  background: var(--or-l);
+}
+.weergave-wissel button:disabled,
+.pil-groep button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Keuzepil (`.pil`): Losse pillen voor opties uit de data, in wisselend aantal of met wisselende lengte (focusgroepen,
+   filters, afdelingen). Niet gekozen is wit met grijze rand, niet oranje omlijnd: Oranje rand en tekst zijn van een knop met een
+   actie. Gekozen is massief oranje. */
+.pil {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid var(--border-d);
+  border-radius: 16px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--ink-m);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.pil > span {
+  font-weight: 400;
+}
+.pil:hover:not(:disabled):not([aria-pressed="true"]) {
+  border-color: var(--or);
+  color: var(--ink);
+}
+.pil[aria-pressed="true"] {
+  background: var(--or);
+  border-color: var(--or);
+  color: #fff;
+}
+.pil[aria-pressed="true"]:hover {
+  background: var(--or-l);
+}
+.pil:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.pil--klein {
+  border-style: dashed;
+  color: var(--ink-s);
+}
+.pil-rij {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
 }
 
 /* Bij veel kolommen scrolt de matrix horizontaal met een vaste eerste kolom (visualisatie-scores.md, E). */
@@ -384,7 +459,6 @@
   position: sticky;
   left: 0;
   z-index: 1;
-  min-width: 11rem;
   background: var(--bg);
 }
 
@@ -402,7 +476,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
 }
 .vis-antw th {
   position: sticky;
@@ -478,11 +552,11 @@
   text-align: center;
   font-weight: 700;
 }
-.vis-antw td.vis-antw-cel--1 { background: var(--score-1); color: #fff; }
-.vis-antw td.vis-antw-cel--2 { background: var(--score-2); color: var(--ink); }
-.vis-antw td.vis-antw-cel--3 { background: var(--score-3); color: var(--ink); }
-.vis-antw td.vis-antw-cel--4 { background: var(--score-4); color: var(--ink); }
-.vis-antw td.vis-antw-cel--5 { background: var(--score-5); color: #fff; }
+.vis-antw td.vis-antw-cel--1 { background: var(--score-1-cel); color: var(--score-1-cel-tekst); }
+.vis-antw td.vis-antw-cel--2 { background: var(--score-2-cel); color: var(--score-2-cel-tekst); }
+.vis-antw td.vis-antw-cel--3 { background: var(--score-3-cel); color: var(--score-3-cel-tekst); }
+.vis-antw td.vis-antw-cel--4 { background: var(--score-4-cel); color: var(--score-4-cel-tekst); }
+.vis-antw td.vis-antw-cel--5 { background: var(--score-5-cel); color: var(--score-5-cel-tekst); }
 .vis-antw td.vis-antw-cel--leeg {
   background: var(--bg);
 }
@@ -516,7 +590,7 @@
   margin: 0 0 0.2rem;
 }
 .qv-kaart-sub {
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink-m);
   margin: 0 0 0.9rem;
 }
@@ -531,7 +605,7 @@
   color: var(--ink-s);
 }
 .qv-naam {
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   font-weight: 600;
   color: var(--ink);
 }
@@ -540,7 +614,7 @@
   color: var(--ink-s);
 }
 .qv-waarde {
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   text-align: right;
   white-space: nowrap;
 }
@@ -548,7 +622,7 @@
   display: grid;
   grid-template-columns: 12rem minmax(0, 1fr) 8.5rem;
   gap: 1rem;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   color: var(--ink-s);
 }
@@ -604,7 +678,7 @@
   margin: -0.75rem 0 0 -0.75rem;
   background: rgba(93, 106, 120, 0.82);
   color: #fff;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -641,14 +715,14 @@
   background: #b9cde8;
 }
 .qv-streep--groep {
-  background: #225ba0;
+  background: var(--bl);
 }
 .qv-bol--x {
   background: var(--or);
 }
 .qv-label {
   display: inline-block;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   border: 1.5px solid var(--border-d);
   color: var(--ink-m);
@@ -674,7 +748,7 @@
 }
 .qv-klasse {
   display: inline-block;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   border-radius: 100px;
   padding: 0.1rem 0.6rem;
@@ -684,10 +758,10 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 4px;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
 }
 .qv-matrix th {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   color: var(--ink-s);
   text-transform: uppercase;
@@ -708,7 +782,7 @@
 .qv-cel small {
   display: block;
   font-weight: 400;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
 }
 .qv-cel--leeg {
   background: repeating-linear-gradient(135deg, #faf9f7 0, #faf9f7 6px, #f2f0eb 6px, #f2f0eb 12px);
@@ -725,7 +799,7 @@
   gap: 1rem;
   align-items: center;
   padding: 0.3rem 0;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
 }
 .qv-balk {
   height: 0.9rem;
@@ -739,14 +813,9 @@
 }
 .qv-keuze {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--sp-2);
   flex-wrap: wrap;
-  margin: 1rem 0 0;
-}
-.qv-keuze .actief {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: #fff;
+  margin: var(--sp-4) 0 var(--sp-6);
 }
 .qv-stapel {
   display: flex;
@@ -760,7 +829,7 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
 }
 .qv-vraag-rij {
@@ -770,21 +839,21 @@
   align-items: center;
   padding: 0.5rem 0;
   border-bottom: 1px solid var(--border);
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
 }
 .qv-dimensie-kop {
   display: flex;
   justify-content: space-between;
   margin-top: 1.2rem;
   font-weight: 700;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink);
 }
 .qv-legenda {
   display: flex;
   gap: 1.2rem;
   flex-wrap: wrap;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink-m);
   margin: 0.8rem 0;
 }
@@ -823,41 +892,11 @@
 .vk-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0.4rem 0 0.2rem;
-}
-.vk-chip {
-  height: 30px;
-  border-radius: 15px;
-  border: 1px solid var(--border-d);
-  background: var(--bg);
-  font-family: inherit;
-  font-size: var(--fs-s);
-  font-weight: 600;
-  color: var(--ink-m);
-  padding: 0 0.9rem;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.vk-chip span {
-  font-weight: 400;
-  margin-left: 0.35rem;
-}
-.vk-chip[aria-pressed="true"] {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: #fff;
-}
-.vk-chip--focus[aria-pressed="true"] {
-  background: var(--or);
-  border-color: var(--or);
-}
-.vk-chip--klein {
-  border-style: dashed;
-  color: var(--ink-s);
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0 0;
 }
 .vk-veldkop {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -866,7 +905,7 @@
 }
 .vk-teller {
   margin-top: 1.2rem;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink-m);
 }
 .vk-teller-balk {
@@ -930,7 +969,7 @@
   border: 1px solid var(--stat-amber);
   border-radius: 8px;
   padding: 0.7rem 0.9rem;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink);
   margin-top: 0.9rem;
 }
@@ -954,11 +993,263 @@
   padding: 0.5rem 0.4rem;
   border-radius: 6px;
   font-weight: 800;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
 }
 .vk-heat--klein {
   background: repeating-linear-gradient(135deg, #faf9f7 0, #faf9f7 6px, #f2f0eb 6px, #f2f0eb 12px);
   border: 1px dashed var(--border-d);
   color: var(--ink-s);
   font-weight: 400;
+}
+
+/* Kolomkop en rijkop (stylesheet.md, Kolomkop en rijkop): Elke kolom met cijfers is 96px, een kop is één regel met een afkapping
+   en een tweede regel van 12px, de eerste kolom is 240px met een afkapping en de volledige naam in een tooltip. */
+.vis-matrix th.vis-kolomkop,
+.vis-matrix td.vis-cel,
+.vis-matrix td.vis-matrix-zij {
+  width: var(--kolom-b);
+  min-width: var(--kolom-b);
+  max-width: var(--kolom-b);
+  box-sizing: border-box;
+}
+.vis-kolomkop-naam,
+.vis-kolomkop-knop {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: inherit;
+  font-size: var(--fs-14);
+  font-weight: 700;
+  color: var(--ink);
+}
+.vis-kolomkop-knop {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+.vis-kolomkop-knop:hover {
+  color: var(--or);
+}
+.vis-kolomkop-sub {
+  display: block;
+  font-size: var(--fs-12);
+  font-weight: 400;
+  color: var(--ink-s);
+  white-space: nowrap;
+}
+.vis-matrix th.vis-matrix-naam,
+.vis-matrix td.vis-matrix-naam {
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Filtermenu en modal Korte namen (stylesheet.md, Filterchip, focuschip en slider) ---------- */
+.filtermenu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  /* De knop staat aan de rechterrand van de kaart: Het menu is rechts uitgelijnd, zoals het Accountmenu. */
+  right: 0;
+  z-index: 20;
+  width: 380px;
+  max-width: calc(100vw - 2rem);
+  max-height: 440px;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: 0 12px 28px rgba(28, 28, 26, 0.08);
+  padding: var(--sp-2);
+}
+.filtermenu-zoek {
+  width: 100%;
+  box-sizing: border-box;
+  height: var(--control-h);
+  padding: 0 0.875rem;
+  border: 1.5px solid var(--border-d);
+  border-radius: var(--r);
+  font: inherit;
+  font-size: var(--fs-14);
+  color: var(--ink);
+  background: var(--bg);
+}
+.filtermenu-kop {
+  margin: var(--sp-3) 0 var(--sp-1);
+  padding: 0 var(--sp-2);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.filtermenu-rij {
+  display: flex;
+  width: 100%;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: 0.5rem var(--sp-2);
+  border: 0;
+  border-radius: var(--r);
+  background: none;
+  font: inherit;
+  font-size: var(--fs-14);
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink);
+}
+.filtermenu-rij:hover {
+  background: var(--bg-warm);
+}
+.filtermenu-rij.grijs .filtermenu-naam {
+  color: var(--ink-s);
+}
+.filtermenu-naam {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.filtermenu-n {
+  flex: none;
+  font-weight: 400;
+  color: var(--ink-s);
+  white-space: nowrap;
+}
+.filtermenu-leeg {
+  margin: var(--sp-3) var(--sp-2);
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.vk-kop-rij {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.vk-kop-rij .vk-veldkop {
+  margin: 1rem 0 0;
+}
+.vk-potlood {
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-s);
+  cursor: pointer;
+}
+.vk-potlood:hover {
+  color: var(--ink);
+}
+
+/* Invoerveld van een korte naam in de tabel (stylesheet.md, Modal Korte namen): Zelfde vorm als een veld in een filterrij. */
+.kn-invoer {
+  width: 100%;
+  min-width: 12rem;
+  box-sizing: border-box;
+  height: var(--control-h);
+  padding: 0 0.875rem;
+  border: 1.5px solid var(--border-d);
+  border-radius: var(--r);
+  background: var(--bg);
+  font: inherit;
+  font-size: var(--fs-14);
+  font-weight: 400;
+  color: var(--ink);
+}
+.kn-invoer:focus {
+  outline: none;
+  border-color: var(--or);
+  box-shadow: 0 0 0 3px var(--or-faint);
+}
+.kn-invoer[aria-invalid="true"] {
+  border-color: var(--stat-red);
+}
+
+/* ---------- Kaart Kenmerken en Groeperen op (stylesheet.md, Kaart Kenmerken en volgende) ---------- */
+.vk-kenmerk {
+  padding: var(--sp-6) 0 0;
+}
+.vk-kenmerk + .vk-kenmerk {
+  margin-top: var(--sp-6);
+  border-top: 1px solid var(--border);
+}
+.vk-kenmerk .vk-kop-rij {
+  justify-content: space-between;
+}
+.vk-kenmerk .vk-kop-rij .vk-veldkop {
+  margin: 0;
+  flex: 1;
+}
+.vk-kenmerk .vk-potlood {
+  margin-top: 0;
+}
+.vk-kruis {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border-d);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--ink-m);
+  font-size: var(--fs-14);
+  line-height: 1;
+  cursor: pointer;
+}
+.vk-kruis:hover {
+  border-color: var(--or);
+  color: var(--ink);
+}
+.vk-leeg {
+  padding-top: var(--sp-2);
+}
+.vk-leeg .vk-chips {
+  margin-top: var(--sp-3);
+}
+.vk-acties {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin-top: var(--sp-6);
+}
+.filtermenu-rij:disabled {
+  cursor: not-allowed;
+}
+.filtermenu-rij:disabled:hover {
+  background: none;
+}
+.vk-reden {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.vk-melding {
+  margin: var(--sp-3) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  display: flex;
+  gap: var(--sp-2);
+  background: var(--stat-amber-faint);
+  border: 1px solid var(--stat-amber);
+  border-radius: var(--r);
+  font-size: var(--fs-14);
+  color: var(--ink);
+}
+.pil:disabled,
+.pil[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

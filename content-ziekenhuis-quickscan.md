@@ -456,5 +456,4 @@ voorbeeld-output in `data/demo-antwoorden-quickscan.ts`, de kaarten in `componen
   - Leads-venster: De vinkjes Resultaten, Spreiding, Antwoorden en Uitnodigen werken. Exporteren is grijs met de reden.
   - Exporteren: De dropdown ontbreekt op de resultatenpagina en in het Meting-overzicht. De CSV-bulkexport slaat deze scans
     over en meldt dat.
-  - Het testknopje in de doorloopflow vult voor dit type Ja, Nee en Weet ik niet, waarbij het gekozen cijfer bepaalt hoeveel
-    vragen Ja krijgen.
+  - De tijdelijke testknop in de doorloopflow staat niet bij dit Assessment: Een respondent vult de Quickscan zelf in.

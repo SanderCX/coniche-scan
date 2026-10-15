@@ -169,7 +169,7 @@ zodat een score nooit met een categorie verward wordt.
 
 ### Drie niveaus van scorekleur
 
-Voorstel van 15 oktober 2026, besloten door Joost op dezelfde dag. Een score
+Besloten door Joost en gebouwd op 15 oktober 2026. Een score
 krijgt de kleur op drie niveaus, van zacht naar vol. Welk niveau bij welk
 onderdeel hoort, ligt vast:
 
@@ -248,8 +248,9 @@ in `tokens.css` (`--fs-12` tot `--fs-48`) en in de Tailwind-configuratie als
 enige waarden van `theme.fontSize`, zodat `text-sm` en `var(--fs-14)` altijd
 hetzelfde zijn en een losse waarde zoals `text-[13px]` niet kan. Tekst in
 grafieken (SVG) volgt dezelfde schaal en erft het lettertype
-(`font-family: inherit`). Voorstel van 15 oktober 2026, besloten door Joost
-op dezelfde dag. De PDF-export valt hier niet onder (zie boven).
+(`font-family: inherit`). Besloten door Joost en gebouwd op 15 oktober 2026
+(`tokens.css`, `@theme` in `app/globals.css`). De PDF-export valt hier niet
+onder (zie boven).
 
 | Token | Maat | Gebruik |
 |---|---|---|
@@ -341,7 +342,8 @@ binnen één rij of één tabel dezelfde lettermaat. De vaste regel:
 
 ### Afstanden
 
-Voorstel van 15 oktober 2026. Een raster van 4px. Marges, paddings en
+Besloten op 15 oktober 2026, gebouwd in de onderdelen die zijn aangeraakt
+(de pil, Verkennen, de matrix en de kolomkoppen). Een raster van 4px. Marges, paddings en
 tussenruimtes in nieuwe en aangeraakte onderdelen zijn een van deze stappen,
 als tokens in `tokens.css`: 4px (`--sp-1`), 8px (`--sp-2`), 12px (`--sp-3`),
 16px (`--sp-4`), 24px (`--sp-6`), 32px (`--sp-8`) en 48px (`--sp-12`).
@@ -825,7 +827,8 @@ een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
 
 ### Keuzepil en pilvormige groep
 
-Voorstel van 15 oktober 2026, besloten door Joost op dezelfde dag. Eén vorm voor
+Besloten door Joost en gebouwd op 15 oktober 2026 (`.pil`, `.pil-groep` en
+`.weergave-wissel`). Eén vorm voor
 alles wat de gebruiker kiest, ter vervanging van de rechthoekige
 weergave-schakelaar met een zwarte actieve knop, de filterchips met een zwarte
 vulling en de oranje omlijnde afdelingsknoppen van de Quickscan.
@@ -872,7 +875,7 @@ omlijnd, want oranje rand en tekst maken van een keuze een knop met een actie
 
 ### Kolomkop en rijkop in tabellen, matrices en heatmaps
 
-Voorstel van 15 oktober 2026. Een kop breekt nooit over meerdere regels en geeft
+Gebouwd op 15 oktober 2026 (matrix en heatmap, `.vis-kolomkop`). Een kop breekt nooit over meerdere regels en geeft
 de kolom geen breedte. De Antwoorden-weergave (initialen met de volledige naam
 in een tooltip) en de lijst Respondenten zijn het voorbeeld.
 
@@ -903,9 +906,8 @@ in een tooltip) en de lijst Respondenten zijn het voorbeeld.
 ### Filterchip, focuschip en slider (Verkennen)
 
 Uit het visual design van Verkennen (`visualisatie-verkennen.md`), gebouwd op
-15 oktober 2026 met de oude vorm van de chips. De vorm hieronder, met de
-keuzepil, is het voorstel van de opmaakronde van 15 oktober 2026 en nog niet
-gebouwd. Alleen de onderdelen die nog niet in dit document staan. De vier weergaven, Groeperen op en Sorteren gebruiken de
+15 oktober 2026 met de oude vorm van de chips en bijgewerkt in de opmaakronde van
+dezelfde dag (keuzepil, filtermenu met korte namen en de modal Korte namen). Alleen de onderdelen die nog niet in dit document staan. De vier weergaven, Groeperen op en Sorteren gebruiken de
 pilvormige groep (`.weergave-wissel`).
 
 - **Filterchip**: Een keuzepil (zie Keuzepil en pilvormige groep) met het aantal

@@ -594,31 +594,31 @@ screenshots van de draaiende app. Niets is besloten of gebouwd.
   Scorekleuren).
 - **Contrast, `--ink-s`**: `#888884` is ongeveer 3,5:1 voor hints en labels.
   Een tint donkerder (rond `#6f6f6b`) lost dat op.
-- **Grafiektekst**: Opgelost in het voorstel van 15 oktober 2026: Minimaal 12px (`--fs-12`), zie `stylesheet.md`, Lettergroottes. Bouwen volgt.
+- **Grafiektekst**: Opgelost in het voorstel van 15 oktober 2026: Minimaal 12px (`--fs-12`), zie `stylesheet.md`, Lettergroottes. Gebouwd op 15 oktober 2026.
 - **Foutstaten in formulieren**: Rode rand met een korte melding onder het
   veld. Staat al als open punt in `stylesheet.md`.
 - **Lege, laad- en opgeslagen-staten**: Een vaste lege staat met uitleg en
   een knop naar de volgende stap, en één vaste terugkoppeling na opslaan
   (toast of `.beheer-melding`).
-- **Display-maten en spacing**: Besloten op 15 oktober 2026 (`stylesheet.md`,
-  Lettergroottes en Afstanden): Acht maten in even px, een afstandsraster
-  van 4px, en `font-size` alleen uit de tokens. Nog te bouwen: De CSS
-  doorlopen op alle losse `font-size`-waarden, de Tailwind-configuratie
-  beperken tot de acht maten, `--control-h` naar 40px en de tekst in
-  grafieken naar 12px. Bestaande marges en gaps (`.82rem`, `1.7rem`, `.6rem`,
-  `1.2rem`, `1.8rem`) gaan mee naar het raster zodra een onderdeel wordt
-  aangeraakt. Inline styles (bijv. `app/page.tsx`) naar klassen.
-- **Opmaakronde van 15 oktober 2026** (`stylesheet.md`): De pilvormige groep
-  en de keuzepil voor alle keuzes (weergave-schakelaar, Groeperen op,
-  Sorteren, filters, focusgroepen, afdelingen in de Quickscan), met gekozen
-  als massief oranje en geen zwarte vulling meer. De paginatitel op 32px,
-  zodat de kop van de voorbeeld-output niet meer over twee regels breekt. Drie
-  niveaus van scorekleur, met celtinten voor Antwoorden en de heatmap van
-  Verkennen (nu volle kleuren). Verschil in blauw en `--dal`, en een
-  driehoek in plaats van de zwarte rand in de matrix op niveau 1. Kolomkoppen
-  van 96px op één regel met een tooltip, en `Organisatie.korteNaam`. Het
-  visual design van Verkennen heeft de vorm bijgewerkt (versie 5), maar nog
-  niet het gedrag van Kenmerken en Groeperen op. De PDF-export valt er niet onder.
+- **Display-maten en spacing**: Gebouwd op 15 oktober 2026 (`stylesheet.md`,
+  Lettergroottes en Afstanden): Acht maten in even px (`--fs-12` tot
+  `--fs-48`), de Tailwind-schaal beperkt tot dezelfde acht maten
+  (`@theme` in `app/globals.css`), `--control-h` op 40px en de tekst in
+  grafieken op 12px. Wat nog openstaat: De afstandstokens (`--sp-*`) zijn
+  alleen toegepast in de onderdelen die zijn aangeraakt. Bestaande marges en
+  gaps (`.82rem`, `1.7rem`, `.6rem`, `1.2rem`, `1.8rem`) gaan mee naar het
+  raster zodra een onderdeel wordt aangeraakt. Inline styles (bijv.
+  `app/page.tsx`) naar klassen. Het scherm is na de verkleining van de
+  tekst (interface 14px in plaats van 13,6px) niet per scherm doorlopen op
+  uitlijning.
+- **Opmaakronde van 15 oktober 2026** (`stylesheet.md`): Gebouwd op dezelfde
+  dag: De pilvormige groep en de keuzepil, drie niveaus van scorekleur,
+  verschil in blauw en `--dal`, de driehoek bij een afwijkende cel, kolomkoppen
+  van 96px op één regel met een tooltip en `Organisatie.korteNaam`. De pil
+  staat in de weergave-schakelaar, Verkennen en de antwoorden van de
+  Quickscan. Nog niet: Een doorloop van de overige keuzeknoppen in de app
+  op de pil. Het visual design van Verkennen (versie 6) is gebouwd. De
+  PDF-export valt er niet onder.
 - **Vragenlijst en resultaten**: Duidelijkere actieve staat op de gekozen
   schaalwaarde, de hele antwoordrij klikbaar, een zichtbare
   "opgeslagen"-indicator en een korte uitleg boven de grafieken.

@@ -37,7 +37,7 @@ export default function VoorbeeldPage({
       <div style={{ marginBottom: "2rem" }}>
         <span className="eyebrow">Voorbeeld-output</span>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1.5rem", marginTop: "0.3rem" }}>
-          <h1 style={{ margin: 0, minWidth: 0 }}>{assessment.naam}</h1>
+          <h1 className="page-title" style={{ margin: 0, minWidth: 0 }}>{assessment.naam}</h1>
           <Link href={`/${assessment.id}`} className="btn btn-outline btn-compact">
             ← Terug
           </Link>

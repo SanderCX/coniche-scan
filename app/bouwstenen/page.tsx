@@ -61,7 +61,7 @@ function BouwsteenKaart({
           position: "absolute",
           top: "0.7rem",
           right: "0.9rem",
-          fontSize: "var(--fs-xs)",
+          fontSize: "var(--fs-12)",
           fontWeight: 700,
           color: actief ? "rgba(255,255,255,0.75)" : "var(--ink-s)",
         }}
@@ -264,7 +264,7 @@ function BouwstenenInhoud() {
             style={{
               maxWidth: "40rem",
               margin: "1rem auto 0",
-              fontSize: "1.1rem",
+              fontSize: "var(--fs-18)",
               fontWeight: 600,
               color: "var(--ink)",
             }}

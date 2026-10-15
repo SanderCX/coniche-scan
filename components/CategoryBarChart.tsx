@@ -45,12 +45,12 @@ export function CategoryBarChart({
             layout="vertical"
             margin={{ top: 8, right: 24, left: 8, bottom: 8 }}
           >
-            <XAxis type="number" domain={[0, 5]} ticks={[0, 1, 2, 3, 4, 5]} tick={{ fontSize: 11, fill: "#4d4d49" }} />
+            <XAxis type="number" domain={[0, 5]} ticks={[0, 1, 2, 3, 4, 5]} tick={{ fontSize: 12, fill: "#4d4d49" }} />
             <YAxis
               type="category"
               dataKey="naam"
               width={140}
-              tick={{ fontSize: 11, fill: "#4d4d49" }}
+              tick={{ fontSize: 12, fill: "#4d4d49" }}
             />
             <Tooltip formatter={(value) => Number(value).toFixed(1)} />
             {vergelijking && <Legend wrapperStyle={{ fontSize: 12 }} />}
@@ -70,8 +70,8 @@ export function CategoryBarChart({
     <div className="h-72 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 16, left: -16, bottom: 8 }}>
-          <XAxis dataKey="naam" tick={{ fontSize: 11, fill: "#4d4d49" }} />
-          <YAxis domain={[0, 5]} ticks={[0, 1, 2, 3, 4, 5]} tick={{ fontSize: 11, fill: "#4d4d49" }} />
+          <XAxis dataKey="naam" tick={{ fontSize: 12, fill: "#4d4d49" }} />
+          <YAxis domain={[0, 5]} ticks={[0, 1, 2, 3, 4, 5]} tick={{ fontSize: 12, fill: "#4d4d49" }} />
           <Tooltip formatter={(value) => Number(value).toFixed(1)} />
           {vergelijking && <Legend wrapperStyle={{ fontSize: 12 }} />}
           <Bar dataKey="score" name={naam} radius={[6, 6, 0, 0]}>

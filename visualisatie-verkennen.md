@@ -2,7 +2,7 @@
 
 Spec voor het Admin-scherm Verkennen, waar je alle Organisaties van één Assessment door elkaar kunt filteren, groeperen en naast elkaar zetten.
 
-**Status: Voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026 met filters en een vaste groepering.** Er is een visual design (Claude Design, "Coniche Scan Verkennen") met voorbeelddata. Dat design (versie 6) toont ook het gedrag van Kenmerken en Groeperen op zoals hieronder beschreven (besloten op 15 oktober 2026), met een gedeeltelijke kenmerkenlijst: Sector, CRM-pakket, LLM-oplossing, Ingezette kanalen, AHT, NPS en FTR. De keuzes bij het bouwen staan onder Gebouwd. Kenmerken en Groeperen op, de korte namen, de pilvormige groep en de celtinten zijn voorstel van 15 oktober 2026 en nog niet gebouwd. Wat in dit document staat als "Besloten" komt uit het gesprek van 15 oktober 2026.
+**Status: Voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026.** Er is een visual design (Claude Design, "Coniche Scan Verkennen") met voorbeelddata. Dat design (versie 6) toont ook het gedrag van Kenmerken en Groeperen op zoals hieronder beschreven (besloten op 15 oktober 2026), met een gedeeltelijke kenmerkenlijst: Sector, CRM-pakket, LLM-oplossing, Ingezette kanalen, AHT, NPS en FTR. De keuzes bij het bouwen staan onder Gebouwd. De korte namen, de pilvormige groep en de celtinten zijn gebouwd op 15 oktober 2026 (zie Gebouwd). Kenmerken en Groeperen op zijn gebouwd op 15 oktober 2026 naar versie 6 van het visual design. Wat in dit document staat als "Besloten" komt uit het gesprek van 15 oktober 2026.
 
 ## Wat het is
 
@@ -53,7 +53,7 @@ De kenmerken komen uit de organisatievelden (`datamodel.md`, `VeldDefinitie`) en
 
 ## Korte namen
 
-**Voorstel van 15 oktober 2026.** Namen als "Activiteiten op het gebied van financiële dienstverlening en verzekeringen" of "Volume en klantbasis › Totaal aantal contacten per jaar, per kanaal › Call" zijn te lang voor een pil, een menuregel of een kolomkop. Een korte naam is een weergavenaam naast het origineel. Hij kan bij veldnamen en bij waarden.
+**Gebouwd op 15 oktober 2026.** Namen als "Activiteiten op het gebied van financiële dienstverlening en verzekeringen" of "Volume en klantbasis › Totaal aantal contacten per jaar, per kanaal › Call" zijn te lang voor een pil, een menuregel of een kolomkop. Een korte naam is een weergavenaam naast het origineel. Hij kan bij veldnamen en bij waarden.
 
 - **Waar hij staat.** Overal in Verkennen waar een veld of waarde getoond wordt: Het menu Kenmerk toevoegen, de pillen, de groepsnamen, de kolomkoppen van de heatmap en de assen en tooltips van het spreidingsdiagram. Bij hover op een pil of menuregel staat het origineel in een tooltip.
 - **Waar hij niet staat.** In het organisatie-detail, de exports en de import. Daar blijft het origineel staan. De Organisatie bewaart altijd het origineel, zodat er geen twee namen voor één waarde in de data komen.
@@ -168,7 +168,28 @@ Kleuren in de grafieken: Focus oranje (`--or`), rest grijs (`rgba(136,136,132,.5
 Gebouwd op 15 oktober 2026. De berekeningen staan in `lib/verkennen.ts` (met tests in `lib/verkennen.test.ts`), het scherm in
 `app/beheer/verkennen/page.tsx` en de onderdelen in `components/verkennen/`.
 
-**Wat de kenmerken vervangen.** Wat hieronder is gebouwd (filters, met Sector en de ingezette kanalen als standaard, en Groeperen op CRM-pakket of sector met CRM-pakket als startwaarde) is de eerste versie. Het voorstel van Kenmerken en Groeperen op (hierboven) vervangt dat: Het scherm begint leeg, een toegevoegd kenmerk is filter en groepering, en zonder groepering is de hele pool de focus. Dat is nog niet gebouwd.
+**Kenmerken en Groeperen op** (gebouwd op 15 oktober 2026, vervangt de eerste versie met Sector en kanalen als standaard)
+
+- Het scherm begint leeg. `components/verkennen/KenmerkenKaart.tsx` is de kaart Kenmerken, `FilterMenu.tsx` het menu Kenmerk
+  toevoegen, `Vergelijken.tsx` Groeperen op en de focusgroep. De stand (kenmerken, gekozen waarden, groepering, drempel) staat in
+  de pagina `app/beheer/verkennen/page.tsx` en wordt niet opgeslagen.
+- Of een kenmerk kan groeperen staat in `kanGroeperen` (`lib/verkennen.ts`, met tests). De drempels zijn constanten met de
+  startwaarden uit de spec: `MIN_POOL_GROEPEREN` (6), `MAX_WAARDEN_GROEPEREN` (12) en `MIN_INGEVULD_AANDEEL` (40%). Een getal
+  kan niet groeperen als er geen twee verschillende waarden zijn.
+- Het eerste bruikbare kenmerk dat de Admin toevoegt wordt de groepering. De terugval gebeurt zodra de gekozen groepering niet meer
+  kan: De groepering staat dan op het eerste kenmerk dat wel kan, met de melding. Wordt de eerder gekozen groepering weer
+  bruikbaar (bijvoorbeeld na "Wis filters"), dan keert de groepering daarnaar terug.
+- De rest zijn de Organisaties van de andere groepen (`splitsFocus`). Wie het kenmerk niet heeft, zit in geen groep en staat als
+  "n zonder waarde" onder de focusgroep.
+- Zonder groepering is de hele pool de focus: Weergave 1 en 2 tonen alleen de pool met de kaarten Gemiddelde van de pool,
+  Organisaties, Hoogste en Laagste bouwblok, de heatmap alleen de kolom Hele pool met de hint, en Grootste verschil is
+  uitgeschakeld (met een tooltip).
+- De drempel bij een getal gebruikt `VeldDefinitie.eenheid`: Alleen AHT heeft "s", bij een percentage is het "%". Groepsnamen
+  zijn "≤ 420 s" en "> 420 s".
+- Ingezette kanalen staat als kenmerk in het menu (groep Volume en klantbasis), alleen als filter en niet als groepering.
+- Nog niet: De pil "Ander kenmerk…" boven ongeveer vijf pillen (open punt), en een filter op bereik bij getallen (Later).
+- De pool-eis van 6 Organisaties betekent dat Groeperen op bij de seed (3 Organisaties met toestemming) niet kan: De pool
+  verschijnt dan zonder groepering, met de reden onder Groeperen op.
 
 **Keuzes waar de spec open liet** (de open punten hierboven, met de gebouwde waarde)
 
@@ -184,5 +205,20 @@ Gebouwd op 15 oktober 2026. De berekeningen staan in `lib/verkennen.ts` (met tes
 - Het verband (weergave 4) neemt de Organisaties na de filters, met AHT, FTR of NPS horizontaal. De lijn en r komen bij minstens
   3 Organisaties met een waarde.
 - Het Assessment-keuzeveld toont geen Assessment met Ja / Nee / Weet ik niet (Later).
+
+**Korte namen en opmaakronde** (gebouwd op 15 oktober 2026)
+
+- De korte namen staan bij de instellingen (`Instellingen.korteNamen`, server-sleutel `instellingen`), met pure functies in
+  `lib/korte-namen.ts` (met tests). Voor de Secties van de SBI gelden de beginwaarden uit `sbi-indeling.md` zolang er geen
+  opgeslagen korte naam is. Een lege opgeslagen korte naam betekent bewust het origineel.
+- Het filtermenu (`components/verkennen/FilterMenu.tsx`) biedt elk select- of getalveld, ook als de pool er geen waarden voor heeft:
+  Zo'n veld staat grijs. De grens voor grijs is 40% van de Organisaties in de pool en staat nu als constante in de code.
+- Het potlood naast de kop van een filter staat bij select-velden en opent de modal met de waarden van dat veld, op volgorde van
+  "in gebruik zonder korte naam" eerst.
+- De groepsnaam (chip, heatmapkolom) is de korte naam van de waarde, het origineel staat in de tooltip. De kenmerken bij Verband
+  gebruiken de korte naam van het veld.
+- Het info-icoon bij Groeperen op is `info.verkennenGroeperen`. Groeperen kent altijd een keuze (startwaarde CRM-pakket).
+- Nog niet: Het sectorfilter bij het samenstellen van een benchmark gebruikt de korte namen niet (open punt hieronder), en een
+  opgeslagen korte naam voor een waarde die nergens meer voorkomt wordt niet opgeruimd in Data-integriteit.
 
 **Nog niet gebouwd**: Wat onder Later staat.

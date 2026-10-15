@@ -68,7 +68,13 @@ export interface FilterVeld {
   label: string;
   pad: string[];
   type: "select" | "getal";
+  /** Eenheid van een getal (`VeldDefinitie.eenheid`, bij een percentage "%"). */
+  eenheid?: string;
 }
+
+/** Het afgeleide kenmerk "Ingezette kanalen": Alleen een filter, geen groepering (`visualisatie-verkennen.md`, Kenmerken en filters). */
+export const KANALEN_ID = "__kanalen";
+export const KANALEN_LABEL = "Volume en klantbasis › Ingezette kanalen";
 
 /** Alle velden die als filter kunnen dienen: De bladeren van de organisatievelden, select of getal (percentage telt als getal). */
 export function filterVelden(velden: VeldDefinitie[] = organisatieVelden): FilterVeld[] {
@@ -79,11 +85,43 @@ export function filterVelden(velden: VeldDefinitie[] = organisatieVelden): Filte
       const n = [...namen, v.label];
       if (v.type === "groep") loop(v.subvelden ?? [], p, n);
       else if (v.type === "select" || v.type === "select-afhankelijk") uit.push({ id: p.join("."), label: n.join(" › "), pad: p, type: "select" });
-      else if (v.type === "getal" || v.type === "percentage") uit.push({ id: p.join("."), label: n.join(" › "), pad: p, type: "getal" });
+      else if (v.type === "getal" || v.type === "percentage")
+        uit.push({
+          id: p.join("."),
+          label: n.join(" › "),
+          pad: p,
+          type: "getal",
+          eenheid: v.eenheid ?? (v.type === "percentage" ? "%" : undefined),
+        });
     }
   };
   loop(velden, [], []);
   return uit;
+}
+
+/** Het afgeleide veld Ingezette kanalen, naast de organisatievelden in het menu Kenmerk toevoegen. */
+export function kanalenVeld(): FilterVeld {
+  return { id: KANALEN_ID, label: KANALEN_LABEL, pad: [], type: "select" };
+}
+
+/** De groep van een veld in het filtermenu: Het eerste deel van het label ("Techstack"), anders "Overig". */
+export function veldGroep(veld: FilterVeld): string {
+  const delen = veld.label.split(" › ");
+  return delen.length > 1 ? delen[0] : "Overig";
+}
+
+/** Het label zonder de groep ("Contact center › Oplossing"): Het origineel waar een korte naam van een veld op bouwt. */
+export function veldLabelZonderGroep(veld: FilterVeld): string {
+  const delen = veld.label.split(" › ");
+  return delen.length > 1 ? delen.slice(1).join(" › ") : veld.label;
+}
+
+/** Hoeveel van deze organisaties het veld hebben ingevuld (voor "37 van 50" in het filtermenu). */
+export function ingevuldAantal(organisaties: Pick<Organisatie, "kenmerken">[], veld: FilterVeld): number {
+  return organisaties.filter((o) => {
+    const w = kenmerkWaarde(o, veld.pad);
+    return w !== undefined && w !== null && w !== "";
+  }).length;
 }
 
 /** De waarde van een kenmerk op een pad, of `undefined`. */
@@ -221,7 +259,10 @@ export type Groepering =
 
 export interface Groep {
   sleutel: string;
+  /** De getoonde naam: De korte naam van de waarde als die er is (`visualisatie-verkennen.md`, Korte namen). */
   naam: string;
+  /** Het origineel als `naam` een korte naam is: Komt in de tooltip. */
+  volledigeNaam?: string;
   leden: PoolLid[];
 }
 
@@ -230,7 +271,13 @@ export interface Groep {
  * drempel op een getalveld twee: "≤ drempel" en "> drempel". Organisaties zonder waarde horen niet bij een groep, maar wel bij
  * de rest. De grootste groep staat vooraan.
  */
-export function maakGroepen(leden: PoolLid[], groepering: Groepering, velden: FilterVeld[] = filterVelden()): Groep[] {
+export function maakGroepen(
+  leden: PoolLid[],
+  groepering: Groepering,
+  velden: FilterVeld[] = filterVelden(),
+  /** De korte naam van een waarde bij een veld, of het origineel zelf. */
+  naamVan: (veldId: string, waarde: string) => string = (_veldId, waarde) => waarde
+): Groep[] {
   const veld = velden.find((v) => v.id === groepering.veldId);
   if (!veld) return [];
   if (groepering.soort === "select") {
@@ -241,7 +288,10 @@ export function maakGroepen(leden: PoolLid[], groepering: Groepering, velden: Fi
       per.set(w, [...(per.get(w) ?? []), lid]);
     }
     return [...per.entries()]
-      .map(([naam, l]) => ({ sleutel: naam, naam, leden: l }))
+      .map(([waarde, l]) => {
+        const kort = naamVan(veld.id, waarde);
+        return { sleutel: waarde, naam: kort, ...(kort !== waarde ? { volledigeNaam: waarde } : {}), leden: l };
+      })
       .sort((a, b) => b.leden.length - a.leden.length || a.naam.localeCompare(b.naam, "nl"));
   }
   const onder: PoolLid[] = [];
@@ -252,17 +302,70 @@ export function maakGroepen(leden: PoolLid[], groepering: Groepering, velden: Fi
     (w <= groepering.drempel ? onder : boven).push(lid);
   }
   const d = String(groepering.drempel).replace(".", ",");
+  const eenheid = veld.eenheid ? ` ${veld.eenheid}` : "";
   return [
-    { sleutel: "onder", naam: `≤ ${d}`, leden: onder },
-    { sleutel: "boven", naam: `> ${d}`, leden: boven },
+    { sleutel: "onder", naam: `≤ ${d}${eenheid}`, leden: onder },
+    { sleutel: "boven", naam: `> ${d}${eenheid}`, leden: boven },
   ];
 }
 
-/** De focus en de rest: De rest is alle andere organisaties in de pool (na de filters). */
-export function splitsFocus(leden: PoolLid[], focus: Groep | undefined): { focus: PoolLid[]; rest: PoolLid[] } {
-  if (!focus) return { focus: [], rest: leden };
-  const ids = new Set(focus.leden.map((l) => l.organisatie.id));
-  return { focus: focus.leden, rest: leden.filter((l) => !ids.has(l.organisatie.id)) };
+/**
+ * De focus en de rest (`visualisatie-verkennen.md`, Groeperen en focus): De rest zijn de organisaties van de andere groepen. Wie
+ * voor het gekozen kenmerk geen waarde heeft, zit in geen groep en telt niet mee. Zonder groepering (`groepen` leeg of geen focus)
+ * is de hele pool de focus en is er geen rest (Zonder groepering).
+ */
+export function splitsFocus(
+  leden: PoolLid[],
+  groepen: Groep[],
+  focus: Groep | undefined
+): { focus: PoolLid[]; rest: PoolLid[] } {
+  if (!focus || groepen.length === 0) return { focus: leden, rest: [] };
+  return { focus: focus.leden, rest: groepen.filter((g) => g.sleutel !== focus.sleutel).flatMap((g) => g.leden) };
+}
+
+/** Hoeveel organisaties van deze lijst geen waarde voor het veld hebben ("n zonder waarde" onder de groepen). */
+export function zonderWaarde(leden: PoolLid[], veld: FilterVeld): number {
+  return leden.filter((l) => {
+    const w = kenmerkWaarde(l.organisatie, veld.pad);
+    return w === undefined || w === null || w === "";
+  }).length;
+}
+
+/* ---------- Wanneer een kenmerk kan groeperen ---------- */
+
+/** Minder organisaties in de pool dan dit: Geen enkele groepering (startwaarde, `visualisatie-verkennen.md`, Open punten). */
+export const MIN_POOL_GROEPEREN = 6;
+/** Een select met meer verschillende waarden in de pool kan niet groeperen (startwaarde). */
+export const MAX_WAARDEN_GROEPEREN = 12;
+/** Een kenmerk dat bij minder dan dit aandeel van de organisaties van het Assessment is ingevuld, kan niet groeperen (startwaarde). */
+export const MIN_INGEVULD_AANDEEL = 0.4;
+
+export interface Bruikbaarheid {
+  ok: boolean;
+  /** De reden als het kenmerk niet kan groeperen. */
+  reden?: string;
+}
+
+/**
+ * Kan dit kenmerk de pool in groepen verdelen? `alle` is de pool van het Assessment (zonder filters, voor de 40%), `gefilterd` de
+ * pool na de filters. Elke regel geeft een reden die in een tooltip en onder de groep Groeperen op staat.
+ */
+export function kanGroeperen(veld: FilterVeld, alle: PoolLid[], gefilterd: PoolLid[]): Bruikbaarheid {
+  if (gefilterd.length < MIN_POOL_GROEPEREN) return { ok: false, reden: `Minder dan ${MIN_POOL_GROEPEREN} Organisaties in de pool` };
+  const minIngevuld = Math.ceil(MIN_INGEVULD_AANDEEL * alle.length);
+  const ingevuld = alle.length - zonderWaarde(alle, veld);
+  if (ingevuld < minIngevuld) return { ok: false, reden: `Minder dan ${minIngevuld} ingevulde waarden` };
+  if (veld.type === "select") {
+    const aantal = selectOpties(gefilterd, veld).length;
+    if (aantal > MAX_WAARDEN_GROEPEREN) return { ok: false, reden: `Meer dan ${MAX_WAARDEN_GROEPEREN} verschillende waarden` };
+    if (aantal < 2) return { ok: false, reden: "Het filter laat één waarde over" };
+    return { ok: true };
+  }
+  const waarden = getalWaarden(gefilterd, veld);
+  if (waarden.length < 2 || Math.min(...waarden) === Math.max(...waarden)) {
+    return { ok: false, reden: "Er zijn geen twee verschillende waarden" };
+  }
+  return { ok: true };
 }
 
 /* ---------- Statistiek voor de weergaven ---------- */

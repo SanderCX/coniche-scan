@@ -84,6 +84,8 @@ const ORGANISATIE_TABS = [
   { href: "/beheer/organisaties", label: "Organisaties" },
   { href: "/beheer/respondenten", label: "Respondenten" },
 ];
+/** Alleen een Admin (`content.beheren`): De definitie van de organisatievelden en hun korte namen. */
+const ORGANISATIEVELDEN_TAB = { href: "/beheer/organisatievelden", label: "Organisatievelden" };
 
 /** Tabbalk van Resultaten (beheerpagina.md, punt 7): Metingen, voor een Admin aangevuld met Benchmarks. */
 const RESULTATEN_TABS = [{ href: "/beheer/resultaten/metingen", label: "Metingen" }];
@@ -136,7 +138,8 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
   ];
 
   const rolInfo = gebruiker ? ROL_KLEUR[gebruiker.rol] : undefined;
-  const toonTabs = ORGANISATIE_TABS.some((t) => pathname === t.href);
+  const organisatieTabs = [...ORGANISATIE_TABS, ...(magContentBeheren(gebruiker) ? [ORGANISATIEVELDEN_TAB] : [])];
+  const toonTabs = organisatieTabs.some((t) => pathname === t.href);
   // Met maar één tab, zoals bij een Consultant, toont de pagina geen tabbalk (`beheerpagina.md`, punt 7).
   const toonResultatenTabs = resultatenTabs.length > 1 && resultatenTabs.some((t) => pathname === t.href);
   const toonInstellingenTabs = heeftInstellingen && INSTELLINGEN_TABS.some((t) => pathname === t.href);
@@ -180,7 +183,7 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
       {toonTabs && (
         <div className="beheer-tabs">
           <nav className="beheer-tabs-inner" aria-label="Onderdelen van Organisaties">
-            {ORGANISATIE_TABS.map((tab) => (
+            {organisatieTabs.map((tab) => (
               <Link key={tab.href} href={tab.href} className={`beheer-tab ${pathname === tab.href ? "actief" : ""}`}>
                 {tab.label}
               </Link>

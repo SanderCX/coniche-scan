@@ -545,7 +545,7 @@ export const organisatieVelden: VeldDefinitie[] = [
     label: "KPI's",
     type: "groep",
     subvelden: [
-      { id: "aht", label: "AHT", type: "getal" },
+      { id: "aht", label: "AHT", type: "getal", eenheid: "s" },
       { id: "nps", label: "NPS", type: "getal" },
       { id: "csat", label: "CSAT", type: "percentage" },
       { id: "sla", label: "SLA", type: "percentage" },
