@@ -31,18 +31,15 @@ export default function VoorbeeldPage({
 
   return (
     <PageWithChrome>
-    <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
-      <div className="mb-8 flex items-center justify-between">
+    <div className="container" style={{ padding: "3.5rem 2rem 4.5rem" }}>
+      {/* Eyebrow en kop volgens `stylesheet.md` (Koppen, Label/eyebrow): Het label is oranje, de kop is de standaard h1. De knop
+          om terug te gaan is een `.btn`, zoals de andere acties. */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1.5rem", marginBottom: "2rem" }}>
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-ink-m">
-            Voorbeeld-output
-          </p>
-          <h1 className="mt-1 text-2xl font-bold text-ink">{assessment.naam}</h1>
+          <span className="eyebrow">Voorbeeld-output</span>
+          <h1 style={{ margin: "0.3rem 0 0" }}>{assessment.naam}</h1>
         </div>
-        <Link
-          href={`/${assessment.id}`}
-          className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-gray-400"
-        >
+        <Link href={`/${assessment.id}`} className="btn btn-outline btn-compact" style={{ flexShrink: 0 }}>
           ← Terug
         </Link>
       </div>
@@ -61,7 +58,8 @@ export default function VoorbeeldPage({
         // Wat er bij meerdere respondenten van dezelfde Meting en organisatie bij komt: Het gemiddelde en de afwijking daarop
         // (`visualisatie-scores.md`, A, Per bouwblok).
         <section style={{ marginTop: "4rem" }}>
-          <h2>Gemiddelde en afwijking</h2>
+          <span className="eyebrow">Meerdere respondenten</span>
+          <h2 style={{ margin: "0.3rem 0 0" }}>Gemiddelde en afwijking</h2>
           <p className="mt-2 text-ink-m">
             Wanneer er meerdere respondenten voor de zelfde meting en organisatie de scan hebben ingevuld, verschaft de tool ook
             inzicht in de gemiddelde scores en afwijkingen daarop.
