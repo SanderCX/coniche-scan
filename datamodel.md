@@ -243,6 +243,7 @@ Die koppeling loopt via Meting.
 Organisatie {
   id: string
   naam: string                      // bewerkbaar via organisaties.bewerken, gelogd als organisatie.hernoemd
+  korteNaam?: string | null         // voorstel van 15 oktober 2026: weergavenaam in kolomkoppen, maximaal 30 tekens, leeg betekent `naam`
   kenmerken: { [veldId: string]: waarde }   // in beheer, altijd bewerkbaar, niet door respondenten
   aangemaaktOp: datetime
 }
@@ -671,8 +672,25 @@ VeldDefinitie {
   afhankelijkVan?: string           // alleen "select-afhankelijk": id van het broer-veld waarvan de keuze de lijst hier bepaalt
   optiesPerWaarde?: { [waarde: string]: string[] } // alleen "select-afhankelijk"
   subvelden?: VeldDefinitie[]       // voor herhalende structuren
+  korteNaam?: string                // voorstel: weergavenaam van het veld in lijsten en grafieken, leeg betekent `label`
 }
 ```
+
+**Korte namen** (voorstel van 15 oktober 2026, `visualisatie-verkennen.md`, Korte namen). Een korte naam is een weergavenaam naast het origineel. De Organisatie bewaart altijd de originele waarde.
+
+```
+KorteNaam {
+  veldId: string       // id van het veld waar de waarde bij hoort (bij een subveld de id van het subveld)
+  waarde: string       // de originele waarde, zoals ze in `Organisatie.kenmerken` staat
+  korteNaam: string    // maximaal 30 tekens, uniek binnen het veld (hoofdletterongevoelig)
+}
+```
+
+- Een veldnaam heeft zijn korte naam in `VeldDefinitie.korteNaam`. `KorteNaam` is er voor waarden.
+- Een lege of ontbrekende korte naam betekent het origineel.
+- De rij hoort bij de combinatie van veld en waarde. Bij een waarde via "Anders…" ontstaat de rij pas zodra een Admin een korte naam invult. Verdwijnt de waarde uit de lijst en uit alle Organisaties, dan kan de rij weg (Data-integriteit, `beheerpagina.md`, punt 13).
+- De korte naam staat in Verkennen en in andere schermen waar ruimte krap is. Hij staat niet in het organisatie-detail, de exports en de import, want daar blijft het origineel staan.
+- Wijzigen vraagt `content.beheren` (alleen Admin) en wordt gelogd (zie Audit).
 
 **Sector en subsector**
 - Sector (select, vaste lijst: de SBI-hoofdindeling, `opties` in
@@ -1204,6 +1222,9 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   de benchmark en of het vinkje aan of uit is gezet, zonder naam of
   e-mailadres van de Lead. De gebeurtenissen `benchmark.toegewezen` en
   `benchmark.toewijzingIngetrokken` blijven geldig voor wat al is gelogd.
+- `korteNaam.gewijzigd` (voorstel van 15 oktober 2026). `details` bevat het
+  veld en de originele waarde, en niet de nieuwe korte naam, zoals bij
+  `algemeneTekst.gewijzigd`.
 - `organisatie.antwoordenNamenGewijzigd` (voorstel). `details` bevat de naam
   van de organisatie en de nieuwe stand van de schakelaar.
 - `organisatie.benchmarkVlagGewijzigd`. `details` bevat de naam van de

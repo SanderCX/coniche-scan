@@ -89,6 +89,23 @@ Stand van `tokens.css`, aangevuld met `--nav-h`:
   --score-4-faint: #eef7e6;
   --score-5: #15803d;     /* donkergroen */
   --score-5-faint: #e6f2ea;
+
+  /* Celtinten voor cellen met een getal, met tekstkleur (voorstel, zie "Drie niveaus van scorekleur") */
+  --score-1-cel: #f7c6c1;  --score-1-cel-tekst: #7f1d1d;
+  --score-2-cel: #fde9c8;  --score-2-cel-tekst: #6b3a00;
+  --score-3-cel: #fbf0b8;  --score-3-cel-tekst: #5c4800;
+  --score-4-cel: #dcefc6;  --score-4-cel-tekst: #2f5a12;
+  --score-5-cel: #c3e6d2;  --score-5-cel-tekst: #0e4d30;
+
+  /* Verschil: boven is --bl, onder is --dal */
+  --dal: #c2570c;
+
+  /* Afstanden, raster van 4px */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+  --sp-6: 24px; --sp-8: 32px; --sp-12: 48px;
+
+  /* Kolombreedte in tabellen en matrices */
+  --kolom-b: 96px;
 }
 ```
 
@@ -143,12 +160,70 @@ voor de antwoordopties in de vragenlijst zelf, om respondenten niet
 richting een kleur te sturen.
 
 Tekst op geel en lichtgroen is `var(--ink)`, op de andere drie wit, voor
-voldoende contrast.
+voldoende contrast. Dit geldt voor de volle kleuren (cirkel, balk, bol).
 
 De hexwaarden zijn een voorstel. Rood en oranje zijn gelijk aan de
 bestaande statuskleuren. Donkergroen is bewust iets anders dan `--gr`
 (categorie Mens), en de scorekleuren staan los van de categoriekleuren,
 zodat een score nooit met een categorie verward wordt.
+
+### Drie niveaus van scorekleur
+
+Voorstel van 15 oktober 2026, besloten door Joost op dezelfde dag. Een score
+krijgt de kleur op drie niveaus, van zacht naar vol. Welk niveau bij welk
+onderdeel hoort, ligt vast:
+
+- **Band** (`--score-N-faint`, of de drie klassekleuren `--stat-red-faint`,
+  `--stat-amber-faint` en `--stat-green-faint`): De achtergrond achter een
+  balk, bol of streep op een schaal. Overal waar een score op een schaal van
+  1 tot 5 (of 0 tot 100%) staat, hoort de band erachter, in de weergaven
+  waarvoor `visualisatie-scores.md` hem noemt en daarnaast in het
+  spreidingsdiagram en de weergave Per bouwblok van Verkennen, de
+  staafdiagrammen per categorie en als twee ringen op 2,5 en 3,5 in de radar.
+- **Cel** (`--score-N-cel`, met tekst `--score-N-cel-tekst`): De vulling van een
+  cel met een getal erin: De matrix, de eerste kolom van de heatmap in Verkennen
+  en de antwoorden in Antwoorden. De vijf stappen zijn zachter dan de volle
+  kleuren, zodat een tabel vol getallen rustig blijft.
+- **Vol** (`--score-N`): Alleen voor kleine tekens en vlakken zonder lopende
+  tekst: De classificatiecirkel, een stip, een bol, een balk, de ring in een
+  totaalkaart en de marker bij een legenda-item.
+
+Een cel met een getal gebruikt dus nooit de volle kleur. De matrix in A tot en
+met E houdt de drie klassekleuren als celvulling (`#f7c6c1`, `#fde9c8` en
+`#c3e6d2`, zoals nu). De vijf stappen gelden waar een cel een afgeronde score
+van 1 tot 5 toont: Antwoorden en de eerste kolom van de heatmap.
+
+| Score | Cel | Tekst in de cel |
+|---|---|---|
+| 1 | `#f7c6c1` | `#7f1d1d` |
+| 2 | `#fde9c8` | `#6b3a00` |
+| 3 | `#fbf0b8` | `#5c4800` |
+| 4 | `#dcefc6` | `#2f5a12` |
+| 5 | `#c3e6d2` | `#0e4d30` |
+
+De hexwaarden van stap 3, 4 en 5 zijn een voorstel en moeten op het scherm
+beoordeeld worden. Stap 1 en 2 komen uit de bestaande matrix.
+
+### Verschil en afwijking
+
+- **Verschil** tussen twee waarden (boven of onder het gemiddelde, stijging of
+  daling, een groep tegenover de pool): Boven is blauw (`--bl`), onder is
+  donkeroranje (`--dal`, `#c2570c`). Rood wordt hiervoor nooit gebruikt.
+- **Cel met een verschil** (de heatmap in Verkennen, de kolom Verschil): De
+  achtergrond is de kleur met een dekking die oploopt met het verschil, tot
+  maximaal 35% bij een verschil van 1,0 of meer, met tekst `var(--ink)` en het
+  teken (+ of −) in het getal. Bij 0 is de cel wit. Zo is een verschil nooit
+  harder dan een score.
+- **Afwijking van de groep** in een matrix (voorheen een zwarte rand): Een
+  driehoek van 8px in de linkerbovenhoek van de cel, blauw (`--bl`) bij 0,5 of
+  meer boven het gemiddelde van de rij en donkeroranje (`--dal`) bij 0,5 of meer
+  eronder.
+- **Oranje heeft drie betekenissen** en dat blijft zo: De merkkleur en de
+  focus (`--or`), score 2 (`--score-2`) en daling (`--dal`). Een verschil gebruikt
+  daarom altijd `--dal` en nooit `--or`, zodat een daling niet op de focus
+  lijkt.
+- **Zwart**: Er is geen zwarte vulling of rand. `--ink` is een tekstkleur en
+  de kleur van dunne lijnen.
 
 ---
 
@@ -164,44 +239,46 @@ zodat een score nooit met een categorie verward wordt.
   PDF-export houdt bewust Helvetica Neue / Arial
   (`export-pdf-visual-volwassenheidsscan.md`).
 
-### Lettergroottes voor interface-tekst
+### Lettergroottes
 
-Eén schaal voor alles wat geen kop of lopende tekst is, als tokens in
-`tokens.css` (`--fs-*`). Tailwind-klassen volgen dezelfde schaal
-(`app/globals.css`: `text-xs`, `text-sm`, `text-base` en `text-lg` zijn
-dezelfde waarden), dus `text-sm` en `var(--fs-s)` zijn altijd hetzelfde.
+Eén schaal van acht maten, allemaal even getallen in px. Er zijn geen halve
+maten (geen 13,6px of 14,4px) en geen maten buiten deze lijst. Een nieuwe
+`font-size` in de CSS is een fout, geen variant. De schaal staat als tokens
+in `tokens.css` (`--fs-12` tot `--fs-48`) en in de Tailwind-configuratie als
+enige waarden van `theme.fontSize`, zodat `text-sm` en `var(--fs-14)` altijd
+hetzelfde zijn en een losse waarde zoals `text-[13px]` niet kan. Tekst in
+grafieken (SVG) volgt dezelfde schaal en erft het lettertype
+(`font-family: inherit`). Voorstel van 15 oktober 2026, besloten door Joost
+op dezelfde dag. De PDF-export valt hier niet onder (zie boven).
 
 | Token | Maat | Gebruik |
 |---|---|---|
-| `--fs-xs` | `.75rem` (12px) | Labels, badges, tabelkoppen, kleine tekst, hints |
-| `--fs-s` | `.85rem` (13,6px) | Tabellen, formulierlabels en -tekst, nav, compacte knoppen, meldingen |
-| `--fs-m` | `.9rem` (14,4px) | Standaardknoppen en invoervelden |
-| `--fs-l` | `1.15rem` (18,4px) | Titel van modals en beheerblokken, `.admin-main h2` |
+| `--fs-12` | 12px | Eyebrow, labels, badges, tabelkoppen, hints, tekst in grafieken, de tweede regel van een kolomkop |
+| `--fs-14` | 14px | Alle interface-tekst: Tabellen, formulieren, knoppen, invoervelden, nav, tabs, kruimelpad, pillen, schakelaars, meldingen |
+| `--fs-16` | 16px | Lopende tekst |
+| `--fs-18` | 18px | Inleidende regel op publieke pagina's, h3, titel van modals en beheerblokken, koppen in de privacypagina en de overzichtsmodal, `.admin-main h2` |
+| `--fs-24` | 24px | Kop van een bouwblok en van een Assessment-kaart |
+| `--fs-32` | 32px | Paginatitel (beheer, resultaten, voorbeeld-output), h2 op publieke pagina's |
+| `--fs-40` | 40px | Score in de classificatiecirkel |
+| `--fs-48` | 48px | h1 op publieke pagina's |
 
-- **Uitzondering in beheer**: In de beheeromgeving zijn `--fs-s` en
-  `--fs-m` allebei `.875rem` (14px). Eén tekstmaat voor alle tabeltekst,
-  formuliertekst, knoppen en invoervelden, zodat er geen verschil van een
-  halve pixel tussen besturingselementen zit. Buiten beheer (de scan zelf
-  en de resultaten) blijven de maten hierboven gelden.
-- **Beheer-paginatitel** (`.admin-main h1`): `1.9rem`.
-- **Modaltitel**: Altijd `--fs-l`, ongeacht waar de modal staat
+- **Wat er vervalt**: De tokens `--fs-xs`, `--fs-s`, `--fs-m` en `--fs-l`, de maten
+  `.68rem` tot `.9rem`, `1.1rem`, `1.12rem`, `1.15rem`, `1.3rem`, `1.5rem`,
+  `1.6rem`, `1.9rem` en `2.4rem`, de `clamp()` bij h1 en h2 en de tekst van 10
+  tot 11px in grafieken. De uitzondering in beheer, met `--fs-s` en
+  `--fs-m` allebei op 14px, geldt nu overal.
+- **Modaltitel**: Altijd 18px, ongeacht waar de modal staat
   (`.modal-overlay .modal-box h2`).
 - **Gewichten**: 400 (lopende tekst), 600 (labels, links, nav), 700
   (knoppen, badges, tabelkoppen) en 800 (koppen). Gewicht 500 wordt niet
   gebruikt.
-- **Eyebrow** (`.69rem`) en de koppen (h1/h2/h3) staan hierboven en wijken
-  bewust af van deze schaal.
-- **Buiten deze schaal, bewust ongewijzigd en nog niet in een eigen
-  schaal gevat**: De inleidende regels op de publieke pagina's (`1.1rem`),
-  de koppen in de privacypagina (`1.3rem`), de koppen van een bouwblok en
-  Assessment-kaart (`1.5rem`/`1.6rem`), de score in de classificatiecirkel
-  (`2.4rem`), het icoon van een Assessment (`2rem`) en de tekst in de
-  grafieken (10 tot 11px, radar `.68rem`).
 
 **Veldhoogte.** Velden en compacte knoppen die in één rij staan, hebben
-dezelfde vaste hoogte: `--control-h` (`2.4rem`, 38,4px), in de CSS voor
+dezelfde vaste hoogte: `--control-h` (`2.5rem`, 40px), in de CSS voor
 `.admin-field input`/`select` en `.btn.btn-compact`. Een knop in de nav
-(`.nav-right .btn`) is compacter en volgt dit niet.
+(`.nav-right .btn`) is compacter en volgt dit niet. Een pil (32px) staat niet
+in dezelfde rij als een veld.
+
 ### Tekst in besturingselementen
 
 Knoppen, dropdowns, invoervelden en de opties in een dropdown-menu hebben
@@ -209,13 +286,13 @@ binnen één rij of één tabel dezelfde lettermaat. De vaste regel:
 
 - **Lettertype**: Epilogue voor alles (`font-family: inherit` op `button`,
   `input`, `select`, `textarea` en op de opties in een menu).
-- **Maat**: In een tabel (`.admin-table`), in een filter- of actierij en in
-  de bulk-actiebalk is alles `--fs-s`: de knop, de Dropdown-knop, de
-  opties in het menu, de `select` en het invoerveld. `--fs-m` blijft voor
-  losse formulieren buiten een tabel of rij, zoals de intake en een modal.
+- **Maat**: 14px (`--fs-14`) voor alles: De knop, de Dropdown-knop, de opties
+  in het menu, de `select`, het invoerveld en de pil, in een tabel
+  (`.admin-table`), een filter- of actierij, de bulk-actiebalk, een los
+  formulier en een modal.
 - **Gewicht**: Knoppen (ook de Dropdown-knop) 700. Wat een waarde toont, dus
   de tekst in een `select`, een invoerveld en de opties in een menu, 400. Het
-  label boven een veld is `--fs-xs`, gewicht 700, in hoofdletters.
+  label boven een veld is 12px (`--fs-12`), gewicht 700, in hoofdletters.
 - **Geen afwijking per scherm.** Een knop in een tabelrij heeft dezelfde maat
   als een knop in een filterrij. Een afwijkende `font-size`, `font-weight`
   of regelhoogte op één scherm geldt als een fout, niet als een variant.
@@ -224,11 +301,17 @@ binnen één rij of één tabel dezelfde lettermaat. De vaste regel:
 
 - **Koppen**: Font-weight 800 (h1/h2) of 700 (h3), line-height 1.1,
   licht negatieve letter-spacing, kleur `var(--ink)`.
-  - h1: `clamp(2.5rem, 5vw, 4rem)`
-  - h2: `clamp(1.85rem, 3.5vw, 2.65rem)`
-  - h3: `1.12rem`
-- **Body-tekst**: Line-height 1.78, kleur `var(--ink-m)`.
-- **Label/eyebrow**: Font-size `.69rem`, font-weight 700, letter-spacing
+  - h1 op publieke pagina's: 48px. Onder 900px 32px.
+  - h2 op publieke pagina's: 32px. Onder 900px 24px.
+  - h3: 18px.
+  - **Paginatitel** (`.page-title`, ook `.admin-main h1`): 32px, gewicht 800.
+    Voor elke pagina waar een knop of een andere actie naast de kop staat, zoals
+    de voorbeeld-output en de resultaten. Een kop van 48px naast een knop
+    breekt over twee regels, dus de grote h1 is alleen voor een kop die de
+    volle breedte heeft.
+- **Body-tekst**: 16px, line-height 1.78, kleur `var(--ink-m)`. Een
+  inleidende regel op een publieke pagina is 18px.
+- **Label/eyebrow**: Font-size 12px, font-weight 700, letter-spacing
   `.14em`, hoofdletters, kleur `var(--or)`. Voor kleine kop-labels zoals
   "AI Assessment" boven een scanpagina en "Voorbeeld-output" boven de
   voorbeeldpagina van een scan. De kleur is op elk scherm oranje, ook als
@@ -255,6 +338,22 @@ binnen één rij of één tabel dezelfde lettermaat. De vaste regel:
 - **Voortgang op smalle schermen**: Onder 900px toont
   `.flow-mobiel-voortgang` een compacte, sticky voortgangsbalk. Bestaat
   al, verder geen werk aan zolang de app niet responsive hoeft.
+
+### Afstanden
+
+Voorstel van 15 oktober 2026. Een raster van 4px. Marges, paddings en
+tussenruimtes in nieuwe en aangeraakte onderdelen zijn een van deze stappen,
+als tokens in `tokens.css`: 4px (`--sp-1`), 8px (`--sp-2`), 12px (`--sp-3`),
+16px (`--sp-4`), 24px (`--sp-6`), 32px (`--sp-8`) en 48px (`--sp-12`).
+
+- **Vaste afstanden bij besturing**: 8px tussen pillen en tussen een label
+  en zijn rij, 24px tussen twee blokken met besturing en 24px onder een rij
+  met pillen of een schakelaar tot de inhoud.
+- **Bestaande waarden**: Waarden als `.82rem`, `1.7rem`, `.6rem`, `1.2rem`
+  en `1.8rem` liggen niet op het raster. Ze gaan mee naar het raster zodra
+  een onderdeel wordt aangeraakt. Er komt geen losse omzetting van de hele
+  CSS (`backlog.md`).
+
 
 ## Logo
 
@@ -304,7 +403,7 @@ telefoon is het mini-icoon van Coniche, dus niet het volledige logo met tekst.
 ### Knoppen
 
 Standaardmaat: `border-radius: var(--r)`, `padding: .82rem 1.7rem`,
-`font-weight: 700`, `font-size: .9rem`.
+`font-weight: 700`, `font-size: var(--fs-14)`.
 
 - `.btn-or`: Primair. Gevuld `var(--or)`, witte tekst, hover `var(--or-l)`
   met lichte `translateY(-1px)`.
@@ -323,13 +422,13 @@ Standaardmaat: `border-radius: var(--r)`, `padding: .82rem 1.7rem`,
   outline-variant.
 - **Disabled**: `background: var(--bg-mid)`, tekst `var(--ink-s)`, rand
   `var(--border)`, `cursor: not-allowed`. Geldt voor elke variant.
-- `.btn-compact`: Kleinere maat (`height: var(--control-h); padding: 0 1rem; font-size: var(--fs-s)`)
+- `.btn-compact`: Kleinere maat (`height: var(--control-h); padding: 0 1rem; font-size: var(--fs-14)`)
   voor knoppen in de nav en in bulk-actiebalken, zoals "N geselecteerd"
   met Exporteren en Verwijderen, en voor een knop die naast een
   `.admin-field`-invoerveld in dezelfde rij staat (bijv. "+ Meting
   plannen" naast het Label-veld) — de vaste hoogte `--control-h`
-  (38,4px) is bewust gelijk aan die van een `.admin-field input`/`select`
-  ernaast (gemeten: 38,4px voor beide), geen losse afstemming per rij nodig. **Selector in de code is `.btn.btn-compact`, niet los
+  (40px) is bewust gelijk aan die van een `.admin-field input`/`select`
+  ernaast (gemeten: 40px voor beide), geen losse afstemming per rij nodig. **Selector in de code is `.btn.btn-compact`, niet los
   `.btn-compact`**: Bij gelijke specificiteit met de algemene `.btn`-regel
   wint anders de regel die later in het bestand staat, ongeacht welke
   klasse "bedoeld" specifieker is — met los `.btn-compact` kreeg elke
@@ -342,7 +441,7 @@ transparant, en `line-height: normal`. Zonder rand is een `.btn-outline`
 anders de regelhoogte 1.78 van de body-tekst en wordt hoger dan een
 `<button>`. Ook zonder gevolgen voor de hoogte: Een pijltje in een knop
 (Dropdown-knop) staat in een eigen element met `line-height: 0`, een icoon
-in een knop is niet groter dan de tekstregel (`.8rem`), en de wrapper van een
+in een knop is niet groter dan de tekstregel (14px), en de wrapper van een
 Dropdown-knop is `inline-flex` zodat hij niet hoger is dan zijn knop.
 
 **Knoptekst staat op één regel.** Elke `.btn` heeft `white-space: nowrap`
@@ -412,7 +511,7 @@ staat, is het menu rechts uitgelijnd met de knop en niet links, anders loopt
 het buiten het scherm.
 
 - **Eerste rij** (e-mailadres en rol): Niet klikbaar, `var(--ink-s)`,
-  `--fs-s`, zonder hover.
+  `--fs-14`, zonder hover.
 - **Scheidingslijn** boven "Uitloggen": `1px solid var(--border)`, met
   `.25rem` ruimte boven en onder.
 - **Actieve staat**: Zolang een pagina onder Instellingen open is, heeft de
@@ -550,7 +649,7 @@ Label-veld en de knop "Meting plannen". De vaste waarde is `--control-h`
 **Datumvelden.** Een `input[type="date"]` heeft dezelfde hoogte als een
 dropdown (`--control-h`), met `box-sizing: border-box` en `line-height:
 normal`, zodat het kalendericoon van de browser het veld niet hoger maakt.
-Randdikte, -kleur, `border-radius`, padding en `font-size` (`--fs-s`) zijn
+Randdikte, -kleur, `border-radius`, padding en `font-size` (`--fs-14`) zijn
 gelijk aan die van een `select`. Staat een datumveld naast een dropdown in een
 filterrij (bijvoorbeeld in de Audit-log), dan staan de labels erboven op
 dezelfde hoogte en beginnen de velden op dezelfde bovenrand (`align-items:
@@ -640,7 +739,7 @@ een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
 
 - **Icoon**: Een wit rondje (`var(--bg)`) van `1.25rem` met een `1px`
   oranje rand (`var(--or)`) en een oranje kleine letter "i" (`var(--or)`,
-  `--fs-xs`, gewicht 800). Geen hover-staat: Het icoon reageert alleen op
+  `--fs-12`, gewicht 800). Geen hover-staat: Het icoon reageert alleen op
   een klik (zie Openen en sluiten). Het staat
   direct achter de knop of het veld waar het over gaat (rechts ervan, bij
   een groot veld zoals een tekstvak op de hoogte van de eerste regel),
@@ -667,7 +766,7 @@ een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
   half buiten beeld, ook niet als het icoon onderaan een lange pagina of
   tegen de rand van een modal staat. De layout verspringt niet. Opmaak:
   `var(--bg-warm)`, rand `1px solid var(--border-d)` met links een `4px`
-  oranje rand, `--fs-s`, schaduw zoals de Dropdown-knop, breedte maximaal
+  oranje rand, `--fs-14`, schaduw zoals de Dropdown-knop, breedte maximaal
   `26rem` en `calc(100vw - 2rem)` op een smal venster, en maximaal `80vh`
   hoog met scrollen als de tekst langer is. Achter het veld staat een lichte
   dimlaag (zoals `.modal-overlay`, maar zonder eigen kop), zodat duidelijk is
@@ -704,47 +803,117 @@ een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
 
 - **Tabbalk** (`.beheer-tabs`): Direct onder de nav, witte achtergrond met
   een `1px solid var(--border)` onderrand, op dezelfde breedte als de
-  beheerpagina's (`max-width: 1300px`). Tabtekst `.85rem`, gewicht 600,
+  beheerpagina's (`max-width: 1300px`). Tabtekst 14px, gewicht 600,
   `var(--ink-m)`. De actieve tab is `var(--ink)` met een onderstreep van
   `3px solid var(--or)`. Alleen zichtbaar op de lijstpagina's van
   Organisaties en op de pagina's onder Instellingen, niet op een detailpagina (`beheerpagina.md`, Navigatie in
   beheer).
-- **Kruimelpad** (`.kruimelpad`): Boven de paginatitel, `.85rem`,
+- **Kruimelpad** (`.kruimelpad`): Boven de paginatitel, 14px,
   `var(--ink-s)`, gescheiden door een `›` in `var(--border-d)`. Elk deel is
   een link, het laatste deel staat in `var(--ink)` en is niet klikbaar. Een
   link krijgt bij hover `var(--or)`.
-- **Weergave-schakelaar** (`.weergave-wissel`, besloten op
-  12 oktober 2026, gebouwd op 13 oktober 2026, ook met de vierde knop Antwoorden): Een rij van 2 tot 4 knoppen aan elkaar
-  op een resultatenpagina, onder de kop en boven de inhoud. Hij is bedoeld
+- **Weergave-schakelaar** (`.weergave-wissel`, besloten op 12 oktober 2026,
+  gebouwd op 13 oktober 2026, ook met de vierde knop Antwoorden): Een
+  pilvormige groep van 2 tot 4 pillen op een resultatenpagina, onder de kop
+  en boven de inhoud (Keuzepil en pilvormige groep, hieronder). Hij is bedoeld
   voor het wisselen van weergave binnen één pagina en dus niet voor
-  navigatie, de bestaande tabbalk blijft voor lijstpagina's. Gezamenlijke
-  omtrek `1.5px solid var(--border-d)`, `border-radius: 10px`, witte
-  achtergrond, knoptekst `.85rem` gewicht 600 in `var(--ink-m)`. De
-  actieve knop heeft `background: var(--ink)` en witte tekst. Hover op een
-  niet-actieve knop `var(--bg-warm)`. Een uitgeschakelde knop staat op 50%
-  dekking met een Info-icoon voor de reden. Het toetsenbord kent Tab naar
-  de schakelaar en pijltjes links en rechts binnen de schakelaar, met
-  `role="tablist"` en `aria-selected` op de knoppen. Rechts ernaast kan een
-  losse actieknop staan (`.btn-compact`).
+  navigatie, de bestaande tabbalk blijft voor lijstpagina's.
 - **Melding bovenaan een beheerpagina** (`.beheer-melding`): Een
   `.admin-notice` met groene tint (`--stat-green-faint`, rand
   `--stat-green`) en een sluitkruisje, na een actie die de Respondent van de
   pagina haalt. Verdwijnt bij het wisselen van pagina.
 
+### Keuzepil en pilvormige groep
+
+Voorstel van 15 oktober 2026, besloten door Joost op dezelfde dag. Eén vorm voor
+alles wat de gebruiker kiest, ter vervanging van de rechthoekige
+weergave-schakelaar met een zwarte actieve knop, de filterchips met een zwarte
+vulling en de oranje omlijnde afdelingsknoppen van de Quickscan.
+
+**De regel.** Gekozen is massief oranje (`var(--or)`) met witte tekst, op elk
+scherm. Zwart (`var(--ink)`) is geen vulling voor een besturingselement. Een
+pil die niet gekozen is, is wit met grijze rand en grijze tekst en niet oranje
+omlijnd, want oranje rand en tekst maken van een keuze een knop met een actie
+(`.btn-outline`).
+
+- **Keuzepil** (`.pil`): 32px hoog, `border-radius: 16px`, `padding: 0 16px`,
+  `1px solid var(--border-d)`, witte achtergrond, tekst 14px gewicht 600 in
+  `var(--ink-m)`, `white-space: nowrap`. Een aantal erachter ("12") staat in
+  gewicht 400.
+  - Hover (niet gekozen): Rand `var(--or)` en tekst `var(--ink)`.
+  - Gekozen: `background: var(--or)`, rand `var(--or)`, witte tekst. Hover op een
+    gekozen pil: `var(--or-l)`.
+  - Uitgeschakeld: 50% dekking, met een Info-icoon voor de reden.
+  - Verwijderbaar (filterchip): Een kruisje van 14px achter de tekst.
+  - Focus: De bestaande focusstijl (zie Toetsenbord en focus).
+- **Pilvormige groep** (`.pil-groep`, voor de weergave-schakelaar
+  `.weergave-wissel`): Eén afgeronde houder om een rij pillen, met
+  `1px solid var(--border-d)`, `border-radius: 20px`, witte achtergrond,
+  `padding: 4px` en 2px tussen de pillen. De pillen erin hebben geen eigen rand
+  (transparant, zodat de maat gelijk blijft), zijn 32px hoog en 14px
+  gewicht 600. Hover op een niet-gekozen pil: `var(--bg-warm)`. Gekozen is
+  massief oranje. Het toetsenbord kent Tab naar de groep en pijltjes links en
+  rechts binnen de groep, met `role="tablist"` en `aria-selected` op de
+  pillen. Rechts naast de groep kan een losse actieknop staan
+  (`.btn-compact`).
+- **Wanneer een groep en wanneer losse pillen**: Een vast aantal korte opties
+  waarvan er precies één gekozen is (de weergaven, Groeperen op, Sorteren) is
+  een pilvormige groep. Opties die uit de data komen, in wisselend aantal of
+  met wisselende lengte, zijn losse pillen die op een tweede regel mogen
+  doorlopen: De focusgroepen, de filters en de afdelingen van de Quickscan.
+- **Wat het niet is**: De tabbalk (`.beheer-tabs`) blijft voor het wisselen van
+  pagina en houdt de onderstreepte actieve tab. Een actie ("Opslaan",
+  "Exporteren") blijft een knop.
+- **Afstanden**: 8px tussen losse pillen, in de rij en tussen twee regels. Het
+  label boven een rij (Groeperen op, in het label-formaat van 12px) staat 8px
+  boven de pillen. Tussen twee blokken met besturing, zoals Groeperen op en
+  Focusgroep, staat 24px, en onder een rij pillen tot de inhoud eronder
+  minimaal 24px (zie Afstanden bij Layout).
+
+### Kolomkop en rijkop in tabellen, matrices en heatmaps
+
+Voorstel van 15 oktober 2026. Een kop breekt nooit over meerdere regels en geeft
+de kolom geen breedte. De Antwoorden-weergave (initialen met de volledige naam
+in een tooltip) en de lijst Respondenten zijn het voorbeeld.
+
+- **Kolombreedte**: Elke kolom met cijfers heeft dezelfde vaste breedte van 96px
+  (`--kolom-b`), ook als de kop korter of langer is. Past een tabel niet, dan
+  scrolt de kaart horizontaal met de eerste kolom vast, zoals bij Antwoorden. Uitzondering: In Antwoorden is een kolom met initialen (R1 tot Rn) 48px breed.
+- **Kolomkop**: Hooguit twee regels van vaste hoogte. De eerste is de korte naam
+  of afkorting in 14px gewicht 700, op één regel en met een afkapping (`…`) als
+  hij niet past. De tweede is optioneel, 12px gewicht 400 in `var(--ink-s)`,
+  voor een kort gegeven als "n = 11". Al het andere staat in de tooltip:
+  de volledige naam, het label en de meetdatum van de Meting en het aantal
+  scans. Een tooltip volgt het patroon van de initialen in Antwoorden.
+- **Namen van Organisaties in een kop**: De korte naam van de Organisatie
+  (`Organisatie.korteNaam`, optioneel, `datamodel.md`) en anders de naam zelf.
+- **Rijkop** (bouwblok, vraag, groep): Eén regel, `white-space: nowrap`, met
+  een afkapping en de volledige naam in een tooltip. De eerste kolom is
+  240px breed, met het volgnummer en de accentrand van de categorie voor de
+  naam.
+- **Groepskoppen en chips**: Een chip of kop met een groepsnaam toont de korte
+  naam. Het aantal ("n = 11") staat in de tweede regel van een kolomkop of
+  achter de naam in een pil, nooit tussen de naam en de rest van een
+  afgebroken regel.
+- **Fout, geen variant**: Een kop die op twee regels uitkomt omdat de naam lang
+  is, een kolom die breder wordt dan 96px en een rijkop die op twee regels
+  breekt.
+
+
 ### Filterchip, focuschip en slider (Verkennen)
 
-Gebouwd op 15 oktober 2026, uit het visual design van Verkennen
-(`visualisatie-verkennen.md`). Alleen de onderdelen die nog niet in dit
-document staan. De vier weergaven, Groeperen op en Sorteren gebruiken de
-bestaande weergave-schakelaar (`.weergave-wissel`).
+Uit het visual design van Verkennen (`visualisatie-verkennen.md`), gebouwd op
+15 oktober 2026 met de oude vorm van de chips. De vorm hieronder, met de
+keuzepil, is het voorstel van de opmaakronde van 15 oktober 2026 en nog niet
+gebouwd. Alleen de onderdelen die nog niet in dit document staan. De vier weergaven, Groeperen op en Sorteren gebruiken de
+pilvormige groep (`.weergave-wissel`).
 
-- **Filterchip**: Een afgeronde knop van 30px hoog (`border-radius: 15px`),
-  `1px solid var(--border-d)`, witte achtergrond, tekst `.85rem` gewicht 600 in
-  `var(--ink-m)`, met het aantal Organisaties erachter in gewicht 400. Gekozen
-  heeft hij `background: var(--ink)` met witte tekst.
-- **Focuschip**: Dezelfde vorm als de filterchip. Gekozen is hij oranje
-  (`var(--or)`) met witte tekst. Een groep met minder dan 3 Organisaties heeft
-  een gestreepte rand en tekst in `var(--ink-s)`.
+- **Filterchip**: Een keuzepil (zie Keuzepil en pilvormige groep) met het aantal
+  Organisaties erachter in gewicht 400. Gekozen is hij massief oranje, met een
+  kruisje om het filter weg te halen.
+- **Focuschip**: Dezelfde keuzepil. Gekozen is hij massief oranje, zoals elke
+  gekozen pil. Een groep met minder dan 3 Organisaties heeft een gestreepte rand
+  en tekst in `var(--ink-s)`.
 - **Slider met histogram**: Een smalle balk (4px) in `var(--border-d)` met een
   rond handvat van 20px in `var(--or)` en een witte rand. Erboven een histogram
   van 12 staven, 52px hoog, waarvan de staven van de focusgroep `var(--or)` zijn
@@ -752,6 +921,18 @@ bestaande weergave-schakelaar (`.weergave-wissel`).
   Organisaties aan elke kant van de drempel.
 - **Kleine groep**: Een waarschuwing in `--stat-amber-faint` met een
   driehoekicoon, in de stijl van de bestaande meldingen.
+- **Filtermenu**: Een dropdown onder de knop "Filter toevoegen" (zelfde patroon
+  als de Dropdown-knop), 380px breed en maximaal 440px hoog, scrollt binnen het
+  menu. Bovenaan een zoekveld. Daaronder per groep een kopregel in het
+  label-formaat (`--fs-12`, gewicht 700, hoofdletters) en de velden als rijen,
+  links de korte naam (`--fs-14`, gewicht 600) en rechts "n van N" in
+  `var(--ink-s)`, gewicht 400. Een veld met weinig ingevulde waarden heeft
+  grijze tekst. Hover `var(--bg-warm)`. Het volledige pad staat in een tooltip.
+- **Korte naam in een chip**: De chip toont de korte naam en bij hover het
+  origineel in een tooltip.
+- **Modal Korte namen**: De basismodal (`.modal-box--breed`) met een tabel van
+  Origineel, Korte naam (invoerveld met teller, maximaal 30 tekens) en In
+  gebruik, en "Annuleren" en "Opslaan" (`.btn-or .btn-compact`).
 
 ### Overzichtsmodal
 
@@ -761,11 +942,11 @@ als de andere modals, met `.modal-box--breed`: `max-width: 720px`,
 `max-height: 88vh`, scrollt binnen de modal. Sluiten met het kruisje, Esc,
 een klik naast de modal of de terugknop van de browser.
 
-- **Kop** (`.overzicht-kop`): Naam als `h2` (`1.3rem`), eronder een regel
-  `.85rem` met organisatie en de statusbadge. Een Lead krijgt de Lead-badge
+- **Kop** (`.overzicht-kop`): Naam als `h2` (18px), eronder een regel
+  14px met organisatie en de statusbadge. Een Lead krijgt de Lead-badge
   (zie Badges).
 - **Blokken** (`.overzicht-blok`): Elk blok begint met een scheidingslijn
-  (`1px solid var(--border)`) en een kopje in kapitalen (`.72rem`,
+  (`1px solid var(--border)`) en een kopje in kapitalen (12px,
   `letter-spacing: .08em`, `var(--ink-s)`). Rechts in de kop mag één kleine
   knop staan, bijv. "Bewerken".
 - **Beschrijvingslijst** (`.beschrijvingslijst`): Label links (`9rem`,
@@ -841,10 +1022,13 @@ Eerder gebruikte categoriekleuren die niet (meer) gebruikt worden:
 
 ## Open punten
 
-- **Typografie van de display-maten**: De maten die in "Buiten deze schaal"
-  staan (inleidende regels, privacykoppen, bouwblokkoppen, de score in de
-  cirkel, grafiektekst) hebben nog geen eigen schaal. Nog te besluiten of
-  die er komt, en welke waarden.
+- **Contrast van oranje**: Witte tekst op `--or` (`#ff671f`) haalt ongeveer
+  3:1 bij 14px. Dat geldt nu voor `.btn-or` en voor elke gekozen pil
+  (Keuzepil, hierboven). Een donkerder oranje voor vulling met tekst is een
+  merkbesluit van Coniche (`backlog.md`, Contrast) en werkt door in alle pillen.
+- **Lengte van een korte naam in een kolomkop**: Een kolomkop is 96px breed
+  (Kolomkop en rijkop). Een korte naam tot 12 tekens past zonder afkapping.
+  Nog te besluiten of de modal Korte namen dat als advies toont.
 - **Citaten**: Source Serif 4 staat in de spec maar de app toont nog geen
   citaat. Pas laden als er een komt.
 - Footer-logo: Vraagt een witte variant van het logo, nu geen prioriteit.

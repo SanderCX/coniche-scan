@@ -100,7 +100,17 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   Een Admin-scherm onder Resultaten om alle Organisaties van één Assessment
   te filteren, te groeperen en te vergelijken, met vier weergaven. Nog niet
   voor de Quickscan Ziekenhuis, voor een Consultant en voor meerdere Metingen
-  per Organisatie.
+  per Organisatie. Korte namen voor veldnamen en waarden (zoals de lange
+  SBI-sectoren) houden de filterlijst en de chips leesbaar. Dat is een voorstel
+  van 15 oktober 2026 en nog niet gebouwd.
+- **Opmaakronde**: Voorstel van 15 oktober 2026, besloten door Joost, nog niet
+  gebouwd (`stylesheet.md`). Acht lettergroottes in even px (12, 14, 16, 18,
+  24, 32, 40, 48) in plaats van zo'n 17 maten, met de paginatitel op 32px.
+  Eén vorm voor keuzes: De pil en de pilvormige groep, waarin gekozen massief
+  oranje is en zwart geen vulling meer. Drie niveaus van scorekleur (band, cel,
+  vol), zodat een cel met een getal een zachte tint krijgt. Verschil in blauw
+  en donkeroranje. Kolomkoppen en rijkoppen op één regel met een tooltip, kolommen
+  van 96px, en een afstandsraster van 4px. De PDF-export valt er niet onder.
 - **Quickscan Ziekenhuis**: Gebouwd op 14 oktober 2026
   (`content-ziekenhuis-quickscan.md`): Het eerste Assessment met
   antwoordType Ja / Nee / Weet ik niet, met doorloopflow en eigen
@@ -203,7 +213,9 @@ ontwikkeld", "Gemiddeld ontwikkeld" en "Aanzienlijke ontwikkelruimte"
 Elke score krijgt een kleur op basis van de afgeronde waarde: 5
 donkergroen, 4 lichtgroen, 3 geel, 2 oranje, 1 rood. Basis op Orde is
 daarmee rood of oranje, Uitbouwen geel, Sterk punt licht- of donkergroen.
-Tokens en details in `stylesheet.md`.
+Tokens en details in `stylesheet.md`. Daar staan ook de drie niveaus van
+scorekleur (band, cel, vol): Een cel met een getal krijgt een zachte celtint
+en nooit de volle kleur.
 
 ### Top 3
 
@@ -322,7 +334,9 @@ geen afwijking van de spec maar een gat erin.
    elk Assessment, dus ook voor de AI-scan, de Zorgscan en de Quickscan,
    staat bovenaan dezelfde kop:
    - Links een eyebrow "Voorbeeld-output" (`stylesheet.md`, Label/eyebrow,
-     oranje en in hoofdletters), daaronder als h1 de naam van het Assessment.
+     oranje en in hoofdletters), daaronder als paginatitel (`.page-title`, 32px,
+     `stylesheet.md`, Koppen en lopende tekst) de naam van het Assessment. Een
+     h1 van 48px past hier niet naast de knop en breekt over twee regels.
    - Rechts naast de h1, verticaal uitgelijnd met de h1, een knop
      "← Terug" (`.btn.btn-outline.btn-compact`, `stylesheet.md`, Knoptekst
      staat op één regel) naar de Assessment-landingspagina (scherm 2).

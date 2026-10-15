@@ -121,6 +121,9 @@ Bewust nog niet opgepakt. Geen prioritering.
   - Export van de gefilterde pool als CSV.
   - Verkennen voor de Quickscan Ziekenhuis (percentages) en voor meerdere
     Metingen per Organisatie.
+  - Een eigen veld Branche (vijf of zes Coniche-branches, los van SBI). Vraag
+    van 15 oktober 2026, nog niet besloten. SBI-secties sluiten niet aan bij de
+    indeling van de eigen klanten (verzekeraars zitten in Sectie L, Afdeling 65).
 - **Kopiëren van een Meting naar een nieuwe meetdatum (bewust niet opgepakt, 14
   oktober 2026)**: Een functie die onderdeel en Assessment van een eerdere
   Meting overneemt, zoals "Nieuwe ronde starten" dat deed. Joost vond dit te
@@ -582,22 +585,38 @@ screenshots van de draaiende app. Niets is besloten of gebouwd.
   WCAG AA voor tekst van 14px. Dat geldt voor `.btn-or` en voor oranje
   links op wit. Opties: Knoptekst in `--pu`, een iets donkerder oranje voor
   knoppen, of grotere en dikkere tekst. Het is merkkleur, dus dit is aan
-  Coniche.
+  Coniche. Sinds 15 oktober 2026 raakt het ook elke gekozen pil
+  (`stylesheet.md`, Keuzepil en pilvormige groep).
 - **Contrast, scorekleuren**: Witte tekst op `--score-2` (`#e8871e`) is
   ongeveer 2,6:1. Donkere tekst werkt daar beter (`stylesheet.md`,
   Scorekleuren).
 - **Contrast, `--ink-s`**: `#888884` is ongeveer 3,5:1 voor hints en labels.
   Een tint donkerder (rond `#6f6f6b`) lost dat op.
-- **Grafiektekst**: 10 tot 11px is erg klein, 12px (`--fs-xs`) is haalbaar.
+- **Grafiektekst**: Opgelost in het voorstel van 15 oktober 2026: Minimaal 12px (`--fs-12`), zie `stylesheet.md`, Lettergroottes. Bouwen volgt.
 - **Foutstaten in formulieren**: Rode rand met een korte melding onder het
   veld. Staat al als open punt in `stylesheet.md`.
 - **Lege, laad- en opgeslagen-staten**: Een vaste lege staat met uitleg en
   een knop naar de volgende stap, en één vaste terugkoppeling na opslaan
   (toast of `.beheer-melding`).
-- **Display-maten en spacing**: `1.1rem`, `1.3rem`, `1.5rem`, `1.6rem` en
-  `2.4rem` staan los van de `--fs-*`-tokens (open punt in `stylesheet.md`).
-  Dezelfde vraag voor marges en gaps: een schaal van vijf of zes stappen.
-  Inline styles (bijv. `app/page.tsx`) naar klassen.
+- **Display-maten en spacing**: Besloten op 15 oktober 2026 (`stylesheet.md`,
+  Lettergroottes en Afstanden): Acht maten in even px, een afstandsraster
+  van 4px, en `font-size` alleen uit de tokens. Nog te bouwen: De CSS
+  doorlopen op alle losse `font-size`-waarden, de Tailwind-configuratie
+  beperken tot de acht maten, `--control-h` naar 40px en de tekst in
+  grafieken naar 12px. Bestaande marges en gaps (`.82rem`, `1.7rem`, `.6rem`,
+  `1.2rem`, `1.8rem`) gaan mee naar het raster zodra een onderdeel wordt
+  aangeraakt. Inline styles (bijv. `app/page.tsx`) naar klassen.
+- **Opmaakronde van 15 oktober 2026** (`stylesheet.md`): De pilvormige groep
+  en de keuzepil voor alle keuzes (weergave-schakelaar, Groeperen op,
+  Sorteren, filters, focusgroepen, afdelingen in de Quickscan), met gekozen
+  als massief oranje en geen zwarte vulling meer. De paginatitel op 32px,
+  zodat de kop van de voorbeeld-output niet meer over twee regels breekt. Drie
+  niveaus van scorekleur, met celtinten voor Antwoorden en de heatmap van
+  Verkennen (nu volle kleuren). Verschil in blauw en `--dal`, en een
+  driehoek in plaats van de zwarte rand in de matrix op niveau 1. Kolomkoppen
+  van 96px op één regel met een tooltip, en `Organisatie.korteNaam`. Het
+  visual design van Verkennen toont nog tabs, de oude chips en vaste
+  uitlegtekst en moet nog bijgewerkt worden. De PDF-export valt er niet onder.
 - **Vragenlijst en resultaten**: Duidelijkere actieve staat op de gekozen
   schaalwaarde, de hele antwoordrij klikbaar, een zichtbare
   "opgeslagen"-indicator en een korte uitleg boven de grafieken.

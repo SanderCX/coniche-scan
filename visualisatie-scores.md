@@ -24,7 +24,7 @@ Een resultaat moet in één blik laten zien waar een organisatie hoog en laag sc
 
 Deze regels gelden voor alle weergaven. G wijkt af in de kleuren en heeft geen banden, zie daar.
 
-**Schaal en banden.** De horizontale as loopt van 1 tot 5. De positie van een score is `(score − 1) / 4` van de breedte. Achter elke rij staan drie banden die de classificatie van `CLAUDE.md` (sectie 1) volgen: onder 2,5 (Basis op Orde, 37,5% van de breedte), 2,5 tot en met 3,49 (Uitbouwen, 25%) en vanaf 3,5 (Sterk punt, 37,5%). Boven de eerste rij staan de drie namen. Bij D en E vervalt de bandachtergrond, zie daar.
+**Schaal en banden.** De horizontale as loopt van 1 tot 5. De positie van een score is `(score − 1) / 4` van de breedte. Achter elke rij staan drie banden die de classificatie van `CLAUDE.md` (sectie 1) volgen: onder 2,5 (Basis op Orde, 37,5% van de breedte), 2,5 tot en met 3,49 (Uitbouwen, 25%) en vanaf 3,5 (Sterk punt, 37,5%). Boven de eerste rij staan de drie namen. Bij D en E vervalt de bandachtergrond, zie daar. De band is ook de achtergrond in Verkennen (weergaven 1 en 2 en het spreidingsdiagram, `visualisatie-verkennen.md`) en hoort volgens `stylesheet.md` (Drie niveaus van scorekleur) overal waar een score op een schaal staat.
 
 **Volgorde en groepering.** Bouwblokken staan in de volgorde van het model: Overkoepelend (1 en 2), Organisatie, Proces & Tech, Mens, Fundament (15). Boven elke groep staat de categorienaam als klein label. Links van de bouwblokknaam staat het volgnummer en een accentrand van 4px in de categoriekleur (zelfde patroon als `bouwstenenmodel-visual.md`). De categoriekleur wordt nergens als vulling gebruikt. Bij AI-volwassenheid, dat geen categorielaag heeft, vervallen de groepslabels en staan de acht domeinen op volgorde.
 
@@ -120,7 +120,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 - Een holle ring op de vorige Meting (grijs).
 - Een gevulde stip op de huidige Meting, gekleurd naar de klasse zoals bij A.
-- Een lijn ertussen: blauw (`--bl`) bij een stijging, donkeroranje bij een daling, grijs bij geen verandering.
+- Een lijn ertussen: blauw (`--bl`) bij een stijging, donkeroranje (`--dal`) bij een daling, grijs bij geen verandering.
 - Rechts het verschil met een driehoekje en een teken ("▲ +0,3", "▼ −0,3"), en als het bouwblok van klasse wisselt een label zoals "Basis op orde → Uitbouwen".
 
 **Tegels.** Totaalscore van de vorige en huidige Meting ("2,9 → 3,1"), aantal bouwblokken gestegen, aantal gedaald, aantal van klasse gewisseld.
@@ -157,13 +157,13 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Data.** Per bouwblok het gemiddelde van elke gekozen Meting. Elke Meting telt even zwaar mee, ongeacht het aantal respondenten.
 
-**Opbouw.** Rijen zijn bouwblokken, kolommen zijn de Metingen met hun label en het aantal afgeronde scans eronder. Elke cel is gevuld naar de klasse, met het getal erin. Rechts staan het gemiddelde van de rij en het bereik (laagste tot hoogste). Onderaan staat een rij Totaalscore, gekleurd op dezelfde manier. Op niveau 2 vervallen het gemiddelde van de rij, het bereik en de zwarte rand, want er is geen groep om van af te wijken. In plaats daarvan komt er bij twee Metingen een kolom Verschil (zie Volgorde van de kolommen). Op niveau 1 krijgt een cel die 0,5 of meer afwijkt van het gemiddelde van de rij een zwarte rand van 2px.
+**Opbouw.** Rijen zijn bouwblokken, kolommen zijn de Metingen met hun label en het aantal afgeronde scans eronder. Elke cel is gevuld naar de klasse, met het getal erin. Rechts staan het gemiddelde van de rij en het bereik (laagste tot hoogste). Onderaan staat een rij Totaalscore, gekleurd op dezelfde manier. Op niveau 2 vervallen het gemiddelde van de rij, het bereik en de markering voor afwijking, want er is geen groep om van af te wijken. In plaats daarvan komt er bij twee Metingen een kolom Verschil (zie Volgorde van de kolommen). Op niveau 1 krijgt een cel die 0,5 of meer afwijkt van het gemiddelde van de rij een driehoek van 8px in de linkerbovenhoek, blauw (`--bl`) bij boven en donkeroranje (`--dal`) bij onder (voorstel van 15 oktober 2026, voorheen een zwarte rand van 2px, `stylesheet.md`, Verschil en afwijking).
 
-**Tegels.** Hoogste Meting en laagste Meting (totaalscore en label), bouwblok met het grootste verschil tussen Metingen, aantal cellen met een zwarte rand.
+**Tegels.** Hoogste Meting en laagste Meting (totaalscore en label), bouwblok met het grootste verschil tussen Metingen, aantal cellen met een markering voor afwijking.
 
-**Niveau 1, kolommen met organisaties.** Besloten op 13 oktober 2026, gebouwd op 13 oktober 2026. De opbouw, de kleuren, de zwarte rand, de rij Totaalscore en de tegels zijn gelijk aan niveau 2. Wat anders is:
+**Niveau 1, kolommen met organisaties.** Besloten op 13 oktober 2026, gebouwd op 13 oktober 2026. De opbouw, de kleuren, de markering voor afwijking, de rij Totaalscore en de tegels zijn gelijk aan niveau 2. Wat anders is:
 
-- De kolomkop is de organisatienaam, met daaronder het label van de Meting en het aantal afgeronde scans. Op niveau 2 is de kop het label van de Meting.
+- De kolomkop is de korte naam van de organisatie (`Organisatie.korteNaam`, anders de naam) op één regel, met daaronder "n = 5" voor het aantal afgeronde scans (voorstel van 15 oktober 2026, voorheen drie regels). Het label van de Meting en de volledige naam staan in een tooltip. De kolom is 96px breed (`stylesheet.md`, Kolomkop en rijkop). Op niveau 2 is de kop het label van de Meting, op dezelfde manier ingekort.
 - De tegels heten Hoogste organisatie en Laagste organisatie, met de totaalscore en de organisatienaam.
 - Organisaties zonder lid bij dit Assessment hebben geen kolom.
 - De matrix is alleen voor de Admin. De privacyregel van D geldt voor een Lead en verandert daar niets aan, omdat een Lead de matrix niet ziet.
@@ -171,7 +171,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 **Samengestelde Meting (gebouwd op 13 oktober 2026).** De matrix onder een samengestelde Meting (`benchmark.md`, Onderdeel en samengestelde Meting) heeft de onderliggende Metingen als kolommen. Alleen voor de Admin, om dezelfde reden als op niveau 2.
 
-**Volgorde van de kolommen (gebouwd op 14 oktober 2026, ter vervanging van de groepering per onderdeel, met de kolom Verschil bij Ontwikkeling over tijd en de kolom Hoogste bij Naast elkaar).** De kolommen staan op meetdatum, de oudste links. De kolomkop toont de naam van de Meting en haar meetdatum. Bij precies twee Metingen komt er rechts een kolom bij, afhankelijk van de lezing. Bij Ontwikkeling over tijd is dat Verschil, de nieuwere min de oudere, met dezelfde opbouw als weergave C. Bij Naast elkaar staan de kolommen op de naam van de Meting in plaats van op meetdatum, en is de extra kolom Hoogste, met het symbool of de naam van de Meting die op die rij hoger scoort en "Gelijk" bij gelijke getoonde waarden. Bij meer dan twee Metingen is er nog geen extra kolom.
+**Volgorde van de kolommen (gebouwd op 14 oktober 2026, ter vervanging van de groepering per onderdeel, met de kolom Verschil bij Ontwikkeling over tijd en de kolom Hoogste bij Naast elkaar).** De kolommen staan op meetdatum, de oudste links. De kolomkop toont de naam van de Meting op één regel en haar meetdatum in 12px eronder, in een kolom van 96px. Een lange naam wordt afgekapt en staat volledig in de tooltip. Bij precies twee Metingen komt er rechts een kolom bij, afhankelijk van de lezing. Bij Ontwikkeling over tijd is dat Verschil, de nieuwere min de oudere, met dezelfde opbouw als weergave C. Bij Naast elkaar staan de kolommen op de naam van de Meting in plaats van op meetdatum, en is de extra kolom Hoogste, met het symbool of de naam van de Meting die op die rij hoger scoort en "Gelijk" bij gelijke getoonde waarden. Bij meer dan twee Metingen is er nog geen extra kolom.
 
 **Overzicht van een ronde (gebouwd op 13 oktober 2026, vervalt met de ronde).** Dit overzicht en de knop in de rondekop vervallen. Voor het zien van meerdere onderdelen naast elkaar maakt de Admin een vergelijking tussen Metingen.
 
@@ -191,7 +191,9 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 - Rechts staat per rij het gemiddelde (Gem.) en het aantal beantwoorde antwoorden (N). Gem. bij een vraag is het gemiddelde antwoord over de respondenten. Gem. bij een bouwblok is het gemiddelde van de vraaggemiddelden, zoals bij weergave A.
 - Onderaan staat een rij Totaalscore per respondent, uit de gedeelde scorefunctie met `Bouwblok.gewicht`. Gem. is de totaalscore van de Meting. N is het aantal beantwoorde antwoorden.
 
-**Kleur.** Elke cel krijgt de scorekleur van de afgeronde waarde, met de vijf stappen van `stylesheet.md`: 1 `--score-1` (rood) tot 5 `--score-5` (donkergroen). Afronden gaat half-away-from-zero, dus 2,5 krijgt de kleur van 3. Tekst is wit op 1 en 5 en donker op 2, 3 en 4. Dit wijkt af van de PDF, waar de tekst op oranje wit is, omdat wit op `--score-2` een te laag contrast geeft. Een lege cel is wit met een rand van 1px (`--border`). Deze weergave gebruikt dus de vijf scorekleuren en niet de drie klassekleuren van A tot en met E, omdat hier losse antwoorden staan en geen gemiddelden over een groep.
+**Kleur.** Elke cel krijgt de scorekleur van de afgeronde waarde, met de vijf stappen van `stylesheet.md`: 1 `--score-1` (rood) tot 5 `--score-5` (donkergroen). Afronden gaat half-away-from-zero, dus 2,5 krijgt de kleur van 3. Een lege cel is wit met een rand van 1px (`--border`). Deze weergave gebruikt dus de vijf stappen en niet de drie klassekleuren van A tot en met E, omdat hier losse antwoorden staan en geen gemiddelden over een groep.
+
+**Zachtere kleur (voorstel van 15 oktober 2026, wijziging op wat gebouwd is).** De cel gebruikt de celtint van de stap (`--score-1-cel` tot `--score-5-cel`, met tekst `--score-N-cel-tekst`, `stylesheet.md`, Drie niveaus van scorekleur) en niet de volle scorekleur. De volle kleuren, met wit op 1 en 5, waren in de praktijk te hard voor een tabel vol cijfers. De tekst in elke cel is donker en wijkt daarmee ook af van de PDF, waar de tekst op oranje wit is.
 
 **Opbouw.**
 
@@ -284,11 +286,11 @@ Voorstel, op te nemen in `stylesheet.md` zodra ze zijn bevestigd:
 | Band achter de rij, achtereenvolgens | `--stat-red-faint`, `--stat-amber-faint`, `--stat-green-faint` |
 | Celvulling matrix | `#f7c6c1` (tekst `#7f1d1d`), `#fde9c8` (tekst `#6b3a00`), `#c3e6d2` (tekst `#0e4d30`) |
 | Stijging | `--bl` (`#225ba0`) |
-| Daling | `#c2570c` (nieuw) |
+| Daling | `--dal` (`#c2570c`) |
 | Positielabel boven de groep | vulling `#e8f1fb`, tekst `#174473`, rand `#bcd3ee` |
 | Positielabel onder de groep | vulling `#fdf2e3`, tekst `#8a4a00`, rand `#f2cf9b` |
 | Spreiding, stip van een respondent | `#5d6a78` met 75% dekking |
-| G, cel met een antwoord of score | `--score-1` tot `--score-5`, tekst wit op 1 en 5, `--ink` op 2 tot en met 4 (gebouwd) |
+| G, cel met een antwoord of score | `--score-1-cel` tot `--score-5-cel` met tekst `--score-N-cel-tekst` (voorstel van 15 oktober 2026, gebouwd met de volle `--score-1` tot `--score-5`) |
 | G, lege cel | wit, rand `1px solid var(--border)` |
 
 ## Open punten

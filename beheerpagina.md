@@ -415,6 +415,9 @@ standaardteksten zoals ze nu in de app staan):
 | `info.benchmarkAanmakenMetingen` | Benchmark binnen een organisatie aanmaken of wijzigen, achter de uitgeschakelde knop | Een vergelijking tussen Metingen heeft een naam nodig, een organisatie, een Assessment en precies twee Metingen. Een Meting is alleen te kiezen met een meetdatum en genoeg afgeronde scans. |
 | `info.benchmarkAanmakenScans` | Benchmark binnen een Meting aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark binnen een Meting heeft een naam nodig, een organisatie, een Assessment en een Meting. Een Meting is alleen te kiezen met genoeg afgeronde scans. |
 | `info.exportEenScan` | Meting-overzicht en de lijsten onder Resultaten, achter de uitgeschakelde opties "Als PDF" en "Voor InDesign (XML)" | Beschikbaar bij precies één scan. |
+| `info.korteNaamOrganisatie` | Organisatie aanmaken en bewerken, naast het veld Korte naam | Een korte naam staat in de kolomkoppen van matrices en heatmaps, bijvoorbeeld "Rabobank" in plaats van de volledige naam. Laat je het veld leeg, dan geldt de naam zelf. De volledige naam staat in de tooltip. |
+| `info.verkennenGroeperen` | Verkennen, naast het label Groeperen op | Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties. |
+| `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
 
 Elk nieuw Info-icoon krijgt hier een regel en een regel in
 `data/info-teksten.ts`. Een standaardtekst bevat geen verwijzing naar een
@@ -740,6 +743,34 @@ en voor een Consultant bij zijn eigen organisaties
 aan de klant, tijdens een gesprek over de inrichting en omvang, en moet
 het antwoord daarom zelf kunnen vastleggen.
 
+**Korte namen (voorstel van 15 oktober 2026).** Veldnamen en waarden zoals
+"Activiteiten op het gebied van financiële dienstverlening en verzekeringen"
+zijn te lang voor de chips en lijsten van Verkennen. Een Admin geeft ze hier een
+korte naam (`visualisatie-verkennen.md`, Korte namen). De pagina heeft een
+schakelaar Velden | Korte namen (`.weergave-wissel`), en de tweede weergave is
+een tabel met de kolommen Soort (Veldnaam of Waarde), Veld, Origineel, Korte
+naam en In gebruik.
+
+- **Korte naam**: Een invoerveld van hoogstens 30 tekens, met een teller.
+  Leeg betekent het origineel. De naam moet uniek zijn binnen het veld, zonder
+  verschil tussen hoofdletters en kleine letters, anders staat er een melding
+  bij het veld.
+- **Filters**: Veld (Alle velden, Veldnamen of een veld), zoeken op origineel of
+  korte naam, en een vinkje dat waarden in gebruik zonder korte naam bovenaan
+  zet (standaard aan). Boven de tabel staat "X van Y hebben een korte naam".
+- **Opslaan**: Eén knop onder de tabel, met "Annuleren" ernaast.
+- **In gebruik**: Het aantal Organisaties met die waarde. Bij een veldnaam het
+  aantal Organisaties dat het veld heeft ingevuld.
+- **Nieuwe waarden**: Waarden die Organisaties zelf invullen via "Anders…"
+  verschijnen vanzelf in de tabel, met een lege korte naam
+  (`datamodel.md`, Korte namen).
+- **Op de plek zelf**: In Verkennen opent een potlood naast de kop van een
+  filter een modal met dezelfde tabel voor dat ene veld (punt 15).
+- **Recht en logging**: `content.beheren`, dus alleen een Admin. Een wijziging
+  wordt gelogd als `korteNaam.gewijzigd` (`datamodel.md`, Audit).
+- **Uitleg**: In een Info-icoon (`info.korteNamen`, punt 2a), niet als vaste
+  tekst. Het visual design toont hem als vaste tekst.
+
 #### 4. Organisaties
 
 - **Lijst**: Voor een Admin alle organisaties. Voor een Consultant
@@ -766,6 +797,12 @@ het antwoord daarom zelf kunnen vastleggen.
     loopt.
 - **Aanmaken**: Naam en kenmerken invullen. Zowel Admin als Consultant;
   de aanmaker wordt automatisch eigenaar (`aangemaaktDoor`).
+- **Korte naam** (optioneel, voorstel van 15 oktober 2026): Een tweede,
+  korte naam van de Organisatie voor kolomkoppen in matrices en heatmaps
+  (`stylesheet.md`, Kolomkop en rijkop), maximaal 30 tekens, bij voorkeur
+  tot 12 zodat hij zonder afkapping in een kolom van 96px past. Leeg
+  betekent dat de naam zelf geldt. Staat in het aanmaak- en bewerkformulier
+  onder Naam, met een Info-icoon (`info.korteNaamOrganisatie`).
 - **Organisatie-toegang toewijzen** (Admin-only, ook weer intrekken):
   Op de organisatiedetailpagina, naast Kenmerken, één of meer
   Consultants toevoegen die deze organisatie ook mogen zien en
@@ -1907,7 +1944,8 @@ spreiding binnen een Meting (niveau 3) krijgt een Lead als kolom Spreiding
 #### 15. Verkennen
 
 **Status.** Gebouwd op 15 oktober 2026, naar het visual design met
-voorbeelddata. Het gedrag staat in
+voorbeelddata. De korte namen op de chips en het potlood naast de kop van een
+filter zijn voorstel van 15 oktober 2026 en nog niet gebouwd. Het gedrag staat in
 `visualisatie-verkennen.md`, hier staat de plek in beheer.
 
 De tab Verkennen onder Resultaten (punt 7), alleen zichtbaar voor een Admin
@@ -1918,7 +1956,10 @@ de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat niets op.
   keuze van het Assessment. Alles op de pagina werkt binnen dat ene
   Assessment.
 - **Filters**: Chips voor sector en ingezette kanalen, met het aantal
-  Organisaties erachter, een knop "Filter toevoegen" en "Wis filters". Onderaan
+  Organisaties erachter en de korte naam op de chip (het origineel in een
+  tooltip), een potlood naast de kop van een filter voor de korte namen van dat
+  veld (punt 3), een knop "Filter toevoegen" met een menu per groep van velden
+  met zoekveld, en "Wis filters". Onderaan
   de teller "X van Y Organisaties in de pool" met een balk, en een regel met het
   aantal Organisaties zonder toestemming voor benchmark.
 - **Vergelijken**: Groeperen op CRM-pakket, sector of de AHT-drempel (een slider
