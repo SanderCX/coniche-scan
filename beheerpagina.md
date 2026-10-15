@@ -344,6 +344,21 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
   laagste tot hoogste score aan te zetten (`visualisatie-scores.md`,
   onderdeel A).
 
+**Formulier Verkennen** (voorstel van 15 oktober 2026, `visualisatie-verkennen.md`, Drempels). Een eigen formulier onder Drempels en termijnen, naast de formulieren Bewaartermijn en Benchmark, met de kop Verkennen en een Info-icoon (`info.verkennenInstellingen`). Het bevat de grenzen die bepalen wanneer Verkennen een groep, een vergelijking of een groepering toestaat. De eerste twee velden staan op 15 oktober 2026 al in de app (`verkennenMinGroep` en `verkennenWaarschuwingGroep`, met het Info-icoon `info.verkennenDrempels`), door Joost op 2 en 2 gezet om te proberen. Dit voorstel maakt er vijf van, hernoemt `verkennenWaarschuwingGroep` naar `verkennenMinVergelijking` en vervangt het Info-icoon door `info.verkennenInstellingen`. De rij `info.verkennenDrempels` hieronder is de gebouwde versie en vervalt bij het bouwen van dit voorstel. De startwaarden 3, 5, 6, 12 en 40 zijn de norm vanuit het ontwerp en blijven de beginstand. Een Admin kan elke waarde in de praktijk aanpassen.
+
+| Veld | Instelling | Startwaarde | Wat het doet |
+|---|---|---|---|
+| Organisaties in een groep, minimum | `verkennenMinGroep` | 3 | Een kleinere groep is gestreept en krijgt in de heatmap geen cijfers. Ook het minimum voor het verband in weergave 4. |
+| Organisaties in focus of rest, waarschuwing | `verkennenMinVergelijking` | 5 | Een kleinere focus of rest krijgt een waarschuwing. Het is geen blokkade. |
+| Organisaties in de pool, minimum | `verkennenMinPool` | 6 | In een kleinere pool kan er niet gegroepeerd worden. |
+| Waarden per kenmerk, maximum | `verkennenMaxGroepen` | 12 | Een select-kenmerk met meer verschillende waarden in de pool kan niet groeperen. |
+| Kenmerk ingevuld, minimum | `verkennenMinIngevuldPct` | 40 | Een kenmerk dat bij een lager percentage van de Organisaties in het Assessment is ingevuld, kan niet groeperen en staat grijs in het menu Kenmerk toevoegen. |
+
+- **Opmaak**: Eén rij velden die op een smal scherm doorloopt naar de volgende regel. Per veld het label in het label-formaat (`--fs-12`, gewicht 700, hoofdletters) boven een invoerveld van `--control-h` (40px), met onder het veld in `--fs-12` en `var(--ink-s)` wat het doet (bij het percentage de eenheid). Onder de velden de knop Opslaan en het Info-icoon op één regel. Het formulier heeft geen Annuleren, net als Benchmark.
+- **Invoer**: Gehele getallen van minstens 1. Het percentage ligt tussen 1 en 100. Bij een ongeldige waarde staat er naast Opslaan "Vul bij elk veld een geheel getal van minstens 1 in. Het percentage kan niet boven 100." en schrijft Opslaan niets.
+- **Opslaan** schrijft direct. De nieuwe waarden gelden vanaf het volgende scherm Verkennen, voor alle Assessments. Het scherm slaat zijn eigen keuzes niet op, dus er valt niets te migreren.
+- **Alleen een Admin** ziet dit formulier en kan het wijzigen.
+
 #### 2a. Algemene teksten
 
 Teksten los van een specifiek Assessment (`datamodel.md`, Algemene
@@ -416,6 +431,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.benchmarkAanmakenScans` | Benchmark binnen een Meting aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark binnen een Meting heeft een naam nodig, een organisatie, een Assessment en een Meting. Een Meting is alleen te kiezen met genoeg afgeronde scans. |
 | `info.exportEenScan` | Meting-overzicht en de lijsten onder Resultaten, achter de uitgeschakelde opties "Als PDF" en "Voor InDesign (XML)" | Beschikbaar bij precies één scan. |
 | `info.korteNaamOrganisatie` | Organisatie aanmaken en bewerken, naast het veld Korte naam | Een korte naam staat in de kolomkoppen van matrices en heatmaps, bijvoorbeeld "Rabobank" in plaats van de volledige naam. Laat je het veld leeg, dan geldt de naam zelf. De volledige naam staat in de tooltip. |
+| `info.verkennenInstellingen` | Instellingen, Drempels en termijnen, formulier Verkennen | Grenzen voor Verkennen. Een groep onder het minimum is gestreept en krijgt geen cijfers. Bij een kleinere focus of rest staat een waarschuwing. In een kleinere pool kun je niet groeperen. Een kenmerk met meer waarden dan het maximum of een lagere invulling dan het minimum kan niet groeperen. |
 | `info.verkennenKenmerken` | Verkennen, kaart Kenmerken, naast de titel | Zet hier een kenmerk neer om op te filteren en om op te groeperen. Een kenmerk zonder gekozen waarde filtert niets. Filteren op bereik bij getallen volgt later. |
 | `info.verkennenGroeperen` | Verkennen, naast het label Groeperen op | Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties. Is er nog geen kenmerk, dan staat er: Er is nog geen kenmerk om op te groeperen. Voeg bij Kenmerken een kenmerk toe, dan kun je de Organisaties erop in groepen verdelen. |
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |

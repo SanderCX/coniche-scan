@@ -618,7 +618,7 @@ bouwblokken met naam, omschrijving, tags en vragen.
   `visualisatie-quickscan.md`.
 - Verkennen: De open punten staan onderaan `visualisatie-verkennen.md`, onder
   andere of meerdere gekozen kanalen als "en" of "of" werken, de
-  startwaarden van de drempels bij kleine groepen en de grenzen van Groeperen
-  op (6 Organisaties, 12 waarden, 40% ingevuld).
+  startwaarden van de vijf instelbare drempels (`visualisatie-verkennen.md`,
+  Drempels).
 - Rol/functie bij de respondent: Vrij tekstveld of vaste lijst.
 - Focus- en error-states in formulieren (zie `stylesheet.md`).

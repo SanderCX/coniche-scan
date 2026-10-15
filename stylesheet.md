@@ -914,7 +914,7 @@ pilvormige groep (`.weergave-wissel`).
   Organisaties erachter in gewicht 400. Gekozen is hij massief oranje, met een
   kruisje om het filter weg te halen.
 - **Focuschip**: Dezelfde keuzepil. Gekozen is hij massief oranje, zoals elke
-  gekozen pil. Een groep met minder dan 3 Organisaties heeft een gestreepte rand
+  gekozen pil. Een groep onder de drempel `verkennenMinGroep` heeft een gestreepte rand
   en tekst in `var(--ink-s)`.
 - **Slider met histogram**: Een smalle balk (4px) in `var(--border-d)` met een
   rond handvat van 20px in `var(--or)` en een witte rand. Erboven een histogram
