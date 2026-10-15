@@ -89,15 +89,30 @@ h3 {
 
 h3 {
   font-weight: 700;
-  font-size: 1.12rem;
+  font-size: var(--fs-18);
 }
 
 h1 {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: var(--fs-48);
+}
+
+/* De paginatitel (stylesheet.md, Koppen): 32px, voor een pagina met een knop of actie naast de kop. */
+.page-title {
+  font-size: var(--fs-32);
+  font-weight: 800;
 }
 
 h2 {
-  font-size: clamp(1.85rem, 3.5vw, 2.65rem);
+  font-size: var(--fs-32);
+}
+
+@media (max-width: 900px) {
+  h1 {
+    font-size: var(--fs-32);
+  }
+  h2 {
+    font-size: var(--fs-24);
+  }
 }
 
 p {
@@ -116,7 +131,7 @@ p {
 
 .eyebrow {
   display: inline-block;
-  font-size: 0.69rem;
+  font-size: var(--fs-12);
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;

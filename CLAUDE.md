@@ -101,10 +101,10 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   te filteren, te groeperen en te vergelijken, met vier weergaven. Nog niet
   voor de Quickscan Ziekenhuis, voor een Consultant en voor meerdere Metingen
   per Organisatie. Korte namen voor veldnamen en waarden (zoals de lange
-  SBI-sectoren) houden de filterlijst en de chips leesbaar. Dat is een voorstel
-  van 15 oktober 2026 en nog niet gebouwd.
-- **Opmaakronde**: Voorstel van 15 oktober 2026, besloten door Joost, nog niet
-  gebouwd (`stylesheet.md`). Acht lettergroottes in even px (12, 14, 16, 18,
+  SBI-sectoren) houden de filterlijst en de chips leesbaar, gebouwd op 15
+  oktober 2026 (`visualisatie-verkennen.md`, Korte namen).
+- **Opmaakronde**: Besloten door Joost en gebouwd op 15 oktober 2026
+  (`stylesheet.md`). Acht lettergroottes in even px (12, 14, 16, 18,
   24, 32, 40, 48) in plaats van zo'n 17 maten, met de paginatitel op 32px.
   Eén vorm voor keuzes: De pil en de pilvormige groep, waarin gekozen massief
   oranje is en zwart geen vulling meer. Drie niveaus van scorekleur (band, cel,

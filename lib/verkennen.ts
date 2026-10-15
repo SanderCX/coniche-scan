@@ -86,6 +86,26 @@ export function filterVelden(velden: VeldDefinitie[] = organisatieVelden): Filte
   return uit;
 }
 
+/** De groep van een veld in het filtermenu: Het eerste deel van het label ("Techstack"), anders "Overig". */
+export function veldGroep(veld: FilterVeld): string {
+  const delen = veld.label.split(" › ");
+  return delen.length > 1 ? delen[0] : "Overig";
+}
+
+/** Het label zonder de groep ("Contact center › Oplossing"): Het origineel waar een korte naam van een veld op bouwt. */
+export function veldLabelZonderGroep(veld: FilterVeld): string {
+  const delen = veld.label.split(" › ");
+  return delen.length > 1 ? delen.slice(1).join(" › ") : veld.label;
+}
+
+/** Hoeveel van deze organisaties het veld hebben ingevuld (voor "37 van 50" in het filtermenu). */
+export function ingevuldAantal(organisaties: Pick<Organisatie, "kenmerken">[], veld: FilterVeld): number {
+  return organisaties.filter((o) => {
+    const w = kenmerkWaarde(o, veld.pad);
+    return w !== undefined && w !== null && w !== "";
+  }).length;
+}
+
 /** De waarde van een kenmerk op een pad, of `undefined`. */
 export function kenmerkWaarde(organisatie: Pick<Organisatie, "kenmerken">, pad: string[]): unknown {
   let huidig: unknown = organisatie.kenmerken;
@@ -221,7 +241,10 @@ export type Groepering =
 
 export interface Groep {
   sleutel: string;
+  /** De getoonde naam: De korte naam van de waarde als die er is (`visualisatie-verkennen.md`, Korte namen). */
   naam: string;
+  /** Het origineel als `naam` een korte naam is: Komt in de tooltip. */
+  volledigeNaam?: string;
   leden: PoolLid[];
 }
 
@@ -230,7 +253,13 @@ export interface Groep {
  * drempel op een getalveld twee: "≤ drempel" en "> drempel". Organisaties zonder waarde horen niet bij een groep, maar wel bij
  * de rest. De grootste groep staat vooraan.
  */
-export function maakGroepen(leden: PoolLid[], groepering: Groepering, velden: FilterVeld[] = filterVelden()): Groep[] {
+export function maakGroepen(
+  leden: PoolLid[],
+  groepering: Groepering,
+  velden: FilterVeld[] = filterVelden(),
+  /** De korte naam van een waarde bij een veld, of het origineel zelf. */
+  naamVan: (veldId: string, waarde: string) => string = (_veldId, waarde) => waarde
+): Groep[] {
   const veld = velden.find((v) => v.id === groepering.veldId);
   if (!veld) return [];
   if (groepering.soort === "select") {
@@ -241,7 +270,10 @@ export function maakGroepen(leden: PoolLid[], groepering: Groepering, velden: Fi
       per.set(w, [...(per.get(w) ?? []), lid]);
     }
     return [...per.entries()]
-      .map(([naam, l]) => ({ sleutel: naam, naam, leden: l }))
+      .map(([waarde, l]) => {
+        const kort = naamVan(veld.id, waarde);
+        return { sleutel: waarde, naam: kort, ...(kort !== waarde ? { volledigeNaam: waarde } : {}), leden: l };
+      })
       .sort((a, b) => b.leden.length - a.leden.length || a.naam.localeCompare(b.naam, "nl"));
   }
   const onder: PoolLid[] = [];

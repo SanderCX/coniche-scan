@@ -176,7 +176,7 @@ function BewaartermijnBlok({
 
         {instellingen.bewaarTermijnDagen !== null && (
           <>
-            <h3 style={{ fontSize: "var(--fs-l)", marginTop: "1.5rem" }}>
+            <h3 style={{ fontSize: "var(--fs-18)", marginTop: "1.5rem" }}>
               Data ouder dan de bewaartermijn ({verlopenRijen.length})
             </h3>
             {verlopenRijen.length === 0 ? (
@@ -225,7 +225,7 @@ function BewaartermijnBlok({
 
             {verlengdeRijen.length > 0 && (
               <>
-                <h3 style={{ fontSize: "var(--fs-l)", marginTop: "1.5rem" }}>
+                <h3 style={{ fontSize: "var(--fs-18)", marginTop: "1.5rem" }}>
                   Verlengd, nog niet opnieuw te beoordelen ({verlengdeRijen.length})
                 </h3>
                 <table className="admin-table mt-2">

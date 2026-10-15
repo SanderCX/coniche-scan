@@ -151,6 +151,24 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Een groep met minder organisaties dan het minimum is gestreept en krijgt in de heatmap geen cijfers. Heeft de focus of de rest minder organisaties dan de waarschuwingsgrens, dan staat er een waarschuwing dat verschillen voorzichtig gelezen moeten worden. Dat is geen blokkade.",
   },
   {
+    sleutel: "info.korteNaamOrganisatie",
+    plek: "Organisatie aanmaken en bewerken, naast het veld Korte naam",
+    tekst:
+      "Een korte naam staat in de kolomkoppen van matrices en heatmaps, bijvoorbeeld \"Rabobank\" in plaats van de volledige naam. Laat je het veld leeg, dan geldt de naam zelf. De volledige naam staat in de tooltip.",
+  },
+  {
+    sleutel: "info.verkennenGroeperen",
+    plek: "Verkennen, naast het label Groeperen op",
+    tekst:
+      "Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties.",
+  },
+  {
+    sleutel: "info.korteNamen",
+    plek: "Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen",
+    tekst:
+      "Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel.",
+  },
+  {
     sleutel: "info.benchmarkVlag",
     plek: "Organisatie-detail, bij de schakelaar \"Doet mee aan benchmark\"",
     tekst:

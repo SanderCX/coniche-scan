@@ -23,7 +23,7 @@ export function BeheerLoginForm() {
       <SiteHeader badge="Beheer" />
       <main className="flex-1">
         <div className="container section" style={{ maxWidth: "24rem" }}>
-          <h1 style={{ fontSize: "1.5rem" }}>Coniche Scan — Beheer</h1>
+          <h1 style={{ fontSize: "var(--fs-24)" }}>Coniche Scan — Beheer</h1>
           <p>
             Prototype-inlog voor Joost en Sander. Nog geen 2FA — zie beheerpagina.md voor
             de vervolgstap.

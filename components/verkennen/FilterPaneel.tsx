@@ -1,6 +1,12 @@
 "use client";
 
-import { DropdownKnop } from "@/components/DropdownKnop";
+import { useState } from "react";
+import { FilterMenu } from "@/components/verkennen/FilterMenu";
+import { OverzichtModal } from "@/components/beheer/OverzichtModal";
+import { KorteNamenTabel } from "@/components/beheer/KorteNamenTabel";
+import { InfoIcoon } from "@/components/InfoIcoon";
+import { useInstellingen } from "@/lib/instellingen-store";
+import { korteNaamVeld, korteNaamWaarde } from "@/lib/korte-namen";
 import {
   FilterStand,
   FilterVeld,
@@ -11,6 +17,7 @@ import {
   histogram,
   kanaalAantallen,
   selectOpties,
+  veldLabelZonderGroep,
 } from "@/lib/verkennen";
 
 /** De velden die standaard als filter staan: Sector en de ingezette kanalen (`visualisatie-verkennen.md`, Filters). */
@@ -41,16 +48,13 @@ export function FilterPaneel({
   gefilterd: PoolLid[];
   zonderToestemming: number;
 }) {
+  const { korteNamen } = useInstellingen();
+  const [modalVeld, setModalVeld] = useState<string | null>(null);
   const perId = new Map(velden.map((v) => [v.id, v]));
   const zichtbaar = [SECTOR_VELD, ...toegevoegd].map((id) => perId.get(id)).filter((v): v is FilterVeld => v !== undefined);
   const kanalen = kanaalAantallen(pool);
-  // Alleen velden die in de pool minstens één waarde hebben, zodat de keuzelijst niets leegs aanbiedt.
-  const keuzes = velden.filter(
-    (v) =>
-      v.id !== SECTOR_VELD &&
-      !toegevoegd.includes(v.id) &&
-      (v.type === "select" ? selectOpties(pool, v).length > 0 : getalWaarden(pool, v).length > 0)
-  );
+  // Alle velden die als filter kunnen dienen: Een veld met weinig waarden staat grijs in het menu maar blijft te kiezen.
+  const keuzes = velden.filter((v) => v.id !== SECTOR_VELD && !toegevoegd.includes(v.id));
 
   const wisselSelect = (id: string, waarde: string) => {
     const huidig = stand.select[id] ?? [];
@@ -67,14 +71,7 @@ export function FilterPaneel({
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
         <h3 style={{ margin: 0 }}>Filters</h3>
         <span style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-          <DropdownKnop
-            label="Filter toevoegen"
-            opties={
-              keuzes.length === 0
-                ? [{ label: "Geen velden met waarden in de pool", disabled: true }]
-                : keuzes.map((v) => ({ label: v.label, onClick: () => onToegevoegd([...toegevoegd, v.id]) }))
-            }
-          />
+          <FilterMenu velden={keuzes} pool={pool} korteNamen={korteNamen} onKies={(id) => onToegevoegd([...toegevoegd, id])} />
           <button
             type="button"
             className="btn btn-outline btn-compact"
@@ -91,19 +88,38 @@ export function FilterPaneel({
 
       {zichtbaar.map((veld) => (
         <div key={veld.id}>
-          <p className="vk-veldkop">{veld.label}</p>
+          <div className="vk-kop-rij">
+            <p className="vk-veldkop" title={veld.label}>
+              {korteNaamVeld(korteNamen, veld.id, veldLabelZonderGroep(veld))}
+            </p>
+            {veld.type === "select" && (
+              <button
+                type="button"
+                className="vk-potlood"
+                aria-label={`Korte namen van ${korteNaamVeld(korteNamen, veld.id, veldLabelZonderGroep(veld))} bewerken`}
+                title="Korte namen bewerken"
+                onClick={() => setModalVeld(veld.id)}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
+          </div>
           {veld.type === "select" ? (
             <div className="vk-chips">
               {selectOpties(pool, veld).map((o) => (
                 <button
                   key={o.waarde}
                   type="button"
-                  className="vk-chip"
+                  className="pil"
+                  title={o.waarde}
                   aria-pressed={(stand.select[veld.id] ?? []).includes(o.waarde)}
                   onClick={() => wisselSelect(veld.id, o.waarde)}
                 >
-                  {o.waarde}
+                  {korteNaamWaarde(korteNamen, veld.id, o.waarde)}
                   <span>{o.aantal}</span>
+                  {(stand.select[veld.id] ?? []).includes(o.waarde) && <span aria-label="Filter weghalen">×</span>}
                 </button>
               ))}
               {selectOpties(pool, veld).length === 0 && <span className="text-sm text-ink-s">Geen waarden in de pool.</span>}
@@ -149,9 +165,10 @@ export function FilterPaneel({
         <p className="vk-veldkop">Ingezette kanalen (de organisatie zet ze allemaal in)</p>
         <div className="vk-chips">
           {kanalen.map((k) => (
-            <button key={k.id} type="button" className="vk-chip" aria-pressed={stand.kanalen.includes(k.id)} onClick={() => wisselKanaal(k.id)}>
+            <button key={k.id} type="button" className="pil" aria-pressed={stand.kanalen.includes(k.id)} onClick={() => wisselKanaal(k.id)}>
               {k.naam}
               <span>{k.aantal}</span>
+              {stand.kanalen.includes(k.id) && <span aria-label="Filter weghalen">×</span>}
             </button>
           ))}
         </div>
@@ -170,6 +187,20 @@ export function FilterPaneel({
           </span>
         )}
       </div>
+      {modalVeld && perId.get(modalVeld) && (
+        <OverzichtModal label="Korte namen" onSluit={() => setModalVeld(null)}>
+          <div className="overzicht-kop">
+            <div className="titel-rij">
+              <h2 style={{ margin: 0 }}>Korte namen</h2>
+              <InfoIcoon sleutel="info.korteNamen" />
+            </div>
+            <p className="text-sm text-ink-m" style={{ margin: 0 }}>
+              {perId.get(modalVeld)?.label}
+            </p>
+          </div>
+          <KorteNamenTabel veldId={modalVeld} onKlaar={() => setModalVeld(null)} />
+        </OverzichtModal>
+      )}
     </section>
   );
 }

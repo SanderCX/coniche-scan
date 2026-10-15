@@ -18,7 +18,7 @@
 }
 
 .radar-label {
-  font-size: 0.68rem;
+  font-size: var(--fs-12);
   fill: var(--ink-m);
 }
 
@@ -36,7 +36,7 @@
 }
 
 .bar-row .bar-naam {
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink);
   font-weight: 600;
 }
@@ -55,7 +55,7 @@
 }
 
 .bar-row .bar-waarde {
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   font-weight: 700;
   color: var(--ink);
   text-align: right;

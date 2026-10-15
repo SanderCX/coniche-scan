@@ -62,7 +62,7 @@ export default function AssessmentLandingPage({
             style={{
               maxWidth: "34rem",
               margin: "0 auto",
-              fontSize: "var(--fs-l)",
+              fontSize: "var(--fs-18)",
               fontWeight: 700,
               color: "var(--ink)",
             }}
@@ -110,7 +110,7 @@ export default function AssessmentLandingPage({
                   background: "var(--or-faint)",
                   color: "var(--or)",
                   fontWeight: 800,
-                  fontSize: "var(--fs-m)",
+                  fontSize: "var(--fs-14)",
                   marginBottom: "0.9rem",
                 }}
               >

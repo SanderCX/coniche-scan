@@ -19,7 +19,7 @@ import { gewichtMarkering } from "@/lib/weging";
  */
 function LeesbareSchaalTick({ x, y, payload }: { x: number; y: number; payload: { value: number } }) {
   return (
-    <text x={x} y={y} dy={-4} textAnchor="middle" fontSize={10} fill="#4d4d49">
+    <text x={x} y={y} dy={-4} textAnchor="middle" fontSize={12} fill="#4d4d49">
       {payload.value}
     </text>
   );
@@ -53,7 +53,7 @@ export function RadarChartView({
           <PolarGrid stroke="#e8e6e1" />
           <PolarAngleAxis
             dataKey="naam"
-            tick={{ fontSize: 10, fill: "#4d4d49" }}
+            tick={{ fontSize: 12, fill: "#4d4d49" }}
           />
           <PolarRadiusAxis domain={[0, 5]} tickCount={6} tick={<LeesbareSchaalTick x={0} y={0} payload={{ value: 0 }} />} />
           {vergelijking && (

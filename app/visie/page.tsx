@@ -34,7 +34,7 @@ export default async function VisiePage({
             style={{
               maxWidth: "44rem",
               margin: "1rem auto 0",
-              fontSize: "1.1rem",
+              fontSize: "var(--fs-18)",
               fontWeight: 600,
               color: "var(--ink)",
             }}
@@ -73,7 +73,7 @@ export default async function VisiePage({
                     borderRadius: "50%",
                     background: "var(--or)",
                     color: "#fff",
-                    fontSize: "var(--fs-xs)",
+                    fontSize: "var(--fs-12)",
                     fontWeight: 800,
                     flex: "none",
                     marginTop: "0.1rem",
@@ -131,7 +131,7 @@ export default async function VisiePage({
                     background: "var(--or-faint)",
                     color: "var(--or)",
                     fontWeight: 800,
-                    fontSize: "1.1rem",
+                    fontSize: "var(--fs-18)",
                   }}
                 >
                   {i + 1}
@@ -141,7 +141,7 @@ export default async function VisiePage({
                 </span>
               </div>
               {i < verbetercyclus.length - 1 && (
-                <span style={{ color: "var(--or-mid)", fontSize: "1.5rem", marginBottom: "1.6rem" }}>
+                <span style={{ color: "var(--or-mid)", fontSize: "var(--fs-24)", marginBottom: "1.6rem" }}>
                   →
                 </span>
               )}

@@ -2,7 +2,7 @@
 
 Spec voor het Admin-scherm Verkennen, waar je alle Organisaties van één Assessment door elkaar kunt filteren, groeperen en naast elkaar zetten.
 
-**Status: Voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026.** Er is een visual design (Claude Design, "Coniche Scan Verkennen") met voorbeelddata. De keuzes bij het bouwen staan onder Gebouwd. De korte namen, de pilvormige groep en de celtinten uit de opmaakronde zijn voorstel van 15 oktober 2026 en nog niet gebouwd. Wat in dit document staat als "Besloten" komt uit het gesprek van 15 oktober 2026.
+**Status: Voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026.** Er is een visual design (Claude Design, "Coniche Scan Verkennen") met voorbeelddata. De keuzes bij het bouwen staan onder Gebouwd. De korte namen, de pilvormige groep en de celtinten uit de opmaakronde zijn gebouwd op 15 oktober 2026 (zie Gebouwd). Wat in dit document staat als "Besloten" komt uit het gesprek van 15 oktober 2026.
 
 ## Wat het is
 
@@ -50,7 +50,7 @@ Organisaties zonder waarde voor een filterveld vallen bij dat filter weg. Bij ee
 
 ## Korte namen
 
-**Voorstel van 15 oktober 2026.** Namen als "Activiteiten op het gebied van financiële dienstverlening en verzekeringen" of "Volume en klantbasis › Totaal aantal contacten per jaar, per kanaal › Call" zijn te lang voor een chip, een menuregel of een kolomkop. Een korte naam is een weergavenaam naast het origineel. Hij kan bij veldnamen en bij waarden.
+**Gebouwd op 15 oktober 2026.** Namen als "Activiteiten op het gebied van financiële dienstverlening en verzekeringen" of "Volume en klantbasis › Totaal aantal contacten per jaar, per kanaal › Call" zijn te lang voor een chip, een menuregel of een kolomkop. Een korte naam is een weergavenaam naast het origineel. Hij kan bij veldnamen en bij waarden.
 
 - **Waar hij staat.** Overal in Verkennen waar een veld of waarde getoond wordt: Het filtermenu, de chips, de groepsnamen, de kolomkoppen van de heatmap en de assen en tooltips van het spreidingsdiagram. Bij hover op een chip of menuregel staat het origineel in een tooltip.
 - **Waar hij niet staat.** In het organisatie-detail, de exports en de import. Daar blijft het origineel staan. De Organisatie bewaart altijd het origineel, zodat er geen twee namen voor één waarde in de data komen.
@@ -159,5 +159,20 @@ Gebouwd op 15 oktober 2026. De berekeningen staan in `lib/verkennen.ts` (met tes
 - Het verband (weergave 4) neemt de Organisaties na de filters, met AHT, FTR of NPS horizontaal. De lijn en r komen bij minstens
   3 Organisaties met een waarde.
 - Het Assessment-keuzeveld toont geen Assessment met Ja / Nee / Weet ik niet (Later).
+
+**Korte namen en opmaakronde** (gebouwd op 15 oktober 2026)
+
+- De korte namen staan bij de instellingen (`Instellingen.korteNamen`, server-sleutel `instellingen`), met pure functies in
+  `lib/korte-namen.ts` (met tests). Voor de Secties van de SBI gelden de beginwaarden uit `sbi-indeling.md` zolang er geen
+  opgeslagen korte naam is. Een lege opgeslagen korte naam betekent bewust het origineel.
+- Het filtermenu (`components/verkennen/FilterMenu.tsx`) biedt elk select- of getalveld, ook als de pool er geen waarden voor heeft:
+  Zo'n veld staat grijs. De grens voor grijs is 40% van de Organisaties in de pool en staat nu als constante in de code.
+- Het potlood naast de kop van een filter staat bij select-velden en opent de modal met de waarden van dat veld, op volgorde van
+  "in gebruik zonder korte naam" eerst.
+- De groepsnaam (chip, heatmapkolom) is de korte naam van de waarde, het origineel staat in de tooltip. De kenmerken bij Verband
+  gebruiken de korte naam van het veld.
+- Het info-icoon bij Groeperen op is `info.verkennenGroeperen`. Groeperen kent altijd een keuze (startwaarde CRM-pakket).
+- Nog niet: Het sectorfilter bij het samenstellen van een benchmark gebruikt de korte namen niet (open punt hieronder), en een
+  opgeslagen korte naam voor een waarde die nergens meer voorkomt wordt niet opgeruimd in Data-integriteit.
 
 **Nog niet gebouwd**: Wat onder Later staat.

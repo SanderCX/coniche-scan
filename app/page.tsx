@@ -17,7 +17,7 @@ export default function Home() {
             style={{
               maxWidth: "40rem",
               margin: "1rem auto 0",
-              fontSize: "1.1rem",
+              fontSize: "var(--fs-18)",
               fontWeight: 600,
               color: "var(--ink)",
             }}

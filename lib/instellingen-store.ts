@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { ScanInvulling } from "./types";
+import type { KorteNamen } from "./korte-namen";
 import { haalServerKopieOp, stuurNaarServer } from "./server-sync";
 import { logAudit } from "./audit-store";
 
@@ -38,6 +39,11 @@ export interface Instellingen {
   verkennenMinGroep: number;
   /** Heeft de focus of de rest minder organisaties dan dit, dan staat er een waarschuwing. Geen blokkade. Startwaarde 5. */
   verkennenWaarschuwingGroep: number;
+  /**
+   * De korte namen voor veldnamen en waarden (`datamodel.md`, Korte namen). Ze staan hier, bij de instellingen, omdat het
+   * weergavenamen zijn en de organisatievelden zelf vaste data zijn.
+   */
+  korteNamen: KorteNamen;
 }
 
 const STANDAARDWAARDEN: Instellingen = {
@@ -49,6 +55,7 @@ const STANDAARDWAARDEN: Instellingen = {
   benchmarkMaxDagenTussenMetingen: 90,
   verkennenMinGroep: 3,
   verkennenWaarschuwingGroep: 5,
+  korteNamen: { velden: {}, waarden: [] },
 };
 
 const KEY = "coniche-scan:instellingen";
@@ -101,14 +108,20 @@ export function useInstellingen(): Instellingen {
   return parseSnapshot(snapshot);
 }
 
-export function zetInstellingen(patch: Partial<Instellingen>): void {
+/** Schrijft de instellingen weg zonder te loggen: De aanroeper logt zelf, met de details die bij zijn wijziging horen. */
+export function schrijfInstellingen(patch: Partial<Instellingen>): void {
   if (typeof window === "undefined") return;
-  const huidig = parseSnapshot(getSnapshot());
-  const nieuw = { ...huidig, ...patch };
+  const nieuw = { ...parseSnapshot(getSnapshot()), ...patch };
   const json = JSON.stringify(nieuw);
   window.localStorage.setItem(KEY, json);
   emitChange();
   stuurNaarServer(SERVER_SLEUTEL, json);
+}
+
+export function zetInstellingen(patch: Partial<Instellingen>): void {
+  if (typeof window === "undefined") return;
+  const huidig = parseSnapshot(getSnapshot());
+  schrijfInstellingen(patch);
   logAudit({
     actie: "instellingen.gewijzigd",
     entiteitType: "instellingen",

@@ -50,14 +50,14 @@ export function WeergaveVerband({
         {[1, 2, 3, 4, 5].map((t) => (
           <g key={t}>
             <line x1={M.l} x2={B - M.r} y1={py(t)} y2={py(t)} stroke="#e8e6e1" />
-            <text x={M.l - 8} y={py(t) + 4} textAnchor="end" fontSize="11" fill="#888884">
+            <text x={M.l - 8} y={py(t) + 4} textAnchor="end" fontSize="12" fill="#888884">
               {t}
             </text>
           </g>
         ))}
         <line x1={M.l} x2={B - M.r} y1={H - M.b} y2={H - M.b} stroke="#d4d1ca" />
         {[0, 0.25, 0.5, 0.75, 1].map((f) => (
-          <text key={f} x={M.l + f * (B - M.l - M.r)} y={H - M.b + 16} textAnchor="middle" fontSize="11" fill="#888884">
+          <text key={f} x={M.l + f * (B - M.l - M.r)} y={H - M.b + 16} textAnchor="middle" fontSize="12" fill="#888884">
             {String(Math.round((minX + f * spanX) * 10) / 10).replace(".", ",")}
           </text>
         ))}

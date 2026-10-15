@@ -25,7 +25,7 @@ export function AssessmentCard({ assessment }: { assessment: Assessment }) {
           name={assessment.icoon}
           style={{ width: "3.5rem", height: "3.5rem", color: "var(--or)", flex: "none" }}
         />
-        <h2 className="text-xl font-bold text-ink" style={{ margin: 0, fontSize: "1.6rem" }}>
+        <h2 className="text-xl font-bold text-ink" style={{ margin: 0, fontSize: "var(--fs-24)" }}>
           {regels[0]}
           <br />
           {regels[1]}

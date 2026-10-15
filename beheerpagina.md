@@ -743,7 +743,7 @@ en voor een Consultant bij zijn eigen organisaties
 aan de klant, tijdens een gesprek over de inrichting en omvang, en moet
 het antwoord daarom zelf kunnen vastleggen.
 
-**Korte namen (voorstel van 15 oktober 2026).** Veldnamen en waarden zoals
+**Korte namen (gebouwd op 15 oktober 2026).** Veldnamen en waarden zoals
 "Activiteiten op het gebied van financiële dienstverlening en verzekeringen"
 zijn te lang voor de chips en lijsten van Verkennen. Een Admin geeft ze hier een
 korte naam (`visualisatie-verkennen.md`, Korte namen). De pagina heeft een
@@ -797,7 +797,7 @@ naam en In gebruik.
     loopt.
 - **Aanmaken**: Naam en kenmerken invullen. Zowel Admin als Consultant;
   de aanmaker wordt automatisch eigenaar (`aangemaaktDoor`).
-- **Korte naam** (optioneel, voorstel van 15 oktober 2026): Een tweede,
+- **Korte naam** (optioneel, gebouwd op 15 oktober 2026): Een tweede,
   korte naam van de Organisatie voor kolomkoppen in matrices en heatmaps
   (`stylesheet.md`, Kolomkop en rijkop), maximaal 30 tekens, bij voorkeur
   tot 12 zodat hij zonder afkapping in een kolom van 96px past. Leeg
@@ -1945,7 +1945,7 @@ spreiding binnen een Meting (niveau 3) krijgt een Lead als kolom Spreiding
 
 **Status.** Gebouwd op 15 oktober 2026, naar het visual design met
 voorbeelddata. De korte namen op de chips en het potlood naast de kop van een
-filter zijn voorstel van 15 oktober 2026 en nog niet gebouwd. Het gedrag staat in
+filter zijn gebouwd op 15 oktober 2026. Het gedrag staat in
 `visualisatie-verkennen.md`, hier staat de plek in beheer.
 
 De tab Verkennen onder Resultaten (punt 7), alleen zichtbaar voor een Admin

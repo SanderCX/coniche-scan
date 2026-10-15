@@ -17,6 +17,8 @@ import { MetingenSectie } from "@/components/beheer/MetingenSectie";
 import { LeadsBlok } from "@/components/beheer/LeadsBlok";
 import { AntwoordenNamenSchakelaar } from "@/components/beheer/AntwoordenNamenSchakelaar";
 import { isLead } from "@/lib/lead";
+import { InfoIcoon } from "@/components/InfoIcoon";
+import { MAX_KORTE_NAAM } from "@/lib/korte-namen";
 
 /** Aantal rijen per lijst op de detailpagina (beheerpagina.md, punt 4, "Lange lijsten"). */
 const MAX_RIJEN = 5;
@@ -26,13 +28,15 @@ const MAX_RIJEN = 5;
  * met "Opslaan" en "Annuleren". De naam is verplicht en wordt getrimd. Wie dit scherm ziet, mag de organisatie bewerken
  * (`organisaties.bewerken`: Admin alle, Consultant eigen).
  */
-function OrganisatieNaam({ organisatieId, naam }: { organisatieId: string; naam: string }) {
+function OrganisatieNaam({ organisatieId, naam, korteNaam }: { organisatieId: string; naam: string; korteNaam: string }) {
   const [bewerken, setBewerken] = useState(false);
   const [concept, setConcept] = useState(naam);
+  const [conceptKort, setConceptKort] = useState(korteNaam);
   const [fout, setFout] = useState<string | null>(null);
 
   function start() {
     setConcept(naam);
+    setConceptKort(korteNaam);
     setFout(null);
     setBewerken(true);
   }
@@ -43,6 +47,10 @@ function OrganisatieNaam({ organisatieId, naam }: { organisatieId: string; naam:
     if (!r.ok) {
       setFout(r.reden);
       return;
+    }
+    const kort = conceptKort.trim().slice(0, MAX_KORTE_NAAM);
+    if (kort !== korteNaam) {
+      updateOrganisatie(organisatieId, (o) => ({ ...o, korteNaam: kort || null }));
     }
     setBewerken(false);
   }
@@ -62,6 +70,20 @@ function OrganisatieNaam({ organisatieId, naam }: { organisatieId: string; naam:
           />
           {fout && <p className="overzicht-melding fout" style={{ marginTop: "0.4rem" }}>{fout}</p>}
         </div>
+        <div className="admin-field" style={{ marginBottom: 0, minWidth: "12rem" }}>
+          <div className="knop-met-icoon">
+            <input
+              type="text"
+              aria-label="Korte naam van de organisatie"
+              placeholder="Korte naam"
+              maxLength={MAX_KORTE_NAAM}
+              value={conceptKort}
+              onChange={(e) => setConceptKort(e.target.value)}
+              onKeyDown={(e) => e.key === "Escape" && setBewerken(false)}
+            />
+            <InfoIcoon naastVeld sleutel="info.korteNaamOrganisatie" />
+          </div>
+        </div>
         <button type="submit" className="btn btn-or btn-compact">
           Opslaan
         </button>
@@ -75,6 +97,11 @@ function OrganisatieNaam({ organisatieId, naam }: { organisatieId: string; naam:
   return (
     <div className="titel-rij">
       <h1>{naam}</h1>
+      {korteNaam && (
+        <span className="text-sm text-ink-s" title="Korte naam in kolomkoppen">
+          Korte naam: {korteNaam}
+        </span>
+      )}
       <button type="button" className="titel-potlood" aria-label="Naam wijzigen" title="Naam wijzigen" onClick={start}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -147,7 +174,7 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
   return (
     <div className="admin-main admin-main--breed">
       <Kruimelpad delen={[{ label: "Organisaties", href: "/beheer/organisaties" }, { label: organisatie.naam }]} />
-      <OrganisatieNaam organisatieId={organisatie.id} naam={organisatie.naam} />
+      <OrganisatieNaam organisatieId={organisatie.id} naam={organisatie.naam} korteNaam={organisatie.korteNaam ?? ""} />
       <p className="text-sm text-ink-m">
         Aangemaakt door: {eigenaar ? eigenaar.naam : "onbekend"}
         {toegewezenGebruikers.length > 0 && ` · Ook toegewezen aan: ${toegewezenGebruikers.map((g) => g.naam).join(", ")}`}

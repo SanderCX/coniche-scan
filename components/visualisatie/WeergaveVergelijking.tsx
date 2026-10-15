@@ -37,7 +37,7 @@ export function WeergaveVergelijking({
       <Schaalkop rechts="Verschil" />
       {weergave.rijen.map((r, i) => {
         const kleurLijn =
-          r.richting === "stijging" ? "var(--bl)" : r.richting === "daling" ? "#c2570c" : "var(--ink-s)";
+          r.richting === "stijging" ? "var(--bl)" : r.richting === "daling" ? "var(--dal)" : "var(--ink-s)";
         const links = r.vorig !== null && r.huidig !== null ? Math.min(pct(r.vorig), pct(r.huidig)) : 0;
         const breedte = r.vorig !== null && r.huidig !== null ? Math.abs(pct(r.huidig) - pct(r.vorig)) : 0;
         return (

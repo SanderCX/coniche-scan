@@ -243,7 +243,7 @@ Die koppeling loopt via Meting.
 Organisatie {
   id: string
   naam: string                      // bewerkbaar via organisaties.bewerken, gelogd als organisatie.hernoemd
-  korteNaam?: string | null         // voorstel van 15 oktober 2026: weergavenaam in kolomkoppen, maximaal 30 tekens, leeg betekent `naam`
+  korteNaam?: string | null         // gebouwd op 15 oktober 2026: weergavenaam in kolomkoppen, maximaal 30 tekens, leeg betekent `naam`
   kenmerken: { [veldId: string]: waarde }   // in beheer, altijd bewerkbaar, niet door respondenten
   aangemaaktOp: datetime
 }
@@ -676,7 +676,7 @@ VeldDefinitie {
 }
 ```
 
-**Korte namen** (voorstel van 15 oktober 2026, `visualisatie-verkennen.md`, Korte namen). Een korte naam is een weergavenaam naast het origineel. De Organisatie bewaart altijd de originele waarde.
+**Korte namen** (gebouwd op 15 oktober 2026, `visualisatie-verkennen.md`, Korte namen). Een korte naam is een weergavenaam naast het origineel. De Organisatie bewaart altijd de originele waarde.
 
 ```
 KorteNaam {
@@ -691,6 +691,9 @@ KorteNaam {
 - De rij hoort bij de combinatie van veld en waarde. Bij een waarde via "Anders…" ontstaat de rij pas zodra een Admin een korte naam invult. Verdwijnt de waarde uit de lijst en uit alle Organisaties, dan kan de rij weg (Data-integriteit, `beheerpagina.md`, punt 13).
 - De korte naam staat in Verkennen en in andere schermen waar ruimte krap is. Hij staat niet in het organisatie-detail, de exports en de import, want daar blijft het origineel staan.
 - Wijzigen vraagt `content.beheren` (alleen Admin) en wordt gelogd (zie Audit).
+- **Opslag zoals gebouwd.** De korte namen staan niet op de definities (`organisatie-velden.ts` is vaste data) maar bij de
+  instellingen: `Instellingen.korteNamen = { velden: { [veldId]: string }, waarden: KorteNaam[] }`, met het veld-id als pad
+  met punten (`kpis.aht`). `VeldDefinitie.korteNaam` staat in het type maar wordt niet gebruikt.
 
 **Sector en subsector**
 - Sector (select, vaste lijst: de SBI-hoofdindeling, `opties` in
@@ -1222,7 +1225,7 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   de benchmark en of het vinkje aan of uit is gezet, zonder naam of
   e-mailadres van de Lead. De gebeurtenissen `benchmark.toegewezen` en
   `benchmark.toewijzingIngetrokken` blijven geldig voor wat al is gelogd.
-- `korteNaam.gewijzigd` (voorstel van 15 oktober 2026). `details` bevat het
+- `korteNaam.gewijzigd` (gebouwd op 15 oktober 2026). `details` bevat het
   veld en de originele waarde, en niet de nieuwe korte naam, zoals bij
   `algemeneTekst.gewijzigd`.
 - `organisatie.antwoordenNamenGewijzigd` (voorstel). `details` bevat de naam

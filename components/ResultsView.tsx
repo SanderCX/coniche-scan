@@ -80,7 +80,7 @@ export function ResultsView({
         </p>
         {toonKop && (
           <>
-            <h1 className="mt-1">{assessment.naam}</h1>
+            <h1 className="page-title mt-1">{assessment.naam}</h1>
             <p className="resultaten-voortgang">
               {beantwoord} van {totaal} vragen beantwoord
             </p>

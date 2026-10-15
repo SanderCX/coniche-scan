@@ -121,7 +121,7 @@ function AfdelingKaart({
       <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap", alignItems: "baseline" }}>
         <h3>{naam}</h3>
         <span>
-          <strong style={{ color: s?.tekst, fontSize: "1.3rem" }}>{a.percentage ?? 0}%</strong>{" "}
+          <strong style={{ color: s?.tekst, fontSize: "var(--fs-18)" }}>{a.percentage ?? 0}%</strong>{" "}
           <span className="text-sm text-ink-m">
             {getal(a.punten)}/{getal(a.maximum)}
           </span>{" "}

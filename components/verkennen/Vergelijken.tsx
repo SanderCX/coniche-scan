@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoIcoon } from "@/components/InfoIcoon";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
 import { Groep, Groepering, PoolLid, FilterVeld, getalWaarden, histogram, mediaan } from "@/lib/verkennen";
 
@@ -103,6 +104,7 @@ export function Vergelijken({
       <p className="qv-kaart-sub">Groepeer de pool en kies de focusgroep. De rest is alle andere Organisaties in de pool.</p>
       <div className="vis-acties" style={{ marginBottom: "0.4rem" }}>
         <span className="text-sm text-ink-m">Groeperen op</span>
+        <InfoIcoon naastVeld sleutel="info.verkennenGroeperen" />
         <WeergaveWissel
           ariaLabel="Groeperen op"
           opties={[
@@ -121,7 +123,7 @@ export function Vergelijken({
           <button
             key={g.sleutel}
             type="button"
-            className={`vk-chip vk-chip--focus ${g.leden.length < minGroep ? "vk-chip--klein" : ""}`}
+            className={`pil ${g.leden.length < minGroep ? "pil--klein" : ""}`}
             aria-pressed={g.sleutel === focusSleutel}
             onClick={() => onFocus(g.sleutel)}
           >

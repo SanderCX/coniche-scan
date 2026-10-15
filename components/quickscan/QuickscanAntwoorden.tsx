@@ -79,7 +79,7 @@ function Verdeling({ verdeling }: { verdeling: AfdelingVerdeling[] }) {
           <button
             key={x.categorie.id}
             type="button"
-            className={`btn btn-outline btn-compact ${x.categorie.id === a.categorie.id ? "actief" : ""}`}
+            className="pil"
             disabled={x.respondenten === 0}
             aria-pressed={x.categorie.id === a.categorie.id}
             onClick={() => setGekozen(x.categorie.id)}

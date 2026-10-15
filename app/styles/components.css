@@ -35,7 +35,7 @@
 .nav-badge {
   background: var(--ink);
   color: #fff;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -73,7 +73,7 @@
 }
 
 .nav-right a {
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   font-weight: 600;
   color: var(--ink-m);
   text-decoration: none;
@@ -112,14 +112,14 @@
   padding-block: 0;
   padding-inline: 1rem;
   height: var(--control-h);
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   white-space: nowrap;
 }
 
 .nav-right .btn {
   height: auto;
   padding: 0.5rem 1rem;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
 }
 
 /* Het pijltje van een Dropdown-knop (stylesheet.md, Dropdown-knop, Eén pijltje overal): Een gevulde, kleine
@@ -211,7 +211,7 @@
   background: none;
   border: none;
   font-family: inherit;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   font-weight: 400;
   cursor: pointer;
 }
@@ -229,7 +229,7 @@
    (admin-beheerpagina.md: "e-mailadres + rol tussen haakjes"). */
 .dropdown-menu-header {
   padding: 0.6rem 1rem;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink-s);
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
@@ -239,7 +239,7 @@
 .footer {
   text-align: center;
   padding: 1.5rem 1rem;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   color: var(--ink-s);
   border-top: 1px solid var(--border);
   margin-top: 2rem;
@@ -272,7 +272,7 @@
   border-radius: var(--r);
   padding: 0.82rem 1.7rem;
   font-weight: 700;
-  font-size: var(--fs-m);
+  font-size: var(--fs-14);
   /* Elke knopvariant heeft dezelfde 2px rand (transparant bij de gevulde
      varianten), anders is een `.btn-outline` 4px hoger dan een `.btn-or` of
      `.btn-danger` naast elkaar in één rij. `line-height: normal` zoals bij
@@ -355,7 +355,7 @@
   background: var(--or);
   color: #fff;
   text-transform: uppercase;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   letter-spacing: 0.08em;
   padding: 0.3rem 0.8rem;
@@ -369,7 +369,7 @@
   background: var(--or-faint);
   border: 1px solid var(--or-mid);
   color: var(--or);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   line-height: 1.5;
   white-space: nowrap;
@@ -382,7 +382,7 @@
   border: 1px solid var(--or-mid);
   border-radius: 100px;
   padding: 0.3rem 0.85rem;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 600;
 }
 
@@ -446,7 +446,7 @@ button.card:hover,
 }
 
 .assessment-card .icoon {
-  font-size: 2rem;
+  font-size: var(--fs-32);
 }
 
 /* Assessment-icoon (stylesheet.md, Assessment-icoon): Oranje icoon in een rond vlak van --or-faint. Het raster van het
@@ -465,7 +465,7 @@ button.card:hover,
 
 .assessment-card .duur {
   color: var(--ink-s);
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   font-weight: 600;
 }
 
@@ -477,13 +477,13 @@ button.card:hover,
 .field label {
   display: block;
   font-weight: 700;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink);
   margin-bottom: 0.4rem;
 }
 
 .field .hint {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   color: var(--ink-s);
   margin-top: 0.3rem;
 }
@@ -496,7 +496,7 @@ button.card:hover,
 select.field {
   width: 100%;
   height: var(--control-h);
-  font-size: var(--fs-m);
+  font-size: var(--fs-14);
   padding-block: 0;
   padding-left: 0.9rem;
   border: 1px solid var(--border-d);
@@ -514,7 +514,7 @@ select.veld-compact:focus {
 .field textarea {
   width: 100%;
   font-family: inherit;
-  font-size: var(--fs-m);
+  font-size: var(--fs-14);
   padding: 0.75rem 0.9rem;
   border: 1px solid var(--border-d);
   border-radius: var(--r);
@@ -586,7 +586,7 @@ select.veld-compact:focus {
 }
 
 .schaal-optie .optie-tekst {
-  font-size: var(--fs-m);
+  font-size: var(--fs-14);
   color: var(--ink-m);
 }
 
@@ -595,7 +595,7 @@ select.veld-compact:focus {
   background: var(--bg-mid);
   border-radius: var(--r);
   padding: 0.9rem 1.1rem;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink-m);
   margin: 1.2rem 0 1.6rem;
 }
@@ -655,7 +655,7 @@ select.veld-compact:focus {
 }
 
 .flow-sidebar .respondent-naam {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   color: var(--ink-s);
   margin-bottom: 0.4rem;
 }
@@ -676,7 +676,7 @@ select.veld-compact:focus {
 }
 
 .progress-label {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   color: var(--ink-s);
   margin-bottom: 0;
@@ -687,7 +687,7 @@ select.veld-compact:focus {
 }
 
 .sidebar-categorie-naam {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -701,7 +701,7 @@ select.veld-compact:focus {
   gap: 0.5rem;
   padding: 0.45rem 0.4rem;
   border-radius: var(--r);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   line-height: 1.25;
   color: var(--ink-m);
   cursor: pointer;
@@ -732,7 +732,7 @@ select.veld-compact:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.62rem;
+  font-size: var(--fs-12);
   font-weight: 700;
   color: var(--ink-s);
   border: 1.5px solid var(--border-d);
@@ -744,7 +744,7 @@ select.veld-compact:focus {
   width: 24px;
   height: 24px;
   min-width: 24px;
-  font-size: 0.65rem;
+  font-size: var(--fs-12);
   color: var(--ink-m);
   border-color: var(--or);
 }
@@ -791,7 +791,7 @@ select.veld-compact:focus {
 }
 
 .bouwblok-kop h2 {
-  font-size: 1.5rem;
+  font-size: var(--fs-24);
   margin-bottom: 0.3rem;
 }
 
@@ -800,7 +800,7 @@ select.veld-compact:focus {
   border: none;
   cursor: pointer;
   color: var(--accent, var(--or));
-  font-size: 1.1rem;
+  font-size: var(--fs-18);
   line-height: 1;
   padding: 0.2rem;
 }
@@ -881,7 +881,7 @@ select.veld-compact:focus {
   width: 32px;
   height: 32px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: var(--fs-16);
   color: var(--ink-m);
 }
 
@@ -899,13 +899,13 @@ select.veld-compact:focus {
 }
 
 .classificatie-cirkel .score {
-  font-size: 2.4rem;
+  font-size: var(--fs-40);
   font-weight: 800;
   color: var(--ink);
 }
 
 .classificatie-cirkel .label {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   color: var(--kleur, var(--stat-amber));
 }
@@ -939,11 +939,11 @@ select.veld-compact:focus {
 
 .legenda-item h3 {
   margin-bottom: 0.2rem;
-  font-size: var(--fs-m);
+  font-size: var(--fs-14);
 }
 
 .legenda-item p {
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   margin: 0;
 }
 
@@ -986,7 +986,7 @@ select.veld-compact:focus {
 
 .resultaten-voortgang {
   color: var(--ink-s);
-  font-size: var(--fs-m);
+  font-size: var(--fs-14);
   margin-top: 0.6rem;
 }
 
@@ -997,7 +997,7 @@ select.veld-compact:focus {
   text-align: center;
   padding: 0.8rem;
   font-weight: 700;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   /* Eén regel ruimte onder de balk, voor de eerste kaart van het resultaat. */
   margin-bottom: 1.5rem;
 }
@@ -1062,7 +1062,7 @@ select.veld-compact:focus {
   padding: 0;
   background: var(--bg);
   color: var(--or);
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
@@ -1095,7 +1095,7 @@ select.veld-compact:focus {
   border-left: 4px solid var(--or);
   border-radius: var(--r);
   box-shadow: 0 12px 28px rgba(28, 28, 26, 0.08);
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   font-weight: 400;
   line-height: 1.5;
   color: var(--ink-m);
@@ -1118,7 +1118,7 @@ select.veld-compact:focus {
   display: inline-flex;
   align-items: center;
   height: 1em;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
 }
 .info-veld-actie:hover {
   color: var(--ink);
@@ -1129,7 +1129,7 @@ select.veld-compact:focus {
 }
 .info-veld-voorloop {
   margin: 0 0 0.5rem;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   color: var(--ink-m);
 }
 .info-veld-bewerken textarea {
@@ -1138,14 +1138,14 @@ select.veld-compact:focus {
   padding: 0.5rem 0.6rem;
   border: 1px solid var(--border-d);
   border-radius: var(--r);
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   line-height: 1.5;
   background: var(--bg);
   color: var(--ink);
 }
 .info-veld-teller {
   text-align: right;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   color: var(--ink-s);
   margin: 0.2rem 0 0.5rem;
 }
@@ -1161,7 +1161,7 @@ select.veld-compact:focus {
   border: none;
   padding: 0;
   color: var(--ink-s);
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   cursor: pointer;
   line-height: 1;
 }
@@ -1240,13 +1240,13 @@ select.veld-compact:focus {
   align-items: center;
 }
 .qs-totaal-percentage {
-  font-size: 3rem;
+  font-size: var(--fs-48);
   font-weight: 800;
   line-height: 1.1;
   margin: 0.2rem 0 0;
 }
 .qs-totaal-punten {
-  font-size: 1.2rem;
+  font-size: var(--fs-18);
   font-weight: 600;
   color: var(--ink-m);
 }
@@ -1275,17 +1275,17 @@ select.veld-compact:focus {
 }
 .qs-badge {
   color: #fff;
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   padding: 0.15rem 0.6rem;
   border-radius: 100px;
 }
 .qs-punten {
-  font-size: 1.6rem;
+  font-size: var(--fs-24);
   margin: 0.6rem 0 0;
 }
 .qs-punten span {
-  font-size: 1rem;
+  font-size: var(--fs-16);
   color: var(--ink-m);
 }
 .qs-punten .qs-percentage {
@@ -1295,12 +1295,12 @@ select.veld-compact:focus {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
   font-weight: 700;
   margin: 0.4rem 0 0;
 }
 .qs-kopje {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-s);
@@ -1313,7 +1313,7 @@ select.veld-compact:focus {
   display: flex;
   justify-content: space-between;
   gap: 0.6rem;
-  font-size: var(--fs-s);
+  font-size: var(--fs-14);
 }
 .qs-chips {
   margin-top: 0.8rem;
@@ -1323,7 +1323,7 @@ select.veld-compact:focus {
   gap: 0.4rem;
 }
 .qs-chip {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-12);
   font-weight: 700;
   padding: 0.15rem 0.7rem;
   border-radius: 100px;

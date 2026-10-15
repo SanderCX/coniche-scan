@@ -124,23 +124,12 @@ export default function DoorloopPage({
     const vragen = actieveVragen(assessmentVast);
     const nieuweAntwoorden: Record<string, Antwoord> = {};
     vragen.forEach((vraag, i) => {
-      if (jaNee) {
-        // Het gemiddelde bepaalt hoeveel Ja's: 2 is een derde, 3 twee derde, 4 bijna alles. De rest is Nee of Weet ik niet.
-        const ja = i % 3 < testGemiddelde - 1;
-        nieuweAntwoorden[vraag.id] = ja ? "ja" : i % 2 === 0 ? "nee" : "weet-niet";
-        return;
-      }
       const offset = (i % 3) - 1; // cyclisch: gemiddelde-1, gemiddelde, gemiddelde+1
       nieuweAntwoorden[vraag.id] = Math.min(5, Math.max(1, testGemiddelde + offset));
     });
-    // Bij optionele categorieën zijn ze allemaal van toepassing.
-    const alleRelevantie = Object.fromEntries(
-      (assessmentVast.categorieen ?? []).filter((c) => c.optioneel).map((c) => [c.id, true])
-    );
     updateScanInvulling(respondentId, (i) => ({
       ...i,
       antwoorden: { ...i.antwoorden, ...nieuweAntwoorden },
-      ...(jaNee ? { relevantie: { ...(i.relevantie ?? {}), ...alleRelevantie } } : {}),
       status: "afgerond",
       afgerondOp: i.afgerondOp ?? new Date().toISOString(),
     }));
@@ -181,54 +170,59 @@ export default function DoorloopPage({
       }
       identiteitMenu={<MijnGegevensMenu lid={lid} />}
     >
-      {/* TIJDELIJKE TESTKNOP — op verzoek van Sander, om het resultatenscherm
-          (classificatiekleuren, radar chart, spreiding) te kunnen testen
-          zonder alle vragen met de hand te beantwoorden. Verwijderen voor
-          productie. */}
-      <div
-        className="container"
-        style={{
-          margin: "1rem auto 0",
-          padding: "0.75rem 1rem",
-          border: "1px dashed var(--or)",
-          borderRadius: "0.5rem",
-          background: "var(--or-faint)",
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          gap: "0.75rem",
-        }}
-      >
-        <span className="text-xs font-semibold" style={{ color: "var(--or)" }}>
-          TESTKNOP (tijdelijk)
-        </span>
-        <label
-          className="text-sm"
-          style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}
+      {/* Geen testknop bij de Quickscan Ziekenhuis: Daar vult de respondent de scan zelf in (op verzoek van Sander). */}
+      {!jaNee && (
+        <>
+        {/* TIJDELIJKE TESTKNOP — op verzoek van Sander, om het resultatenscherm
+            (classificatiekleuren, radar chart, spreiding) te kunnen testen
+            zonder alle vragen met de hand te beantwoorden. Verwijderen voor
+            productie. */}
+        <div
+          className="container"
+          style={{
+            margin: "1rem auto 0",
+            padding: "0.75rem 1rem",
+            border: "1px dashed var(--or)",
+            borderRadius: "0.5rem",
+            background: "var(--or-faint)",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: "0.75rem",
+          }}
         >
-          Gemiddelde score
-          {/* Een keuzelijst met de toegestane waarden, geen invulveld: Er is niets anders dan 2, 3 of 4 te kiezen. */}
-          <select
-            className="veld-compact"
-            value={testGemiddelde}
-            onChange={(e) => setTestGemiddelde(Number(e.target.value))}
-            aria-label="Gemiddelde score"
+          <span className="text-xs font-semibold" style={{ color: "var(--or)" }}>
+            TESTKNOP (tijdelijk)
+          </span>
+          <label
+            className="text-sm"
+            style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}
           >
-            {[2, 3, 4].map((waarde) => (
-              <option key={waarde} value={waarde}>
-                {waarde}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button
-          type="button"
-          onClick={handleTestVulAutomatisch}
-          className="btn btn-outline btn-compact"
-        >
-          Vul alle vragen automatisch in
-        </button>
-      </div>
+            Gemiddelde score
+            {/* Een keuzelijst met de toegestane waarden, geen invulveld: Er is niets anders dan 2, 3 of 4 te kiezen. */}
+            <select
+              className="veld-compact"
+              value={testGemiddelde}
+              onChange={(e) => setTestGemiddelde(Number(e.target.value))}
+              aria-label="Gemiddelde score"
+            >
+              {[2, 3, 4].map((waarde) => (
+                <option key={waarde} value={waarde}>
+                  {waarde}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            onClick={handleTestVulAutomatisch}
+            className="btn btn-outline btn-compact"
+          >
+            Vul alle vragen automatisch in
+          </button>
+        </div>
+        </>
+      )}
 
       <MobielVoortgang assessment={assessment} respondent={respondent} />
       <div className="flow-layout flex-1">

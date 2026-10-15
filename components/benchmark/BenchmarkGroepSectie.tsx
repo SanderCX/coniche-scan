@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { kopNaam } from "@/lib/korte-namen";
 import { BenchmarkSectie, resultatenVan } from "@/lib/benchmark";
 import { alleBouwblokkenMetGroep, isVlakkeAssessment } from "@/lib/assessment-structuur";
 import { classificatie } from "@/lib/scoring";
@@ -141,7 +142,8 @@ export function BenchmarkGroepSectie({
             weergave={matrix(
               assessment,
               rijen.map((r) => ({
-                label: r.organisatie.naam,
+                label: kopNaam(r.organisatie),
+                volledigeNaam: r.organisatie.naam,
                 sublabel: r.meting.label,
                 aantalScans: r.aantalAfgerond,
                 antwoorden: r.antwoorden,

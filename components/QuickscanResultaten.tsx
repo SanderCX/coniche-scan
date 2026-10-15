@@ -218,7 +218,7 @@ function QuickscanResultatenInhoud({
           Dit is een voorbeeld met demo-data — zo ziet jouw resultatenscherm eruit na afronding van de scan.
         </div>
       )}
-      {toonKop && <h1 style={{ marginBottom: "1.2rem" }}>{assessment.naam}</h1>}
+      {toonKop && <h1 className="page-title" style={{ marginBottom: "1.2rem" }}>{assessment.naam}</h1>}
 
       <div className="card qs-totaal" style={{ borderLeft: `4px solid ${kleur}` }}>
         <div>
@@ -246,7 +246,7 @@ function QuickscanResultatenInhoud({
         </div>
         <div className="qs-totaal-rechts">
           <div className="classificatie-cirkel" style={{ ["--kleur" as string]: kleur } as React.CSSProperties}>
-            <span className="score" style={{ fontSize: "2rem" }}>
+            <span className="score" style={{ fontSize: "var(--fs-32)" }}>
               {r.percentage ?? 0}%
             </span>
           </div>

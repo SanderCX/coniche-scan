@@ -22,6 +22,7 @@ import {
   splitsFocus,
   vergelijk,
 } from "@/lib/verkennen";
+import { korteNaamVeld, korteNaamWaarde } from "@/lib/korte-namen";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
@@ -68,7 +69,9 @@ export default function VerkennenPage() {
   const ahtVeld = velden.find((v) => v.id === AHT_VELD);
   const ahtMediaan = ahtVeld ? mediaan(getalWaarden(gefilterd, ahtVeld)) : null;
   const gekozenGroepering = groepering(op, drempel, ahtMediaan === null ? null : Math.round(ahtMediaan));
-  const groepen = maakGroepen(gefilterd, gekozenGroepering, velden);
+  const groepen = maakGroepen(gefilterd, gekozenGroepering, velden, (veldId, waarde) =>
+    korteNaamWaarde(instellingen.korteNamen, veldId, waarde)
+  );
   // Bij het wisselen van groepering wordt de grootste groep de focus: Een focus die niet (meer) bestaat valt terug op de eerste.
   const focus = groepen.find((g) => g.sleutel === focusKeuze) ?? groepen[0];
   const { focus: focusLeden, rest: restLeden } = splitsFocus(gefilterd, focus);
@@ -198,7 +201,7 @@ export default function VerkennenPage() {
                 <select id="verband-x" value={verbandX} onChange={(e) => setVerbandX(e.target.value)}>
                   {VERBAND_X.map((x) => (
                     <option key={x.id} value={x.id}>
-                      {x.label}
+                      {korteNaamVeld(instellingen.korteNamen, x.id, x.label)}
                     </option>
                   ))}
                 </select>
@@ -232,7 +235,7 @@ export default function VerkennenPage() {
             }}
           />
         ) : weergave === "verband" ? (
-          <WeergaveVerband punten={punten} xLabel={xVeld.label} yLabel={yLabel} eenheidX={xVeld.eenheid} />
+          <WeergaveVerband punten={punten} xLabel={korteNaamVeld(instellingen.korteNamen, xVeld.id, xVeld.label)} yLabel={yLabel} eenheidX={xVeld.eenheid} />
         ) : focusLeden.length === 0 || restLeden.length === 0 ? (
           <p className="admin-notice">
             {focusLeden.length === 0 ? "De focus is leeg." : "De rest is leeg."} Kies een andere focusgroep of pas de filters aan.

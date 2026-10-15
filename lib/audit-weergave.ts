@@ -19,6 +19,7 @@ const TYPE_LABEL: Record<string, string> = {
   auditlog: "Audit-log",
   benchmark: "Benchmark",
   assessment: "Assessment",
+  korteNaam: "Korte naam",
 };
 
 /** Het deel van de actie vóór de punt, bijv. "organisatie" bij "organisatie.verwijderd". */
@@ -85,6 +86,9 @@ const DETAIL_LABEL: Record<string, string> = {
   redenenOvergeslagen: "Reden overgeslagen",
   samengevoegd: "Samengevoegd",
   velden: "Velden",
+  veld: "Veld",
+  soort: "Soort",
+  origineel: "Origineel",
   rol: "Rol",
   status: "Status",
   bestand: "Bestand",

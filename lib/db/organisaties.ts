@@ -13,6 +13,7 @@ export function useOrganisatie(id: string): Organisatie | undefined {
 
 export function maakOrganisatie(input: {
   naam: string;
+  korteNaam?: string;
   kenmerken: Record<string, unknown>;
   /** `Gebruiker.id` van de Consultant/Admin die aanmaakt — bepaalt het bereik "eigen" (`lib/rechten.ts`). */
   aangemaaktDoor: string;
@@ -21,6 +22,7 @@ export function maakOrganisatie(input: {
   const organisatie: Organisatie = {
     id: nieuwId(),
     naam: input.naam,
+    ...(input.korteNaam?.trim() ? { korteNaam: input.korteNaam.trim().slice(0, 30) } : {}),
     kenmerken: input.kenmerken,
     leden: [],
     scanUitvoeringen: [],
@@ -120,6 +122,7 @@ export function updateOrganisatie(
   const na = alles[index];
   const velden = [
     voor.naam !== na.naam ? "naam" : null,
+    (voor.korteNaam ?? "") !== (na.korteNaam ?? "") ? "korteNaam" : null,
     JSON.stringify(voor.kenmerken) !== JSON.stringify(na.kenmerken) ? "kenmerken" : null,
     JSON.stringify(voor.toegewezenAan) !== JSON.stringify(na.toegewezenAan) ? "toegewezenAan" : null,
     voor.aangemaaktDoor !== na.aangemaaktDoor ? "aangemaaktDoor" : null,

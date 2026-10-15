@@ -157,7 +157,7 @@ export default function LeadResultatenPage({
     >
       <div className="container section" style={{ maxWidth: "64rem" }}>
         <span className="eyebrow">{scanUitvoering.label}</span>
-        <h1>{assessment.naam}</h1>
+        <h1 className="page-title">{assessment.naam}</h1>
         <p className="text-sm text-ink-m">
           {samengesteld
             ? "Gemiddelde van de onderdelen, elk even zwaar"

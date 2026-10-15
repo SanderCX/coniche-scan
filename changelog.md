@@ -1,5 +1,42 @@
 # Coniche Scan — Changelog
 
+## 2026-10-15 (6) — Specs van Joost, PR 116: opmaakronde en korte namen
+
+Op verzoek van Sander gebouwd (`stylesheet.md`, `visualisatie-verkennen.md`, `beheerpagina.md` punt 3, `datamodel.md`).
+
+**Opmaak**:
+- **Tokens** (`app/styles/tokens.css`): Acht lettergroottes in even px (`--fs-12` tot `--fs-48`, de oude `--fs-xs/s/m/l`
+  vervallen), afstandsraster `--sp-1` tot `--sp-12`, `--kolom-b` (96px), de celtinten `--score-N-cel` met tekstkleur, `--dal` en
+  `--control-h` op 40px. De Tailwind-schaal in `app/globals.css` is tot dezelfde acht maten beperkt. Alle losse `font-size`s in CSS
+  en inline styles lopen via de tokens, grafiektekst is 12px, de paginatitel `.page-title` 32px.
+- **Pil** (`.pil`, `.pil-groep`, `.weergave-wissel`): Eén vorm voor keuzes, gekozen is massief oranje. Toegepast in de
+  weergave-schakelaar, de filters en focusgroepen van Verkennen en de antwoorden van de Quickscan.
+- **Scorekleur op drie niveaus**: Band, cel en vol. De matrix en de heatmap (eerste kolom en Overall) gebruiken de celtinten, het
+  verschil is blauw (`--bl`) of `--dal`, een afwijkende cel in de matrix heeft een driehoek van 8px in plaats van de zwarte rand.
+- **Kolomkop en rijkop** (`WeergaveMatrix`, `WeergaveHeatmap`): Kolommen van 96px, de kop op één regel met een afkapping en de
+  tweede regel (meetdatum of "n = 5") in 12px, de volledige naam in een tooltip. Rijkop 240px op één regel.
+
+**Korte namen**:
+- **Data**: `Organisatie.korteNaam` (aanmaken en bewerken, `info.korteNaamOrganisatie`) en `Instellingen.korteNamen` voor
+  veldnamen en waarden (`lib/korte-namen.ts`, 7 tests). De beginwaarden voor de 22 SBI-sectoren komen uit `sbi-indeling.md`.
+  Elke wijziging is een gebeurtenis `korteNaam.gewijzigd`, zonder de nieuwe naam.
+- **Beheer**: De pagina Organisatievelden (`/beheer/organisatievelden`, tab voor een Admin) met de schakelaar Velden | Korte
+  namen. De tabel heeft filters op veld en zoekterm, "waarden in gebruik zonder korte naam bovenaan", een teller, validatie op
+  lengte (30) en uniciteit binnen het veld, en één Opslaan.
+- **Verkennen**: Het filtermenu met zoekveld, koppen per groep en "n van N" (grijs onder 40%), de korte naam op chips en
+  groepsnamen, het origineel in de tooltip, een potlood naast de kop van een filter dat de modal Korte namen opent en
+  `info.verkennenGroeperen` naast Groeperen op. De matrix tussen organisaties toont de korte naam van de Organisatie.
+
+**Keuzes waar de spec open liet**: De weergave Velden toont de definitie alleen lezend (het beheren van de velden zelf is niet
+gebouwd). De korte namen staan bij de instellingen en niet op de definitie, zodat er geen nieuwe serversleutel nodig is. Het
+sectorfilter bij een benchmark gebruikt de korte namen niet, de spec vraagt daar nog bevestiging.
+
+## 2026-10-15 (5) — Quickscan Ziekenhuis: geen testknop in de doorloopflow
+
+Op verzoek van Sander. De tijdelijke testknop ("Vul alle vragen automatisch in") staat niet meer bij de Quickscan
+(`app/scan/[respondentId]/doorloop/page.tsx`), de andere scans houden hem. De Ja / Nee / Weet ik niet-tak van de knop is
+verwijderd.
+
 ## 2026-10-15 (4) — Specs van Joost, PR 114: Verkennen
 
 Op verzoek van Sander volledig gebouwd (`visualisatie-verkennen.md`, `beheerpagina.md` punt 15).

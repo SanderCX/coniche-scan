@@ -78,6 +78,11 @@ export type VeldType =
 export interface VeldDefinitie {
   id: string;
   label: string;
+  /**
+   * Weergavenaam van het veld in lijsten en grafieken (`datamodel.md`, Korte namen). Leeg betekent `label`. De namen die een
+   * Admin invult staan bij de instellingen (`Instellingen.korteNamen`), de definities zelf zijn vaste data.
+   */
+  korteNaam?: string;
   type: VeldType;
   opties?: string[];
   /**
@@ -241,6 +246,11 @@ export interface Gebruiker {
 export interface Organisatie {
   id: string;
   naam: string;
+  /**
+   * Weergavenaam voor kolomkoppen in matrices en heatmaps (`datamodel.md`, Organisatie), maximaal 30 tekens. Leeg of ontbrekend
+   * betekent dat `naam` zelf geldt.
+   */
+  korteNaam?: string | null;
   /** Volgt de (platformbrede) organisatieVelden-lijst, altijd bewerkbaar. */
   kenmerken: Record<string, unknown>;
   leden: OrganisatieLid[];
