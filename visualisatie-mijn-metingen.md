@@ -2,7 +2,7 @@
 
 Spec voor de landingspagina "Mijn metingen", die een Respondent, een Lead of iemand met beide rollen ziet na het openen van de persoonlijke link.
 
-**Status: Voorstel van 15 oktober 2026.** Er is een visual design (Claude Design, "Coniche Scan Mijn metingen", versie 11) met drie borden: Respondent, Lead en respondent, en Lead. Het ontwerp is door Joost goedgekeurd als richting ("veel mooier"). Er is nog niets gebouwd. Dit document vervangt de opmaak van de bestaande lijst in `CLAUDE.md` (schermflow punt 4) en de beschrijving van de kaarten in `beheerpagina.md` (punt 6a). Wat daar over routing en rechten staat, blijft gelden.
+**Status: Voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026.** Er is een visual design (Claude Design, "Coniche Scan Mijn metingen", versie 11) met drie borden: Respondent, Lead en respondent, en Lead. Het ontwerp is door Joost goedgekeurd als richting ("veel mooier"). De bouw staat onder Gebouwd. Dit document vervangt de opmaak van de bestaande lijst in `CLAUDE.md` (schermflow punt 4) en de beschrijving van de kaarten in `beheerpagina.md` (punt 6a). Wat daar over routing en rechten staat, blijft gelden.
 
 ## Doel
 
@@ -179,3 +179,28 @@ Alles volgt `stylesheet.md`. Voor deze pagina in het bijzonder:
 - **Quickscan-teaser voor Lead.** Het ontwerp toont de Lead-teaser alleen voor de Volwassenheidsscan. De Quickscan-variant volgt dezelfde regels met afdelingen, maar is nog niet uitgetekend.
 - **Staten in het ontwerp.** "Te weinig scans" en "geen Resultaten" zitten nog niet in het design.
 - **Meerdere Metingen van hetzelfde Assessment.** Op een Lead-pagina met veel Metingen (bijvoorbeeld 8 in vier jaar) wordt de lijst lang. Voorstel: De nieuwste drie tonen en de rest achter "Oudere metingen tonen". Pas oppakken als het voorkomt.
+
+## Gebouwd
+
+Gebouwd op 15 oktober 2026. De pagina is `app/s/[code]/page.tsx`, de kaarten staan in
+`components/mijn-metingen/MijnMetingenOnderdelen.tsx`, de rekenregels in `lib/mijn-metingen.ts` (met tests) en de opmaak in
+`app/styles/mijn-metingen.css`.
+
+**Keuzes waar de spec open liet**
+
+- **Laatst opgeslagen.** `ScanInvulling.laatstOpgeslagenOp` is gezet bij elke wijziging van de antwoorden (`updateScanInvulling`).
+  Bij data van vóór het veld ontbreekt het en vervalt de rechterhelft van de voortgangsregel. In dagen staat het tot en met 6 dagen
+  geleden, vanaf 7 dagen als datum.
+- **Tussenstand en eindstand.** Er is nog geen sluitingsdatum, dus "Eindstand" staat er zodra alle uitgenodigde scans van de
+  Meting zijn afgerond en anders "Tussenstand". Een samengestelde Meting heeft de chip "Gemiddelde".
+- **Quickscan-teaser voor een Lead.** Dezelfde regels als bij de eigen scan, met het gemiddelde van de Meting
+  (`quickscanMeting`) en alleen percentages in de rijen.
+- **Zonder categorieën of afdelingen** (de AI-scan) staat alleen het totaal met de klassenpil.
+- **"Respondenten uitnodigen"** opent onder de knoppen het invoerveld voor een e-mailadres.
+- **Benchmarkkaart.** Titel is `Benchmark.naam`. De regel noemt het aantal organisaties alleen bij `benchmarkMinOrganisaties`. Bij
+  niveau 2 staat "Vergelijking van Metingen".
+- **Smalle blokken.** In een kaart of blok smaller dan 560px staat het getal boven de rijen (container query), zodat de balken
+  breed genoeg blijven naast een tweede blok.
+- Nog niet: De staten "te weinig scans" en "geen Resultaten" als apart ontwerp, "Oudere metingen tonen" en de lege staat per
+  sectie.
+

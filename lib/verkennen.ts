@@ -333,12 +333,20 @@ export function zonderWaarde(leden: PoolLid[], veld: FilterVeld): number {
 
 /* ---------- Wanneer een kenmerk kan groeperen ---------- */
 
-/** Minder organisaties in de pool dan dit: Geen enkele groepering (startwaarde, `visualisatie-verkennen.md`, Open punten). */
-export const MIN_POOL_GROEPEREN = 6;
-/** Een select met meer verschillende waarden in de pool kan niet groeperen (startwaarde). */
-export const MAX_WAARDEN_GROEPEREN = 12;
-/** Een kenmerk dat bij minder dan dit aandeel van de organisaties van het Assessment is ingevuld, kan niet groeperen (startwaarde). */
-export const MIN_INGEVULD_AANDEEL = 0.4;
+/**
+ * De grenzen voor Groeperen op (`visualisatie-verkennen.md`, Drempels): Instellingen bij Drempels en termijnen, geen vaste
+ * waarden in de code. `minPool`: Bij minder organisaties in de pool kan er niet gegroepeerd worden. `maxGroepen`: Een select met
+ * meer verschillende waarden in de pool kan niet groeperen. `minIngevuldPct`: Een kenmerk dat bij een lager percentage van de
+ * organisaties van het Assessment is ingevuld, kan niet groeperen.
+ */
+export interface GroeperDrempels {
+  minPool: number;
+  maxGroepen: number;
+  minIngevuldPct: number;
+}
+
+/** De startwaarden uit de spec, voor tests en voor een instelling die ontbreekt. */
+export const STANDAARD_GROEPER_DREMPELS: GroeperDrempels = { minPool: 6, maxGroepen: 12, minIngevuldPct: 40 };
 
 export interface Bruikbaarheid {
   ok: boolean;
@@ -350,14 +358,19 @@ export interface Bruikbaarheid {
  * Kan dit kenmerk de pool in groepen verdelen? `alle` is de pool van het Assessment (zonder filters, voor de 40%), `gefilterd` de
  * pool na de filters. Elke regel geeft een reden die in een tooltip en onder de groep Groeperen op staat.
  */
-export function kanGroeperen(veld: FilterVeld, alle: PoolLid[], gefilterd: PoolLid[]): Bruikbaarheid {
-  if (gefilterd.length < MIN_POOL_GROEPEREN) return { ok: false, reden: `Minder dan ${MIN_POOL_GROEPEREN} Organisaties in de pool` };
-  const minIngevuld = Math.ceil(MIN_INGEVULD_AANDEEL * alle.length);
+export function kanGroeperen(
+  veld: FilterVeld,
+  alle: PoolLid[],
+  gefilterd: PoolLid[],
+  drempels: GroeperDrempels = STANDAARD_GROEPER_DREMPELS
+): Bruikbaarheid {
+  if (gefilterd.length < drempels.minPool) return { ok: false, reden: `Minder dan ${drempels.minPool} Organisaties in de pool` };
+  const minIngevuld = Math.ceil((drempels.minIngevuldPct / 100) * alle.length);
   const ingevuld = alle.length - zonderWaarde(alle, veld);
   if (ingevuld < minIngevuld) return { ok: false, reden: `Minder dan ${minIngevuld} ingevulde waarden` };
   if (veld.type === "select") {
     const aantal = selectOpties(gefilterd, veld).length;
-    if (aantal > MAX_WAARDEN_GROEPEREN) return { ok: false, reden: `Meer dan ${MAX_WAARDEN_GROEPEREN} verschillende waarden` };
+    if (aantal > drempels.maxGroepen) return { ok: false, reden: `Meer dan ${drempels.maxGroepen} verschillende waarden` };
     if (aantal < 2) return { ok: false, reden: "Het filter laat één waarde over" };
     return { ok: true };
   }

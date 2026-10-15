@@ -6,7 +6,7 @@ import {
   LEGE_FILTERS,
   bouwPool,
   filterVelden,
-  MIN_POOL_GROEPEREN,
+  STANDAARD_GROEPER_DREMPELS,
   heatmap,
   histogram,
   kanGroeperen,
@@ -182,7 +182,7 @@ describe("wanneer een kenmerk kan groeperen", () => {
     bouwPool(Array.from({ length: n }, (_, i) => org(`o${i}`, 3, { kenmerken: f(i) })), assessment, 3).leden;
 
   it("een pool onder de minimale grootte kan niet groeperen", () => {
-    const l = leden(MIN_POOL_GROEPEREN - 1, (i) => kenmerken(sectoren[i % 3], 300 + i));
+    const l = leden(STANDAARD_GROEPER_DREMPELS.minPool - 1, (i) => kenmerken(sectoren[i % 3], 300 + i));
     const r = kanGroeperen(sector, l, l);
     expect(r.ok).toBe(false);
     expect(r.reden).toBe("Minder dan 6 Organisaties in de pool");
@@ -212,6 +212,15 @@ describe("wanneer een kenmerk kan groeperen", () => {
   it("een select met meer dan 12 waarden kan niet", () => {
     const l = leden(20, (i) => kenmerken(`Sector ${i}`, 300 + i));
     expect(kanGroeperen(sector, l, l).reden).toBe("Meer dan 12 verschillende waarden");
+  });
+
+  it("de grenzen zijn instellingen en staan in de reden", () => {
+    const l = leden(10, (i) => kenmerken(sectoren[i % 3], 300 + i));
+    const strak = { minPool: 12, maxGroepen: 2, minIngevuldPct: 90 };
+    expect(kanGroeperen(sector, l, l, strak).reden).toBe("Minder dan 12 Organisaties in de pool");
+    expect(kanGroeperen(sector, l, l, { ...strak, minPool: 2 }).reden).toBe("Meer dan 2 verschillende waarden");
+    const gedeeltelijk = leden(10, (i) => (i < 5 ? kenmerken("Industrie", 300 + i) : kenmerken("Onderwijs")));
+    expect(kanGroeperen(aht, gedeeltelijk, gedeeltelijk, { ...strak, minPool: 2 }).reden).toBe("Minder dan 9 ingevulde waarden");
   });
 });
 

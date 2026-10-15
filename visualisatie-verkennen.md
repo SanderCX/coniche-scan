@@ -207,8 +207,9 @@ Gebouwd op 15 oktober 2026. De berekeningen staan in `lib/verkennen.ts` (met tes
 **Keuzes waar de spec open liet** (de open punten hierboven, met de gebouwde waarde)
 
 - Meerdere gekozen kanalen werken als "en", zoals in het ontwerp. Een Organisatie met een leeg veld voor een gekozen kanaal valt weg.
-- De drempels bij kleine groepen zijn instellingen bij Drempels en termijnen (`verkennenMinGroep`, startwaarde 3, en
-  `verkennenWaarschuwingGroep`, startwaarde 5, `info.verkennenDrempels`).
+- De drempels zijn instellingen bij Drempels en termijnen, nu vijf (zie Drempels hieronder, gebouwd op 15 oktober 2026): Het
+  formulier Verkennen, `info.verkennenInstellingen`. `verkennenWaarschuwingGroep` heet `verkennenMinVergelijking`. Het scherm
+  leest ze en toont ze in zijn meldingen, ook de grens voor grijs in het menu Kenmerk toevoegen en het minimum voor het verband.
 - Groeperen kan op CRM-pakket (`techstack.techstack-crm.leverancier`), sector en de AHT-drempel. De AHT-drempel begint op de
   mediaan van de gefilterde pool, afgerond.
 - Filters: Sector staat er standaard en de ingezette kanalen. "Filter toevoegen" biedt elk select- of getalveld uit de

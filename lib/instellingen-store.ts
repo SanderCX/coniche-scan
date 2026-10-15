@@ -38,7 +38,13 @@ export interface Instellingen {
    */
   verkennenMinGroep: number;
   /** Heeft de focus of de rest minder organisaties dan dit, dan staat er een waarschuwing. Geen blokkade. Startwaarde 5. */
-  verkennenWaarschuwingGroep: number;
+  verkennenMinVergelijking: number;
+  /** Bij minder organisaties in de pool kan er niet gegroepeerd worden. Startwaarde 6. */
+  verkennenMinPool: number;
+  /** Een select-kenmerk met meer verschillende waarden in de pool kan niet groeperen. Startwaarde 12. */
+  verkennenMaxGroepen: number;
+  /** Een kenmerk dat bij een lager percentage van de organisaties in het Assessment is ingevuld, kan niet groeperen. Startwaarde 40. */
+  verkennenMinIngevuldPct: number;
   /**
    * De korte namen voor veldnamen en waarden (`datamodel.md`, Korte namen). Ze staan hier, bij de instellingen, omdat het
    * weergavenamen zijn en de organisatievelden zelf vaste data zijn.
@@ -54,7 +60,10 @@ const STANDAARDWAARDEN: Instellingen = {
   benchmarkMinRespondenten: 5,
   benchmarkMaxDagenTussenMetingen: 90,
   verkennenMinGroep: 3,
-  verkennenWaarschuwingGroep: 5,
+  verkennenMinVergelijking: 5,
+  verkennenMinPool: 6,
+  verkennenMaxGroepen: 12,
+  verkennenMinIngevuldPct: 40,
   korteNamen: { velden: {}, waarden: [] },
 };
 
@@ -96,8 +105,14 @@ if (typeof window !== "undefined") {
 function parseSnapshot(snapshot: string): Instellingen {
   if (snapshot === SERVER_SENTINEL) return { ...STANDAARDWAARDEN };
   try {
-    const waarden = JSON.parse(snapshot) as Partial<Instellingen>;
-    return { ...STANDAARDWAARDEN, ...waarden };
+    const waarden = JSON.parse(snapshot) as Partial<Instellingen> & { verkennenWaarschuwingGroep?: number };
+    // `verkennenWaarschuwingGroep` is hernoemd naar `verkennenMinVergelijking` (`visualisatie-verkennen.md`, Drempels).
+    const { verkennenWaarschuwingGroep: oud, ...rest } = waarden;
+    return {
+      ...STANDAARDWAARDEN,
+      ...(oud !== undefined && rest.verkennenMinVergelijking === undefined ? { verkennenMinVergelijking: oud } : {}),
+      ...rest,
+    };
   } catch {
     return { ...STANDAARDWAARDEN };
   }

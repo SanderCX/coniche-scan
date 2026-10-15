@@ -6,6 +6,42 @@ import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magGebruikersBeheren } from "@/lib/rechten";
 import { useInstellingen, zetInstellingen } from "@/lib/instellingen-store";
 
+interface VerkennenVeld {
+  sleutel: "verkennenMinGroep" | "verkennenMinVergelijking" | "verkennenMinPool" | "verkennenMaxGroepen" | "verkennenMinIngevuldPct";
+  label: string;
+  uitleg: string;
+  max?: number;
+}
+
+const VERKENNEN_VELDEN: VerkennenVeld[] = [
+  {
+    sleutel: "verkennenMinGroep",
+    label: "Organisaties in een groep, minimum",
+    uitleg: "Een kleinere groep is gestreept en krijgt geen cijfers in de heatmap. Ook het minimum voor het verband.",
+  },
+  {
+    sleutel: "verkennenMinVergelijking",
+    label: "Organisaties in focus of rest, waarschuwing",
+    uitleg: "Een kleinere focus of rest krijgt een waarschuwing. Geen blokkade.",
+  },
+  {
+    sleutel: "verkennenMinPool",
+    label: "Organisaties in de pool, minimum",
+    uitleg: "In een kleinere pool kan er niet gegroepeerd worden.",
+  },
+  {
+    sleutel: "verkennenMaxGroepen",
+    label: "Waarden per kenmerk, maximum",
+    uitleg: "Een keuzelijst met meer waarden kan niet groeperen.",
+  },
+  {
+    sleutel: "verkennenMinIngevuldPct",
+    label: "Kenmerk ingevuld, minimum (%)",
+    uitleg: "Een kenmerk dat bij een lager percentage is ingevuld kan niet groeperen.",
+    max: 100,
+  },
+];
+
 /**
  * Drempels en termijnen (`beheerpagina.md`, punt 10, heette eerder Instellingen), Admin-only, een tab onder Instellingen
  * in het Accountmenu. Nu de
@@ -25,8 +61,7 @@ export default function DrempelsEnTermijnenPage() {
   const [minRespondentenInput, setMinRespondentenInput] = useState<string | null>(null);
   const [maxDagenInput, setMaxDagenInput] = useState<string | null>(null);
   const [benchmarkOpgeslagen, setBenchmarkOpgeslagen] = useState(false);
-  const [minGroepInput, setMinGroepInput] = useState<string | null>(null);
-  const [waarschuwingInput, setWaarschuwingInput] = useState<string | null>(null);
+  const [verkennenInput, setVerkennenInput] = useState<Record<string, string>>({});
   const [verkennenOpgeslagen, setVerkennenOpgeslagen] = useState(false);
 
   if (!magGebruikersBeheren(gebruiker)) {
@@ -44,8 +79,6 @@ export default function DrempelsEnTermijnenPage() {
   const minScans = minScansInput ?? String(instellingen.benchmarkMinScans);
   const minRespondenten = minRespondentenInput ?? String(instellingen.benchmarkMinRespondenten);
   const maxDagen = maxDagenInput ?? String(instellingen.benchmarkMaxDagenTussenMetingen);
-  const minGroep = minGroepInput ?? String(instellingen.verkennenMinGroep);
-  const waarschuwing = waarschuwingInput ?? String(instellingen.verkennenWaarschuwingGroep);
   const geheelGetalVanMinstens1 = (v: string) => v.trim() !== "" && Number.isInteger(Number(v)) && Number(v) >= 1;
   const benchmarkGeldig = [minOrg, minScans, minRespondenten, maxDagen].every(geheelGetalVanMinstens1);
 
@@ -66,14 +99,18 @@ export default function DrempelsEnTermijnenPage() {
     setTimeout(() => setBenchmarkOpgeslagen(false), 1600);
   }
 
-  const verkennenGeldig = [minGroep, waarschuwing].every(geheelGetalVanMinstens1);
+  // De vijf grenzen van Verkennen (`visualisatie-verkennen.md`, Drempels): Gehele getallen van minstens 1, het percentage tot en met 100.
+  const verkennenWaarde = (veld: VerkennenVeld) => verkennenInput[veld.sleutel] ?? String(instellingen[veld.sleutel]);
+  const verkennenGeldig = VERKENNEN_VELDEN.every((v) => {
+    const w = verkennenWaarde(v);
+    return geheelGetalVanMinstens1(w) && (v.max === undefined || Number(w) <= v.max);
+  });
 
   function handleVerkennenOpslaan(e: React.FormEvent) {
     e.preventDefault();
     if (!verkennenGeldig) return;
-    zetInstellingen({ verkennenMinGroep: Number(minGroep), verkennenWaarschuwingGroep: Number(waarschuwing) });
-    setMinGroepInput(null);
-    setWaarschuwingInput(null);
+    zetInstellingen(Object.fromEntries(VERKENNEN_VELDEN.map((v) => [v.sleutel, Number(verkennenWaarde(v))])));
+    setVerkennenInput({});
     setVerkennenOpgeslagen(true);
     setTimeout(() => setVerkennenOpgeslagen(false), 1600);
   }
@@ -160,20 +197,36 @@ export default function DrempelsEnTermijnenPage() {
       </form>
 
       <h2 style={{ marginTop: "2rem" }}>Verkennen</h2>
-      <form onSubmit={handleVerkennenOpslaan} className="flex flex-wrap items-end gap-3">
-        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem", minWidth: 0 }}>
-          <label>Organisaties in een groep, minimum</label>
-          <input type="number" min={1} step={1} value={minGroep} onChange={(e) => setMinGroepInput(e.target.value)} />
+      <form onSubmit={handleVerkennenOpslaan}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sp-4)", alignItems: "flex-start" }}>
+          {VERKENNEN_VELDEN.map((v) => (
+            <div key={v.sleutel} className="admin-field" style={{ marginBottom: 0, width: "13rem", minWidth: 0 }}>
+              <label htmlFor={`verkennen-${v.sleutel}`}>{v.label}</label>
+              <input
+                id={`verkennen-${v.sleutel}`}
+                type="number"
+                min={1}
+                max={v.max}
+                step={1}
+                value={verkennenWaarde(v)}
+                onChange={(e) => setVerkennenInput({ ...verkennenInput, [v.sleutel]: e.target.value })}
+              />
+              <p className="text-xs text-ink-s" style={{ margin: "var(--sp-1) 0 0" }}>
+                {v.uitleg}
+              </p>
+            </div>
+          ))}
         </div>
-        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem", minWidth: 0 }}>
-          <label>Organisaties in focus of rest, waarschuwing</label>
-          <input type="number" min={1} step={1} value={waarschuwing} onChange={(e) => setWaarschuwingInput(e.target.value)} />
-        </div>
-        <span className="knop-met-icoon">
-          <button type="submit" className="btn btn-or btn-compact" disabled={!verkennenGeldig}>
+        <span className="knop-met-icoon" style={{ marginTop: "var(--sp-4)" }}>
+          <button type="submit" className="btn btn-or btn-compact">
             Opslaan
           </button>
-          <InfoIcoon naastVeld sleutel="info.verkennenDrempels" />
+          <InfoIcoon naastVeld sleutel="info.verkennenInstellingen" />
+          {!verkennenGeldig && (
+            <span className="text-sm" style={{ color: "var(--stat-red)", whiteSpace: "normal" }}>
+              Vul bij elk veld een geheel getal van minstens 1 in. Het percentage kan niet boven 100.
+            </span>
+          )}
           {verkennenOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
         </span>
       </form>

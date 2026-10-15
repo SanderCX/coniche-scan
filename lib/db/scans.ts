@@ -55,9 +55,13 @@ export function updateScanInvulling(
       const index = scanUitvoering.invullingen.findIndex((i) => i.id === scanInvullingId);
       if (index !== -1) {
         const eerderStatus = scanUitvoering.invullingen[index].status;
-        scanUitvoering.invullingen[index] = updater(
-          structuredClone(scanUitvoering.invullingen[index])
-        );
+        const voor = scanUitvoering.invullingen[index];
+        const nieuw = updater(structuredClone(voor));
+        // `laatstOpgeslagenOp`: Gezet bij elke wijziging van de antwoorden (`visualisatie-mijn-metingen.md`, Open punten).
+        const antwoordenGewijzigd = JSON.stringify(voor.antwoorden) !== JSON.stringify(nieuw.antwoorden);
+        scanUitvoering.invullingen[index] = antwoordenGewijzigd
+          ? { ...nieuw, laatstOpgeslagenOp: new Date().toISOString() }
+          : nieuw;
         slaAlles(alles);
         const nu = scanUitvoering.invullingen[index];
         if (eerderStatus !== "afgerond" && nu.status === "afgerond") {

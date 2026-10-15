@@ -145,10 +145,10 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Verkennen werkt op de pool van één Assessment: De Organisaties met toestemming voor benchmark die een Meting hebben met genoeg afgeronde scans, de meest recente per Organisatie. Elke Organisatie telt even zwaar mee. Het scherm slaat niets op en een Lead ziet het nooit.",
   },
   {
-    sleutel: "info.verkennenDrempels",
+    sleutel: "info.verkennenInstellingen",
     plek: "Instellingen, Drempels en termijnen, formulier Verkennen",
     tekst:
-      "Een groep met minder organisaties dan het minimum is gestreept en krijgt in de heatmap geen cijfers. Heeft de focus of de rest minder organisaties dan de waarschuwingsgrens, dan staat er een waarschuwing dat verschillen voorzichtig gelezen moeten worden. Dat is geen blokkade.",
+      "Grenzen voor Verkennen. Een groep onder het minimum is gestreept en krijgt geen cijfers. Bij een kleinere focus of rest staat een waarschuwing. In een kleinere pool kun je niet groeperen. Een kenmerk met meer waarden dan het maximum of een lagere invulling dan het minimum kan niet groeperen.",
   },
   {
     sleutel: "info.korteNaamOrganisatie",
