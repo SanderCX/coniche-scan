@@ -131,9 +131,8 @@ function Uitgelicht({
 }) {
   return (
     <div className="card" style={{ borderTop: `4px solid ${kleur}` }}>
-      <p className="eyebrow" style={{ color: kleur }}>
-        {titel}
-      </p>
+      {/* Een eyebrow is altijd oranje (`stylesheet.md`, Label/eyebrow): De klassekleur staat alleen in de rand van de kaart. */}
+      <p className="eyebrow">{titel}</p>
       {afdelingen.map((a) => (
         <p key={a.categorie.id} style={{ margin: "0.3rem 0 0" }}>
           <strong>{a.categorie.naam}</strong>{" "}
