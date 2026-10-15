@@ -312,8 +312,22 @@ geen afwijking van de spec maar een gat erin.
    wordt later mogelijk een leadgenerator met "Toegang aanvragen"
    (`backlog.md`).
 3. **Voorbeeld-output**: Dezelfde resultaatcomponenten als scherm 6, met
-   vaste demodata. De resultaatcomponent wordt één keer gebouwd. Bij de
-   Klantcontact Volwassenheidsscan, de AI-volwassenheidsscan en de Zorgscan staat daaronder de weergave Per bouwblok
+   vaste demodata. De resultaatcomponent wordt één keer gebouwd. Voor
+   elk Assessment, dus ook voor de AI-scan, de Zorgscan en de Quickscan,
+   staat bovenaan dezelfde kop:
+   - Links een eyebrow "Voorbeeld-output" (`stylesheet.md`, Label/eyebrow,
+     oranje en in hoofdletters), daaronder als h1 de naam van het Assessment.
+   - Rechts naast de h1, verticaal uitgelijnd met de h1, een knop
+     "← Terug" (`.btn.btn-outline.btn-compact`, `stylesheet.md`, Knoptekst
+     staat op één regel) naar de Assessment-landingspagina (scherm 2).
+     Pijl en tekst staan op één regel en de knop heeft de hoogte
+     `--control-h`.
+   - De kop is één component voor alle Assessments. Een afwijking per
+     Assessment (andere kleur, andere knop) is een fout.
+   - De nav toont hier de 4 vaste content-links en "Inloggen" (Globale
+     layout, punt 3 en 7). "← Terug" staat in de kop en niet ook in de nav.
+   Onder die kop staat bij de Klantcontact Volwassenheidsscan, de
+   AI-volwassenheidsscan en de Zorgscan de weergave Per bouwblok
    van een Meting met zes demo-respondenten (`visualisatie-scores.md`, A), met
    de uitleg dat de tool bij meerdere respondenten van dezelfde Meting en
    organisatie ook het gemiddelde en de afwijking daarop toont.
