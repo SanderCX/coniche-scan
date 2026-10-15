@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { BeheerNavActionsProvider, useBeheerNavActionsValue } from "@/components/beheer/BeheerNavActions";
 import { logout, useIngelogdeGebruiker } from "@/lib/admin-auth";
-import { magBenchmarkBeheren, magContentBeheren, magGebruikersBeheren } from "@/lib/rechten";
+import { magBenchmarkBeheren, magContentBeheren, magGebruikersBeheren, magVerkennen } from "@/lib/rechten";
 import { VIA_RESULTATEN } from "@/lib/resultaten-nav";
 import { ROL_KLEUR } from "@/lib/colors";
 import { BeheerMeldingBalk } from "@/components/beheer/BeheerMelding";
@@ -61,7 +61,7 @@ type Sectie = "assessments" | "organisaties" | "resultaten";
  */
 function sectieVoor(pathname: string, via: boolean): Sectie {
   if (pathname.startsWith("/beheer/assessments") || pathname.startsWith("/beheer/content")) return "assessments";
-  if (pathname.startsWith("/beheer/benchmark")) return "resultaten";
+  if (pathname.startsWith("/beheer/benchmark") || pathname.startsWith("/beheer/verkennen")) return "resultaten";
   if (pathname.startsWith("/beheer/resultaten/metingen")) return "resultaten";
   if (
     via &&
@@ -88,6 +88,7 @@ const ORGANISATIE_TABS = [
 /** Tabbalk van Resultaten (beheerpagina.md, punt 7): Metingen, voor een Admin aangevuld met Benchmarks. */
 const RESULTATEN_TABS = [{ href: "/beheer/resultaten/metingen", label: "Metingen" }];
 const BENCHMARKS_TAB = { href: "/beheer/benchmark", label: "Benchmarks" };
+const VERKENNEN_TAB = { href: "/beheer/verkennen", label: "Verkennen" };
 
 /**
  * Tabbalk van Instellingen (beheerpagina.md, "Navigatie in beheer"): Gebruikers is de landingstab. Alleen zichtbaar op de
@@ -128,7 +129,11 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
     { sectie: "resultaten" as const, href: "/beheer/resultaten/metingen", label: "Resultaten" },
   ];
   const huidigeSectie = sectieVoor(pathname, via);
-  const resultatenTabs = [...RESULTATEN_TABS, ...(magBenchmarkBeheren(gebruiker) ? [BENCHMARKS_TAB] : [])];
+  const resultatenTabs = [
+    ...RESULTATEN_TABS,
+    ...(magBenchmarkBeheren(gebruiker) ? [BENCHMARKS_TAB] : []),
+    ...(magVerkennen(gebruiker) ? [VERKENNEN_TAB] : []),
+  ];
 
   const rolInfo = gebruiker ? ROL_KLEUR[gebruiker.rol] : undefined;
   const toonTabs = ORGANISATIE_TABS.some((t) => pathname === t.href);

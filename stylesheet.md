@@ -733,7 +733,7 @@ een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
 
 ### Filterchip, focuschip en slider (Verkennen)
 
-Voorstel van 15 oktober 2026, uit het visual design van Verkennen
+Gebouwd op 15 oktober 2026, uit het visual design van Verkennen
 (`visualisatie-verkennen.md`). Alleen de onderdelen die nog niet in dit
 document staan. De vier weergaven, Groeperen op en Sorteren gebruiken de
 bestaande weergave-schakelaar (`.weergave-wissel`).

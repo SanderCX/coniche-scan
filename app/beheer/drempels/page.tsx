@@ -25,6 +25,9 @@ export default function DrempelsEnTermijnenPage() {
   const [minRespondentenInput, setMinRespondentenInput] = useState<string | null>(null);
   const [maxDagenInput, setMaxDagenInput] = useState<string | null>(null);
   const [benchmarkOpgeslagen, setBenchmarkOpgeslagen] = useState(false);
+  const [minGroepInput, setMinGroepInput] = useState<string | null>(null);
+  const [waarschuwingInput, setWaarschuwingInput] = useState<string | null>(null);
+  const [verkennenOpgeslagen, setVerkennenOpgeslagen] = useState(false);
 
   if (!magGebruikersBeheren(gebruiker)) {
     return (
@@ -41,6 +44,8 @@ export default function DrempelsEnTermijnenPage() {
   const minScans = minScansInput ?? String(instellingen.benchmarkMinScans);
   const minRespondenten = minRespondentenInput ?? String(instellingen.benchmarkMinRespondenten);
   const maxDagen = maxDagenInput ?? String(instellingen.benchmarkMaxDagenTussenMetingen);
+  const minGroep = minGroepInput ?? String(instellingen.verkennenMinGroep);
+  const waarschuwing = waarschuwingInput ?? String(instellingen.verkennenWaarschuwingGroep);
   const geheelGetalVanMinstens1 = (v: string) => v.trim() !== "" && Number.isInteger(Number(v)) && Number(v) >= 1;
   const benchmarkGeldig = [minOrg, minScans, minRespondenten, maxDagen].every(geheelGetalVanMinstens1);
 
@@ -59,6 +64,18 @@ export default function DrempelsEnTermijnenPage() {
     setMaxDagenInput(null);
     setBenchmarkOpgeslagen(true);
     setTimeout(() => setBenchmarkOpgeslagen(false), 1600);
+  }
+
+  const verkennenGeldig = [minGroep, waarschuwing].every(geheelGetalVanMinstens1);
+
+  function handleVerkennenOpslaan(e: React.FormEvent) {
+    e.preventDefault();
+    if (!verkennenGeldig) return;
+    zetInstellingen({ verkennenMinGroep: Number(minGroep), verkennenWaarschuwingGroep: Number(waarschuwing) });
+    setMinGroepInput(null);
+    setWaarschuwingInput(null);
+    setVerkennenOpgeslagen(true);
+    setTimeout(() => setVerkennenOpgeslagen(false), 1600);
   }
 
   function handleOpslaan(e: React.FormEvent) {
@@ -139,6 +156,25 @@ export default function DrempelsEnTermijnenPage() {
           </button>
           <InfoIcoon naastVeld sleutel="info.benchmarkInstellingen" />
           {benchmarkOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
+        </span>
+      </form>
+
+      <h2 style={{ marginTop: "2rem" }}>Verkennen</h2>
+      <form onSubmit={handleVerkennenOpslaan} className="flex flex-wrap items-end gap-3">
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem", minWidth: 0 }}>
+          <label>Organisaties in een groep, minimum</label>
+          <input type="number" min={1} step={1} value={minGroep} onChange={(e) => setMinGroepInput(e.target.value)} />
+        </div>
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem", minWidth: 0 }}>
+          <label>Organisaties in focus of rest, waarschuwing</label>
+          <input type="number" min={1} step={1} value={waarschuwing} onChange={(e) => setWaarschuwingInput(e.target.value)} />
+        </div>
+        <span className="knop-met-icoon">
+          <button type="submit" className="btn btn-or btn-compact" disabled={!verkennenGeldig}>
+            Opslaan
+          </button>
+          <InfoIcoon naastVeld sleutel="info.verkennenDrempels" />
+          {verkennenOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
         </span>
       </form>
     </div>

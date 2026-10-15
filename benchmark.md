@@ -16,7 +16,7 @@ Een benchmark kan één of meer Assessments omvatten, bijvoorbeeld de Klantconta
 
 Scores worden berekend en nooit opgeslagen (`datamodel.md`, Scoreberekening). Dat geldt voor alle niveaus.
 
-Naast de benchmark bestaat Verkennen (voorstel van 15 oktober 2026, `visualisatie-verkennen.md`). Daar werkt de Admin op de hele pool van een Assessment met filters die hij tijdens het kijken wisselt, zonder een groep samen te stellen en zonder iets op te slaan. Verkennen gebruikt dezelfde rekenregels als niveau 1 (Gedeelde regels hieronder) en is niet voor een Lead. Een filterstand kan later een benchmark worden.
+Naast de benchmark bestaat Verkennen (gebouwd op 15 oktober 2026, `visualisatie-verkennen.md`). Daar werkt de Admin op de hele pool van een Assessment met filters die hij tijdens het kijken wisselt, zonder een groep samen te stellen en zonder iets op te slaan. Verkennen gebruikt dezelfde rekenregels als niveau 1 (Gedeelde regels hieronder) en is niet voor een Lead. Een filterstand kan later een benchmark worden.
 
 ## Plek in beheer
 

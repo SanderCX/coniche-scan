@@ -52,6 +52,14 @@ export function magBenchmarkBeheren(gebruiker: Gebruiker | null): boolean {
 }
 
 /**
+ * `verkennen.inzien` (`datamodel.md` deel 2, Rechtenmatrix; `visualisatie-verkennen.md`, Privacy en rechten): Alleen een Admin.
+ * Verkennen rekent over alle organisaties van een Assessment en toont hun namen, net als `benchmark.beheren`.
+ */
+export function magVerkennen(gebruiker: Gebruiker | null): boolean {
+  return isAdmin(gebruiker);
+}
+
+/**
  * Bereik "eigen" (`datamodel.md` deel 2, Eigenaarschap en toegang van/tot
  * organisaties): Admin altijd, Consultant alleen als hij de organisatie
  * aanmaakte (`aangemaaktDoor`) óf een Admin hem die expliciet toewees

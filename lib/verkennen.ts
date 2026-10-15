@@ -1,0 +1,414 @@
+/**
+ * De berekeningen van Verkennen (`visualisatie-verkennen.md`): De pool van een Assessment, de filters uit de organisatievelden,
+ * het groeperen met een focus en de statistiek voor de vier weergaven. Pure functies zonder opslag, het scherm slaat niets op.
+ * De rekenregels zijn die van de benchmark tussen organisaties (`benchmark.md`): Per organisatie de meest recente Meting die aan
+ * `benchmarkMinScans` voldoet, en elke organisatie telt even zwaar mee.
+ */
+import { Assessment, Organisatie, ScanUitvoering, VeldDefinitie } from "./types";
+import { BouwblokRij, bouwblokRijen, kwantiel, rond1, steekproefSd } from "./visualisatie";
+import { bouwblokScoreRuw, overallScoreRuw } from "./scoring";
+import { gemiddeldeAntwoordenVoorMetingMetSamenstelling, voldoetAanMinScans, vergelijkNieuwsteEerst, aantalAfgerondInMeting } from "./metingen";
+import { organisatieVelden } from "@/data/organisatie-velden";
+
+/* ---------- Pool ---------- */
+
+export interface PoolLid {
+  organisatie: Organisatie;
+  meting: ScanUitvoering;
+  aantalScans: number;
+  /** De ruwe bouwblokscore (1 tot 5) per rij van `Pool.rijen`, `null` zonder antwoorden. */
+  scores: (number | null)[];
+  /** De overall van het Assessment, met weging waar die geldt, niet afgerond. */
+  overall: number | null;
+}
+
+export interface Pool {
+  rijen: BouwblokRij[];
+  leden: PoolLid[];
+  /** Organisaties met een bruikbare Meting maar zonder `benchmarkToegestaan`: Niet beschikbaar. */
+  zonderToestemming: number;
+}
+
+/**
+ * De pool van een Assessment (`visualisatie-verkennen.md`, Pool): Organisaties met `benchmarkToegestaan` die een Meting van het
+ * Assessment hebben met minstens `minScans` afgeronde scans. Per organisatie telt de meest recente zo'n Meting.
+ */
+export function bouwPool(organisaties: Organisatie[], assessment: Assessment, minScans: number): Pool {
+  const rijen = bouwblokRijen(assessment);
+  const leden: PoolLid[] = [];
+  let zonderToestemming = 0;
+  for (const organisatie of organisaties) {
+    const meting = organisatie.scanUitvoeringen
+      .filter((m) => m.assessmentId === assessment.id && voldoetAanMinScans(organisatie, m, minScans))
+      .sort(vergelijkNieuwsteEerst)[0];
+    if (!meting) continue;
+    if (!organisatie.benchmarkToegestaan) {
+      zonderToestemming += 1;
+      continue;
+    }
+    const antwoorden = gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, organisatie, meting);
+    leden.push({
+      organisatie,
+      meting,
+      aantalScans: aantalAfgerondInMeting(organisatie, meting),
+      scores: rijen.map((r) => bouwblokScoreRuw(r.bouwblok, antwoorden)),
+      overall: overallScoreRuw(assessment, antwoorden),
+    });
+  }
+  leden.sort((a, b) => a.organisatie.naam.localeCompare(b.organisatie.naam, "nl"));
+  return { rijen, leden, zonderToestemming };
+}
+
+/* ---------- Filters uit de organisatievelden ---------- */
+
+export interface FilterVeld {
+  /** Het pad in `Organisatie.kenmerken` met punten, bijvoorbeeld "kpis.aht". */
+  id: string;
+  /** "Techstack › Contact center › Oplossing". */
+  label: string;
+  pad: string[];
+  type: "select" | "getal";
+}
+
+/** Alle velden die als filter kunnen dienen: De bladeren van de organisatievelden, select of getal (percentage telt als getal). */
+export function filterVelden(velden: VeldDefinitie[] = organisatieVelden): FilterVeld[] {
+  const uit: FilterVeld[] = [];
+  const loop = (lijst: VeldDefinitie[], pad: string[], namen: string[]) => {
+    for (const v of lijst) {
+      const p = [...pad, v.id];
+      const n = [...namen, v.label];
+      if (v.type === "groep") loop(v.subvelden ?? [], p, n);
+      else if (v.type === "select" || v.type === "select-afhankelijk") uit.push({ id: p.join("."), label: n.join(" › "), pad: p, type: "select" });
+      else if (v.type === "getal" || v.type === "percentage") uit.push({ id: p.join("."), label: n.join(" › "), pad: p, type: "getal" });
+    }
+  };
+  loop(velden, [], []);
+  return uit;
+}
+
+/** De waarde van een kenmerk op een pad, of `undefined`. */
+export function kenmerkWaarde(organisatie: Pick<Organisatie, "kenmerken">, pad: string[]): unknown {
+  let huidig: unknown = organisatie.kenmerken;
+  for (const sleutel of pad) {
+    if (huidig === null || typeof huidig !== "object") return undefined;
+    huidig = (huidig as Record<string, unknown>)[sleutel];
+  }
+  return huidig;
+}
+
+const KANAAL_PREFIX = ["volume-klantbasis", "contacten-per-jaar"];
+
+/** De kanalen uit de contacten per jaar, voor het filter "Ingezette kanalen". */
+export function kanaalVelden(): { id: string; naam: string; pad: string[] }[] {
+  const groep = organisatieVelden
+    .find((v) => v.id === KANAAL_PREFIX[0])
+    ?.subvelden?.find((v) => v.id === KANAAL_PREFIX[1]);
+  return (groep?.subvelden ?? []).map((v) => ({ id: v.id, naam: v.label, pad: [...KANAAL_PREFIX, v.id] }));
+}
+
+/**
+ * Een kanaal is ingezet bij een waarde boven 0, niet ingezet bij 0 of "niet van toepassing", en onbekend bij een leeg veld
+ * (`visualisatie-verkennen.md`, Filters). Geeft `null` bij onbekend.
+ */
+export function kanaalIngezet(organisatie: Pick<Organisatie, "kenmerken">, pad: string[]): boolean | null {
+  const w = kenmerkWaarde(organisatie, pad);
+  if (w === undefined || w === null || w === "") return null;
+  if (typeof w === "number") return w > 0;
+  if (typeof w === "string") {
+    const n = Number(w.replace(",", "."));
+    if (Number.isFinite(n)) return n > 0;
+    return false;
+  }
+  return false;
+}
+
+export interface FilterStand {
+  /** Per select-veld de gekozen waarden: "of" binnen een veld. */
+  select: Record<string, string[]>;
+  /** Per getalveld een bereik. */
+  bereik: Record<string, [number, number]>;
+  /** Gekozen kanalen (de id's uit `kanaalVelden`): "en", de organisatie moet ze allemaal inzetten. */
+  kanalen: string[];
+}
+
+export const LEGE_FILTERS: FilterStand = { select: {}, bereik: {}, kanalen: [] };
+
+export function heeftFilters(stand: FilterStand): boolean {
+  return (
+    Object.values(stand.select).some((l) => l.length > 0) || Object.keys(stand.bereik).length > 0 || stand.kanalen.length > 0
+  );
+}
+
+/** Verschillende filters werken als "en". Een organisatie zonder waarde voor een gekozen filterveld valt weg. */
+export function pasFiltersToe(leden: PoolLid[], stand: FilterStand, velden: FilterVeld[] = filterVelden()): PoolLid[] {
+  const perId = new Map(velden.map((v) => [v.id, v]));
+  const kanalen = kanaalVelden().filter((k) => stand.kanalen.includes(k.id));
+  return leden.filter((lid) => {
+    for (const [id, gekozen] of Object.entries(stand.select)) {
+      if (gekozen.length === 0) continue;
+      const veld = perId.get(id);
+      if (!veld) continue;
+      const w = kenmerkWaarde(lid.organisatie, veld.pad);
+      if (typeof w !== "string" || !gekozen.includes(w)) return false;
+    }
+    for (const [id, [min, max]] of Object.entries(stand.bereik)) {
+      const veld = perId.get(id);
+      if (!veld) continue;
+      const w = getalWaarde(kenmerkWaarde(lid.organisatie, veld.pad));
+      if (w === null || w < min || w > max) return false;
+    }
+    for (const kanaal of kanalen) if (kanaalIngezet(lid.organisatie, kanaal.pad) !== true) return false;
+    return true;
+  });
+}
+
+export function getalWaarde(w: unknown): number | null {
+  if (typeof w === "number" && Number.isFinite(w)) return w;
+  if (typeof w === "string" && w.trim() !== "") {
+    const n = Number(w.replace(",", "."));
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
+/** De waarden van een select-veld in de pool, met het aantal organisaties, het vaakst voorkomend eerst. */
+export function selectOpties(leden: PoolLid[], veld: FilterVeld): { waarde: string; aantal: number }[] {
+  const telling = new Map<string, number>();
+  for (const lid of leden) {
+    const w = kenmerkWaarde(lid.organisatie, veld.pad);
+    if (typeof w === "string" && w !== "") telling.set(w, (telling.get(w) ?? 0) + 1);
+  }
+  return [...telling.entries()]
+    .map(([waarde, aantal]) => ({ waarde, aantal }))
+    .sort((a, b) => b.aantal - a.aantal || a.waarde.localeCompare(b.waarde, "nl"));
+}
+
+/** De ingevulde getallen van een veld in de pool, en hoeveel organisaties het veld hebben ingevuld. */
+export function getalWaarden(leden: PoolLid[], veld: FilterVeld): number[] {
+  return leden.map((l) => getalWaarde(kenmerkWaarde(l.organisatie, veld.pad))).filter((w): w is number => w !== null);
+}
+
+/** Per kanaal het aantal organisaties in de pool dat het inzet. */
+export function kanaalAantallen(leden: PoolLid[]): { id: string; naam: string; aantal: number }[] {
+  return kanaalVelden().map((k) => ({ ...k, aantal: leden.filter((l) => kanaalIngezet(l.organisatie, k.pad) === true).length }));
+}
+
+/** Een histogram met `bakken` staven van `min` tot en met `max`. */
+export function histogram(waarden: number[], min: number, max: number, bakken = 12): number[] {
+  const uit = new Array<number>(bakken).fill(0);
+  if (max <= min) {
+    if (waarden.length > 0) uit[0] = waarden.length;
+    return uit;
+  }
+  for (const w of waarden) {
+    const i = Math.min(bakken - 1, Math.floor(((w - min) / (max - min)) * bakken));
+    uit[i] += 1;
+  }
+  return uit;
+}
+
+/** De mediaan van een lijst getallen, met lineaire interpolatie. `null` bij een lege lijst. */
+export function mediaan(waarden: number[]): number | null {
+  if (waarden.length === 0) return null;
+  return kwantiel([...waarden].sort((a, b) => a - b), 0.5);
+}
+
+/* ---------- Groeperen en focus ---------- */
+
+export type Groepering =
+  | { soort: "select"; veldId: string }
+  | { soort: "drempel"; veldId: string; drempel: number };
+
+export interface Groep {
+  sleutel: string;
+  naam: string;
+  leden: PoolLid[];
+}
+
+/**
+ * Verdeelt de pool in groepen (`visualisatie-verkennen.md`, Groeperen en focus). Een select-veld geeft één groep per waarde, een
+ * drempel op een getalveld twee: "≤ drempel" en "> drempel". Organisaties zonder waarde horen niet bij een groep, maar wel bij
+ * de rest. De grootste groep staat vooraan.
+ */
+export function maakGroepen(leden: PoolLid[], groepering: Groepering, velden: FilterVeld[] = filterVelden()): Groep[] {
+  const veld = velden.find((v) => v.id === groepering.veldId);
+  if (!veld) return [];
+  if (groepering.soort === "select") {
+    const per = new Map<string, PoolLid[]>();
+    for (const lid of leden) {
+      const w = kenmerkWaarde(lid.organisatie, veld.pad);
+      if (typeof w !== "string" || w === "") continue;
+      per.set(w, [...(per.get(w) ?? []), lid]);
+    }
+    return [...per.entries()]
+      .map(([naam, l]) => ({ sleutel: naam, naam, leden: l }))
+      .sort((a, b) => b.leden.length - a.leden.length || a.naam.localeCompare(b.naam, "nl"));
+  }
+  const onder: PoolLid[] = [];
+  const boven: PoolLid[] = [];
+  for (const lid of leden) {
+    const w = getalWaarde(kenmerkWaarde(lid.organisatie, veld.pad));
+    if (w === null) continue;
+    (w <= groepering.drempel ? onder : boven).push(lid);
+  }
+  const d = String(groepering.drempel).replace(".", ",");
+  return [
+    { sleutel: "onder", naam: `≤ ${d}`, leden: onder },
+    { sleutel: "boven", naam: `> ${d}`, leden: boven },
+  ];
+}
+
+/** De focus en de rest: De rest is alle andere organisaties in de pool (na de filters). */
+export function splitsFocus(leden: PoolLid[], focus: Groep | undefined): { focus: PoolLid[]; rest: PoolLid[] } {
+  if (!focus) return { focus: [], rest: leden };
+  const ids = new Set(focus.leden.map((l) => l.organisatie.id));
+  return { focus: focus.leden, rest: leden.filter((l) => !ids.has(l.organisatie.id)) };
+}
+
+/* ---------- Statistiek voor de weergaven ---------- */
+
+function gem(w: number[]): number | null {
+  return w.length === 0 ? null : w.reduce((a, b) => a + b, 0) / w.length;
+}
+
+export interface Verdeling {
+  n: number;
+  gemiddelde: number | null;
+  mediaan: number | null;
+  /** Het eerste en derde kwartiel: De middelste helft. */
+  q1: number | null;
+  q3: number | null;
+  min: number | null;
+  max: number | null;
+  /** Standaardafwijking met n − 1, leeg bij minder dan twee organisaties. */
+  sd: number | null;
+}
+
+export function verdeling(waarden: number[]): Verdeling {
+  if (waarden.length === 0) return { n: 0, gemiddelde: null, mediaan: null, q1: null, q3: null, min: null, max: null, sd: null };
+  const g = [...waarden].sort((a, b) => a - b);
+  return {
+    n: g.length,
+    gemiddelde: gem(g),
+    mediaan: kwantiel(g, 0.5),
+    q1: kwantiel(g, 0.25),
+    q3: kwantiel(g, 0.75),
+    min: g[0],
+    max: g[g.length - 1],
+    sd: steekproefSd(g),
+  };
+}
+
+export interface RijVergelijking {
+  rij: BouwblokRij;
+  focus: Verdeling;
+  rest: Verdeling;
+  /** Gemiddelde van de focus min dat van de rest, op één decimaal. */
+  verschil: number | null;
+  /** De scores van elke organisatie, voor de stippen, met de naam voor hover. */
+  stippenFocus: { naam: string; score: number }[];
+  stippenRest: { naam: string; score: number }[];
+}
+
+export interface Vergelijking {
+  rijen: RijVergelijking[];
+  overall: { focus: Verdeling; rest: Verdeling; verschil: number | null };
+  grootstePlus: { naam: string; verschil: number } | null;
+  grootsteMin: { naam: string; verschil: number } | null;
+}
+
+const verschilVan = (a: number | null, b: number | null) => (a === null || b === null ? null : rond1(a - b));
+
+/** Groep tegenover de rest en Spreiding binnen de groep (`visualisatie-verkennen.md`, Weergave 1 en 2). */
+export function vergelijk(rijen: BouwblokRij[], focus: PoolLid[], rest: PoolLid[]): Vergelijking {
+  const perRij: RijVergelijking[] = rijen.map((rij, i) => {
+    const stip = (l: PoolLid) => ({ naam: l.organisatie.naam, score: l.scores[i] });
+    const f = focus.map(stip).filter((s): s is { naam: string; score: number } => s.score !== null);
+    const r = rest.map(stip).filter((s): s is { naam: string; score: number } => s.score !== null);
+    const fv = verdeling(f.map((s) => s.score));
+    const rv = verdeling(r.map((s) => s.score));
+    return { rij, focus: fv, rest: rv, verschil: verschilVan(fv.gemiddelde, rv.gemiddelde), stippenFocus: f, stippenRest: r };
+  });
+  const overallVan = (l: PoolLid[]) => verdeling(l.map((x) => x.overall).filter((o): o is number => o !== null));
+  const of = overallVan(focus);
+  const or = overallVan(rest);
+  const metVerschil = perRij.filter((r) => r.verschil !== null);
+  const plus = metVerschil.reduce<RijVergelijking | null>((m, r) => (m === null || (r.verschil as number) > (m.verschil as number) ? r : m), null);
+  const min = metVerschil.reduce<RijVergelijking | null>((m, r) => (m === null || (r.verschil as number) < (m.verschil as number) ? r : m), null);
+  return {
+    rijen: perRij,
+    overall: { focus: of, rest: or, verschil: verschilVan(of.gemiddelde, or.gemiddelde) },
+    grootstePlus: plus && (plus.verschil as number) > 0 ? { naam: plus.rij.bouwblok.naam, verschil: plus.verschil as number } : null,
+    grootsteMin: min && (min.verschil as number) < 0 ? { naam: min.rij.bouwblok.naam, verschil: min.verschil as number } : null,
+  };
+}
+
+/* ---------- Alle groepen naast elkaar ---------- */
+
+export interface HeatmapCel {
+  /** Gemiddelde van de groep voor deze rij, `null` bij een te kleine groep of zonder scores. */
+  gemiddelde: number | null;
+  /** Verschil met het gemiddelde van de hele pool, op één decimaal. */
+  verschil: number | null;
+}
+
+export interface Heatmap {
+  /** De hele pool (na de filters): Het gemiddelde per rij en overall. */
+  pool: { gemiddelde: (number | null)[]; overall: number | null };
+  groepen: { groep: Groep; teKlein: boolean; cellen: HeatmapCel[]; overall: HeatmapCel }[];
+}
+
+/** De heatmap (`visualisatie-verkennen.md`, Weergave 3): De groep zelf telt mee in het gemiddelde van de hele pool. */
+export function heatmap(rijen: BouwblokRij[], pool: PoolLid[], groepen: Groep[], minGroep: number): Heatmap {
+  const poolGem = rijen.map((_, i) => gem(pool.map((l) => l.scores[i]).filter((s): s is number => s !== null)));
+  const poolOverall = gem(pool.map((l) => l.overall).filter((o): o is number => o !== null));
+  return {
+    pool: { gemiddelde: poolGem, overall: poolOverall },
+    groepen: groepen.map((groep) => {
+      const teKlein = groep.leden.length < minGroep;
+      const cel = (waarden: number[], poolWaarde: number | null): HeatmapCel => {
+        const g = teKlein ? null : gem(waarden);
+        return { gemiddelde: g, verschil: g === null || poolWaarde === null ? null : rond1(g - poolWaarde) };
+      };
+      return {
+        groep,
+        teKlein,
+        cellen: rijen.map((_, i) =>
+          cel(groep.leden.map((l) => l.scores[i]).filter((s): s is number => s !== null), poolGem[i])
+        ),
+        overall: cel(groep.leden.map((l) => l.overall).filter((o): o is number => o !== null), poolOverall),
+      };
+    }),
+  };
+}
+
+/* ---------- Verband met een kenmerk ---------- */
+
+export interface Regressie {
+  n: number;
+  helling: number;
+  snijpunt: number;
+  r: number;
+}
+
+/** Een rechte lijn door de punten (kleinste kwadraten) en de correlatiecoëfficiënt r. `null` bij minder dan 3 punten of zonder spreiding. */
+export function regressie(punten: { x: number; y: number }[]): Regressie | null {
+  const n = punten.length;
+  if (n < 3) return null;
+  const mx = punten.reduce((s, p) => s + p.x, 0) / n;
+  const my = punten.reduce((s, p) => s + p.y, 0) / n;
+  const sxx = punten.reduce((s, p) => s + (p.x - mx) ** 2, 0);
+  const syy = punten.reduce((s, p) => s + (p.y - my) ** 2, 0);
+  const sxy = punten.reduce((s, p) => s + (p.x - mx) * (p.y - my), 0);
+  if (sxx === 0 || syy === 0) return null;
+  const helling = sxy / sxx;
+  return { n, helling, snijpunt: my - helling * mx, r: sxy / Math.sqrt(sxx * syy) };
+}
+
+/** Het woord bij de sterkte van een verband: Onder 0,2 nauwelijks, onder 0,4 zwak, onder 0,6 matig, daarboven sterk. */
+export function sterkteWoord(r: number): string {
+  const a = Math.abs(r);
+  const woord = a < 0.2 ? "nauwelijks" : a < 0.4 ? "zwak" : a < 0.6 ? "matig" : "sterk";
+  if (a < 0.2) return woord;
+  return `${woord} ${r > 0 ? "positief" : "negatief"}`;
+}

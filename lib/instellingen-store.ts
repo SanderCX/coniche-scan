@@ -31,6 +31,13 @@ export interface Instellingen {
    * meetdatum waarboven de Admin een waarschuwing krijgt. Geen blokkade. Voorstel, startwaarde 90.
    */
   benchmarkMaxDagenTussenMetingen: number;
+  /**
+   * Verkennen (`visualisatie-verkennen.md`, Groeperen en focus): Een groep met minder organisaties dan dit is gestreept en krijgt in
+   * de heatmap geen cijfers. Voorstel, startwaarde 3.
+   */
+  verkennenMinGroep: number;
+  /** Heeft de focus of de rest minder organisaties dan dit, dan staat er een waarschuwing. Geen blokkade. Startwaarde 5. */
+  verkennenWaarschuwingGroep: number;
 }
 
 const STANDAARDWAARDEN: Instellingen = {
@@ -40,6 +47,8 @@ const STANDAARDWAARDEN: Instellingen = {
   benchmarkMinScans: 3,
   benchmarkMinRespondenten: 5,
   benchmarkMaxDagenTussenMetingen: 90,
+  verkennenMinGroep: 3,
+  verkennenWaarschuwingGroep: 5,
 };
 
 const KEY = "coniche-scan:instellingen";

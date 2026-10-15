@@ -818,3 +818,147 @@
 .qv-rij--breed .qv-waarde .qv-label {
   margin-left: 0;
 }
+
+/* Verkennen (`visualisatie-verkennen.md`, `stylesheet.md`, Filterchip, focuschip en slider). */
+.vk-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0.2rem;
+}
+.vk-chip {
+  height: 30px;
+  border-radius: 15px;
+  border: 1px solid var(--border-d);
+  background: var(--bg);
+  font-family: inherit;
+  font-size: var(--fs-s);
+  font-weight: 600;
+  color: var(--ink-m);
+  padding: 0 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.vk-chip span {
+  font-weight: 400;
+  margin-left: 0.35rem;
+}
+.vk-chip[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.vk-chip--focus[aria-pressed="true"] {
+  background: var(--or);
+  border-color: var(--or);
+}
+.vk-chip--klein {
+  border-style: dashed;
+  color: var(--ink-s);
+}
+.vk-veldkop {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+  margin: 1rem 0 0;
+}
+.vk-teller {
+  margin-top: 1.2rem;
+  font-size: var(--fs-s);
+  color: var(--ink-m);
+}
+.vk-teller-balk {
+  height: 6px;
+  background: var(--bg-mid);
+  border-radius: 3px;
+  margin: 0.4rem 0;
+  overflow: hidden;
+}
+.vk-teller-balk > div {
+  height: 100%;
+  background: var(--or);
+}
+.vk-histogram {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 52px;
+  margin-top: 0.6rem;
+}
+.vk-histogram > div {
+  flex: 1;
+  background: #cfccc5;
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+}
+.vk-histogram > div.focus {
+  background: var(--or);
+}
+.vk-slider {
+  width: 100%;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-d);
+  margin: 0.9rem 0 0.4rem;
+}
+.vk-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--or);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+.vk-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--or);
+  border: 2px solid #fff;
+  cursor: pointer;
+}
+.vk-waarschuwing {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  background: var(--stat-amber-faint);
+  border: 1px solid var(--stat-amber);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  font-size: var(--fs-s);
+  color: var(--ink);
+  margin-top: 0.9rem;
+}
+.vk-stip-focus {
+  background: var(--or);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+.vk-stip-rest {
+  background: rgba(136, 136, 132, 0.5);
+}
+.vk-streep-focus {
+  background: var(--or);
+}
+.vk-streep-rest {
+  background: var(--ink-m);
+}
+.vk-heat {
+  min-width: 5rem;
+  text-align: center;
+  padding: 0.5rem 0.4rem;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: var(--fs-s);
+}
+.vk-heat--klein {
+  background: repeating-linear-gradient(135deg, #faf9f7 0, #faf9f7 6px, #f2f0eb 6px, #f2f0eb 12px);
+  border: 1px dashed var(--border-d);
+  color: var(--ink-s);
+  font-weight: 400;
+}

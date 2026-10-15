@@ -105,10 +105,9 @@ Bewust nog niet opgepakt. Geen prioritering.
   `datamodel.md`, Meting en `beheerpagina.md`, punt 5 en 14. Nog niet
   ontworpen: De weergave bij drie of meer Metingen, bijvoorbeeld een lijn per
   bouwblok over de meetdata.
-- **Verkennen (voorstel van 15 oktober 2026)**: Een Admin-scherm om de hele
+- **Verkennen (gebouwd op 15 oktober 2026)**: Een Admin-scherm om de hele
   pool van een Assessment te filteren, te groeperen en te vergelijken
-  (`visualisatie-verkennen.md`, `beheerpagina.md` punt 15). Er is een visual
-  design, nog niets gebouwd. Bewust later:
+  (`visualisatie-verkennen.md`, `beheerpagina.md` punt 15). Bewust later:
   - Een versie voor de Consultant, met de namen van niet-eigen Organisaties
     afgeschermd en de drempel `benchmarkMinOrganisaties` voor beide kanten van
     een splitsing.

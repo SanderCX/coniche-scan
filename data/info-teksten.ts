@@ -139,6 +139,18 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. Het aantal dagen tussen Metingen is voor een vergelijking met de lezing Naast elkaar: Liggen de meetdata verder uit elkaar, dan krijg je bij het opslaan een waarschuwing. Opslaan blijft mogelijk.",
   },
   {
+    sleutel: "info.verkennen",
+    plek: "Verkennen, naast de paginatitel",
+    tekst:
+      "Verkennen werkt op de pool van één Assessment: De Organisaties met toestemming voor benchmark die een Meting hebben met genoeg afgeronde scans, de meest recente per Organisatie. Elke Organisatie telt even zwaar mee. Het scherm slaat niets op en een Lead ziet het nooit.",
+  },
+  {
+    sleutel: "info.verkennenDrempels",
+    plek: "Instellingen, Drempels en termijnen, formulier Verkennen",
+    tekst:
+      "Een groep met minder organisaties dan het minimum is gestreept en krijgt in de heatmap geen cijfers. Heeft de focus of de rest minder organisaties dan de waarschuwingsgrens, dan staat er een waarschuwing dat verschillen voorzichtig gelezen moeten worden. Dat is geen blokkade.",
+  },
+  {
     sleutel: "info.benchmarkVlag",
     plek: "Organisatie-detail, bij de schakelaar \"Doet mee aan benchmark\"",
     tekst:

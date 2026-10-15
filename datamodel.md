@@ -1256,7 +1256,7 @@ Een streepje betekent geen toegang.
 | `export.uitvoeren` | alle | eigen | zelf, of aangevinkte Metingen (Exporteren) | zelf |
 | `benchmark.beheren` | alle | - | - | - |
 | `benchmark.inzien` | alle | - | aangevinkte benchmarks | - |
-| `verkennen.inzien` (voorstel, 15 oktober 2026) | alle | - | - | - |
+| `verkennen.inzien` (gebouwd, 15 oktober 2026) | alle | - | - | - |
 
 Een Lead die zelf invult, doet dat met het bereik `zelf`, net als elke
 respondent.
@@ -1299,7 +1299,7 @@ toegang van de Lead via de toewijzing en `leadMetingIds`, net als bij
 `export.uitvoeren`, tot de overgang naar `LeadToegang`. De regel in de matrix is
 het doel voor de rolrechten die met de database komen.
 
-`verkennen.inzien` (voorstel, 15 oktober 2026) is Admin-only, om dezelfde reden
+`verkennen.inzien` (gebouwd, 15 oktober 2026) is Admin-only, om dezelfde reden
 als `benchmark.beheren`: Verkennen rekent over alle Organisaties van een
 Assessment en laat de namen zien. Een Consultant en een Lead hebben er geen
 toegang toe (`visualisatie-verkennen.md`).

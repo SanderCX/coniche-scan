@@ -1,5 +1,34 @@
 # Coniche Scan — Changelog
 
+## 2026-10-15 (4) — Specs van Joost, PR 114: Verkennen
+
+Op verzoek van Sander volledig gebouwd (`visualisatie-verkennen.md`, `beheerpagina.md` punt 15).
+
+**Gedaan**:
+- **Scherm** (`app/beheer/verkennen/page.tsx`): De tab Verkennen onder Resultaten, alleen voor een Admin (`verkennen.inzien`,
+  `lib/rechten.ts`). Keuze van het Assessment, filters, vergelijken en vier weergaven. Het scherm slaat niets op.
+- **Filters** (`components/verkennen/FilterPaneel.tsx`): Afgeleid uit de organisatievelden (`filterVelden`), dus een nieuw veld wordt
+  vanzelf een filter. Chips voor select-velden ("of"), een bereik met histogram voor getallen, ingezette kanalen ("en"), "Filter
+  toevoegen" en "Wis filters", en de teller "X van Y Organisaties in de pool" met het aantal zonder toestemming.
+- **Vergelijken** (`Vergelijken.tsx`): Groeperen op CRM-pakket, sector of de AHT-drempel (slider met histogram), de focusgroep als
+  chips en de waarschuwing bij een kleine groep.
+- **Weergaven**: Groep tegenover de rest, Spreiding binnen de groep (beide met sorteren op grootste verschil of spreiding), Alle
+  groepen naast elkaar (heatmap, een klik op een kolomkop maakt de groep de focus) en Verband met een kenmerk (diagram met lijn,
+  r en een woord bij de sterkte).
+- **Berekeningen** (`lib/verkennen.ts`, 14 tests): De pool, filters, groepen, gemiddelde, mediaan, kwartielen, standaardafwijking
+  (n − 1), heatmap en regressie.
+- **Instellingen**: `verkennenMinGroep` (3) en `verkennenWaarschuwingGroep` (5) bij Drempels en termijnen, met `info.verkennenDrempels`
+  en `info.verkennen` in het register.
+
+**Keuzes waar de spec open liet** (onder Gebouwd in `visualisatie-verkennen.md`): Meerdere kanalen werken als "en", de drempels staan
+op 3 en 5, en groeperen kan op CRM-pakket, sector en AHT. Voor Joost nog te bevestigen: De eerste twee, en de keuze van de
+groeperingsvelden.
+
+**Nog niet gebouwd**: Een versie voor de Consultant, de Quickscan Ziekenhuis, meerdere Metingen per Organisatie, AHT per kanaal,
+bewaren als benchmark en export (allemaal onder Later).
+
+**Tests**: 324 (was 310).
+
 ## 2026-10-15 (3) — Voorbeeld-output: Gemiddelde en afwijking bij de Klantcontact Volwassenheidsscan
 
 Op verzoek van Sander gebouwd (`app/[assessmentId]/voorbeeld/page.tsx`).

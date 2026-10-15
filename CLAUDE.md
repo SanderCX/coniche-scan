@@ -35,7 +35,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `benchmark.md` | Benchmark op drie niveaus: Tussen organisaties (gebouwd, geaggregeerd en anoniem, met een view per organisatie voor een Lead), binnen een organisatie tussen Metingen, en binnen een Meting (beide voorstel) |
 | `visualisatie-scores.md` | Hoe hoge en lage scores getoond worden: één meting, spreiding binnen een Meting, tussen Metingen, tussen organisaties en de matrix over Metingen (besloten ontwerp, gebouwd op 13 oktober 2026) |
 | `visualisatie-quickscan.md` | Visualisaties van de Quickscan Ziekenhuis in percentages: eigen resultaat (twee standen), gemiddelde en spreiding, antwoorden per vraag en benchmark (besloten op 15 oktober 2026, gebouwd) |
-| `visualisatie-verkennen.md` | Admin-scherm Verkennen onder Resultaten: filteren, groeperen en vergelijken van alle Organisaties van één Assessment, met vier weergaven (voorstel van 15 oktober 2026, visual design klaar, nog niet gebouwd) |
+| `visualisatie-verkennen.md` | Admin-scherm Verkennen onder Resultaten: filteren, groeperen en vergelijken van alle Organisaties van één Assessment, met vier weergaven (besloten en gebouwd op 15 oktober 2026) |
 | `backlog.md` | Bewust nog niet opgepakt |
 | `go-live-plan.md` | Actielijst naar productie |
 | `azure-plan.md` | Aanvulling op `go-live-plan.md` met de stappen voor de Azure-omgeving (Azure DevOps, Azure SQL, `coniche-scan.nl`) |
@@ -96,10 +96,11 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   oktober 2026) en binnen een Meting (`benchmark.md`). Bij niveau 2 kiest
   de Admin de lezing Ontwikkeling over tijd (weergave C) of Naast elkaar
   (weergave H), gebouwd op 14 oktober 2026.
-- **Verkennen**: Voorstel van 15 oktober 2026 (`visualisatie-verkennen.md`).
+- **Verkennen**: Gebouwd op 15 oktober 2026 (`visualisatie-verkennen.md`).
   Een Admin-scherm onder Resultaten om alle Organisaties van één Assessment
-  te filteren, te groeperen en te vergelijken, met vier weergaven. Er is een
-  visual design met voorbeelddata, nog niets gebouwd.
+  te filteren, te groeperen en te vergelijken, met vier weergaven. Nog niet
+  voor de Quickscan Ziekenhuis, voor een Consultant en voor meerdere Metingen
+  per Organisatie.
 - **Quickscan Ziekenhuis**: Gebouwd op 14 oktober 2026
   (`content-ziekenhuis-quickscan.md`): Het eerste Assessment met
   antwoordType Ja / Nee / Weet ik niet, met doorloopflow en eigen
