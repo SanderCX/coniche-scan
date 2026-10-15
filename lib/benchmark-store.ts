@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { Benchmark, BenchmarkLid, BenchmarkNiveau, BenchmarkToewijzing } from "./types";
+import { Benchmark, BenchmarkLezing, BenchmarkLid, BenchmarkNiveau, BenchmarkToewijzing } from "./types";
 import { nieuwId } from "./id";
 import { logAudit } from "./audit-store";
 
@@ -99,7 +99,14 @@ export interface BenchmarkNamen {
 }
 
 export function maakBenchmark(
-  input: { naam: string; niveau?: BenchmarkNiveau; assessmentIds: string[]; leden: BenchmarkLid[]; aangemaaktDoor: string },
+  input: {
+    naam: string;
+    niveau?: BenchmarkNiveau;
+    lezing?: BenchmarkLezing;
+    assessmentIds: string[];
+    leden: BenchmarkLid[];
+    aangemaaktDoor: string;
+  },
   namen: BenchmarkNamen
 ): Benchmark {
   const opslag = laad();
@@ -107,6 +114,7 @@ export function maakBenchmark(
     id: nieuwId(),
     naam: input.naam,
     niveau: input.niveau ?? "organisaties",
+    ...(input.lezing ? { lezing: input.lezing } : {}),
     assessmentIds: input.assessmentIds,
     leden: input.leden,
     meldingen: [],
@@ -120,7 +128,7 @@ export function maakBenchmark(
     entiteitType: "benchmark",
     entiteitId: benchmark.id,
     entiteitNaam: benchmark.naam,
-    details: { benchmarkNaam: benchmark.naam, niveau: benchmark.niveau, ...namen },
+    details: { benchmarkNaam: benchmark.naam, niveau: benchmark.niveau, ...(benchmark.lezing ? { lezing: benchmark.lezing } : {}), ...namen },
   });
   return benchmark;
 }
@@ -128,7 +136,7 @@ export function maakBenchmark(
 /** Wijzigt de samenstelling. Leden van een Assessment dat niet meer gekozen is, vallen weg. */
 export function wijzigBenchmark(
   id: string,
-  input: { naam: string; assessmentIds: string[]; leden: BenchmarkLid[] },
+  input: { naam: string; assessmentIds: string[]; leden: BenchmarkLid[]; lezing?: BenchmarkLezing },
   namen: BenchmarkNamen
 ): void {
   const opslag = laad();
@@ -137,6 +145,7 @@ export function wijzigBenchmark(
   benchmark.naam = input.naam;
   benchmark.assessmentIds = input.assessmentIds;
   benchmark.leden = input.leden.filter((l) => input.assessmentIds.includes(l.assessmentId));
+  if (input.lezing) benchmark.lezing = input.lezing;
   benchmark.meldingen = [];
   // De vinkjes van Leads voor een organisatie die niet meer meedoet, vallen bij het volgende opslaan van de organisaties weg
   // (`ruimLeadToegangOp`) en tellen intussen niet meer mee (`benchmarkGeldigVoorOrganisatie`).
@@ -146,7 +155,12 @@ export function wijzigBenchmark(
     entiteitType: "benchmark",
     entiteitId: id,
     entiteitNaam: benchmark.naam,
-    details: { benchmarkNaam: benchmark.naam, niveau: benchmark.niveau ?? "organisaties", ...namen },
+    details: {
+      benchmarkNaam: benchmark.naam,
+      niveau: benchmark.niveau ?? "organisaties",
+      ...(benchmark.lezing ? { lezing: benchmark.lezing } : {}),
+      ...namen,
+    },
   });
 }
 

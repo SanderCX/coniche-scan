@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { MetingenVergelijking, verschillendeOnderdelen } from "@/lib/benchmark";
+import { MetingenVergelijking } from "@/lib/benchmark";
 import { onderdeelVan, toonMeetdatum } from "@/lib/metingen";
-import { matrix, tussenMetingenUitAntwoorden } from "@/lib/visualisatie";
+import { matrix, naastElkaarUitAntwoorden, tussenMetingenUitAntwoorden } from "@/lib/visualisatie";
 import { scoreKleur } from "@/lib/colors";
 import { WeergaveVergelijking } from "@/components/visualisatie/WeergaveVergelijking";
+import { WeergaveNaastElkaar } from "@/components/visualisatie/WeergaveNaastElkaar";
 import { WeergaveMatrix } from "@/components/visualisatie/WeergaveMatrix";
 
 function Score({ waarde }: { waarde: number | null }) {
@@ -16,10 +17,10 @@ function Score({ waarde }: { waarde: number | null }) {
 }
 
 /**
- * Eén Assessment van een vergelijking tussen Metingen, een benchmark binnen een organisatie (`benchmark.md`, Niveau 2): De
- * Metingen op meetdatum met de oudste eerst, elk met haar eigen scores en zonder groepsgemiddelde. Bij precies twee Metingen
- * staat er weergave C (`visualisatie-scores.md`, C) en daaronder de matrix met een kolom Verschil (E). Hebben ze een ander
- * onderdeel, dan staat er "Let op: Dit zijn verschillende onderdelen, het verschil is geen ontwikkeling."
+ * Eén Assessment van een vergelijking tussen Metingen, een benchmark binnen een organisatie (`benchmark.md`, Niveau 2): Elke
+ * Meting met haar eigen scores en zonder groepsgemiddelde. De lezing bepaalt de rest. Ontwikkeling over tijd: De Metingen op
+ * meetdatum met de oudste eerst, bij precies twee weergave C (`visualisatie-scores.md`, C) en daaronder de matrix met een kolom
+ * Verschil (E). Naast elkaar: De Metingen op naam, bij precies twee weergave H en daaronder de matrix met een kolom Hoogste.
  *
  * `beheer` (de Admin): Met de tabel en de matrix, want de kolomkoppen tonen de namen van de Metingen. Een Lead krijgt alleen de
  * vergelijking van zijn eigen Metingen in weergave C (`visualisatie-scores.md`, E, Plek).
@@ -34,8 +35,9 @@ export function MetingenVergelijkingView({
   /** De resultatenpagina van een Meting, voor de knop "Bekijk" in de tabel van de Admin. */
   metingHref?: (metingId: string) => string;
 }) {
-  const { assessment, metingen } = vergelijking;
+  const { assessment, metingen, lezing } = vergelijking;
   const twee = metingen.length === 2;
+  const naastElkaar = lezing === "naastElkaar";
   return (
     <section className="benchmark-sectie" aria-label={assessment.naam}>
       <h2>{assessment.naam}</h2>
@@ -82,24 +84,28 @@ export function MetingenVergelijkingView({
             </tbody>
           </table>
 
-          {twee && (
-            <>
-              {verschillendeOnderdelen(metingen.map((m) => m.meting)) && (
-                <p className="admin-notice" role="status">
-                  Let op: Dit zijn verschillende onderdelen, het verschil is geen ontwikkeling.
-                </p>
-              )}
-              <WeergaveVergelijking
-                assessment={assessment}
-                weergave={tussenMetingenUitAntwoorden(assessment, metingen[0].antwoorden, metingen[1].antwoorden)}
-                vorigLabel={metingen[0].meting.label}
-                huidigLabel={metingen[1].meting.label}
-              />
-            </>
+          {twee && !naastElkaar && (
+            <WeergaveVergelijking
+              assessment={assessment}
+              weergave={tussenMetingenUitAntwoorden(assessment, metingen[0].antwoorden, metingen[1].antwoorden)}
+              vorigLabel={metingen[0].meting.label}
+              huidigLabel={metingen[1].meting.label}
+            />
+          )}
+          {twee && naastElkaar && (
+            <WeergaveNaastElkaar
+              assessment={assessment}
+              weergave={naastElkaarUitAntwoorden(assessment, metingen[0].antwoorden, metingen[1].antwoorden)}
+              eersteLabel={metingen[0].meting.label}
+              tweedeLabel={metingen[1].meting.label}
+              eersteDatum={toonMeetdatum(metingen[0].meting.meetdatum)}
+              tweedeDatum={toonMeetdatum(metingen[1].meting.meetdatum)}
+            />
           )}
           {!twee && metingen.length > 2 && (
             <p className="admin-notice">
-              Voor meer dan twee Metingen is er nog geen weergave van de ontwikkeling. Hieronder staan de Metingen naast elkaar.
+              Voor meer dan twee Metingen is er nog geen weergave van {naastElkaar ? "de Metingen naast elkaar" : "de ontwikkeling"}.
+              Hieronder staan de Metingen naast elkaar.
             </p>
           )}
 
@@ -118,7 +124,7 @@ export function MetingenVergelijkingView({
                     aantalScans: m.aantalAfgerond,
                     antwoorden: m.antwoorden,
                   })),
-                  { groepsvergelijking: false }
+                  { groepsvergelijking: false, lezing }
                 )}
               />
             </>

@@ -18,6 +18,11 @@ export interface Bouwblok {
   tags: string[];
   /** Standaard 1; een getal groter dan 0, ook decimalen. Werkt door in categorie- en overallscore (`lib/scoring.ts`), niet in de bouwblokscore. Zie datamodel.md, Bouwblok. */
   gewicht: number;
+  /**
+   * Alleen bij antwoordType "ja-nee-weetniet": De zin onder de afdelingskaart als dit bouwblok het grootste aandachtspunt van de
+   * afdeling is (`content-ziekenhuis-quickscan.md`). Leeg: Er staat geen zin.
+   */
+  aandachtZin?: string | null;
   vragen: Vraag[];
   /**
    * "Verwijderen" in het contentbeheerscherm zet dit i.p.v. het record echt
@@ -41,7 +46,20 @@ export interface Categorie {
   bouwblokken: Bouwblok[];
   /** Zie `Bouwblok.gearchiveerd` hierboven — dezelfde reden, op categorieniveau. */
   gearchiveerd?: boolean;
+  /**
+   * De respondent kan aangeven dat deze categorie niet van toepassing is (`datamodel.md`, Optionele categorieën). Standaard
+   * `false`: Dan verandert er niets.
+   */
+  optioneel?: boolean;
+  /** Definitie onder de naam in de doorloopflow (Quickscan, de afdeling). Leeg: Er staat niets. */
+  omschrijving?: string | null;
 }
+
+/** Hoe een vraag wordt beantwoord en hoe de score wordt berekend (`datamodel.md`, Antwoordtype). */
+export type AntwoordType = "schaal" | "ja-nee-weetniet";
+
+/** Een antwoord op een vraag: 1 tot en met 5 bij antwoordType "schaal", Ja, Nee of Weet ik niet bij "ja-nee-weetniet". */
+export type Antwoord = number | "ja" | "nee" | "weet-niet";
 
 export interface SchaalLabel {
   waarde: 1 | 2 | 3 | 4 | 5;
@@ -153,7 +171,14 @@ export interface Assessment {
   /** UI-woord voor meerdere bouwblokken na een aantal, bijv. "bouwblokken" of "AI-domeinen". */
   bouwblokEenheidMeervoud: string;
   featureCards: FeatureCard[];
+  /** De 1–5-schaal. Leeg bij antwoordType "ja-nee-weetniet": Dan is er geen schaal (`datamodel.md` noemt dat `null`). */
   schaal: SchaalLabel[];
+  /** Standaard "schaal" (1–5). Zie `datamodel.md`, Antwoordtype. */
+  antwoordType?: AntwoordType;
+  /** Regel boven de vragen in de doorloopflow. Leeg: De standaardtekst voor de 1–5-schaal. */
+  instructieregel?: string | null;
+  /** Alleen als een Categorie optioneel is: De Ja/Nee-vraag bovenaan die categorie. */
+  relevantieVraag?: string | null;
   // Let op: organisatieVelden staat hier bewust niet meer — die zijn platformbreed
   // geworden, zie data/organisatie-velden.ts (datamodel-rbac-voorstel.md, keuze 4).
   /** Herkomst-template bij een sector-variant (bijv. Zorgscan). null bij een op zichzelf staand Assessment. Puur informatief, geen lopende koppeling — datamodel.md, Sector-varianten. */
@@ -353,7 +378,12 @@ export interface ScanInvulling {
   scanUitvoeringId: string;
   organisatieLidId: string;
   status: ScanInvullingStatus;
-  antwoorden: Record<string, number>;
+  antwoorden: Record<string, Antwoord>;
+  /**
+   * Alleen bij optionele categorieën (`Categorie.optioneel`): Per categorie `true` (van toepassing) of `false` (niet van
+   * toepassing). Ontbreekt de categorie, dan is de vraag nog niet beantwoord (`datamodel.md`, Optionele categorieën).
+   */
+  relevantie?: Record<string, boolean>;
   opmerkingenPerBouwblok: Record<string, string>;
   /**
    * Notitie bij het starten van déze scan (`datamodel.md`, Notitie op de scan). Bij een import de `start_comment`. Hoort bij
@@ -379,7 +409,8 @@ export interface ScanInvulling {
  */
 export interface ScanWeergave {
   naam: string | null;
-  antwoorden: Record<string, number>;
+  antwoorden: Record<string, Antwoord>;
+  relevantie?: Record<string, boolean>;
   opmerkingenPerBouwblok: Record<string, string>;
 }
 
@@ -391,6 +422,12 @@ export type Classificatie = "rood" | "oranje" | "groen";
  */
 export type BenchmarkNiveau = "organisaties" | "metingen" | "scans";
 
+/**
+ * Hoe de Metingen van een benchmark binnen een organisatie gelezen worden (`benchmark.md`, Niveau 2, Lezing): De ontwikkeling
+ * van één onderdeel over de tijd (weergave C), of Metingen op een vergelijkbaar meetmoment naast elkaar (weergave H).
+ */
+export type BenchmarkLezing = "ontwikkeling" | "naastElkaar";
+
 export interface Benchmark {
   id: string;
   naam: string;
@@ -400,6 +437,11 @@ export interface Benchmark {
    * `scans` één Meting waarin de afgeronde scans worden vergeleken. Ontbreekt het veld, dan is het `organisaties`.
    */
   niveau?: BenchmarkNiveau;
+  /**
+   * Alleen bij niveau `metingen` (`benchmark.md`, Niveau 2, Lezing): Hoe de Metingen gelezen worden. Ontbreekt het veld, dan
+   * volgt de lezing uit de Metingen zelf (`lezingVan` in `lib/benchmark.ts`).
+   */
+  lezing?: BenchmarkLezing;
   /** Eén of meer Assessments. Elk heeft in de weergave een eigen sectie, scores van verschillende Assessments worden niet samengevoegd. */
   assessmentIds: string[];
   /** Per organisatie hoogstens één lid per Assessment. */

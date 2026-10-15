@@ -10,7 +10,7 @@ sector-variant van de Zorgscan. Het antwoordtype en de score in punten
 staan in `datamodel.md` (Antwoordtype, Scoreberekening). De classificatie
 staat in `CLAUDE.md`, sectie 1.
 
-**Status**: Gespecificeerd, nog niet gebouwd.
+**Status**: Gebouwd op 14 oktober 2026, zie Gebouwd onderaan.
 
 **Bron**: Joost, aangeleverd als PDF-resultaat van een ingevulde
 proefscan voor een fictief ziekenhuis in de oude tool, plus twee
@@ -105,8 +105,9 @@ Door Joost, 14 oktober 2026.
 
 - Naam: "Klantcontact Quickscan – Ziekenhuis"
 - `kortLabel`: "Quickscan Ziekenhuis" (voorstel)
-- `icoon`: Voorstel 🏥 als tijdelijke emoji, want 🩺 is al van de
-  Zorgscan. Joost kiest.
+- `icoon`: `cross`, een plusteken als omtrek in dezelfde lijnstijl als
+  de andere drie (`stylesheet.md`, Assessment-icoon). Gebouwd op 14
+  oktober 2026, op verzoek van Sander; de tijdelijke emoji 🏥 vervalt.
 - `antwoordType`: `"ja-nee-weetniet"`, `schaal`: `null`
 - `relevantieVraag`: "Is deze afdeling relevant voor uw situatie?" (in de
   oude tool "Is dit organisatieonderdeel relevant voor uw situatie?")
@@ -414,3 +415,42 @@ en klachten van patiënten afhandelt, buiten de directe behandeling om"
    tevredenheidsmetingen?
 10. Worden resultaten (bijv. wachttijd, volumes, succes selfservice)
     gebruikt om de organisatie te adviseren of beleid aan te passen?
+
+## Gebouwd
+
+Gebouwd op 14 oktober 2026. De scoring staat in `lib/quickscan.ts` (met tests in
+`lib/quickscan.test.ts`), de content in `data/ziekenhuis-quickscan-assessment.ts`, de demo-antwoorden voor de
+voorbeeld-output in `data/demo-antwoorden-quickscan.ts`, de kaarten in `components/AfdelingKaarten.tsx`,
+`components/JaNeeRadio.tsx` en `components/QuickscanResultaten.tsx`.
+
+**De open punten bovenaan, zoals gebouwd**
+
+1. Het minimum van 3 vragen voor "Relatief sterkste basis" staat als één constante (`MIN_VRAGEN_STERKSTE_BASIS`).
+   "Grootste aandachtspunt" en "Relatief sterkste basis" komen alleen bij minstens twee dimensies in een afdeling en
+   alleen als er één laagste respectievelijk hoogste is. Bij gelijkstand staat er geen chip.
+2. Radar, top 3 en staafdiagram per categorie vervallen voor dit Assessment. In plaats daarvan staan "Sterkste afdeling" en
+   "Meeste ontwikkelruimte" (alle gelijke afdelingen bij gelijkstand, geen van beide bij één afdeling of als alles gelijk is).
+3. De wegingskaart toont de naam als "Afdeling · Dimensie", bijvoorbeeld "Poliklinieken · Organisatie (2×)". De factor in de
+   doorloopflow en in de sidebar staat al binnen de afdeling en blijft "2×".
+4. De voorgestelde teksten staan zoals in dit bestand en zijn te wijzigen in beheer: Bij het Assessment de instructieregel en
+   de relevantievraag, bij een afdeling de omschrijving en het vinkje Optioneel, bij een dimensie de zin bij het grootste
+   aandachtspunt (`aandachtZin`).
+
+**Keuzes bij het bouwen**
+
+- **Opslag.** De antwoorden staan als `"ja"`, `"nee"` of `"weet-niet"` in `ScanInvulling.antwoorden`, de relevantie per
+  afdeling in `ScanInvulling.relevantie`. Een Assessment met dit type heeft `schaal: []` in de code in plaats van `null`, zodat
+  bestaande schermen die de schaal doorlopen niet breken. Alle schaalfuncties negeren een antwoord dat geen getal is.
+- **Toelichtingsicoon.** De dimensies hebben geen toelichting, centrale vraag of tags. Het ⓘ naast de titel van een bouwblok
+  verschijnt daarom alleen als er een toelichting of centrale vraag is, bij elk Assessment.
+- **Bestaande data.** Een browser of serverkopie met opgeslagen Assessments krijgt de Quickscan er één keer bij. Een Admin die
+  het Assessment verwijdert, ziet het niet terugkomen (per browser onthouden).
+- **Schermen die niet uitgewerkt zijn voor dit type** (besloten bij het bouwen, zie ook `backlog.md`):
+  - Resultaten van een Meting in beheer en voor een Lead: Een melding dat het gemiddelde nog niet is uitgewerkt. Het
+    resultaat van elke scan staat bij de scan zelf.
+  - Leads-venster: Alleen Uitnodigen is te kiezen, de andere vinkjes zijn grijs met de reden.
+  - Benchmark en samengestelde Meting: Het Assessment staat niet in de keuzelijst.
+  - Exporteren: De dropdown ontbreekt op de resultatenpagina en in het Meting-overzicht. De CSV-bulkexport slaat deze scans
+    over en meldt dat.
+  - Het testknopje in de doorloopflow vult voor dit type Ja, Nee en Weet ik niet, waarbij het gekozen cijfer bepaalt hoeveel
+    vragen Ja krijgen.

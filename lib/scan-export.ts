@@ -6,12 +6,24 @@ import {
   genereerScansCsv,
 } from "./csv-export";
 import { pdfBestandsnaam } from "./pdf/bestandsnaam";
+import { numeriekeAntwoorden } from "./scoring";
+import { isJaNeeWeetNiet } from "./quickscan";
 import type { ExportPdfPayload } from "./pdf/build-html";
 import { buildIndesignExport } from "./indesign/build-xml";
 import { downloadIndesignExport } from "./indesign/export";
 
 /** CSV van één of meer scans binnen één organisatie (export-csv.md). */
-export function exporteerScansCsv(rijen: CsvRijContext[]): void {
+export function exporteerScansCsv(alleRijen: CsvRijContext[]): void {
+  // De CSV kent alleen de 1–5-schaal: Een Assessment met Ja / Nee / Weet ik niet is er nog niet voor uitgewerkt (`backlog.md`,
+  // Quickscan Ziekenhuis). Die scans worden overgeslagen, met een melding.
+  const rijen = alleRijen.filter((r) => !isJaNeeWeetNiet(r.assessment));
+  if (rijen.length < alleRijen.length && typeof window !== "undefined") {
+    window.alert(
+      rijen.length === 0
+        ? "De CSV-export is voor dit type Assessment (Ja / Nee / Weet ik niet) nog niet beschikbaar."
+        : `${alleRijen.length - rijen.length} scan(s) van een Assessment met Ja / Nee / Weet ik niet zijn niet meegenomen: De CSV-export is daarvoor nog niet beschikbaar.`
+    );
+  }
   if (rijen.length === 0) return;
   const csv = genereerScansCsv(rijen);
   const bestandsnaam = rijen.length === 1 ? csvBestandsnaamEnkel(rijen[0]) : csvBestandsnaamBulk();
@@ -44,7 +56,7 @@ export async function downloadPdf(payload: ExportPdfPayload): Promise<boolean> {
 export function exporteerScanPdf({ organisatie, lid, invulling, assessment }: CsvRijContext): Promise<boolean> {
   return downloadPdf({
     assessment,
-    antwoorden: invulling.antwoorden,
+    antwoorden: numeriekeAntwoorden(invulling.antwoorden),
     opmerkingenPerBouwblok: invulling.opmerkingenPerBouwblok,
     organisatieNaam: organisatie.naam,
     respondentNaam: lid.naam ?? lid.email,
@@ -56,7 +68,7 @@ export function exporteerScanPdf({ organisatie, lid, invulling, assessment }: Cs
 export function exporteerScanIndesign({ organisatie, scanUitvoering, lid, invulling, assessment }: CsvRijContext): void {
   const resultaat = buildIndesignExport({
     assessment,
-    antwoorden: invulling.antwoorden,
+    antwoorden: numeriekeAntwoorden(invulling.antwoorden),
     organisatieNaam: organisatie.naam,
     organisatieKenmerken: organisatie.kenmerken,
     respondentNaam: lid.naam ?? lid.email,

@@ -3,7 +3,7 @@
 import { use } from "react";
 import Link from "next/link";
 import { useAssessment } from "@/lib/assessment-store";
-import { getDemoAntwoorden, demoRespondentNaam } from "@/data/demo-antwoorden-per-assessment";
+import { getDemoAntwoorden, getDemoRelevantie, demoRespondentNaam } from "@/data/demo-antwoorden-per-assessment";
 import { ResultsView } from "@/components/ResultsView";
 import { PageWithChrome } from "@/components/PageWithChrome";
 
@@ -46,8 +46,11 @@ export default function VoorbeeldPage({
       <ResultsView
         assessment={assessment}
         antwoorden={getDemoAntwoorden(assessment.id)}
+        relevantie={getDemoRelevantie(assessment.id)}
         respondentNaam={demoRespondentNaam}
         isPreview
+        // De pagina heeft zelf al de kop met de naam van het Assessment: Zonder dit staat hij er twee keer.
+        toonKop={false}
       />
     </div>
     </PageWithChrome>

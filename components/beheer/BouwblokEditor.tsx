@@ -77,6 +77,20 @@ export function BouwblokEditor({
           />
         </label>
         <label className="block text-sm">
+          <span className="mb-1 block text-ink">Zin bij grootste aandachtspunt</span>
+          <textarea
+            value={bouwblok.aandachtZin ?? ""}
+            onChange={(e) =>
+              patchBouwblok(assessmentId, categorieId, bouwblok.id, {
+                aandachtZin: e.target.value || null,
+              })
+            }
+            rows={2}
+            placeholder="Alleen gebruikt door de Quickscan: staat in het resultaat als dit het grootste aandachtspunt is."
+            className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+          />
+        </label>
+        <label className="block text-sm">
           <span className="mb-1 block text-ink">Toelichting</span>
           <div className="flex items-start gap-2">
             <textarea

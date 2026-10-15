@@ -74,8 +74,8 @@ function BenchmarkKaarten({ code, organisatie, lid }: { code: string; organisati
 /**
  * Eén Meting waarvoor een Admin minstens één weergave voor deze Lead heeft aangevinkt (`beheerpagina.md`, punt 6a). Los van "Mijn
  * metingen" hieronder: Een Lead kan hier staan zonder zelf ooit een vragenlijst te hebben ingevuld. Op de kaart staan alleen de
- * knoppen van de weergaven die aan staan: Resultaten, Spreiding, Antwoorden en Uitnodigen. Exporteren staat op de
- * resultatenpagina zelf. Een weergave die resultaten laat zien, is er pas bij minstens één afgeronde scan.
+ * knoppen Resultaten en Uitnodigen, voor zover ze aan staan. Spreiding, Antwoorden en Exporteren zitten in de schakelaar en op de
+ * resultatenpagina van de Meting. Resultaten is er pas bij minstens één afgeronde scan.
  */
 function LeadMetingKaart({
   code,
@@ -150,16 +150,6 @@ function LeadMetingKaart({
               <Link href={basis} className="btn btn-or btn-compact">
                 Resultaten
               </Link>
-              {aan("spreiding") && !samengesteld && (
-                <Link href={`${basis}?weergave=spreiding`} className="btn btn-outline btn-compact">
-                  Spreiding
-                </Link>
-              )}
-              {aan("antwoorden") && !samengesteld && (
-                <Link href={`${basis}?weergave=antwoorden`} className="btn btn-outline btn-compact">
-                  Antwoorden
-                </Link>
-              )}
             </>
           ) : (
             <span className="text-sm text-ink-m">Er zijn nog geen afgeronde scans, dus nog geen resultaten.</span>
@@ -252,18 +242,8 @@ function EigenEnLeadMetingKaart({
         {aan("resultaten") && afgerondInMeting > 0 && (
           <>
             <Link href={basis} className="btn btn-or btn-compact">
-              Bekijk de resultaten van de hele meting
+              Resultaten hele meting
             </Link>
-            {aan("spreiding") && (
-              <Link href={`${basis}?weergave=spreiding`} className="btn btn-outline btn-compact">
-                Spreiding
-              </Link>
-            )}
-            {aan("antwoorden") && (
-              <Link href={`${basis}?weergave=antwoorden`} className="btn btn-outline btn-compact">
-                Antwoorden
-              </Link>
-            )}
           </>
         )}
       </div>
@@ -366,7 +346,7 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
                 );
               }
               const { percentage } = assessment
-                ? voortgang(assessment, invulling.antwoorden)
+                ? voortgang(assessment, invulling.antwoorden, invulling.relevantie)
                 : { percentage: 0 };
               return (
                 <Link

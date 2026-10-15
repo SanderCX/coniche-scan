@@ -198,8 +198,16 @@ export function metingCelReden(opts: {
   afgerondeScans: number;
   antwoordenMetNamen: boolean;
   drempels: LeadDrempels;
+  /**
+   * Is de weergave voor het Assessment van deze Meting uitgewerkt? Niet bij Ja / Nee / Weet ik niet: Daar is alleen
+   * Uitnodigen beschikbaar (`backlog.md`, Quickscan Ziekenhuis). Standaard ja.
+   */
+  ondersteund?: boolean;
 }): string | null {
-  const { weergave, meting, resultatenAan, afgerondeScans, antwoordenMetNamen, drempels } = opts;
+  const { weergave, meting, resultatenAan, afgerondeScans, antwoordenMetNamen, drempels, ondersteund = true } = opts;
+  if (!ondersteund && weergave !== "uitnodigen") {
+    return "Deze weergave is nog niet beschikbaar voor een Assessment met Ja / Nee / Weet ik niet.";
+  }
   if (weergave === "resultaten") return null;
   if (weergave === "uitnodigen") {
     return isSamengesteld(meting) ? "Een samengestelde Meting heeft geen Respondenten om uit te nodigen." : null;

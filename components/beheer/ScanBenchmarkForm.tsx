@@ -52,7 +52,9 @@ export function ScanBenchmarkForm({
     if (!organisatie) return [];
     const ids = new Set(organisatie.scanUitvoeringen.filter((m) => aantalAfgerond(m) >= minScans).map((m) => m.assessmentId));
     if (huidig && huidig.organisatieId === organisatie.id) ids.add(huidig.assessmentId);
-    return [...ids].map((id) => ({ id, naam: assessments.find((a) => a.id === id)?.naam ?? "Onbekend Assessment" }));
+    return [...ids]
+      .filter((id) => assessments.some((a) => a.id === id))
+      .map((id) => ({ id, naam: assessments.find((a) => a.id === id)?.naam ?? "Onbekend Assessment" }));
   }, [organisatie, assessments, minScans, huidig]);
   const metingOpties = useMemo(() => {
     if (!organisatie || !assessmentId) return [];

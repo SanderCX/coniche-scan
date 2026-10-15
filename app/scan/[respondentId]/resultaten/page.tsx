@@ -9,6 +9,7 @@ import { ResultsView } from "@/components/ResultsView";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { DropdownKnop } from "@/components/DropdownKnop";
+import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/scan-export";
 
 export default function ResultatenPage({
@@ -62,19 +63,23 @@ export default function ResultatenPage({
       navRight={
         <>
           <Link href={`/scan/${respondentId}/doorloop`}>← Terug naar de scan</Link>
-          <DropdownKnop
-            label={pdfBezig ? "Bezig…" : "Exporteren"}
-            opties={[
-              {
-                label: "Als PDF",
-                onClick: handleExportPdf,
-                disabled: pdfBezig,
-                title: pdfBezig ? "PDF wordt gemaakt…" : undefined,
-              },
-              { label: "Als CSV", onClick: () => exporteerScansCsv([context]) },
-              { label: "Voor InDesign (XML)", onClick: () => exporteerScanIndesign(context) },
-            ]}
-          />
+          {/* Voor Ja / Nee / Weet ik niet is er voorlopig geen export: PDF, CSV en InDesign gaan uit van de 1–5-schaal
+              (`content-ziekenhuis-quickscan.md`, Resultaten, `backlog.md`). */}
+          {!isJaNeeWeetNiet(assessment) && (
+            <DropdownKnop
+              label={pdfBezig ? "Bezig…" : "Exporteren"}
+              opties={[
+                {
+                  label: "Als PDF",
+                  onClick: handleExportPdf,
+                  disabled: pdfBezig,
+                  title: pdfBezig ? "PDF wordt gemaakt…" : undefined,
+                },
+                { label: "Als CSV", onClick: () => exporteerScansCsv([context]) },
+                { label: "Voor InDesign (XML)", onClick: () => exporteerScanIndesign(context) },
+              ]}
+            />
+          )}
         </>
       }
       identiteitMenu={<MijnGegevensMenu lid={lid} />}
@@ -83,6 +88,7 @@ export default function ResultatenPage({
         <ResultsView
           assessment={assessment}
           antwoorden={invulling.antwoorden}
+          relevantie={invulling.relevantie}
           respondentNaam={lid.naam}
           bouwblokHref={(bouwblokId) => `/scan/${respondentId}/doorloop?bouwblok=${bouwblokId}`}
         />

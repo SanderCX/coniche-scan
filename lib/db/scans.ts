@@ -39,6 +39,7 @@ export function scanWeergave(lid: OrganisatieLid, invulling: ScanInvulling): Sca
   return {
     naam: lid.naam,
     antwoorden: invulling.antwoorden,
+    relevantie: invulling.relevantie,
     opmerkingenPerBouwblok: invulling.opmerkingenPerBouwblok,
   };
 }

@@ -100,7 +100,7 @@ Bewust nog niet opgepakt. Geen prioritering.
   vergelijking tussen Metingen is een benchmark binnen een organisatie
   (niveau 2) die de Admin zelf aanmaakt, eerst met twee Metingen. De Admin
   kiest een lezing, Ontwikkeling over tijd (weergave C) of Naast elkaar
-  (weergave H, voorstel van 14 oktober 2026):
+  (weergave H, gebouwd op 14 oktober 2026):
   `benchmark.md`, Niveau 2, `visualisatie-scores.md`, onderdeel C, E, H,
   `datamodel.md`, Meting en `beheerpagina.md`, punt 5 en 14. Nog niet
   ontworpen: De weergave bij drie of meer Metingen, bijvoorbeeld een lijn per
@@ -117,10 +117,9 @@ Bewust nog niet opgepakt. Geen prioritering.
   ontwikkeling in de tijd binnen een benchmark. Het berekenen moet op de
   server, zie Fase 2.
 - **Benchmark, niveau 2 (binnen een organisatie, tussen Metingen)**:
-  Besproken en uitgewerkt als voorstel in `benchmark.md`, nog te bouwen. Een
-  Meting per bedrijfsonderdeel van één organisatie naast elkaar, op dezelfde
-  plek als niveau 1, met `Benchmark.niveau`. Eerst alleen voor een Admin.
-  Open: Of een Lead de view van zijn Meting ziet, en met welke drempel.
+  Gebouwd op 14 oktober 2026 (`benchmark.md`, Niveau 2): Een vergelijking van
+  twee Metingen met de lezing Ontwikkeling over tijd of Naast elkaar, voor een
+  Admin en voor een Lead met het vinkje in het Leads-venster.
 - **Benchmark, niveau 3 (binnen een Meting)**: Hoe scoort een scan ten
   opzichte van de andere scans in dezelfde Meting. Het kader staat in
   `benchmark.md`. Het ontwerp van de spreiding (een stip per scan, gemiddelde,
@@ -206,8 +205,8 @@ Bewust nog niet opgepakt. Geen prioritering.
 
 ### Quickscan Ziekenhuis (antwoordType Ja / Nee / Weet ik niet)
 
-Gespecificeerd in `content-ziekenhuis-quickscan.md`. Bewust nog niet
-opgepakt:
+Gebouwd op 14 oktober 2026 (`content-ziekenhuis-quickscan.md`, Gebouwd). Bewust
+nog niet opgepakt:
 
 - **PDF-export**: Eerst specificeren (eigen `export-pdf-visual-*.md`). De
   PDF van de oude tool is alleen een referentie voor de inhoud.

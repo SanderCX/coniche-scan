@@ -46,6 +46,8 @@ export function verrijkAssessment(assessment: Assessment): Assessment {
     bouwblokLabel: assessment.bouwblokLabel ?? (isAi ? "AI-domein" : "Bouwsteen"),
     wegingTitel: assessment.wegingTitel ?? null,
     wegingToelichting: assessment.wegingToelichting ?? null,
+    // De Quickscan had eerst een tijdelijke emoji: Opgeslagen kopieën krijgen het SVG-icoon (`stylesheet.md`, Assessment-icoon).
+    icoon: assessment.id === "quickscan-ziekenhuis" && assessment.icoon === "🏥" ? "cross" : assessment.icoon,
     categorieen: assessment.categorieen
       ? assessment.categorieen.map((c) => ({ ...c, bouwblokken: c.bouwblokken.map(verrijkBouwblok) }))
       : null,

@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { useScanInvulling, updateScanInvulling, scanWeergave } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { actieveBouwblokkenMetGroep, actieveVragen } from "@/lib/assessment-structuur";
+import { categorieVanToepassing, isVolledigIngevuld } from "@/lib/scoring";
+import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { Antwoord } from "@/lib/types";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { Sidebar } from "@/components/Sidebar";
@@ -30,8 +33,15 @@ export default function DoorloopPage({
   const slot = useBewerkslot("scan", gegevens ? respondentId : null);
 
   // Gearchiveerde bouwblokken (datamodel.md, "Content bewerken") krijgt een
-  // nieuwe invulling niet meer te zien.
-  const alleBouwblokken = assessment ? actieveBouwblokkenMetGroep(assessment) : [];
+  // nieuwe invulling niet meer te zien. Bij een optionele categorie die niet van toepassing is, blijft alleen het eerste
+  // bouwblok over (de kaarten met de relevantievraag): De rest wordt overgeslagen (`datamodel.md`, Optionele categorieën).
+  const relevantie = gegevens?.invulling.relevantie;
+  const alleBouwblokken = assessment
+    ? actieveBouwblokkenMetGroep(assessment).filter((b, i, lijst) => {
+        if (categorieVanToepassing(assessment, b.groepId, relevantie)) return true;
+        return lijst.findIndex((x) => x.groepId === b.groepId) === i;
+      })
+    : [];
 
   // Geen lazy-initializer: alleBouwblokken is pas na hydration (async localStorage-
   // lezing) gevuld, dus het actieve bouwblok wordt bij elke render opnieuw afgeleid
@@ -88,8 +98,15 @@ export default function DoorloopPage({
   const huidigeIndex = alleBouwblokken.findIndex((b) => b.bouwblok.id === actieveBouwblokId);
   const huidig = alleBouwblokken[huidigeIndex];
   const isLaatsteBouwblok = huidigeIndex === alleBouwblokken.length - 1;
+  const jaNee = isJaNeeWeetNiet(assessment);
+  // Een optionele categorie begint met haar kaarten bij het eerste bouwblok.
+  const categorie = (assessment.categorieen ?? []).find((c) => c.id === huidig.groepId);
+  const eersteVanOptioneleCategorie =
+    categorie?.optioneel === true &&
+    actieveBouwblokkenMetGroep(assessmentVast).find((b) => b.groepId === huidig.groepId)?.bouwblok.id === huidig.bouwblok.id;
+  const kanAfronden = isVolledigIngevuld(invulling.antwoorden, assessment, invulling.relevantie);
 
-  function handleAntwoord(vraagId: string, waarde: number) {
+  function handleAntwoord(vraagId: string, waarde: Antwoord) {
     updateScanInvulling(respondentId, (i) => ({
       ...i,
       antwoorden: { ...i.antwoorden, [vraagId]: waarde },
@@ -105,18 +122,36 @@ export default function DoorloopPage({
 
   function handleTestVulAutomatisch() {
     const vragen = actieveVragen(assessmentVast);
-    const nieuweAntwoorden: Record<string, number> = {};
+    const nieuweAntwoorden: Record<string, Antwoord> = {};
     vragen.forEach((vraag, i) => {
+      if (jaNee) {
+        // Het gemiddelde bepaalt hoeveel Ja's: 2 is een derde, 3 twee derde, 4 bijna alles. De rest is Nee of Weet ik niet.
+        const ja = i % 3 < testGemiddelde - 1;
+        nieuweAntwoorden[vraag.id] = ja ? "ja" : i % 2 === 0 ? "nee" : "weet-niet";
+        return;
+      }
       const offset = (i % 3) - 1; // cyclisch: gemiddelde-1, gemiddelde, gemiddelde+1
       nieuweAntwoorden[vraag.id] = Math.min(5, Math.max(1, testGemiddelde + offset));
     });
+    // Bij optionele categorieën zijn ze allemaal van toepassing.
+    const alleRelevantie = Object.fromEntries(
+      (assessmentVast.categorieen ?? []).filter((c) => c.optioneel).map((c) => [c.id, true])
+    );
     updateScanInvulling(respondentId, (i) => ({
       ...i,
       antwoorden: { ...i.antwoorden, ...nieuweAntwoorden },
+      ...(jaNee ? { relevantie: { ...(i.relevantie ?? {}), ...alleRelevantie } } : {}),
       status: "afgerond",
       afgerondOp: i.afgerondOp ?? new Date().toISOString(),
     }));
     router.push(`/scan/${respondentId}/resultaten`);
+  }
+
+  function handleRelevantie(categorieId: string, relevant: boolean) {
+    updateScanInvulling(respondentId, (i) => ({
+      ...i,
+      relevantie: { ...(i.relevantie ?? {}), [categorieId]: relevant },
+    }));
   }
 
   function handleVolgende() {
@@ -213,6 +248,19 @@ export default function DoorloopPage({
             schaal={assessment.schaal}
             respondent={respondent}
             isLaatsteBouwblok={isLaatsteBouwblok}
+            jaNee={jaNee}
+            instructieregel={assessment.instructieregel}
+            afdeling={
+              eersteVanOptioneleCategorie && categorie
+                ? {
+                    categorie,
+                    relevantieVraag: assessment.relevantieVraag?.trim() || "Is dit onderdeel relevant voor uw situatie?",
+                    relevantie: invulling.relevantie?.[categorie.id],
+                    onRelevantie: (relevant) => handleRelevantie(categorie.id, relevant),
+                  }
+                : undefined
+            }
+            kanAfronden={kanAfronden}
             onAntwoord={handleAntwoord}
             onOpmerking={handleOpmerking}
             onVolgende={handleVolgende}

@@ -1,5 +1,66 @@
 # Coniche Scan — Changelog
 
+## 2026-10-14 (4) — Specs van Joost, PR 105: De kaart op de Lead-pagina toont alleen Resultaten en Uitnodigen
+
+Op verzoek van Sander gebouwd (`app/s/[code]/page.tsx`).
+
+**Gedaan** (`CLAUDE.md`, scherm 4; `beheerpagina.md`, punt 6a; `datamodel.md`, Wat de Lead op zijn eigen pagina ziet):
+- De knoppen Spreiding en Antwoorden zijn van de Meting-kaart en van de kaart bij de eigen scan gehaald. Ze zitten in de
+  schakelaar op de resultatenpagina van de Meting, waar ze al stonden voor zover het vinkje aan staat.
+- "Bekijk de resultaten van de hele meting" heet nu "Resultaten hele meting".
+
+**Tests**: ongewijzigd, 294.
+
+## 2026-10-14 (3) — Specs van Joost, PR 103: Quickscan Ziekenhuis en de lezing bij een vergelijking tussen Metingen
+
+Op verzoek van Sander volledig gebouwd. Er is niets aan de opgeslagen data omgezet: Een bestaande browser of serverkopie krijgt
+de Quickscan er één keer bij, en een benchmark van vóór de lezing volgt haar lezing uit haar leden.
+
+**Gedaan, Quickscan Ziekenhuis** (`content-ziekenhuis-quickscan.md`; `datamodel.md`, Antwoordtype, Scoreberekening):
+- **Datamodel** (`lib/types.ts`): `Assessment.antwoordType`, `instructieregel` en `relevantieVraag`, `Categorie.optioneel` en
+  `omschrijving`, `Bouwblok.aandachtZin` en `ScanInvulling.relevantie`. Een antwoord is een getal of `"ja"`, `"nee"`,
+  `"weet-niet"`. Alle schaalfuncties negeren een antwoord dat geen getal is (`numeriekeAntwoorden`).
+- **Scoring** (`lib/quickscan.ts`, met tests): Ja is 1 punt, bouwblok `p/n`, afdeling en overall `Σ(g × p) / Σ(g × n)`, klassen vanaf
+  80 en 50 op het afgeronde percentage, afdelingen die niet van toepassing zijn tellen niet mee, chips bij minstens twee
+  dimensies (sterkste basis minstens 3 vragen, gelijkstand geeft geen chip). Voortgang en afronden volgen de relevantie
+  (`lib/scoring.ts`).
+- **Content**: 4 afdelingen, 10 dimensies, 60 vragen (`data/ziekenhuis-quickscan-assessment.ts`), met demo-antwoorden voor de
+  voorbeeld-output (5, 3, 5 en 4 van 15, samen 17 van 60).
+- **Doorloopflow**: Per afdeling twee kaarten (definitie en relevantievraag), pas na Ja volgen de vragen, Ja / Nee / Weet ik niet
+  per vraag, sidebar met de afdelingen en dimensies, en de testknop vult dit type ook.
+- **Resultaten**: Totaalkaart, een kaart per afdeling met verdieping op de dimensies en de chips, "Sterkste afdeling" en "Meeste
+  ontwikkelruimte", en de legenda. Radar, top 3 en staafdiagram per categorie vervallen.
+- **Beheer**: Instructieregel en relevantievraag bij het Assessment, omschrijving en Optioneel bij een afdeling en de zin bij het
+  grootste aandachtspunt bij een dimensie.
+
+**Gedaan, de lezing** (`benchmark.md`, Niveau 2; `visualisatie-scores.md`, C, E en H):
+- `Benchmark.lezing` (`ontwikkeling` of `naastElkaar`) met de schakelaar "Lees als" bij aanmaken en wijzigen. De app stelt de
+  lezing voor zolang de Admin de schakelaar niet aanraakte. Bij Ontwikkeling over tijd staan Metingen met een ander onderdeel
+  uitgeschakeld en kan Opslaan niet bij gelijke meetdata, bij Naast elkaar staat er een waarschuwing boven
+  `benchmarkMaxDagenTussenMetingen` dagen (nieuwe instelling bij Drempels en termijnen, startwaarde 90, geen blokkade).
+- Weergave H (`WeergaveNaastElkaar`): Cirkel en ruit, het verschil zonder teken met het symbool van de hogere Meting, "Gelijk",
+  tegels en een legenda. De matrix heeft bij Naast elkaar de kolom Hoogste, de Metingen staan op naam. De waarschuwing bij een
+  ander onderdeel in weergave C vervalt, want die Metingen komen daar niet meer voor.
+- De knop "Vergelijking" toont bij meer dan één benchmark de naam met de lezing, voor een Lead alleen de lezing. De lijst met
+  benchmarks en het detail tonen de lezing.
+- De meetdatum van een samengestelde Meting is alleen-lezen in "Wijzigen" ("Volgt de nieuwste Meting in de samenstelling") en
+  staat met dezelfde toelichting in het Meting-overzicht.
+
+**Keuzes waar de spec open liet**:
+- De bestaande schermen voor 1–5-scores zijn voor de Quickscan bewust uit (CLAUDE.md, scherm 6): Gemiddelde van een Meting,
+  Per bouwblok, Spreiding en Antwoorden, benchmark, samengestelde Meting, Exporteren en de vinkjes in het Leads-venster behalve
+  Uitnodigen.
+- Het ⓘ naast een bouwblok verschijnt alleen met een toelichting of centrale vraag, ook bij de andere Assessments.
+- Een Assessment met dit type heeft `schaal: []` in de code in plaats van `null`.
+- De wegingskaart noemt de naam als "Afdeling · Dimensie" (open punt 3), de factor in de flow blijft "2×".
+- Een verwijderde seed-Assessment komt niet terug (bijgehouden per browser).
+- In `datamodel.md`, `benchmark.md` en `visualisatie-scores.md` stonden onderdelen van PR 100 (Leads-venster, `LeadToegang`,
+  `antwoordenMetNamen`, kolom Verschil) weer als "voorstel". Ze zijn teruggezet op gebouwd. Wat nog voorstel is: Het vervallen
+  van niveau 3 als `Benchmark.niveau` (de weergave voor de Admin bestaat nog).
+
+**Tests**: 294 (was 274): Quickscan-scoring met de rekenvoorbeelden uit de spec, klassen en afronding, chips en gelijkstand,
+relevantie en voortgang, de lezing (voorstel, regels, dagen, volgorde) en weergave H met de kolom Hoogste.
+
 ## 2026-10-14 (2) — Specs van Joost, PR 100: Meetdatum vervangt de ronde, Leads-venster in plaats van tabel
 
 Op verzoek van Sander volledig gebouwd. De opgeslagen data blijft bruikbaar: Bestaande Metingen houden naam, onderdeel en

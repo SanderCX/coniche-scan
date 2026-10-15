@@ -158,7 +158,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
         naam: lid.naam || lid.email,
         rolTeam: rolTeamTekst(lid),
         status: invulling.status,
-        voortgang: voortgang(assessment!, invulling.antwoorden).percentage,
+        voortgang: voortgang(assessment!, invulling.antwoorden, invulling.relevantie).percentage,
         gestart: invulling.gestartOp ?? "",
         aangemaakt: invulling.aangemaaktOp,
         notitie: invulling.notitie ?? "",
@@ -212,6 +212,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
           {organisatie.naam}
         </Link>
         {` · meetdatum ${toonMeetdatum(scanUitvoering.meetdatum)}`}
+        {isSamengesteld(scanUitvoering) && " (volgt de nieuwste Meting in de samenstelling)"}
         {onderdeelVan(scanUitvoering) !== STANDAARD_ONDERDEEL && ` · onderdeel ${onderdeelVan(scanUitvoering)}`} · {afgerond} van{" "}
         {invullingen.length} afgerond
       </p>

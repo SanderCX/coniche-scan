@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
+import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { useOrganisaties } from "@/lib/db";
 import { maakBenchmark } from "@/lib/benchmark-store";
 import { benchmarkNamen } from "@/lib/benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
-import { BenchmarkNiveau } from "@/lib/types";
+import { BenchmarkLezing, BenchmarkNiveau } from "@/lib/types";
 import { BenchmarkForm } from "@/components/beheer/BenchmarkForm";
 import { MetingenBenchmarkForm } from "@/components/beheer/MetingenBenchmarkForm";
 import { ScanBenchmarkForm } from "@/components/beheer/ScanBenchmarkForm";
@@ -26,6 +27,9 @@ export default function NieuweBenchmarkPage() {
   const gebruiker = useIngelogdeGebruiker();
   const organisaties = useOrganisaties();
   const assessments = useAssessments();
+  // Een benchmark rekent met gemiddelden en spreiding van de 1–5-schaal: Voor Ja / Nee / Weet ik niet is dat nog niet uitgewerkt
+  // (`backlog.md`, Quickscan Ziekenhuis).
+  const voorBenchmark = assessments.filter((a) => !isJaNeeWeetNiet(a));
   const instellingen = useInstellingen();
   const router = useRouter();
   const [niveau, setNiveau] = useState<BenchmarkNiveau>("organisaties");
@@ -38,7 +42,12 @@ export default function NieuweBenchmarkPage() {
     );
   }
 
-  function opslaan(w: { naam: string; assessmentIds: string[]; leden: Parameters<typeof benchmarkNamen>[1] }) {
+  function opslaan(w: {
+    naam: string;
+    lezing?: BenchmarkLezing;
+    assessmentIds: string[];
+    leden: Parameters<typeof benchmarkNamen>[1];
+  }) {
     const b = maakBenchmark(
       { ...w, niveau, aangemaaktDoor: gebruiker!.id },
       benchmarkNamen(w.assessmentIds, w.leden, organisaties, assessments, niveau)
@@ -69,7 +78,7 @@ export default function NieuweBenchmarkPage() {
         <BenchmarkForm
           key="organisaties"
           organisaties={organisaties}
-          assessments={assessments}
+          assessments={voorBenchmark}
           minScans={instellingen.benchmarkMinScans}
           minOrganisaties={instellingen.benchmarkMinOrganisaties}
           bevestigLabel="Benchmark aanmaken"
@@ -80,8 +89,9 @@ export default function NieuweBenchmarkPage() {
         <MetingenBenchmarkForm
           key="metingen"
           organisaties={organisaties}
-          assessments={assessments}
+          assessments={voorBenchmark}
           minScans={instellingen.benchmarkMinScans}
+          maxDagen={instellingen.benchmarkMaxDagenTussenMetingen}
           bevestigLabel="Benchmark aanmaken"
           onOpslaan={opslaan}
         />
@@ -90,7 +100,7 @@ export default function NieuweBenchmarkPage() {
         <ScanBenchmarkForm
           key="scans"
           organisaties={organisaties}
-          assessments={assessments}
+          assessments={voorBenchmark}
           minScans={instellingen.benchmarkMinScans}
           bevestigLabel="Benchmark aanmaken"
           onOpslaan={opslaan}

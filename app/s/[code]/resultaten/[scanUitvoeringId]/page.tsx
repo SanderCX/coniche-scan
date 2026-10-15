@@ -1,5 +1,6 @@
 "use client";
 
+import { LEZING_NAAM, lezingVan } from "@/lib/benchmark";
 import { use, useState } from "react";
 import { useRespondentPerToegangscode } from "@/lib/db";
 import { heeftMetingToegang, metingIdsMetWeergave } from "@/lib/lead-toegang";
@@ -16,6 +17,7 @@ import {
   isSamengesteld,
 } from "@/lib/metingen";
 import { useBenchmarks } from "@/lib/benchmark-store";
+import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { benchmarkGeldigVoorOrganisatie, heeftBenchmarkToegang } from "@/lib/lead-toegang";
 
 /**
@@ -47,6 +49,19 @@ export default function LeadResultatenPage({
         <div className="container section" style={{ maxWidth: "40rem" }}>
           <h1>Geen toegang</h1>
           <p>Deze meting bestaat niet (meer), of de resultaten ervan staan niet voor jou klaar.</p>
+        </div>
+      </PageWithChrome>
+    );
+  }
+
+  // Het gemiddelde over de scans is er nog niet voor Ja / Nee / Weet ik niet (`backlog.md`, Quickscan Ziekenhuis).
+  if (isJaNeeWeetNiet(assessment)) {
+    return (
+      <PageWithChrome logoHref={`/s/${code}`} code={code} toonTerug>
+        <div className="container section" style={{ maxWidth: "40rem" }}>
+          <span className="eyebrow">{scanUitvoering.label}</span>
+          <h1>Nog niet beschikbaar</h1>
+          <p>Het resultaat van een hele Meting is voor dit type Assessment nog niet beschikbaar.</p>
         </div>
       </PageWithChrome>
     );
@@ -84,7 +99,12 @@ export default function LeadResultatenPage({
         heeftBenchmarkToegang(gegevens.organisatie, gegevens.lid.id, b.id) &&
         b.leden.filter((l) => resultatenIds.includes(l.metingId)).length >= 2
     )
-    .map((b) => ({ id: b.id, naam: "Vergelijking", href: `/s/${code}/benchmark/${b.id}` }));
+    .map((b) => ({
+      id: b.id,
+      // De naam van de benchmark is vrije tekst van een Admin: Een Lead ziet alleen de lezing.
+      naam: `Vergelijking (${LEZING_NAAM[lezingVan(b, [gegevens.organisatie])]})`,
+      href: `/s/${code}/benchmark/${b.id}`,
+    }));
 
   // export.uitvoeren voor een Lead (datamodel.md deel 2, Rechtenmatrix): Alleen met het vinkje Exporteren voor deze Meting.
   // Mag exporteren wat hij hier al ziet, dus het gemiddelde van deze Meting

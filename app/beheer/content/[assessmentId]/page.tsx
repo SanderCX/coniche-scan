@@ -197,6 +197,29 @@ export default function ContentEditorPage({
             />
           </label>
           <label className="block text-sm sm:col-span-2">
+            <span className="mb-1 block text-ink">Instructieregel boven de vragen</span>
+            <textarea
+              value={assessment.instructieregel ?? ""}
+              onChange={(e) =>
+                updateAssessment(assessmentId, (a) => ({ ...a, instructieregel: e.target.value || undefined }))
+              }
+              rows={2}
+              placeholder="Leeg: de standaardregel van de schaalvragen"
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+            />
+          </label>
+          <label className="block text-sm sm:col-span-2">
+            <span className="mb-1 block text-ink">Relevantievraag per afdeling</span>
+            <input
+              value={assessment.relevantieVraag ?? ""}
+              onChange={(e) =>
+                updateAssessment(assessmentId, (a) => ({ ...a, relevantieVraag: e.target.value || undefined }))
+              }
+              placeholder="Alleen voor Assessments met optionele afdelingen"
+              className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+            />
+          </label>
+          <label className="block text-sm sm:col-span-2">
             <span className="mb-1 block text-ink">Tekst wegingskaart</span>
             <textarea
               value={assessment.wegingToelichting ?? ""}
@@ -398,6 +421,14 @@ export default function ContentEditorPage({
                         </option>
                       ))}
                     </select>
+                    <label className="flex items-center gap-1 text-xs text-ink-m" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={categorie.optioneel === true}
+                        onChange={(e) => patchCategorie(assessmentId, categorie.id, { optioneel: e.target.checked })}
+                      />
+                      Optioneel
+                    </label>
                     <button
                       type="button"
                       onClick={(e) => {
@@ -409,6 +440,18 @@ export default function ContentEditorPage({
                       Archiveren
                     </button>
                   </summary>
+
+                  <label className="mt-3 block text-sm">
+                    <span className="mb-1 block text-ink">Omschrijving</span>
+                    <textarea
+                      value={categorie.omschrijving ?? ""}
+                      onChange={(e) =>
+                        patchCategorie(assessmentId, categorie.id, { omschrijving: e.target.value || null })
+                      }
+                      rows={2}
+                      className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+                    />
+                  </label>
 
                   <div className="mt-4 space-y-3 border-l-2 border-gray-100 pl-4">
                     {categorie.bouwblokken

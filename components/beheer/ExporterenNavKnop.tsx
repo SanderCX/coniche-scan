@@ -5,6 +5,7 @@ import { useScanInvulling } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/scan-export";
 import { DropdownKnop } from "@/components/DropdownKnop";
+import { isJaNeeWeetNiet } from "@/lib/quickscan";
 
 /**
  * "Exporteren" als scherm-specifieke actie in `.nav-right` op de
@@ -17,7 +18,8 @@ export function ExporterenNavKnop({ scanInvullingId }: { scanInvullingId: string
   const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
   const [pdfBezig, setPdfBezig] = useState(false);
 
-  if (!gegevens || !assessment) return null;
+  // Voor Ja / Nee / Weet ik niet is er voorlopig geen export (`backlog.md`, Quickscan Ziekenhuis).
+  if (!gegevens || !assessment || isJaNeeWeetNiet(assessment)) return null;
   const context = { ...gegevens, assessment };
 
   async function handlePdf() {

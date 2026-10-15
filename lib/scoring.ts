@@ -1,5 +1,5 @@
-import { Assessment, Bouwblok, Classificatie, ScanInvulling } from "./types";
-import { alleBouwblokkenMetGroep, alleVragen, actieveVragen, isVlakkeAssessment } from "./assessment-structuur";
+import { Antwoord, Assessment, Bouwblok, Classificatie, ScanInvulling } from "./types";
+import { actieveGroepen, alleBouwblokkenMetGroep, alleVragen, isVlakkeAssessment } from "./assessment-structuur";
 
 function round1(n: number): number {
   return Number(n.toFixed(1));
@@ -10,14 +10,32 @@ export function gewichtVan(bouwblok: Bouwblok): number {
   return typeof bouwblok.gewicht === "number" && bouwblok.gewicht > 0 ? bouwblok.gewicht : 1;
 }
 
-function beantwoordeScores(bouwblok: Bouwblok, antwoorden: Record<string, number>): number[] {
+/**
+ * Alleen de antwoorden van de 1–5-schaal, als getallen. Voor plekken die met scores rekenen of exporteren en geen Ja / Nee /
+ * Weet ik niet kennen (de gemiddelden, PDF, CSV en InDesign, `backlog.md`, Quickscan Ziekenhuis).
+ */
+export function numeriekeAntwoorden(antwoorden: Record<string, Antwoord>): Record<string, number> {
+  const uit: Record<string, number> = {};
+  for (const [vraagId, antwoord] of Object.entries(antwoorden)) if (typeof antwoord === "number") uit[vraagId] = antwoord;
+  return uit;
+}
+
+/**
+ * Is een vraag beantwoord? Een waarde staat er, ook "weet-niet" (`datamodel.md`, Antwoordtype). Bij de 1–5-schaal is dat een
+ * getal.
+ */
+export function isBeantwoord(antwoord: Antwoord | undefined | null): boolean {
+  return antwoord !== undefined && antwoord !== null;
+}
+
+function beantwoordeScores(bouwblok: Bouwblok, antwoorden: Record<string, Antwoord>): number[] {
   return bouwblok.vragen
     .map((v) => antwoorden[v.id])
     .filter((s): s is number => typeof s === "number");
 }
 
 /** Bouwblokscore zonder afronding. Alleen voor verdere berekening; getoond wordt `bouwblokScore`. */
-export function bouwblokScoreRuw(bouwblok: Bouwblok, antwoorden: Record<string, number>): number | null {
+export function bouwblokScoreRuw(bouwblok: Bouwblok, antwoorden: Record<string, Antwoord>): number | null {
   const scores = beantwoordeScores(bouwblok, antwoorden);
   return scores.length === 0 ? null : scores.reduce((a, b) => a + b, 0) / scores.length;
 }
@@ -25,7 +43,7 @@ export function bouwblokScoreRuw(bouwblok: Bouwblok, antwoorden: Record<string, 
 /** Bouwblokscore = gemiddelde van de scores op de vragen binnen dat bouwblok. Ongewogen. */
 export function bouwblokScore(
   bouwblok: Bouwblok,
-  antwoorden: Record<string, number>
+  antwoorden: Record<string, Antwoord>
 ): number | null {
   const ruw = bouwblokScoreRuw(bouwblok, antwoorden);
   return ruw === null ? null : round1(ruw);
@@ -38,7 +56,7 @@ export function bouwblokScore(
  */
 export function categorieScore(
   bouwblokken: { bouwblok: Bouwblok }[],
-  antwoorden: Record<string, number>
+  antwoorden: Record<string, Antwoord>
 ): number | null {
   let som = 0;
   let gewichten = 0;
@@ -58,7 +76,7 @@ export function categorieScore(
  * categoriescores (`datamodel.md`, Scoreberekening). Bij een afgeronde scan is
  * het aantal beantwoorde vragen gelijk aan het aantal vragen in het blok.
  */
-export function overallScoreRuw(assessment: Assessment, antwoorden: Record<string, number>): number | null {
+export function overallScoreRuw(assessment: Assessment, antwoorden: Record<string, Antwoord>): number | null {
   let teller = 0;
   let noemer = 0;
   for (const { bouwblok } of alleBouwblokkenMetGroep(assessment)) {
@@ -70,7 +88,7 @@ export function overallScoreRuw(assessment: Assessment, antwoorden: Record<strin
   return noemer === 0 ? null : teller / noemer;
 }
 
-export function overallScore(assessment: Assessment, antwoorden: Record<string, number>): number | null {
+export function overallScore(assessment: Assessment, antwoorden: Record<string, Antwoord>): number | null {
   const ruw = overallScoreRuw(assessment, antwoorden);
   return ruw === null ? null : round1(ruw);
 }
@@ -82,22 +100,43 @@ export function classificatie(score: number): Classificatie {
   return "groen";
 }
 
-export function voortgang(assessment: Assessment, antwoorden: Record<string, number>): {
+export function voortgang(
+  assessment: Assessment,
+  antwoorden: Record<string, Antwoord>,
+  relevantie?: Record<string, boolean>
+): {
   beantwoord: number;
   totaal: number;
   percentage: number;
 } {
   // Gearchiveerde vragen tellen hier niet mee (lib/assessment-structuur.ts,
   // `actieveVragen`): een lopende invulling moet ze niet meer hoeven
-  // beantwoorden om op 100% te komen.
-  const vragen = actieveVragen(assessment);
-  const beantwoord = vragen.filter((v) => typeof antwoorden[v.id] === "number").length;
+  // beantwoorden om op 100% te komen. De vragen van een categorie die niet van toepassing is, tellen ook niet mee; zolang de
+  // relevantievraag niet beantwoord is, telt de categorie als van toepassing (`datamodel.md`, Optionele categorieën).
+  const vragen = actieveGroepen(assessment)
+    .filter((groep) => categorieVanToepassing(assessment, groep.id, relevantie))
+    .flatMap((groep) => groep.bouwblokken.flatMap((b) => b.vragen.filter((v) => !v.gearchiveerd)));
+  const beantwoord = vragen.filter((v) => isBeantwoord(antwoorden[v.id])).length;
   const totaal = vragen.length;
   return {
     beantwoord,
     totaal,
     percentage: totaal === 0 ? 0 : Math.round((beantwoord / totaal) * 100),
   };
+}
+
+/**
+ * Is de categorie van toepassing? Bij een categorie zonder `optioneel` altijd. Bij een optionele categorie tenzij de respondent
+ * `false` antwoordde: Zolang de vraag niet beantwoord is, telt ze mee (`datamodel.md`, Optionele categorieën).
+ */
+export function categorieVanToepassing(
+  assessment: Assessment,
+  categorieId: string,
+  relevantie?: Record<string, boolean>
+): boolean {
+  const categorie = (assessment.categorieen ?? []).find((c) => c.id === categorieId);
+  if (!categorie || categorie.optioneel !== true) return true;
+  return relevantie?.[categorieId] !== false;
 }
 
 export interface BouwblokResultaat {
@@ -111,7 +150,7 @@ export interface BouwblokResultaat {
 
 export function alleBouwblokResultaten(
   assessment: Assessment,
-  antwoorden: Record<string, number>
+  antwoorden: Record<string, Antwoord>
 ): BouwblokResultaat[] {
   return alleBouwblokkenMetGroep(assessment).map(({ bouwblok, groepId, groepNaam }) => ({
     bouwblok,
@@ -141,7 +180,7 @@ export interface GroepResultaat {
 export function alleGroepResultaten(
   assessment: Assessment,
   bouwblokResultaten: BouwblokResultaat[],
-  antwoorden: Record<string, number>
+  antwoorden: Record<string, Antwoord>
 ): GroepResultaat[] {
   const isVlak = isVlakkeAssessment(assessment);
 
@@ -174,9 +213,9 @@ export function alleGroepResultaten(
 
 export function bouwblokStatus(
   bouwblok: Bouwblok,
-  antwoorden: Record<string, number>
+  antwoorden: Record<string, Antwoord>
 ): { status: "nog-niet-begonnen" | "bezig" | "afgerond"; beantwoord: number; totaal: number } {
-  const beantwoord = bouwblok.vragen.filter((v) => typeof antwoorden[v.id] === "number").length;
+  const beantwoord = bouwblok.vragen.filter((v) => isBeantwoord(antwoorden[v.id])).length;
   const totaal = bouwblok.vragen.length;
   const status =
     beantwoord === 0 ? "nog-niet-begonnen" : beantwoord === totaal ? "afgerond" : "bezig";
@@ -195,12 +234,26 @@ export function topSterktesEnVerbeterkansen(bouwblokResultaten: BouwblokResultaa
   };
 }
 
+/**
+ * Is de scan volledig ingevuld? Alle vragen van de categorieën die van toepassing zijn, zijn beantwoord. Bij optionele
+ * categorieën moet elke relevantievraag een antwoord hebben en minstens één categorie van toepassing zijn: Zijn ze allemaal
+ * Nee, dan is er niets te scoren en kan de scan niet worden afgerond (`datamodel.md`, Optionele categorieën).
+ */
 export function isVolledigIngevuld(
-  antwoorden: Record<string, number>,
-  assessment: Assessment
+  antwoorden: Record<string, Antwoord>,
+  assessment: Assessment,
+  relevantie?: Record<string, boolean>
 ): boolean {
-  const v = voortgang(assessment, antwoorden);
-  return v.beantwoord === v.totaal;
+  const optioneel = (assessment.categorieen ?? []).filter((c) => c.optioneel === true && !c.gearchiveerd);
+  if (optioneel.length > 0) {
+    if (optioneel.some((c) => relevantie?.[c.id] === undefined)) return false;
+    if (optioneel.every((c) => relevantie?.[c.id] === false)) {
+      const verplicht = (assessment.categorieen ?? []).filter((c) => c.optioneel !== true && !c.gearchiveerd);
+      if (verplicht.length === 0) return false;
+    }
+  }
+  const v = voortgang(assessment, antwoorden, relevantie);
+  return v.beantwoord === v.totaal && v.totaal > 0;
 }
 
 /**

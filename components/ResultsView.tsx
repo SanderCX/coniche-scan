@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { Assessment } from "@/lib/types";
+import { Antwoord, Assessment } from "@/lib/types";
+import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { QuickscanResultaten } from "./QuickscanResultaten";
 import { isVlakkeAssessment } from "@/lib/assessment-structuur";
 import {
   alleBouwblokResultaten,
@@ -18,13 +20,16 @@ import { CategoryBarChart } from "./CategoryBarChart";
 export function ResultsView({
   assessment,
   antwoorden,
+  relevantie,
   respondentNaam,
   isPreview = false,
   bouwblokHref,
   toonKop = true,
 }: {
   assessment: Assessment;
-  antwoorden: Record<string, number>;
+  antwoorden: Record<string, Antwoord>;
+  /** Alleen bij een Assessment met optionele categorieën (de Quickscan): Welke afdelingen van toepassing zijn. */
+  relevantie?: Record<string, boolean>;
   respondentNaam?: string | null;
   isPreview?: boolean;
   /** Als gezet: bouwblokken in de top 3-lijsten linken hiernaartoe om het antwoord aan te passen. */
@@ -36,6 +41,19 @@ export function ResultsView({
    */
   toonKop?: boolean;
 }) {
+  // Een Assessment met Ja / Nee / Weet ik niet heeft een eigen opbouw (`content-ziekenhuis-quickscan.md`, Resultaten).
+  if (isJaNeeWeetNiet(assessment)) {
+    return (
+      <QuickscanResultaten
+        assessment={assessment}
+        antwoorden={antwoorden}
+        relevantie={relevantie}
+        respondentNaam={respondentNaam}
+        isPreview={isPreview}
+        toonKop={toonKop}
+      />
+    );
+  }
   const bouwblokResultaten = alleBouwblokResultaten(assessment, antwoorden);
   const groepResultaten = alleGroepResultaten(assessment, bouwblokResultaten, antwoorden);
   const overall = overallScore(assessment, antwoorden);

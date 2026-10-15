@@ -123,7 +123,7 @@ function ScanWeergaven({
         />
       </div>
       {weergave === "scan" ? (
-        <ResultsView assessment={assessment} antwoorden={invulling.antwoorden} respondentNaam={lid.naam} />
+        <ResultsView assessment={assessment} antwoorden={invulling.antwoorden} relevantie={invulling.relevantie} respondentNaam={lid.naam} />
       ) : (
         <>
           <h1 style={{ marginTop: 0 }}>{assessment.naam}</h1>

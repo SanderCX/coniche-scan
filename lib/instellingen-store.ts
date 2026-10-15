@@ -26,6 +26,11 @@ export interface Instellingen {
    * aan een Lead te mogen toewijzen en voor de ondergrens in de weergave. Voorstel, startwaarde 5.
    */
   benchmarkMinRespondenten: number;
+  /**
+   * Niveau 2 met de lezing Naast elkaar (`benchmark.md`, Niveau 2, Lezing): Het aantal dagen tussen de oudste en de nieuwste
+   * meetdatum waarboven de Admin een waarschuwing krijgt. Geen blokkade. Voorstel, startwaarde 90.
+   */
+  benchmarkMaxDagenTussenMetingen: number;
 }
 
 const STANDAARDWAARDEN: Instellingen = {
@@ -34,6 +39,7 @@ const STANDAARDWAARDEN: Instellingen = {
   benchmarkMinOrganisaties: 5,
   benchmarkMinScans: 3,
   benchmarkMinRespondenten: 5,
+  benchmarkMaxDagenTussenMetingen: 90,
 };
 
 const KEY = "coniche-scan:instellingen";

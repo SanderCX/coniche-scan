@@ -1,4 +1,4 @@
-import { Assessment, Benchmark, BenchmarkLid, BenchmarkNiveau, Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering } from "./types";
+import { Assessment, Benchmark, BenchmarkLezing, BenchmarkLid, BenchmarkNiveau, Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering } from "./types";
 import { alleVragen } from "./assessment-structuur";
 import {
   aantalAfgerondInMeting,
@@ -17,6 +17,7 @@ import {
   alleGroepResultaten,
   BouwblokResultaat,
   GroepResultaat,
+  numeriekeAntwoorden,
   overallScore,
 } from "./scoring";
 
@@ -176,16 +177,20 @@ export function bouwBenchmarkSecties(
     const assessment = assessments.find((a) => a.id === assessmentId);
     if (!assessment) continue;
     const binnenOrganisatie = niveauVan(benchmark) === "metingen";
+    const naastElkaar = binnenOrganisatie && lezingVan(benchmark, organisaties) === "naastElkaar";
     const rijen = benchmark.leden
       .filter((l) => l.assessmentId === assessmentId)
       .map((l) => bouwRij(l, assessment, organisaties))
       .filter((r): r is BenchmarkRij => r !== null)
-      // Tussen organisaties op naam van de organisatie, binnen een organisatie op meetdatum met de oudste eerst, bij dezelfde
-      // datum op de naam van de Meting (`benchmark.md`, Niveau 2, Volgorde).
+      // Tussen organisaties op naam van de organisatie, binnen een organisatie bij Ontwikkeling over tijd op meetdatum met de
+      // oudste eerst, bij dezelfde datum op de naam van de Meting, en bij Naast elkaar op de naam van de Meting
+      // (`benchmark.md`, Niveau 2, Volgorde).
       .sort((a, b) =>
-        binnenOrganisatie
-          ? vergelijkOudsteEerst(a.meting, b.meting)
-          : a.organisatie.naam.localeCompare(b.organisatie.naam, "nl")
+        naastElkaar
+          ? a.meting.label.localeCompare(b.meting.label, "nl") || vergelijkOudsteEerst(a.meting, b.meting)
+          : binnenOrganisatie
+            ? vergelijkOudsteEerst(a.meting, b.meting)
+            : a.organisatie.naam.localeCompare(b.organisatie.naam, "nl")
       );
     const metLid = new Set(rijen.map((r) => r.organisatie.id));
     secties.push({
@@ -437,6 +442,8 @@ export interface VergelijkingsMeting {
  */
 export interface MetingenVergelijking {
   assessment: Assessment;
+  /** De lezing van de benchmark: Bepaalt de volgorde, de weergave (C of H) en de kolom rechts in de matrix. */
+  lezing: BenchmarkLezing;
   metingen: VergelijkingsMeting[];
 }
 
@@ -454,6 +461,7 @@ export function bouwMetingenVergelijkingen(
   return bouwBenchmarkSecties(benchmark, assessments, organisaties)
     .map((sectie) => ({
       assessment: sectie.assessment,
+      lezing: lezingVan(benchmark, organisaties),
       metingen: sectie.rijen
         .filter((r) => !opties.alleenMetingIds || opties.alleenMetingIds.includes(r.meting.id))
         .map((r) => ({ organisatie: r.organisatie, meting: r.meting, aantalAfgerond: r.aantalAfgerond, antwoorden: r.antwoorden, overall: r.overall })),
@@ -461,9 +469,74 @@ export function bouwMetingenVergelijkingen(
     .filter((v) => !opties.alleenMetingIds || v.metingen.length >= MIN_METINGEN_PER_ASSESSMENT);
 }
 
-/** Hebben twee Metingen een verschillend onderdeel? Dan is het verschil geen ontwikkeling (`visualisatie-scores.md`, C). */
-export function verschillendeOnderdelen(metingen: Pick<ScanUitvoering, "onderdeel">[]): boolean {
-  return new Set(metingen.map(onderdeelVan)).size > 1;
+/** De korte naam van een lezing, voor in een keuzelijst en een lijst (`benchmark.md`, Niveau 2, Lezing). */
+export const LEZING_NAAM: Record<BenchmarkLezing, string> = {
+  ontwikkeling: "ontwikkeling",
+  "naastElkaar": "naast elkaar",
+};
+
+/** De titel van de keuze in de schakelaar "Lees als" en de uitleg eronder (`beheerpagina.md`, punt 14). */
+export const LEZING_KEUZE: Record<BenchmarkLezing, { titel: string; uitleg: string }> = {
+  ontwikkeling: {
+    titel: "Ontwikkeling over tijd",
+    uitleg: "Dezelfde Meting op twee momenten. Het onderdeel is gelijk en de meetdatum verschilt.",
+  },
+  "naastElkaar": {
+    titel: "Naast elkaar",
+    uitleg: "Twee onderdelen of samenstellingen op een vergelijkbaar meetmoment.",
+  },
+};
+
+/**
+ * Het voorstel van de app voor de lezing bij een selectie (`benchmark.md`, Niveau 2, Voorstel van de app): Metingen met hetzelfde
+ * onderdeel en verschillende meetdata zijn een ontwikkeling, in elk ander geval staan ze naast elkaar.
+ */
+export function voorstelLezing(metingen: Pick<ScanUitvoering, "onderdeel" | "meetdatum">[]): BenchmarkLezing {
+  if (metingen.length < 2) return "naastElkaar";
+  const zelfdeOnderdeel = new Set(metingen.map(onderdeelVan)).size === 1;
+  const datums = metingen.map(meetdatumVan);
+  const verschillendeDatums = datums.every((d) => d !== null) && new Set(datums).size === datums.length;
+  return zelfdeOnderdeel && verschillendeDatums ? "ontwikkeling" : "naastElkaar";
+}
+
+/**
+ * De lezing van een benchmark binnen een organisatie. Staat `lezing` er niet op (een benchmark van vóór de lezing), dan volgt ze
+ * uit de leden volgens het voorstel van de app. Een Meting die niet meer bestaat telt niet mee.
+ */
+export function lezingVan(benchmark: Pick<Benchmark, "lezing" | "leden">, organisaties: Pick<Organisatie, "id" | "scanUitvoeringen">[]): BenchmarkLezing {
+  if (benchmark.lezing === "ontwikkeling" || benchmark.lezing === "naastElkaar") return benchmark.lezing;
+  const metingen = benchmark.leden
+    .map((l) => organisaties.find((o) => o.id === l.organisatieId)?.scanUitvoeringen.find((m) => m.id === l.metingId))
+    .filter((m): m is ScanUitvoering => m !== undefined);
+  return voorstelLezing(metingen);
+}
+
+/**
+ * Welke Metingen kunnen bij de gekozen Metingen bij de lezing Ontwikkeling over tijd (`benchmark.md`, Niveau 2, Lezing): Alleen
+ * Metingen met hetzelfde onderdeel als de eerst gekozen Meting. Geeft per Meting de reden als het niet kan, anders `null`.
+ * Zonder keuze kan elke Meting.
+ */
+export function redenOntwikkeling(
+  meting: Pick<ScanUitvoering, "onderdeel">,
+  gekozen: Pick<ScanUitvoering, "onderdeel">[]
+): string | null {
+  if (gekozen.length === 0) return null;
+  const onderdeel = onderdeelVan(gekozen[0]);
+  return onderdeelVan(meting) === onderdeel ? null : `Ander onderdeel dan ${onderdeel}`;
+}
+
+/** Hebben twee of meer gekozen Metingen dezelfde meetdatum? Dan is er bij Ontwikkeling over tijd geen volgorde: Opslaan kan niet. */
+export function gelijkeMeetdata(metingen: Pick<ScanUitvoering, "meetdatum">[]): boolean {
+  const datums = metingen.map(meetdatumVan).filter((d): d is string => d !== null);
+  return new Set(datums).size !== datums.length;
+}
+
+/** Het aantal dagen tussen de oudste en de nieuwste meetdatum van de Metingen, of `null` als er minder dan twee een datum hebben. */
+export function dagenTussenMeetdata(metingen: Pick<ScanUitvoering, "meetdatum">[]): number | null {
+  const datums = metingen.map(meetdatumVan).filter((d): d is string => d !== null).sort();
+  if (datums.length < 2) return null;
+  const dag = (d: string) => Date.UTC(Number(d.slice(0, 4)), Number(d.slice(5, 7)) - 1, Number(d.slice(8, 10)));
+  return Math.round((dag(datums[datums.length - 1]) - dag(datums[0])) / 86_400_000);
 }
 
 /* ---------- Niveau 3: Binnen een Meting ---------- */
@@ -515,7 +588,7 @@ export function bouwScanSectie(benchmark: Benchmark, assessments: Assessment[], 
           invulling,
           lid: respondent,
           naam: respondent.naam || respondent.email,
-          antwoorden: invulling.antwoorden,
+          antwoorden: numeriekeAntwoorden(invulling.antwoorden),
           overall: overallScore(assessment, invulling.antwoorden),
         },
       ];
