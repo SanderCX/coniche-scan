@@ -378,6 +378,7 @@ ScanInvulling {
   uitgenodigdOp: datetime
   gestartOp: datetime | null        // gezet bij het verzenden van de intake
   afgerondOp: datetime | null
+  laatstOpgeslagenOp: datetime | null  // voorstel 15 oktober 2026, voor "Laatst opgeslagen" op Mijn metingen (`visualisatie-mijn-metingen.md`); gezet bij elk opslaan van een antwoord
   antwoorden: { [vraagId: string]: number | string }   // 1-5, of "ja" | "nee" | "weet-niet" bij antwoordType "ja-nee-weetniet"
   relevantie: { [categorieId: string]: boolean }       // alleen bij optionele categorieën: true = van toepassing, false = niet van toepassing, ontbreekt = nog niet beantwoord
   opmerkingenPerBouwblok: { [bouwblokId: string]: string }
@@ -1447,6 +1448,9 @@ niveau een eigen drempel voor het aanvinken van een view voor een Lead,
 `benchmarkMinRespondenten`
 (startwaarde 5, het minimale aantal afgeronde scans in een Meting voor
 Spreiding, voor anonieme Antwoorden en voor de lijn van laagste tot hoogste score bij een Lead).
+Voorstel voor Verkennen: `verkennenMinGroep` (3), `verkennenMinVergelijking` (5),
+`verkennenMinPool` (6), `verkennenMaxGroepen` (12) en `verkennenMinIngevuldPct` (40),
+alle gehele getallen van minstens 1, het percentage tot en met 100 (`visualisatie-verkennen.md`, Drempels). De eerste twee staan al in de app (op 15 oktober 2026 op 2 en 2 gezet om te proberen), de tweede onder de naam `verkennenWaarschuwingGroep`. Het voorstel hernoemt die naar `verkennenMinVergelijking`. De startwaarden hier zijn de norm vanuit het ontwerp.
 Gebouwd op 14 oktober 2026: `benchmarkMaxDagenTussenMetingen` (startwaarde 90),
 het aantal dagen waarboven een vergelijking met de lezing Naast elkaar een
 waarschuwing geeft. De

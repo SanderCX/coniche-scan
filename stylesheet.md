@@ -611,6 +611,8 @@ bestand `assessment-icoon-<sleutel>.svg`. De code bewaart ze onder
   raster van 24 bij 24, met afgeronde uiteinden en hoeken. Dat raster is
   tussen 60% en 67% van de diameter van het rondje, dus er blijft ruim
   een rand rondom over.
+- **Op Mijn metingen**: Rond vlak van 48 px met een icoon van 30 px, zie
+  `visualisatie-mijn-metingen.md`.
 - **Grootte**: `2rem` voor het icoon zoals het in de lopende UI staat
   (zie Typografie). De SVG's zijn schaalbaar en dus ook groter te
   gebruiken.
@@ -914,7 +916,7 @@ pilvormige groep (`.weergave-wissel`).
   Organisaties erachter in gewicht 400. Gekozen is hij massief oranje, met een
   kruisje om het filter weg te halen.
 - **Focuschip**: Dezelfde keuzepil. Gekozen is hij massief oranje, zoals elke
-  gekozen pil. Een groep met minder dan 3 Organisaties heeft een gestreepte rand
+  gekozen pil. Een groep onder de drempel `verkennenMinGroep` heeft een gestreepte rand
   en tekst in `var(--ink-s)`.
 - **Slider met histogram**: Een smalle balk (4px) in `var(--border-d)` met een
   rond handvat van 20px in `var(--or)` en een witte rand. Erboven een histogram
