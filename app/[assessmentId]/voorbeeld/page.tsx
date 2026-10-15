@@ -32,16 +32,16 @@ export default function VoorbeeldPage({
   return (
     <PageWithChrome>
     <div className="container" style={{ padding: "3.5rem 2rem 4.5rem" }}>
-      {/* Eyebrow en kop volgens `stylesheet.md` (Koppen, Label/eyebrow): Het label is oranje, de kop is de standaard h1. De knop
-          om terug te gaan is een `.btn`, zoals de andere acties. */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1.5rem", marginBottom: "2rem" }}>
-        <div>
-          <span className="eyebrow">Voorbeeld-output</span>
-          <h1 style={{ margin: "0.3rem 0 0" }}>{assessment.naam}</h1>
+      {/* De kop van de voorbeeldpagina (`CLAUDE.md`, scherm 3): Een oranje eyebrow, daaronder de h1 met rechts ernaast, verticaal
+          uitgelijnd met de h1, de knop "← Terug". De kop mag afbreken (`min-width: 0`), de knop niet. */}
+      <div style={{ marginBottom: "2rem" }}>
+        <span className="eyebrow">Voorbeeld-output</span>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1.5rem", marginTop: "0.3rem" }}>
+          <h1 style={{ margin: 0, minWidth: 0 }}>{assessment.naam}</h1>
+          <Link href={`/${assessment.id}`} className="btn btn-outline btn-compact">
+            ← Terug
+          </Link>
         </div>
-        <Link href={`/${assessment.id}`} className="btn btn-outline btn-compact" style={{ flexShrink: 0 }}>
-          ← Terug
-        </Link>
       </div>
 
       <ResultsView

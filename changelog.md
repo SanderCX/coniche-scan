@@ -11,6 +11,11 @@ Op verzoek van Sander gebouwd (`app/[assessmentId]/voorbeeld/page.tsx`).
 - De kop van de pagina volgt de spec: Het label "Voorbeeld-output" is de oranje eyebrow, de titel de standaard h1 (`stylesheet.md`,
   Koppen) en "← Terug" een `.btn .btn-outline .btn-compact`. Eerder stonden daar losse Tailwind-klassen (grijs label, kleine
   titel, kale rand). De sectie eronder heeft ook een eyebrow.
+- De kop volgt de aangescherpte spec (PR 112): "← Terug" staat rechts naast de h1 en is daarmee verticaal uitgelijnd (niet meer
+  naast de eyebrow), en elke `.btn` heeft `white-space: nowrap` en `flex-shrink: 0`, zodat pijl en label op één regel blijven.
+  De eyebrows "Sterkste afdeling" en "Meeste ontwikkelruimte" van de Quickscan waren groen en rood en zijn nu oranje.
+- Onder de balk "Dit is een voorbeeld met demo-data…" staat een regel ruimte (1,5rem) voor de eerste kaart van het resultaat
+  (`.preview-banner`, voor alle Assessments).
 - De demo-scans staan in `data/demo-antwoorden-per-assessment.ts` (`getDemoMetingScans`): Afwijkingen van één punt op de vaste
   demo-antwoorden. Dezelfde sectie staat ook bij de AI-volwassenheidsscan en de Zorgscan. Voor de Quickscan is er (nog) geen demo van
   een Meting.

@@ -265,6 +265,10 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  /* Knoptekst staat op één regel, pijl en label samen, en een knop wordt niet smaller dan zijn tekst
+     (`stylesheet.md`, Knoptekst staat op één regel). */
+  white-space: nowrap;
+  flex-shrink: 0;
   border-radius: var(--r);
   padding: 0.82rem 1.7rem;
   font-weight: 700;
@@ -994,6 +998,8 @@ select.veld-compact:focus {
   padding: 0.8rem;
   font-weight: 700;
   font-size: var(--fs-s);
+  /* Eén regel ruimte onder de balk, voor de eerste kaart van het resultaat. */
+  margin-bottom: 1.5rem;
 }
 
 @media (max-width: 900px) {
