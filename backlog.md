@@ -110,6 +110,14 @@ Bewust nog niet opgepakt. Geen prioritering.
   (`visualisatie-verkennen.md`, `beheerpagina.md` punt 15). Het gedrag van
   Kenmerken en Groeperen op is een voorstel (versie 6 van het visual design) en
   nog niet gebouwd. Bewust later:
+  - Melding bij de terugval van de groepering verdwijnt niet ("CRM › Oplossing
+    is verwijderd. De groepering staat nu op Sector." blijft staan na een
+    filterwijziging). Regel in `visualisatie-verkennen.md`, Levensduur van een
+    melding en Herstel.
+  - Meldingen bij een uitgeschakelde pil bij Groeperen op laten noemen welke
+    instelling erachter zit (nu "Meer dan 1 verschillende waarden", straks "Meer
+    dan 1 waarden (instelling Waarden per kenmerk, maximum)"). Geen aparte
+    pull request, meenemen bij de volgende ronde in Verkennen.
   - Een versie voor de Consultant, met de namen van niet-eigen Organisaties
     afgeschermd en de drempel `benchmarkMinOrganisaties` voor beide kanten van
     een splitsing.

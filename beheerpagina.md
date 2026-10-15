@@ -352,10 +352,10 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
 | Organisaties in focus of rest, waarschuwing | `verkennenMinVergelijking` | 5 | Een kleinere focus of rest krijgt een waarschuwing. Het is geen blokkade. |
 | Organisaties in de pool, minimum | `verkennenMinPool` | 6 | In een kleinere pool kan er niet gegroepeerd worden. |
 | Waarden per kenmerk, maximum | `verkennenMaxGroepen` | 12 | Een select-kenmerk met meer verschillende waarden in de pool kan niet groeperen. |
-| Kenmerk ingevuld, minimum | `verkennenMinIngevuldPct` | 40 | Een kenmerk dat bij een lager percentage van de Organisaties in het Assessment is ingevuld, kan niet groeperen en staat grijs in het menu Kenmerk toevoegen. |
+| Kenmerk ingevuld, minimum | `verkennenMinIngevuldPct` | 40 | Een kenmerk dat bij een lager percentage van de Organisaties in het Assessment is ingevuld, kan niet groeperen en staat grijs in het menu Kenmerk toevoegen. Voorstel, nog niet gebouwd: Bij 0 geldt geen ondergrens. |
 
 - **Opmaak**: Eén rij velden die op een smal scherm doorloopt naar de volgende regel. Per veld het label in het label-formaat (`--fs-12`, gewicht 700, hoofdletters) boven een invoerveld van `--control-h` (40px), met onder het veld in `--fs-12` en `var(--ink-s)` wat het doet (bij het percentage de eenheid). Onder de velden de knop Opslaan en het Info-icoon op één regel. Het formulier heeft geen Annuleren, net als Benchmark.
-- **Invoer**: Gehele getallen van minstens 1. Het percentage ligt tussen 1 en 100. Bij een ongeldige waarde staat er naast Opslaan "Vul bij elk veld een geheel getal van minstens 1 in. Het percentage kan niet boven 100." en schrijft Opslaan niets.
+- **Invoer**: Gehele getallen van minstens 1. Voorstel van 15 oktober 2026, nog niet gebouwd: Alleen het percentage mag 0 zijn (dan geldt geen ondergrens voor hoe vaak een kenmerk is ingevuld) en ligt tussen 0 en 100. Bij een ongeldige waarde staat er naast Opslaan "Vul bij elk veld een geheel getal van minstens 1 in (bij het percentage mag 0). Het percentage kan niet boven 100." en schrijft Opslaan niets.
 - **Opslaan** schrijft direct. De nieuwe waarden gelden vanaf het volgende scherm Verkennen, voor alle Assessments. Het scherm slaat zijn eigen keuzes niet op, dus er valt niets te migreren.
 - **Alleen een Admin** ziet dit formulier en kan het wijzigen.
 
