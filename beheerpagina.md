@@ -1365,13 +1365,14 @@ afhangt van de status van zijn eigen `ScanInvulling`:
 
 - **Eigen scan, afhankelijk van de status** (de gewone knop uit de
   status-routing van "Mijn metingen", CLAUDE.md, schermflow punt 4):
-  - `"uitgenodigd"`: "Start de intake".
-  - `"bezig"`: "Ga verder met de scan".
+  - `"uitgenodigd"`: "Start de scan".
+  - `"bezig"`: "Ga verder".
   - `"afgerond"`: "Bekijk jouw resultaten" → zijn eigen `ScanInvulling`
     (zoals een gewone respondent).
 - **"Resultaten hele meting"** → de
   organisatie-resultaten van die Meting (het gemiddelde van alle
-  afgeronde scans, zie Organisatie-resultaten hierboven).
+  afgeronde scans, zie Organisatie-resultaten hierboven). Opmaak, teaser en
+  voorwaarden: `visualisatie-mijn-metingen.md`.
 
 De eigen scan blijft dus altijd bereikbaar, ook als hij nog niet is
 afgerond. Alleen "Bekijk jouw resultaten" vervalt zolang de scan niet is

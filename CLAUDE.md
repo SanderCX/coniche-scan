@@ -35,6 +35,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `benchmark.md` | Benchmark op drie niveaus: Tussen organisaties (gebouwd, geaggregeerd en anoniem, met een view per organisatie voor een Lead), binnen een organisatie tussen Metingen, en binnen een Meting (beide voorstel) |
 | `visualisatie-scores.md` | Hoe hoge en lage scores getoond worden: één meting, spreiding binnen een Meting, tussen Metingen, tussen organisaties en de matrix over Metingen (besloten ontwerp, gebouwd op 13 oktober 2026) |
 | `visualisatie-quickscan.md` | Visualisaties van de Quickscan Ziekenhuis in percentages: eigen resultaat (twee standen), gemiddelde en spreiding, antwoorden per vraag en benchmark (besloten op 15 oktober 2026, gebouwd) |
+| `visualisatie-mijn-metingen.md` | Opmaak van de landingspagina "Mijn metingen" voor Respondent en Lead: kaarten, statussen, teaser van de uitkomst, respons, benchmarkkaart (voorstel van 15 oktober 2026, visual design klaar, nog niet gebouwd) |
 | `visualisatie-verkennen.md` | Admin-scherm Verkennen onder Resultaten: filteren, groeperen en vergelijken van alle Organisaties van één Assessment, met vier weergaven (besloten en gebouwd op 15 oktober 2026) |
 | `backlog.md` | Bewust nog niet opgepakt |
 | `go-live-plan.md` | Actielijst naar productie |
@@ -385,6 +386,13 @@ geen afwijking van de spec maar een gat erin.
    pagina ze allemaal met hun status. Bovenaan, boven de lijst, een
    introtekst uit `mijnMetingenIntro` (`datamodel.md`, Algemene
    teksten) — beheerbaar, geen vaste tekst in de code.
+
+   **Opmaak van "Mijn metingen"**: kaarten per Meting met Assessment-icoon,
+   statuschip, voortgang en, bij een afgeronde scan, een teaser van de
+   uitkomst. Een Lead ziet ook een teaser van de hele meting (alleen met
+   Resultaten aan en minstens `benchmarkMinRespondenten` afgeronde scans).
+   Volledig in `visualisatie-mijn-metingen.md`. Knoppen: "Start de scan",
+   "Ga verder", "Bekijk jouw resultaten".
 
    **Bij een Lead-rol** (`datamodel.md` deel 2) toont de pagina alleen wat een
    Admin voor deze Lead heeft aangevinkt (`beheerpagina.md`, punt 6a).

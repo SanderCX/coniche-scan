@@ -378,6 +378,7 @@ ScanInvulling {
   uitgenodigdOp: datetime
   gestartOp: datetime | null        // gezet bij het verzenden van de intake
   afgerondOp: datetime | null
+  laatstOpgeslagenOp: datetime | null  // voorstel 15 oktober 2026, voor "Laatst opgeslagen" op Mijn metingen (`visualisatie-mijn-metingen.md`); gezet bij elk opslaan van een antwoord
   antwoorden: { [vraagId: string]: number | string }   // 1-5, of "ja" | "nee" | "weet-niet" bij antwoordType "ja-nee-weetniet"
   relevantie: { [categorieId: string]: boolean }       // alleen bij optionele categorieën: true = van toepassing, false = niet van toepassing, ontbreekt = nog niet beantwoord
   opmerkingenPerBouwblok: { [bouwblokId: string]: string }

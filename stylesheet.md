@@ -611,6 +611,8 @@ bestand `assessment-icoon-<sleutel>.svg`. De code bewaart ze onder
   raster van 24 bij 24, met afgeronde uiteinden en hoeken. Dat raster is
   tussen 60% en 67% van de diameter van het rondje, dus er blijft ruim
   een rand rondom over.
+- **Op Mijn metingen**: Rond vlak van 48 px met een icoon van 30 px, zie
+  `visualisatie-mijn-metingen.md`.
 - **Grootte**: `2rem` voor het icoon zoals het in de lopende UI staat
   (zie Typografie). De SVG's zijn schaalbaar en dus ook groter te
   gebruiken.
