@@ -2,16 +2,16 @@
 
 Spec voor het Admin-scherm Verkennen, waar je alle Organisaties van één Assessment door elkaar kunt filteren, groeperen en naast elkaar zetten.
 
-**Status: Voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026.** Er is een visual design (Claude Design, "Coniche Scan Verkennen") met voorbeelddata. De keuzes bij het bouwen staan onder Gebouwd. De korte namen, de pilvormige groep en de celtinten uit de opmaakronde zijn voorstel van 15 oktober 2026 en nog niet gebouwd. Wat in dit document staat als "Besloten" komt uit het gesprek van 15 oktober 2026.
+**Status: Voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026 met filters en een vaste groepering.** Er is een visual design (Claude Design, "Coniche Scan Verkennen") met voorbeelddata. Dat design (versie 6) toont ook het gedrag van Kenmerken en Groeperen op zoals hieronder beschreven (besloten op 15 oktober 2026), met een gedeeltelijke kenmerkenlijst: Sector, CRM-pakket, LLM-oplossing, Ingezette kanalen, AHT, NPS en FTR. De keuzes bij het bouwen staan onder Gebouwd. Kenmerken en Groeperen op, de korte namen, de pilvormige groep en de celtinten zijn voorstel van 15 oktober 2026 en nog niet gebouwd. Wat in dit document staat als "Besloten" komt uit het gesprek van 15 oktober 2026.
 
 ## Wat het is
 
-Verkennen is bedoeld om vragen te beantwoorden als "scoren Organisaties met pakket X anders dan de rest?" en "hoe verschillend zijn de Organisaties die pakket X gebruiken onderling?". Het werkt op de hele pool van een Assessment, met filters die je tijdens het kijken wisselt.
+Verkennen is bedoeld om vragen te beantwoorden als "scoren Organisaties met pakket X anders dan de rest?" en "hoe verschillend zijn de Organisaties die pakket X gebruiken onderling?". Het werkt op de hele pool van een Assessment, met kenmerken waarop je tijdens het kijken filtert en groepeert.
 
 Het verschilt van de benchmark tussen Organisaties (`benchmark.md`, niveau 1):
 
 - Een benchmark is een samengestelde groep die de Admin opslaat, bedoeld om aan een Lead te laten zien. Verkennen slaat niets op.
-- Bij een benchmark kiest de Admin eerst de leden. Bij Verkennen is de hele pool het uitgangspunt en maken filters die kleiner.
+- Bij een benchmark kiest de Admin eerst de leden. Bij Verkennen is de hele pool het uitgangspunt en maken de gekozen waarden bij de kenmerken die kleiner.
 - Verkennen is voor de Admin. Een Lead ziet het nooit.
 
 De rekenregels van de benchmark gelden ook hier (`benchmark.md`, Gedeelde regels). Dat zijn één Meting per Organisatie en een gelijk gewicht voor elke Organisatie.
@@ -31,30 +31,33 @@ De tab Verkennen onder de hoofdlink Resultaten, naast Metingen en Benchmarks, al
 - De Admin ziet de namen van de Organisaties.
 - De Zorgscan en de Klantcontact Volwassenheidsscan hebben dezelfde 15 bouwblokken, maar zijn aparte Assessments en dus aparte pools. De Zorgscan weegt bouwblok 4, 10 en 11 dubbel. Binnen een pool speelt dat niet, omdat bouwblokscores ongewogen zijn en de overall scoring van het Assessment volgt (`CLAUDE.md`, sectie 1).
 
-**Teller.** In het filtervenster staat "X van Y Organisaties in de pool". Y is het aantal Organisaties dat voor het Assessment in aanmerking komt, X het aantal na de filters. Eronder staat een balk, en een regel met hoeveel Organisaties niet beschikbaar zijn omdat ze geen toestemming hebben gegeven voor benchmark. Dit volgt het patroon van de redenen onder de lijst bij het samenstellen van een benchmark.
+**Teller.** Onderaan de kaart Kenmerken staat "X van Y Organisaties in de pool". Y is het aantal Organisaties dat voor het Assessment in aanmerking komt, X het aantal na de filters. Eronder staat een balk, en een regel met hoeveel Organisaties niet beschikbaar zijn omdat ze geen toestemming hebben gegeven voor benchmark. Dit volgt het patroon van de redenen onder de lijst bij het samenstellen van een benchmark.
 
-## Filters
+## Kenmerken en filters
 
-De filters komen uit de organisatievelden (`datamodel.md`, `VeldDefinitie`) en niet uit een vaste lijst in de code. Een nieuw veld wordt vanzelf een filter. Het veldtype bepaalt het bedieningselement.
+**Besloten (15 oktober 2026).** Een kenmerk is een organisatieveld dat de Admin aan het scherm toevoegt. Een toegevoegd kenmerk is automatisch een filter en een mogelijke groepering. Wil je alleen filteren, dan kies je geen groepering. Wil je alleen groeperen, dan kies je bij het kenmerk geen waarden. Een kenmerk zonder gekozen waarde filtert niets.
 
-- **Select en select-afhankelijk** (sector, subsector, leverancier per techstackcategorie, ondersteuner, deploymentmodel, cloudleverancier): Chips met meerkeuze en het aantal Organisaties erachter. Meerdere chips binnen één veld werken als "of".
-- **Getal en percentage** (AHT, NPS, CSAT, SLA, FTR, FTE, contacten per kanaal, digitaliseringspercentage): Een slider met een histogram erboven. Het getalfilter staat nog niet in het eerste ontwerp, behalve de AHT-drempel bij het groeperen (zie hieronder). Het filter zelf is een bereik met twee handvatten.
-- **Ingezette kanalen**: Afgeleid uit de contacten per jaar per kanaal. Een kanaal telt als ingezet bij een waarde boven 0. Een leeg veld is onbekend en telt niet als "niet ingezet". Een Organisatie met "niet van toepassing" bij een kanaal telt als niet ingezet. In het ontwerp werken meerdere gekozen kanalen als "en": De Organisatie moet ze allemaal inzetten.
-- **Filter toevoegen**: Een knop met een menu van alle organisatievelden die als filter bruikbaar zijn (keuzelijst, getal en percentage). Het menu heeft een zoekveld en koppen per groep van velden, zoals Sector en subsector, Volume en klantbasis, Digitalisering, Techstack, FTE en KPI's. Onder een kop staat alleen de korte naam van het veld (zie Korte namen), met het volledige pad in een tooltip. Achter elk veld staat hoeveel Organisaties het hebben ingevuld, bijvoorbeeld "37 van 50". Velden die bij minder dan 40% van de Organisaties zijn ingevuld, staan grijs maar blijven te kiezen (startwaarde, zie Open punten). Een gekozen veld sluit het menu en verschijnt als eigen filter.
+De kenmerken komen uit de organisatievelden (`datamodel.md`, `VeldDefinitie`) en niet uit een vaste lijst in de code. Een nieuw veld is vanzelf een kenmerk. Het veldtype bepaalt het bedieningselement en of er op gegroepeerd kan worden.
 
-Verschillende filters werken als "en". Het filter op sector en het filter op kanalen beperken de pool dus allebei.
-
-Organisaties zonder waarde voor een filterveld vallen bij dat filter weg. Bij een getalfilter staat erbij hoeveel Organisaties het veld hebben ingevuld (bijvoorbeeld "37 van 50"), omdat de organisatievelden nog niet overal gevuld zijn.
-
-"Wis filters" zet alle filters terug.
+- **Geen standaardkenmerken.** Het scherm begint leeg. Er staat geen sector of CRM-pakket vooraf, want de Admin bepaalt zelf waar de vraag over gaat.
+- **De kaart Kenmerken.** Links of boven de kaart Vergelijken (op smalle schermen boven). Titel Kenmerken met een Info-icoon (`info.verkennenKenmerken`, `beheerpagina.md`, register), per kenmerk een rij, de knop "Kenmerk toevoegen", "Wis filters" en onderaan de teller.
+- **Lege kaart.** De tekst "Nog geen kenmerken. Voeg een kenmerk toe om te filteren en te vergelijken." en daaronder een regel "Snel beginnen:" met losse keuzepillen voor CRM-pakket, Sector en AHT. Een pil voegt alleen dat kenmerk toe, hij kiest geen waarde. De drie zijn een snelkoppeling en geen vaste kenmerken. Zodra er een kenmerk staat, verdwijnt de regel.
+- **Kenmerk toevoegen.** Een knop met een menu van alle organisatievelden van het type keuzelijst, getal en percentage. Het menu heeft een zoekveld en koppen per groep van velden, zoals Sector en subsector, Volume en klantbasis, Digitalisering, Techstack, FTE en KPI's. Onder een kop staat alleen de korte naam van het veld (zie Korte namen), met het volledige pad in een tooltip. Achter elk veld staat hoeveel Organisaties het hebben ingevuld, bijvoorbeeld "37 van 50". Velden die bij minder dan 40% van de Organisaties in het Assessment zijn ingevuld, staan grijs maar blijven te kiezen (startwaarde, zie Open punten). Een veld dat al is toegevoegd, staat uitgeschakeld met "toegevoegd" erachter. Een gekozen veld sluit het menu en verschijnt als rij.
+- **Een kenmerkrij.** Bovenaan de korte naam van het kenmerk (potlood voor de korte namen van dat veld, zie Korte namen) en een kruisje om het kenmerk te verwijderen. Het kruisje haalt ook het filter weg. Daaronder het bedieningselement:
+  - **Select en select-afhankelijk** (sector, subsector, leverancier per techstackcategorie, ondersteuner, deploymentmodel, cloudleverancier): Losse keuzepillen met de korte naam en het aantal Organisaties erachter. Meerdere pillen binnen één kenmerk werken als "of".
+  - **Getal en percentage** (AHT, NPS, CSAT, SLA, FTR, FTE, contacten per kanaal, digitaliseringspercentage): Er is nog geen filter op bereik. De rij toont de tekst "Getal, 37 van 50 ingevuld. Te gebruiken bij Groeperen op." Het filter op bereik (twee handvatten, histogram) volgt later, zie Later.
+  - **Ingezette kanalen**: Afgeleid uit de contacten per jaar per kanaal. Een kanaal telt als ingezet bij een waarde boven 0. Een leeg veld is onbekend en telt niet als "niet ingezet". Een Organisatie met "niet van toepassing" bij een kanaal telt als niet ingezet. Meerdere gekozen kanalen werken als "en": De Organisatie moet ze allemaal inzetten. Dit kenmerk is alleen een filter en geen groepering.
+- **Verschillende kenmerken werken als "en".** Het kenmerk sector en het kenmerk kanalen beperken de pool dus allebei.
+- **Organisaties zonder waarde** voor een kenmerk met een gekozen waarde vallen bij dat filter weg. Bij een getal staat erbij hoeveel Organisaties het hebben ingevuld (bijvoorbeeld "37 van 50"), omdat de organisatievelden nog niet overal gevuld zijn.
+- **Wis filters** wist de gekozen waarden en laat de kenmerken staan. Het kruisje bij een kenmerk haalt het kenmerk zelf weg.
 
 ## Korte namen
 
-**Voorstel van 15 oktober 2026.** Namen als "Activiteiten op het gebied van financiële dienstverlening en verzekeringen" of "Volume en klantbasis › Totaal aantal contacten per jaar, per kanaal › Call" zijn te lang voor een chip, een menuregel of een kolomkop. Een korte naam is een weergavenaam naast het origineel. Hij kan bij veldnamen en bij waarden.
+**Voorstel van 15 oktober 2026.** Namen als "Activiteiten op het gebied van financiële dienstverlening en verzekeringen" of "Volume en klantbasis › Totaal aantal contacten per jaar, per kanaal › Call" zijn te lang voor een pil, een menuregel of een kolomkop. Een korte naam is een weergavenaam naast het origineel. Hij kan bij veldnamen en bij waarden.
 
-- **Waar hij staat.** Overal in Verkennen waar een veld of waarde getoond wordt: Het filtermenu, de chips, de groepsnamen, de kolomkoppen van de heatmap en de assen en tooltips van het spreidingsdiagram. Bij hover op een chip of menuregel staat het origineel in een tooltip.
+- **Waar hij staat.** Overal in Verkennen waar een veld of waarde getoond wordt: Het menu Kenmerk toevoegen, de pillen, de groepsnamen, de kolomkoppen van de heatmap en de assen en tooltips van het spreidingsdiagram. Bij hover op een pil of menuregel staat het origineel in een tooltip.
 - **Waar hij niet staat.** In het organisatie-detail, de exports en de import. Daar blijft het origineel staan. De Organisatie bewaart altijd het origineel, zodat er geen twee namen voor één waarde in de data komen.
-- **Beheer.** Een Admin vult ze in bij Organisatievelden, op de tab Korte namen (`beheerpagina.md`, punt 3). Ook op de plek zelf: Een potlood naast de kop van een filter opent een modal met de waarden van dat ene veld. Het recht is `content.beheren`, dus alleen een Admin.
+- **Beheer.** Een Admin vult ze in bij Organisatievelden, op de tab Korte namen (`beheerpagina.md`, punt 3). Ook op de plek zelf: Een potlood naast de naam van een kenmerk opent een modal met de waarden van dat ene veld. Het recht is `content.beheren`, dus alleen een Admin.
 - **Uitleg.** De uitleg bij de tabel staat in een Info-icoon (`info.korteNamen`, `beheerpagina.md`, punt 2a). Het visual design toont hem als vaste tekst.
 - **Regels.** Hoogstens 30 tekens en uniek binnen een veld, zonder verschil tussen hoofdletters en kleine letters. Een lege korte naam betekent het origineel. Twee waarden onder dezelfde naam samenvoegen kan dus niet.
 - **Wat de Admin invult.** Waarden die in gebruik zijn en nog geen korte naam hebben, staan in de tabel bovenaan. Waarden die Organisaties zelf invullen via "Anders…" komen daar vanzelf bij, met een lege korte naam. Voor de SBI-sectoren zijn beginwaarden voorgesteld (`sbi-indeling.md`, Korte namen).
@@ -63,18 +66,27 @@ Organisaties zonder waarde voor een filterveld vallen bij dat filter weg. Bij ee
 
 ## Groeperen en focus
 
-Groeperen verdeelt de pool (na de filters) in groepen. Eén groep is de focus. De rest is alle andere Organisaties in de pool.
+**Besloten (15 oktober 2026).** Groeperen verdeelt de pool (na de filters) in groepen. Eén groep is de focus. De rest zijn de Organisaties van de andere groepen. Wie voor het gekozen kenmerk geen waarde heeft, zit in geen groep en telt niet mee in de rest. Welke groepering er kan, volgt uit de kenmerken: Wat de Admin heeft toegevoegd en bruikbaar is, staat bij Groeperen op.
 
-- **Groeperen op een select-veld** (CRM-pakket, sector): Eén groep per waarde. In het ontwerp staan CRM-pakket en sector als keuze. Elk select-veld kan hier later bij.
-- **Groeperen op een getalveld** (nu AHT): Een drempel met twee groepen, "≤ drempel" en "> drempel". De slider heeft een histogram erboven, waarin de staven van de focusgroep oranje zijn. Onder de slider staat hoeveel Organisaties aan elke kant zitten. De startwaarde van de drempel is de mediaan van de pool. In het ontwerp staat 420 seconden als voorbeeld.
-- **Focusgroep**: Losse keuzepillen met de groepsnaam en het aantal (`stylesheet.md`, Keuzepil en pilvormige groep). De gekozen pil is massief oranje. Bij het wisselen van groepering wordt de grootste groep de focus.
-- **Altijd een groepering.** Een vergelijking heeft een kenmerk nodig dat de Organisaties in groepen verdeelt, anders is er geen focusgroep om tegenover de rest te zetten. Er is dus altijd een groepering gekozen, met CRM-pakket als startwaarde. Naast het label Groeperen op staat een Info-icoon (`beheerpagina.md`, register, `info.verkennenGroeperen`) met de tekst: "Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties." Het visual design toont hier nog vaste tekst, bij het bouwen wordt dat het Info-icoon.
+- **Groeperen op** is een pilvormige groep (`stylesheet.md`, Keuzepil en pilvormige groep) met één pil per kenmerk dat kan groeperen, met precies één gekozen pil. Naast het label staat een Info-icoon (`info.verkennenGroeperen`, `beheerpagina.md`, register).
+- **Geen kenmerk.** Is er nog geen kenmerk toegevoegd, dan staat er in plaats van de groep één losse, grijze, uitgeschakelde pil "Geen kenmerk", 32px hoog zoals de andere pillen en zonder houder eromheen. Het Info-icoon geeft dan de tekst "Er is nog geen kenmerk om op te groeperen. Voeg bij Kenmerken een kenmerk toe, dan kun je de Organisaties erop in groepen verdelen." Onder de pil staat "Voeg bij Kenmerken een kenmerk toe om te beginnen." Er is dan ook geen resultaat, zie Zonder groepering voor de pool die er wel is.
+- **Het eerste bruikbare kenmerk** dat de Admin toevoegt, wordt automatisch de groepering. Daarna verandert de groepering alleen als de Admin een andere pil kiest, of door de terugval hieronder.
+- **Wanneer een kenmerk kan groeperen.** Een kenmerk is een pil, maar die is uitgeschakeld (50% dekking, `not-allowed`, nooit gekozen) in deze gevallen. De reden staat in een tooltip en als regel van 12px in grijs onder de groep:
+  - De pool heeft minder dan 6 Organisaties: Alle pillen zijn uitgeschakeld. Reden: "Minder dan 6 Organisaties in de pool".
+  - Het kenmerk is bij minder dan 40% van de Organisaties in het Assessment ingevuld (bij 50 Organisaties dus minder dan 20). Reden: "Minder dan 20 ingevulde waarden".
+  - Een select-kenmerk waarvan na de filters nog één waarde over is. Reden: "Het filter laat één waarde over".
+  - Een select-kenmerk met meer dan 12 verschillende waarden in de pool. Reden: "Meer dan 12 verschillende waarden".
+  - Ingezette kanalen kan niet groeperen.
+- **Terugval.** Wordt het gekozen kenmerk onbruikbaar (door een filter) of verwijdert de Admin het, dan gaat de groepering naar de eerste pil die wel kan, met een melding in de stijl van `--stat-amber-faint`: "<Reden>. De groepering staat nu op <kenmerk>." Kan geen enkele pil meer, dan is er geen pil gekozen en staat er een melding: "Er is geen kenmerk meer om op te groeperen." of, als de pool te klein is, "Met deze filters zit er 1 Organisatie in de pool. Dat is te weinig om te vergelijken. Haal een filter weg." (met het werkelijke aantal). De resultaten tonen dan de hele pool, zie Zonder groepering.
+- **Groeperen op een select-kenmerk** (CRM-pakket, sector): Eén groep per waarde die in de pool voorkomt. Organisaties zonder waarde horen bij geen groep en staan als "n zonder waarde" onder de groepen.
+- **Groeperen op een getal-kenmerk** (AHT, NPS, FTR): Een drempel met twee groepen, "≤ drempel" en "> drempel". De pil heet "<korte naam>-drempel". De slider loopt van het laagste tot het hoogste getal in de pool, met de eenheid van het veld (`VeldDefinitie.eenheid`). De startwaarde is de mediaan van de pool. Boven de slider staat een histogram, waarin de staven van de focusgroep oranje zijn. Onder de slider staat hoeveel Organisaties aan elke kant zitten. De groepen krijgen neutrale namen ("≤ 420 s" en "> 420 s"), geen oordeel als "snel" of "langzaam". Er is een apart drempelfilter niet nodig: De drempel is de groepering.
+- **Focusgroep**: Losse keuzepillen met de groepsnaam en het aantal. De gekozen pil is massief oranje. Bij het wisselen van groepering wordt de grootste groep de focus.
 - **Kleine groepen.** Een groep met minder dan 3 Organisaties is gestreept getekend en krijgt in de heatmap geen cijfers. Heeft de focus of de rest minder dan 5 Organisaties, dan staat er een waarschuwing dat verschillen voorzichtig gelezen moeten worden. Het is geen blokkade, want de Admin mag de namen zien. Beide grenzen worden instellingen (Instellingen, Drempels en termijnen), met startwaarde 3 en 5.
 - Is de focus of de rest leeg, dan staat er een melding en geen grafiek.
 
 ## Weergaven
 
-Vier weergaven, gekozen met de weergave-schakelaar boven de resultaten, een pilvormige groep (`stylesheet.md`, Keuzepil en pilvormige groep). Het visual design toont ze nog als tabs met een onderstreping en dat is niet de bedoeling: Bij het bouwen geldt de pilvormige groep, net als op elke andere resultatenpagina. De rijen zijn de bouwblokken, gegroepeerd per categorie met de categoriekleur (`stylesheet.md`, Categoriekleuren). Bij een Assessment zonder categorielaag (de AI-scan) zijn de rijen de domeinen, zonder kopregels.
+Vier weergaven (met groepering, zie Zonder groepering voor de pool zonder), gekozen met de weergave-schakelaar boven de resultaten, een pilvormige groep (`stylesheet.md`, Keuzepil en pilvormige groep). Het visual design toont ze nog als tabs met een onderstreping en dat is niet de bedoeling: Bij het bouwen geldt de pilvormige groep, net als op elke andere resultatenpagina. De rijen zijn de bouwblokken, gegroepeerd per categorie met de categoriekleur (`stylesheet.md`, Categoriekleuren). Bij een Assessment zonder categorielaag (de AI-scan) zijn de rijen de domeinen, zonder kopregels.
 
 ### 1. Groep tegenover de rest
 
@@ -94,9 +106,18 @@ Een heatmap met de bouwblokken als rijen en de groepen als kolommen. De eerste k
 
 Een spreidingsdiagram van 780 bij 380 pixels. Horizontaal staat een numeriek organisatieveld (nu AHT, FTR of NPS), verticaal de overall score of de score van één bouwblok. De focus is oranje, de rest grijs. Een rechte lijn (kleinste kwadraten) laat de richting zien. Naast het diagram staan de correlatiecoëfficiënt r, het aantal Organisaties en een woord bij de sterkte (onder 0,2 nauwelijks, onder 0,4 zwak, onder 0,6 matig, daarboven sterk, met de richting erbij). Bij minder dan 3 Organisaties met een waarde staat er "Te weinig data". Onder de coëfficiënt staat een korte zin dat scores zelfrapportage zijn en dat sector en kanaalmix meespelen, zodat een verband geen oorzaak is. Achter het diagram staan horizontale banden op de overall score (onder 2,5, 2,5 tot 3,5 en vanaf 3,5) in de lichte klassekleuren.
 
+### Zonder groepering
+
+**Besloten (15 oktober 2026).** Is er geen groepering, omdat er nog geen kenmerk is of er geen meer kan, dan is de hele pool de focus en is er geen rest. Alle weergaven blijven werken. De pool is dan nog niet gefilterd of heeft alleen filters.
+
+- **1. Groep tegenover de rest.** Alle stippen zijn oranje, met één streep op het gemiddelde van de pool. De kolommen Rest en Verschil vervallen. De vier kaarten zijn het gemiddelde van de pool (overall), het aantal Organisaties, het hoogste bouwblok en het laagste bouwblok.
+- **2. Spreiding binnen de groep.** Alleen de pool. De grijze achtergrondbalk van de rest vervalt.
+- **3. Alle groepen naast elkaar.** Alleen de kolom Hele pool, met de hint "Kies een kenmerk om groepen naast elkaar te zetten".
+- **4. Verband met een kenmerk.** Alle stippen oranje, de lijn en r over de hele pool.
+
 ## Sorteren
 
-Bij weergave 1 en 2 kan de Admin kiezen tussen de volgorde van het model (met kopregels per categorie) en sorteren op grootste verschil (weergave 1) of grootste spreiding (weergave 2). Bij sorteren vervallen de kopregels, de categoriekleur blijft als streepje voor de naam.
+Bij weergave 1 en 2 kan de Admin kiezen tussen de volgorde van het model (met kopregels per categorie) en sorteren op grootste verschil (weergave 1) of grootste spreiding (weergave 2). Zonder groepering is Grootste verschil uitgeschakeld. Bij sorteren vervallen de kopregels, de categoriekleur blijft als streepje voor de naam.
 
 ## Rekenregels
 
@@ -110,7 +131,7 @@ Bij weergave 1 en 2 kan de Admin kiezen tussen de volgorde van het model (met ko
 
 ## Opmaak
 
-Alle opmaak staat in `stylesheet.md`. Het ontwerp gebruikt de bestaande tokens, Epilogue, kaarten met 10px radius en de eyebrow in oranje. De pilvormige groep (`.weergave-wissel`) dient voor de vier weergaven, voor Groeperen op en voor Sorteren. De filters en de focusgroepen zijn losse keuzepillen, en een gekozen pil is overal massief oranje (`stylesheet.md`, Keuzepil en pilvormige groep). Nieuw zijn de slider met histogram, de waarschuwing bij een kleine groep, het filtermenu en de modal Korte namen. Die staan als voorstel in `stylesheet.md`, onder Filterchip, focuschip en slider (Verkennen).
+Alle opmaak staat in `stylesheet.md`. Het ontwerp gebruikt de bestaande tokens, Epilogue, kaarten met 10px radius en de eyebrow in oranje. De pilvormige groep (`.weergave-wissel`) dient voor de vier weergaven, voor Groeperen op en voor Sorteren. De waarden bij een kenmerk, de Snel beginnen-pillen, de pil Geen kenmerk en de focusgroepen zijn losse keuzepillen, en een gekozen pil is overal massief oranje (`stylesheet.md`, Keuzepil en pilvormige groep). Nieuw zijn de kaart Kenmerken, de slider met histogram, de uitgeschakelde pil in een groep, de melding bij de terugval, de waarschuwing bij een kleine groep, het menu Kenmerk toevoegen en de modal Korte namen. Die staan als voorstel in `stylesheet.md`, onder Filterchip, focuschip en slider (Verkennen) en de onderdelen daarna.
 
 Kleuren in de grafieken: Focus oranje (`--or`), rest grijs (`rgba(136,136,132,.5)`), gemiddelde van de rest `--ink-m`, verschil boven 0 blauw (`--bl`) en onder 0 donkeroranje (`--dal`). De scorekleuren staan alleen op absolute scores, zoals de eerste kolom van de heatmap, en daar als celtint. Er is geen zwarte vulling of rand. Lettergroottes komen uit de schaal van acht maten (`stylesheet.md`, Lettergroottes), ook in de grafieken (minimaal 12px).
 
@@ -118,12 +139,13 @@ Kleuren in de grafieken: Focus oranje (`--or`), rest grijs (`rgba(136,136,132,.5
 
 - Alleen een Admin ziet Verkennen, met de permissie `verkennen.inzien` (`datamodel.md` deel 2, Rechtenmatrix). Dat sluit aan op de benchmark, waar de Admin de namen van de Organisaties ook ziet (`benchmark.md`, Weergave voor de Admin).
 - Er is geen minimale groepsgrootte voor het tonen van cijfers aan de Admin. Wel geldt de waarschuwing bij kleine groepen.
-- Het scherm slaat niets op. De filterstand verdwijnt als de Admin het scherm verlaat.
+- Het scherm slaat niets op. De kenmerken, de gekozen waarden en de groepering verdwijnen als de Admin het scherm verlaat.
 
 ## Later
 
 - **Consultant.** Een Consultant mag de namen van Organisaties die niet de zijne zijn niet zien. Dan gelden `benchmarkMinOrganisaties` voor beide kanten van elke splitsing (focus en rest) en de regel dat een filter dat een kant onder de drempel brengt niets toont. Anders is een Organisatie terug te rekenen uit het verschil tussen groep en rest. Voor de eigen klanten van de Consultant kan een uitzondering gelden, die moet nog besloten worden.
-- **Operationele KPI's als filter en als groepering.** Dit werkt vanzelf zodra ze organisatievelden zijn.
+- **Operationele KPI's als kenmerk.** Dit werkt vanzelf zodra ze organisatievelden zijn.
+- **Filter op bereik bij getallen** (twee handvatten met histogram, of één drempel). Nu is een getal alleen te gebruiken bij Groeperen op.
 - **AHT per kanaal.** Dit is een wijziging in het datamodel: AHT wordt een subveld bij elk kanaal in plaats van één los KPI-veld. Het filter combineert dan "kanaal ingezet" met een AHT-slider voor dat kanaal. Dit moet Sander inpassen in `datamodel.md`.
 - **Bewaren als benchmark.** Een filterstand kan een benchmark worden (`benchmark.md`, Samenstellen), en dat is ook de route om het resultaat aan een Lead te tonen.
 - **Export** van de gefilterde pool als CSV (`export-csv.md`).
@@ -134,9 +156,10 @@ Kleuren in de grafieken: Focus oranje (`--or`), rest grijs (`rgba(136,136,132,.5
 
 - Werken meerdere gekozen kanalen als "en" of als "of"? Het ontwerp gebruikt "en".
 - Zijn 3 en 5 de juiste startwaarden voor de drempels bij kleine groepen? Met ongeveer 10 Organisaties per branche vallen combinaties van sector en pakket snel onder 5.
-- Welke velden komen als eerste in de groepering naast CRM-pakket en sector (deploymentmodel, ondersteuner, kanaal ingezet)?
-- Moet een getalfilter naast het bereik ook een drempel kunnen zijn (onder of boven één waarde)? Bij het groeperen is dat al zo.
-- Is 40% de juiste grens voor grijze velden in het filtermenu?
+- Welke drie pillen staan bij Snel beginnen? Nu CRM-pakket, Sector en AHT. Het kunnen er ook meer of andere zijn.
+- Zijn 6 Organisaties (pool), 12 waarden (select) en 40% ingevuld de juiste grenzen voor Groeperen op? De 40% geldt ook voor het grijs in het menu Kenmerk toevoegen.
+- Groeperen op is een pilvormige groep die met elk kenmerk groeit. Voorstel: Boven ongeveer vijf pillen gaan de overige achter een pil "Ander kenmerk…" met hetzelfde menu met zoekveld.
+- Moet een getalkenmerk naast Groeperen op ook een filter op bereik krijgen?
 - Komt er naast SBI een eigen veld Branche (`backlog.md`)? Korte namen blijven dan nodig voor de andere lijsten, het sectorfilter wordt er mogelijk minder belangrijk door.
 - Gebruikt het sectorfilter bij het samenstellen van een benchmark ook de korte namen?
 
@@ -144,6 +167,8 @@ Kleuren in de grafieken: Focus oranje (`--or`), rest grijs (`rgba(136,136,132,.5
 
 Gebouwd op 15 oktober 2026. De berekeningen staan in `lib/verkennen.ts` (met tests in `lib/verkennen.test.ts`), het scherm in
 `app/beheer/verkennen/page.tsx` en de onderdelen in `components/verkennen/`.
+
+**Wat de kenmerken vervangen.** Wat hieronder is gebouwd (filters, met Sector en de ingezette kanalen als standaard, en Groeperen op CRM-pakket of sector met CRM-pakket als startwaarde) is de eerste versie. Het voorstel van Kenmerken en Groeperen op (hierboven) vervangt dat: Het scherm begint leeg, een toegevoegd kenmerk is filter en groepering, en zonder groepering is de hele pool de focus. Dat is nog niet gebouwd.
 
 **Keuzes waar de spec open liet** (de open punten hierboven, met de gebouwde waarde)
 
