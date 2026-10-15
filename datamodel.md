@@ -762,6 +762,13 @@ heeft daarvoor het element `techstackWfm`, en het element
 
 **KPI's**, elk een numeriek veld: AHT, NPS, CSAT, SLA, FTR.
 
+Verkennen (`visualisatie-verkennen.md`) gebruikt deze velden als filter, als
+groepering (AHT met een drempel) en als as in het spreidingsdiagram. Voorstel,
+nog niet besloten: AHT per kanaal. AHT wordt dan een subveld bij elk kanaal in
+plaats van één los KPI-veld, zodat een filter "kanaal ingezet" kan samengaan met
+een AHT-slider voor dat kanaal. Dit raakt de bestaande data en de exports en
+staat in `backlog.md`.
+
 ---
 
 ## Deel 2: Rollen, rechten en inlog (voorstel)
@@ -1249,6 +1256,7 @@ Een streepje betekent geen toegang.
 | `export.uitvoeren` | alle | eigen | zelf, of aangevinkte Metingen (Exporteren) | zelf |
 | `benchmark.beheren` | alle | - | - | - |
 | `benchmark.inzien` | alle | - | aangevinkte benchmarks | - |
+| `verkennen.inzien` (voorstel, 15 oktober 2026) | alle | - | - | - |
 
 Een Lead die zelf invult, doet dat met het bereik `zelf`, net als elke
 respondent.
@@ -1290,6 +1298,11 @@ Admin voor hem heeft aangevinkt (deel 3 en `benchmark.md`). Het prototype kent
 toegang van de Lead via de toewijzing en `leadMetingIds`, net als bij
 `export.uitvoeren`, tot de overgang naar `LeadToegang`. De regel in de matrix is
 het doel voor de rolrechten die met de database komen.
+
+`verkennen.inzien` (voorstel, 15 oktober 2026) is Admin-only, om dezelfde reden
+als `benchmark.beheren`: Verkennen rekent over alle Organisaties van een
+Assessment en laat de namen zien. Een Consultant en een Lead hebben er geen
+toegang toe (`visualisatie-verkennen.md`).
 
 ---
 
