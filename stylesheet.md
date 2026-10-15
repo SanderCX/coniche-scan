@@ -230,7 +230,11 @@ binnen één rij of één tabel dezelfde lettermaat. De vaste regel:
 - **Body-tekst**: Line-height 1.78, kleur `var(--ink-m)`.
 - **Label/eyebrow**: Font-size `.69rem`, font-weight 700, letter-spacing
   `.14em`, hoofdletters, kleur `var(--or)`. Voor kleine kop-labels zoals
-  "AI Assessment" boven een scanpagina.
+  "AI Assessment" boven een scanpagina en "Voorbeeld-output" boven de
+  voorbeeldpagina van een scan. De kleur is op elk scherm oranje, ook als
+  de kop eronder donker is: Een eyebrow in antraciet of bruin is een fout,
+  geen variant. Er is geen eigen kleur per pagina. Een categoriekleur
+  geldt alleen waar de spec die voor een eyebrow met naam noemt.
 
 ## Layout
 
@@ -340,6 +344,15 @@ anders de regelhoogte 1.78 van de body-tekst en wordt hoger dan een
 (Dropdown-knop) staat in een eigen element met `line-height: 0`, een icoon
 in een knop is niet groter dan de tekstregel (`.8rem`), en de wrapper van een
 Dropdown-knop is `inline-flex` zodat hij niet hoger is dan zijn knop.
+
+**Knoptekst staat op één regel.** Elke `.btn` heeft `white-space: nowrap`
+en `flex-shrink: 0`, en een pijl (`←`, `→`) staat in dezelfde regel als
+het label, nooit erboven of eronder. Een knop heeft geen vaste breedte of
+hoogte buiten `--control-h` bij `.btn-compact`. Staat een knop naast een
+kop in een flexrij (zoals "← Terug" rechts van de titel op een
+publieke pagina), dan zorgt de kop voor ruimte (`min-width: 0`, mag
+afbreken) en niet de knop. Een knop die door te weinig ruimte over twee
+regels loopt of smaller wordt dan zijn tekst, geldt als een fout.
 
 **Formulierelementen krijgen niet de line-height van lopende tekst.**
 `input`/`select`/`textarea`/`button` erven anders `body`'s
