@@ -673,6 +673,7 @@ VeldDefinitie {
   optiesPerWaarde?: { [waarde: string]: string[] } // alleen "select-afhankelijk"
   subvelden?: VeldDefinitie[]       // voor herhalende structuren
   korteNaam?: string                // voorstel: weergavenaam van het veld in lijsten en grafieken, leeg betekent `label`
+  eenheid?: string                  // voorstel: weergave-eenheid bij getal en percentage, bijv. "s" of "%", gebruikt door Verkennen bij de drempel
 }
 ```
 
@@ -686,6 +687,7 @@ KorteNaam {
 }
 ```
 
+- Verkennen leidt kenmerken en groeperingen af uit `type` en heeft geen vlag per veld nodig (`visualisatie-verkennen.md`, Kenmerken en filters).
 - Een veldnaam heeft zijn korte naam in `VeldDefinitie.korteNaam`. `KorteNaam` is er voor waarden.
 - Een lege of ontbrekende korte naam betekent het origineel.
 - De rij hoort bij de combinatie van veld en waarde. Bij een waarde via "Anders…" ontstaat de rij pas zodra een Admin een korte naam invult. Verdwijnt de waarde uit de lijst en uit alle Organisaties, dan kan de rij weg (Data-integriteit, `beheerpagina.md`, punt 13).
