@@ -2,7 +2,7 @@
 
 Spec voor het Admin-scherm Verkennen, waar je alle Organisaties van één Assessment door elkaar kunt filteren, groeperen en naast elkaar zetten.
 
-**Status: Voorstel van 15 oktober 2026.** Er is een visual design van (Claude Design, "Coniche Scan Verkennen"), met voorbeelddata. Er is nog niets gebouwd. Wat in dit document staat als "Besloten" komt uit het gesprek van 15 oktober 2026.
+**Status: Voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026.** Er is een visual design van (Claude Design, "Coniche Scan Verkennen"), met voorbeelddata. De keuzes bij het bouwen staan onder Gebouwd. Wat in dit document staat als "Besloten" komt uit het gesprek van 15 oktober 2026.
 
 ## Wat het is
 
@@ -122,3 +122,25 @@ Kleuren in de grafieken: Focus oranje (`--or`), rest grijs (`rgba(136,136,132,.5
 - Zijn 3 en 5 de juiste startwaarden voor de drempels bij kleine groepen? Met ongeveer 10 Organisaties per branche vallen combinaties van sector en pakket snel onder 5.
 - Welke velden komen als eerste in de groepering naast CRM-pakket en sector (deploymentmodel, ondersteuner, kanaal ingezet)?
 - Moet een getalfilter naast het bereik ook een drempel kunnen zijn (onder of boven één waarde)? Bij het groeperen is dat al zo.
+
+## Gebouwd
+
+Gebouwd op 15 oktober 2026. De berekeningen staan in `lib/verkennen.ts` (met tests in `lib/verkennen.test.ts`), het scherm in
+`app/beheer/verkennen/page.tsx` en de onderdelen in `components/verkennen/`.
+
+**Keuzes waar de spec open liet** (de open punten hierboven, met de gebouwde waarde)
+
+- Meerdere gekozen kanalen werken als "en", zoals in het ontwerp. Een Organisatie met een leeg veld voor een gekozen kanaal valt weg.
+- De drempels bij kleine groepen zijn instellingen bij Drempels en termijnen (`verkennenMinGroep`, startwaarde 3, en
+  `verkennenWaarschuwingGroep`, startwaarde 5, `info.verkennenDrempels`).
+- Groeperen kan op CRM-pakket (`techstack.techstack-crm.leverancier`), sector en de AHT-drempel. De AHT-drempel begint op de
+  mediaan van de gefilterde pool, afgerond.
+- Filters: Sector staat er standaard en de ingezette kanalen. "Filter toevoegen" biedt elk select- of getalveld uit de
+  organisatievelden dat in de pool minstens één waarde heeft. Een getalfilter is een bereik met twee schuiven (geen losse drempel).
+  De chips tonen de aantallen in de hele pool, de teller "X van Y" volgt de filters.
+- Een groep zonder waarde voor het groeperingsveld hoort bij geen groep, maar telt wel mee in de rest.
+- Het verband (weergave 4) neemt de Organisaties na de filters, met AHT, FTR of NPS horizontaal. De lijn en r komen bij minstens
+  3 Organisaties met een waarde.
+- Het Assessment-keuzeveld toont geen Assessment met Ja / Nee / Weet ik niet (Later).
+
+**Nog niet gebouwd**: Wat onder Later staat.

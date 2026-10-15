@@ -406,6 +406,8 @@ standaardteksten zoals ze nu in de app staan):
 | `info.positieMeting` | Resultaten van één scan, naast de uitgeschakelde weergave "Positie in de Meting" | De positie van een scan tegenover de andere scans in de Meting is er pas bij voldoende afgeronde scans. Bij minder is een scan te herleiden naar een persoon. Het minimum staat bij Drempels en termijnen (aantal respondenten per Meting). |
 | `info.mijnAccountWachtwoord` | Mijn account, naast de uitgeschakelde knop "Wachtwoord wijzigen" | Wachtwoord wijzigen komt met de echte inlog. Tot die tijd vraag je een Admin om je wachtwoord te wijzigen. |
 | `info.benchmarkInstellingen` | Instellingen, Drempels en termijnen, formulier Benchmark | Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. Het aantal dagen tussen Metingen is voor een vergelijking met de lezing Naast elkaar: Liggen de meetdata verder uit elkaar, dan krijg je bij het opslaan een waarschuwing. Opslaan blijft mogelijk. |
+| `info.verkennen` | Verkennen, naast de paginatitel | Verkennen werkt op de pool van één Assessment: De Organisaties met toestemming voor benchmark die een Meting hebben met genoeg afgeronde scans, de meest recente per Organisatie. Elke Organisatie telt even zwaar mee. Het scherm slaat niets op en een Lead ziet het nooit. |
+| `info.verkennenDrempels` | Instellingen, Drempels en termijnen, formulier Verkennen | Een groep met minder organisaties dan het minimum is gestreept en krijgt in de heatmap geen cijfers. Heeft de focus of de rest minder organisaties dan de waarschuwingsgrens, dan staat er een waarschuwing dat verschillen voorzichtig gelezen moeten worden. Dat is geen blokkade. |
 | `info.benchmarkVlag` | Organisatie-detail, bij de schakelaar "Doet mee aan benchmark" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks. |
 | `info.leadToegangCel` | Leads-venster van de organisatie, in een grijze cel | De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark. |
 | `info.antwoordenMetNamen` | Organisatie-detail, bij de schakelaar "Namen tonen bij Antwoorden" | Uit: Leads zien de antwoorden als R1 tot en met Rn. Aan: Leads zien de namen van de respondenten. Stem dit af met de opdrachtgever voordat je het aanzet. Het geldt voor alle Leads van deze organisatie. |
@@ -1730,7 +1732,7 @@ een view een niveau dieper.
   scan. Je komt dus altijd van organisatie via Meting bij de scan.
 - **Benchmarks** (alleen Admin): De benchmarks, punt 14. Daaronder vallen ook
   de vergelijkingen tussen Metingen (`benchmark.md`, Niveau 2).
-- **Verkennen** (alleen Admin, voorstel van 15 oktober 2026): Alle
+- **Verkennen** (alleen Admin, gebouwd op 15 oktober 2026): Alle
   Organisaties van één Assessment filteren, groeperen en vergelijken, punt 15.
 - **Selectie**: Selectievakje per rij, met de acties "Exporteren" voor de
   afgeronde scans van de geselecteerde Metingen (zie Export hieronder) en
@@ -1904,8 +1906,8 @@ spreiding binnen een Meting (niveau 3) krijgt een Lead als kolom Spreiding
 
 #### 15. Verkennen
 
-**Status.** Voorstel van 15 oktober 2026. Er is een visual design met
-voorbeelddata, nog niets gebouwd. Het gedrag staat in
+**Status.** Gebouwd op 15 oktober 2026, naar het visual design met
+voorbeelddata. Het gedrag staat in
 `visualisatie-verkennen.md`, hier staat de plek in beheer.
 
 De tab Verkennen onder Resultaten (punt 7), alleen zichtbaar voor een Admin
