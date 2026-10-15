@@ -232,3 +232,4 @@ De gebeurtenissen staan in `datamodel.md`, Audit, onder Benchmark. Wat een verwi
 - Niveau 1: Of de matrix bij heel veel organisaties een andere weergave nodig heeft dan horizontaal scrollen.
 - Niveau 2: Hoe de weergave eruitziet bij meer dan twee Metingen, bijvoorbeeld een lijn per bouwblok over de meetdata. De eerste versie vergelijkt twee.
 - Samengestelde Meting: Wat er gebeurt als er één onderliggende Meting overblijft, en de aanvulling in `datamodel.md`, Verwijderen en datakoppelingen.
+- Niveau 1: Of het sectorfilter bij het samenstellen van een benchmark de korte namen gebruikt (`visualisatie-verkennen.md`, Korte namen).

@@ -50,7 +50,7 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 
 ## 2. Overzicht
 
-**Plek.** Hetzelfde scherm als weergave 1, als tweede stand van een schakelaar (`stylesheet.md`, Weergave-schakelaar) met de knoppen Per afdeling en Overzicht. Per afdeling is de standaard. De keuze staat in de adresbalk (`?weergave=overzicht`). Dit wijkt af van `visualisatie-scores.md`, Navigatie, waar de respondent op scherm 6 geen schakelaar ziet: Voor de Quickscan is de schakelaar er wel, omdat beide standen het eigen resultaat tonen.
+**Plek.** Hetzelfde scherm als weergave 1, als tweede stand van een schakelaar (`stylesheet.md`, Weergave-schakelaar, een pilvormige groep) met de pillen Per afdeling en Overzicht. Per afdeling is de standaard. De keuze staat in de adresbalk (`?weergave=overzicht`). Dit wijkt af van `visualisatie-scores.md`, Navigatie, waar de respondent op scherm 6 geen schakelaar ziet: Voor de Quickscan is de schakelaar er wel, omdat beide standen het eigen resultaat tonen.
 
 **Opbouw.** Drie kaarten onder elkaar.
 
@@ -72,7 +72,7 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 
 - Een balk van 0 tot 100% met de drie banden, zoals in weergave 2.
 - Per voorkomende score een bol met het aantal respondenten erin. Eén respondent is een kleine stip zonder getal. De bollen zijn grijs (`rgba(93, 106, 120, .82)`), zonder naam en zonder tooltip.
-- Een verticale zwarte streep op het gemiddelde.
+- Een verticale streep van 2px in `--ink-m` op het gemiddelde.
 - Rechts het gemiddelde als percentage en het spreidingslabel.
 
 **Spreidingslabel.** Op basis van de standaardafwijking (steekproef, n − 1) van de percentages in de relevante scans, in procentpunten. Voorstel: Onder 14 is Eensgezind, van 14 tot 20 is Wisselend en vanaf 20 is Verdeeld. Dit zijn de grenzen van `visualisatie-scores.md` (0,55 en 0,8 op een schaal van vier) omgerekend. Verdeeld is het enige label met een volle vulling. Een bouwblok met minder dan 3 vragen krijgt geen label maar "1 vraag" of "2 vragen" (gestreepte rand), omdat de uitkomsten dan te grof zijn. Bij minder dan 3 relevante scans voor de afdeling staat er "Te weinig antwoorden".
@@ -83,11 +83,11 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 
 ## 4. Antwoorden per vraag
 
-**Plek.** De weergave Antwoorden op de resultatenpagina van een Meting (`visualisatie-scores.md`, onderdeel G), voor Admin, Consultant en een Lead met het vinkje Antwoorden. Bij de Quickscan heeft die weergave twee standen in een kleine schakelaar: Verdeling (standaard, hieronder) en Per respondent. Per respondent is onderdeel G met kolommen per scan, waarbij een cel J (groen), N (rood) of ? (grijs) toont in plaats van een cijfer 1 tot 5. Privacyregels, namen en initialen zijn die van G.
+**Plek.** De weergave Antwoorden op de resultatenpagina van een Meting (`visualisatie-scores.md`, onderdeel G), voor Admin, Consultant en een Lead met het vinkje Antwoorden. Bij de Quickscan heeft die weergave twee standen in een kleine pilvormige groep: Verdeling (standaard, hieronder) en Per respondent. Per respondent is onderdeel G met kolommen per scan, waarbij een cel J (groen), N (rood) of ? (grijs) toont in plaats van een cijfer 1 tot 5. Privacyregels, namen en initialen zijn die van G.
 
 **Opbouw van Verdeling.**
 
-- Boven de kaart een keuze van de afdeling (vier knoppen in een rij, de actieve in `--ink`). Een afdeling zonder relevante scans is uitgeschakeld.
+- Boven de kaart een keuze van de afdeling, als losse keuzepillen (`stylesheet.md`, Keuzepil en pilvormige groep), omdat de afdelingen uit de content komen en hun aantal en lengte wisselen. De gekozen pil is massief oranje, de andere zijn wit met grijze rand. Tussen de pillen staat 8px en tot de tegels eronder 24px. Een afdeling zonder relevante scans is uitgeschakeld.
 - Tegels: Respondenten (die de afdeling relevant vonden), Alle antwoorden (Ja, Nee en Weet niet als percentages, met een gestapelde balk), Minst vaak Ja (bouwblok, vraagnummer en aantal) en Vaakst Weet ik niet.
 - Een legenda met Ja, Nee en Weet ik niet, en de opmerking dat de getallen in de balken aantallen respondenten zijn.
 - Per dimensie een kopregel (naam, aantal vragen, gemiddeld percentage) en daaronder een rij per vraag.

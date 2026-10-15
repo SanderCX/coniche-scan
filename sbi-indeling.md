@@ -146,6 +146,37 @@ genegeerd is").
 | 98 | Niet-gedifferentieerde productie van goederen en diensten door particuliere huishoudens voor eigen gebruik |
 | 99 | Activiteiten van extraterritoriale organisaties en instanties |
 
+## Korte namen (voorstel van 15 oktober 2026)
+
+De lange SBI-titels passen niet op een chip of in een kolomkop (`visualisatie-verkennen.md`, Korte namen). Een korte naam is een weergavenaam. De Organisatie bewaart de originele titel. Voorstel voor de beginwaarden van de 22 Secties, door een Admin aan te passen (`beheerpagina.md`, punt 3, Korte namen):
+
+| Code | Korte naam |
+|---|---|
+| A | Landbouw en visserij |
+| B | Delfstoffen |
+| C | Industrie |
+| D | Energie |
+| E | Water en afval |
+| F | Bouw |
+| G | Handel |
+| H | Vervoer en opslag |
+| I | Horeca |
+| J | Media en uitgeverijen |
+| K | Telecom en IT |
+| L | Financiële dienstverlening |
+| M | Onroerend goed |
+| N | Wetenschap, techniek en advies |
+| O | Verhuur en zakelijke diensten |
+| P | Overheid |
+| Q | Onderwijs |
+| R | Zorg en welzijn |
+| S | Kunst, sport en recreatie |
+| T | Overige dienstverlening |
+| U | Huishoudens als werkgever |
+| V | Extraterritoriale organisaties |
+
+Bij de 87 Afdelingen is het niet zinvol alles vooraf in te vullen. De Admin vult de korte naam in voor wat in gebruik is, en de lijst met korte namen zet waarden in gebruik zonder korte naam bovenaan. Voorstel voor een paar Afdelingen die waarschijnlijk vaak voorkomen: 35 Energie, 61 Telecommunicatie, 62 Software en IT-advies, 64 Financiële diensten (excl. verzekeringen), 65 Verzekeringen en pensioenfondsen (de oude importtekst gebruikte die al, zie hieronder) en 84 Openbaar bestuur.
+
 ## Wat bewust genegeerd is
 
 Groepen (3 cijfers), klassen (4 cijfers) en subklassen (5 cijfers) uit
