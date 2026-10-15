@@ -13,7 +13,6 @@ import {
   Groepering,
   KANALEN_ID,
   LEGE_FILTERS,
-  MIN_POOL_GROEPEREN,
   bouwPool,
   filterVelden,
   getalWaarde,
@@ -75,6 +74,11 @@ export default function VerkennenPage() {
   const alleVelden = [...velden, kanalenVeld()];
   const pool = assessment ? bouwPool(organisaties, assessment, instellingen.benchmarkMinScans) : null;
   const gefilterd = pool ? pasFiltersToe(pool.leden, filters, velden) : [];
+  const drempels = {
+    minPool: instellingen.verkennenMinPool,
+    maxGroepen: instellingen.verkennenMaxGroepen,
+    minIngevuldPct: instellingen.verkennenMinIngevuldPct,
+  };
   const korte = (id: string, label: string) => korteNaamVeld(instellingen.korteNamen, id, label);
 
   // Welke kenmerken kunnen groeperen, en waarop er nu gegroepeerd wordt.
@@ -87,7 +91,7 @@ export default function VerkennenPage() {
           return {
             veld,
             naam: veld.type === "getal" ? `${naam}-drempel` : naam,
-            bruikbaarheid: kanGroeperen(veld, pool.leden, gefilterd),
+            bruikbaarheid: kanGroeperen(veld, pool.leden, gefilterd, drempels),
           };
         })
     : [];
@@ -103,7 +107,7 @@ export default function VerkennenPage() {
     const gekozenNaam = gekozenVeld ? korte(gekozenVeld.id, veldLabelZonderGroep(gekozenVeld)) : "Het kenmerk";
     const reden = gekozenOptie ? (gekozenOptie.bruikbaarheid.reden ?? "Het kenmerk kan niet groeperen") : `${gekozenNaam} is verwijderd`;
     if (effectiefOptie) melding = `${reden}. De groepering staat nu op ${effectiefOptie.naam}.`;
-    else if (gefilterd.length < MIN_POOL_GROEPEREN && pool && pool.leden.length >= MIN_POOL_GROEPEREN) {
+    else if (gefilterd.length < drempels.minPool && pool && pool.leden.length >= drempels.minPool) {
       melding = `Met deze filters zit er ${gefilterd.length} ${gefilterd.length === 1 ? "Organisatie" : "Organisaties"} in de pool. Dat is te weinig om te vergelijken. Haal een filter weg.`;
     } else melding = "Er is geen kenmerk meer om op te groeperen.";
   }
@@ -164,7 +168,7 @@ export default function VerkennenPage() {
     // Het eerste bruikbare kenmerk dat de Admin toevoegt, wordt automatisch de groepering. Een kenmerk dat niet kan, wist een
     // oude (vervallen) keuze zodat de melding niet blijft staan.
     const veld = velden.find((v) => v.id === id);
-    if (effectief === null && id !== KANALEN_ID && veld && kanGroeperen(veld, pool.leden, gefilterd).ok) {
+    if (effectief === null && id !== KANALEN_ID && veld && kanGroeperen(veld, pool.leden, gefilterd, drempels).ok) {
       setGekozenOp(id);
       setDrempel(null);
       setFocusKeuze(undefined);
@@ -249,7 +253,7 @@ export default function VerkennenPage() {
         focusLeden={focusLeden}
         restLeden={restLeden}
         minGroep={instellingen.verkennenMinGroep}
-        waarschuwing={instellingen.verkennenWaarschuwingGroep}
+        waarschuwing={instellingen.verkennenMinVergelijking}
       />
 
       <section className="qv-kaart" aria-label="Resultaten" style={{ marginTop: "1.5rem" }}>
@@ -326,7 +330,7 @@ export default function VerkennenPage() {
             }}
           />
         ) : weergave === "verband" ? (
-          <WeergaveVerband punten={punten} xLabel={korte(xVeld.id, xVeld.label)} yLabel={yLabel} eenheidX={xDef?.eenheid} />
+          <WeergaveVerband minPunten={instellingen.verkennenMinGroep} punten={punten} xLabel={korte(xVeld.id, xVeld.label)} yLabel={yLabel} eenheidX={xDef?.eenheid} />
         ) : !zonderGroepering && (focusLeden.length === 0 || restLeden.length === 0) ? (
           <p className="admin-notice">
             {focusLeden.length === 0 ? "De focus is leeg." : "De rest is leeg."} Kies een andere focusgroep of pas de filters aan.

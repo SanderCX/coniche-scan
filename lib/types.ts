@@ -409,6 +409,11 @@ export interface ScanInvulling {
   /** Moment dat de respondent scherm 4 (intake) indiende, null zolang status "uitgenodigd" is. */
   gestartOp: string | null;
   afgerondOp: string | null;
+  /**
+   * Moment van het laatste opslaan van een antwoord, voor "Laatst opgeslagen" op Mijn metingen (`visualisatie-mijn-metingen.md`).
+   * Gezet bij elke wijziging van de antwoorden. Ontbreekt bij data van vóór dit veld.
+   */
+  laatstOpgeslagenOp?: string | null;
   /** Bewaartermijn ingevulde scans (datamodel.md deel 2): zet de "Data ouder dan de bewaartermijn"-melding uit tot deze datum. `null` = geen verlenging aangevraagd. */
   bewaarVerlengdTot: string | null;
 }

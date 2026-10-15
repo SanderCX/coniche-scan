@@ -4,8 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { KorteNamen, korteNaamVeld } from "@/lib/korte-namen";
 import { FilterVeld, KANALEN_ID, PoolLid, ingevuldAantal, kanaalVelden, kanaalIngezet, veldGroep, veldLabelZonderGroep } from "@/lib/verkennen";
 
-/** Velden die bij minder dan dit aandeel van de Organisaties zijn ingevuld, staan grijs (startwaarde, `visualisatie-verkennen.md`, Open punten). */
-const GRIJS_ONDER = 0.4;
 
 /**
  * Het menu Kenmerk toevoegen (`visualisatie-verkennen.md`, Kenmerken en filters; `stylesheet.md`, Menu Kenmerk toevoegen): Een
@@ -18,6 +16,7 @@ export function FilterMenu({
   toegevoegd,
   pool,
   korteNamen,
+  grijsOnderPct,
   onKies,
 }: {
   velden: FilterVeld[];
@@ -25,6 +24,8 @@ export function FilterMenu({
   toegevoegd: string[];
   pool: PoolLid[];
   korteNamen: KorteNamen;
+  /** `verkennenMinIngevuldPct`: Een veld dat bij een lager percentage is ingevuld, staat grijs maar blijft te kiezen. */
+  grijsOnderPct: number;
   onKies: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -83,7 +84,7 @@ export function FilterMenu({
               {rijen
                 .filter((r) => r.groep === groep)
                 .map((r) => {
-                  const grijs = pool.length > 0 && r.aantal / pool.length < GRIJS_ONDER;
+                  const grijs = pool.length > 0 && (r.aantal / pool.length) * 100 < grijsOnderPct;
                   const al = toegevoegd.includes(r.veld.id);
                   return (
                     <button

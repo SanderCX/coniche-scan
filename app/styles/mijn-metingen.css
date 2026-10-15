@@ -1,0 +1,348 @@
+/* ---------- Mijn metingen (visualisatie-mijn-metingen.md) ----------
+   Kaarten met Assessment-icoon, statuschip, voortgang of teaser. Alles volgt de tokens: Lettergroottes uit de schaal van acht,
+   afstanden op het raster van 4px, geen zwarte vlakken. */
+.mm-pagina {
+  padding-top: var(--sp-8);
+  padding-bottom: var(--sp-12);
+}
+.mm-pagina h1 {
+  font-size: var(--fs-48);
+  margin: var(--sp-1) 0 var(--sp-2);
+}
+.mm-label {
+  display: block;
+  margin: var(--sp-8) 0 var(--sp-3);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.mm-organisatie {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--ink-m);
+  margin: 0;
+}
+.mm-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+}
+@media (min-width: 1120px) {
+  .mm-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .mm-kaart--vol {
+    grid-column: 1 / -1;
+  }
+}
+.mm-kaart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: var(--sp-6);
+  min-width: 0;
+}
+.mm-kaart,
+.mm-blok {
+  container-type: inline-size;
+}
+.mm-kaart--benchmark {
+  background: var(--bg-warm);
+}
+.mm-kop,
+.mm-benchmark {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+.mm-kop-tekst {
+  flex: 1;
+  min-width: 0;
+}
+.mm-kop-tekst h2 {
+  margin: 0;
+  font-size: var(--fs-18);
+  font-weight: 700;
+  line-height: 1.3;
+}
+.mm-kop-tekst p {
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.mm-kop-rechts {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.mm-icoon {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--or-faint);
+  color: var(--or);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.mm-icoon--blauw {
+  background: #ebf1fb;
+  color: var(--bl);
+}
+.mm-label-klein {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.mm-label-klein--blauw {
+  color: var(--bl);
+}
+.mm-tekst {
+  margin: 0;
+  font-size: var(--fs-14);
+  color: var(--ink-m);
+}
+.mm-sub {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.mm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 12px;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.mm-chip i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.mm-chip--blauw {
+  background: #ebf1fb;
+  color: #1b4a85;
+}
+.mm-chip--amber {
+  background: #fdf2e3;
+  color: #6b3a00;
+}
+.mm-chip--groen {
+  background: #e7f6ef;
+  color: #0e4d30;
+}
+.mm-rolchip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 4px;
+  background: var(--bg-mid);
+  color: var(--ink-m);
+  font-size: var(--fs-12);
+  font-weight: 700;
+}
+.mm-voortgang-rij {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-3);
+  font-size: var(--fs-14);
+  margin-bottom: var(--sp-2);
+}
+.mm-balk {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg-mid);
+  overflow: hidden;
+}
+.mm-balk--warm {
+  background: var(--border);
+}
+.mm-balk > div {
+  height: 100%;
+  background: var(--or);
+  border-radius: 4px;
+}
+.mm-teaser {
+  display: grid;
+  grid-template-columns: minmax(12rem, 16rem) 1fr;
+  gap: var(--sp-8);
+  align-items: center;
+  font-variant-numeric: tabular-nums;
+}
+.mm-teaser-getal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.mm-teaser-getal-rij {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.mm-getal {
+  font-size: var(--fs-48);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--ink);
+}
+.mm-klassepil {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 var(--sp-3);
+  border-radius: 16px;
+  font-size: var(--fs-14);
+  font-weight: 700;
+}
+.mm-klassenaam {
+  font-size: var(--fs-14);
+  color: var(--ink);
+}
+.mm-teaser-rijen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.mm-teaser-rij {
+  display: grid;
+  grid-template-columns: 170px 1fr auto;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: var(--fs-14);
+}
+.mm-teaser-naam {
+  color: var(--ink-m);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mm-teaser-balk {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-mid);
+  overflow: hidden;
+}
+.mm-teaser-balk i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+}
+.mm-teaser-waarde {
+  min-width: 3rem;
+  text-align: right;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.mm-wacht {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  font-size: var(--fs-14);
+}
+.mm-respons {
+  font-size: var(--fs-14);
+}
+.mm-knoppen {
+  display: flex;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.mm-knop {
+  padding: 0 20px !important;
+}
+.mm-knoppen--paar .mm-knop {
+  width: 232px;
+  justify-content: center;
+}
+.mm-uitnodigen {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: flex-start;
+}
+.mm-twee {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.mm-blok {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  padding: var(--sp-6);
+  min-width: 0;
+}
+.mm-blok--warm {
+  background: var(--bg-warm);
+  border-left: 1px solid var(--border);
+}
+.mm-blok-kop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.mm-leeg {
+  font-size: var(--fs-16);
+  color: var(--ink-m);
+}
+/* In een smalle kaart of een blok naast een ander blok staat het getal boven de rijen (stap onder 640px in de spec). */
+@container (max-width: 560px) {
+  .mm-teaser {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+  }
+  .mm-teaser-rij {
+    grid-template-columns: 130px 1fr auto;
+  }
+}
+@media (max-width: 920px) {
+  .mm-twee {
+    grid-template-columns: 1fr;
+  }
+  .mm-blok--warm {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+  .mm-teaser-rij {
+    grid-template-columns: 130px 1fr 40px;
+  }
+  .mm-teaser {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .mm-pagina h1 {
+    font-size: var(--fs-32);
+  }
+  .mm-knoppen .mm-knop,
+  .mm-knoppen--paar .mm-knop {
+    width: 100%;
+  }
+  .mm-benchmark {
+    flex-wrap: wrap;
+  }
+}

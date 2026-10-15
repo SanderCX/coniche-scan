@@ -52,7 +52,7 @@ export function KenmerkenKaart({
   gefilterd: PoolLid[];
   zonderToestemming: number;
 }) {
-  const { korteNamen } = useInstellingen();
+  const { korteNamen, verkennenMinIngevuldPct } = useInstellingen();
   const [modalVeld, setModalVeld] = useState<string | null>(null);
   const perId = new Map(velden.map((v) => [v.id, v]));
   const rijen = kenmerken.map((id) => perId.get(id)).filter((v): v is FilterVeld => v !== undefined);
@@ -161,7 +161,7 @@ export function KenmerkenKaart({
       )}
 
       <div className="vk-acties">
-        <FilterMenu velden={velden} toegevoegd={kenmerken} pool={pool} korteNamen={korteNamen} onKies={onToevoegen} />
+        <FilterMenu velden={velden} toegevoegd={kenmerken} pool={pool} korteNamen={korteNamen} grijsOnderPct={verkennenMinIngevuldPct} onKies={onToevoegen} />
         <button type="button" className="btn btn-outline btn-compact" disabled={!heeftFilters(stand)} onClick={() => onStand(LEGE_FILTERS)}>
           Wis filters
         </button>

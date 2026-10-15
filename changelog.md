@@ -1,5 +1,29 @@
 # Coniche Scan — Changelog
 
+## 2026-10-15 (8) — Specs van Joost, PR 119: drempels voor Verkennen en de opmaak van Mijn metingen
+
+Op verzoek van Sander gebouwd (`visualisatie-verkennen.md`, Drempels, `visualisatie-mijn-metingen.md`).
+
+**Drempels voor Verkennen**:
+- Vijf instellingen in plaats van constanten (`lib/instellingen-store.ts`): `verkennenMinGroep` (3), `verkennenMinVergelijking`
+  (5, voorheen `verkennenWaarschuwingGroep`, een opgeslagen waarde onder de oude naam wordt overgenomen), `verkennenMinPool` (6),
+  `verkennenMaxGroepen` (12) en `verkennenMinIngevuldPct` (40). `kanGroeperen` krijgt ze mee en noemt ze in de reden.
+- Het formulier Verkennen bij Drempels en termijnen (`app/beheer/drempels/page.tsx`) met vijf velden, uitleg onder elk veld en de
+  melding bij een ongeldige invoer. `info.verkennenInstellingen` vervangt `info.verkennenDrempels`. Het verband gebruikt
+  `verkennenMinGroep` als minimum en het menu Kenmerk toevoegen `verkennenMinIngevuldPct` voor het grijs.
+
+**Mijn metingen**:
+- Nieuwe opmaak (`app/s/[code]/page.tsx`, `components/mijn-metingen/`, `app/styles/mijn-metingen.css`): De kop met "Welkom terug,
+  <voornaam>" en de Organisatie, secties met aantal (Nog te doen en Afgerond voor een respondent, Metingen en Vergelijkingen
+  voor een Lead), kaarten met Assessment-icoon, statuschip, voortgang en teaser, de respons en de benchmarkkaart. Een Lead die
+  zelf ook invult krijgt één kaart met de blokken Jouw scan en Hele meting.
+- `lib/mijn-metingen.ts` (11 tests): De teaser van een scan en van de hele Meting voor schaal en Quickscan, de relatieve tijd,
+  de volgorde van de secties en de respons.
+- `ScanInvulling.laatstOpgeslagenOp`, gezet bij elke wijziging van de antwoorden.
+
+**Keuzes waar de spec open liet** (onder Gebouwd in `visualisatie-mijn-metingen.md`): Eindstand als alle uitgenodigde scans klaar
+zijn, "Laatst opgeslagen" in dagen tot en met 6, de Quickscan-teaser van een Lead volgt de regels van de eigen scan.
+
 ## 2026-10-15 (7) — Specs van Joost, PR 117: Kenmerken en Groeperen op bij Verkennen
 
 Op verzoek van Sander gebouwd (`visualisatie-verkennen.md`, Kenmerken en filters, Groeperen en focus, Zonder groepering).

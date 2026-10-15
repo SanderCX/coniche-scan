@@ -19,19 +19,22 @@ const M = { l: 52, r: 16, t: 16, b: 42 };
  * sterkte. Bij minder dan drie Organisaties met een waarde staat er "Te weinig data".
  */
 export function WeergaveVerband({
+  minPunten = 3,
   punten,
   xLabel,
   yLabel,
   eenheidX,
 }: {
+  /** `verkennenMinGroep`: Het minimum aantal Organisaties met een waarde voor het diagram. */
+  minPunten?: number;
   punten: VerbandPunt[];
   xLabel: string;
   yLabel: string;
   eenheidX?: string;
 }) {
   const reg: Regressie | null = regressie(punten.map((p) => ({ x: p.x, y: p.y })));
-  if (punten.length < 3) {
-    return <p className="admin-notice">Te weinig data: Er zijn {punten.length} Organisaties met een waarde voor {xLabel}, er zijn er minstens 3 nodig.</p>;
+  if (punten.length < minPunten) {
+    return <p className="admin-notice">Te weinig data: Er zijn {punten.length} Organisaties met een waarde voor {xLabel}, er zijn er minstens {minPunten} nodig.</p>;
   }
   const xs = punten.map((p) => p.x);
   const minX = Math.min(...xs);
