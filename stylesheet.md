@@ -731,6 +731,28 @@ een `title`-tooltip). Zie `components/InfoIcoon.tsx`, `.info-icoon` en
   `--stat-green`) en een sluitkruisje, na een actie die de Respondent van de
   pagina haalt. Verdwijnt bij het wisselen van pagina.
 
+### Filterchip, focuschip en slider (Verkennen)
+
+Voorstel van 15 oktober 2026, uit het visual design van Verkennen
+(`visualisatie-verkennen.md`). Alleen de onderdelen die nog niet in dit
+document staan. De vier weergaven, Groeperen op en Sorteren gebruiken de
+bestaande weergave-schakelaar (`.weergave-wissel`).
+
+- **Filterchip**: Een afgeronde knop van 30px hoog (`border-radius: 15px`),
+  `1px solid var(--border-d)`, witte achtergrond, tekst `.85rem` gewicht 600 in
+  `var(--ink-m)`, met het aantal Organisaties erachter in gewicht 400. Gekozen
+  heeft hij `background: var(--ink)` met witte tekst.
+- **Focuschip**: Dezelfde vorm als de filterchip. Gekozen is hij oranje
+  (`var(--or)`) met witte tekst. Een groep met minder dan 3 Organisaties heeft
+  een gestreepte rand en tekst in `var(--ink-s)`.
+- **Slider met histogram**: Een smalle balk (4px) in `var(--border-d)` met een
+  rond handvat van 20px in `var(--or)` en een witte rand. Erboven een histogram
+  van 12 staven, 52px hoog, waarvan de staven van de focusgroep `var(--or)` zijn
+  en de andere `#cfccc5`. Onder de slider staan het bereik en het aantal
+  Organisaties aan elke kant van de drempel.
+- **Kleine groep**: Een waarschuwing in `--stat-amber-faint` met een
+  driehoekicoon, in de stijl van de bestaande meldingen.
+
 ### Overzichtsmodal
 
 Voor het Respondent-overzicht en het Scan-overzicht in beheer

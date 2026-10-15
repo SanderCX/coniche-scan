@@ -105,6 +105,23 @@ Bewust nog niet opgepakt. Geen prioritering.
   `datamodel.md`, Meting en `beheerpagina.md`, punt 5 en 14. Nog niet
   ontworpen: De weergave bij drie of meer Metingen, bijvoorbeeld een lijn per
   bouwblok over de meetdata.
+- **Verkennen (voorstel van 15 oktober 2026)**: Een Admin-scherm om de hele
+  pool van een Assessment te filteren, te groeperen en te vergelijken
+  (`visualisatie-verkennen.md`, `beheerpagina.md` punt 15). Er is een visual
+  design, nog niets gebouwd. Bewust later:
+  - Een versie voor de Consultant, met de namen van niet-eigen Organisaties
+    afgeschermd en de drempel `benchmarkMinOrganisaties` voor beide kanten van
+    een splitsing.
+  - Getalfilters (sliders) op operationele KPI's, naast de AHT-drempel bij het
+    groeperen.
+  - AHT per kanaal. Dit is een wijziging in het datamodel (AHT wordt een
+    subveld bij elk kanaal in plaats van één los KPI-veld, `datamodel.md`,
+    KPI's) en vraagt Sander.
+  - Een filterstand bewaren als benchmark, en het resultaat zo aan een Lead
+    tonen.
+  - Export van de gefilterde pool als CSV.
+  - Verkennen voor de Quickscan Ziekenhuis (percentages) en voor meerdere
+    Metingen per Organisatie.
 - **Kopiëren van een Meting naar een nieuwe meetdatum (bewust niet opgepakt, 14
   oktober 2026)**: Een functie die onderdeel en Assessment van een eerdere
   Meting overneemt, zoals "Nieuwe ronde starten" dat deed. Joost vond dit te

@@ -121,7 +121,7 @@ Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
   met de onderdelen van de gekozen hoofdlink. Bij Organisaties zijn dat
   Organisaties en Respondenten, voor een Admin aangevuld met
   Organisatievelden. Bij Resultaten zijn dat Metingen en, voor een
-  Admin, Benchmarks (punt 7). Bij Instellingen zijn
+  Admin, Benchmarks en Verkennen (punt 7 en 15). Bij Instellingen zijn
   dat Gebruikers, Drempels en termijnen, Algemene teksten, Content-pagina's,
   Audit-log en Data-integriteit. De tabbalk is zichtbaar op de
   lijstpagina's, niet op een detailpagina. Metingen en uitnodigen hebben
@@ -1714,7 +1714,7 @@ organisaties (`datamodel.md` deel 2, Rechtenmatrix, `resultaten.inzien`).
 Benchmarks zijn alleen voor een Admin (`benchmark.beheren`). De hoofdlink staat
 in `.nav-right` na Organisaties.
 
-De tabs zijn Metingen en, voor een Admin, Benchmarks. Heeft een gebruiker maar
+De tabs zijn Metingen en, voor een Admin, Benchmarks en Verkennen. Heeft een gebruiker maar
 één tab, zoals een Consultant, dan toont de pagina geen tabbalk. Elke lijst
 opent met een klik op de rij het volgende niveau, hetzelfde patroon als de
 benchmarkniveaus (`benchmark.md`): Een lijst van deelnemers, en per deelnemer
@@ -1730,6 +1730,8 @@ een view een niveau dieper.
   scan. Je komt dus altijd van organisatie via Meting bij de scan.
 - **Benchmarks** (alleen Admin): De benchmarks, punt 14. Daaronder vallen ook
   de vergelijkingen tussen Metingen (`benchmark.md`, Niveau 2).
+- **Verkennen** (alleen Admin, voorstel van 15 oktober 2026): Alle
+  Organisaties van één Assessment filteren, groeperen en vergelijken, punt 15.
 - **Selectie**: Selectievakje per rij, met de acties "Exporteren" voor de
   afgeronde scans van de geselecteerde Metingen (zie Export hieronder) en
   "Samenbrengen in één Meting…" (punt 6b).
@@ -1899,6 +1901,30 @@ ontworpen (`benchmark.md`, Niveau 3). De vergelijking (niveau 2) geeft
 de Admin via het Leads-venster aan een Lead met Resultaten op de Metingen daarin. De
 spreiding binnen een Meting (niveau 3) krijgt een Lead als kolom Spreiding
 (punt 6a). De view op één scan blijft voor de Admin.
+
+#### 15. Verkennen
+
+**Status.** Voorstel van 15 oktober 2026. Er is een visual design met
+voorbeelddata, nog niets gebouwd. Het gedrag staat in
+`visualisatie-verkennen.md`, hier staat de plek in beheer.
+
+De tab Verkennen onder Resultaten (punt 7), alleen zichtbaar voor een Admin
+(`verkennen.inzien`, `datamodel.md` deel 2, Rechtenmatrix). Een Consultant ziet
+de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat niets op.
+
+- **Bovenaan**: De eyebrow Resultaten, de paginatitel Verkennen en een
+  keuze van het Assessment. Alles op de pagina werkt binnen dat ene
+  Assessment.
+- **Filters**: Chips voor sector en ingezette kanalen, met het aantal
+  Organisaties erachter, een knop "Filter toevoegen" en "Wis filters". Onderaan
+  de teller "X van Y Organisaties in de pool" met een balk, en een regel met het
+  aantal Organisaties zonder toestemming voor benchmark.
+- **Vergelijken**: Groeperen op CRM-pakket, sector of de AHT-drempel (een slider
+  met histogram), en de focusgroep als chips. Een waarschuwing staat in beeld bij
+  een kleine groep.
+- **Resultaten**: Vier weergaven in de weergave-schakelaar (`stylesheet.md`,
+  Tabbalk en kruimelpad): Groep tegenover de rest, Spreiding binnen de groep,
+  Alle groepen naast elkaar en Verband met een kenmerk.
 
 ---
 
