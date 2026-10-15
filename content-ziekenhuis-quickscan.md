@@ -224,7 +224,10 @@ Classificatie. Van boven naar beneden:
    ongelijk, dan toont de legenda alleen percentages.
 
 De radar, het staafdiagram per categorie, de top 3 en "Scores per
-Domein" vervallen voor dit Assessment (open punt 2).
+Domein" vervallen voor dit Assessment (open punt 2). Ter vervanging
+komt er een tweede stand Overzicht met alle afdelingen en bouwblokken
+in één blik. Die en de weergaven voor de groep, de antwoorden per
+vraag en de benchmark staan in `visualisatie-quickscan.md`.
 
 ### Regels voor de bouwblokken per afdeling
 

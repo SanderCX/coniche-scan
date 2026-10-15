@@ -34,6 +34,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `sbi-indeling.md` | Vaste optielijst voor Sector/Subsector (SBI2025, top 2 niveaus) |
 | `benchmark.md` | Benchmark op drie niveaus: Tussen organisaties (gebouwd, geaggregeerd en anoniem, met een view per organisatie voor een Lead), binnen een organisatie tussen Metingen, en binnen een Meting (beide voorstel) |
 | `visualisatie-scores.md` | Hoe hoge en lage scores getoond worden: één meting, spreiding binnen een Meting, tussen Metingen, tussen organisaties en de matrix over Metingen (besloten ontwerp, gebouwd op 13 oktober 2026) |
+| `visualisatie-quickscan.md` | Visualisaties van de Quickscan Ziekenhuis in percentages: eigen resultaat (twee standen), gemiddelde en spreiding, antwoorden per vraag en benchmark (richting besloten op 15 oktober 2026, nog niet gebouwd) |
 | `backlog.md` | Bewust nog niet opgepakt |
 | `go-live-plan.md` | Actielijst naar productie |
 | `azure-plan.md` | Aanvulling op `go-live-plan.md` met de stappen voor de Azure-omgeving (Azure DevOps, Azure SQL, `coniche-scan.nl`) |
@@ -97,8 +98,10 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
 - **Quickscan Ziekenhuis**: Gebouwd op 14 oktober 2026
   (`content-ziekenhuis-quickscan.md`): Het eerste Assessment met
   antwoordType Ja / Nee / Weet ik niet, met doorloopflow en eigen
-  resultaatscherm. PDF, CSV, InDesign, import, het gemiddelde over een
-  Meting, spreiding en benchmark volgen later (`backlog.md`).
+  resultaatscherm. De visualisaties (eigen resultaat, groep, antwoorden per
+  vraag en benchmark) staan als voorstel in `visualisatie-quickscan.md`. PDF,
+  CSV, InDesign, import, het gemiddelde over een Meting, spreiding en
+  benchmark volgen later (`backlog.md`).
 
 ## Terminologie
 
@@ -569,6 +572,7 @@ bouwblokken met naam, omschrijving, tags en vragen.
   `content-ziekenhuis-quickscan.md`, met per punt wat er is gebouwd. Ze
   zijn klein (een minimum voor een chip, of de radar wegblijft, namen in de
   wegingskaart en de voorstelteksten). De scan zelf heeft rework nodig
-  (`backlog.md`).
+  (`backlog.md`). De open punten van de visualisaties staan onderaan
+  `visualisatie-quickscan.md`.
 - Rol/functie bij de respondent: Vrij tekstveld of vaste lijst.
 - Focus- en error-states in formulieren (zie `stylesheet.md`).
