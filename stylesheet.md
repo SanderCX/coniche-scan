@@ -923,13 +923,18 @@ pilvormige groep (`.weergave-wissel`).
   Organisaties aan elke kant van de drempel.
 - **Kleine groep**: Een waarschuwing in `--stat-amber-faint` met een
   driehoekicoon, in de stijl van de bestaande meldingen.
-- **Filtermenu**: Een dropdown onder de knop "Filter toevoegen" (zelfde patroon
+- **Menu Kenmerk toevoegen**: Een dropdown onder de knop "Kenmerk toevoegen" (zelfde patroon
   als de Dropdown-knop), 380px breed en maximaal 440px hoog, scrollt binnen het
   menu. Bovenaan een zoekveld. Daaronder per groep een kopregel in het
   label-formaat (`--fs-12`, gewicht 700, hoofdletters) en de velden als rijen,
   links de korte naam (`--fs-14`, gewicht 600) en rechts "n van N" in
   `var(--ink-s)`, gewicht 400. Een veld met weinig ingevulde waarden heeft
   grijze tekst. Hover `var(--bg-warm)`. Het volledige pad staat in een tooltip.
+- **Kaart Kenmerken**: Een kaart met titel, Info-icoon en per kenmerk een rij. De kenmerknaam staat als label (`--fs-12`, gewicht 700, hoofdletters), met rechts een kruisje van 24px rond om het kenmerk te verwijderen. De rijen zijn gescheiden door een lijn van 1px `--border` en 24px ruimte. De waarden zijn losse keuzepillen.
+- **Lege staat van Kenmerken**: De tekst in `--ink-s` (`--fs-12`) en daaronder "Snel beginnen:" met losse keuzepillen, 8px ertussen. Daaronder de knop "Kenmerk toevoegen", met 24px ruimte.
+- **Uitgeschakelde pil in een groep**: 50% dekking, `cursor: not-allowed`, nooit als gekozen getekend. De reden staat in een tooltip en als regel van `--fs-12` in `--ink-s` onder de groep.
+- **Pil "Geen kenmerk"**: Een losse, uitgeschakelde pil van 32px, zonder pilvormige groep eromheen, zodat hij even hoog is als de andere pillen.
+- **Melding bij de terugval van Groeperen op**: Een melding in `--stat-amber-faint` met een driehoekicoon, in de stijl van de melding bij een kleine groep.
 - **Korte naam in een chip**: De chip toont de korte naam en bij hover het
   origineel in een tooltip.
 - **Modal Korte namen**: De basismodal (`.modal-box--breed`) met een tabel van

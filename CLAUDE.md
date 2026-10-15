@@ -101,8 +101,12 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   te filteren, te groeperen en te vergelijken, met vier weergaven. Nog niet
   voor de Quickscan Ziekenhuis, voor een Consultant en voor meerdere Metingen
   per Organisatie. Korte namen voor veldnamen en waarden (zoals de lange
-  SBI-sectoren) houden de filterlijst en de chips leesbaar, gebouwd op 15
-  oktober 2026 (`visualisatie-verkennen.md`, Korte namen).
+  SBI-sectoren) houden de filterlijst en de pillen leesbaar, gebouwd op 15
+  oktober 2026 (`visualisatie-verkennen.md`, Korte namen). Kenmerken
+  (organisatievelden die je toevoegt en waarop je filtert en groepeert)
+  beginnen leeg, zonder groepering is de hele pool de focus. De kenmerken zijn
+  een voorstel van 15 oktober 2026 (visual design versie 6) en nog niet
+  gebouwd.
 - **Opmaakronde**: Besloten door Joost en gebouwd op 15 oktober 2026
   (`stylesheet.md`). Acht lettergroottes in even px (12, 14, 16, 18,
   24, 32, 40, 48) in plaats van zo'n 17 maten, met de paginatitel op 32px.
@@ -614,7 +618,8 @@ bouwblokken met naam, omschrijving, tags en vragen.
   (`backlog.md`). De open punten van de visualisaties staan onderaan
   `visualisatie-quickscan.md`.
 - Verkennen: De open punten staan onderaan `visualisatie-verkennen.md`, onder
-  andere of meerdere gekozen kanalen als "en" of "of" werken en de
-  startwaarden van de drempels bij kleine groepen.
+  andere of meerdere gekozen kanalen als "en" of "of" werken, de
+  startwaarden van de drempels bij kleine groepen en de grenzen van Groeperen
+  op (6 Organisaties, 12 waarden, 40% ingevuld).
 - Rol/functie bij de respondent: Vrij tekstveld of vaste lijst.
 - Focus- en error-states in formulieren (zie `stylesheet.md`).

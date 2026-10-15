@@ -416,7 +416,8 @@ standaardteksten zoals ze nu in de app staan):
 | `info.benchmarkAanmakenScans` | Benchmark binnen een Meting aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark binnen een Meting heeft een naam nodig, een organisatie, een Assessment en een Meting. Een Meting is alleen te kiezen met genoeg afgeronde scans. |
 | `info.exportEenScan` | Meting-overzicht en de lijsten onder Resultaten, achter de uitgeschakelde opties "Als PDF" en "Voor InDesign (XML)" | Beschikbaar bij precies één scan. |
 | `info.korteNaamOrganisatie` | Organisatie aanmaken en bewerken, naast het veld Korte naam | Een korte naam staat in de kolomkoppen van matrices en heatmaps, bijvoorbeeld "Rabobank" in plaats van de volledige naam. Laat je het veld leeg, dan geldt de naam zelf. De volledige naam staat in de tooltip. |
-| `info.verkennenGroeperen` | Verkennen, naast het label Groeperen op | Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties. |
+| `info.verkennenKenmerken` | Verkennen, kaart Kenmerken, naast de titel | Zet hier een kenmerk neer om op te filteren en om op te groeperen. Een kenmerk zonder gekozen waarde filtert niets. Filteren op bereik bij getallen volgt later. |
+| `info.verkennenGroeperen` | Verkennen, naast het label Groeperen op | Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties. Is er nog geen kenmerk, dan staat er: Er is nog geen kenmerk om op te groeperen. Voeg bij Kenmerken een kenmerk toe, dan kun je de Organisaties erop in groepen verdelen. |
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
 
 Elk nieuw Info-icoon krijgt hier een regel en een regel in
@@ -1944,8 +1945,10 @@ spreiding binnen een Meting (niveau 3) krijgt een Lead als kolom Spreiding
 #### 15. Verkennen
 
 **Status.** Gebouwd op 15 oktober 2026, naar het visual design met
-voorbeelddata. De korte namen op de chips en het potlood naast de kop van een
-filter zijn gebouwd op 15 oktober 2026. Het gedrag staat in
+voorbeelddata, met filters en een vaste groepering. De korte namen op de pillen
+en het potlood naast de kop van een filter zijn gebouwd op 15 oktober 2026. De
+kaart Kenmerken en Groeperen op met pillen (het potlood naast de naam van een
+kenmerk) is voorstel van 15 oktober 2026 en nog niet gebouwd. Het gedrag staat in
 `visualisatie-verkennen.md`, hier staat de plek in beheer.
 
 De tab Verkennen onder Resultaten (punt 7), alleen zichtbaar voor een Admin
@@ -1955,16 +1958,20 @@ de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat niets op.
 - **Bovenaan**: De eyebrow Resultaten, de paginatitel Verkennen en een
   keuze van het Assessment. Alles op de pagina werkt binnen dat ene
   Assessment.
-- **Filters**: Chips voor sector en ingezette kanalen, met het aantal
-  Organisaties erachter en de korte naam op de chip (het origineel in een
-  tooltip), een potlood naast de kop van een filter voor de korte namen van dat
-  veld (punt 3), een knop "Filter toevoegen" met een menu per groep van velden
-  met zoekveld, en "Wis filters". Onderaan
-  de teller "X van Y Organisaties in de pool" met een balk, en een regel met het
-  aantal Organisaties zonder toestemming voor benchmark.
-- **Vergelijken**: Groeperen op CRM-pakket, sector of de AHT-drempel (een slider
-  met histogram), en de focusgroep als chips. Een waarschuwing staat in beeld bij
-  een kleine groep.
+- **Kenmerken**: De kaart Kenmerken (`visualisatie-verkennen.md`, Kenmerken
+  en filters). Het scherm begint leeg, met "Snel beginnen" (CRM-pakket,
+  Sector, AHT) en een knop "Kenmerk toevoegen" met een menu per groep van
+  velden met zoekveld. Per kenmerk een rij met de korte naam, een potlood voor
+  de korte namen van dat veld (punt 3), een kruisje en de keuzepillen met het
+  aantal Organisaties erachter. Daaronder "Wis filters" en de teller "X van Y
+  Organisaties in de pool" met een balk, en een regel met het aantal
+  Organisaties zonder toestemming voor benchmark.
+- **Vergelijken**: Groeperen op als pilvormige groep met de kenmerken die
+  kunnen groeperen (met reden in een tooltip bij een uitgeschakelde pil), de
+  pil "Geen kenmerk" zolang er niets is toegevoegd, de AHT- of NPS-drempel
+  als slider met histogram, en de focusgroep als pillen. Zonder groepering
+  toont het scherm de hele pool. Een waarschuwing staat in beeld bij een
+  kleine groep.
 - **Resultaten**: Vier weergaven in de weergave-schakelaar (`stylesheet.md`,
   Tabbalk en kruimelpad): Groep tegenover de rest, Spreiding binnen de groep,
   Alle groepen naast elkaar en Verband met een kenmerk.

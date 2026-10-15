@@ -107,11 +107,13 @@ Bewust nog niet opgepakt. Geen prioritering.
   bouwblok over de meetdata.
 - **Verkennen (gebouwd op 15 oktober 2026)**: Een Admin-scherm om de hele
   pool van een Assessment te filteren, te groeperen en te vergelijken
-  (`visualisatie-verkennen.md`, `beheerpagina.md` punt 15). Bewust later:
+  (`visualisatie-verkennen.md`, `beheerpagina.md` punt 15). Het gedrag van
+  Kenmerken en Groeperen op is een voorstel (versie 6 van het visual design) en
+  nog niet gebouwd. Bewust later:
   - Een versie voor de Consultant, met de namen van niet-eigen Organisaties
     afgeschermd en de drempel `benchmarkMinOrganisaties` voor beide kanten van
     een splitsing.
-  - Getalfilters (sliders) op operationele KPI's, naast de AHT-drempel bij het
+  - Filter op bereik (sliders) bij getalkenmerken, naast de drempel bij het
     groeperen.
   - AHT per kanaal. Dit is een wijziging in het datamodel (AHT wordt een
     subveld bij elk kanaal in plaats van één los KPI-veld, `datamodel.md`,
@@ -615,7 +617,8 @@ screenshots van de draaiende app. Niets is besloten of gebouwd.
   van 96px op één regel met een tooltip en `Organisatie.korteNaam`. De pil
   staat in de weergave-schakelaar, Verkennen en de antwoorden van de
   Quickscan. Nog niet: Een doorloop van de overige keuzeknoppen in de app
-  op de pil, en het visual design van Verkennen is niet bijgewerkt. De
+  op de pil, en het gedrag van Kenmerken en Groeperen op uit het visual
+  design van Verkennen (versie 6, `visualisatie-verkennen.md`). De
   PDF-export valt er niet onder.
 - **Vragenlijst en resultaten**: Duidelijkere actieve staat op de gekozen
   schaalwaarde, de hele antwoordrij klikbaar, een zichtbare
