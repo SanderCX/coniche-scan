@@ -49,6 +49,8 @@ export default function VoorbeeldPage({
         relevantie={getDemoRelevantie(assessment.id)}
         respondentNaam={demoRespondentNaam}
         isPreview
+        // De pagina heeft zelf al de kop met de naam van het Assessment: Zonder dit staat hij er twee keer.
+        toonKop={false}
       />
     </div>
     </PageWithChrome>

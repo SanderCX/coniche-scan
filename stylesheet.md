@@ -490,6 +490,7 @@ bestand `assessment-icoon-<sleutel>.svg`. De code bewaart ze onder
 | `target` | Doel: twee ringen met een punt, lijntekening | Klantcontact Volwassenheid |
 | `sparkle` | Schittering: vierpuntige ster, gevuld | AI-volwassenheid |
 | `heart` | Hart, lijntekening | Zorgscan |
+| `cross` | Plusteken, lijntekening | Klantcontact Quickscan – Ziekenhuis |
 
 - **Opbouw**: Een rond vlak in `var(--or-faint)` met daarin het icoon in
   `var(--or)`. Lijntekeningen hebben een lijndikte van `1.75` op een

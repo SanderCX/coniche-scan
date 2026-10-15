@@ -105,8 +105,9 @@ Door Joost, 14 oktober 2026.
 
 - Naam: "Klantcontact Quickscan – Ziekenhuis"
 - `kortLabel`: "Quickscan Ziekenhuis" (voorstel)
-- `icoon`: Voorstel 🏥 als tijdelijke emoji, want 🩺 is al van de
-  Zorgscan. Joost kiest.
+- `icoon`: `cross`, een plusteken als omtrek in dezelfde lijnstijl als
+  de andere drie (`stylesheet.md`, Assessment-icoon). Gebouwd op 14
+  oktober 2026, op verzoek van Sander; de tijdelijke emoji 🏥 vervalt.
 - `antwoordType`: `"ja-nee-weetniet"`, `schaal`: `null`
 - `relevantieVraag`: "Is deze afdeling relevant voor uw situatie?" (in de
   oude tool "Is dit organisatieonderdeel relevant voor uw situatie?")

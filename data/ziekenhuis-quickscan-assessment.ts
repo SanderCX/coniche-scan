@@ -166,8 +166,8 @@ export const ziekenhuisQuickscan: Assessment = {
     "Deze quickscan geeft inzicht in hoe goed klantcontact in jouw ziekenhuis is geregeld, per afdeling: Poliklinieken, verpleegafdelingen, receptie en centrale, en patiëntenservice. Je beantwoordt 60 vragen met Ja, Nee of Weet ik niet en ziet daarna per afdeling waar de basis op orde is en waar ontwikkelruimte zit.",
   doelgroep:
     "Ziekenhuizen die willen weten hoe het telefonisch klantcontact per afdeling is geregeld en waar ze het eerst moeten verbeteren.",
-  // Tijdelijke emoji (voorstel, Joost kiest): 🩺 is al van de Zorgscan. Zonder SVG bij de sleutel valt de app terug op de emoji.
-  icoon: "🏥",
+  // Plusteken als omtrek, in dezelfde lijnstijl als de andere drie (`stylesheet.md`, Assessment-icoon).
+  icoon: "cross",
   geschatteDuur: "±15 minuten",
   afgeleidVanAssessmentId: null,
   pdfContentSecties: null,

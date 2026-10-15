@@ -54,11 +54,23 @@ function HeartIcon(props: IconProps) {
   );
 }
 
+function CrossIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      {/* Een plusteken als omtrek, zoals het hart: Op 0.9x rond het midden van de viewBox, zodat het optisch even groot is. */}
+      <g transform="translate(1.2 1.2) scale(0.9)">
+        <path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6V3z" />
+      </g>
+    </IconBase>
+  );
+}
+
 /** Sleutel per Assessment (`assessment.icoon`), instelbaar in Content-beheer. */
 export const ASSESSMENT_ICONS: Record<string, ComponentType<IconProps>> = {
   target: TargetIcon,
   sparkle: SparkleIcon,
   heart: HeartIcon,
+  cross: CrossIcon,
 };
 
 /**
