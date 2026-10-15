@@ -1,12 +1,19 @@
+"use client";
+
+import { Suspense } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Antwoord, Assessment, Classificatie } from "@/lib/types";
 import {
   KLASSE_NAAM,
   QuickscanAfdeling,
+  QuickscanResultaat,
   afdelingenHebbenEvenveelVragen,
   puntenRange,
   quickscanResultaat,
 } from "@/lib/quickscan";
 import { formatGewicht } from "@/lib/format";
+import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
+import { QuickscanOverzicht } from "@/components/quickscan/QuickscanOverzicht";
 
 /**
  * Klassekleuren (`content-ziekenhuis-quickscan.md`, Resultaten): De bestaande groen, oranje en rood uit de scorekleuren
@@ -30,7 +37,7 @@ function Voortgangsbalk({ percentage, kleur }: { percentage: number | null; kleu
   );
 }
 
-function AfdelingKaart({ afdeling }: { afdeling: QuickscanAfdeling }) {
+function AfdelingKaart({ afdeling, toonTellingen }: { afdeling: QuickscanAfdeling; toonTellingen: boolean }) {
   const { categorie } = afdeling;
   if (!afdeling.vanToepassing) {
     return (
@@ -38,6 +45,9 @@ function AfdelingKaart({ afdeling }: { afdeling: QuickscanAfdeling }) {
         <h3 style={{ textDecoration: "line-through", color: "var(--ink-s)" }}>{categorie.naam}</h3>
         <p className="text-sm text-ink-s" style={{ margin: 0 }}>
           Niet van toepassing
+        </p>
+        <p className="text-sm text-ink-s" style={{ margin: "0.3rem 0 0" }}>
+          Eerdere antwoorden blijven bewaard en tellen weer mee als de keuze later verandert.
         </p>
       </div>
     );
@@ -62,11 +72,13 @@ function AfdelingKaart({ afdeling }: { afdeling: QuickscanAfdeling }) {
         </span>
       </p>
       <Voortgangsbalk percentage={afdeling.percentage} kleur={kleur} />
-      <p className="qs-tellingen">
-        <span style={{ color: TELLING_KLEUR.ja }}>Ja: {afdeling.tellingen.ja}</span>
-        <span style={{ color: TELLING_KLEUR.nee }}>Nee: {afdeling.tellingen.nee}</span>
-        <span style={{ color: TELLING_KLEUR.weetNiet }}>Weet niet: {afdeling.tellingen.weetNiet}</span>
-      </p>
+      {toonTellingen && (
+        <p className="qs-tellingen">
+          <span style={{ color: TELLING_KLEUR.ja }}>Ja: {afdeling.tellingen.ja}</span>
+          <span style={{ color: TELLING_KLEUR.nee }}>Nee: {afdeling.tellingen.nee}</span>
+          <span style={{ color: TELLING_KLEUR.weetNiet }}>Weet niet: {afdeling.tellingen.weetNiet}</span>
+        </p>
+      )}
 
       <h4 className="qs-kopje">Verdieping op dimensies</h4>
       <div className="qs-dimensies">
@@ -80,7 +92,7 @@ function AfdelingKaart({ afdeling }: { afdeling: QuickscanAfdeling }) {
                   {b.gewicht !== 1 && <span className="gewicht-chip" style={{ marginLeft: "0.4rem" }}>{formatGewicht(b.gewicht)}×</span>}
                 </span>
                 <span className="text-ink-m">
-                  {b.punten}/{b.vragen} ({b.percentage ?? 0}%)
+                  {getal(b.punten)}/{b.vragen} ({b.percentage ?? 0}%)
                 </span>
               </div>
               <Voortgangsbalk percentage={b.percentage} kleur={k} />
@@ -140,26 +152,65 @@ function Uitgelicht({
  * en de legenda van de drie klassen. Radar, staafdiagram per categorie en top 3 vervallen. Een afdeling die niet van toepassing
  * is, staat er grijs en doorgestreept en doet niet mee.
  */
-export function QuickscanResultaten({
-  assessment,
-  antwoorden,
-  relevantie,
-  respondentNaam,
-  isPreview = false,
-  toonKop = true,
-}: {
+export function QuickscanResultaten(props: QuickscanResultatenProps) {
+  return (
+    <Suspense fallback={null}>
+      <QuickscanResultatenInhoud {...props} />
+    </Suspense>
+  );
+}
+
+export interface QuickscanResultatenProps {
   assessment: Assessment;
-  antwoorden: Record<string, Antwoord>;
+  antwoorden?: Record<string, Antwoord>;
   relevantie?: Record<string, boolean>;
+  /** Een kant-en-klaar resultaat, bijvoorbeeld het gemiddelde van een Meting (`metingAlsResultaat`): Gaat voor `antwoorden`. */
+  resultaat?: QuickscanResultaat;
   respondentNaam?: string | null;
   isPreview?: boolean;
   toonKop?: boolean;
-}) {
-  const r = quickscanResultaat(assessment, antwoorden, relevantie);
+  /**
+   * De schakelaar Per afdeling en Overzicht (`visualisatie-quickscan.md`, 2), met de keuze in de adresbalk
+   * (`?weergave=overzicht`). Standaard aan voor het resultaat van één scan. Staat uit als de pagina zelf al een schakelaar heeft,
+   * zoals de resultatenpagina van een Meting.
+   */
+  toonSchakelaar?: boolean;
+  /** Toont het aantal Ja, Nee en Weet ik niet per afdeling. Bij het gemiddelde van een Meting staat dit uit. */
+  toonTellingen?: boolean;
+  /** Een regel onder het totaal, bijvoorbeeld "Gemiddelde van 5 afgeronde scans". */
+  ondertitel?: string;
+}
+
+function QuickscanResultatenInhoud({
+  assessment,
+  antwoorden,
+  relevantie,
+  resultaat,
+  respondentNaam,
+  isPreview = false,
+  toonKop = true,
+  toonSchakelaar = true,
+  toonTellingen = true,
+  ondertitel,
+}: QuickscanResultatenProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const zoek = useSearchParams();
+  const weergave = toonSchakelaar && zoek.get("weergave") === "overzicht" ? "overzicht" : "afdeling";
+  function kies(w: "afdeling" | "overzicht") {
+    const params = new URLSearchParams(zoek.toString());
+    if (w === "overzicht") params.set("weergave", "overzicht");
+    else params.delete("weergave");
+    const q = params.toString();
+    router.push(q ? `${pathname}?${q}` : pathname, { scroll: false });
+  }
+  const r = resultaat ?? quickscanResultaat(assessment, antwoorden ?? {}, relevantie);
   const klasse = r.klasse;
   const kleur = klasse ? QUICKSCAN_KLASSE_KLEUR[klasse] : "var(--ink-s)";
   const metPunten = afdelingenHebbenEvenveelVragen(r);
   const vragenPerAfdeling = r.afdelingen[0]?.maximum ?? 0;
+  // De totaalkaart noemt de afdelingen die niet meetellen bij naam (`visualisatie-quickscan.md`, 1).
+  const nvtNamen = r.afdelingen.filter((a) => !a.vanToepassing).map((a) => a.categorie.naam);
 
   return (
     <div>
@@ -175,9 +226,11 @@ export function QuickscanResultaten({
           <p className="eyebrow">OVERALL VOLWASSENHEID</p>
           <p className="qs-totaal-percentage">
             <span style={{ color: kleur }}>{r.percentage ?? 0}%</span>{" "}
-            <span className="qs-totaal-punten">
-              ({getal(r.punten)}/{getal(r.maximum)})
-            </span>
+            {toonTellingen && (
+              <span className="qs-totaal-punten">
+                ({getal(r.punten)}/{getal(r.maximum)})
+              </span>
+            )}
           </p>
           {klasse && (
             <p className="qs-totaal-klasse" style={{ color: kleur }}>
@@ -185,6 +238,12 @@ export function QuickscanResultaten({
             </p>
           )}
           {respondentNaam && <p className="text-sm text-ink-m">Resultaat voor {respondentNaam}</p>}
+          {ondertitel && <p className="text-sm text-ink-m">{ondertitel}</p>}
+          {nvtNamen.length > 0 && (
+            <p className="text-sm text-ink-s" style={{ margin: "0.3rem 0 0" }}>
+              {nvtNamen.map((n) => `${n} is niet van toepassing en telt niet mee`).join(". ")}.
+            </p>
+          )}
         </div>
         <div className="qs-totaal-rechts">
           <div className="classificatie-cirkel" style={{ ["--kleur" as string]: kleur } as React.CSSProperties}>
@@ -194,16 +253,38 @@ export function QuickscanResultaten({
           </div>
           <p className="text-sm text-ink-m" style={{ margin: "0.6rem 0 0", textAlign: "center" }}>
             {r.aantalVanToepassing} van {r.aantalAfdelingen} afdelingen beoordeeld
-            <br />
-            {getal(r.punten)} van {getal(r.maximum)} punten
+            {toonTellingen && (
+              <>
+                <br />
+                {getal(r.punten)} van {getal(r.maximum)} punten
+              </>
+            )}
           </p>
         </div>
       </div>
 
+      {toonSchakelaar && (
+        <div className="vis-acties" style={{ marginTop: "1.5rem" }}>
+          <WeergaveWissel
+            ariaLabel="Weergave van het resultaat"
+            opties={[
+              { waarde: "afdeling", label: "Per afdeling" },
+              { waarde: "overzicht", label: "Overzicht" },
+            ]}
+            waarde={weergave}
+            onChange={kies}
+          />
+        </div>
+      )}
+
+      {weergave === "overzicht" ? (
+        <QuickscanOverzicht resultaat={r} />
+      ) : (
+        <>
       <h2 style={{ marginTop: "2.5rem" }}>Scores per afdeling</h2>
       <div className="qs-afdelingen">
         {r.afdelingen.map((a) => (
-          <AfdelingKaart key={a.categorie.id} afdeling={a} />
+          <AfdelingKaart key={a.categorie.id} afdeling={a} toonTellingen={toonTellingen} />
         ))}
       </div>
 
@@ -235,6 +316,8 @@ export function QuickscanResultaten({
           );
         })}
       </div>
+        </>
+      )}
     </div>
   );
 }

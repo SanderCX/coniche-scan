@@ -7,6 +7,7 @@ import { useAssessment } from "@/lib/assessment-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magOrganisatieToegang } from "@/lib/rechten";
 import { ResultsView } from "@/components/ResultsView";
+import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { ExporterenNavKnop } from "@/components/beheer/ExporterenNavKnop";
 import { useBeheerNavActions } from "@/components/beheer/BeheerNavActions";
@@ -95,6 +96,12 @@ function ScanWeergaven({
   const scans = aantalAfgerond(scanUitvoering);
   const genoeg = scans >= instellingen.benchmarkMinRespondenten;
   const weergave: "scan" | "positie" = zoek.get("weergave") === "positie" && genoeg ? "positie" : "scan";
+  // "Positie in de Meting" is de spreiding op de schaal van 1 tot 5. Een Assessment met Ja / Nee / Weet ik niet heeft eigen
+  // weergaven op de resultatenpagina van de Meting (`visualisatie-quickscan.md`, 3), en het scherm van de scan heeft zelf de
+  // schakelaar Per afdeling en Overzicht.
+  if (isJaNeeWeetNiet(assessment)) {
+    return <ResultsView assessment={assessment} antwoorden={invulling.antwoorden} relevantie={invulling.relevantie} respondentNaam={lid.naam} />;
+  }
 
   function zet(waarde: "scan" | "positie") {
     const params = new URLSearchParams(zoek.toString());

@@ -3,9 +3,11 @@
 import { use } from "react";
 import Link from "next/link";
 import { useAssessment } from "@/lib/assessment-store";
-import { getDemoAntwoorden, getDemoRelevantie, demoRespondentNaam } from "@/data/demo-antwoorden-per-assessment";
+import { getDemoAntwoorden, getDemoMetingScans, getDemoRelevantie, demoRespondentNaam } from "@/data/demo-antwoorden-per-assessment";
 import { ResultsView } from "@/components/ResultsView";
 import { PageWithChrome } from "@/components/PageWithChrome";
+import { WeergaveBouwblok } from "@/components/visualisatie/WeergaveBouwblok";
+import { eenMeting } from "@/lib/visualisatie";
 
 export default function VoorbeeldPage({
   params,
@@ -24,6 +26,8 @@ export default function VoorbeeldPage({
       </PageWithChrome>
     );
   }
+
+  const demoMeting = getDemoMetingScans(assessment.id);
 
   return (
     <PageWithChrome>
@@ -52,6 +56,22 @@ export default function VoorbeeldPage({
         // De pagina heeft zelf al de kop met de naam van het Assessment: Zonder dit staat hij er twee keer.
         toonKop={false}
       />
+
+      {demoMeting && (
+        // Wat er bij meerdere respondenten van dezelfde Meting en organisatie bij komt: Het gemiddelde en de afwijking daarop
+        // (`visualisatie-scores.md`, A, Per bouwblok).
+        <section style={{ marginTop: "4rem" }}>
+          <h2>Gemiddelde en afwijking</h2>
+          <p className="mt-2 text-ink-m">
+            Wanneer er meerdere respondenten voor de zelfde meting en organisatie de scan hebben ingevuld, verschaft de tool ook
+            inzicht in de gemiddelde scores en afwijkingen daarop.
+          </p>
+          <p className="text-sm text-ink-m" style={{ margin: "1rem 0 1.2rem" }}>
+            Gemiddelde over {demoMeting.length} afgeronde respondenten
+          </p>
+          <WeergaveBouwblok assessment={assessment} weergave={eenMeting(assessment, demoMeting)} toonBereik />
+        </section>
+      )}
     </div>
     </PageWithChrome>
   );

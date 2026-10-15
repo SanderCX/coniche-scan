@@ -224,18 +224,20 @@ nog niet opgepakt:
   niet op worden gerekend. De drie scans in de batch-export lijken
   testscans (fictieve organisaties, dezelfde invuller); controleren of er
   echte scans bestaan.
-- **Gemiddelde over meerdere Respondenten, spreiding en benchmark** voor
-  dit antwoordType. Een Ja telt als 1 en Nee en Weet ik niet als 0; de
-  berekeningen over een groep (`datamodel.md`, Scoreberekening) zijn nog
-  niet uitgewerkt voor punten.
+- **Gemiddelde over meerdere Respondenten, spreiding en benchmark tussen
+  organisaties** voor dit antwoordType zijn gebouwd op 15 oktober 2026
+  (`visualisatie-quickscan.md`). Nog niet: De vergelijking tussen Metingen
+  (weergave C, E en H in percentages), een samengestelde Meting en de
+  benchmark binnen een organisatie of een Meting.
 - **Afdelingen toevoegen** (bijvoorbeeld de SEH). Nu zijn het vier vaste
   afdelingen. Of een afdeling niet van toepassing is, geeft de Respondent
   zelf aan in de scan.
 - **Gemiddelde en benchmark bij afdelingen die niet van toepassing
   zijn**: Respondenten kunnen verschillende afdelingen als Nee
-  beantwoorden, dus niet elke scan heeft dezelfde vragen. Hoe dat in
-  een gemiddelde over Respondenten en in de benchmark telt, is niet
-  besloten.
+  beantwoorden, dus niet elke scan heeft dezelfde vragen. Gebouwd met de
+  keuze alle punten gedeeld door alle mogelijke punten van de relevante
+  afdelingen (`visualisatie-quickscan.md`, Gebouwd). Joost bevestigt dit
+  nog (open punt 2 daar).
 - **Managementsamenvatting**: De PDF van de oude tool had een AI-tekst die
   uitging van een score "van 5" en dus niet bij deze scoring past. Niet
   overnemen; zie de bestaande backlog-regel over de AI-samenvatting.

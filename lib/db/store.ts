@@ -8,6 +8,7 @@ import { ruimOrganisatieOp } from "@/lib/metingen";
 import { getBenchmarks, haalMetingenUitBenchmarks, legeToewijzingen, wisOmgezetteToewijzingen } from "@/lib/benchmark-store";
 import { ruimLeadToegangOp, toegangSleutel, zetLegacyBereikOm } from "@/lib/lead-toegang";
 import { techstackCategorieIdsMetLijst } from "@/data/organisatie-velden";
+import { migreerFteManagementSupport } from "@/lib/fte";
 
 const KEY = "coniche-scan:organisaties";
 const SERVER_SLEUTEL = "organisaties";
@@ -73,9 +74,11 @@ function normaliseerOrganisatie(invoer: Organisatie): Organisatie {
   const organisatie: Organisatie = {
     ...ruw,
     // Het oude veld zelf/extern wordt "Ondersteund door" bij de techstack-categorieën met een lijst (`lib/techstack.ts`).
-    kenmerken: migreerTechstackOndersteuning(
-      ruw.kenmerken && typeof ruw.kenmerken === "object" ? ruw.kenmerken : {},
-      techstackCategorieIdsMetLijst
+    kenmerken: migreerFteManagementSupport(
+      migreerTechstackOndersteuning(
+        ruw.kenmerken && typeof ruw.kenmerken === "object" ? ruw.kenmerken : {},
+        techstackCategorieIdsMetLijst
+      )
     ),
     // `email` genormaliseerd (getrimd, lowercase) voor data van vóór die
     // regel bestond (datamodel.md, Respondent) — anders herkent

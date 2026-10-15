@@ -18,6 +18,8 @@ import {
 } from "@/lib/metingen";
 import { useBenchmarks } from "@/lib/benchmark-store";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { metingAlsResultaat, quickscanMeting, quickscanScansVan } from "@/lib/quickscan-groep";
+import { QuickscanResultaten } from "@/components/QuickscanResultaten";
 import { benchmarkGeldigVoorOrganisatie, heeftBenchmarkToegang } from "@/lib/lead-toegang";
 
 /**
@@ -54,19 +56,6 @@ export default function LeadResultatenPage({
     );
   }
 
-  // Het gemiddelde over de scans is er nog niet voor Ja / Nee / Weet ik niet (`backlog.md`, Quickscan Ziekenhuis).
-  if (isJaNeeWeetNiet(assessment)) {
-    return (
-      <PageWithChrome logoHref={`/s/${code}`} code={code} toonTerug>
-        <div className="container section" style={{ maxWidth: "40rem" }}>
-          <span className="eyebrow">{scanUitvoering.label}</span>
-          <h1>Nog niet beschikbaar</h1>
-          <p>Het resultaat van een hele Meting is voor dit type Assessment nog niet beschikbaar.</p>
-        </div>
-      </PageWithChrome>
-    );
-  }
-
   // Bij een samengestelde Meting ziet de Lead alleen het gemiddelde, niet de onderliggende Metingen (`benchmark.md`).
   const samengesteld = isSamengesteld(scanUitvoering);
   const magExporteren = heeftMetingToegang(gegevens.organisatie, gegevens.lid.id, "exporteren", scanUitvoering.id);
@@ -88,6 +77,23 @@ export default function LeadResultatenPage({
   }
 
   const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, gegevens.organisatie, scanUitvoering);
+  // Een Assessment met Ja / Nee / Weet ik niet rekent in punten en procenten (`visualisatie-quickscan.md`, 3 en 4).
+  const quickscanScans = isJaNeeWeetNiet(assessment) ? quickscanScansVan(scanUitvoering.invullingen) : null;
+  const quickscanData = quickscanScans ? quickscanMeting(assessment, quickscanScans) : null;
+  const quickscan =
+    quickscanScans && quickscanData
+      ? {
+          meting: quickscanData,
+          scans: quickscanScans,
+          namen: Object.fromEntries(
+            scanUitvoering.invullingen.map((i) => {
+              const lid = gegevens.organisatie.leden.find((l) => l.id === i.organisatieLidId);
+              return [i.id, lid ? lid.naam || lid.email : ""];
+            })
+          ),
+          uitgenodigd: scanUitvoering.invullingen.length,
+        }
+      : undefined;
   // De knop "Vergelijking" (`benchmark.md`, Niveau 2): De benchmarks binnen een organisatie waarvan deze Meting lid is, met het
   // vinkje voor de Lead en Resultaten op minstens twee van de leden. De vergelijking zelf staat op zijn benchmarkpagina.
   const vergelijkingen = benchmarks
@@ -132,7 +138,8 @@ export default function LeadResultatenPage({
       code={code}
       toonTerug
       navRight={
-        magExporteren ? (
+        // De export kent de 1–5-schaal: Voor een Assessment met Ja / Nee / Weet ik niet is er nog geen export.
+        magExporteren && !quickscanData ? (
           <DropdownKnop
             label={pdfBezig ? "Bezig…" : "Exporteren"}
             opties={[
@@ -161,7 +168,21 @@ export default function LeadResultatenPage({
             assessment={assessment}
             organisatie={gegevens.organisatie}
             scanUitvoering={scanUitvoering}
-            overzicht={<ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />}
+            overzicht={
+              quickscanData ? (
+                <QuickscanResultaten
+                  assessment={assessment}
+                  resultaat={metingAlsResultaat(quickscanData)}
+                  toonKop={false}
+                  toonSchakelaar={false}
+                  toonTellingen={false}
+                  ondertitel={`Gemiddelde van ${afgerond.length} afgeronde ${afgerond.length === 1 ? "scan" : "scans"}`}
+                />
+              ) : (
+                <ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />
+              )
+            }
+            quickscan={quickscan}
             spreidingToegestaan={magSpreiding}
             antwoordenToegestaan={magAntwoorden}
             antwoordenAnoniem={gegevens.organisatie.antwoordenMetNamen !== true}

@@ -1,5 +1,62 @@
 # Coniche Scan — Changelog
 
+## 2026-10-15 (3) — Voorbeeld-output: Gemiddelde en afwijking bij de Klantcontact Volwassenheidsscan
+
+Op verzoek van Sander gebouwd (`app/[assessmentId]/voorbeeld/page.tsx`).
+
+**Gedaan**:
+- Onder het voorbeeldresultaat staat bij de Klantcontact Volwassenheidsscan de weergave Per bouwblok van een Meting (`visualisatie-scores.md`,
+  A) met zes demo-respondenten, onder de kop "Gemiddelde en afwijking" en de tekst dat de tool bij meerdere respondenten van dezelfde
+  Meting en organisatie ook inzicht geeft in de gemiddelde scores en de afwijkingen daarop.
+- De demo-scans staan in `data/demo-antwoorden-per-assessment.ts` (`getDemoMetingScans`): Afwijkingen van één punt op de vaste
+  demo-antwoorden. Dezelfde sectie staat ook bij de AI-volwassenheidsscan en de Zorgscan. Voor de Quickscan is er (nog) geen demo van
+  een Meting.
+
+## 2026-10-15 (2) — Specs van Joost, PR 109: Visualisaties van de Quickscan Ziekenhuis
+
+Op verzoek van Sander volledig gebouwd (`visualisatie-quickscan.md`).
+
+**Gedaan**:
+- **Weergave 1 en 2** (`components/QuickscanResultaten.tsx`, `components/quickscan/QuickscanOverzicht.tsx`): De schakelaar Per
+  afdeling en Overzicht met `?weergave=overzicht`, op het resultaatscherm, de voorbeeld-output en de scan in beheer. De totaalkaart
+  noemt afdelingen die niet meetellen bij naam, en een kaart "Niet van toepassing" zegt dat antwoorden bewaard blijven.
+  Overzicht heeft de afdelingen op één schaal met een lijn op het totaal, de matrix afdeling × dimensie en alle bouwblokken van
+  laag naar hoog.
+- **Weergave 3 en 4** (`components/quickscan/QuickscanGemiddeldeSpreiding.tsx`, `QuickscanAntwoorden.tsx`): Op de resultatenpagina
+  van een Meting heeft de schakelaar voor dit type Overzicht (het gemiddelde in dezelfde kaarten), Gemiddelde en spreiding, en
+  Antwoorden met Verdeling en Per respondent. Een Lead ziet een afdeling met minder relevante scans dan `benchmarkMinRespondenten`
+  als "Te weinig antwoorden".
+- **Weergave 5** (`components/quickscan/QuickscanBenchmarkView.tsx`): De view per organisatie in percentages, voor een Admin en een
+  Lead, en in de lijst van de benchmark het totaal met de klasse. Een Assessment met Ja / Nee / Weet ik niet is nu te kiezen bij een
+  benchmark tussen organisaties.
+- **Berekeningen** (`lib/quickscan-groep.ts`): Gemiddelde en spreiding over een Meting, de verdeling per vraag en de vergelijking
+  tussen organisaties, met 14 tests. Het Leads-venster laat Resultaten, Spreiding en Antwoorden voor dit type weer toe, alleen
+  Exporteren blijft grijs. De kolommen van Per respondent komen uit dezelfde functie als weergave G (`kolommenVoorScans`).
+
+**Keuzes waar de spec open liet** (onder Gebouwd in `visualisatie-quickscan.md`): De grenzen van het spreidingslabel staan op 14 en
+20, het totaal is alle punten gedeeld door alle mogelijke punten, de respondent krijgt de schakelaar op scherm 6, en bij gelijkstand
+tonen de tegels de eerste vraag in de volgorde van het model. Voor Joost nog te bevestigen: Deze vier plus de drempel "Onbekend bij".
+
+**Nog niet gebouwd**: De weergaven C, E en H voor dit type, een samengestelde Meting, de benchmark binnen een organisatie en binnen
+een Meting, en export.
+
+**Tests**: 310 (was 296).
+
+## 2026-10-15 — Klantcontact management & support krijgt "Aantal FTE" zoals IT DevOps
+
+Op verzoek van Sander gebouwd.
+
+**Gedaan** (`datamodel.md`, Organisatievelden, FTE):
+- Het veld "Klantcontact management & support" is een groep met het veld "Aantal FTE", net als "IT DevOps medewerkers", met dezelfde
+  kop en hetzelfde vlak (`data/organisatie-velden.ts`).
+- Bestaande waarden worden bij het laden omgezet: `28` wordt `{ aantal: 28 }` (`lib/fte.ts`, met tests). De demo-organisatie en
+  de InDesign-export (`fteKlantcontactManagementSupport`, `lib/indesign/kenmerken-xml.ts`) lezen het nieuwe pad. Het element en
+  de CSV-kolom met de kenmerken blijven bestaan, de waarde staat nu in de groep.
+
+**Keuze**: Het veld staat nu, zoals de andere twee, in een eigen kader met kop. Het invoerveld is daardoor even breed als het kader.
+
+**Tests**: 296 (was 294).
+
 ## 2026-10-14 (4) — Specs van Joost, PR 105: De kaart op de Lead-pagina toont alleen Resultaten en Uitnodigen
 
 Op verzoek van Sander gebouwd (`app/s/[code]/page.tsx`).

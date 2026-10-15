@@ -23,6 +23,8 @@ import {
 } from "@/lib/metingen";
 import { useBenchmarks } from "@/lib/benchmark-store";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { metingAlsResultaat, quickscanMeting, quickscanScansVan } from "@/lib/quickscan-groep";
+import { QuickscanResultaten } from "@/components/QuickscanResultaten";
 import { kruimelsVoorMeting, VIA_RESULTATEN } from "@/lib/resultaten-nav";
 
 /**
@@ -67,21 +69,6 @@ export default function RapportagePage({
       </div>
     );
   }
-  // Het gemiddelde over de scans van een Meting is er nog niet voor Ja / Nee / Weet ik niet (`backlog.md`, Quickscan Ziekenhuis):
-  // De resultaten staan bij elke scan zelf.
-  if (isJaNeeWeetNiet(assessment)) {
-    return (
-      <div className="admin-main">
-        <Kruimelpad delen={kruimelsVoorMeting(organisatie, scanUitvoering, via, "Resultaten van de Meting")} />
-        <span className="eyebrow">{scanUitvoering.label}</span>
-        <h1>{assessment.naam}</h1>
-        <p className="admin-notice">
-          Voor een Assessment met Ja / Nee / Weet ik niet is het resultaat van een hele Meting (het gemiddelde over de scans) nog niet
-          uitgewerkt. Het resultaat van elke afgeronde scan staat bij de scan zelf, via het Meting-overzicht.
-        </p>
-      </div>
-    );
-  }
   const samengesteld = isSamengesteld(scanUitvoering);
   const onderliggend = onderliggendeMetingen(organisatie, scanUitvoering);
   // Bij een samengestelde Meting zijn de afgeronde scans die van de onderliggende Metingen.
@@ -104,6 +91,24 @@ export default function RapportagePage({
 
   // Elke onderliggende Meting telt één keer mee (`datamodel.md`, Scoreberekening).
   const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, organisatie, scanUitvoering);
+  // Een Assessment met Ja / Nee / Weet ik niet rekent in punten en procenten (`visualisatie-quickscan.md`, 3 en 4): Het
+  // gemiddelde, de spreiding en de antwoorden komen uit `lib/quickscan-groep.ts`. Een samengestelde Meting bestaat er niet voor.
+  const quickscanScans = isJaNeeWeetNiet(assessment) ? quickscanScansVan(scanUitvoering.invullingen) : null;
+  const quickscanMetingData = quickscanScans ? quickscanMeting(assessment, quickscanScans) : null;
+  const quickscan =
+    quickscanScans && quickscanMetingData
+      ? {
+          meting: quickscanMetingData,
+          scans: quickscanScans,
+          namen: Object.fromEntries(
+            scanUitvoering.invullingen.map((i) => {
+              const lid = organisatie.leden.find((l) => l.id === i.organisatieLidId);
+              return [i.id, lid ? lid.naam || lid.email : "Onbekende respondent"];
+            })
+          ),
+          uitgenodigd: scanUitvoering.invullingen.length,
+        }
+      : undefined;
   // De knop "Vergelijking" (`benchmark.md`, Niveau 2): Alleen een Admin opent benchmarks. De vergelijking zelf staat in de
   // benchmark. Een Consultant krijgt de knop niet.
   const vergelijkingen = isAdmin(ingelogd)
@@ -130,7 +135,21 @@ export default function RapportagePage({
           assessment={assessment}
           organisatie={organisatie}
           scanUitvoering={scanUitvoering}
-          overzicht={<ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />}
+          overzicht={
+            quickscanMetingData ? (
+              <QuickscanResultaten
+                assessment={assessment}
+                resultaat={metingAlsResultaat(quickscanMetingData)}
+                toonKop={false}
+                toonSchakelaar={false}
+                toonTellingen={false}
+                ondertitel={`Gemiddelde van ${aantalAfgerond} afgeronde ${aantalAfgerond === 1 ? "scan" : "scans"}`}
+              />
+            ) : (
+              <ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />
+            )
+          }
+          quickscan={quickscan}
           spreidingToegestaan={!samengesteld}
           antwoordenToegestaan={!samengesteld}
           bereikAltijd

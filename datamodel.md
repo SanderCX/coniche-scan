@@ -756,7 +756,8 @@ heeft daarvoor het element `techstackWfm`, en het element
 
 **FTE**
 - Klantcontactmedewerkers (getal, met inhouse/BPO-verdeling)
-- Klantcontact management & support (getal)
+- Klantcontact management & support (een groep met het veld Aantal FTE, zoals
+  IT DevOps. Een bestaande waarde zonder groep wordt bij het laden `{ aantal }`)
 - IT DevOps-medewerkers (getal, met percentage gericht op Digital)
 
 **KPI's**, elk een numeriek veld: AHT, NPS, CSAT, SLA, FTR.

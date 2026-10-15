@@ -9,6 +9,8 @@ import { RadarChartView } from "@/components/RadarChartView";
 import { CategoryBarChart } from "@/components/CategoryBarChart";
 import { WeergaveMatrix } from "@/components/visualisatie/WeergaveMatrix";
 import { matrix } from "@/lib/visualisatie";
+import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { KlasseBadge } from "@/components/quickscan/gedeeld";
 
 function Score({ waarde }: { waarde: number | null }) {
   if (waarde === null) return <span className="text-ink-s">–</span>;
@@ -62,6 +64,43 @@ export function BenchmarkGroepSectie({
 
       {rijen.length === 0 ? (
         <p className="admin-notice">Nog geen organisaties in deze benchmark voor dit Assessment.</p>
+      ) : isJaNeeWeetNiet(assessment) ? (
+        // Ja / Nee / Weet ik niet rekent in punten en procenten: Geen radar, matrix of gemiddelde per vraag. De vergelijking
+        // staat in de view per organisatie (`visualisatie-quickscan.md`, 5).
+        <table className="admin-table" style={{ marginBottom: "1.5rem" }}>
+          <thead>
+            <tr>
+              <th>Organisatie</th>
+              <th>Meting</th>
+              <th>Afgeronde scans</th>
+              <th>Totaal</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {rijen.map((r) => (
+              <tr key={r.organisatie.id}>
+                <td>{r.organisatie.naam}</td>
+                <td>{r.meting.label}</td>
+                <td>{r.aantalAfgerond}</td>
+                <td>
+                  {r.quickscan?.percentage === null || r.quickscan === undefined ? (
+                    <span className="text-ink-s">–</span>
+                  ) : (
+                    <>
+                      <strong>{r.quickscan.percentage}%</strong> <KlasseBadge klasse={r.quickscan.klasse} totaal />
+                    </>
+                  )}
+                </td>
+                <td className="cel-knop">
+                  <Link href={`/beheer/benchmark/${benchmarkId}/organisatie/${r.organisatie.id}`} className="btn btn-outline btn-compact">
+                    View
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       ) : (
         <>
           <table className="admin-table" style={{ marginBottom: "1.5rem" }}>

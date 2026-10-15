@@ -651,6 +651,29 @@ function achternaamSleutel(naam: string): [string, string] {
 }
 
 /**
+ * De kolommen van "Per respondent" bij een scan zonder 1–5-schaal (de Quickscan, `visualisatie-quickscan.md`, 4): Dezelfde
+ * volgorde en dezelfde namen als weergave G. Anoniem (R1 tot en met Rn, in een vaste volgorde uit een hash van het scan-id) of
+ * alfabetisch op achternaam, met initialen die bij gelijke letters een volgnummer krijgen.
+ */
+export function kolommenVoorScans(scans: { id: string; naam: string }[], anoniem: boolean): AntwoordenKolom[] {
+  const lijst = anoniem
+    ? scans.map((s) => ({ ...s, naam: "" })).sort((a, b) => hash(a.id) - hash(b.id) || a.id.localeCompare(b.id))
+    : [...scans].sort((a, b) => {
+        const [aa, an] = achternaamSleutel(a.naam);
+        const [ba, bn] = achternaamSleutel(b.naam);
+        return aa.localeCompare(ba, "nl") || an.localeCompare(bn, "nl");
+      });
+  const gebruikt = new Map<string, number>();
+  return lijst.map((s, i) => {
+    if (anoniem) return { invullingId: s.id, naam: "", initialen: `R${i + 1}` };
+    const basis = initialenVan(s.naam);
+    const keer = (gebruikt.get(basis) ?? 0) + 1;
+    gebruikt.set(basis, keer);
+    return { invullingId: s.id, naam: s.naam, initialen: keer === 1 ? basis : `${basis}${keer}` };
+  });
+}
+
+/**
  * De antwoorden per vraag van één Meting (`visualisatie-scores.md`, G): Eén kolom per afgeronde scan, de rijen de bouwblokken
  * met hun vragen. De kolommen staan alfabetisch op achternaam. Gelijke initialen krijgen een volgnummer ("JJ", "JJ2"), zodat de
  * kolomkoppen te onderscheiden zijn. Alles komt uit de gedeelde scorefuncties, er is geen tweede rekenmethode. Gearchiveerde
