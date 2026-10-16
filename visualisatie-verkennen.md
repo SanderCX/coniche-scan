@@ -98,7 +98,7 @@ De kenmerken komen uit de organisatievelden (`datamodel.md`, `VeldDefinitie`) en
 - **Herstel.** Is er geen pil gekozen en kan een kenmerk door een wijziging in de filters weer groeperen, dan wordt de eerste pil die kan automatisch gekozen, zoals bij het eerste bruikbare kenmerk. Daarbij staat geen melding. De melding "Er is geen kenmerk meer om op te groeperen" verdwijnt dan ook.
 - **Groeperen op een select-kenmerk** (CRM-pakket, sector): Eén groep per waarde die in de pool voorkomt. Organisaties zonder waarde horen bij geen groep en staan als "n zonder waarde" onder de groepen.
 - **Groeperen op een getal-kenmerk** (AHT, NPS, FTR): Een drempel met twee groepen, "≤ drempel" en "> drempel". De pil heet "<korte naam>-drempel". De slider loopt van het laagste tot het hoogste getal in de pool, met de eenheid van het veld (`VeldDefinitie.eenheid`). De startwaarde is de mediaan van de pool. Boven de slider staat een histogram, waarin de staven van de focusgroep oranje zijn. Onder de slider staat hoeveel Organisaties aan elke kant zitten. De groepen krijgen neutrale namen ("≤ 420 s" en "> 420 s"), geen oordeel als "snel" of "langzaam". Er is een apart drempelfilter niet nodig: De drempel is de groepering.
-- **De drempel instellen** (voorstel van 15 oktober 2026, door Joost te bevestigen). Bij grote getallen is een slider alleen te onnauwkeurig, dus de drempel heeft vier manieren om te kiezen, die elkaar bijwerken:
+- **De drempel instellen** (voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026 in afwachting van de bevestiging van Joost). Bij grote getallen is een slider alleen te onnauwkeurig, dus de drempel heeft vier manieren om te kiezen, die elkaar bijwerken:
   - **De slider** loopt in afgeronde stappen van 1, 2 of 5 keer een macht van tien, zo gekozen dat er ongeveer 100 standen zijn (bij een bereik tot 5.000.000 is de stap 50.000). De pijltoetsen verschuiven één stap, met Shift tien stappen.
   - **Een invoerveld** naast de slider met de exacte waarde en de eenheid. Typ je een waarde, dan springt de slider ernaartoe. Een waarde buiten het bereik van de pool wordt teruggezet naar de dichtstbijzijnde grens, met de regel "Dit kenmerk loopt in de pool van <laagste> tot <hoogste>." Het veld accepteert geen letters.
   - **Snelknoppen** "Mediaan" en "Gemiddelde", elk met de waarde erachter. Mediaan is de startwaarde.
@@ -244,5 +244,22 @@ Gebouwd op 15 oktober 2026. De berekeningen staan in `lib/verkennen.ts` (met tes
 - Het info-icoon bij Groeperen op is `info.verkennenGroeperen`. Groeperen kent altijd een keuze (startwaarde CRM-pakket).
 - Nog niet: Het sectorfilter bij het samenstellen van een benchmark gebruikt de korte namen niet (open punt hieronder), en een
   opgeslagen korte naam voor een waarde die nergens meer voorkomt wordt niet opgeruimd in Data-integriteit.
+
+**Ronde na PR 121** (gebouwd op 15 oktober 2026)
+
+- **Terugval, levensduur en herstel** staan in `besluitGroepering` (`lib/verkennen.ts`, met tests). Elke wijziging van kenmerken,
+  filters of keuze bepaalt de groepering en de melding opnieuw (`wijzig` in `app/beheer/verkennen/page.tsx`): Een melding
+  verdwijnt dus bij de volgende wijziging en komt niet terug. Is er geen pil gekozen en kan een kenmerk weer groeperen, dan wordt
+  de eerste die kan gekozen, zonder melding.
+- **Redenen noemen de instelling**, met het getal van de huidige waarde. Ingezette kanalen staat als uitgeschakelde pil met "Kan
+  niet groeperen: Een Organisatie kan meerdere kanalen hebben", en "Geen kenmerk" staat alleen zolang er geen kenmerk is
+  toegevoegd. In het menu Kenmerk toevoegen staat "alleen filteren" bij Ingezette kanalen.
+- **Percentage 0** bij `verkennenMinIngevuldPct` betekent geen ondergrens (formulier, `kanGroeperen` en het grijs in het menu).
+- **De drempel instellen**: De slider volgt `drempelStap` (1, 2 of 5 keer een macht van tien, ongeveer 100 standen, de uiteinden op
+  een veelvoud van de stap) en Shift met de pijltjestoetsen verschuift tien stappen. Het invoerveld, de snelknoppen Mediaan en
+  Gemiddelde en een klik op een staaf (bovengrens van die staaf) werken elkaar bij. Een waarde buiten het bereik wordt op de
+  dichtstbijzijnde grens gezet met de regel "Dit kenmerk loopt in de pool van x tot y." Getallen hebben punten als
+  duizendtalscheiding en een komma voor decimalen (`formatGetal`), ook in de groepsnamen. Mediaan en gemiddelde zijn afgerond op
+  hele getallen, bij decimale waarden op één decimaal.
 
 **Nog niet gebouwd**: Wat onder Later staat.

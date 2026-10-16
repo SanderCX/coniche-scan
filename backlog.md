@@ -107,17 +107,9 @@ Bewust nog niet opgepakt. Geen prioritering.
   bouwblok over de meetdata.
 - **Verkennen (gebouwd op 15 oktober 2026)**: Een Admin-scherm om de hele
   pool van een Assessment te filteren, te groeperen en te vergelijken
-  (`visualisatie-verkennen.md`, `beheerpagina.md` punt 15). Het gedrag van
-  Kenmerken en Groeperen op is een voorstel (versie 6 van het visual design) en
-  nog niet gebouwd. Bewust later:
-  - Melding bij de terugval van de groepering verdwijnt niet ("CRM › Oplossing
-    is verwijderd. De groepering staat nu op Sector." blijft staan na een
-    filterwijziging). Regel in `visualisatie-verkennen.md`, Levensduur van een
-    melding en Herstel.
-  - Meldingen bij een uitgeschakelde pil bij Groeperen op laten noemen welke
-    instelling erachter zit (nu "Meer dan 1 verschillende waarden", straks "Meer
-    dan 1 waarden (instelling Waarden per kenmerk, maximum)"). Geen aparte
-    pull request, meenemen bij de volgende ronde in Verkennen.
+  (`visualisatie-verkennen.md`, `beheerpagina.md` punt 15). Kenmerken, Groeperen
+  op (versie 6 van het visual design), de drempels als instellingen en de
+  ronde na PR 121 zijn gebouwd. Bewust later:
   - Een versie voor de Consultant, met de namen van niet-eigen Organisaties
     afgeschermd en de drempel `benchmarkMinOrganisaties` voor beide kanten van
     een splitsing.

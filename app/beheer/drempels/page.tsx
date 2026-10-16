@@ -11,33 +11,40 @@ interface VerkennenVeld {
   label: string;
   uitleg: string;
   max?: number;
+  /** Ondergrens van het veld: 1, of 0 bij het percentage (dan geldt geen ondergrens voor de invulling). */
+  min: number;
 }
 
 const VERKENNEN_VELDEN: VerkennenVeld[] = [
   {
     sleutel: "verkennenMinGroep",
+    min: 1,
     label: "Organisaties in een groep, minimum",
     uitleg: "Een kleinere groep is gestreept en krijgt geen cijfers in de heatmap. Ook het minimum voor het verband.",
   },
   {
     sleutel: "verkennenMinVergelijking",
+    min: 1,
     label: "Organisaties in focus of rest, waarschuwing",
     uitleg: "Een kleinere focus of rest krijgt een waarschuwing. Geen blokkade.",
   },
   {
     sleutel: "verkennenMinPool",
+    min: 1,
     label: "Organisaties in de pool, minimum",
     uitleg: "In een kleinere pool kan er niet gegroepeerd worden.",
   },
   {
     sleutel: "verkennenMaxGroepen",
+    min: 1,
     label: "Waarden per kenmerk, maximum",
     uitleg: "Een keuzelijst met meer waarden kan niet groeperen.",
   },
   {
     sleutel: "verkennenMinIngevuldPct",
+    min: 0,
     label: "Kenmerk ingevuld, minimum (%)",
-    uitleg: "Een kenmerk dat bij een lager percentage is ingevuld kan niet groeperen.",
+    uitleg: "Een kenmerk dat bij een lager percentage is ingevuld kan niet groeperen. Bij 0 geldt geen ondergrens.",
     max: 100,
   },
 ];
@@ -103,7 +110,7 @@ export default function DrempelsEnTermijnenPage() {
   const verkennenWaarde = (veld: VerkennenVeld) => verkennenInput[veld.sleutel] ?? String(instellingen[veld.sleutel]);
   const verkennenGeldig = VERKENNEN_VELDEN.every((v) => {
     const w = verkennenWaarde(v);
-    return geheelGetalVanMinstens1(w) && (v.max === undefined || Number(w) <= v.max);
+    return w.trim() !== "" && Number.isInteger(Number(w)) && Number(w) >= v.min && (v.max === undefined || Number(w) <= v.max);
   });
 
   function handleVerkennenOpslaan(e: React.FormEvent) {
@@ -205,7 +212,7 @@ export default function DrempelsEnTermijnenPage() {
               <input
                 id={`verkennen-${v.sleutel}`}
                 type="number"
-                min={1}
+                min={v.min}
                 max={v.max}
                 step={1}
                 value={verkennenWaarde(v)}
@@ -224,7 +231,7 @@ export default function DrempelsEnTermijnenPage() {
           <InfoIcoon naastVeld sleutel="info.verkennenInstellingen" />
           {!verkennenGeldig && (
             <span className="text-sm" style={{ color: "var(--stat-red)", whiteSpace: "normal" }}>
-              Vul bij elk veld een geheel getal van minstens 1 in. Het percentage kan niet boven 100.
+              Vul bij elk veld een geheel getal van minstens 1 in (bij het percentage mag 0). Het percentage kan niet boven 100.
             </span>
           )}
           {verkennenOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}

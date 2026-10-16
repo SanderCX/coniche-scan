@@ -6,7 +6,12 @@ import {
   LEGE_FILTERS,
   bouwPool,
   filterVelden,
+  KANALEN_REDEN,
   STANDAARD_GROEPER_DREMPELS,
+  besluitGroepering,
+  drempelStap,
+  formatGetal,
+  kanalenVeld,
   heatmap,
   histogram,
   kanGroeperen,
@@ -185,14 +190,14 @@ describe("wanneer een kenmerk kan groeperen", () => {
     const l = leden(STANDAARD_GROEPER_DREMPELS.minPool - 1, (i) => kenmerken(sectoren[i % 3], 300 + i));
     const r = kanGroeperen(sector, l, l);
     expect(r.ok).toBe(false);
-    expect(r.reden).toBe("Minder dan 6 Organisaties in de pool");
+    expect(r.reden).toBe("Minder dan 6 Organisaties in de pool (instelling Organisaties in de pool, minimum)");
   });
 
   it("een select met twee of meer waarden kan, een met één waarde na filteren niet", () => {
     const l = leden(10, (i) => kenmerken(sectoren[i % 2], 300 + i));
     expect(kanGroeperen(sector, l, l).ok).toBe(true);
     const een = l.filter((x) => kenmerkWaardeVan(x) === "Industrie");
-    expect(kanGroeperen(sector, l, een).reden).toBe("Minder dan 6 Organisaties in de pool");
+    expect(kanGroeperen(sector, l, een).reden).toBe("Minder dan 6 Organisaties in de pool (instelling Organisaties in de pool, minimum)");
     const l2 = leden(10, (i) => kenmerken("Industrie", 300 + i));
     expect(kanGroeperen(sector, l2, l2).reden).toBe("Het filter laat één waarde over");
   });
@@ -201,7 +206,7 @@ describe("wanneer een kenmerk kan groeperen", () => {
     const l = leden(10, (i) => (i < 3 ? kenmerken("Industrie", 300 + i) : kenmerken("Onderwijs")));
     const r = kanGroeperen(aht, l, l);
     expect(r.ok).toBe(false);
-    expect(r.reden).toBe("Minder dan 4 ingevulde waarden");
+    expect(r.reden).toBe("Minder dan 4 ingevulde waarden (instelling Kenmerk ingevuld, minimum)");
   });
 
   it("een getal met verschillende waarden kan", () => {
@@ -211,16 +216,93 @@ describe("wanneer een kenmerk kan groeperen", () => {
 
   it("een select met meer dan 12 waarden kan niet", () => {
     const l = leden(20, (i) => kenmerken(`Sector ${i}`, 300 + i));
-    expect(kanGroeperen(sector, l, l).reden).toBe("Meer dan 12 verschillende waarden");
+    expect(kanGroeperen(sector, l, l).reden).toBe("Meer dan 12 waarden (instelling Waarden per kenmerk, maximum)");
   });
 
   it("de grenzen zijn instellingen en staan in de reden", () => {
     const l = leden(10, (i) => kenmerken(sectoren[i % 3], 300 + i));
     const strak = { minPool: 12, maxGroepen: 2, minIngevuldPct: 90 };
-    expect(kanGroeperen(sector, l, l, strak).reden).toBe("Minder dan 12 Organisaties in de pool");
-    expect(kanGroeperen(sector, l, l, { ...strak, minPool: 2 }).reden).toBe("Meer dan 2 verschillende waarden");
+    expect(kanGroeperen(sector, l, l, strak).reden).toBe("Minder dan 12 Organisaties in de pool (instelling Organisaties in de pool, minimum)");
+    expect(kanGroeperen(sector, l, l, { ...strak, minPool: 2 }).reden).toBe("Meer dan 2 waarden (instelling Waarden per kenmerk, maximum)");
     const gedeeltelijk = leden(10, (i) => (i < 5 ? kenmerken("Industrie", 300 + i) : kenmerken("Onderwijs")));
-    expect(kanGroeperen(aht, gedeeltelijk, gedeeltelijk, { ...strak, minPool: 2 }).reden).toBe("Minder dan 9 ingevulde waarden");
+    expect(kanGroeperen(aht, gedeeltelijk, gedeeltelijk, { ...strak, minPool: 2 }).reden).toBe("Minder dan 9 ingevulde waarden (instelling Kenmerk ingevuld, minimum)");
+  });
+});
+
+describe("kanalen, nul procent en het besluit over de groepering", () => {
+  const velden = filterVelden();
+  const aht = velden.find((v) => v.id === "kpis.aht")!;
+  const sector = velden.find((v) => v.id === "sector-subsector.sector")!;
+  const leden = (n: number, f: (i: number) => Organisatie["kenmerken"]) =>
+    bouwPool(Array.from({ length: n }, (_, i) => org(`o${i}`, 3, { kenmerken: f(i) })), assessment, 3).leden;
+
+  it("ingezette kanalen kan nooit groeperen", () => {
+    const l = leden(10, (i) => kenmerken("Industrie", 300 + i));
+    expect(kanGroeperen(kanalenVeld(), l, l)).toEqual({ ok: false, reden: KANALEN_REDEN });
+  });
+
+  it("bij 0% geldt geen ondergrens voor hoe vaak een kenmerk is ingevuld", () => {
+    const l = leden(10, (i) => (i === 0 ? kenmerken("Industrie", 300) : kenmerken("Onderwijs", i === 1 ? 500 : undefined)));
+    const drempels = { minPool: 6, maxGroepen: 12, minIngevuldPct: 40 };
+    expect(kanGroeperen(aht, l, l, drempels).ok).toBe(false);
+    expect(kanGroeperen(aht, l, l, { ...drempels, minIngevuldPct: 0 }).ok).toBe(true);
+  });
+
+  const opties = (...tekens: [string, boolean][]) =>
+    tekens.map(([id, ok]) => ({ id, naam: id.toUpperCase(), bruikbaarheid: ok ? { ok } : { ok, reden: `${id} kan niet` } }));
+  const basis = { poolGrootte: 10, poolTotaal: 10, minPool: 6 };
+
+  it("het eerste bruikbare kenmerk wordt de groepering, zonder melding", () => {
+    expect(besluitGroepering({ ...basis, vorige: null, kenmerken: opties(["a", false], ["b", true]) })).toEqual({ gekozen: "b", melding: null });
+    expect(besluitGroepering({ ...basis, vorige: null, kenmerken: opties(["a", false]) })).toEqual({ gekozen: null, melding: null });
+  });
+
+  it("een gekozen kenmerk dat kan, blijft staan", () => {
+    expect(besluitGroepering({ ...basis, vorige: "b", kenmerken: opties(["a", true], ["b", true]) })).toEqual({ gekozen: "b", melding: null });
+  });
+
+  it("terugval naar de eerste pil die kan, met de reden en de naam", () => {
+    const r = besluitGroepering({ ...basis, vorige: "b", kenmerken: opties(["b", false], ["c", true]) });
+    expect(r).toEqual({ gekozen: "c", melding: "b kan niet. De groepering staat nu op C." });
+  });
+
+  it("een verwijderd kenmerk noemt zijn naam, en zonder alternatief staat er een melding", () => {
+    const r = besluitGroepering({ ...basis, vorige: "b", vorigeNaam: "CRM", kenmerken: opties(["a", true]) });
+    expect(r.melding).toBe("CRM is verwijderd. De groepering staat nu op A.");
+    expect(besluitGroepering({ ...basis, vorige: "b", vorigeNaam: "CRM", kenmerken: [] })).toEqual({
+      gekozen: null,
+      melding: "Er is geen kenmerk meer om op te groeperen.",
+    });
+  });
+
+  it("een pool die door de filters te klein werd, krijgt de melding met het aantal", () => {
+    const r = besluitGroepering({ vorige: "a", kenmerken: opties(["a", false]), poolGrootte: 1, poolTotaal: 10, minPool: 6 });
+    expect(r.melding).toBe("Met deze filters zit er 1 Organisatie in de pool. Dat is te weinig om te vergelijken. Haal een filter weg.");
+  });
+
+  it("herstel: Zonder gekozen pil wordt een kenmerk dat weer kan vanzelf gekozen, zonder melding", () => {
+    expect(besluitGroepering({ ...basis, vorige: null, kenmerken: opties(["a", true]) })).toEqual({ gekozen: "a", melding: null });
+  });
+
+  it("getallen met punten en komma", () => {
+    expect(formatGetal(3932600)).toBe("3.932.600");
+    expect(formatGetal(420)).toBe("420");
+    expect(formatGetal(4.5)).toBe("4,5");
+    expect(formatGetal(1234.567, 1)).toBe("1.234,6");
+    expect(formatGetal(-1500)).toBe("−1.500");
+  });
+
+  it("de stap van de slider geeft ongeveer 100 standen", () => {
+    expect(drempelStap(0, 5_000_000)).toBe(50_000);
+    expect(drempelStap(100, 900)).toBe(10);
+    expect(drempelStap(0, 60)).toBe(1);
+    expect(drempelStap(0, 1000)).toBe(10);
+    expect(drempelStap(0, 120)).toBe(2);
+    expect(drempelStap(0, 5, false)).toBe(0.05);
+  });
+
+  it("de sector blijft een select", () => {
+    expect(sector.type).toBe("select");
   });
 });
 

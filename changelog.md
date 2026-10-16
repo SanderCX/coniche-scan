@@ -1,5 +1,20 @@
 # Coniche Scan — Changelog
 
+## 2026-10-15 (9) — Specs van Joost, PR 121: Verkennen, melding, herstel en de drempel instellen
+
+Op verzoek van Sander gebouwd (`visualisatie-verkennen.md`, Groeperen en focus, Drempels, `beheerpagina.md`, Formulier Verkennen).
+
+**Gedaan**:
+- **Percentage 0** bij `verkennenMinIngevuldPct` (geen ondergrens), met aangepaste invoerregel en foutmelding in het formulier.
+- **Redenen** bij een uitgeschakelde pil noemen de instelling ("Minder dan 6 Organisaties in de pool (instelling Organisaties in de
+  pool, minimum)"). Ingezette kanalen staat als uitgeschakelde pil met een eigen reden, "Geen kenmerk" alleen zolang er geen
+  kenmerk is, en "alleen filteren" in het menu Kenmerk toevoegen.
+- **Levensduur van een melding en herstel**: `besluitGroepering` bepaalt bij elke wijziging opnieuw de groepering en de melding.
+  Vorige versie hield de gekozen groepering vast en toonde de melding zolang de situatie duurde.
+- **De drempel instellen** (voorstel, door Joost te bevestigen): Slider met afgeronde stappen, invoerveld, snelknoppen Mediaan en
+  Gemiddelde, klikken op een staaf, en getallen met punten en komma (`formatGetal`, `drempelStap`).
+- 12 nieuwe tests in `lib/verkennen.test.ts` (kanalen, nul procent, besluit, getalnotatie en stap).
+
 ## 2026-10-15 (8) — Specs van Joost, PR 119: drempels voor Verkennen en de opmaak van Mijn metingen
 
 Op verzoek van Sander gebouwd (`visualisatie-verkennen.md`, Drempels, `visualisatie-mijn-metingen.md`).

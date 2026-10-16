@@ -1,8 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
-import { Bruikbaarheid, FilterVeld, Groep, PoolLid, getalWaarden, histogram, mediaan } from "@/lib/verkennen";
+import {
+  Bruikbaarheid,
+  FilterVeld,
+  Groep,
+  PoolLid,
+  drempelStap,
+  formatGetal,
+  getalWaarden,
+  histogram,
+  mediaan,
+  rondDrempel,
+} from "@/lib/verkennen";
 
 /** Een kenmerk als pil bij Groeperen op, met of het kan groeperen en de naam zoals die op de pil staat. */
 export interface GroeperOptie {
@@ -12,11 +24,12 @@ export interface GroeperOptie {
 }
 
 /**
- * Vergelijken (`visualisatie-verkennen.md`, Groeperen en focus): Groeperen op is een pilvormige groep met één pil per kenmerk dat
- * kan groeperen. Een pil die niet kan is uitgeschakeld, met de reden in een tooltip en als regel eronder. Is er geen kenmerk, dan
- * staat er één losse, grijze pil "Geen kenmerk". Bij een getal staat er een drempel (slider met histogram, de staven van de
- * focusgroep oranje). Daarna de focusgroep als pillen met het aantal. Een groep met minder dan `minGroep` organisaties is gestreept,
- * en heeft de focus of de rest minder dan `waarschuwing`, dan staat er een waarschuwing. Het is geen blokkade.
+ * Vergelijken (`visualisatie-verkennen.md`, Groeperen en focus): Groeperen op is een pilvormige groep met één pil per kenmerk. Een
+ * pil die niet kan is uitgeschakeld, met de reden in een tooltip en als regel eronder. Is er geen kenmerk toegevoegd, dan staat er
+ * één losse, grijze pil "Geen kenmerk". Bij een getal staat de drempel met vier manieren om hem te kiezen (slider, invoerveld,
+ * snelknoppen en klikken op een staaf), die elkaar bijwerken. Daarna de focusgroep als pillen met het aantal. Een groep met minder
+ * dan `minGroep` organisaties is gestreept, en heeft de focus of de rest minder dan `waarschuwing`, dan staat er een
+ * waarschuwing. Het is geen blokkade.
  */
 export function Vergelijken({
   opties,
@@ -54,6 +67,7 @@ export function Vergelijken({
   minGroep: number;
   waarschuwing: number;
 }) {
+  const [bereikMelding, setBereikMelding] = useState<string | null>(null);
   const gekozen = opties.find((o) => o.veld.id === effectief);
   const focus = groepen.find((g) => g.sleutel === focusSleutel);
   const focusIds = new Set(focus?.leden.map((l) => l.organisatie.id));
@@ -66,7 +80,14 @@ export function Vergelijken({
     if (waarden.length > 0) {
       const min = Math.min(...waarden);
       const max = Math.max(...waarden);
-      const d = drempel ?? Math.round(mediaan(waarden) ?? min);
+      const hele = waarden.every((w) => Number.isInteger(w));
+      const stap = drempelStap(min, max, hele);
+      // De slider loopt in afgeronde stappen: De uiteinden liggen op een veelvoud van de stap, zodat ze bereikbaar zijn.
+      const sliderMin = Math.floor(min / stap) * stap;
+      const sliderMax = Math.ceil(max / stap) * stap;
+      const mediaanWaarde = rondDrempel(mediaan(waarden) ?? min, hele);
+      const gemiddelde = rondDrempel(waarden.reduce((a, b) => a + b, 0) / waarden.length, hele);
+      const d = drempel ?? mediaanWaarde;
       const staven = histogram(waarden, min, max);
       const piek = Math.max(1, ...staven);
       const lid = (w: number) => (max <= min ? 0 : Math.min(staven.length - 1, Math.floor(((w - min) / (max - min)) * staven.length)));
@@ -77,29 +98,86 @@ export function Vergelijken({
         if (w !== undefined && focusIds.has(l.organisatie.id)) focusStaven[lid(w)] += 1;
       }
       const onder = waarden.filter((w) => w <= d).length;
+      const stel = (n: number) => {
+        setBereikMelding(null);
+        onDrempel(n);
+      };
+      const stelUitInvoer = (tekst: string) => {
+        if (tekst.trim() === "") return;
+        const n = Number(tekst.replace(",", "."));
+        if (!Number.isFinite(n)) return;
+        if (n < min || n > max) {
+          const dichtstbij = n < min ? min : max;
+          onDrempel(dichtstbij);
+          setBereikMelding(`Dit kenmerk loopt in de pool van ${formatGetal(min, 1)} tot ${formatGetal(max, 1)}.`);
+        } else {
+          stel(n);
+        }
+      };
+      // Shift met de pijltjestoetsen verschuift tien stappen in plaats van één.
+      const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (!e.shiftKey || (e.key !== "ArrowLeft" && e.key !== "ArrowRight" && e.key !== "ArrowUp" && e.key !== "ArrowDown")) return;
+        e.preventDefault();
+        const richting = e.key === "ArrowLeft" || e.key === "ArrowDown" ? -1 : 1;
+        stel(Math.min(sliderMax, Math.max(sliderMin, d + richting * 10 * stap)));
+      };
       slider = (
         <div style={{ marginTop: "0.8rem" }}>
           <p className="vk-veldkop" style={{ marginTop: 0 }}>
-            {gekozen.naam}{gekozen.veld.eenheid ? ` (${gekozen.veld.eenheid})` : ""}
+            {gekozen.naam}
+            {gekozen.veld.eenheid ? ` (${gekozen.veld.eenheid})` : ""}
           </p>
-          <div className="vk-histogram" aria-hidden="true">
-            {staven.map((n, i) => (
-              <div key={i} className={focusStaven[i] > 0 ? "focus" : undefined} style={{ height: `${(n / piek) * 100}%` }} />
-            ))}
+          <div className="vk-histogram">
+            {staven.map((n, i) => {
+              // Klikken op een staaf zet de drempel op de bovengrens van die staaf.
+              const boven = rondDrempel(min + ((i + 1) * (max - min)) / staven.length, hele);
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  className={focusStaven[i] > 0 ? "focus" : undefined}
+                  style={{ height: `${(n / piek) * 100}%` }}
+                  aria-label={`Drempel op ${formatGetal(boven, 1)}${eenheid}, ${n} Organisaties in deze staaf`}
+                  title={`Drempel op ${formatGetal(boven, 1)}${eenheid}`}
+                  onClick={() => stel(boven)}
+                />
+              );
+            })}
           </div>
           <input
             type="range"
             className="vk-slider"
             aria-label={`${gekozen.naam}, drempel`}
-            min={min}
-            max={max}
-            step={max - min > 100 ? 5 : max - min > 10 ? 1 : 0.1}
-            value={Math.min(max, Math.max(min, d))}
-            onChange={(e) => onDrempel(Number(e.target.value))}
+            min={sliderMin}
+            max={sliderMax}
+            step={stap}
+            value={Math.min(sliderMax, Math.max(sliderMin, d))}
+            onChange={(e) => stel(Number(e.target.value))}
+            onKeyDown={onKeyDown}
           />
-          <p className="text-sm text-ink-m" style={{ margin: 0 }}>
-            Drempel <strong>{String(d).replace(".", ",")}{eenheid}</strong> · {onder} Organisaties op of onder de drempel,{" "}
-            {waarden.length - onder} erboven · {waarden.length} van {leden.length} hebben dit ingevuld
+          <div className="vk-drempel-rij">
+            <label className="vk-drempel-invoer">
+              <span className="text-sm text-ink-m">Drempel</span>
+              <input
+                type="number"
+                step={hele ? 1 : 0.1}
+                value={d}
+                aria-label={`${gekozen.naam}, drempel exact`}
+                onChange={(e) => stelUitInvoer(e.target.value)}
+              />
+              {gekozen.veld.eenheid && <span className="text-sm text-ink-m">{gekozen.veld.eenheid}</span>}
+            </label>
+            <button type="button" className="pil" aria-pressed={d === mediaanWaarde} onClick={() => stel(mediaanWaarde)}>
+              Mediaan <span>{formatGetal(mediaanWaarde, 1)}</span>
+            </button>
+            <button type="button" className="pil" aria-pressed={d === gemiddelde} onClick={() => stel(gemiddelde)}>
+              Gemiddelde <span>{formatGetal(gemiddelde, 1)}</span>
+            </button>
+          </div>
+          {bereikMelding && <p className="vk-reden">{bereikMelding}</p>}
+          <p className="text-sm text-ink-m" style={{ margin: "var(--sp-2) 0 0" }}>
+            Drempel <strong>{formatGetal(d, 1)}{eenheid}</strong> · {onder} Organisaties op of onder de drempel, {waarden.length - onder} erboven ·{" "}
+            {waarden.length} van {leden.length} hebben dit ingevuld
           </p>
         </div>
       );
