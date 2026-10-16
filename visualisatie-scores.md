@@ -19,6 +19,7 @@ Een resultaat moet in één blik laten zien waar een organisatie hoog en laag sc
 | E. Matrix | Hoe verschillen de Metingen of organisaties per bouwblok? | Niveau 2, binnen een organisatie, en niveau 1, tussen organisaties | Alleen Admin |
 | G. Antwoorden per vraag | Wie antwoordde wat, per vraag en per bouwblok? | Het laagste niveau, binnen een Meting | Admin, Consultant, en een Lead met vinkje |
 | H. Metingen naast elkaar | Hoe scoren twee onderdelen of samenstellingen ten opzichte van elkaar? | Niveau 2, binnen een organisatie, lezing Naast elkaar, bij twee Metingen | Admin, Lead met vinkje |
+| I. Samengestelde Meting en vergelijking | Dezelfde opties als bij één Meting, met onderdelen als eenheid | Een samengestelde Meting, en niveau 2 | Admin, Lead met vinkje |
 
 ## Gedeelde regels
 
@@ -223,6 +224,38 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 **Tegels.** De totaalscore van beide Metingen naast elkaar, gescheiden door een streep en zonder pijl ("2,9 | 3,1"), het aantal bouwblokken waar de cirkel hoger scoort, het aantal waar de ruit hoger scoort en het aantal gelijke.
 
 **Meer dan twee Metingen.** Hier is nog geen ontwerp voor. Voorstel voor later is een eigen symbool per Meting.
+
+## I. Dezelfde opties voor een samengestelde Meting en een vergelijking
+
+**Voorstel van 16 oktober 2026, ontworpen in "Coniche Scan Resultaten en onderdelen" (versie 3), nog niet gebouwd.** Een Meting, een samengestelde Meting en een vergelijking binnen een organisatie krijgen dezelfde schakelaar en dezelfde weergaven. Joost wilde alle opties op alle drie de resultaatschermen. Wat anders is, volgt uit de eenheid: Bij een Meting is de eenheid een afgeronde scan, bij een samengestelde Meting en een vergelijking is het een onderdeel (een Meting).
+
+**Schakelaar.** Overzicht, Per bouwblok, Spreiding en Antwoorden (Navigatie). Antwoorden is er alleen bij één Meting, want een samengestelde Meting heeft geen scans en een vergelijking mengt Metingen. Bij de andere twee staat Antwoorden uitgeschakeld.
+
+**Toon als.** Alleen bij een samengestelde Meting en een vergelijking staat rechts van de schakelaar "Toon als" met Gemiddeld en Naast elkaar, naast een Info-icoon.
+
+- **Gemiddeld.** Elk onderdeel telt even zwaar, ongeacht het aantal scans (`benchmark.md`, Samengestelde Meting). Het scherm laat niet zien welk onderdeel waar zit. Dit is de standaard bij een samengestelde Meting.
+- **Naast elkaar.** Elk onderdeel heeft een eigen vorm (cirkel, ruit, vierkant, driehoek omhoog, driehoek omlaag, plus), gekleurd naar de klasse zoals bij A. Boven de weergave staat een legenda met de vormen en de namen. De vorm onderscheidt de onderdelen, niet de kleur (zelfde principe als H). Dit is de standaard bij een vergelijking, omdat de Admin de Metingen daar zelf heeft gekozen. Er zijn zes vormen, dus Naast elkaar is er bij hoogstens zes onderdelen. Bij meer staat de keuze uitgeschakeld, met de reden in het Info-icoon.
+
+**Per bouwblok (A).**
+
+- Gemiddeld: Een stip op het gemiddelde van de onderdelen en een lijn van het laagste tot het hoogste onderdeel.
+- Naast elkaar: Een vorm per onderdeel op zijn eigen score en de streep op het gemiddelde. Onderdelen met dezelfde score staan onder elkaar gestapeld, zoals bij B.
+
+**Spreiding tussen onderdelen (B).** Dezelfde weergave als B, met een stip per onderdeel in plaats van een stip per scan, en de streep op het gemiddelde. Het spreidingslabel gebruikt dezelfde grenzen als bij B. De weergave is er vanaf drie onderdelen, want bij twee zegt een standaardafwijking weinig. Bij minder dan drie staat de zin "Spreiding tussen onderdelen is er vanaf 3 onderdelen". Bij Naast elkaar krijgen de stippen de vorm van hun onderdeel.
+
+**Tegels.** Bij Spreiding drie kaarten naast elkaar, zoals ook bij een Meting. Het getal staat groot en de naam van het bouwblok eronder.
+
+- De eerste kaart is Respondenten (afgeronde scans) bij een Meting en Onderdelen bij een samengestelde Meting ("Metingen in deze samenstelling") en bij een vergelijking ("onderdelen in deze vergelijking").
+- De tweede kaart is Meest verdeeld: De standaardafwijking van het bouwblok met de grootste spreiding, met de naam eronder.
+- De derde kaart is Meest eensgezind: Dezelfde berekening voor het bouwblok met de kleinste spreiding.
+
+Zo blijft de rij tegels gelijk aan die van een Meting (gebouwd). De eerdere tekstregel met "(sd 0,86)" is vervallen.
+
+**Overzicht.** Bij een samengestelde Meting en een vergelijking staat onder het Overzicht een kaart per onderdeel met de vorm, de naam, de meetdatum en de totaalscore in de klassekleur.
+
+**Wie ziet het.** Dezelfde regels als bij de bestaande weergaven. Een Lead ziet een samengestelde Meting alleen als hij Resultaten heeft (`benchmark.md`, View voor een Lead). Voor een vergelijking geldt wat bij Niveau 2 staat. Een samengestelde Meting heeft in het Leads-venster alleen de kolom Resultaten. Gemiddeld, Naast elkaar en Spreiding tussen onderdelen vallen daar voorlopig onder.
+
+**Open.** Of Spreiding tussen onderdelen een eigen vinkje voor een Lead krijgt. De stippen zijn onderdelen van zijn eigen Organisatie, dus anonimiteit speelt niet, maar het Leads-venster kent bij een samengestelde Meting nu alleen Resultaten. Daarnaast of Naast elkaar bij meer dan zes onderdelen een andere vormentaal nodig heeft.
 
 ## Gebouwd
 

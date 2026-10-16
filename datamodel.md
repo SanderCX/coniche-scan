@@ -1362,13 +1362,19 @@ Benchmark {
   id: string
   naam: string                      // vrije tekst, bepaalt de Admin
   assessmentIds: string[]           // één of meer
-  leden: BenchmarkLid[]
+  leden: BenchmarkLid[]             // leeg bij soort "verkenning", de leden volgen uit de filters
   meldingen: { tekst: string, op: datetime }[]
                                     // gebouwd: schermmeldingen, zie hieronder
   niveau?: "organisaties" | "metingen" | "scans"
                                     // voorstel, ontbreekt = "organisaties"
   lezing?: "ontwikkeling" | "naastElkaar"
                                     // gebouwd op 14 oktober 2026, alleen bij niveau "metingen"; ontbreekt het veld, dan volgt ze uit de leden (zie hieronder)
+  soort?: "vasteGroep" | "verkenning"
+                                    // voorstel van 16 oktober 2026, alleen bij niveau "organisaties"; ontbreekt = "vasteGroep"
+  eenheid?: "organisaties" | "onderdelen"
+                                    // alleen bij soort "verkenning"
+  filters?: { kenmerk: string, waarden: string[] }[]
+                                    // alleen bij soort "verkenning", minstens één; kenmerk is een veld uit de organisatievelden
   aangemaaktOp: datetime
   aangemaaktDoor: string            // Gebruiker
 }
@@ -1409,6 +1415,16 @@ bestaan zolang de benchmark bestaat.
   2026: Deze waarde vervalt, want een view op een scan wordt niet meer aan een
   Lead gegeven (`benchmark.md`, View voor een Lead). Niveau 3 blijft een
   weergave voor de Admin.
+
+**`soort`, `eenheid` en `filters`** (voorstel van 16 oktober 2026, `benchmark.md`,
+Opgeslagen verkenning). Een benchmark met `soort: "verkenning"` slaat geen
+leden op. De leden worden bij elk gebruik berekend uit `filters`, met de
+poolregels van Verkennen. Bij `eenheid: "organisaties"` is een lid een
+Organisatie, bij `onderdelen` een onderdeel. `assessmentIds` heeft bij een
+verkenning precies één waarde. Het Assessment en de eenheid zijn niet te
+wijzigen, de naam en de filters wel. De groepering, de focus en de drempel van
+een getalkenmerk uit Verkennen worden niet opgeslagen. Voldoet een Organisatie
+niet meer aan de filters, dan vervalt het vinkje van haar Leads (`LeadToegang`).
 
 **`lezing`** (gebouwd op 14 oktober 2026) zegt hoe de leden van een benchmark
 op niveau `metingen` gelezen worden (`benchmark.md`, Niveau 2, Lezing). Bij
@@ -1451,6 +1467,7 @@ Spreiding, voor anonieme Antwoorden en voor de lijn van laagste tot hoogste scor
 Gebouwd op 15 oktober 2026 voor Verkennen: `verkennenMinGroep` (3), `verkennenMinVergelijking` (5),
 `verkennenMinPool` (6), `verkennenMaxGroepen` (12) en `verkennenMinIngevuldPct` (40),
 alle gehele getallen van minstens 1, het percentage tot en met 100 (`visualisatie-verkennen.md`, Drempels). `verkennenWaarschuwingGroep` is hernoemd naar `verkennenMinVergelijking`: Een opgeslagen waarde onder de oude naam wordt bij het lezen overgenomen. De startwaarden zijn de norm vanuit het ontwerp. Gebouwd op 15 oktober 2026: Het percentage mag 0 zijn (geen ondergrens), dus voor het percentage geldt 0 tot en met 100.
+Voorstel van 16 oktober 2026: `benchmarkMinOrganisaties` geldt ook voor een opgeslagen verkenning en telt daar altijd Organisaties, ook bij de eenheid Onderdelen. Er komt geen nieuwe instelling bij.
 Gebouwd op 14 oktober 2026: `benchmarkMaxDagenTussenMetingen` (startwaarde 90),
 het aantal dagen waarboven een vergelijking met de lezing Naast elkaar een
 waarschuwing geeft. De
