@@ -377,3 +377,42 @@ describe("niveau 2: de lezing", () => {
     expect(ontw.metingen.map((m) => m.meting.label)).toEqual(["Team Z", "Team A"]);
   });
 });
+
+describe("Lead-view van een opgeslagen verkenning met de eenheid Onderdelen", () => {
+  const metOnderdelen = (id: string, onderdelen: string[], scans = 3): Organisatie => ({
+    ...org(id, scans),
+    scanUitvoeringen: onderdelen.map((o, i) => ({
+      id: `m-${id}-${i}`, organisatieId: id, assessmentId: assessment.id, label: o, onderdeel: o, aangemaaktOp: "x", meetdatum: "2026-01-01",
+      invullingen: Array.from({ length: scans }, (_, k) => invulling(`${id}-${i}-${k}`, k + i + id.charCodeAt(0))),
+    })),
+  });
+  const verkenning = (leden: Organisatie[], filters: Benchmark["filters"] = [{ kenmerk: "x", waarden: ["y"] }]): Benchmark => ({
+    id: "v", naam: "Verkenning", niveau: "organisaties", soort: "verkenning", eenheid: "onderdelen", filters,
+    assessmentIds: [assessment.id], meldingen: [], aangemaaktOp: "x", aangemaaktDoor: "a",
+    leden: leden.flatMap((o) => o.scanUitvoeringen.map((m) => ({ organisatieId: o.id, assessmentId: assessment.id, metingId: m.id }))),
+  });
+
+  it("de Lead ziet elk eigen onderdeel met naam, tegenover de andere Organisaties", () => {
+    const eigen = metOnderdelen("U", ["Particulier", "Zakelijk"]);
+    const orgs = [eigen, metOnderdelen("B", ["Hele organisatie"]), metOnderdelen("C", ["Hele organisatie"])];
+    const r = leadViewsVoorBenchmark(verkenning(orgs), [assessment], orgs, eigen, [], { minOrganisaties: 3, minRespondenten: 5 });
+    expect(r.map((x) => (x.niveau === "organisaties" ? x.eigenNaam : ""))).toEqual(["Org U, Particulier", "Org U, Zakelijk"]);
+    // De rest zijn de onderdelen van de andere Organisaties: 2, niet de eigen.
+    for (const x of r) if (x.niveau === "organisaties") expect(x.views[0].aantalAnderen).toBe(2);
+  });
+
+  it("de drempel telt Organisaties en geen onderdelen", () => {
+    const eigen = metOnderdelen("U", ["Particulier", "Zakelijk"]);
+    const orgs = [eigen, metOnderdelen("B", ["Team A", "Team B", "Team C"])];
+    // 5 onderdelen maar 2 Organisaties: Onder de drempel van 3.
+    expect(leadViewsVoorBenchmark(verkenning(orgs), [assessment], orgs, eigen, [], { minOrganisaties: 3, minRespondenten: 5 })).toEqual([]);
+  });
+
+  it("met een filter op één Organisatie geldt de drempel niet en staan de eigen onderdelen naast elkaar", () => {
+    const eigen = metOnderdelen("U", ["Particulier", "Zakelijk"]);
+    const b = verkenning([eigen], [{ kenmerk: "__organisatie", waarden: ["U"] }]);
+    const r = leadViewsVoorBenchmark(b, [assessment], [eigen], eigen, [], { minOrganisaties: 5, minRespondenten: 5 });
+    expect(r).toHaveLength(2);
+    if (r[0].niveau === "organisaties") expect(r[0].views[0].aantalAnderen).toBe(1);
+  });
+});

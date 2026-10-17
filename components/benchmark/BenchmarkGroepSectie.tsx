@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { kopNaam } from "@/lib/korte-namen";
+import { poolLidNaam } from "@/lib/verkennen";
+import { onderdeelVan } from "@/lib/metingen";
 import { BenchmarkSectie, resultatenVan } from "@/lib/benchmark";
 import { alleBouwblokkenMetGroep, isVlakkeAssessment } from "@/lib/assessment-structuur";
 import { classificatie } from "@/lib/scoring";
@@ -34,11 +36,16 @@ export function BenchmarkGroepSectie({
   sectie,
   benchmarkId,
   minOrganisaties,
+  metOnderdeel = false,
 }: {
   sectie: BenchmarkSectie;
   benchmarkId: string;
   minOrganisaties: number;
+  /** Bij een verkenning met de eenheid Onderdelen staat het onderdeel achter de naam van de organisatie. */
+  metOnderdeel?: boolean;
 }) {
+  const naamVan = (r: (typeof sectie.rijen)[number]) =>
+    metOnderdeel ? poolLidNaam(r.organisatie, onderdeelVan(r.meting)) : r.organisatie.naam;
   const { assessment, rijen, ontbrekend, teller } = sectie;
   const resultaten = resultatenVan(assessment, sectie.groepAntwoorden);
   const vlak = isVlakkeAssessment(assessment);
@@ -80,8 +87,8 @@ export function BenchmarkGroepSectie({
           </thead>
           <tbody>
             {rijen.map((r) => (
-              <tr key={r.organisatie.id}>
-                <td>{r.organisatie.naam}</td>
+              <tr key={`${r.organisatie.id}:${r.meting.id}`}>
+                <td>{naamVan(r)}</td>
                 <td>{r.meting.label}</td>
                 <td>{r.aantalAfgerond}</td>
                 <td>
@@ -116,8 +123,8 @@ export function BenchmarkGroepSectie({
             </thead>
             <tbody>
               {rijen.map((r) => (
-                <tr key={r.organisatie.id}>
-                  <td>{r.organisatie.naam}</td>
+                <tr key={`${r.organisatie.id}:${r.meting.id}`}>
+                  <td>{naamVan(r)}</td>
                   <td>{r.meting.label}</td>
                   <td>{r.aantalAfgerond}</td>
                   <td>
@@ -142,8 +149,8 @@ export function BenchmarkGroepSectie({
             weergave={matrix(
               assessment,
               rijen.map((r) => ({
-                label: kopNaam(r.organisatie),
-                volledigeNaam: r.organisatie.naam,
+                label: metOnderdeel ? naamVan(r) : kopNaam(r.organisatie),
+                volledigeNaam: naamVan(r),
                 sublabel: r.meting.label,
                 aantalScans: r.aantalAfgerond,
                 antwoorden: r.antwoorden,

@@ -5,7 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
 import { ruimBenchmarkVinkjesOp, useOrganisaties } from "@/lib/db";
-import { sluitBenchmarkMeldingen, useBenchmark, verwijderBenchmark } from "@/lib/benchmark-store";
+import { sluitBenchmarkMeldingen, verwijderBenchmark } from "@/lib/benchmark-store";
+import { useBenchmarkMetLeden } from "@/lib/use-benchmarks";
+import { filterRegels, isVerkenning, onbekendeKenmerken } from "@/lib/verkenning-benchmark";
+import { maakFilterNamen } from "@/lib/verkenning-namen";
 import {
   benchmarkNamen,
   bouwBenchmarkSecties,
@@ -38,7 +41,7 @@ const NIVEAU_TEKST = { organisaties: "Tussen organisaties", metingen: "Binnen ee
 export default function BenchmarkDetailPage({ params }: { params: Promise<{ benchmarkId: string }> }) {
   const { benchmarkId } = use(params);
   const gebruiker = useIngelogdeGebruiker();
-  const benchmark = useBenchmark(benchmarkId);
+  const benchmark = useBenchmarkMetLeden(benchmarkId);
   const organisaties = useOrganisaties();
   const assessments = useAssessments();
   const instellingen = useInstellingen();
@@ -61,6 +64,9 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
   }
 
   const niveau = niveauVan(benchmark);
+  const verkenning = isVerkenning(benchmark);
+  const regels = verkenning ? filterRegels(benchmark.filters ?? [], maakFilterNamen(instellingen.korteNamen, organisaties)) : [];
+  const verdwenenKenmerken = verkenning ? onbekendeKenmerken(benchmark.filters ?? [], benchmark.eenheid) : [];
   const secties = niveau === "organisaties" ? bouwBenchmarkSecties(benchmark, assessments, organisaties) : [];
   const vergelijkingen = niveau === "metingen" ? bouwMetingenVergelijkingen(benchmark, assessments, organisaties) : [];
   // Binnen een organisatie hebben alle leden dezelfde organisatie: Daar staat de lijst met Leads die de vergelijking zien.
@@ -81,12 +87,42 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
           { label: benchmark.naam },
         ]}
       />
-      <h1>{benchmark.naam}</h1>
+      <h1>
+        {benchmark.naam}
+        {niveau === "organisaties" && (
+          <span className="mm-rolchip" style={{ marginLeft: "var(--sp-3)", verticalAlign: "middle" }}>
+            {verkenning ? "Verkenning" : "Vaste groep"}
+          </span>
+        )}
+      </h1>
       <p className="text-sm text-ink-m">
         {NIVEAU_TEKST[niveau]}
         {niveau === "metingen" && ` · ${LEZING_KEUZE[lezingVan(benchmark, organisaties)].titel}`} · aangemaakt op {datumFormat.format(new Date(benchmark.aangemaaktOp))} · cijfers berekend op{" "}
         {datumFormat.format(new Date())}
       </p>
+
+      {verkenning && (
+        <div className="vk-opslaan-paneel" style={{ marginTop: "var(--sp-4)", maxWidth: "40rem" }}>
+          <div>
+            <p className="vk-veldkop" style={{ marginTop: 0 }}>
+              Filters · eenheid {benchmark.eenheid === "onderdelen" ? "Onderdelen" : "Organisaties"}
+            </p>
+            <ul className="vk-regels">
+              {regels.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+            </ul>
+          </div>
+          <p className="text-sm text-ink-m" style={{ margin: 0 }}>
+            De leden volgen uit de filters en zijn hier niet te kiezen. Nu {new Set(benchmark.leden.map((l) => l.organisatieId)).size} Organisaties in de groep.
+          </p>
+          {verdwenenKenmerken.length > 0 && (
+            <p className="admin-notice" style={{ margin: 0 }}>
+              Een kenmerk waarop deze verkenning filtert bestaat niet meer. De groep is daarom leeg en de cel van elke Lead is grijs.
+            </p>
+          )}
+        </div>
+      )}
 
       {benchmark.meldingen.length > 0 && (
         <div className="beheer-melding admin-notice" role="status">
@@ -149,6 +185,7 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
             sectie={s}
             benchmarkId={benchmark.id}
             minOrganisaties={instellingen.benchmarkMinOrganisaties}
+            metOnderdeel={verkenning && benchmark.eenheid === "onderdelen"}
           />
         ))
       )}

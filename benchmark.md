@@ -114,7 +114,7 @@ De view toont nooit de namen van andere organisaties. De Admin bekijkt de view e
 
 ### Opgeslagen verkenning
 
-**Voorstel van 16 oktober 2026, ontworpen in "Coniche Scan Verkennen" (Opslaan als benchmark en het bord Leads-venster), nog niet gebouwd.** Een Admin die in Verkennen (`visualisatie-verkennen.md`) een groep heeft gevonden, slaat de filters op als benchmark op niveau 1. Een Lead ziet dan hoe hij scoort ten opzichte van bijvoorbeeld alle Organisaties met Salesforce, zonder dat de Admin leden hoeft aan te vinken. De keuzes hieronder zijn op 16 oktober 2026 met Joost besproken.
+**Voorstel van 16 oktober 2026, ontworpen in "Coniche Scan Verkennen" (Opslaan als benchmark en het bord Leads-venster), gebouwd op 17 oktober 2026.** Een Admin die in Verkennen (`visualisatie-verkennen.md`) een groep heeft gevonden, slaat de filters op als benchmark op niveau 1. Een Lead ziet dan hoe hij scoort ten opzichte van bijvoorbeeld alle Organisaties met Salesforce, zonder dat de Admin leden hoeft aan te vinken. De keuzes hieronder zijn op 16 oktober 2026 met Joost besproken.
 
 - **Soort.** Een benchmark op niveau 1 is een Vaste groep (de leden zijn gekozen, zoals hierboven beschreven) of een Verkenning (de leden volgen uit filters). In de lijst en in het Leads-venster staat het soort als badge.
 - **Wat er wordt opgeslagen.** De naam, het Assessment, de eenheid (Organisaties of Onderdelen) en de filters, dus de kenmerken met de gekozen waarden. De groepering, de focus en de drempel van een getalkenmerk horen bij het kijken en worden niet opgeslagen. De uitkomst ook niet. Een verkenning zonder filter is de hele pool en kan niet worden opgeslagen.
@@ -129,6 +129,21 @@ De view toont nooit de namen van andere organisaties. De Admin bekijkt de view e
 - **Vervallen.** Zoals bij een Vaste groep (View voor een Lead, Vervallen). Daar komt bij dat de Organisatie niet meer aan de filters voldoet, bijvoorbeeld omdat een kenmerk is gewijzigd of `benchmarkToegestaan` is ingetrokken.
 - **Peildatum.** De cijfers zijn live (Gedeelde regels). De peildatum is het moment van openen.
 - **Wie maakt hem aan.** Alleen een Admin (`benchmark.beheren`), vanuit Verkennen met de knop Opslaan als benchmark (`visualisatie-verkennen.md`, Opslaan als benchmark). Aanmaken vanuit de tab Benchmarks is er niet, want de filters horen bij het kijken.
+
+**Gebouwd op 17 oktober 2026.** De leden van een verkenning worden berekend in `lib/verkenning-benchmark.ts` (`ledenVoorVerkenning`,
+`materialiseerBenchmark`, met tests). Schermen lezen de benchmarks met leden via `useBenchmarksMetLeden` (`lib/use-benchmarks.ts`),
+de opslag houdt de vinkjes kloppend via `getBenchmarksMetLeden` bij elke schrijfactie op de organisaties (`slaAlles`). Zo vervalt een
+vinkje vanzelf als een Organisatie niet meer aan de filters voldoet.
+
+- Een filter naar een kenmerk dat niet meer bestaat, maakt de groep leeg (voorstel uit de open punten). De detailpagina meldt dat en
+  de cel van elke Lead is grijs.
+- Wijzigen (`components/beheer/VerkenningBewerken.tsx`): De naam en het weghalen van waarden of filters, met minstens één filter. Nieuwe
+  filters of andere waarden zet de Admin in Verkennen, daarna slaat hij een nieuwe verkenning op. De bevestiging noemt het aantal
+  vinkjes dat vervalt.
+- De view van een Lead bij de eenheid Onderdelen (`leadViewsOnderdelen` in `lib/benchmark.ts`): Elk eigen onderdeel met naam
+  tegenover de onderdelen van andere Organisaties als anoniem gemiddelde, de drempel telt Organisaties. Bij een filter op één
+  Organisatie geldt de drempel niet. De lead-pagina toont de naam en de filters van een verkenning, niet de ledenlijst.
+- Nog niet: Een Consultant die opslaat, en de peildatum bij een verkenning (die is nu "vandaag").
 
 ### Drempels
 

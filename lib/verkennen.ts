@@ -4,15 +4,30 @@
  * De rekenregels zijn die van de benchmark tussen organisaties (`benchmark.md`): Per organisatie de meest recente Meting die aan
  * `benchmarkMinScans` voldoet, en elke organisatie telt even zwaar mee.
  */
-import { Assessment, Organisatie, ScanUitvoering, VeldDefinitie } from "./types";
+import { Assessment, Organisatie, ScanUitvoering, VeldDefinitie, VerkenEenheid } from "./types";
 import { BouwblokRij, bouwblokRijen, kwantiel, rond1, steekproefSd } from "./visualisatie";
 import { bouwblokScoreRuw, overallScoreRuw } from "./scoring";
-import { gemiddeldeAntwoordenVoorMetingMetSamenstelling, voldoetAanMinScans, vergelijkNieuwsteEerst, aantalAfgerondInMeting } from "./metingen";
+import {
+  gemiddeldeAntwoordenVoorMetingMetSamenstelling,
+  voldoetAanMinScans,
+  vergelijkNieuwsteEerst,
+  aantalAfgerondInMeting,
+  isSamengesteld,
+  onderdeelVan,
+  onderliggendeMetingen,
+  STANDAARD_ONDERDEEL,
+} from "./metingen";
 import { organisatieVelden } from "@/data/organisatie-velden";
 
 /* ---------- Pool ---------- */
 
 export interface PoolLid {
+  /** Uniek in de pool: Het id van de organisatie, bij de eenheid Onderdelen dat van de organisatie en de Meting samen. */
+  id: string;
+  /** De naam in lijsten en tooltips: De organisatie, bij een onderdeel "{Organisatie}, {onderdeel}" (of alleen de organisatie bij "Hele organisatie"). */
+  naam: string;
+  /** Alleen bij de eenheid Onderdelen. */
+  onderdeel?: string;
   organisatie: Organisatie;
   meting: ScanUitvoering;
   aantalScans: number;
@@ -33,30 +48,79 @@ export interface Pool {
  * De pool van een Assessment (`visualisatie-verkennen.md`, Pool): Organisaties met `benchmarkToegestaan` die een Meting van het
  * Assessment hebben met minstens `minScans` afgeronde scans. Per organisatie telt de meest recente zo'n Meting.
  */
-export function bouwPool(organisaties: Organisatie[], assessment: Assessment, minScans: number): Pool {
+export function bouwPool(
+  organisaties: Organisatie[],
+  assessment: Assessment,
+  minScans: number,
+  eenheid: VerkenEenheid = "organisaties"
+): Pool {
   const rijen = bouwblokRijen(assessment);
-  const leden: PoolLid[] = [];
+  const { gekozen, zonderToestemming } = kiesPoolMetingen(organisaties, assessment.id, minScans, eenheid);
+  const leden: PoolLid[] = gekozen.map((lid) => {
+    const antwoorden = gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, lid.organisatie, lid.meting);
+    return {
+      ...lid,
+      aantalScans: aantalAfgerondInMeting(lid.organisatie, lid.meting),
+      scores: rijen.map((r) => bouwblokScoreRuw(r.bouwblok, antwoorden)),
+      overall: overallScoreRuw(assessment, antwoorden),
+    };
+  });
+  return { rijen, leden, zonderToestemming };
+}
+
+/** De naam van een lid van de pool: De organisatie, of bij een onderdeel "{Organisatie}, {onderdeel}" (alleen de organisatie bij "Hele organisatie"). */
+export function poolLidNaam(organisatie: Pick<Organisatie, "naam">, onderdeel: string | undefined): string {
+  return !onderdeel || onderdeel === STANDAARD_ONDERDEEL ? organisatie.naam : `${organisatie.naam}, ${onderdeel}`;
+}
+
+/**
+ * De Metingen die in de pool komen, zonder scores (`visualisatie-verkennen.md`, Pool en Eenheid). Bij de eenheid Organisaties
+ * telt per organisatie de meest recente Meting die aan `minScans` voldoet. Bij Onderdelen telt per onderdeel (de naam van het
+ * onderdeel binnen een organisatie) de meest recente zo'n Meting. Een samengestelde Meting en haar eigen onderliggende Metingen
+ * tellen niet allebei mee: Komt de samengestelde Meting in de pool, dan vallen haar onderliggende Metingen eruit (voorstel,
+ * een open punt in `benchmark.md`). Alleen organisaties met `benchmarkToegestaan`, de rest telt als "zonder toestemming".
+ */
+export function kiesPoolMetingen(
+  organisaties: Organisatie[],
+  assessmentId: string,
+  minScans: number,
+  eenheid: VerkenEenheid
+): { gekozen: Omit<PoolLid, "aantalScans" | "scores" | "overall">[]; zonderToestemming: number } {
+  const gekozen: Omit<PoolLid, "aantalScans" | "scores" | "overall">[] = [];
   let zonderToestemming = 0;
   for (const organisatie of organisaties) {
-    const meting = organisatie.scanUitvoeringen
-      .filter((m) => m.assessmentId === assessment.id && voldoetAanMinScans(organisatie, m, minScans))
-      .sort(vergelijkNieuwsteEerst)[0];
-    if (!meting) continue;
+    const kandidaten = organisatie.scanUitvoeringen
+      .filter((m) => m.assessmentId === assessmentId && voldoetAanMinScans(organisatie, m, minScans))
+      .sort(vergelijkNieuwsteEerst);
+    if (kandidaten.length === 0) continue;
     if (!organisatie.benchmarkToegestaan) {
       zonderToestemming += 1;
       continue;
     }
-    const antwoorden = gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, organisatie, meting);
-    leden.push({
-      organisatie,
-      meting,
-      aantalScans: aantalAfgerondInMeting(organisatie, meting),
-      scores: rijen.map((r) => bouwblokScoreRuw(r.bouwblok, antwoorden)),
-      overall: overallScoreRuw(assessment, antwoorden),
-    });
+    if (eenheid === "organisaties") {
+      gekozen.push({ id: organisatie.id, naam: organisatie.naam, organisatie, meting: kandidaten[0] });
+      continue;
+    }
+    const perOnderdeel = new Map<string, ScanUitvoering>();
+    for (const m of kandidaten) if (!perOnderdeel.has(onderdeelVan(m))) perOnderdeel.set(onderdeelVan(m), m);
+    const gekozenMetingen = [...perOnderdeel.values()];
+    const onderliggend = new Set(
+      gekozenMetingen.filter(isSamengesteld).flatMap((m) => onderliggendeMetingen(organisatie, m).map((o) => o.id))
+    );
+    for (const meting of gekozenMetingen) {
+      if (onderliggend.has(meting.id)) continue;
+      const onderdeel = onderdeelVan(meting);
+      gekozen.push({
+        id: `${organisatie.id}:${meting.id}`,
+        naam: poolLidNaam(organisatie, onderdeel),
+        onderdeel,
+        organisatie,
+        meting,
+      });
+    }
   }
-  leden.sort((a, b) => a.organisatie.naam.localeCompare(b.organisatie.naam, "nl"));
-  return { rijen, leden, zonderToestemming };
+  gekozen.sort((a, b) => a.naam.localeCompare(b.naam, "nl"));
+  return { gekozen, zonderToestemming };
 }
 
 /* ---------- Filters uit de organisatievelden ---------- */
@@ -102,6 +166,34 @@ export function filterVelden(velden: VeldDefinitie[] = organisatieVelden): Filte
 /** Het afgeleide veld Ingezette kanalen, naast de organisatievelden in het menu Kenmerk toevoegen. */
 export function kanalenVeld(): FilterVeld {
   return { id: KANALEN_ID, label: KANALEN_LABEL, pad: [], type: "select" };
+}
+
+/** Alleen bij de eenheid Onderdelen: De kenmerken Organisatie en Onderdeel (`visualisatie-verkennen.md`, Eenheid). */
+export const ORGANISATIE_ID = "__organisatie";
+export const ONDERDEEL_ID = "__onderdeel";
+export const ORGANISATIE_ONDERDEEL_GROEP = "Organisatie en onderdeel";
+
+export function onderdeelVelden(): FilterVeld[] {
+  return [
+    { id: ORGANISATIE_ID, label: `${ORGANISATIE_ONDERDEEL_GROEP} › Organisatie`, pad: [], type: "select" },
+    { id: ONDERDEEL_ID, label: `${ORGANISATIE_ONDERDEEL_GROEP} › Onderdeel`, pad: [], type: "select" },
+  ];
+}
+
+/**
+ * De waarde van een kenmerk voor een lid van de pool. Een organisatieveld komt van de organisatie, Organisatie is haar id (de
+ * naam staat in `waardeLabel`) en Onderdeel de naam van het onderdeel.
+ */
+export function lidWaarde(lid: Pick<PoolLid, "organisatie" | "onderdeel">, veld: FilterVeld): unknown {
+  if (veld.id === ORGANISATIE_ID) return lid.organisatie.id;
+  if (veld.id === ONDERDEEL_ID) return lid.onderdeel;
+  return kenmerkWaarde(lid.organisatie, veld.pad);
+}
+
+/** De tekst van een waarde bij een kenmerk: Voor Organisatie de naam bij het id, anders de waarde zelf. */
+export function waardeLabel(leden: Pick<PoolLid, "organisatie">[], veld: Pick<FilterVeld, "id">, waarde: string): string {
+  if (veld.id !== ORGANISATIE_ID) return waarde;
+  return leden.find((l) => l.organisatie.id === waarde)?.organisatie.naam ?? waarde;
 }
 
 /** De groep van een veld in het filtermenu: Het eerste deel van het label ("Techstack"), anders "Overig". */
@@ -186,13 +278,13 @@ export function pasFiltersToe(leden: PoolLid[], stand: FilterStand, velden: Filt
       if (gekozen.length === 0) continue;
       const veld = perId.get(id);
       if (!veld) continue;
-      const w = kenmerkWaarde(lid.organisatie, veld.pad);
+      const w = lidWaarde(lid, veld);
       if (typeof w !== "string" || !gekozen.includes(w)) return false;
     }
     for (const [id, [min, max]] of Object.entries(stand.bereik)) {
       const veld = perId.get(id);
       if (!veld) continue;
-      const w = getalWaarde(kenmerkWaarde(lid.organisatie, veld.pad));
+      const w = getalWaarde(lidWaarde(lid, veld));
       if (w === null || w < min || w > max) return false;
     }
     for (const kanaal of kanalen) if (kanaalIngezet(lid.organisatie, kanaal.pad) !== true) return false;
@@ -213,17 +305,23 @@ export function getalWaarde(w: unknown): number | null {
 export function selectOpties(leden: PoolLid[], veld: FilterVeld): { waarde: string; aantal: number }[] {
   const telling = new Map<string, number>();
   for (const lid of leden) {
-    const w = kenmerkWaarde(lid.organisatie, veld.pad);
+    const w = lidWaarde(lid, veld);
     if (typeof w === "string" && w !== "") telling.set(w, (telling.get(w) ?? 0) + 1);
   }
+  // Bij Organisatie alleen de organisaties met meer dan één onderdeel: Met één onderdeel is er niets om naast elkaar te zetten.
+  if (veld.id === ORGANISATIE_ID) for (const [w, n] of [...telling]) if (n < 2) telling.delete(w);
   return [...telling.entries()]
     .map(([waarde, aantal]) => ({ waarde, aantal }))
-    .sort((a, b) => b.aantal - a.aantal || a.waarde.localeCompare(b.waarde, "nl"));
+    .sort((a, b) =>
+      b.aantal - a.aantal ||
+      waardeLabel(leden, veld, a.waarde).localeCompare(waardeLabel(leden, veld, b.waarde), "nl")
+    );
 }
+
 
 /** De ingevulde getallen van een veld in de pool, en hoeveel organisaties het veld hebben ingevuld. */
 export function getalWaarden(leden: PoolLid[], veld: FilterVeld): number[] {
-  return leden.map((l) => getalWaarde(kenmerkWaarde(l.organisatie, veld.pad))).filter((w): w is number => w !== null);
+  return leden.map((l) => getalWaarde(lidWaarde(l, veld))).filter((w): w is number => w !== null);
 }
 
 /** Per kanaal het aantal organisaties in de pool dat het inzet. */
@@ -283,21 +381,22 @@ export function maakGroepen(
   if (groepering.soort === "select") {
     const per = new Map<string, PoolLid[]>();
     for (const lid of leden) {
-      const w = kenmerkWaarde(lid.organisatie, veld.pad);
+      const w = lidWaarde(lid, veld);
       if (typeof w !== "string" || w === "") continue;
       per.set(w, [...(per.get(w) ?? []), lid]);
     }
     return [...per.entries()]
       .map(([waarde, l]) => {
-        const kort = naamVan(veld.id, waarde);
-        return { sleutel: waarde, naam: kort, ...(kort !== waarde ? { volledigeNaam: waarde } : {}), leden: l };
+        const kort = veld.id === ORGANISATIE_ID ? waardeLabel(leden, veld, waarde) : naamVan(veld.id, waarde);
+        const volledig = veld.id === ORGANISATIE_ID ? undefined : kort !== waarde ? waarde : undefined;
+        return { sleutel: waarde, naam: kort, ...(volledig ? { volledigeNaam: volledig } : {}), leden: l };
       })
       .sort((a, b) => b.leden.length - a.leden.length || a.naam.localeCompare(b.naam, "nl"));
   }
   const onder: PoolLid[] = [];
   const boven: PoolLid[] = [];
   for (const lid of leden) {
-    const w = getalWaarde(kenmerkWaarde(lid.organisatie, veld.pad));
+    const w = getalWaarde(lidWaarde(lid, veld));
     if (w === null) continue;
     (w <= groepering.drempel ? onder : boven).push(lid);
   }
@@ -326,7 +425,7 @@ export function splitsFocus(
 /** Hoeveel organisaties van deze lijst geen waarde voor het veld hebben ("n zonder waarde" onder de groepen). */
 export function zonderWaarde(leden: PoolLid[], veld: FilterVeld): number {
   return leden.filter((l) => {
-    const w = kenmerkWaarde(l.organisatie, veld.pad);
+    const w = lidWaarde(l, veld);
     return w === undefined || w === null || w === "";
   }).length;
 }
@@ -406,6 +505,10 @@ export function besluitGroepering(invoer: {
   kenmerken: GroeperKenmerk[];
   /** De naam van het vorige kenmerk, voor de melding als het is verwijderd. */
   vorigeNaam?: string;
+  /** De reden als het vorige kenmerk er niet meer is, in plaats van "is verwijderd" (bijvoorbeeld bij het wisselen van eenheid). */
+  vorigeWeg?: string;
+  /** "Organisaties" of "onderdelen". */
+  eenheidWoord?: string;
   poolGrootte: number;
   /** De pool zonder filters: Een te kleine pool door de filters is iets anders dan een te kleine pool. */
   poolTotaal: number;
@@ -415,12 +518,16 @@ export function besluitGroepering(invoer: {
   if (invoer.vorige === null) return { gekozen: eerste?.id ?? null, melding: null };
   const huidig = invoer.kenmerken.find((k) => k.id === invoer.vorige);
   if (huidig?.bruikbaarheid.ok) return { gekozen: huidig.id, melding: null };
-  const reden = huidig ? (huidig.bruikbaarheid.reden ?? "Het kenmerk kan niet groeperen") : `${invoer.vorigeNaam ?? "Het kenmerk"} is verwijderd`;
+  const reden = huidig
+    ? (huidig.bruikbaarheid.reden ?? "Het kenmerk kan niet groeperen")
+    : (invoer.vorigeWeg ?? `${invoer.vorigeNaam ?? "Het kenmerk"} is verwijderd`);
   if (eerste) return { gekozen: eerste.id, melding: `${reden}. De groepering staat nu op ${eerste.naam}.` };
   if (invoer.poolGrootte < invoer.minPool && invoer.poolTotaal >= invoer.minPool) {
     return {
       gekozen: null,
-      melding: `Met deze filters zit er ${invoer.poolGrootte} ${invoer.poolGrootte === 1 ? "Organisatie" : "Organisaties"} in de pool. Dat is te weinig om te vergelijken. Haal een filter weg.`,
+      melding: `Met deze filters zit er ${invoer.poolGrootte} ${
+        invoer.poolGrootte === 1 ? (invoer.eenheidWoord === "onderdelen" ? "onderdeel" : "Organisatie") : (invoer.eenheidWoord ?? "Organisaties")
+      } in de pool. Dat is te weinig om te vergelijken. Haal een filter weg.`,
     };
   }
   return { gekozen: null, melding: "Er is geen kenmerk meer om op te groeperen." };
@@ -440,13 +547,19 @@ export function kanGroeperen(
   veld: FilterVeld,
   alle: PoolLid[],
   gefilterd: PoolLid[],
-  drempels: GroeperDrempels = STANDAARD_GROEPER_DREMPELS
+  drempels: GroeperDrempels = STANDAARD_GROEPER_DREMPELS,
+  /** "Organisaties", of "onderdelen" bij de eenheid Onderdelen. */
+  eenheidWoord = "Organisaties"
 ): Bruikbaarheid {
   // Ingezette kanalen kan nooit groeperen: Een organisatie zet meerdere kanalen in en valt dan in meer dan één groep.
   if (veld.id === KANALEN_ID) return { ok: false, reden: KANALEN_REDEN };
   // De redenen noemen de instelling erachter, zodat een Admin meteen ziet waar hij de grens aanpast.
   if (gefilterd.length < drempels.minPool) {
-    return { ok: false, reden: `Minder dan ${drempels.minPool} Organisaties in de pool (instelling Organisaties in de pool, minimum)` };
+    return { ok: false, reden: `Minder dan ${drempels.minPool} ${eenheidWoord} in de pool (instelling Organisaties in de pool, minimum)` };
+  }
+  // Onderdelen heten per organisatie anders: Groeperen op Onderdeel kan alleen binnen één organisatie.
+  if (veld.id === ONDERDEEL_ID && new Set(gefilterd.map((l) => l.organisatie.id)).size > 1) {
+    return { ok: false, reden: "Onderdelen heten per Organisatie anders. Filter eerst op één Organisatie" };
   }
   // Bij 0% geldt geen ondergrens voor hoe vaak een kenmerk is ingevuld.
   const minIngevuld = Math.ceil((drempels.minIngevuldPct / 100) * alle.length);
@@ -526,7 +639,7 @@ const verschilVan = (a: number | null, b: number | null) => (a === null || b ===
 /** Groep tegenover de rest en Spreiding binnen de groep (`visualisatie-verkennen.md`, Weergave 1 en 2). */
 export function vergelijk(rijen: BouwblokRij[], focus: PoolLid[], rest: PoolLid[]): Vergelijking {
   const perRij: RijVergelijking[] = rijen.map((rij, i) => {
-    const stip = (l: PoolLid) => ({ naam: l.organisatie.naam, score: l.scores[i] });
+    const stip = (l: PoolLid) => ({ naam: l.naam, score: l.scores[i] });
     const f = focus.map(stip).filter((s): s is { naam: string; score: number } => s.score !== null);
     const r = rest.map(stip).filter((s): s is { naam: string; score: number } => s.score !== null);
     const fv = verdeling(f.map((s) => s.score));

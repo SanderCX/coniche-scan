@@ -7,6 +7,8 @@ import {
   bouwPool,
   filterVelden,
   KANALEN_REDEN,
+  onderdeelVelden,
+  selectOpties,
   STANDAARD_GROEPER_DREMPELS,
   besluitGroepering,
   drempelStap,
@@ -299,6 +301,37 @@ describe("kanalen, nul procent en het besluit over de groepering", () => {
     expect(drempelStap(0, 1000)).toBe(10);
     expect(drempelStap(0, 120)).toBe(2);
     expect(drempelStap(0, 5, false)).toBe(0.05);
+  });
+
+  it("de eenheid Onderdelen: Per onderdeel de meest recente Meting, met de naam van organisatie en onderdeel", () => {
+    const meting = (id: string, onderdeel: string, datum: string) =>
+      ({
+        id, organisatieId: "x", assessmentId: assessment.id, label: id, onderdeel, meetdatum: datum, aangemaaktOp: datum,
+        invullingen: org("tmp", 3).scanUitvoeringen[0].invullingen,
+      }) as unknown as Organisatie["scanUitvoeringen"][number];
+    const meerdere = org("m", 3);
+    meerdere.naam = "Univé";
+    meerdere.scanUitvoeringen = [
+      meting("a1", "Particulier", "2026-01-10"),
+      meting("a2", "Particulier", "2026-06-10"),
+      meting("b1", "Zakelijk", "2026-03-10"),
+      meting("c1", "Hele organisatie", "2026-02-10"),
+    ];
+    const enkel = org("e", 3);
+    const pool = bouwPool([meerdere, enkel], assessment, 3, "onderdelen");
+    expect(pool.leden.map((l) => l.naam).sort()).toEqual(["Org e", "Univé", "Univé, Particulier", "Univé, Zakelijk"].sort());
+    const particulier = pool.leden.find((l) => l.onderdeel === "Particulier")!;
+    expect(particulier.meting.id).toBe("a2");
+    expect(new Set(pool.leden.map((l) => l.id)).size).toBe(pool.leden.length);
+    // Organisatie als kenmerk: Alleen organisaties met meer dan één onderdeel.
+    const orgVeld = onderdeelVelden()[0];
+    expect(selectOpties(pool.leden, orgVeld).map((o) => [o.waarde, o.aantal])).toEqual([[meerdere.id, 3]]);
+    // Onderdeel kan alleen groeperen binnen één organisatie.
+    const onderdeelVeld = onderdeelVelden()[1];
+    const drempels = { minPool: 2, maxGroepen: 12, minIngevuldPct: 0 };
+    expect(kanGroeperen(onderdeelVeld, pool.leden, pool.leden, drempels, "onderdelen").reden).toContain("Filter eerst op één Organisatie");
+    const alleen = pool.leden.filter((l) => l.organisatie.id === meerdere.id);
+    expect(kanGroeperen(onderdeelVeld, alleen, alleen, drempels, "onderdelen").ok).toBe(true);
   });
 
   it("de sector blijft een select", () => {

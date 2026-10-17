@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { KorteNamen, korteNaamVeld } from "@/lib/korte-namen";
-import { FilterVeld, KANALEN_ID, PoolLid, ingevuldAantal, kanaalVelden, kanaalIngezet, veldGroep, veldLabelZonderGroep } from "@/lib/verkennen";
+import { FilterVeld, KANALEN_ID, ONDERDEEL_ID, ORGANISATIE_ID, PoolLid, ingevuldAantal, kanaalVelden, kanaalIngezet, veldGroep, veldLabelZonderGroep } from "@/lib/verkennen";
 
 
 /**
@@ -52,7 +52,9 @@ export function FilterMenu({
     .map((v) => {
       const korte = korteNaamVeld(korteNamen, v.id, veldLabelZonderGroep(v));
       const aantal =
-        v.id === KANALEN_ID
+        v.id === ORGANISATIE_ID || v.id === ONDERDEEL_ID
+          ? pool.length
+          : v.id === KANALEN_ID
           ? pool.filter((l) => kanaalVelden().some((k) => kanaalIngezet(l.organisatie, k.pad) !== null)).length
           : ingevuldAantal(organisaties, v);
       return { veld: v, korte, aantal, groep: veldGroep(v) };

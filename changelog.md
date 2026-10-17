@@ -1,5 +1,38 @@
 # Coniche Scan — Changelog
 
+## 2026-10-17 (1) — Specs van Joost, PR 125: opgeslagen verkenning en de eenheid Onderdelen
+
+Op verzoek van Sander gebouwd (`benchmark.md`, Opgeslagen verkenning, `visualisatie-verkennen.md`, Eenheid en Opslaan als benchmark).
+Het onderdeel I van `visualisatie-scores.md` (weergaven voor een samengestelde Meting en een vergelijking) is niet gebouwd.
+
+**Gedaan**:
+- **Datamodel**: `Benchmark.soort`, `eenheid` en `filters` (`lib/types.ts`). Een verkenning heeft geen opgeslagen leden: `lib/verkenning-benchmark.ts`
+  berekent ze uit de filters met de poolregels van Verkennen. `useBenchmarksMetLeden` en `getBenchmarksMetLeden` geven de benchmarks met leden,
+  `slaAlles` laat een vinkje vervallen zodra een Organisatie niet meer aan de filters voldoet.
+- **Verkennen**: De groep Eenheid (Organisaties of Onderdelen) met de kenmerken Organisatie en Onderdeel, en de knop Opslaan als benchmark met
+  het paneel. `PoolLid` heeft een eigen `id` en `naam`. `info.verkennenEenheid` en `info.verkennenOpslaan` zijn nieuw in het register.
+- **Beheer**: De badge Vaste groep of Verkenning en het aantal Organisaties in de lijst en het detail, de filters als regels, Wijzigen voor
+  naam en filters (`VerkenningBewerken`), en in het Leads-venster een kolom met de badge, het aantal en de reden "Te weinig Organisaties in deze
+  groep: n, minimaal m" onder de drempel.
+- **Lead**: De view bij de eenheid Onderdelen (elk eigen onderdeel met naam tegenover de rest), met `benchmarkMinOrganisaties` op Organisaties
+  en uitgezonderd bij een filter op één Organisatie. De pagina toont de naam en de filters van een verkenning.
+- 15 nieuwe tests (`lib/verkenning-benchmark.test.ts`, `lib/verkennen.test.ts`, `lib/benchmark.test.ts`).
+
+**Keuzes waar de spec open liet**: Een samengestelde Meting en haar onderliggende Metingen tellen niet allebei mee (de onderliggende vallen
+eruit). Een filter naar een verdwenen kenmerk maakt de groep leeg. `info.verkennenEenheid` heb ik zelf geschreven. Wijzigen laat alleen
+waarden en filters weghalen, geen nieuwe toevoegen.
+
+## 2026-10-16 (2) — Mijn metingen: gelijke uitlijning van Jouw scan en Hele meting
+
+Op verzoek van Sander. De regel "Gemiddelde van n afgeronde scans" onder het getal van de hele meting vervalt, het aantal staat
+achter de titel ("Gemiddelde score · 6 scans"). Zo staan de rijen van beide blokken op dezelfde hoogte (`lib/mijn-metingen.ts`,
+`components/mijn-metingen/`).
+
+## 2026-10-16 (1) — Mijn metingen: een Lead is altijd als Lead herkenbaar
+
+Op verzoek van Sander. Naast de Organisatie in de kop staat de rolchip "Lead", en zonder Metingen of vergelijkingen staat er een
+korte melding (`app/s/[code]/page.tsx`, `visualisatie-mijn-metingen.md`, Gebouwd).
+
 ## 2026-10-15 (9) — Specs van Joost, PR 121: Verkennen, melding, herstel en de drempel instellen
 
 Op verzoek van Sander gebouwd (`visualisatie-verkennen.md`, Groeperen en focus, Drempels, `beheerpagina.md`, Formulier Verkennen).

@@ -62,7 +62,8 @@ describe("teaser", () => {
   it("de hele meting is het gemiddelde van de afgeronde scans", () => {
     const t = teaserVoorMeting(zorgscan, [scan(2), scan(4), { ...scan(1), status: "bezig" }])!;
     expect(t.getal).toBe("3,0");
-    expect(t.sub).toBe("Gemiddelde van 2 afgeronde scans");
+    expect(t.sub).toBeNull();
+    expect(t.aantalScans).toBe(2);
     expect(t.klasseNaam).toBe("Uitbouwen");
   });
 
@@ -97,7 +98,8 @@ describe("teaser van de Quickscan", () => {
       id: `s${i}`, status: "afgerond", antwoorden: antwoorden(n), relevantie,
     })) as unknown as ScanInvulling[];
     const t = teaserVoorMeting(ziekenhuisQuickscan, scans)!;
-    expect(t.sub).toBe("Gemiddelde van 2 afgeronde scans");
+    expect(t.sub).toBeNull();
+    expect(t.aantalScans).toBe(2);
     expect(t.rijen.every((r) => /^\d+%$/.test(r.waarde))).toBe(true);
   });
 });

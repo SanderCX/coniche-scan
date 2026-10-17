@@ -1287,3 +1287,46 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ---------- Opslaan als benchmark en Eenheid (visualisatie-verkennen.md) ---------- */
+.vk-opslaan {
+  margin-top: var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.vk-opslaan-paneel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.vk-regels {
+  margin: 0;
+  padding: 0 0 0 var(--sp-4);
+  font-size: var(--fs-14);
+  color: var(--ink-m);
+}
+.vk-opgeslagen {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--stat-green-faint);
+  border: 1px solid var(--stat-green);
+  border-radius: var(--r);
+  font-size: var(--fs-14);
+  color: var(--ink);
+}
+.vk-eenheid {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-4) 0 0;
+}
+.vk-voet {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}

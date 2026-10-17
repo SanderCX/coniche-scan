@@ -1370,7 +1370,7 @@ Benchmark {
   lezing?: "ontwikkeling" | "naastElkaar"
                                     // gebouwd op 14 oktober 2026, alleen bij niveau "metingen"; ontbreekt het veld, dan volgt ze uit de leden (zie hieronder)
   soort?: "vasteGroep" | "verkenning"
-                                    // voorstel van 16 oktober 2026, alleen bij niveau "organisaties"; ontbreekt = "vasteGroep"
+                                    // gebouwd op 17 oktober 2026, alleen bij niveau "organisaties"; ontbreekt = "vasteGroep"
   eenheid?: "organisaties" | "onderdelen"
                                     // alleen bij soort "verkenning"
   filters?: { kenmerk: string, waarden: string[] }[]
@@ -1416,7 +1416,7 @@ bestaan zolang de benchmark bestaat.
   Lead gegeven (`benchmark.md`, View voor een Lead). Niveau 3 blijft een
   weergave voor de Admin.
 
-**`soort`, `eenheid` en `filters`** (voorstel van 16 oktober 2026, `benchmark.md`,
+**`soort`, `eenheid` en `filters`** (gebouwd op 17 oktober 2026, `benchmark.md`,
 Opgeslagen verkenning). Een benchmark met `soort: "verkenning"` slaat geen
 leden op. De leden worden bij elk gebruik berekend uit `filters`, met de
 poolregels van Verkennen. Bij `eenheid: "organisaties"` is een lid een
@@ -1467,7 +1467,7 @@ Spreiding, voor anonieme Antwoorden en voor de lijn van laagste tot hoogste scor
 Gebouwd op 15 oktober 2026 voor Verkennen: `verkennenMinGroep` (3), `verkennenMinVergelijking` (5),
 `verkennenMinPool` (6), `verkennenMaxGroepen` (12) en `verkennenMinIngevuldPct` (40),
 alle gehele getallen van minstens 1, het percentage tot en met 100 (`visualisatie-verkennen.md`, Drempels). `verkennenWaarschuwingGroep` is hernoemd naar `verkennenMinVergelijking`: Een opgeslagen waarde onder de oude naam wordt bij het lezen overgenomen. De startwaarden zijn de norm vanuit het ontwerp. Gebouwd op 15 oktober 2026: Het percentage mag 0 zijn (geen ondergrens), dus voor het percentage geldt 0 tot en met 100.
-Voorstel van 16 oktober 2026: `benchmarkMinOrganisaties` geldt ook voor een opgeslagen verkenning en telt daar altijd Organisaties, ook bij de eenheid Onderdelen. Er komt geen nieuwe instelling bij.
+Gebouwd op 17 oktober 2026: `benchmarkMinOrganisaties` geldt ook voor een opgeslagen verkenning en telt daar altijd Organisaties, ook bij de eenheid Onderdelen. Er komt geen nieuwe instelling bij.
 Gebouwd op 14 oktober 2026: `benchmarkMaxDagenTussenMetingen` (startwaarde 90),
 het aantal dagen waarboven een vergelijking met de lezing Naast elkaar een
 waarschuwing geeft. De

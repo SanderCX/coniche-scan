@@ -27,6 +27,18 @@
   color: var(--ink-m);
   margin: 0;
 }
+.mm-organisatie .mm-rolchip {
+  margin-left: var(--sp-1);
+}
+.mm-leadmelding {
+  margin: var(--sp-6) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  font-size: var(--fs-14);
+  color: var(--ink-m);
+}
 .mm-grid {
   display: grid;
   grid-template-columns: 1fr;

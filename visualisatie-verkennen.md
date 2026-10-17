@@ -4,7 +4,7 @@ Spec voor het Admin-scherm Verkennen, waar je alle Organisaties van één Assess
 
 **Status: Voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026.** Er is een visual design (Claude Design, "Coniche Scan Verkennen") met voorbeelddata. Dat design (versie 6) toont ook het gedrag van Kenmerken en Groeperen op zoals hieronder beschreven (besloten op 15 oktober 2026), met een gedeeltelijke kenmerkenlijst: Sector, CRM-pakket, LLM-oplossing, Ingezette kanalen, AHT, NPS en FTR. De keuzes bij het bouwen staan onder Gebouwd. De korte namen, de pilvormige groep en de celtinten zijn gebouwd op 15 oktober 2026 (zie Gebouwd). Kenmerken en Groeperen op zijn gebouwd op 15 oktober 2026 naar versie 6 van het visual design. De vijf instelbare drempels (zie Drempels) zijn gebouwd op 15 oktober 2026. Twee wijzigingen daarop zijn voorstel van 15 oktober 2026 en nog niet gebouwd: Het percentage Kenmerk ingevuld mag 0 zijn (geen ondergrens), en de reden bij een uitgeschakelde pil noemt de instelling erachter. Wat in dit document staat als "Besloten" komt uit het gesprek van 15 oktober 2026.
 
-Voorstel van 16 oktober 2026, ontworpen in versie 14 van het visual design (nog niet gebouwd): De eenheid Onderdelen (Eenheid) en Opslaan als benchmark.
+Voorstel van 16 oktober 2026, ontworpen in versie 14 van het visual design, gebouwd op 17 oktober 2026: De eenheid Onderdelen (Eenheid) en Opslaan als benchmark.
 
 ## Wat het is
 
@@ -26,7 +26,7 @@ De tab Verkennen onder de hoofdlink Resultaten, naast Metingen en Benchmarks, al
 
 ## Eenheid
 
-**Voorstel van 16 oktober 2026, ontworpen.** Boven de kaart Kenmerken staat een pilvormige groep Eenheid met Organisaties en Onderdelen, naast een Info-icoon. Organisaties is de standaard en is wat hierboven staat.
+**Voorstel van 16 oktober 2026, gebouwd op 17 oktober 2026.** Boven de kaart Kenmerken staat een pilvormige groep Eenheid met Organisaties en Onderdelen, naast een Info-icoon. Organisaties is de standaard en is wat hierboven staat.
 
 - **Organisaties.** Elke Organisatie telt één keer mee, met haar meest recente Meting (Pool).
 - **Onderdelen.** Elke Meting met een onderdeel is een eenheid (`benchmark.md`, Onderdeel en samengestelde Meting). Een Organisatie met drie onderdelen telt dus drie keer. Een Organisatie met één onderdeel heet in de lijst "Hele organisatie". Per onderdeel telt de meest recente Meting die aan `benchmarkMinScans` voldoet. De pool, de teller en de balk, de drempels, de groepen en de teksten gaan over onderdelen en gebruiken het woord "onderdelen". Een regel onder de teller noemt uit hoeveel Organisaties de pool bestaat.
@@ -178,7 +178,7 @@ Kleuren in de grafieken: Focus oranje (`--or`), rest grijs (`rgba(136,136,132,.5
 
 ## Opslaan als benchmark
 
-**Voorstel van 16 oktober 2026, ontworpen.** Zo wordt een verkenning een benchmark op niveau 1 die een Lead kan krijgen (`benchmark.md`, Niveau 1, Opgeslagen verkenning). Dit is de enige plek waar Verkennen iets bewaart.
+**Voorstel van 16 oktober 2026, gebouwd op 17 oktober 2026.** Zo wordt een verkenning een benchmark op niveau 1 die een Lead kan krijgen (`benchmark.md`, Niveau 1, Opgeslagen verkenning). Dit is de enige plek waar Verkennen iets bewaart.
 
 - **Knop.** Onder de teller en de balk in de kaart Kenmerken staat "Opslaan als benchmark" met een Info-icoon (`info.verkennenOpslaan`). De Admin heeft hiervoor `benchmark.beheren` nodig.
 - **Uitgeschakeld.** Zonder filter, met de reden "Zet eerst een filter, anders is de groep de hele pool". En als de pool kleiner is dan `verkennenMinPool`, met de reden "Minder dan {n} {Organisaties of onderdelen} in de pool". De reden staat naast de knop.
@@ -294,5 +294,23 @@ Gebouwd op 15 oktober 2026. De berekeningen staan in `lib/verkennen.ts` (met tes
   dichtstbijzijnde grens gezet met de regel "Dit kenmerk loopt in de pool van x tot y." Getallen hebben punten als
   duizendtalscheiding en een komma voor decimalen (`formatGetal`), ook in de groepsnamen. Mediaan en gemiddelde zijn afgerond op
   hele getallen, bij decimale waarden op één decimaal.
+
+**Eenheid en Opslaan als benchmark** (gebouwd op 17 oktober 2026)
+
+- **Eenheid.** `bouwPool(…, eenheid)` en `kiesPoolMetingen` in `lib/verkennen.ts`: Bij Onderdelen telt per organisatie per onderdeel (de
+  naam) de meest recente Meting met genoeg scans. Elk lid van de pool heeft een eigen `id` en `naam` (`PoolLid`), zodat meerdere
+  onderdelen van één Organisatie los te filteren en te groeperen zijn. De kenmerken Organisatie (alleen Organisaties met meer dan
+  één onderdeel) en Onderdeel (groeperen alleen binnen één Organisatie) staan in de groep "Organisatie en onderdeel" van het menu.
+  Wisselen naar Organisaties laat ze vervallen, met de terugvalmelding "Organisatie en Onderdeel bestaan alleen bij Eenheid
+  Onderdelen". De teksten, de teller en de redenen gebruiken het woord onderdelen, met de regel "De pool bestaat uit n onderdelen
+  van m Organisaties" en de voettekst over het gelijke gewicht.
+- **Open punt van Joost, mijn keuze: samengestelde Meting.** Komt een samengestelde Meting in de pool, dan vallen haar eigen
+  onderliggende Metingen eruit, zodat ze niet dubbel tellen.
+- **Opslaan als benchmark** (`components/verkennen/OpslaanAlsBenchmark.tsx`): Paneel met naam (maximaal 60 tekens), de filters als
+  regels, het aantal in de groep en de groene regel erna. De knop is uit zonder filter of bij een pool onder `verkennenMinPool`. De
+  naam is voorgevuld bij één filter met één waarde. Opgeslagen worden de filters, de eenheid en het Assessment
+  (`Benchmark.soort = "verkenning"`, `lib/verkenning-benchmark.ts`).
+- **`info.verkennenEenheid`** staat niet in het register van Joost: Ik heb de regel toegevoegd (`beheerpagina.md`, punt 2a) met een
+  eigen tekst, de spec noemt alleen "een Info-icoon" naast Eenheid.
 
 **Nog niet gebouwd**: Wat onder Later staat.

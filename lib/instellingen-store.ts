@@ -124,6 +124,11 @@ export function useInstellingen(): Instellingen {
 }
 
 /** Schrijft de instellingen weg zonder te loggen: De aanroeper logt zelf, met de details die bij zijn wijziging horen. */
+/** De instellingen buiten React om, voor berekeningen in de opslag. */
+export function getInstellingen(): Instellingen {
+  return parseSnapshot(getSnapshot());
+}
+
 export function schrijfInstellingen(patch: Partial<Instellingen>): void {
   if (typeof window === "undefined") return;
   const nieuw = { ...parseSnapshot(getSnapshot()), ...patch };

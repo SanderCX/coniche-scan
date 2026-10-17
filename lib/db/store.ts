@@ -6,6 +6,7 @@ import { haalServerKopieOp, stuurNaarServer } from "../server-sync";
 import { migreerTechstackOndersteuning } from "@/lib/techstack";
 import { ruimOrganisatieOp } from "@/lib/metingen";
 import { getBenchmarks, haalMetingenUitBenchmarks, legeToewijzingen, wisOmgezetteToewijzingen } from "@/lib/benchmark-store";
+import { getBenchmarksMetLeden } from "@/lib/benchmark-leden";
 import { ruimLeadToegangOp, toegangSleutel, zetLegacyBereikOm } from "@/lib/lead-toegang";
 import { techstackCategorieIdsMetLijst } from "@/data/organisatie-velden";
 import { migreerFteManagementSupport } from "@/lib/fte";
@@ -163,7 +164,8 @@ export function slaAlles(alles: Organisatie[]): void {
   if (verdwenen.length > 0) haalMetingenUitBenchmarks(verdwenen);
   // De vinkjes van Leads kloppend houden: Een benchmark die er niet meer is of waar de organisatie geen lid meer van is, en
   // alles wat van een verdwenen Meting of Lead was (`datamodel.md`, Verwijderen en datakoppelingen).
-  const benchmarks = getBenchmarks();
+  // Bij een opgeslagen verkenning volgen de leden uit de filters: Voldoet een organisatie niet meer, dan vervalt het vinkje van haar Leads.
+  const benchmarks = getBenchmarksMetLeden(alles);
   for (const organisatie of alles) ruimLeadToegangOp(organisatie, benchmarks);
   const json = JSON.stringify(alles);
   window.localStorage.setItem(KEY, json);

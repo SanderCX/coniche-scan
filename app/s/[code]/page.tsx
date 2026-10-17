@@ -2,7 +2,7 @@
 
 import { use } from "react";
 import { useRespondentPerToegangscode, useOrganisaties } from "@/lib/db";
-import { useBenchmarks } from "@/lib/benchmark-store";
+import { useBenchmarksMetLeden } from "@/lib/use-benchmarks";
 import { leadViewsVoorBenchmark } from "@/lib/benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useAssessments } from "@/lib/assessment-store";
@@ -39,7 +39,7 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
   const gegevens = useRespondentPerToegangscode(code);
   const assessments = useAssessments();
   const intro = useAlgemeneTekst("mijnMetingenIntro");
-  const benchmarks = useBenchmarks();
+  const benchmarks = useBenchmarksMetLeden();
   const organisaties = useOrganisaties();
   const instellingen = useInstellingen();
 
@@ -119,6 +119,7 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
             <path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 9h5a1 1 0 0 1 1 1v11M2 21h20M8 8h2M8 12h2M8 16h2" />
           </svg>
           {organisatie.naam}
+          {isLeadLid && <span className="mm-rolchip">Lead</span>}
         </p>
         <p className="mt-2 text-ink-m" style={{ maxWidth: "46rem" }}>
           {intro}
@@ -126,6 +127,13 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
 
         {leeg && (
           <p className="mm-leeg mt-6">Er staat nog niets voor je klaar. Neem contact op met Coniche als je dit niet verwacht.</p>
+        )}
+
+        {/* Een Lead ziet dat hij Lead is, ook als er (nog) geen Metingen of vergelijkingen voor hem aanstaan. */}
+        {isLeadLid && leadMetingen.length === 0 && benchmarkKaarten.length === 0 && (
+          <p className="mm-leadmelding">
+            Je bent Lead van {organisatie.naam}. Een beheerder bepaalt welke resultaten je hier ziet. Er staat nu nog niets voor je klaar.
+          </p>
         )}
 
         {nogTeDoen.length > 0 && (

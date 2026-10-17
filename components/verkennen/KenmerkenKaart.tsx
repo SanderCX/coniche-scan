@@ -12,6 +12,8 @@ import {
   FilterVeld,
   KANALEN_ID,
   LEGE_FILTERS,
+  ONDERDEEL_ID,
+  ORGANISATIE_ID,
   PoolLid,
   getalWaarden,
   heeftFilters,
@@ -19,10 +21,13 @@ import {
   kanaalAantallen,
   selectOpties,
   veldLabelZonderGroep,
+  waardeLabel,
 } from "@/lib/verkennen";
 
 /** De snelkoppelingen op een lege kaart (`visualisatie-verkennen.md`, Kenmerken en filters): Geen vaste kenmerken. */
 export const SNEL_BEGINNEN = ["techstack.techstack-crm.leverancier", "sector-subsector.sector", "kpis.aht"];
+/** Bij de eenheid Onderdelen staat Organisatie erbij (`visualisatie-verkennen.md`, Eenheid). */
+export const SNEL_BEGINNEN_ONDERDELEN = [...SNEL_BEGINNEN, ORGANISATIE_ID];
 
 /**
  * De kaart Kenmerken (`visualisatie-verkennen.md`, Kenmerken en filters): Het scherm begint leeg. Een toegevoegd kenmerk is
@@ -40,6 +45,9 @@ export function KenmerkenKaart({
   pool,
   gefilterd,
   zonderToestemming,
+  eenheidWoord = "Organisaties",
+  snelBeginnen = SNEL_BEGINNEN,
+  onderTeller,
 }: {
   /** Alle velden die een kenmerk kunnen zijn, ook "Ingezette kanalen". */
   velden: FilterVeld[];
@@ -51,6 +59,11 @@ export function KenmerkenKaart({
   pool: PoolLid[];
   gefilterd: PoolLid[];
   zonderToestemming: number;
+  /** "Organisaties" of "onderdelen" (`visualisatie-verkennen.md`, Eenheid). */
+  eenheidWoord?: string;
+  snelBeginnen?: string[];
+  /** Onder de teller en de balk, bijvoorbeeld de knop Opslaan als benchmark. */
+  onderTeller?: React.ReactNode;
 }) {
   const { korteNamen, verkennenMinIngevuldPct } = useInstellingen();
   const [modalVeld, setModalVeld] = useState<string | null>(null);
@@ -83,7 +96,7 @@ export function KenmerkenKaart({
           </p>
           <div className="vk-chips" style={{ alignItems: "center" }}>
             <span className="text-xs text-ink-s">Snel beginnen:</span>
-            {SNEL_BEGINNEN.map((id) => perId.get(id))
+            {snelBeginnen.map((id) => perId.get(id))
               .filter((v): v is FilterVeld => v !== undefined)
               .map((v) => (
                 <button key={v.id} type="button" className="pil" title={v.label} onClick={() => onToevoegen(v.id)}>
@@ -99,7 +112,7 @@ export function KenmerkenKaart({
               <p className="vk-veldkop" title={veld.label}>
                 {naamVan(veld)}
               </p>
-              {veld.type === "select" && veld.id !== KANALEN_ID && (
+              {veld.type === "select" && veld.id !== KANALEN_ID && veld.id !== ORGANISATIE_ID && veld.id !== ONDERDEEL_ID && (
                 <button
                   type="button"
                   className="vk-potlood"
@@ -140,11 +153,11 @@ export function KenmerkenKaart({
                     key={o.waarde}
                     type="button"
                     className="pil"
-                    title={o.waarde}
+                    title={veld.id === ORGANISATIE_ID ? waardeLabel(pool, veld, o.waarde) : o.waarde}
                     aria-pressed={(stand.select[veld.id] ?? []).includes(o.waarde)}
                     onClick={() => wisselSelect(veld.id, o.waarde)}
                   >
-                    {korteNaamWaarde(korteNamen, veld.id, o.waarde)}
+                    {veld.id === ORGANISATIE_ID ? waardeLabel(pool, veld, o.waarde) : korteNaamWaarde(korteNamen, veld.id, o.waarde)}
                     <span>{o.aantal}</span>
                   </button>
                 ))}
@@ -169,17 +182,27 @@ export function KenmerkenKaart({
 
       <div className="vk-teller">
         <strong>
-          {gefilterd.length} van {pool.length} Organisaties in de pool
+          {gefilterd.length} van {pool.length} {eenheidWoord} in de pool
         </strong>
         <div className="vk-teller-balk" aria-hidden="true">
           <div style={{ width: `${pct}%` }} />
         </div>
+        {eenheidWoord === "onderdelen" && (
+          <span className="text-ink-s" style={{ display: "block" }}>
+            De pool bestaat uit {pool.length} onderdelen van {new Set(pool.map((l) => l.organisatie.id)).size} Organisaties.
+          </span>
+        )}
         {zonderToestemming > 0 && (
           <span className="text-ink-s">
             {zonderToestemming} {zonderToestemming === 1 ? "Organisatie is" : "Organisaties zijn"} niet beschikbaar: Geen toestemming voor benchmark.
           </span>
         )}
       </div>
+
+      {onderTeller}
+      {eenheidWoord === "onderdelen" && (
+        <p className="vk-voet">Elk onderdeel telt even zwaar mee, ook als een Organisatie er meer heeft dan een andere.</p>
+      )}
 
       {modalVeld && perId.get(modalVeld) && (
         <OverzichtModal label="Korte namen" onSluit={() => setModalVeld(null)}>

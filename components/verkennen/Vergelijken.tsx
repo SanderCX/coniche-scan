@@ -48,6 +48,7 @@ export function Vergelijken({
   restLeden,
   minGroep,
   waarschuwing,
+  eenheidWoord = "Organisaties",
 }: {
   opties: GroeperOptie[];
   heeftKenmerken: boolean;
@@ -66,11 +67,13 @@ export function Vergelijken({
   restLeden: PoolLid[];
   minGroep: number;
   waarschuwing: number;
+  /** "Organisaties" of "onderdelen" (`visualisatie-verkennen.md`, Eenheid). */
+  eenheidWoord?: string;
 }) {
   const [bereikMelding, setBereikMelding] = useState<string | null>(null);
   const gekozen = opties.find((o) => o.veld.id === effectief);
   const focus = groepen.find((g) => g.sleutel === focusSleutel);
-  const focusIds = new Set(focus?.leden.map((l) => l.organisatie.id));
+  const focusIds = new Set(focus?.leden.map((l) => l.id));
   const klein = (n: number) => n < waarschuwing;
   const eenheid = gekozen?.veld.eenheid ? ` ${gekozen.veld.eenheid}` : "";
 
@@ -95,7 +98,7 @@ export function Vergelijken({
       const focusStaven = new Array<number>(staven.length).fill(0);
       for (const l of leden) {
         const w = getalWaarden([l], gekozen.veld)[0];
-        if (w !== undefined && focusIds.has(l.organisatie.id)) focusStaven[lid(w)] += 1;
+        if (w !== undefined && focusIds.has(l.id)) focusStaven[lid(w)] += 1;
       }
       const onder = waarden.filter((w) => w <= d).length;
       const stel = (n: number) => {
@@ -176,7 +179,7 @@ export function Vergelijken({
           </div>
           {bereikMelding && <p className="vk-reden">{bereikMelding}</p>}
           <p className="text-sm text-ink-m" style={{ margin: "var(--sp-2) 0 0" }}>
-            Drempel <strong>{formatGetal(d, 1)}{eenheid}</strong> · {onder} Organisaties op of onder de drempel, {waarden.length - onder} erboven ·{" "}
+            Drempel <strong>{formatGetal(d, 1)}{eenheid}</strong> · {onder} {eenheidWoord} op of onder de drempel, {waarden.length - onder} erboven ·{" "}
             {waarden.length} van {leden.length} hebben dit ingevuld
           </p>
         </div>
@@ -189,7 +192,7 @@ export function Vergelijken({
   return (
     <section className="qv-kaart" aria-label="Vergelijken">
       <h3>Vergelijken</h3>
-      <p className="qv-kaart-sub">Groepeer de pool en kies de focusgroep. De rest zijn de Organisaties van de andere groepen.</p>
+      <p className="qv-kaart-sub">Groepeer de pool en kies de focusgroep. De rest zijn de {eenheidWoord} van de andere groepen.</p>
 
       <div className="vis-acties" style={{ marginBottom: "0.4rem" }}>
         <span className="text-sm text-ink-m">Groeperen op</span>
@@ -244,7 +247,7 @@ export function Vergelijken({
                 <span>{g.leden.length}</span>
               </button>
             ))}
-            {groepen.length === 0 && <span className="text-sm text-ink-s">Geen groepen: Geen Organisatie heeft dit kenmerk ingevuld.</span>}
+            {groepen.length === 0 && <span className="text-sm text-ink-s">Geen groepen: Geen enkel lid van de pool heeft dit kenmerk ingevuld.</span>}
           </div>
           {zonderWaarde > 0 && <p className="vk-reden">{zonderWaarde} zonder waarde</p>}
           {focus && (focusLeden.length === 0 || restLeden.length === 0) && (
@@ -257,11 +260,11 @@ export function Vergelijken({
               <span aria-hidden="true">⚠</span>
               <span>
                 {klein(focusLeden.length) && klein(restLeden.length)
-                  ? `De focus telt ${focusLeden.length} en de rest ${restLeden.length} Organisaties`
+                  ? `De focus telt ${focusLeden.length} en de rest ${restLeden.length} ${eenheidWoord}`
                   : klein(focusLeden.length)
-                    ? `De focus telt ${focusLeden.length} Organisaties`
-                    : `De rest telt ${restLeden.length} Organisaties`}
-                . Lees verschillen voorzichtig: Bij zo weinig Organisaties kan een enkele uitschieter het gemiddelde bepalen.
+                    ? `De focus telt ${focusLeden.length} ${eenheidWoord}`
+                    : `De rest telt ${restLeden.length} ${eenheidWoord}`}
+                . Lees verschillen voorzichtig: Bij zo weinig {eenheidWoord} kan een enkele uitschieter het gemiddelde bepalen.
               </span>
             </p>
           )}

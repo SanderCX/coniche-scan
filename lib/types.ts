@@ -439,6 +439,18 @@ export type Classificatie = "rood" | "oranje" | "groen";
  */
 export type BenchmarkNiveau = "organisaties" | "metingen" | "scans";
 
+/** Een benchmark tussen organisaties is een vaste groep (gekozen leden) of een verkenning (leden volgen uit filters, `benchmark.md`, Opgeslagen verkenning). */
+export type BenchmarkSoort = "vasteGroep" | "verkenning";
+
+/** De eenheid van een verkenning: Een lid is een Organisatie of een onderdeel (een Meting met een onderdeel). */
+export type VerkenEenheid = "organisaties" | "onderdelen";
+
+/** Eén filter van een opgeslagen verkenning: Een kenmerk (een veld, `__kanalen`, `__organisatie` of `__onderdeel`) met de gekozen waarden. */
+export interface VerkenningFilter {
+  kenmerk: string;
+  waarden: string[];
+}
+
 /**
  * Hoe de Metingen van een benchmark binnen een organisatie gelezen worden (`benchmark.md`, Niveau 2, Lezing): De ontwikkeling
  * van één onderdeel over de tijd (weergave C), of Metingen op een vergelijkbaar meetmoment naast elkaar (weergave H).
@@ -454,6 +466,12 @@ export interface Benchmark {
    * `scans` één Meting waarin de afgeronde scans worden vergeleken. Ontbreekt het veld, dan is het `organisaties`.
    */
   niveau?: BenchmarkNiveau;
+  /** Alleen bij niveau `organisaties` (voorstel van 16 oktober 2026): Ontbreekt het veld, dan is het een vaste groep. */
+  soort?: BenchmarkSoort;
+  /** Alleen bij soort `verkenning`. */
+  eenheid?: VerkenEenheid;
+  /** Alleen bij soort `verkenning`, minstens één. De leden zijn leeg en volgen bij elk gebruik uit deze filters. */
+  filters?: VerkenningFilter[];
   /**
    * Alleen bij niveau `metingen` (`benchmark.md`, Niveau 2, Lezing): Hoe de Metingen gelezen worden. Ontbreekt het veld, dan
    * volgt de lezing uit de Metingen zelf (`lezingVan` in `lib/benchmark.ts`).

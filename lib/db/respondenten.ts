@@ -6,6 +6,7 @@ import { laadAlles, slaAlles, useOrganisaties } from "./store";
 import { metingenMetToegang, ruimLeadToegangOp, toegangSleutel } from "../lead-toegang";
 import { logAudit, nieuweGroepId } from "../audit-store";
 import { getBenchmarks } from "../benchmark-store";
+import { getBenchmarksMetLeden } from "../benchmark-leden";
 import { metingContext, organisatieContext } from "../audit-context";
 
 /** Respondenten (in de code `OrganisatieLid`): uitnodigen, Lead-toegang, gegevens, verwijderen en opzoeken via toegangscode. */
@@ -227,7 +228,7 @@ export function slaLeadToegangOp(organisatieId: string, wijzigingen: LeadToegang
   }
   organisatie.leadToegang = [...lijst.values()];
   // Wat van een uitgezet vinkje afhangt gaat mee uit, en een vinkje dat niet kan wordt niet gezet.
-  ruimLeadToegangOp(organisatie, getBenchmarks());
+  ruimLeadToegangOp(organisatie, getBenchmarksMetLeden(laadAlles()));
   const na = new Set(organisatie.leadToegang.map(toegangSleutel));
   const gewijzigd = [...new Set([...voor, ...na])].filter((k) => voor.has(k) !== na.has(k));
   if (gewijzigd.length === 0) return 0;
