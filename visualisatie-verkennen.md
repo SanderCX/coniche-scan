@@ -4,15 +4,17 @@ Spec voor het Admin-scherm Verkennen, waar je alle Organisaties van één Assess
 
 **Status: Voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026.** Er is een visual design (Claude Design, "Coniche Scan Verkennen") met voorbeelddata. Dat design (versie 6) toont ook het gedrag van Kenmerken en Groeperen op zoals hieronder beschreven (besloten op 15 oktober 2026), met een gedeeltelijke kenmerkenlijst: Sector, CRM-pakket, LLM-oplossing, Ingezette kanalen, AHT, NPS en FTR. De keuzes bij het bouwen staan onder Gebouwd. De korte namen, de pilvormige groep en de celtinten zijn gebouwd op 15 oktober 2026 (zie Gebouwd). Kenmerken en Groeperen op zijn gebouwd op 15 oktober 2026 naar versie 6 van het visual design. De vijf instelbare drempels (zie Drempels) zijn gebouwd op 15 oktober 2026. Twee wijzigingen daarop zijn voorstel van 15 oktober 2026 en nog niet gebouwd: Het percentage Kenmerk ingevuld mag 0 zijn (geen ondergrens), en de reden bij een uitgeschakelde pil noemt de instelling erachter. Wat in dit document staat als "Besloten" komt uit het gesprek van 15 oktober 2026.
 
+Voorstel van 16 oktober 2026, ontworpen in versie 14 van het visual design (nog niet gebouwd): De eenheid Onderdelen (Eenheid) en Opslaan als benchmark.
+
 ## Wat het is
 
 Verkennen is bedoeld om vragen te beantwoorden als "scoren Organisaties met pakket X anders dan de rest?" en "hoe verschillend zijn de Organisaties die pakket X gebruiken onderling?". Het werkt op de hele pool van een Assessment, met kenmerken waarop je tijdens het kijken filtert en groepeert.
 
 Het verschilt van de benchmark tussen Organisaties (`benchmark.md`, niveau 1):
 
-- Een benchmark is een samengestelde groep die de Admin opslaat, bedoeld om aan een Lead te laten zien. Verkennen slaat niets op.
+- Een benchmark is een samengestelde groep die de Admin opslaat, bedoeld om aan een Lead te laten zien. Verkennen slaat zelf niets op. Wel kan de Admin de filters opslaan als benchmark (Opslaan als benchmark), en dan is dat een Verkenning-benchmark met de leden die uit de filters volgen.
 - Bij een benchmark kiest de Admin eerst de leden. Bij Verkennen is de hele pool het uitgangspunt en maken de gekozen waarden bij de kenmerken die kleiner.
-- Verkennen is voor de Admin. Een Lead ziet het nooit.
+- Verkennen is voor de Admin. Een Lead ziet het scherm nooit. Een Lead kan wel een opgeslagen verkenning als benchmark krijgen (`benchmark.md`, Niveau 1, Opgeslagen verkenning).
 
 De rekenregels van de benchmark gelden ook hier (`benchmark.md`, Gedeelde regels). Dat zijn één Meting per Organisatie en een gelijk gewicht voor elke Organisatie.
 
@@ -21,6 +23,21 @@ De rekenregels van de benchmark gelden ook hier (`benchmark.md`, Gedeelde regels
 ## Plek in beheer
 
 De tab Verkennen onder de hoofdlink Resultaten, naast Metingen en Benchmarks, alleen zichtbaar voor een Admin (`beheerpagina.md`, punt 7 en 15). Kruimelpad Resultaten › Verkennen. Bovenaan staat de keuze van het Assessment. Alles daaronder werkt binnen dat ene Assessment.
+
+## Eenheid
+
+**Voorstel van 16 oktober 2026, ontworpen.** Boven de kaart Kenmerken staat een pilvormige groep Eenheid met Organisaties en Onderdelen, naast een Info-icoon. Organisaties is de standaard en is wat hierboven staat.
+
+- **Organisaties.** Elke Organisatie telt één keer mee, met haar meest recente Meting (Pool).
+- **Onderdelen.** Elke Meting met een onderdeel is een eenheid (`benchmark.md`, Onderdeel en samengestelde Meting). Een Organisatie met drie onderdelen telt dus drie keer. Een Organisatie met één onderdeel heet in de lijst "Hele organisatie". Per onderdeel telt de meest recente Meting die aan `benchmarkMinScans` voldoet. De pool, de teller en de balk, de drempels, de groepen en de teksten gaan over onderdelen en gebruiken het woord "onderdelen". Een regel onder de teller noemt uit hoeveel Organisaties de pool bestaat.
+- **Gelijk gewicht.** Elk onderdeel telt even zwaar, ook als een Organisatie er meer heeft dan een andere (`benchmark.md`, Gedeelde regels). Een Organisatie met vier onderdelen telt dus vier keer zwaar in het gemiddelde. De voettekst zegt dat.
+- **Drempels.** Dezelfde vijf instellingen (Drempels) gelden voor onderdelen, met de eenheid onderdelen in de tekst. Er komen geen aparte instellingen bij.
+- **Nieuwe kenmerken.** Alleen bij Onderdelen staan er twee kenmerken bij in het menu, in de groep "Organisatie en onderdeel".
+  - **Organisatie.** De pillen zijn de Organisaties die meer dan één onderdeel hebben, want een Organisatie met één onderdeel heeft niets om naast elkaar te zetten. Dit kenmerk kan filteren en groeperen. Groeperen op Organisatie geeft de Organisaties als groepen van onderdelen.
+  - **Onderdeel.** De pillen zijn de namen van de onderdelen. Namen verschillen per Organisatie ("Particulier" bij de ene, "Retail" bij de andere), dus Onderdeel kan alleen groeperen als de filters op één Organisatie staan. Anders staat de pil uitgeschakeld, met de reden "Onderdelen heten per Organisatie anders. Filter eerst op één Organisatie".
+- **Wisselen van eenheid.** Wisselt de Admin van Onderdelen naar Organisaties, dan vervallen de kenmerken Organisatie en Onderdeel en hun filters. Was een van beide de groepering, dan geldt de terugval (Groeperen en focus), met de reden "Organisatie en Onderdeel bestaan alleen bij Eenheid Onderdelen".
+- **Snel beginnen.** De pillen bij Snel beginnen volgen de eenheid. Bij Onderdelen is Organisatie er een van.
+- **Weergaven.** Ongewijzigd. De naam in de heatmap en in de lijsten is bij Onderdelen "{Organisatie}, {onderdeel}", of de naam van de Organisatie bij "Hele organisatie".
 
 ## Pool
 
@@ -159,11 +176,25 @@ Alle opmaak staat in `stylesheet.md`. Het ontwerp gebruikt de bestaande tokens, 
 
 Kleuren in de grafieken: Focus oranje (`--or`), rest grijs (`rgba(136,136,132,.5)`), gemiddelde van de rest `--ink-m`, verschil boven 0 blauw (`--bl`) en onder 0 donkeroranje (`--dal`). De scorekleuren staan alleen op absolute scores, zoals de eerste kolom van de heatmap, en daar als celtint. Er is geen zwarte vulling of rand. Lettergroottes komen uit de schaal van acht maten (`stylesheet.md`, Lettergroottes), ook in de grafieken (minimaal 12px).
 
+## Opslaan als benchmark
+
+**Voorstel van 16 oktober 2026, ontworpen.** Zo wordt een verkenning een benchmark op niveau 1 die een Lead kan krijgen (`benchmark.md`, Niveau 1, Opgeslagen verkenning). Dit is de enige plek waar Verkennen iets bewaart.
+
+- **Knop.** Onder de teller en de balk in de kaart Kenmerken staat "Opslaan als benchmark" met een Info-icoon (`info.verkennenOpslaan`). De Admin heeft hiervoor `benchmark.beheren` nodig.
+- **Uitgeschakeld.** Zonder filter, met de reden "Zet eerst een filter, anders is de groep de hele pool". En als de pool kleiner is dan `verkennenMinPool`, met de reden "Minder dan {n} {Organisaties of onderdelen} in de pool". De reden staat naast de knop.
+- **Paneel.** De knop opent onder zich een paneel met het veld Naam (maximaal 60 tekens, "zichtbaar voor de Lead"), de filters die worden opgeslagen als regels ("CRM-pakket is Salesforce", bij meerdere waarden "of", bij Ingezette kanalen "alle van"), en de zin "Nu {n} {eenheid} in de groep. De Lead ziet de eigen scores tegenover de rest van de groep. Alleen de eigen Organisatie en haar onderdelen staan met naam in beeld." Daaronder "Opslaan" en "Annuleren". Opslaan is uitgeschakeld zolang de naam leeg is.
+- **Voorgestelde naam.** Is er één filter met één waarde, dan staat er "Organisaties met {waarde}" voorgevuld. In andere gevallen is het veld leeg. De Admin kiest een naam die voor een Lead logisch leest.
+- **Na Opslaan.** Een groene regel: "Opgeslagen als {naam}. Wijs hem toe in het Leads-venster van een Organisatie die erin zit." De stand in Verkennen blijft zoals hij was.
+- **Wat er wordt bewaard.** De naam, het Assessment, de eenheid en de filters. Niet de groepering, de focus, de drempel van een getalkenmerk of de uitkomst.
+- **Toewijzen.** Gebeurt niet hier maar in het Leads-venster van de Organisatie (`beheerpagina.md`, punt 6a). Daar staat een kolom met de badge Verkenning en het aantal Organisaties (visual design, bord "Leads-venster").
+- **Terugvinden en wijzigen.** In de tab Benchmarks (`beheerpagina.md`, punt 14). Een opgeslagen verkenning opent niet terug in Verkennen. Dat staat bij Later.
+
 ## Privacy en rechten
 
 - Alleen een Admin ziet Verkennen, met de permissie `verkennen.inzien` (`datamodel.md` deel 2, Rechtenmatrix). Dat sluit aan op de benchmark, waar de Admin de namen van de Organisaties ook ziet (`benchmark.md`, Weergave voor de Admin).
 - Er is geen minimale groepsgrootte voor het tonen van cijfers aan de Admin. Wel geldt de waarschuwing bij kleine groepen.
-- Het scherm slaat niets op. De kenmerken, de gekozen waarden en de groepering verdwijnen als de Admin het scherm verlaat.
+- Het scherm slaat zelf niets op. De kenmerken, de gekozen waarden en de groepering verdwijnen als de Admin het scherm verlaat. Alleen Opslaan als benchmark bewaart de filters, voor een Admin met `benchmark.beheren`.
+- Een opgeslagen verkenning is voor een Lead een benchmark op niveau 1. De drempels van het scherm Verkennen gelden niet voor de Lead. Voor hem geldt `benchmarkMinOrganisaties` (`benchmark.md`, Opgeslagen verkenning).
 
 ## Later
 
@@ -171,13 +202,15 @@ Kleuren in de grafieken: Focus oranje (`--or`), rest grijs (`rgba(136,136,132,.5
 - **Operationele KPI's als kenmerk.** Dit werkt vanzelf zodra ze organisatievelden zijn.
 - **Filter op bereik bij getallen** (twee handvatten met histogram, of één drempel). Nu is een getal alleen te gebruiken bij Groeperen op.
 - **AHT per kanaal.** Dit is een wijziging in het datamodel: AHT wordt een subveld bij elk kanaal in plaats van één los KPI-veld. Het filter combineert dan "kanaal ingezet" met een AHT-slider voor dat kanaal. Dit moet Sander inpassen in `datamodel.md`.
-- **Bewaren als benchmark.** Een filterstand kan een benchmark worden (`benchmark.md`, Samenstellen), en dat is ook de route om het resultaat aan een Lead te tonen.
+- **Een opgeslagen verkenning weer openen in Verkennen.** Nu staan de filters als regels in de tab Benchmarks. Terug openen in Verkennen om verder te kijken staat nog open.
 - **Export** van de gefilterde pool als CSV (`export-csv.md`).
 - **Quickscan Ziekenhuis.** De antwoorden zijn percentages (`visualisatie-quickscan.md`), dus de schaal wordt 0 tot 100%, met de classificatiekleuren van de Quickscan.
 - **Meerdere Metingen per Organisatie.** Nu telt de meest recente. Een tijdsdimensie hoort bij niveau 2 van de benchmark.
 
 ## Open punten
 
+- Eenheid Onderdelen: Welke Meting telt als een samengestelde Meting en haar onderliggende Metingen allebei voor hetzelfde onderdeel in aanmerking komen (`benchmark.md`, Open punten).
+- Eenheid Onderdelen: Of een Organisatie met vele onderdelen te zwaar meetelt in het gemiddelde. Nu telt elk onderdeel even zwaar, de voettekst zegt het.
 - Werken meerdere gekozen kanalen als "en" of als "of"? Het ontwerp gebruikt "en".
 - Zijn 3, 5, 6, 12 en 40% de juiste startwaarden voor de vijf drempels (zie Drempels)? Met ongeveer 10 Organisaties per branche vallen combinaties van sector en pakket snel onder 5.
 - Welke drie pillen staan bij Snel beginnen? Nu CRM-pakket, Sector en AHT. Het kunnen er ook meer of andere zijn.

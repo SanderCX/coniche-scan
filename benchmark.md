@@ -1,6 +1,6 @@
 # Coniche Scan: Benchmark
 
-**Status.** Niveau 1 (tussen organisaties) is gebouwd (PR 61, 8 oktober 2026). Niveau 2 (binnen een organisatie, tussen Metingen) en niveau 3 (binnen een Meting) zijn besproken met Joost en Sander en nog niet gebouwd. De records staan in `datamodel.md` deel 3, de schermen in `beheerpagina.md` punt 14 en de privacytekst in `privacy-pagina.md` sectie 3a. Dit bestand beschrijft het gedrag. Per onderdeel staat of het besloten, gebouwd of een voorstel is dat nog bevestiging vraagt.
+**Status.** Niveau 1 (tussen organisaties) is gebouwd (PR 61, 8 oktober 2026). Niveau 2 (binnen een organisatie, tussen Metingen) en niveau 3 (binnen een Meting) zijn besproken met Joost en Sander en nog niet gebouwd. De records staan in `datamodel.md` deel 3, de schermen in `beheerpagina.md` punt 14 en de privacytekst in `privacy-pagina.md` sectie 3a. Dit bestand beschrijft het gedrag. Per onderdeel staat of het besloten, gebouwd of een voorstel is dat nog bevestiging vraagt. Voorstel van 16 oktober 2026: Een filterstand uit Verkennen is op te slaan als benchmark op niveau 1 en aan een Lead te geven (Niveau 1, Opgeslagen verkenning).
 
 ## Wat het is
 
@@ -16,7 +16,7 @@ Een benchmark kan één of meer Assessments omvatten, bijvoorbeeld de Klantconta
 
 Scores worden berekend en nooit opgeslagen (`datamodel.md`, Scoreberekening). Dat geldt voor alle niveaus.
 
-Naast de benchmark bestaat Verkennen (gebouwd op 15 oktober 2026, `visualisatie-verkennen.md`). Daar werkt de Admin op de hele pool van een Assessment met filters die hij tijdens het kijken wisselt, zonder een groep samen te stellen en zonder iets op te slaan. Verkennen gebruikt dezelfde rekenregels als niveau 1 (Gedeelde regels hieronder) en is niet voor een Lead. Een filterstand kan later een benchmark worden.
+Naast de benchmark bestaat Verkennen (gebouwd op 15 oktober 2026, `visualisatie-verkennen.md`). Daar werkt de Admin op de hele pool van een Assessment met filters die hij tijdens het kijken wisselt, zonder een groep samen te stellen en zonder iets op te slaan. Verkennen gebruikt dezelfde rekenregels als niveau 1 (Gedeelde regels hieronder) en is zelf niet voor een Lead. Een Admin kan de filters opslaan als benchmark (Niveau 1, Opgeslagen verkenning). Dat is de route om een verkenning aan een Lead te tonen.
 
 ## Plek in beheer
 
@@ -28,7 +28,7 @@ Naast de benchmark bestaat Verkennen (gebouwd op 15 oktober 2026, `visualisatie-
 
 De records staan in `datamodel.md`, deel 3. Het zijn `Benchmark`, `BenchmarkLid` (een organisatie met een Assessment en een Meting) en `LeadToegang` met `weergave: "benchmark"` (een vinkje van een Lead voor een benchmark, `datamodel.md` deel 2), plus het veld `Organisatie.benchmarkToegestaan`. De twee instellingen `benchmarkMinOrganisaties` (startwaarde 5) en `benchmarkMinScans` (startwaarde 3) staan in `beheerpagina.md`, punt 10. Zie Drempels hieronder.
 
-Het niveau staat als veld op de benchmark (voorstel, zie `datamodel.md`). Een benchmark zonder niveau is een benchmark tussen organisaties. Het sectorfilter bij het samenstellen wordt niet opgeslagen, het is een zoekhulp.
+Het niveau staat als veld op de benchmark (voorstel, zie `datamodel.md`). Een benchmark zonder niveau is een benchmark tussen organisaties. Het sectorfilter bij het samenstellen wordt niet opgeslagen, het is een zoekhulp. Een opgeslagen verkenning slaat wel filters op en geen leden (Niveau 1, Opgeslagen verkenning).
 
 ## Gedeelde regels
 
@@ -112,11 +112,29 @@ De view toont nooit de namen van andere organisaties. De Admin bekijkt de view e
 
 **Rechten.** In de rechtenmatrix staat `benchmark.inzien` voor de Lead, met het bereik "aangevinkte benchmarks" (`datamodel.md` deel 2). Het prototype kent dit recht nog niet als aparte regel in `lib/rechten.ts`. Het recht in de matrix is het doel voor de rolrechten die met de database komen. De niveaus 2 en 3 en de overige regels staan onder View voor een Lead, verderop.
 
+### Opgeslagen verkenning
+
+**Voorstel van 16 oktober 2026, ontworpen in "Coniche Scan Verkennen" (Opslaan als benchmark en het bord Leads-venster), nog niet gebouwd.** Een Admin die in Verkennen (`visualisatie-verkennen.md`) een groep heeft gevonden, slaat de filters op als benchmark op niveau 1. Een Lead ziet dan hoe hij scoort ten opzichte van bijvoorbeeld alle Organisaties met Salesforce, zonder dat de Admin leden hoeft aan te vinken. De keuzes hieronder zijn op 16 oktober 2026 met Joost besproken.
+
+- **Soort.** Een benchmark op niveau 1 is een Vaste groep (de leden zijn gekozen, zoals hierboven beschreven) of een Verkenning (de leden volgen uit filters). In de lijst en in het Leads-venster staat het soort als badge.
+- **Wat er wordt opgeslagen.** De naam, het Assessment, de eenheid (Organisaties of Onderdelen) en de filters, dus de kenmerken met de gekozen waarden. De groepering, de focus en de drempel van een getalkenmerk horen bij het kijken en worden niet opgeslagen. De uitkomst ook niet. Een verkenning zonder filter is de hele pool en kan niet worden opgeslagen.
+- **Leden.** De leden worden bij elk gebruik bepaald uit de filters, met de poolregels van Verkennen (`visualisatie-verkennen.md`, Pool). Dat zijn de Organisaties met `benchmarkToegestaan` en per Organisatie de meest recente Meting met minstens `benchmarkMinScans` afgeronde scans. Komt er een Organisatie bij die aan de filters voldoet, dan telt ze mee, en valt er een af, dan verdwijnt ze. Bij een Vaste groep ligt de samenstelling vast (Gedeelde regels). Hier niet.
+- **Eenheid Onderdelen.** Een lid is dan een onderdeel in plaats van een Organisatie, dus een Meting met onderdeel of een samengestelde Meting. Een Organisatie kan meerdere leden hebben en elk lid telt even zwaar (Gedeelde regels). Per onderdeel telt de meest recente Meting die aan `benchmarkMinScans` voldoet. Een samengestelde Meting en haar eigen onderliggende Metingen tellen niet allebei mee. Welke dan telt, staat bij de open punten.
+- **Toewijzen.** Via het Leads-venster van een Organisatie (`beheerpagina.md`, punt 6a), zoals bij een Vaste groep. De kolom staat er alleen als de Organisatie in de uitkomst zit. Bij de eenheid Organisaties betekent dat dat ze aan de filters voldoet, bij de eenheid Onderdelen dat minstens één onderdeel van haar eraan voldoet. Een Lead van een Organisatie die buiten de groep valt, kan de benchmark dus niet krijgen. De Admin kan dezelfde verkenning aan meerdere Leads geven, en een Lead kan meerdere benchmarks krijgen.
+- **Wat de Lead ziet.** De view van niveau 1 (View per organisatie): Zijn eigen Organisatie tegenover de rest van de groep, zonder de eigen Organisatie in die rest. De naam van de benchmark en de filters zijn zichtbaar, de ledenlijst niet. De Lead ziet nooit de namen van andere Organisaties of van hun onderdelen. Bij de eenheid Onderdelen ziet hij de onderdelen van zijn eigen Organisatie met naam, naast de rest van de groep als anoniem gemiddelde. De naam van de benchmark is zichtbaar voor de Lead, dus de Admin kiest een naam die iets zegt.
+- **Drempels.** Voor wat een Lead ziet geldt `benchmarkMinOrganisaties` (Drempels hieronder). Die telt altijd Organisaties, ook bij de eenheid Onderdelen, want vijf onderdelen uit twee Organisaties zijn te herleiden. De drempel is een instelling die een Admin kan aanpassen. De drempels van Verkennen zelf (`verkennenMinPool` en de andere) gelden voor de Admin tijdens het kijken en niet voor de Lead.
+- **Filter op één Organisatie.** Staat er in de filters maar één Organisatie (bijvoorbeeld de onderdelen van Univé), dan is er geen rest die anoniem moet blijven. `benchmarkMinOrganisaties` geldt dan niet. `benchmarkMinScans` geldt per Meting wel. De Lead ziet zijn eigen onderdelen naast elkaar, met naam.
+- **Onder de drempel.** De cel in het Leads-venster is grijs, met de reden en het aantal Organisaties in de groep. De Admin ziet de benchmark altijd. In het Leads-venster staat bij elke kolom van een verkenning het aantal Organisaties, zodat de Admin dit voor het aanvinken weet.
+- **Aanpassen.** De Admin kan de naam en de filters achteraf wijzigen. Staan er Leads aan, dan zegt de bevestiging hoeveel. Valt een Organisatie door de wijziging buiten de groep, dan vervalt het vinkje van haar Leads. Het Assessment en de eenheid zijn niet te wijzigen, daarvoor maakt de Admin een nieuwe verkenning.
+- **Vervallen.** Zoals bij een Vaste groep (View voor een Lead, Vervallen). Daar komt bij dat de Organisatie niet meer aan de filters voldoet, bijvoorbeeld omdat een kenmerk is gewijzigd of `benchmarkToegestaan` is ingetrokken.
+- **Peildatum.** De cijfers zijn live (Gedeelde regels). De peildatum is het moment van openen.
+- **Wie maakt hem aan.** Alleen een Admin (`benchmark.beheren`), vanuit Verkennen met de knop Opslaan als benchmark (`visualisatie-verkennen.md`, Opslaan als benchmark). Aanmaken vanuit de tab Benchmarks is er niet, want de filters horen bij het kijken.
+
 ### Drempels
 
 **Gebouwd.** Twee instellingen, door een Admin aan te passen (Instellingen, Drempels en termijnen).
 
-- `benchmarkMinOrganisaties` (startwaarde 5). Minimale groepsgrootte per Assessment, inclusief de organisatie van de view. Bij 5 ziet een Lead het gemiddelde van minstens 4 anderen. De drempel is een afweging op privacy. Bij minder anderen kan een deelnemer uit het groepsgemiddelde en zijn eigen score vrij precies afleiden wat de rest scoort. De Admin ziet de benchmark altijd, ook onder de drempel.
+- `benchmarkMinOrganisaties` (startwaarde 5). Minimale groepsgrootte per Assessment, inclusief de organisatie van de view. Bij 5 ziet een Lead het gemiddelde van minstens 4 anderen. De drempel is een afweging op privacy. Bij minder anderen kan een deelnemer uit het groepsgemiddelde en zijn eigen score vrij precies afleiden wat de rest scoort. De Admin ziet de benchmark altijd, ook onder de drempel. Bij een opgeslagen verkenning met de eenheid Onderdelen telt de drempel Organisaties en geen onderdelen (Opgeslagen verkenning).
 - `benchmarkMinScans` (startwaarde 3). Minimaal aantal afgeronde scans in een Meting om gekozen te mogen worden. Dit gaat over betrouwbaarheid, omdat een score uit één of twee scans te weinig zegt, zeker met gelijk gewicht per lid.
 - `benchmarkMaxDagenTussenMetingen` (gebouwd, startwaarde 90). Alleen voor niveau 2 met de lezing Naast elkaar: Het aantal dagen tussen de oudste en de nieuwste meetdatum waarboven de Admin een waarschuwing krijgt dat het geen vergelijkbaar meetmoment meer is. Het is geen blokkade.
 
@@ -194,6 +212,7 @@ Een Meting die verwijst naar andere Metingen (`Meting.samenstelling`) en daarvan
 **Gebouwd op 14 oktober 2026.** Dit vervangt de onderdelen "Bereik van een Lead" en "Toewijzen aan een Lead op alle niveaus" (niveau 1 gebouwd op 13 oktober 2026, niveau 2 en 3 voorstel). Eén Leads-venster per organisatie bepaalt wat een Lead ziet (`beheerpagina.md`, punt 6a). Voor benchmarks is dat één kolom per benchmark waar de organisatie in zit, met een vinkje per Lead. Een Lead heeft geen bereik meer en een view wordt niet meer op de view zelf toegewezen.
 
 - **Niveau 1.** De Lead krijgt de view van de organisatie tegenover de rest van de groep, als de organisatie in de benchmark zit. Resultaten is niet nodig, omdat de view de scores van de eigen organisatie zelf al toont. De lid-Meting kan per Assessment een andere zijn, en is vaak een samengestelde Meting (Onderdeel en samengestelde Meting). De Lead ziet alleen de secties die aan de drempel voldoen.
+- **Opgeslagen verkenning (niveau 1).** Een Lead krijgt een Verkenning op dezelfde manier als een Vaste groep, met een vinkje in zijn kolom van het Leads-venster, en alleen als zijn Organisatie in de uitkomst zit. Wat hij ziet en welke drempels gelden, staat onder Niveau 1, Opgeslagen verkenning.
 - **Niveau 2.** De Lead ziet de vergelijking met de Metingen die lid zijn van de benchmark en waarvoor hij Resultaten heeft, en niet meer dan dat. Heeft hij Resultaten op minder dan twee van de leden, dan is er niets te vergelijken en is de cel in de tabel grijs. Bij twee leden moet hij dus beide hebben.
 - **Niveau 3.** De spreiding binnen een Meting krijgt een Lead als kolom Spreiding in het Leads-venster, zonder ring (`visualisatie-scores.md`, onderdeel B). Positie in de Meting, de ring op één scan, blijft voor de Admin. Een Lead die de antwoorden mag zien, krijgt ze via Antwoorden (`visualisatie-scores.md`, onderdeel G).
 - **Geen scan nodig.** Een Lead kan een view krijgen zonder zelf een scan te hebben.
@@ -229,6 +248,8 @@ De gebeurtenissen staan in `datamodel.md`, Audit, onder Benchmark. Wat een verwi
 - Niveau 2: Of voor het privacy statement iets nodig is, nu de gegevens binnen de organisatie blijven.
 - Niveau 3: De grenzen van het spreidingslabel en de vraag of een Admin bij een stip de naam kan zien (`visualisatie-scores.md`, Open punten).
 - Niveau 1: Of de band en de kwartielen van de groep een eigen drempel krijgen.
+- Opgeslagen verkenning, eenheid Onderdelen: Welke Meting telt als een samengestelde Meting en haar onderliggende Metingen allebei aan de filters voldoen, en of een Consultant later een verkenning mag opslaan.
+- Opgeslagen verkenning: Wat er gebeurt als een kenmerk uit de organisatievelden verdwijnt waarop een verkenning filtert. Voorstel: Er staat een melding bij de benchmark, de groep is leeg en de cel van elke Lead is grijs.
 - Niveau 1: Of de matrix bij heel veel organisaties een andere weergave nodig heeft dan horizontaal scrollen.
 - Niveau 2: Hoe de weergave eruitziet bij meer dan twee Metingen, bijvoorbeeld een lijn per bouwblok over de meetdata. De eerste versie vergelijkt twee.
 - Samengestelde Meting: Wat er gebeurt als er één onderliggende Meting overblijft, en de aanvulling in `datamodel.md`, Verwijderen en datakoppelingen.

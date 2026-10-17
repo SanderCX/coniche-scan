@@ -324,7 +324,7 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
 - **Minimale groepsgrootte benchmark** (`benchmarkMinOrganisaties`,
   startwaarde 5): Het minimale aantal organisaties per Assessment in een
   benchmark, inclusief de organisatie van de view, om die view voor een Lead
-  aan te kunnen vinken in het Leads-venster. Eén getal voor deze drempel van niveau 1. De betekenis
+  aan te kunnen vinken in het Leads-venster. Bij een opgeslagen verkenning telt hij altijd Organisaties, ook bij de eenheid Onderdelen (voorstel van 16 oktober 2026). Eén getal voor deze drempel van niveau 1. De betekenis
   staat in `benchmark.md`, Drempels. Het privacy statement noemt dezelfde
   waarde (`privacy-pagina.md`, sectie 3a).
 - **Minimaal aantal scans per Meting in een benchmark**
@@ -424,7 +424,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.verkennen` | Verkennen, naast de paginatitel | Verkennen werkt op de pool van één Assessment: De Organisaties met toestemming voor benchmark die een Meting hebben met genoeg afgeronde scans, de meest recente per Organisatie. Elke Organisatie telt even zwaar mee. Het scherm slaat niets op en een Lead ziet het nooit. |
 | `info.verkennenDrempels` | Instellingen, Drempels en termijnen, formulier Verkennen | Een groep met minder organisaties dan het minimum is gestreept en krijgt in de heatmap geen cijfers. Heeft de focus of de rest minder organisaties dan de waarschuwingsgrens, dan staat er een waarschuwing dat verschillen voorzichtig gelezen moeten worden. Dat is geen blokkade. |
 | `info.benchmarkVlag` | Organisatie-detail, bij de schakelaar "Doet mee aan benchmark" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks. |
-| `info.leadToegangCel` | Leads-venster van de organisatie, in een grijze cel | De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark. |
+| `info.leadToegangCel` | Leads-venster van de organisatie, in een grijze cel | De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark. Bij een Verkenning met te weinig Organisaties staat er: "Te weinig Organisaties in deze groep: {n}, minimaal {min}." |
 | `info.antwoordenMetNamen` | Organisatie-detail, bij de schakelaar "Namen tonen bij Antwoorden" | Uit: Leads zien de antwoorden als R1 tot en met Rn. Aan: Leads zien de namen van de respondenten. Stem dit af met de opdrachtgever voordat je het aanzet. Het geldt voor alle Leads van deze organisatie. |
 | `info.benchmarkAanmaken` | Benchmark aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark heeft een naam nodig, minstens één Assessment en minstens één organisatie die je hebt aangevinkt. Een organisatie staat alleen in de lijst als ze meedoet aan benchmarks en een Meting heeft van een gekozen Assessment met genoeg afgeronde scans. |
 | `info.benchmarkAanmakenMetingen` | Benchmark binnen een organisatie aanmaken of wijzigen, achter de uitgeschakelde knop | Een vergelijking tussen Metingen heeft een naam nodig, een organisatie, een Assessment en precies twee Metingen. Een Meting is alleen te kiezen met een meetdatum en genoeg afgeronde scans. |
@@ -434,6 +434,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.verkennenInstellingen` | Instellingen, Drempels en termijnen, formulier Verkennen | Grenzen voor Verkennen. Een groep onder het minimum is gestreept en krijgt geen cijfers. Bij een kleinere focus of rest staat een waarschuwing. In een kleinere pool kun je niet groeperen. Een kenmerk met meer waarden dan het maximum of een lagere invulling dan het minimum kan niet groeperen. |
 | `info.verkennenKenmerken` | Verkennen, kaart Kenmerken, naast de titel | Zet hier een kenmerk neer om op te filteren en om op te groeperen. Een kenmerk zonder gekozen waarde filtert niets. Filteren op bereik bij getallen volgt later. |
 | `info.verkennenGroeperen` | Verkennen, naast het label Groeperen op | Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties. Is er nog geen kenmerk, dan staat er: Er is nog geen kenmerk om op te groeperen. Voeg bij Kenmerken een kenmerk toe, dan kun je de Organisaties erop in groepen verdelen. |
+| `info.verkennenOpslaan` | Verkennen, naast de knop Opslaan als benchmark | Je slaat de filters op en niet de uitkomst. De groep volgt de filters: Komt er een Organisatie bij die erbij past, dan telt die mee. Daarna wijs je de benchmark toe aan een Lead van een Organisatie die erin zit, in het Leads-venster van die Organisatie. |
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
 
 Elk nieuw Info-icoon krijgt hier een regel en een regel in
@@ -1178,7 +1179,14 @@ daarom staat ze niet op de pagina zelf maar in een eigen venster.
     Metingen. Een samengestelde Meting heeft de badge "Gemiddelde" en alleen
     de kolom Resultaten, want ze heeft geen scans en geen Respondenten.
   - Per benchmark waar deze organisatie in zit één kolom, met de naam van de
-    benchmark.
+    benchmark. Onder de naam staat een badge, Vaste groep of Verkenning, en
+    het aantal Organisaties in de groep (voorstel van 16 oktober 2026,
+    `benchmark.md`, Opgeslagen verkenning). Bij een Verkenning zit de
+    organisatie in de groep als ze aan de filters voldoet, bij de eenheid
+    Onderdelen als minstens één onderdeel van haar eraan voldoet. Een
+    Verkenning waarin de organisatie niet zit, heeft geen kolom. Is de groep
+    kleiner dan `benchmarkMinOrganisaties`, dan zijn de vakjes van die kolom
+    grijs.
 - **Cellen**: Een selectievakje. Aan betekent dat de Lead die weergave ziet.
   Een nieuwe Lead en een nieuwe Meting beginnen zonder vinkjes. Er wordt niets
   meegenomen of vanzelf aangezet.
@@ -1900,7 +1908,7 @@ en is voorstel.
 - **Lijst**: Alle benchmarks, per rij de naam, de Assessments, per
   Assessment het aantal organisaties als "X van Y" (`benchmark.md`, Teller)
   en wanneer de benchmark is aangemaakt. Voorstel: Een kolom Niveau, zodra
-  er meer dan één niveau bestaat, en bij niveau 2 de lezing. Boven de lijst een oranje knop
+  er meer dan één niveau bestaat, en bij niveau 2 de lezing. Voorstel van 16 oktober 2026: Bij niveau 1 een badge Vaste groep of Verkenning. Boven de lijst een oranje knop
   "+ Benchmark aanmaken" (`.btn-or .btn-compact`).
 - **Aanmaken en wijzigen**: Eerst de Assessments, daarna de organisaties
   met het optionele sectorfilter, en per organisatie de Meting per
@@ -1910,6 +1918,14 @@ en is voorstel.
   met de reden. De knop "Benchmark aanmaken" is uitgeschakeld tot de benchmark een naam,
   een Assessment en een organisatie heeft, met de reden in
   `info.benchmarkAanmaken`. Voorstel: Eerst een keuze voor het niveau.
+- **Verkenning** (voorstel van 16 oktober 2026): Een benchmark die uit
+  Verkennen komt (`benchmark.md`, Opgeslagen verkenning) staat in de lijst met
+  de badge Verkenning en het aantal Organisaties van dit moment. Het detail
+  toont erboven de filters als regels ("CRM-pakket is Salesforce") en de eenheid. De
+  leden zijn berekend en niet te kiezen. De Admin wijzigt de naam en de
+  filters met de knop "Wijzigen" (zie Opgeslagen verkenning, Aanpassen). Aanmaken
+  gaat alleen vanuit Verkennen. Bij het verwijderen staat in de bevestiging
+  hoeveel vinkjes van Leads vervallen, zoals bij een Vaste groep.
 - **Detail**: Kruimelpad Resultaten › Benchmarks › {naam}. Per Assessment een sectie met
   de teller "X van Y organisaties", de gemiddelden van de groep en per
   organisatie het aantal afgeronde scans. De Admin ziet hier de namen van
@@ -1970,11 +1986,23 @@ kenmerk) zijn gebouwd op 15 oktober 2026. Het gedrag staat in
 
 De tab Verkennen onder Resultaten (punt 7), alleen zichtbaar voor een Admin
 (`verkennen.inzien`, `datamodel.md` deel 2, Rechtenmatrix). Een Consultant ziet
-de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat niets op.
+de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat zelf niets op. Alleen de knop Opslaan als benchmark bewaart de filters (voorstel van 16 oktober 2026).
 
 - **Bovenaan**: De eyebrow Resultaten, de paginatitel Verkennen en een
   keuze van het Assessment. Alles op de pagina werkt binnen dat ene
   Assessment.
+- **Eenheid** (voorstel van 16 oktober 2026, ontworpen): Een pilvormige groep
+  Organisaties of Onderdelen naast de keuze van het Assessment
+  (`visualisatie-verkennen.md`, Eenheid). Bij Onderdelen komen de kenmerken
+  Organisatie en Onderdeel erbij, en tellen de teller, de teksten en de
+  drempels in onderdelen.
+- **Opslaan als benchmark** (voorstel van 16 oktober 2026, ontworpen): Onder
+  de teller en de balk in de kaart Kenmerken staat de knop "Opslaan als
+  benchmark" met een Info-icoon (`info.verkennenOpslaan`). De knop opent een
+  paneel met het veld Naam (zichtbaar voor de Lead), de filters als regels,
+  het aantal in de groep en "Opslaan" en "Annuleren". Na Opslaan staat er een
+  groene regel met de naam en de verwijzing naar het Leads-venster
+  (`visualisatie-verkennen.md`, Opslaan als benchmark).
 - **Kenmerken**: De kaart Kenmerken (`visualisatie-verkennen.md`, Kenmerken
   en filters). Het scherm begint leeg, met "Snel beginnen" (CRM-pakket,
   Sector, AHT) en een knop "Kenmerk toevoegen" met een menu per groep van
