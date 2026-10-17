@@ -60,7 +60,11 @@ function TeaserBlok({ teaser, label }: { teaser: Teaser; label: string }) {
   return (
     <div className="mm-teaser">
       <div className="mm-teaser-getal">
-        <span className="mm-label-klein">{label}</span>
+        {/* Bij de hele Meting staat het aantal scans achter de titel, zodat beide blokken dezelfde regels hebben. */}
+        <span className="mm-label-klein">
+          {label}
+          {teaser.aantalScans !== undefined && ` · ${teaser.aantalScans} ${teaser.aantalScans === 1 ? "scan" : "scans"}`}
+        </span>
         <div className="mm-teaser-getal-rij">
           <span className="mm-getal" style={teaser.getalKleur ? { color: teaser.getalKleur } : undefined}>
             {teaser.getal}

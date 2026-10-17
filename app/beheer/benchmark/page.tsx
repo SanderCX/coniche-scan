@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties } from "@/lib/db";
-import { useBenchmarks } from "@/lib/benchmark-store";
+import { useBenchmarksMetLeden } from "@/lib/use-benchmarks";
+import { aantalOrganisatiesInLeden, isVerkenning } from "@/lib/verkenning-benchmark";
 import { bouwBenchmarkSecties, bouwScanSectie, LEZING_NAAM, lezingVan, niveauVan } from "@/lib/benchmark";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
@@ -19,7 +20,7 @@ const NIVEAU_TEKST = { organisaties: "Tussen organisaties", metingen: "Binnen ee
  */
 export default function BenchmarkLijstPage() {
   const gebruiker = useIngelogdeGebruiker();
-  const benchmarks = useBenchmarks();
+  const benchmarks = useBenchmarksMetLeden();
   const organisaties = useOrganisaties();
   const assessments = useAssessments();
   const router = useRouter();
@@ -62,6 +63,11 @@ export default function BenchmarkLijstPage() {
                 <tr key={b.id} className="admin-table-rij-klikbaar" onClick={() => router.push(`/beheer/benchmark/${b.id}`)}>
                   <td>
                     <strong>{b.naam}</strong>
+                    {niveau === "organisaties" && (
+                      <span className={`mm-rolchip`} style={{ marginLeft: "var(--sp-2)" }}>
+                        {isVerkenning(b) ? "Verkenning" : "Vaste groep"}
+                      </span>
+                    )}
                   </td>
                   <td>
                     {NIVEAU_TEKST[niveau]}
@@ -75,7 +81,12 @@ export default function BenchmarkLijstPage() {
                     )}
                     {secties.map((s) => (
                       <div key={s.assessment.id}>
-                        {s.assessment.naam}: {niveau === "metingen" ? `${s.teller.x} ${s.teller.x === 1 ? "Meting" : "Metingen"}` : `${s.teller.x} van ${s.teller.y} organisaties`}
+                        {s.assessment.naam}:{" "}
+                        {niveau === "metingen"
+                          ? `${s.teller.x} ${s.teller.x === 1 ? "Meting" : "Metingen"}`
+                          : isVerkenning(b)
+                            ? `${aantalOrganisatiesInLeden(b.leden)} ${aantalOrganisatiesInLeden(b.leden) === 1 ? "Organisatie" : "Organisaties"}${b.eenheid === "onderdelen" ? `, ${b.leden.length} onderdelen` : ""}`
+                            : `${s.teller.x} van ${s.teller.y} organisaties`}
                       </div>
                     ))}
                   </td>

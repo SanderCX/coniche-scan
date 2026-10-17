@@ -163,6 +163,18 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties. Is er nog geen kenmerk, dan staat er: Er is nog geen kenmerk om op te groeperen. Voeg bij Kenmerken een kenmerk toe, dan kun je de Organisaties erop in groepen verdelen.",
   },
   {
+    sleutel: "info.verkennenEenheid",
+    plek: "Verkennen, naast het label Eenheid",
+    tekst:
+      "Kies waarover je vergelijkt. Bij Organisaties telt elke Organisatie één keer, met haar meest recente Meting. Bij Onderdelen telt elk onderdeel van een Organisatie apart, en elk onderdeel telt even zwaar mee.",
+  },
+  {
+    sleutel: "info.verkennenOpslaan",
+    plek: "Verkennen, naast de knop Opslaan als benchmark",
+    tekst:
+      "Je slaat de filters op en niet de uitkomst. De groep volgt de filters: Komt er een Organisatie bij die erbij past, dan telt die mee. Daarna wijs je de benchmark toe aan een Lead van een Organisatie die erin zit, in het Leads-venster van die Organisatie.",
+  },
+  {
     sleutel: "info.verkennenKenmerken",
     plek: "Verkennen, kaart Kenmerken, naast de titel",
     tekst:
@@ -208,7 +220,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     sleutel: "info.leadToegangCel",
     plek: "Leads-venster van de organisatie, in een grijze cel",
     tekst:
-      "De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark.",
+      "De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark. Bij een Verkenning met te weinig Organisaties staat er: \"Te weinig Organisaties in deze groep: {n}, minimaal {min}.\"",
   },
   {
     sleutel: "info.antwoordenMetNamen",

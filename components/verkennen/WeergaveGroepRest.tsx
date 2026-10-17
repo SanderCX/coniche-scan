@@ -23,6 +23,7 @@ export function WeergaveGroepRest({
   sortering,
   focusNaam,
   zonderGroepering = false,
+  eenheidWoord = "Organisaties",
 }: {
   assessment: Assessment;
   vergelijking: Vergelijking;
@@ -31,6 +32,8 @@ export function WeergaveGroepRest({
   focusNaam: string;
   /** Zonder groepering is de hele pool de focus en is er geen rest (`visualisatie-verkennen.md`, Zonder groepering). */
   zonderGroepering?: boolean;
+  /** "Organisaties" of "onderdelen" (`visualisatie-verkennen.md`, Eenheid). */
+  eenheidWoord?: string;
 }) {
   const { overall } = vergelijking;
   const rijen: RijVergelijking[] =
@@ -52,7 +55,7 @@ export function WeergaveGroepRest({
       <Tegels
         tegels={zonderGroepering ? [
           { label: "Gemiddelde van de pool", waarde: toon(overall.focus.gemiddelde), sub: "Overall score" },
-          { label: "Organisaties", waarde: String(overall.focus.n), sub: "in de pool" },
+          { label: eenheidWoord === "onderdelen" ? "Onderdelen" : "Organisaties", waarde: String(overall.focus.n), sub: "in de pool" },
           {
             label: `Hoogste ${assessment.bouwblokEenheidEnkelvoud}`,
             waarde: hoogste ? toon(hoogste.focus.gemiddelde) : "–",
@@ -64,8 +67,8 @@ export function WeergaveGroepRest({
             sub: laagste?.rij.bouwblok.naam,
           },
         ] : [
-          { label: `Gemiddelde van ${focusNaam}`, waarde: toon(overall.focus.gemiddelde), sub: `${overall.focus.n} Organisaties` },
-          { label: "Gemiddelde van de rest", waarde: toon(overall.rest.gemiddelde), sub: `${overall.rest.n} Organisaties` },
+          { label: `Gemiddelde van ${focusNaam}`, waarde: toon(overall.focus.gemiddelde), sub: `${overall.focus.n} ${eenheidWoord}` },
+          { label: "Gemiddelde van de rest", waarde: toon(overall.rest.gemiddelde), sub: `${overall.rest.n} ${eenheidWoord}` },
           {
             label: `Grootste plus per ${assessment.bouwblokEenheidEnkelvoud}`,
             waarde: vergelijking.grootstePlus ? `+${toon(vergelijking.grootstePlus.verschil)}` : "–",
@@ -177,11 +180,11 @@ export function WeergaveGroepRest({
       <p className="vis-onderschrift">
         {zonderGroepering
           ? modus === "groep"
-            ? "Elke stip is een Organisatie in de pool. De oranje streep is het gemiddelde van de pool. Elke Organisatie telt even zwaar. Kies bij Kenmerken een kenmerk om de pool in groepen te verdelen."
-            : "De stippen zijn de Organisaties van de pool. De oranje balk is de middelste helft van de pool, de streep de mediaan. σ is de standaardafwijking (n − 1)."
+            ? "Elke stip is een lid van de pool. De oranje streep is het gemiddelde van de pool. Elk lid telt even zwaar. Kies bij Kenmerken een kenmerk om de pool in groepen te verdelen."
+            : "De stippen zijn de leden van de pool. De oranje balk is de middelste helft van de pool, de streep de mediaan. σ is de standaardafwijking (n − 1)."
           : modus === "groep"
-          ? "Elke stip is een Organisatie: Oranje is de focus, grijs de rest. De oranje streep is het gemiddelde van de focus, de donkergrijze streep dat van de rest. Elke Organisatie telt even zwaar."
-          : "De stippen zijn de Organisaties van de focus. De oranje balk is de middelste helft van de focus, de grijze balk daarachter de middelste helft van de rest, de streep de mediaan. σ is de standaardafwijking (n − 1)."}
+          ? "Elke stip is een lid van de pool: Oranje is de focus, grijs de rest. De oranje streep is het gemiddelde van de focus, de donkergrijze streep dat van de rest. Elke Organisatie telt even zwaar."
+          : "De stippen zijn de leden van de focus. De oranje balk is de middelste helft van de focus, de grijze balk daarachter de middelste helft van de rest, de streep de mediaan. σ is de standaardafwijking (n − 1)."}
       </p>
     </div>
   );

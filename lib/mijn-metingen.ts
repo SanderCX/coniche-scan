@@ -82,8 +82,10 @@ export interface Teaser {
   getalKleur: string | null;
   pilAchtergrond: string | null;
   pilTekst: string | null;
-  /** Regel onder het getal: "35 van 60 punten" of "Gemiddelde van 5 afgeronde scans". */
+  /** Regel onder het getal: "35 van 60 punten". Bij de hele Meting leeg: Het aantal scans staat achter de titel. */
   sub: string | null;
+  /** Alleen bij de hele Meting: Het aantal afgeronde scans waarover het gemiddelde gaat, voor achter de titel ("6 scans"). */
+  aantalScans?: number;
   rijen: TeaserRij[];
 }
 
@@ -100,7 +102,7 @@ export function celStap(score: number): 1 | 2 | 3 | 4 | 5 {
   return Math.min(5, Math.max(1, Math.round(Number(score.toFixed(1))))) as 1 | 2 | 3 | 4 | 5;
 }
 
-function schaalTeaser(assessment: Assessment, antwoorden: Record<string, Antwoord>, metSub: string | null, metGetal: boolean): Teaser | null {
+function schaalTeaser(assessment: Assessment, antwoorden: Record<string, Antwoord>, aantalScans?: number): Teaser | null {
   const overall = overallScore(assessment, antwoorden);
   if (overall === null) return null;
   const stap = celStap(overall);
@@ -121,7 +123,6 @@ function schaalTeaser(assessment: Assessment, antwoorden: Record<string, Antwoor
       });
     }
   }
-  void metGetal;
   return {
     soort: "schaal",
     getal: komma(overall),
@@ -129,7 +130,8 @@ function schaalTeaser(assessment: Assessment, antwoorden: Record<string, Antwoor
     getalKleur: null,
     pilAchtergrond: `var(--score-${stap}-cel)`,
     pilTekst: `var(--score-${stap}-cel-tekst)`,
-    sub: metSub,
+    sub: null,
+    ...(aantalScans !== undefined ? { aantalScans } : {}),
     rijen,
   };
 }
@@ -153,7 +155,8 @@ function quickscanTeaser(resultaat: QuickscanResultaat, metingModus: boolean, n?
     getalKleur: KLASSE_KLEUR[resultaat.klasse],
     pilAchtergrond: null,
     pilTekst: null,
-    sub: metingModus ? `Gemiddelde van ${n} afgeronde scans` : `${komma(resultaat.punten, 0)} van ${komma(resultaat.maximum, 0)} punten`,
+    sub: metingModus ? null : `${komma(resultaat.punten, 0)} van ${komma(resultaat.maximum, 0)} punten`,
+    ...(metingModus ? { aantalScans: n } : {}),
     rijen,
   };
 }
@@ -161,7 +164,7 @@ function quickscanTeaser(resultaat: QuickscanResultaat, metingModus: boolean, n?
 /** De teaser van een gemiddelde dat al is uitgerekend, bijvoorbeeld van een samengestelde Meting (alleen voor scans met een schaal). */
 export function teaserVoorGemiddelden(assessment: Assessment, gemiddeldeAntwoorden: Record<string, number>, aantalScans: number): Teaser | null {
   if (isJaNeeWeetNiet(assessment)) return null;
-  return schaalTeaser(assessment, gemiddeldeAntwoorden, `Gemiddelde van ${aantalScans} afgeronde scans`, true);
+  return schaalTeaser(assessment, gemiddeldeAntwoorden, aantalScans);
 }
 
 /** De teaser van één afgeronde scan. `null` als er niets te tonen is. */
@@ -171,7 +174,7 @@ export function teaserVoorScan(
   relevantie?: Record<string, boolean>
 ): Teaser | null {
   if (isJaNeeWeetNiet(assessment)) return quickscanTeaser(quickscanResultaat(assessment, antwoorden, relevantie), false);
-  return schaalTeaser(assessment, antwoorden, null, false);
+  return schaalTeaser(assessment, antwoorden);
 }
 
 /**
@@ -186,7 +189,7 @@ export function teaserVoorMeting(assessment: Assessment, invullingen: ScanInvull
     return quickscanTeaser(resultaat, true, afgerond.length);
   }
   const gemiddeld = gemiddeldeAntwoordenVoorMeting(assessment, afgerond);
-  return schaalTeaser(assessment, gemiddeld, `Gemiddelde van ${afgerond.length} afgeronde scans`, true);
+  return schaalTeaser(assessment, gemiddeld, afgerond.length);
 }
 
 /* ---------- Secties en respons ---------- */

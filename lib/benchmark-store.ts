@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { Benchmark, BenchmarkLezing, BenchmarkLid, BenchmarkNiveau, BenchmarkToewijzing } from "./types";
+import { Benchmark, BenchmarkLezing, BenchmarkLid, BenchmarkNiveau, BenchmarkSoort, BenchmarkToewijzing, VerkenEenheid, VerkenningFilter } from "./types";
 import { nieuwId } from "./id";
 import { logAudit } from "./audit-store";
 
@@ -96,6 +96,8 @@ export interface BenchmarkNamen {
   organisatieNamen: string[];
   /** Alleen op de niveaus binnen een organisatie, waar een Meting het lid is. */
   metingLabels?: string[];
+  /** Alleen bij een opgeslagen verkenning: De filters als regels, zonder persoonsgegevens. */
+  filters?: string[];
 }
 
 export function maakBenchmark(
@@ -103,6 +105,10 @@ export function maakBenchmark(
     naam: string;
     niveau?: BenchmarkNiveau;
     lezing?: BenchmarkLezing;
+    /** Alleen bij niveau `organisaties`: Een verkenning heeft filters en een eenheid in plaats van leden. */
+    soort?: BenchmarkSoort;
+    eenheid?: VerkenEenheid;
+    filters?: VerkenningFilter[];
     assessmentIds: string[];
     leden: BenchmarkLid[];
     aangemaaktDoor: string;
@@ -115,8 +121,12 @@ export function maakBenchmark(
     naam: input.naam,
     niveau: input.niveau ?? "organisaties",
     ...(input.lezing ? { lezing: input.lezing } : {}),
+    ...(input.soort === "verkenning"
+      ? { soort: "verkenning" as const, eenheid: input.eenheid ?? "organisaties", filters: input.filters ?? [] }
+      : {}),
     assessmentIds: input.assessmentIds,
-    leden: input.leden,
+    // Bij een verkenning volgen de leden uit de filters en staan ze niet in de opslag.
+    leden: input.soort === "verkenning" ? [] : input.leden,
     meldingen: [],
     aangemaaktOp: new Date().toISOString(),
     aangemaaktDoor: input.aangemaaktDoor,
@@ -128,7 +138,13 @@ export function maakBenchmark(
     entiteitType: "benchmark",
     entiteitId: benchmark.id,
     entiteitNaam: benchmark.naam,
-    details: { benchmarkNaam: benchmark.naam, niveau: benchmark.niveau, ...(benchmark.lezing ? { lezing: benchmark.lezing } : {}), ...namen },
+    details: {
+      benchmarkNaam: benchmark.naam,
+      niveau: benchmark.niveau,
+      ...(benchmark.soort === "verkenning" ? { soort: "verkenning", eenheid: benchmark.eenheid } : {}),
+      ...(benchmark.lezing ? { lezing: benchmark.lezing } : {}),
+      ...namen,
+    },
   });
   return benchmark;
 }
@@ -136,15 +152,20 @@ export function maakBenchmark(
 /** Wijzigt de samenstelling. Leden van een Assessment dat niet meer gekozen is, vallen weg. */
 export function wijzigBenchmark(
   id: string,
-  input: { naam: string; assessmentIds: string[]; leden: BenchmarkLid[]; lezing?: BenchmarkLezing },
+  input: { naam: string; assessmentIds: string[]; leden: BenchmarkLid[]; lezing?: BenchmarkLezing; filters?: VerkenningFilter[] },
   namen: BenchmarkNamen
 ): void {
   const opslag = laad();
   const benchmark = opslag.benchmarks.find((b) => b.id === id);
   if (!benchmark) return;
   benchmark.naam = input.naam;
-  benchmark.assessmentIds = input.assessmentIds;
-  benchmark.leden = input.leden.filter((l) => input.assessmentIds.includes(l.assessmentId));
+  if (benchmark.soort === "verkenning") {
+    // Alleen de naam en de filters zijn te wijzigen: Het Assessment en de eenheid blijven (`benchmark.md`, Opgeslagen verkenning, Aanpassen).
+    if (input.filters) benchmark.filters = input.filters;
+  } else {
+    benchmark.assessmentIds = input.assessmentIds;
+    benchmark.leden = input.leden.filter((l) => input.assessmentIds.includes(l.assessmentId));
+  }
   if (input.lezing) benchmark.lezing = input.lezing;
   benchmark.meldingen = [];
   // De vinkjes van Leads voor een organisatie die niet meer meedoet, vallen bij het volgende opslaan van de organisaties weg
@@ -158,6 +179,7 @@ export function wijzigBenchmark(
     details: {
       benchmarkNaam: benchmark.naam,
       niveau: benchmark.niveau ?? "organisaties",
+      ...(benchmark.soort === "verkenning" ? { soort: "verkenning", eenheid: benchmark.eenheid } : {}),
       ...(benchmark.lezing ? { lezing: benchmark.lezing } : {}),
       ...namen,
     },

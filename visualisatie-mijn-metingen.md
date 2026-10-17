@@ -201,6 +201,13 @@ Gebouwd op 15 oktober 2026. De pagina is `app/s/[code]/page.tsx`, de kaarten sta
   niveau 2 staat "Vergelijking van Metingen".
 - **Smalle blokken.** In een kaart of blok smaller dan 560px staat het getal boven de rijen (container query), zodat de balken
   breed genoeg blijven naast een tweede blok.
+- **Een Lead is altijd als Lead herkenbaar** (op verzoek van Sander): Naast de naam van de Organisatie in de kop staat de
+  rolchip "Lead", ook als er geen Meting of vergelijking voor hem aanstaat. Zijn er geen Lead-kaarten, dan staat er een korte
+  melding "Je bent Lead van <Organisatie>. Een beheerder bepaalt welke resultaten je hier ziet. Er staat nu nog niets voor je
+  klaar." boven zijn eigen scans. Dit is een aanvulling op de spec, die de rolchip alleen op kaarten noemt.
+- **Aantal scans achter de titel.** Bij de teaser van de hele meting staat het aantal niet als regel "Gemiddelde van n afgeronde
+  scans" onder het getal, maar achter de titel ("Gemiddelde score · 6 scans"). Zo hebben het blok Jouw scan en het blok Hele
+  meting dezelfde regels en staan de rijen op dezelfde hoogte (op verzoek van Sander, wijkt af van de spec).
 - Nog niet: De staten "te weinig scans" en "geen Resultaten" als apart ontwerp, "Oudere metingen tonen" en de lege staat per
   sectie.
 

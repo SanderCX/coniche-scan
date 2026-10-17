@@ -13,6 +13,8 @@ import {
 } from "./metingen";
 import { SpreidingWeergave, spreiding, tussenOrganisaties, TussenOrganisatiesWeergave } from "./visualisatie";
 import { isJaNeeWeetNiet } from "./quickscan";
+import { isVerkenning } from "./verkenning-benchmark";
+import { poolLidNaam } from "./verkennen";
 import { BenchmarkViewQs, QuickscanMeting, quickscanBenchmark, quickscanMeting, quickscanScansVan } from "./quickscan-groep";
 import {
   alleBouwblokResultaten,
@@ -665,6 +667,44 @@ export type LeadBenchmarkView =
     };
 
 /**
+ * De views van een Lead bij een opgeslagen verkenning met de eenheid Onderdelen (`benchmark.md`, Opgeslagen verkenning, Wat de Lead
+ * ziet): Elk onderdeel van zijn eigen Organisatie met naam, tegenover de onderdelen van de andere Organisaties als anoniem gemiddelde.
+ * De drempel `benchmarkMinOrganisaties` telt Organisaties en geen onderdelen. Staat er in de filters maar één Organisatie, dan
+ * geldt hij niet en staan de onderdelen van de Lead naast elkaar. Per eigen onderdeel een entry, met zijn naam als `eigenNaam`.
+ */
+function leadViewsOnderdelen(
+  benchmark: Benchmark,
+  secties: BenchmarkSectie[],
+  organisatie: Organisatie,
+  minOrganisaties: number
+): LeadBenchmarkView[] {
+  const enkeleOrganisatie = (benchmark.filters ?? []).some((f) => f.kenmerk === "__organisatie" && f.waarden.length === 1);
+  const uit: LeadBenchmarkView[] = [];
+  const perOnderdeel = new Map<string, VergelijkingsView[]>();
+  for (const sectie of secties) {
+    const eigen = sectie.rijen.filter((r) => r.organisatie.id === organisatie.id);
+    const anderenElders = sectie.rijen.filter((r) => r.organisatie.id !== organisatie.id);
+    const aantalOrganisaties = new Set(sectie.rijen.map((r) => r.organisatie.id)).size;
+    for (const rij of eigen) {
+      const anderen = enkeleOrganisatie ? eigen.filter((r) => r !== rij) : anderenElders;
+      const voldoet = enkeleOrganisatie ? anderen.length > 0 : aantalOrganisaties >= minOrganisaties && anderen.length > 0;
+      if (!voldoet) continue;
+      const basis = maakVergelijking(
+        sectie.assessment,
+        rij.antwoorden,
+        anderen.map((r) => r.antwoorden),
+        enkeleOrganisatie ? eigen.length : aantalOrganisaties,
+        enkeleOrganisatie ? 1 : minOrganisaties
+      );
+      const naam = poolLidNaam(organisatie, onderdeelVan(rij.meting));
+      perOnderdeel.set(naam, [...(perOnderdeel.get(naam) ?? []), { ...basis, voldoetAanDrempel: true }]);
+    }
+  }
+  for (const [eigenNaam, views] of perOnderdeel) uit.push({ niveau: "organisaties", eigenNaam, views });
+  return uit;
+}
+
+/**
  * Wat een Lead ziet van een benchmark waarvoor hij het vinkje heeft (`benchmark.md`, View voor een Lead). Niveau 1: De view van
  * zijn organisatie tegenover de rest van de groep, per Assessment waarvan de groep aan de drempel voldoet. Niveau 2: De
  * vergelijking met de Metingen die lid zijn van de benchmark en waarvoor hij Resultaten heeft (`resultatenMetingIds`), en niet
@@ -684,6 +724,9 @@ export function leadViewsVoorBenchmark(
   if (!benchmark.leden.some((l) => l.organisatieId === organisatie.id)) return [];
   if (niveau === "organisaties") {
     const secties = bouwBenchmarkSecties(benchmark, assessments, organisaties);
+    if (isVerkenning(benchmark) && benchmark.eenheid === "onderdelen") {
+      return leadViewsOnderdelen(benchmark, secties, organisatie, drempels.minOrganisaties);
+    }
     const views = viewsVoorLead(secties, organisatie.id, drempels.minOrganisaties);
     return views.length === 0 ? [] : [{ niveau, eigenNaam: organisatie.naam, views: views.map(zonderRij) }];
   }

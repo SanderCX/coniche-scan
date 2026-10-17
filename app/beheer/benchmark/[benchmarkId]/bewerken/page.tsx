@@ -6,7 +6,11 @@ import { useAssessments } from "@/lib/assessment-store";
 import { BenchmarkLezing } from "@/lib/types";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { ruimBenchmarkVinkjesOp, useOrganisaties } from "@/lib/db";
-import { useBenchmark, wijzigBenchmark } from "@/lib/benchmark-store";
+import { wijzigBenchmark } from "@/lib/benchmark-store";
+import { useBenchmarkMetLeden } from "@/lib/use-benchmarks";
+import { filterRegels, isVerkenning, ledenVoorVerkenning } from "@/lib/verkenning-benchmark";
+import { maakFilterNamen } from "@/lib/verkenning-namen";
+import { VerkenningBewerken } from "@/components/beheer/VerkenningBewerken";
 import { benchmarkNamen, niveauVan } from "@/lib/benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
@@ -20,7 +24,7 @@ import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 export default function BenchmarkBewerkenPage({ params }: { params: Promise<{ benchmarkId: string }> }) {
   const { benchmarkId } = use(params);
   const gebruiker = useIngelogdeGebruiker();
-  const benchmark = useBenchmark(benchmarkId);
+  const benchmark = useBenchmarkMetLeden(benchmarkId);
   const organisaties = useOrganisaties();
   const assessments = useAssessments();
   // Tussen organisaties (niveau 1) doet ook een Assessment met Ja / Nee / Weet ik niet mee (`visualisatie-quickscan.md`, 5). Binnen
@@ -66,8 +70,27 @@ export default function BenchmarkBewerkenPage({ params }: { params: Promise<{ be
           { label: "Wijzigen" },
         ]}
       />
-      <h1>Benchmark wijzigen</h1>
-      {niveauVan(benchmark) === "organisaties" && (
+      <h1>{isVerkenning(benchmark) ? "Verkenning wijzigen" : "Benchmark wijzigen"}</h1>
+      {isVerkenning(benchmark) && (
+        <VerkenningBewerken
+          benchmark={benchmark}
+          onAnnuleren={() => router.push(`/beheer/benchmark/${benchmark.id}`)}
+          onOpslaan={(w) => {
+            const leden = ledenVoorVerkenning(organisaties, { ...benchmark, filters: w.filters }, instellingen.benchmarkMinScans);
+            wijzigBenchmark(
+              benchmark.id,
+              { naam: w.naam, assessmentIds: benchmark.assessmentIds, leden: [], filters: w.filters },
+              {
+                ...benchmarkNamen(benchmark.assessmentIds, leden, organisaties, assessments, "organisaties"),
+                filters: filterRegels(w.filters, maakFilterNamen(instellingen.korteNamen, organisaties)),
+              }
+            );
+            ruimBenchmarkVinkjesOp();
+            router.push(`/beheer/benchmark/${benchmark.id}`);
+          }}
+        />
+      )}
+      {niveauVan(benchmark) === "organisaties" && !isVerkenning(benchmark) && (
         <BenchmarkForm
           organisaties={organisaties}
           assessments={assessments}

@@ -8,11 +8,15 @@ import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magVerkennen } from "@/lib/rechten";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { korteNaamVeld, korteNaamWaarde } from "@/lib/korte-namen";
+import { VerkenEenheid } from "@/lib/types";
 import {
   FilterStand,
   Groepering,
   KANALEN_ID,
+  ONDERDEEL_ID,
+  ORGANISATIE_ID,
   besluitGroepering,
+  onderdeelVelden,
   rondDrempel,
   LEGE_FILTERS,
   bouwPool,
@@ -34,7 +38,8 @@ import {
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
-import { KenmerkenKaart } from "@/components/verkennen/KenmerkenKaart";
+import { KenmerkenKaart, SNEL_BEGINNEN, SNEL_BEGINNEN_ONDERDELEN } from "@/components/verkennen/KenmerkenKaart";
+import { OpslaanAlsBenchmark } from "@/components/verkennen/OpslaanAlsBenchmark";
 import { GroeperOptie, Vergelijken } from "@/components/verkennen/Vergelijken";
 import { Sortering, WeergaveGroepRest } from "@/components/verkennen/WeergaveGroepRest";
 import { WeergaveHeatmap } from "@/components/verkennen/WeergaveHeatmap";
@@ -60,6 +65,7 @@ export default function VerkennenPage() {
   const instellingen = useInstellingen();
 
   const [assessmentKeuze, setAssessmentKeuze] = useState<string>("");
+  const [eenheid, setEenheid] = useState<VerkenEenheid>("organisaties");
   const [filters, setFilters] = useState<FilterStand>(LEGE_FILTERS);
   const [kenmerken, setKenmerken] = useState<string[]>([]);
   const [gekozenOp, setGekozenOp] = useState<string | null>(null);
@@ -74,9 +80,12 @@ export default function VerkennenPage() {
   const assessment = assessments.find((a) => a.id === assessmentKeuze) ?? assessments[0];
   // Het scherm rekent bij elke wijziging opnieuw: De pool is klein en er wordt niets opgeslagen.
   const velden = filterVelden();
-  const alleVelden = [...velden, kanalenVeld()];
-  const pool = assessment ? bouwPool(organisaties, assessment, instellingen.benchmarkMinScans) : null;
-  const gefilterd = pool ? pasFiltersToe(pool.leden, filters, velden) : [];
+  // Bij de eenheid Onderdelen komen de kenmerken Organisatie en Onderdeel erbij (`visualisatie-verkennen.md`, Eenheid).
+  const filterbaar = eenheid === "onderdelen" ? [...velden, ...onderdeelVelden()] : velden;
+  const alleVelden = [...filterbaar, kanalenVeld()];
+  const eenheidWoord = eenheid === "onderdelen" ? "onderdelen" : "Organisaties";
+  const pool = assessment ? bouwPool(organisaties, assessment, instellingen.benchmarkMinScans, eenheid) : null;
+  const gefilterd = pool ? pasFiltersToe(pool.leden, filters, filterbaar) : [];
   const drempels = {
     minPool: instellingen.verkennenMinPool,
     maxGroepen: instellingen.verkennenMaxGroepen,
@@ -85,17 +94,23 @@ export default function VerkennenPage() {
   const korte = (id: string, label: string) => korteNaamVeld(instellingen.korteNamen, id, label);
 
   // Welke kenmerken kunnen groeperen: Elk toegevoegd kenmerk is een pil, ook Ingezette kanalen (altijd uitgeschakeld).
-  const optiesVoor = (ids: string[], gefilterdeLeden: typeof gefilterd): GroeperOptie[] =>
+  const optiesVoor = (
+    ids: string[],
+    gefilterdeLeden: typeof gefilterd,
+    poolLeden = pool?.leden ?? [],
+    woord = eenheidWoord,
+    beschikbaar = alleVelden
+  ): GroeperOptie[] =>
     pool
       ? ids
-          .map((id) => alleVelden.find((v) => v.id === id))
+          .map((id) => beschikbaar.find((v) => v.id === id))
           .filter((v): v is NonNullable<typeof v> => v !== undefined)
           .map((veld) => {
             const naam = veld.id === KANALEN_ID ? korte(KANALEN_ID, "Ingezette kanalen") : korte(veld.id, veldLabelZonderGroep(veld));
             return {
               veld,
               naam: veld.type === "getal" ? `${naam}-drempel` : naam,
-              bruikbaarheid: kanGroeperen(veld, pool.leden, gefilterdeLeden, drempels),
+              bruikbaarheid: kanGroeperen(veld, poolLeden, gefilterdeLeden, drempels, woord),
             };
           })
       : [];
@@ -108,24 +123,43 @@ export default function VerkennenPage() {
    * melding en Herstel): De groepering en de melding worden opnieuw bepaald. Een melding beschrijft zo één gebeurtenis en
    * verdwijnt bij de volgende wijziging, en een kenmerk dat weer kan groeperen wordt zonder melding gekozen.
    */
-  const wijzig = (verandering: { kenmerken?: string[]; filters?: FilterStand; gekozen?: string | null }) => {
-    if (!pool) return;
-    const nieuweKenmerken = verandering.kenmerken ?? kenmerken;
-    const nieuweFilters = verandering.filters ?? filters;
-    const nieuweGefilterd = pasFiltersToe(pool.leden, nieuweFilters, velden);
-    const nieuweOpties = optiesVoor(nieuweKenmerken, nieuweGefilterd);
+  const wijzig = (verandering: { kenmerken?: string[]; filters?: FilterStand; gekozen?: string | null; eenheid?: VerkenEenheid }) => {
+    if (!pool || !assessment) return;
+    const nieuweEenheid = verandering.eenheid ?? eenheid;
+    const eenheidGewisseld = nieuweEenheid !== eenheid;
+    const nieuwePool = eenheidGewisseld ? bouwPool(organisaties, assessment, instellingen.benchmarkMinScans, nieuweEenheid) : pool;
+    const nieuweFilterbaar = nieuweEenheid === "onderdelen" ? [...velden, ...onderdeelVelden()] : velden;
+    const nieuweAlle = [...nieuweFilterbaar, kanalenVeld()];
+    const woord = nieuweEenheid === "onderdelen" ? "onderdelen" : "Organisaties";
+    let nieuweKenmerken = verandering.kenmerken ?? kenmerken;
+    let nieuweFilters = verandering.filters ?? filters;
+    // Bij het wisselen naar Organisaties vervallen Organisatie en Onderdeel met hun filters (`visualisatie-verkennen.md`, Eenheid).
+    const vervallen = eenheidGewisseld && nieuweEenheid === "organisaties" ? [ORGANISATIE_ID, ONDERDEEL_ID] : [];
+    if (vervallen.length > 0) {
+      nieuweKenmerken = nieuweKenmerken.filter((k) => !vervallen.includes(k));
+      const select = { ...nieuweFilters.select };
+      for (const k of vervallen) delete select[k];
+      nieuweFilters = { ...nieuweFilters, select };
+    }
+    const nieuweGefilterd = pasFiltersToe(nieuwePool.leden, nieuweFilters, nieuweFilterbaar);
+    const nieuweOpties = optiesVoor(nieuweKenmerken, nieuweGefilterd, nieuwePool.leden, woord, nieuweAlle);
     const vorige = verandering.gekozen !== undefined ? verandering.gekozen : gekozenOp;
     const vorigeVeld = vorige ? alleVelden.find((v) => v.id === vorige) : undefined;
     const besluit = besluitGroepering({
       vorige,
       kenmerken: nieuweOpties.map((o) => ({ id: o.veld.id, naam: o.naam, bruikbaarheid: o.bruikbaarheid })),
       vorigeNaam: vorigeVeld ? korte(vorigeVeld.id, veldLabelZonderGroep(vorigeVeld)) : undefined,
+      vorigeWeg:
+        vorige && vervallen.includes(vorige) ? "Organisatie en Onderdeel bestaan alleen bij Eenheid Onderdelen" : undefined,
+      eenheidWoord: woord,
       poolGrootte: nieuweGefilterd.length,
-      poolTotaal: pool.leden.length,
+      poolTotaal: nieuwePool.leden.length,
       minPool: drempels.minPool,
     });
+    setEenheid(nieuweEenheid);
     setKenmerken(nieuweKenmerken);
     setFilters(nieuweFilters);
+    if (eenheidGewisseld) setFocusKeuze(undefined);
     setMelding(besluit.melding);
     if (besluit.gekozen !== gekozenOp) {
       setGekozenOp(besluit.gekozen);
@@ -144,7 +178,7 @@ export default function VerkennenPage() {
       ? { soort: "select", veldId: groeperVeld.id }
       : { soort: "drempel", veldId: groeperVeld.id, drempel: drempel ?? rondDrempel(mediaanVeld ?? 0, heleGetallen) };
   const groepen = gekozenGroepering
-    ? maakGroepen(gefilterd, gekozenGroepering, velden, (veldId, waarde) =>
+    ? maakGroepen(gefilterd, gekozenGroepering, filterbaar, (veldId, waarde) =>
         korteNaamWaarde(instellingen.korteNamen, veldId, waarde)
       )
     : [];
@@ -170,7 +204,7 @@ export default function VerkennenPage() {
 
   const vergelijking = vergelijk(pool.rijen, focusLeden, restLeden);
   const heat = bouwHeatmap(pool.rijen, gefilterd, groepen, instellingen.verkennenMinGroep);
-  const focusIds = new Set(focusLeden.map((l) => l.organisatie.id));
+  const focusIds = new Set(focusLeden.map((l) => l.id));
   const xVeld = VERBAND_X.find((x) => x.id === verbandX) ?? VERBAND_X[0];
   const xDef = velden.find((v) => v.id === xVeld.id);
   const yIndex = verbandY === "overall" ? -1 : pool.rijen.findIndex((r) => r.bouwblok.id === verbandY);
@@ -238,6 +272,20 @@ export default function VerkennenPage() {
         </select>
       </div>
 
+      <div className="vk-eenheid">
+        <span className="text-sm text-ink-m">Eenheid</span>
+        <InfoIcoon naastVeld sleutel="info.verkennenEenheid" />
+        <WeergaveWissel<VerkenEenheid>
+          ariaLabel="Eenheid"
+          opties={[
+            { waarde: "organisaties", label: "Organisaties" },
+            { waarde: "onderdelen", label: "Onderdelen" },
+          ]}
+          waarde={eenheid}
+          onChange={(nieuw) => wijzig({ eenheid: nieuw })}
+        />
+      </div>
+
       <KenmerkenKaart
         velden={alleVelden}
         kenmerken={kenmerken}
@@ -248,6 +296,18 @@ export default function VerkennenPage() {
         pool={pool.leden}
         gefilterd={gefilterd}
         zonderToestemming={pool.zonderToestemming}
+        eenheidWoord={eenheidWoord}
+        snelBeginnen={eenheid === "onderdelen" ? SNEL_BEGINNEN_ONDERDELEN : SNEL_BEGINNEN}
+        onderTeller={
+          <OpslaanAlsBenchmark
+            assessment={assessment}
+            eenheid={eenheid}
+            stand={filters}
+            poolGrootte={pool.leden.length}
+            gefilterd={gefilterd}
+            organisaties={organisaties}
+          />
+        }
       />
 
       <Vergelijken
@@ -267,6 +327,7 @@ export default function VerkennenPage() {
         restLeden={restLeden}
         minGroep={instellingen.verkennenMinGroep}
         waarschuwing={instellingen.verkennenMinVergelijking}
+        eenheidWoord={eenheidWoord}
       />
 
       <section className="qv-kaart" aria-label="Resultaten" style={{ marginTop: "1.5rem" }}>
@@ -343,7 +404,7 @@ export default function VerkennenPage() {
             }}
           />
         ) : weergave === "verband" ? (
-          <WeergaveVerband minPunten={instellingen.verkennenMinGroep} punten={punten} xLabel={korte(xVeld.id, xVeld.label)} yLabel={yLabel} eenheidX={xDef?.eenheid} />
+          <WeergaveVerband minPunten={instellingen.verkennenMinGroep} eenheidWoord={eenheidWoord} punten={punten} xLabel={korte(xVeld.id, xVeld.label)} yLabel={yLabel} eenheidX={xDef?.eenheid} />
         ) : !zonderGroepering && (focusLeden.length === 0 || restLeden.length === 0) ? (
           <p className="admin-notice">
             {focusLeden.length === 0 ? "De focus is leeg." : "De rest is leeg."} Kies een andere focusgroep of pas de filters aan.
@@ -356,6 +417,7 @@ export default function VerkennenPage() {
             sortering={sorteringNu}
             focusNaam={focus?.naam ?? "de focus"}
             zonderGroepering={zonderGroepering}
+            eenheidWoord={eenheidWoord}
           />
         )}
       </section>

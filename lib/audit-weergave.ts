@@ -88,6 +88,8 @@ const DETAIL_LABEL: Record<string, string> = {
   velden: "Velden",
   veld: "Veld",
   soort: "Soort",
+  eenheid: "Eenheid",
+  filters: "Filters",
   origineel: "Origineel",
   rol: "Rol",
   status: "Status",

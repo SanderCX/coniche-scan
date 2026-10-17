@@ -324,7 +324,7 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
 - **Minimale groepsgrootte benchmark** (`benchmarkMinOrganisaties`,
   startwaarde 5): Het minimale aantal organisaties per Assessment in een
   benchmark, inclusief de organisatie van de view, om die view voor een Lead
-  aan te kunnen vinken in het Leads-venster. Bij een opgeslagen verkenning telt hij altijd Organisaties, ook bij de eenheid Onderdelen (voorstel van 16 oktober 2026). Eén getal voor deze drempel van niveau 1. De betekenis
+  aan te kunnen vinken in het Leads-venster. Bij een opgeslagen verkenning telt hij altijd Organisaties, ook bij de eenheid Onderdelen (gebouwd op 17 oktober 2026). Eén getal voor deze drempel van niveau 1. De betekenis
   staat in `benchmark.md`, Drempels. Het privacy statement noemt dezelfde
   waarde (`privacy-pagina.md`, sectie 3a).
 - **Minimaal aantal scans per Meting in een benchmark**
@@ -434,6 +434,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.verkennenInstellingen` | Instellingen, Drempels en termijnen, formulier Verkennen | Grenzen voor Verkennen. Een groep onder het minimum is gestreept en krijgt geen cijfers. Bij een kleinere focus of rest staat een waarschuwing. In een kleinere pool kun je niet groeperen. Een kenmerk met meer waarden dan het maximum of een lagere invulling dan het minimum kan niet groeperen. |
 | `info.verkennenKenmerken` | Verkennen, kaart Kenmerken, naast de titel | Zet hier een kenmerk neer om op te filteren en om op te groeperen. Een kenmerk zonder gekozen waarde filtert niets. Filteren op bereik bij getallen volgt later. |
 | `info.verkennenGroeperen` | Verkennen, naast het label Groeperen op | Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties. Is er nog geen kenmerk, dan staat er: Er is nog geen kenmerk om op te groeperen. Voeg bij Kenmerken een kenmerk toe, dan kun je de Organisaties erop in groepen verdelen. |
+| `info.verkennenEenheid` | Verkennen, naast het label Eenheid | Kies waarover je vergelijkt. Bij Organisaties telt elke Organisatie één keer, met haar meest recente Meting. Bij Onderdelen telt elk onderdeel van een Organisatie apart, en elk onderdeel telt even zwaar mee. |
 | `info.verkennenOpslaan` | Verkennen, naast de knop Opslaan als benchmark | Je slaat de filters op en niet de uitkomst. De groep volgt de filters: Komt er een Organisatie bij die erbij past, dan telt die mee. Daarna wijs je de benchmark toe aan een Lead van een Organisatie die erin zit, in het Leads-venster van die Organisatie. |
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
 
@@ -1180,7 +1181,7 @@ daarom staat ze niet op de pagina zelf maar in een eigen venster.
     de kolom Resultaten, want ze heeft geen scans en geen Respondenten.
   - Per benchmark waar deze organisatie in zit één kolom, met de naam van de
     benchmark. Onder de naam staat een badge, Vaste groep of Verkenning, en
-    het aantal Organisaties in de groep (voorstel van 16 oktober 2026,
+    het aantal Organisaties in de groep (gebouwd op 17 oktober 2026,
     `benchmark.md`, Opgeslagen verkenning). Bij een Verkenning zit de
     organisatie in de groep als ze aan de filters voldoet, bij de eenheid
     Onderdelen als minstens één onderdeel van haar eraan voldoet. Een
@@ -1908,7 +1909,7 @@ en is voorstel.
 - **Lijst**: Alle benchmarks, per rij de naam, de Assessments, per
   Assessment het aantal organisaties als "X van Y" (`benchmark.md`, Teller)
   en wanneer de benchmark is aangemaakt. Voorstel: Een kolom Niveau, zodra
-  er meer dan één niveau bestaat, en bij niveau 2 de lezing. Voorstel van 16 oktober 2026: Bij niveau 1 een badge Vaste groep of Verkenning. Boven de lijst een oranje knop
+  er meer dan één niveau bestaat, en bij niveau 2 de lezing. Gebouwd op 17 oktober 2026: Bij niveau 1 een badge Vaste groep of Verkenning. Boven de lijst een oranje knop
   "+ Benchmark aanmaken" (`.btn-or .btn-compact`).
 - **Aanmaken en wijzigen**: Eerst de Assessments, daarna de organisaties
   met het optionele sectorfilter, en per organisatie de Meting per
@@ -1918,7 +1919,7 @@ en is voorstel.
   met de reden. De knop "Benchmark aanmaken" is uitgeschakeld tot de benchmark een naam,
   een Assessment en een organisatie heeft, met de reden in
   `info.benchmarkAanmaken`. Voorstel: Eerst een keuze voor het niveau.
-- **Verkenning** (voorstel van 16 oktober 2026): Een benchmark die uit
+- **Verkenning** (gebouwd op 17 oktober 2026): Een benchmark die uit
   Verkennen komt (`benchmark.md`, Opgeslagen verkenning) staat in de lijst met
   de badge Verkenning en het aantal Organisaties van dit moment. Het detail
   toont erboven de filters als regels ("CRM-pakket is Salesforce") en de eenheid. De
@@ -1986,17 +1987,17 @@ kenmerk) zijn gebouwd op 15 oktober 2026. Het gedrag staat in
 
 De tab Verkennen onder Resultaten (punt 7), alleen zichtbaar voor een Admin
 (`verkennen.inzien`, `datamodel.md` deel 2, Rechtenmatrix). Een Consultant ziet
-de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat zelf niets op. Alleen de knop Opslaan als benchmark bewaart de filters (voorstel van 16 oktober 2026).
+de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat zelf niets op. Alleen de knop Opslaan als benchmark bewaart de filters (gebouwd op 17 oktober 2026).
 
 - **Bovenaan**: De eyebrow Resultaten, de paginatitel Verkennen en een
   keuze van het Assessment. Alles op de pagina werkt binnen dat ene
   Assessment.
-- **Eenheid** (voorstel van 16 oktober 2026, ontworpen): Een pilvormige groep
+- **Eenheid** (gebouwd op 17 oktober 2026): Een pilvormige groep
   Organisaties of Onderdelen naast de keuze van het Assessment
   (`visualisatie-verkennen.md`, Eenheid). Bij Onderdelen komen de kenmerken
   Organisatie en Onderdeel erbij, en tellen de teller, de teksten en de
   drempels in onderdelen.
-- **Opslaan als benchmark** (voorstel van 16 oktober 2026, ontworpen): Onder
+- **Opslaan als benchmark** (gebouwd op 17 oktober 2026): Onder
   de teller en de balk in de kaart Kenmerken staat de knop "Opslaan als
   benchmark" met een Info-icoon (`info.verkennenOpslaan`). De knop opent een
   paneel met het veld Naam (zichtbaar voor de Lead), de filters als regels,

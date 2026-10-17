@@ -20,6 +20,7 @@ const M = { l: 52, r: 16, t: 16, b: 42 };
  */
 export function WeergaveVerband({
   minPunten = 3,
+  eenheidWoord = "Organisaties",
   punten,
   xLabel,
   yLabel,
@@ -27,6 +28,8 @@ export function WeergaveVerband({
 }: {
   /** `verkennenMinGroep`: Het minimum aantal Organisaties met een waarde voor het diagram. */
   minPunten?: number;
+  /** "Organisaties" of "onderdelen" (`visualisatie-verkennen.md`, Eenheid). */
+  eenheidWoord?: string;
   punten: VerbandPunt[];
   xLabel: string;
   yLabel: string;
@@ -34,7 +37,7 @@ export function WeergaveVerband({
 }) {
   const reg: Regressie | null = regressie(punten.map((p) => ({ x: p.x, y: p.y })));
   if (punten.length < minPunten) {
-    return <p className="admin-notice">Te weinig data: Er zijn {punten.length} Organisaties met een waarde voor {xLabel}, er zijn er minstens {minPunten} nodig.</p>;
+    return <p className="admin-notice">Te weinig data: Er zijn {punten.length} {eenheidWoord} met een waarde voor {xLabel}, er zijn er minstens {minPunten} nodig.</p>;
   }
   const xs = punten.map((p) => p.x);
   const minX = Math.min(...xs);
@@ -90,7 +93,7 @@ export function WeergaveVerband({
           <div className="vis-tegel-sub">{reg ? sterkteWoord(reg.r) : "Geen spreiding in de punten"}</div>
         </div>
         <div className="vis-tegel" style={{ marginTop: "0.8rem" }}>
-          <div className="vis-tegel-label">Organisaties</div>
+          <div className="vis-tegel-label">{eenheidWoord === "onderdelen" ? "Onderdelen" : "Organisaties"}</div>
           <div className="vis-tegel-waarde">{punten.length}</div>
           <div className="vis-tegel-sub">met een waarde voor {xLabel}</div>
         </div>
@@ -114,7 +117,7 @@ export function verbandPunten(
     const xv = x(l);
     const yv = y(l);
     if (xv === null || yv === null) continue;
-    uit.push({ naam: l.organisatie.naam, x: xv, y: yv, focus: focusIds.has(l.organisatie.id) });
+    uit.push({ naam: l.naam, x: xv, y: yv, focus: focusIds.has(l.id) });
   }
   return uit;
 }
