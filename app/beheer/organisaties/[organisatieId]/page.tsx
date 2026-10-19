@@ -6,17 +6,17 @@ import { useOrganisatie, updateOrganisatie, hernoemOrganisatie } from "@/lib/db"
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { KenmerkenKaart } from "@/components/beheer/KenmerkenKaart";
 import { KpiBlok } from "@/components/beheer/KpiBlok";
-import { BenchmarkVlag } from "@/components/beheer/BenchmarkVlag";
+import { AfsprakenKaart } from "@/components/beheer/AfsprakenKaart";
+import { ToegangKaart } from "@/components/beheer/ToegangKaart";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { RespondentStatusBadge } from "@/components/beheer/overzicht-helpers";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
-import { magBenchmarkBeheren, magOrganisatieToegang, magOrganisatieToewijzen, magLeadToekennen } from "@/lib/rechten";
+import { magOrganisatieToegang, magOrganisatieToewijzen, magLeadToekennen } from "@/lib/rechten";
 import { useGebruikers } from "@/lib/gebruikers-store";
 import { useBeheerOverzicht } from "@/lib/beheer-url";
 import { MetBewerkslot } from "@/components/beheer/MetBewerkslot";
 import { MetingenSectie } from "@/components/beheer/MetingenSectie";
 import { LeadsBlok } from "@/components/beheer/LeadsBlok";
-import { AntwoordenNamenSchakelaar } from "@/components/beheer/AntwoordenNamenSchakelaar";
 import { isLead } from "@/lib/lead";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { MAX_KORTE_NAAM } from "@/lib/korte-namen";
@@ -156,18 +156,8 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
     updateOrganisatie(organisatieId, (o) => ({ ...o, kenmerken }));
   }
 
-  function handleToegangWisselen(consultantId: string, toegewezen: boolean) {
-    updateOrganisatie(organisatieId, (o) => ({
-      ...o,
-      toegewezenAan: toegewezen ? [...o.toegewezenAan, consultantId] : o.toegewezenAan.filter((id) => id !== consultantId),
-    }));
-  }
-
   const eigenaar = alleGebruikers.find((g) => g.id === organisatie.aangemaaktDoor);
   const toegewezenGebruikers = alleGebruikers.filter((g) => organisatie.toegewezenAan.includes(g.id));
-  const toeTeWijzenKandidaten = alleGebruikers.filter(
-    (g) => g.actief && g.rol === "consultant" && g.id !== organisatie.aangemaaktDoor
-  );
 
   return (
     <div className="admin-main admin-main--breed">
@@ -178,29 +168,14 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
         {toegewezenGebruikers.length > 0 && ` · Ook toegewezen aan: ${toegewezenGebruikers.map((g) => g.naam).join(", ")}`}
       </p>
 
-      {magOrganisatieToewijzen(ingelogd) && toeTeWijzenKandidaten.length > 0 && (
-        <details className="admin-notice mt-3 mb-6" style={{ maxWidth: "28rem" }}>
-          <summary className="cursor-pointer font-medium text-ink">Organisatie-toegang toewijzen</summary>
-          <p className="mt-2 text-sm text-ink-m">
-            Geeft een andere Consultant toegang tot deze organisatie, bovenop het eigenaarschap van{" "}
-            {eigenaar ? eigenaar.naam : "de aanmaker"}.
-          </p>
-          <div className="mt-3 flex flex-col gap-2">
-            {toeTeWijzenKandidaten.map((c) => (
-              <label key={c.id} className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={organisatie.toegewezenAan.includes(c.id)}
-                  onChange={(e) => handleToegangWisselen(c.id, e.target.checked)}
-                />
-                {c.naam} ({c.email})
-              </label>
-            ))}
-          </div>
-        </details>
-      )}
-
       <KenmerkenKaart organisatie={organisatie} onOpslaan={handleKenmerkenOpslaan} />
+      {/* Toegang en Afspraken (alleen een Admin) staan naast elkaar onder de kaart Kenmerken. */}
+      {magOrganisatieToewijzen(ingelogd) && (
+        <div className="kaarten-rij">
+          <ToegangKaart organisatie={organisatie} gebruikers={alleGebruikers} />
+          <AfsprakenKaart organisatie={organisatie} />
+        </div>
+      )}
       <KpiBlok organisatie={organisatie} />
 
       <MetingenSectie organisatie={organisatie} />
@@ -245,8 +220,6 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
       )}
       {magLeadToekennen(ingelogd) && <LeadsBlok organisatie={organisatie} />}
 
-      {magBenchmarkBeheren(ingelogd) && <BenchmarkVlag organisatie={organisatie} />}
-      {magLeadToekennen(ingelogd) && <AntwoordenNamenSchakelaar organisatie={organisatie} />}
     </div>
   );
 }

@@ -129,7 +129,8 @@ describe("CSV ronde en onderdeel", () => {
 
     const metDatum: Organisatie = {
       ...o,
-      scanUitvoeringen: [{ ...o.scanUitvoeringen[0], meetdatum: "2026-10-14", onderdeel: "Team A" }],
+      onderdelen: [{ id: "od1", organisatieId: o.id, naam: "Team A", aangemaaktOp: "x" }],
+      scanUitvoeringen: [{ ...o.scanUitvoeringen[0], meetdatum: "2026-10-14", onderdeelId: "od1" }],
     };
     const met = genereerScansCsv([{ organisatie: metDatum, scanUitvoering: metDatum.scanUitvoeringen[0], lid, invulling: scan(zorgscan), assessment: zorgscan }]);
     expect(kolom(met, "meting_meetdatum")).toBe("2026-10-14");

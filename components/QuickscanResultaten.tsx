@@ -13,7 +13,8 @@ import {
 } from "@/lib/quickscan";
 import { formatGewicht } from "@/lib/format";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
-import { ScoreRing } from "@/components/ScoreRing";
+import { SterksteMeeste } from "@/components/quickscan/SterksteMeeste";
+import { ResultaatKop, Totaalkaart } from "@/components/Resultaatkop";
 import { KLASSE_CHIP } from "@/lib/mijn-metingen";
 import { QuickscanOverzicht } from "@/components/quickscan/QuickscanOverzicht";
 
@@ -108,43 +109,22 @@ function AfdelingKaart({ afdeling, toonTellingen }: { afdeling: QuickscanAfdelin
       {(afdeling.aandachtspunt || afdeling.sterksteBasis) && (
         <div className="qs-chips">
           {afdeling.aandachtspunt && afdeling.aandachtspunt.bouwblok.aandachtZin && (
-            <p className="text-sm text-ink-m" style={{ margin: "0 0 0.5rem" }}>
-              {afdeling.aandachtspunt.bouwblok.aandachtZin}
-            </p>
+            <p className="qs-aandachtzin">{afdeling.aandachtspunt.bouwblok.aandachtZin}</p>
           )}
           {afdeling.aandachtspunt && (
-            <span className="qs-chip qs-chip--aandacht">Grootste aandachtspunt: {afdeling.aandachtspunt.bouwblok.naam}.</span>
+            <p className="qs-regel">
+              <span className="qs-regel-stip" style={{ background: "var(--stat-red)" }} />
+              Grootste aandachtspunt: {afdeling.aandachtspunt.bouwblok.naam}.
+            </p>
           )}
           {afdeling.sterksteBasis && (
-            <span className="qs-chip qs-chip--sterk">Relatief sterkste basis: {afdeling.sterksteBasis.bouwblok.naam}.</span>
+            <p className="qs-regel">
+              <span className="qs-regel-stip" style={{ background: "var(--stat-green)" }} />
+              Relatief sterkste basis: {afdeling.sterksteBasis.bouwblok.naam}.
+            </p>
           )}
         </div>
       )}
-    </div>
-  );
-}
-
-function Uitgelicht({
-  titel,
-  kleur,
-  afdelingen,
-}: {
-  titel: string;
-  kleur: string;
-  afdelingen: QuickscanAfdeling[];
-}) {
-  return (
-    <div className="card" style={{ borderTop: `4px solid ${kleur}` }}>
-      {/* Een eyebrow is altijd oranje (`stylesheet.md`, Label/eyebrow): De klassekleur staat alleen in de rand van de kaart. */}
-      <p className="eyebrow">{titel}</p>
-      {afdelingen.map((a) => (
-        <p key={a.categorie.id} style={{ margin: "0.3rem 0 0" }}>
-          <strong>{a.categorie.naam}</strong>{" "}
-          <span className="text-ink-m">
-            {getal(a.punten)}/{getal(a.maximum)} ({a.percentage ?? 0}%)
-          </span>
-        </p>
-      ))}
     </div>
   );
 }
@@ -172,6 +152,10 @@ export interface QuickscanResultatenProps {
   respondentNaam?: string | null;
   isPreview?: boolean;
   toonKop?: boolean;
+  /** De Resultaatkop (`stylesheet.md`, Resultaatkop): Eyebrow, subregel en de knop rechts naast de titel. */
+  eyebrow?: string;
+  subregel?: (string | null | undefined | false)[];
+  kopRechts?: React.ReactNode;
   /**
    * De schakelaar Per afdeling en Overzicht (`visualisatie-quickscan.md`, 2), met de keuze in de adresbalk
    * (`?weergave=overzicht`). Standaard aan voor het resultaat van één scan. Staat uit als de pagina zelf al een schakelaar heeft,
@@ -180,7 +164,7 @@ export interface QuickscanResultatenProps {
   toonSchakelaar?: boolean;
   /** Toont het aantal Ja, Nee en Weet ik niet per afdeling. Bij het gemiddelde van een Meting staat dit uit. */
   toonTellingen?: boolean;
-  /** Een regel onder het totaal, bijvoorbeeld "Gemiddelde van 5 afgeronde scans". */
+  /** Een feit in de totaalkaart, bijvoorbeeld "Gemiddelde van 5 afgeronde scans". */
   ondertitel?: string;
 }
 
@@ -192,6 +176,9 @@ function QuickscanResultatenInhoud({
   respondentNaam,
   isPreview = false,
   toonKop = true,
+  eyebrow = "Jouw resultaat",
+  subregel,
+  kopRechts,
   toonSchakelaar = true,
   toonTellingen = true,
   ondertitel,
@@ -208,8 +195,6 @@ function QuickscanResultatenInhoud({
     router.push(q ? `${pathname}?${q}` : pathname, { scroll: false });
   }
   const r = resultaat ?? quickscanResultaat(assessment, antwoorden ?? {}, relevantie);
-  const klasse = r.klasse;
-  const kleur = klasse ? QUICKSCAN_KLASSE_KLEUR[klasse] : "var(--ink-s)";
   const metPunten = afdelingenHebbenEvenveelVragen(r);
   const vragenPerAfdeling = r.afdelingen[0]?.maximum ?? 0;
   // De totaalkaart noemt de afdelingen die niet meetellen bij naam (`visualisatie-quickscan.md`, 1).
@@ -217,53 +202,32 @@ function QuickscanResultatenInhoud({
 
   return (
     <div>
+      {toonKop && <ResultaatKop eyebrow={eyebrow} titel={assessment.naam} subregel={subregel ?? [respondentNaam]} rechts={kopRechts} />}
       {isPreview && (
         <div className="preview-banner">
           Dit is een voorbeeld met demo-data — zo ziet jouw resultatenscherm eruit na afronding van de scan.
         </div>
       )}
-      {toonKop && <h1 className="page-title" style={{ marginBottom: "1.2rem" }}>{assessment.naam}</h1>}
 
-      {/* De totaalkaart met de ring (`content-ziekenhuis-quickscan.md`, Resultaten, 1): Links de klasse en de tellingen, rechts de `.score-ring`. */}
-      <div className="card qs-totaal" style={{ borderLeft: `4px solid ${kleur}` }}>
-        <div>
-          <p className="eyebrow">OVERALL VOLWASSENHEID</p>
-          {klasse && (
-            <p className="qs-totaal-klasse" style={{ color: kleur }}>
-              {KLASSE_NAAM.totaal[klasse]}
-            </p>
-          )}
-          {toonTellingen && (
-            <p className="text-sm text-ink-m" style={{ margin: 0 }}>
-              {getal(r.punten)} van {getal(r.maximum)} punten
-            </p>
-          )}
-          <p className="text-sm text-ink-m" style={{ margin: 0 }}>
-            {r.aantalVanToepassing} van {r.aantalAfdelingen} afdelingen beoordeeld
-          </p>
-          {respondentNaam && <p className="text-sm text-ink-m" style={{ margin: "0.4rem 0 0" }}>Resultaat voor {respondentNaam}</p>}
-          {ondertitel && <p className="text-sm text-ink-m" style={{ margin: "0.4rem 0 0" }}>{ondertitel}</p>}
-          {nvtNamen.length > 0 && (
-            <p className="text-sm text-ink-m" style={{ margin: "0.6rem 0 0" }}>
-              {nvtNamen.map((n) => `Vragen over ${n} zijn niet beantwoord. De afdeling telt niet mee in het totaal.`).join(" ")}
-            </p>
-          )}
-        </div>
-        <div className="qs-totaal-rechts">
-          {r.percentage !== null && r.klasse !== null && (
-            <ScoreRing
-              ring={{
-                fractie: r.percentage / 100,
-                kleur: KLASSE_VAR[r.klasse],
-                getal: `${r.percentage}%`,
-                klasseNaam: KLASSE_NAAM.totaal[r.klasse],
-                chipAchtergrond: KLASSE_CHIP[r.klasse].achtergrond,
-                chipTekst: KLASSE_CHIP[r.klasse].tekst,
-              }}
-            />
-          )}
-        </div>
-      </div>
+      {/* De totaalkaart van de Resultaatkop (`stylesheet.md`, Resultaatkop; `content-ziekenhuis-quickscan.md`, Resultaten, 1). */}
+      {r.percentage !== null && r.klasse !== null && (
+        <Totaalkaart
+          ring={{
+            fractie: r.percentage / 100,
+            kleur: KLASSE_VAR[r.klasse],
+            getal: `${r.percentage}%`,
+            klasseNaam: KLASSE_NAAM.totaal[r.klasse],
+            chipAchtergrond: KLASSE_CHIP[r.klasse].achtergrond,
+            chipTekst: KLASSE_CHIP[r.klasse].tekst,
+          }}
+          feiten={[
+            `${r.aantalVanToepassing} van ${r.aantalAfdelingen} afdelingen beoordeeld`,
+            toonTellingen && `${getal(r.punten)} van ${getal(r.maximum)} punten`,
+            ondertitel,
+          ]}
+          extra={nvtNamen.map((n) => `Vragen over ${n} zijn niet beantwoord. De afdeling telt niet mee in het totaal.`)}
+        />
+      )}
 
       {toonSchakelaar && (
         <div className="vis-acties" style={{ marginTop: "1.5rem" }}>
@@ -290,25 +254,18 @@ function QuickscanResultatenInhoud({
         ))}
       </div>
 
-      {r.sterkste.length > 0 && r.meesteOntwikkelruimte.length > 0 && (
-        <div className="qs-uitgelicht">
-          <Uitgelicht titel="Sterkste afdeling" kleur={QUICKSCAN_KLASSE_KLEUR.groen} afdelingen={r.sterkste} />
-          <Uitgelicht titel="Meeste ontwikkelruimte" kleur={QUICKSCAN_KLASSE_KLEUR.rood} afdelingen={r.meesteOntwikkelruimte} />
-        </div>
-      )}
+      <SterksteMeeste sterkste={r.sterkste} meeste={r.meesteOntwikkelruimte} />
 
-      <h2 style={{ marginTop: "2.5rem" }}>Classificatie</h2>
-      <div className="legenda">
+      <h2 style={{ marginTop: "2.5rem", fontSize: "var(--fs-18)", fontWeight: 700 }}>Classificatie</h2>
+      <div className="classificatie-legenda">
         {(["groen", "oranje", "rood"] as const).map((c) => {
           const [laag, hoog] = puntenRange(vragenPerAfdeling || 1, c);
           const grens = c === "groen" ? "Vanaf 80%" : c === "oranje" ? "50% tot en met 79%" : "Onder 50%";
           return (
-            <div key={c} className="legenda-item">
-              <span className="legenda-stippen">
-                <span className="legenda-stip" style={{ ["--kleur" as string]: QUICKSCAN_KLASSE_KLEUR[c] } as React.CSSProperties} />
-              </span>
+            <div key={c} className="classificatie-item">
+              <span className="classificatie-stip" style={{ background: KLASSE_VAR[c] }} />
               <div>
-                <h3 style={{ color: QUICKSCAN_KLASSE_KLEUR[c] }}>{KLASSE_NAAM.afdeling[c]}</h3>
+                <strong>{KLASSE_NAAM.afdeling[c]}</strong>
                 <p>
                   {grens}
                   {metPunten && vragenPerAfdeling > 0 && ` (${laag} tot en met ${hoog} punten per afdeling)`}

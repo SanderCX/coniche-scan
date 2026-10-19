@@ -103,7 +103,7 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
         <td>
           <strong>{m.label}</strong> <span className="text-ink-s">— {assessmentNaam(m.assessmentId)}</span>{" "}
           {samengesteld && <span className="admin-badge status-uitgenodigd">Gemiddelde</span>}
-          {onderdeelVan(m) !== STANDAARD_ONDERDEEL && <span className="text-ink-s"> · {onderdeelVan(m)}</span>}
+          {onderdeelVan(organisatie, m) !== STANDAARD_ONDERDEEL && <span className="text-ink-s"> · {onderdeelVan(organisatie, m)}</span>}
         </td>
         <td className={datum ? undefined : "text-ink-s"}>{datum ? toonMeetdatum(datum) : DATUM_ONTBREEKT}</td>
         <td>

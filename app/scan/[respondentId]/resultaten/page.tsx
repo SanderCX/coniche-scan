@@ -9,6 +9,8 @@ import { ResultsView } from "@/components/ResultsView";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { DropdownKnop } from "@/components/DropdownKnop";
+import { langeDatum } from "@/lib/mijn-metingen";
+import { dagVan } from "@/lib/metingen";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/scan-export";
 
@@ -90,6 +92,7 @@ export default function ResultatenPage({
           antwoorden={invulling.antwoorden}
           relevantie={invulling.relevantie}
           respondentNaam={lid.naam}
+          subregel={[lid.naam, scanUitvoering.label, invulling.afgerondOp ? `afgerond op ${langeDatum(dagVan(invulling.afgerondOp))}` : null]}
           bouwblokHref={(bouwblokId) => `/scan/${respondentId}/doorloop?bouwblok=${bouwblokId}`}
         />
       </div>

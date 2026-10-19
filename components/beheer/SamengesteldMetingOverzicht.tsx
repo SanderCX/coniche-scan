@@ -69,7 +69,7 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
 
       <p className="text-sm text-ink-m">
         {assessment?.naam ?? "Onbekend type"} · {organisatie.naam}
-        {` · meetdatum ${toonMeetdatum(meting.meetdatum)}`} · onderdeel {onderdeelVan(meting)}
+        {` · meetdatum ${toonMeetdatum(meting.meetdatum)}`} · onderdeel {onderdeelVan(organisatie, meting)}
       </p>
       <p className="text-sm text-ink-m">
         Gemiddelde van {onder.length} {onder.length === 1 ? "Meting" : "Metingen"}, elk even zwaar ({scans} afgeronde scans in
@@ -106,7 +106,7 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
             {onder.map((m) => (
               <tr key={m.id} className="admin-table-rij-klikbaar" onClick={() => router.push(`/beheer/metingen/${m.id}`)}>
                 <td>
-                  <strong>{m.label}</strong> <span className="text-ink-s">— {onderdeelVan(m)}</span>
+                  <strong>{m.label}</strong> <span className="text-ink-s">— {onderdeelVan(organisatie, m)}</span>
                 </td>
                 <td>{aantalAfgerondInMeting(organisatie, m)} afgeronde scans</td>
                 <td className="cel-knop">

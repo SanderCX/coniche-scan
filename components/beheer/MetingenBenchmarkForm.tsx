@@ -111,7 +111,7 @@ export function MetingenBenchmarkForm({
   const dagen = dagenTussenMeetdata(gekozenMetingen);
   // Bij Ontwikkeling over tijd hoort alles bij het onderdeel van de eerst gekozen Meting.
   const andereOnderdelen =
-    ontwikkeling && gekozenMetingen.some((m) => redenOntwikkeling(m, gekozenMetingen.slice(0, 1)) !== null);
+    ontwikkeling && organisatie !== undefined && gekozenMetingen.some((m) => redenOntwikkeling(organisatie, m, gekozenMetingen.slice(0, 1)) !== null);
   const gelijkeDatums = ontwikkeling && gelijkeMeetdata(gekozenMetingen);
 
   function kiesOrganisatie(id: string) {
@@ -212,11 +212,11 @@ export function MetingenBenchmarkForm({
               const vol = gekozen.length >= AANTAL_METINGEN && !gekozenNu;
               // Bij wijzigen blijft een huidig lid kiesbaar, ook als zijn Meting inmiddels onder het minimum zakte.
               const nee =
-                !gekozenNu && (m.reden ?? (ontwikkeling ? redenOntwikkeling(m.meting, gekozenMetingen) : null));
+                !gekozenNu && (m.reden ?? (ontwikkeling && organisatie ? redenOntwikkeling(organisatie, m.meting, gekozenMetingen) : null));
               return (
                 <label key={m.meting.id} className="benchmark-keuze" style={{ fontWeight: 400, opacity: nee || vol ? 0.6 : 1 }}>
                   <input type="checkbox" checked={gekozenNu} disabled={Boolean(nee) || vol} onChange={() => wisselMeting(m.meting.id)} />
-                  {m.meting.label} · {onderdeelVan(m.meting)} · {toonMeetdatum(m.meting.meetdatum)} · {scansTekst(m.aantalAfgerond)}
+                  {m.meting.label} · {organisatie ? onderdeelVan(organisatie, m.meting) : ""} · {toonMeetdatum(m.meting.meetdatum)} · {scansTekst(m.aantalAfgerond)}
                   {nee && <span className="text-ink-s"> · {nee}</span>}
                 </label>
               );

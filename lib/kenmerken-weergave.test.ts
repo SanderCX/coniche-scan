@@ -43,6 +43,22 @@ describe("de kaart Kenmerken", () => {
     expect(r["Contact center"]).toBe("Nog niet ingezet");
   });
 
+  it("Sector, Subsector en de techstack-leveranciers tonen hun korte naam, met het origineel erbij", () => {
+    const items = kenmerkenRaster(
+      organisatieVelden,
+      { "sector-subsector": { sector: "Onderwijs", subsector: "Hoger onderwijs" }, techstack: { "techstack-crm": { leverancier: "Salesforce Sales Cloud" } } },
+      { velden: {}, waarden: [
+        { veldId: "sector-subsector.sector", waarde: "Onderwijs", korteNaam: "Onderwijs kort" },
+        { veldId: "techstack.techstack-crm.leverancier", waarde: "Salesforce Sales Cloud", korteNaam: "Salesforce" },
+      ] }
+    );
+    const per = Object.fromEntries(items.map((i) => [i.label, i]));
+    expect(per["Sector"]).toMatchObject({ waarde: "Onderwijs kort", origineel: "Onderwijs" });
+    expect(per["Subsector"]).toMatchObject({ waarde: "Hoger onderwijs" });
+    expect(per["Subsector"].origineel).toBeUndefined();
+    expect(per["CRM"]).toMatchObject({ waarde: "Salesforce", origineel: "Salesforce Sales Cloud" });
+  });
+
   it("een veld zonder waarde staat niet in het raster", () => {
     const r = raster({ "sector-subsector": { sector: "Onderwijs" } });
     expect(Object.keys(r)).toEqual(["Sector"]);

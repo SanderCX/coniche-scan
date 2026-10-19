@@ -223,6 +223,12 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel.",
   },
   {
+    sleutel: "info.organisatieToegang",
+    plek: "Organisatie-detail, kaart Toegang, naast de titel",
+    tekst:
+      "De eigenaar is de Consultant die de organisatie heeft aangemaakt. Een toegewezen Consultant mag deze organisatie ook zien en beheren, en dezelfde gegevens inzien. Intrekken haalt die toegang weer weg.",
+  },
+  {
     sleutel: "info.benchmarkVlag",
     plek: "Organisatie-detail, bij de schakelaar \"Doet mee aan benchmark\"",
     tekst:

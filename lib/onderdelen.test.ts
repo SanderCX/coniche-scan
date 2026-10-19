@@ -3,6 +3,7 @@ import { zorgscan } from "@/data/zorgscan-assessment";
 import {
   HELE_ORGANISATIE,
   controleerOnderdeelNaam,
+  onderdeelNaamVan,
   stabielOnderdeelId,
   vindOnderdeel,
   zorgOnderdelenKloppend,
@@ -29,10 +30,12 @@ beforeAll(async () => {
 beforeEach(() => opslag.clear());
 
 const A = zorgscan;
-const meting = (id: string, onderdeel: string | undefined, extra: Partial<ScanUitvoering> = {}): ScanUitvoering => ({
-  id, organisatieId: "O", assessmentId: A.id, label: id, aangemaaktOp: "2026-01-01T00:00:00.000Z", invullingen: [],
-  ...(onderdeel === undefined ? {} : { onderdeel }), ...extra,
-});
+/** `onderdeel` is de oude tekst op de Meting, zoals ze vóór 19 oktober 2026 werd bewaard. */
+const meting = (id: string, onderdeel: string | undefined, extra: Partial<ScanUitvoering> = {}): ScanUitvoering =>
+  ({
+    id, organisatieId: "O", assessmentId: A.id, label: id, aangemaaktOp: "2026-01-01T00:00:00.000Z", invullingen: [],
+    ...(onderdeel === undefined ? {} : { onderdeel }), ...extra,
+  }) as ScanUitvoering;
 const org = (scanUitvoeringen: ScanUitvoering[], extra: Partial<Organisatie> = {}): Organisatie => ({
   id: "O", naam: "Org", kenmerken: {}, leden: [], scanUitvoeringen, aangemaaktDoor: null, toegewezenAan: [],
   benchmarkToegestaan: false, aangemaaktOp: "x", gewijzigdOp: "x", ...extra,
@@ -56,7 +59,7 @@ describe("overgang van de tekst op de Meting naar Onderdelen", () => {
     expect(o.onderdelen).toHaveLength(1);
     expect(o.onderdelen![0].naam).toBe("Team A");
     expect(new Set(o.scanUitvoeringen.map((m) => m.onderdeelId)).size).toBe(1);
-    expect(o.scanUitvoeringen.every((m) => m.onderdeel === "Team A")).toBe(true);
+    expect(o.scanUitvoeringen.every((m) => onderdeelNaamVan(o, m) === "Team A" && !("onderdeel" in m))).toBe(true);
   });
 
   it("bij gelijke aantallen wint de spelling van de oudste Meting", () => {
@@ -82,7 +85,7 @@ describe("overgang van de tekst op de Meting naar Onderdelen", () => {
   it("een bestaand Onderdeel wint van de spelling op de Meting", () => {
     const o = org([meting("a", "team a")], { onderdelen: [{ id: "x", organisatieId: "O", naam: "Team A", aangemaaktOp: "x" }] });
     zorgOnderdelenKloppend(o);
-    expect(o.scanUitvoeringen[0].onderdeel).toBe("Team A");
+    expect(onderdeelNaamVan(o, o.scanUitvoeringen[0])).toBe("Team A");
     expect(o.scanUitvoeringen[0].onderdeelId).toBe("x");
     expect(o.onderdelen).toHaveLength(1);
   });
@@ -137,7 +140,7 @@ describe("Onderdelen aanmaken, hernoemen en verwijderen", () => {
     expect(db.hernoemOnderdeel("O", id, "Team Alfa")).toEqual({ ok: true, gewijzigd: true });
     const o = laad();
     expect(o.onderdelen![0].naam).toBe("Team Alfa");
-    expect(o.scanUitvoeringen.map((m) => m.onderdeel)).toEqual(["Team Alfa", "Team Alfa"]);
+    expect(o.scanUitvoeringen.map((m) => onderdeelNaamVan(o, m))).toEqual(["Team Alfa", "Team Alfa"]);
     expect(o.scanUitvoeringen[0].label).toBe("Team Alfa | feb 2026");
     expect(o.scanUitvoeringen[1].label).toBe("Mijn eigen naam");
     const e = audit().find((a) => a.actie === "onderdeel.hernoemd")!;

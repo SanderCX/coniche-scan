@@ -1,3 +1,4 @@
+import { zorgOnderdelenKloppend } from "./onderdelen";
 import { describe, expect, it } from "vitest";
 import { zorgscan } from "@/data/zorgscan-assessment";
 import { alleVragen } from "./assessment-structuur";
@@ -158,7 +159,7 @@ describe("KPI's als kenmerk", () => {
       id, organisatieId: "a", assessmentId: assessment.id, label: id, onderdeel, meetdatum: "2026-02-01", aangemaaktOp: "2026-01-01",
       invullingen: org("tmp", 3).scanUitvoeringen[0].invullingen,
     });
-    const o = kpiOrg("a", [{ onderdeelId: null, kanaalId: null, waarde: 400 }, { onderdeelId: "od-Team A", kanaalId: null, waarde: 200 }], ["Team A"]);
+    const o = kpiOrg("a", [{ onderdeelId: null, kanaalId: null, waarde: 400 }, { onderdeelId: "od-Team A", kanaalId: null, waarde: 200 }], ["Team A", "Team B"]);
     o.scanUitvoeringen = [meting("m1", "Team A"), meting("m2", "Team B")] as unknown as Organisatie["scanUitvoeringen"];
     o.scanUitvoeringen[0].onderdeelId = "od-Team A";
     o.scanUitvoeringen[1].onderdeelId = "od-Team B";
@@ -383,6 +384,8 @@ describe("kanalen, nul procent en het besluit over de groepering", () => {
       meting("b1", "Zakelijk", "2026-03-10"),
       meting("c1", "Hele organisatie", "2026-02-10"),
     ];
+    // De oude tekst op de Meting wordt bij het laden een Onderdeel met een `onderdeelId`.
+    zorgOnderdelenKloppend(meerdere);
     const enkel = org("e", 3);
     const pool = bouwPool([meerdere, enkel], assessment, 3, "onderdelen");
     expect(pool.leden.map((l) => l.naam).sort()).toEqual(["Org e", "Univé", "Univé, Particulier", "Univé, Zakelijk"].sort());
@@ -408,6 +411,7 @@ describe("kanalen, nul procent en het besluit over de groepering", () => {
       const o = org(naam, 3);
       o.naam = naam;
       o.scanUitvoeringen = metingen;
+      zorgOnderdelenKloppend(o);
       return o;
     };
 

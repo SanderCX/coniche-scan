@@ -4,6 +4,7 @@ import { useState } from "react";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
 import { organisatieVelden } from "@/data/organisatie-velden";
+import { useInstellingen } from "@/lib/instellingen-store";
 import { kenmerkenRaster } from "@/lib/kenmerken-weergave";
 import { Organisatie } from "@/lib/types";
 
@@ -21,7 +22,8 @@ export function KenmerkenKaart({
   onOpslaan: (kenmerken: Record<string, unknown>) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const raster = kenmerkenRaster(organisatieVelden, organisatie.kenmerken);
+  const { korteNamen } = useInstellingen();
+  const raster = kenmerkenRaster(organisatieVelden, organisatie.kenmerken, korteNamen);
   return (
     <section className="kenmerken-kaart" aria-label="Kenmerken">
       <div className="kenmerken-kop">
@@ -37,7 +39,7 @@ export function KenmerkenKaart({
           {raster.map((item) => (
             <div key={item.label}>
               <dt>{item.label}</dt>
-              <dd>{item.waarde}</dd>
+              <dd title={item.origineel}>{item.waarde}</dd>
             </div>
           ))}
         </dl>

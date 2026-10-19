@@ -138,15 +138,15 @@ export function kiesPoolMetingen(
       gekozen.push({ id: organisatie.id, naam: organisatie.naam, organisatie, meting });
       continue;
     }
-    const alleOnderdelen = new Set(kandidaten.map(onderdeelVan));
+    const alleOnderdelen = new Set(kandidaten.map((m) => onderdeelVan(organisatie, m)));
     const perOnderdeel = new Map<string, ScanUitvoering>();
     for (const m of kandidaten) {
       if (periode && !inMeetperiode(m, periode)) continue;
-      if (!perOnderdeel.has(onderdeelVan(m))) perOnderdeel.set(onderdeelVan(m), m);
+      if (!perOnderdeel.has(onderdeelVan(organisatie, m))) perOnderdeel.set(onderdeelVan(organisatie, m), m);
     }
     buitenPeriode += alleOnderdelen.size - perOnderdeel.size;
     for (const meting of perOnderdeel.values()) {
-      const onderdeel = onderdeelVan(meting);
+      const onderdeel = onderdeelVan(organisatie, meting);
       gekozen.push({
         id: `${organisatie.id}:${meting.id}`,
         naam: poolLidNaam(organisatie, onderdeel),

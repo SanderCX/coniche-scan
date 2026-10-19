@@ -199,7 +199,7 @@ Classificatie. Van boven naar beneden:
    telt niet mee in het totaal." De tekst noemt niet dat de afdeling niet
    relevant is, omdat iemand van die afdeling het kan lezen. Met weging staan
    hier de gewogen punten (`datamodel.md`, Scoreberekening). Op de eigen
-   resultaten van een Respondent staat geen groepsstip op de ring. De totaalkaart van 19 oktober 2026 is gebouwd in `components/QuickscanResultaten.tsx`; de Resultaatkop vervangt haar en is nog niet gebouwd.
+   resultaten van een Respondent staat geen groepsstip op de ring. De totaalkaart van 19 oktober 2026 is gebouwd in `components/QuickscanResultaten.tsx`; de Resultaatkop vervangt haar en is gebouwd op 19 oktober 2026 (`components/QuickscanResultaten.tsx`, `components/Resultaatkop.tsx`).
 2. **Scores per afdeling.** Een kaart per categorie, twee kolommen, in
    de volgorde van de afdelingen. Een afdeling die niet van toepassing is
    krijgt een grijze kaart met de naam doorgestreept, de tekst "Niet van
@@ -222,7 +222,7 @@ Classificatie. Van boven naar beneden:
      elementen per kaart is nu de rand, de chip met de klasse, de balken en de
      twee stippen.
 3. **Sterkste afdeling en Meeste ontwikkelruimte.** Voorstel van 19 oktober
-   2026: Geen kaarten met een gekleurde rand, maar dezelfde component als "Top 3
+   2026, gebouwd op 19 oktober 2026 (`components/quickscan/SterksteMeeste.tsx`, ook onder de weergave Gemiddelde en spreiding): Geen kaarten met een gekleurde rand, maar dezelfde component als "Top 3
    Sterktes" en "Top 3 Verbeterkansen" bij de andere scans, twee kolommen naast
    elkaar. Boven elke kolom staat de kop in 16px, gewicht 700 ("Sterkste
    afdeling" en "Meeste ontwikkelruimte"), daaronder per afdeling een rij (kaart

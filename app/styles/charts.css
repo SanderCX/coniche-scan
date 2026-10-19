@@ -66,3 +66,13 @@
     grid-template-columns: 110px 1fr 2.6rem;
   }
 }
+
+/* De tooltip van het staafdiagram per categorie: De naam en de klasse. */
+.grafiek-tooltip {
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  font-size: var(--fs-12);
+  color: var(--ink);
+}

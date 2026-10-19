@@ -179,7 +179,7 @@ function bouwRijRecord(ctx: CsvRijContext): Record<string, string> {
     meting_label: scanUitvoering.label,
     // Leeg bij een Meting zonder meetdatum (`export-csv.md`, Basisgegevens).
     meting_meetdatum: meetdatumVan(scanUitvoering) ?? "",
-    onderdeel: onderdeelVan(scanUitvoering),
+    onderdeel: onderdeelVan(organisatie, scanUitvoering),
     assessment_naam: assessment.naam,
     respondent_naam: lid.naam ?? "",
     respondent_email: lid.email,

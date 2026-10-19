@@ -32,26 +32,21 @@ export default function VoorbeeldPage({
   return (
     <PageWithChrome>
     <div className="container" style={{ padding: "3.5rem 2rem 4.5rem" }}>
-      {/* De kop van de voorbeeldpagina (`CLAUDE.md`, scherm 3): Een oranje eyebrow, daaronder de h1 met rechts ernaast, verticaal
-          uitgelijnd met de h1, de knop "← Terug". De kop mag afbreken (`min-width: 0`), de knop niet. */}
-      <div style={{ marginBottom: "2rem" }}>
-        <span className="eyebrow">Voorbeeld-output</span>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1.5rem", marginTop: "0.3rem" }}>
-          <h1 className="page-title" style={{ margin: 0, minWidth: 0 }}>{assessment.naam}</h1>
-          <Link href={`/${assessment.id}`} className="btn btn-outline btn-compact">
-            ← Terug
-          </Link>
-        </div>
-      </div>
-
       <ResultsView
         assessment={assessment}
         antwoorden={getDemoAntwoorden(assessment.id)}
         relevantie={getDemoRelevantie(assessment.id)}
         respondentNaam={demoRespondentNaam}
         isPreview
-        // De pagina heeft zelf al de kop met de naam van het Assessment: Zonder dit staat hij er twee keer.
-        toonKop={false}
+        // De Resultaatkop met de eyebrow "Voorbeeld-output" en rechts naast de titel de knop "← Terug" (`CLAUDE.md`, scherm 3). De kop mag
+        // afbreken (`min-width: 0`), de knop niet.
+        eyebrow="Voorbeeld-output"
+        subregel={[demoRespondentNaam]}
+        kopRechts={
+          <Link href={`/${assessment.id}`} className="btn btn-outline btn-compact">
+            ← Terug
+          </Link>
+        }
       />
 
       {demoMeting && (

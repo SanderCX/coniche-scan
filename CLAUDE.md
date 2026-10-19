@@ -143,6 +143,10 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   `visualisatie-mijn-metingen.md`): Een paneel met een cirkel met de totaalscore,
   de klassenchip en bij een Lead de groep, met Jij en Groep op één spoor per
   categorie of afdeling. Voor Assessments met categorieën of afdelingen.
+- **Resultaatkop, Toegang en Afspraken, korte namen in Kenmerken** (gebouwd op 19 oktober 2026): Eén Resultaatkop met de `.score-ring` voor
+  het resultaatscherm van een respondent, een Meting en de voorbeeld-output (`stylesheet.md`, Resultaatkop), de Quickscan met Sterkste en Meeste als twee
+  kolommen, het staafdiagram per categorie met getal van 14px, de kaarten Toegang en Afspraken op het organisatie-detail, korte namen in de kaart
+  Kenmerken en in Sector en Subsector, en `Meting.onderdeel` is vervallen (de naam komt uit het Onderdeel).
 - **Help**: Gebouwd op 19 oktober 2026 (`help.md`). Een helppagina per rol
   (Respondent, Lead, Consultant en Admin) met 24 onderwerpen als Markdown in
   `help/`, twee films met CSS-animaties en de rij "Help" in het Accountmenu

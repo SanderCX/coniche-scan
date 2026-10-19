@@ -902,6 +902,80 @@ select.veld-compact:focus {
 .score-ring svg {
   display: block;
 }
+/* De ring van de Resultaatkop: 128px, het getal in 32px en het label met een letterafstand van 0.04em. */
+.score-ring--klein .score-ring {
+  width: 128px;
+  height: 128px;
+}
+.score-ring--klein .score-ring-getal {
+  font-size: var(--fs-32);
+  font-weight: 700;
+}
+.score-ring--klein .score-ring-label {
+  letter-spacing: 0.04em;
+}
+
+/* ---------- Resultaatkop (`stylesheet.md`, Resultaatkop) ---------- */
+.resultaatkop {
+  margin-bottom: var(--sp-6);
+}
+.resultaatkop .eyebrow {
+  margin: 0;
+}
+.resultaatkop-titelrij {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  margin-top: var(--sp-1);
+}
+.resultaatkop-titelrij .page-title {
+  margin: 0;
+  min-width: 0;
+}
+.resultaatkop-sub {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.totaalkaart {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  margin-bottom: var(--sp-8);
+  padding: var(--sp-6) var(--sp-8);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.totaalkaart .score-ring-blok {
+  margin: 0;
+  flex: none;
+}
+.totaalkaart-tekst {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+.totaalkaart-uitleg {
+  margin: 0;
+  font-size: var(--fs-14);
+  color: var(--ink-m);
+}
+.totaalkaart-feiten {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.totaalkaart-extra {
+  margin: 0;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
 .score-ring-tekst {
   position: absolute;
   inset: 0;
@@ -932,6 +1006,33 @@ select.veld-compact:focus {
   font-size: var(--fs-12);
   font-weight: 700;
   white-space: nowrap;
+}
+
+.classificatie-legenda {
+  display: grid;
+  gap: var(--sp-4);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.classificatie-item {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  font-size: var(--fs-14);
+}
+.classificatie-stip {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 50%;
+}
+.classificatie-item strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+.classificatie-item p {
+  margin: 0;
+  color: var(--ink-s);
 }
 
 .legenda {
@@ -1337,24 +1438,55 @@ select.veld-compact:focus {
   align-items: flex-start;
   gap: 0.4rem;
 }
-.qs-chip {
+.qs-aandachtzin {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+/* "Grootste aandachtspunt" en "Relatief sterkste basis" zijn gewone regels met een stip, geen omrande chips. */
+.qs-regel {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
   font-size: var(--fs-12);
-  font-weight: 700;
-  padding: 0.15rem 0.7rem;
-  border-radius: 100px;
-  border: 1.5px solid;
+  color: var(--ink-m);
 }
-.qs-chip--aandacht {
-  color: #dc2626;
-  border-color: #dc2626;
-}
-.qs-chip--sterk {
-  color: #15803d;
-  border-color: #15803d;
+.qs-regel-stip {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 .qs-uitgelicht {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: var(--sp-8);
+  margin-top: var(--sp-8);
+}
+.qs-uitgelicht-kop {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-16);
+  font-weight: 700;
+}
+.qs-uitgelicht-rijen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.qs-uitgelicht-rij {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: var(--fs-14);
+  color: var(--ink);
+}
+.qs-uitgelicht-rij strong {
+  font-size: var(--fs-16);
+  font-weight: 600;
 }

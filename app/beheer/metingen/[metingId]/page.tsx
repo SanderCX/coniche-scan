@@ -213,7 +213,7 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
         </Link>
         {` · meetdatum ${toonMeetdatum(scanUitvoering.meetdatum)}`}
         {isSamengesteld(scanUitvoering) && " (volgt de nieuwste Meting in de samenstelling)"}
-        {onderdeelVan(scanUitvoering) !== STANDAARD_ONDERDEEL && ` · onderdeel ${onderdeelVan(scanUitvoering)}`} · {afgerond} van{" "}
+        {onderdeelVan(organisatie, scanUitvoering) !== STANDAARD_ONDERDEEL && ` · onderdeel ${onderdeelVan(organisatie, scanUitvoering)}`} · {afgerond} van{" "}
         {invullingen.length} afgerond
       </p>
 

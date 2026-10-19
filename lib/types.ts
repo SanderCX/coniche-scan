@@ -413,15 +413,9 @@ export interface ScanUitvoering {
    */
   meetdatum?: string;
   /**
-   * Het deel van de organisatie waar de Meting over gaat, bijvoorbeeld "Team A". Ontbreekt bij data van vóór dit veld en
-   * geldt dan als "Hele organisatie" (`lib/metingen.ts`, `onderdeelVan`).
-   */
-  onderdeel?: string;
-  /**
-   * Het Onderdeel van de Organisatie waar de Meting over gaat (`datamodel.md`, Onderdeel, voorstel van 19 oktober 2026): `null`
-   * is "Hele organisatie". Afgeleid uit `onderdeel` bij elke schrijfactie (`lib/onderdelen.ts`, `zorgOnderdelenKloppend`).
-   * `onderdeel` blijft de naam van dat Onderdeel, zodat een Meting zonder de Organisatie erbij te lezen is. Een hernoeming
-   * werkt hem in dezelfde schrijfactie bij.
+   * Het Onderdeel van de Organisatie waar de Meting over gaat (`datamodel.md`, Onderdeel): `null` of afwezig is "Hele organisatie". De naam
+   * staat alleen bij het Onderdeel en wordt opgezocht met `onderdeelVan` (`lib/metingen.ts`). Het tekstveld `onderdeel` van vóór 19 oktober
+   * 2026 is vervallen en wordt bij het laden nog één keer gelezen om de Onderdelen aan te maken (`lib/onderdelen.ts`).
    */
   onderdeelId?: string | null;
   /**

@@ -415,8 +415,14 @@ describe("import: meetdatum en onderdeel", () => {
     afgerondOp: null, antwoorden: {}, opmerkingenPerBouwblok: {}, rijNummer: 1, meetdatum: "2026-01-14", ...extra,
   });
   const keuze = (r: Rij, extra: Rij = {}) => ({ rij: r, assessmentId: "A", organisatieId: "O1", ...extra });
-  type Uit = { rondes?: unknown; scanUitvoeringen: { label: string; labelHandmatig?: boolean; meetdatum?: string; rondeId?: string; onderdeel?: string }[] };
+  type Uit = {
+    rondes?: unknown;
+    onderdelen?: { id: string; naam: string }[];
+    scanUitvoeringen: { label: string; labelHandmatig?: boolean; meetdatum?: string; rondeId?: string; onderdeelId?: string | null }[];
+  };
   const uit = () => laad()[0] as unknown as Uit;
+  /** De naam van het Onderdeel van een Meting, opgezocht via `onderdeelId`. */
+  const naamVan = (o: Uit, m: { onderdeelId?: string | null }) => o.onderdelen?.find((x) => x.id === m.onderdeelId)?.naam ?? "Hele organisatie";
   const opzet = () => {
     opslag.set("coniche-scan:gebruikers", JSON.stringify([gebruiker]));
     zet([org("O1", [], [])]);
@@ -430,7 +436,7 @@ describe("import: meetdatum en onderdeel", () => {
     );
     const o = uit();
     expect(o.rondes).toBeUndefined();
-    expect(o.scanUitvoeringen.map((m) => m.onderdeel).sort()).toEqual(["Onderdeel A", "Onderdeel B", "Onderdeel C"]);
+    expect(o.scanUitvoeringen.map((m) => naamVan(o, m)).sort()).toEqual(["Onderdeel A", "Onderdeel B", "Onderdeel C"]);
     expect(o.scanUitvoeringen.every((m) => m.rondeId === undefined)).toBe(true);
     // Het label van de Meting blijft zoals het was, en blijft staan tot de beheerder het wijzigt.
     expect(o.scanUitvoeringen.map((m) => m.label).sort()[0]).toBe("Legacy-import 2026 Onderdeel A");
@@ -440,7 +446,7 @@ describe("import: meetdatum en onderdeel", () => {
   it("bij één bronnaam is het onderdeel Hele organisatie", () => {
     opzet();
     db.voerLegacyImportUit([keuze(rij("Org", "a@x.nl"), { bronnaam: "Org", bronnaamInLabel: false })] as never, "a1");
-    expect(uit().scanUitvoeringen[0].onderdeel).toBe("Hele organisatie");
+    expect(naamVan(uit(), uit().scanUitvoeringen[0])).toBe("Hele organisatie");
   });
 
   it("een door de beheerder ingesteld onderdeel gaat voor de bronnaam", () => {
@@ -449,13 +455,14 @@ describe("import: meetdatum en onderdeel", () => {
       [keuze(rij("Org A", "a@x.nl"), { bronnaam: "Org A", bronnaamInLabel: true, onderdeel: "Team Noord" })] as never,
       "a1"
     );
-    expect(uit().scanUitvoeringen[0].onderdeel).toBe("Team Noord");
+    expect(naamVan(uit(), uit().scanUitvoeringen[0])).toBe("Team Noord");
   });
 
   it("de kolom onderdeel van de eigen export gaat voor de afleiding", () => {
     opzet();
     db.voerLegacyImportUit([keuze(rij("Org", "a@x.nl", { meetingLabel: "Import Nulmeting", onderdeel: "Team A" }))] as never, "a1");
-    expect(uit().scanUitvoeringen[0]).toMatchObject({ label: "Import Nulmeting", onderdeel: "Team A" });
+    expect(uit().scanUitvoeringen[0]).toMatchObject({ label: "Import Nulmeting" });
+    expect(naamVan(uit(), uit().scanUitvoeringen[0])).toBe("Team A");
   });
 
   it("de meetdatum is de oudste datum van de scans in de Meting, ook als een latere scan eerder in het bestand staat", () => {
@@ -547,7 +554,8 @@ describe("notitie per scan", () => {
 describe("scans samenbrengen in één Meting", () => {
   type Uit = {
     leden: { id: string; email: string; naam: string | null; toegangscode: string }[];
-    scanUitvoeringen: { id: string; label: string; meetdatum?: string; onderdeel?: string; invullingen: { id: string; organisatieLidId: string; scanUitvoeringId: string; antwoorden: Record<string, number> }[] }[];
+    onderdelen?: { id: string; naam: string }[];
+    scanUitvoeringen: { id: string; label: string; meetdatum?: string; onderdeelId?: string | null; invullingen: { id: string; organisatieLidId: string; scanUitvoeringId: string; antwoorden: Record<string, number> }[] }[];
   };
   const uit = () => laad()[0] as unknown as Uit;
   const basis = () => {
@@ -570,7 +578,8 @@ describe("scans samenbrengen in één Meting", () => {
     expect(r).toMatchObject({ ok: true, aantal: 3, doelLabel: "Team Service | jan 2026" });
     const o = uit();
     const doel = o.scanUitvoeringen.find((m) => m.label === "Team Service | jan 2026")!;
-    expect(doel).toMatchObject({ onderdeel: "Team Service", meetdatum: "2026-01-14" });
+    expect(doel).toMatchObject({ meetdatum: "2026-01-14" });
+    expect(o.onderdelen?.find((x) => x.id === doel.onderdeelId)?.naam).toBe("Team Service");
     expect(doel.invullingen).toHaveLength(3);
     expect(new Set(doel.invullingen.map((i) => i.organisatieLidId)).size).toBe(3);
     // Beide verwijzingen kloppen en de antwoorden zijn onaangeraakt.
@@ -634,10 +643,10 @@ describe("scans samenbrengen in één Meting", () => {
 
   it("dezelfde combinatie van onderdeel, Assessment en meetdatum is geen blokkade", () => {
     zet([
-      org("O1", [lid("L1", "O1", "a@x.nl")], [
-        { ...meting("M1", "O1", "Een", [inv("I1", "M1", "L1")]), onderdeel: "Team A", meetdatum: "2026-01-14" },
+      { ...org("O1", [lid("L1", "O1", "a@x.nl")], [
+        { ...meting("M1", "O1", "Een", [inv("I1", "M1", "L1")]), onderdeelId: "od-a", meetdatum: "2026-01-14" },
         meting("M2", "O1", "Twee", []),
-      ]),
+      ]), onderdelen: [{ id: "od-a", organisatieId: "O1", naam: "Team A", aangemaaktOp: "x" }] },
     ]);
     const r = db.brengScansSamen("O1", { soort: "nieuw", onderdeel: "Team A", meetdatum: "2026-01-14" }, [
       { invullingId: "I1", respondent: { soort: "nieuw", naam: "", email: "n@x.nl", functie: "", team: "" } },

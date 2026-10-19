@@ -55,8 +55,7 @@ export function hernoemOnderdeel(organisatieId: string, onderdeelId: string, inv
   const oudeNaam = onderdeel.naam;
   onderdeel.naam = naam;
   for (const m of metingenVanOnderdeel(organisatie, onderdeel.id)) {
-    m.onderdeel = naam;
-    if (!m.labelHandmatig) m.label = standaardLabel(m);
+    if (!m.labelHandmatig) m.label = standaardLabel(naam, m);
   }
   organisatie.gewijzigdOp = new Date().toISOString();
   slaAlles(alles);

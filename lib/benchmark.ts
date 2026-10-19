@@ -532,9 +532,9 @@ export const LEZING_KEUZE: Record<BenchmarkLezing, { titel: string; uitleg: stri
  * Het voorstel van de app voor de lezing bij een selectie (`benchmark.md`, Niveau 2, Voorstel van de app): Metingen met hetzelfde
  * onderdeel en verschillende meetdata zijn een ontwikkeling, in elk ander geval staan ze naast elkaar.
  */
-export function voorstelLezing(metingen: Pick<ScanUitvoering, "onderdeel" | "meetdatum">[]): BenchmarkLezing {
+export function voorstelLezing(metingen: Pick<ScanUitvoering, "onderdeelId" | "meetdatum">[]): BenchmarkLezing {
   if (metingen.length < 2) return "naastElkaar";
-  const zelfdeOnderdeel = new Set(metingen.map(onderdeelVan)).size === 1;
+  const zelfdeOnderdeel = new Set(metingen.map((m) => m.onderdeelId ?? null)).size === 1;
   const datums = metingen.map(meetdatumVan);
   const verschillendeDatums = datums.every((d) => d !== null) && new Set(datums).size === datums.length;
   return zelfdeOnderdeel && verschillendeDatums ? "ontwikkeling" : "naastElkaar";
@@ -558,12 +558,13 @@ export function lezingVan(benchmark: Pick<Benchmark, "lezing" | "leden">, organi
  * Zonder keuze kan elke Meting.
  */
 export function redenOntwikkeling(
-  meting: Pick<ScanUitvoering, "onderdeel">,
-  gekozen: Pick<ScanUitvoering, "onderdeel">[]
+  organisatie: Pick<Organisatie, "onderdelen">,
+  meting: Pick<ScanUitvoering, "onderdeelId">,
+  gekozen: Pick<ScanUitvoering, "onderdeelId">[]
 ): string | null {
   if (gekozen.length === 0) return null;
-  const onderdeel = onderdeelVan(gekozen[0]);
-  return onderdeelVan(meting) === onderdeel ? null : `Ander onderdeel dan ${onderdeel}`;
+  if ((meting.onderdeelId ?? null) === (gekozen[0].onderdeelId ?? null)) return null;
+  return `Ander onderdeel dan ${onderdeelVan(organisatie, gekozen[0])}`;
 }
 
 /** Hebben twee of meer gekozen Metingen dezelfde meetdatum? Dan is er bij Ontwikkeling over tijd geen volgorde: Opslaan kan niet. */
@@ -713,7 +714,7 @@ export function leadViewsOnderdelen(
         enkeleOrganisatie ? eigen.length : aantalOrganisaties,
         enkeleOrganisatie ? 1 : minOrganisaties
       );
-      const naam = poolLidNaam(organisatie, onderdeelVan(rij.meting));
+      const naam = poolLidNaam(organisatie, onderdeelVan(organisatie, rij.meting));
       perOnderdeel.set(naam, [...(perOnderdeel.get(naam) ?? []), { ...basis, voldoetAanDrempel: true }]);
     }
   }

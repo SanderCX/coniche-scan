@@ -29,14 +29,28 @@ export function ringVanTeaser(t: Teaser): RingGegevens {
   return { ...t.ring, getal: t.getal, klasseNaam: t.klasseNaam ?? "" };
 }
 
-export function ScoreRing({ ring, stipFractie, alt }: { ring: RingGegevens; stipFractie?: number; alt?: string }) {
+export function ScoreRing({
+  ring,
+  stipFractie,
+  alt,
+  klein = false,
+  metChip = true,
+}: {
+  ring: RingGegevens;
+  stipFractie?: number;
+  alt?: string;
+  /** De ring van 128px in de Resultaatkop, met het getal in 32px. */
+  klein?: boolean;
+  /** De klassenchip onder de ring. In de Resultaatkop staat hij rechts ervan. */
+  metChip?: boolean;
+}) {
   const fractie = Math.min(1, Math.max(0, ring.fractie));
   const midden = GROOTTE / 2;
   const hoek = (stipFractie ?? 0) * 2 * Math.PI;
   return (
-    <div className="score-ring-blok">
+    <div className={`score-ring-blok ${klein ? "score-ring--klein" : ""}`}>
       <div className="score-ring" role="img" aria-label={alt ?? `Totaalscore ${ring.getal}${ring.klasseNaam ? `, ${ring.klasseNaam}` : ""}`}>
-        <svg width={GROOTTE} height={GROOTTE} viewBox={`0 0 ${GROOTTE} ${GROOTTE}`} aria-hidden="true">
+        <svg width="100%" height="100%" viewBox={`0 0 ${GROOTTE} ${GROOTTE}`} aria-hidden="true">
           <circle cx={midden} cy={midden} r={STRAAL} fill="none" stroke="var(--bg-mid)" strokeWidth={DIKTE} />
           {fractie > 0 && (
             <circle
@@ -67,7 +81,7 @@ export function ScoreRing({ ring, stipFractie, alt }: { ring: RingGegevens; stip
           <span className="score-ring-label">Totaalscore</span>
         </div>
       </div>
-      {ring.klasseNaam && (
+      {metChip && ring.klasseNaam && (
         <span className="score-ring-chip" style={{ background: ring.chipAchtergrond, color: ring.chipTekst }}>
           {ring.klasseNaam}
         </span>

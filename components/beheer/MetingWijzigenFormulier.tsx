@@ -38,7 +38,7 @@ export function MetingWijzigenFormulier({
   onKlaar: () => void;
 }) {
   const samengesteld = isSamengesteld(meting);
-  const [waarde, setWaarde] = useState<OnderdeelMeetdatumWaarde>({ onderdeel: onderdeelVan(meting), meetdatum: meetdatumVan(meting) ?? "" });
+  const [waarde, setWaarde] = useState<OnderdeelMeetdatumWaarde>({ onderdeel: onderdeelVan(organisatie, meting), meetdatum: meetdatumVan(meting) ?? "" });
   const onderdeelNaam = onderdeelNaamVoorOpslaan(organisatie, waarde);
   const [naam, setNaam] = useState(meting.label);
   // De naam volgt onderdeel en meetdatum zolang de gebruiker hem niet zelf aanpast.
@@ -46,8 +46,7 @@ export function MetingWijzigenFormulier({
   const [fout, setFout] = useState<string | null>(null);
 
   // De naam die de app zelf zou maken uit het onderdeel en de meetdatum zoals ze nu in het formulier staan.
-  const standaard = standaardLabel({
-    onderdeel: onderdeelNaam,
+  const standaard = standaardLabel(onderdeelNaam, {
     meetdatum: isGeldigeDatum(waarde.meetdatum) ? waarde.meetdatum : meetdatumVan(meting) ?? undefined,
   });
   const getoondeNaam = naamAangepast ? naam : standaard;
