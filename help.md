@@ -1,6 +1,6 @@
 # Coniche Scan: Help
 
-**Voorstel van 19 oktober 2026, ontworpen in "Coniche Scan Help" (borden Help voor Respondent en Lead, Help voor Admin en Consultant, Help in het accountmenu, Animatie: Meetperiode kiezen en Wat krijg je), nog niet gebouwd.** Sander vroeg om een overzichtelijke helppagina die de werking van alle onderdelen beschrijft, in een variant voor de Respondent en Lead en een voor de Admin en Consultant, met plaatje en praatje.
+**Voorstel van 19 oktober 2026, ontworpen in "Coniche Scan Help" (borden Help voor Respondent en Lead, Help voor Admin en Consultant, Help in het accountmenu, Animatie: Meetperiode kiezen en Wat krijg je), gebouwd op 19 oktober 2026 (zie Gebouwd).** Sander vroeg om een overzichtelijke helppagina die de werking van alle onderdelen beschrijft, in een variant voor de Respondent en Lead en een voor de Admin en Consultant, met plaatje en praatje.
 
 ## Wat het is
 
@@ -136,4 +136,20 @@ Het onderwerp "Verkennen" legt de drie keuzes bovenaan uit (Assessment, Eenheid,
 
 ## Gebouwd
 
-Nog niets.
+Gebouwd op 19 oktober 2026, op verzoek van Sander. De inhoud is door Claude Code geschreven op basis van de specs en moet door Joost worden beoordeeld.
+
+- **Routes.** `/help` en `/help/{onderwerp}` voor een Respondent of Lead, met de persoonlijke code in de adresbalk (`/help?code=…`, zoals `/visie?code=`). `/beheer/help` en `/beheer/help/{onderwerp}` voor een Admin of Consultant, binnen de beheeromgeving. Eén component voor beide (`components/help/HelpPagina.tsx`). Zonder code is er op `/help` alleen een korte melding met een link naar Toegang (Open punten, Help zonder menu). Zonder onderwerp in de route staat het eerste onderwerp van de rol open. Een onderwerp dat de rol niet mag zien, geeft de melding "Dit onderwerp bestaat niet" met de inhoudsopgave ernaast.
+- **Menu.** De rij "Help" staat in het Accountmenu na "Mijn account" en "Instellingen" (`components/beheer/BeheerChrome.tsx`) en in "Mijn gegevens" na "Gegevens bekijken/wijzigen" (`components/MijnGegevensMenu.tsx`). Op `/beheer/help` is de rij gemarkeerd.
+- **Inhoud.** 24 bestanden in `help/`, met twee SVG's in `help/afbeeldingen/` (de twee uitgewerkte onderwerpen). `npm run help` (`scripts/bouw-help.ts`, Node 24 met type stripping) leest ze, controleert ze (`lib/help-bron.ts`, `controleerHelp`) en schrijft `data/help-onderwerpen.ts`. Het draait vanzelf voor `npm run dev` en `npm run build`, en `lib/help.test.ts` controleert dat het bestand bij de bronnen past. Gecontroleerd worden de kopgegevens, de groep en de rollen per groep, de bronnen, de afbeelding, de vaste koppen in de vaste volgorde, de genummerde lijst tegenover de markeringen `data-nr` in de SVG, en dat elke rol van een onderwerp alle verwijzingen onder Zie ook kan volgen. Een bron die volgens git nieuwer is dan `bijgewerkt` geeft een waarschuwing.
+- **Rol en toegang.** Een beheerder krijgt zijn rol uit `Gebruiker.rol`. Een Respondent is Lead als hij de Lead-rol heeft en krijgt dan de weergaven uit zijn `LeadToegang` mee (`lib/help.ts`, `helpRolRespondent`). Een onderwerp over een Lead-weergave (`toegang`) staat er alleen bij het bijbehorende vinkje. De rol komt dus nog uit de browser, zoals de rest van het prototype. Met de backend moet dat uit de sessie komen (Rol en inhoud).
+- **Pagina.** Zijbalk met zoekveld en inhoudsopgave, het artikel in de vaste opbouw en de film vóór de illustratie, onder In het kort. Een Admin ziet het label "Admin" achter de onderwerpen die een Consultant niet ziet. De badge boven de titel is "Iedereen", "Respondent en Lead", "Admin en Consultant" of de rol. Het zoeken filtert in de browser op titel en tekst, waarbij elk woord moet voorkomen.
+- **Films.** `components/help/HelpFilm.tsx` en `app/styles/help.css`: Twee films met CSS-animaties, drie stapkaarten waarvan de lopende een oranje rand en een oranje nummer heeft, een pauzeknop (`aria-pressed`) en een verborgen beschrijving voor schermlezers. Bij verminderde beweging staat de film op het eindbeeld en is de pauzeknop weg. Wat krijg ik staat ook op de Assessment-landingspagina, onder de drie kaarten en boven Praktische informatie, met de knop "Bekijk de voorbeeld-output". Die knop vervangt de knop "Bekijk wat je krijgt" in de hero. Bij een scan met Ja / Nee / Weet ik niet (de Quickscan) staat de film er niet, want hij toont staven op de schaal van 1 tot 5. Daar blijft "Bekijk wat je krijgt" staan.
+
+**Afwijkingen en invullingen waar de spec open liet**:
+- De twee films hebben een eigen kop (de titel van de film) boven het label "Voorbeeld met voorbeelddata · n seconden".
+- Alleen "Je resultaten lezen" en "Verkennen" hebben een illustratie. De andere onderwerpen hebben `afbeelding` leeg, zoals de kopgegevens dat toestaan. Voor de rest moeten illustraties nog worden ontworpen.
+- "Je score vergelijken" is ingevuld als uitleg over de klassen, de categorieën naast elkaar, de radar en de top 3 (de dingen waarmee een Respondent zijn score kan vergelijken), omdat de spec geen inhoud noemt. Joost beoordeelt of dit het bedoelde onderwerp is.
+- Twee onderwerpen voor een Lead zijn erbij gekomen: "Antwoorden per vraag" (toegang `antwoorden`) en "Respondenten uitnodigen" (toegang `uitnodigen`), omdat een Lead die vinkjes kan hebben. Ook "KPI's invullen" is erbij gekomen (`datamodel.md`, Help).
+- "Leads toegang geven" heeft alleen de rol Admin, hoewel de tabel in Rol en inhoud de groep Resultaten voor beheer aan de Consultant geeft. Het Leads-venster is Admin-only (`beheerpagina.md`, punt 6a). Het onderwerp heeft daarom het label Admin.
+- Een rol die op een onderwerp niet mag, bestaat voor die rol niet: Er is geen aparte pagina "geen toegang".
+

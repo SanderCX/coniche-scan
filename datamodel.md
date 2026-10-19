@@ -943,8 +943,8 @@ KpiWaarde {
 - `benchmark.md` en `visualisatie-scores.md`: Waar ze het onderdeel van een
   Meting tonen of vergelijken, is dat de naam van het Onderdeel. Er verandert
   niets aan de regels.
-- Help (`help.md`): Er is nog geen helpbestand voor Admin en Consultant. Bij het
-  schrijven ervan horen "KPI's invullen" en het veld Onderdeel erbij.
+- Help (`help.md`): Gebouwd op 19 oktober 2026 in `help/kpis-invullen.md` en
+  `help/metingen-en-onderdelen.md`.
 
 **Open punten.**
 
@@ -1414,10 +1414,11 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   de hele keer. `details` bevat de naam van de Organisatie, de plek (de naam van
   het Onderdeel of "Algemeen") en het aantal ingevulde, gewijzigde en gewiste
   waarden.
-- `kpiDefinitie.aangemaakt`, `kpiDefinitie.gewijzigd`, `kanaal.aangemaakt` en
-  `kanaal.verwijderd` (gebouwd op 19 oktober 2026). `details` bevat de naam en
+- `kpiDefinitie.aangemaakt`, `kpiDefinitie.gewijzigd`, `kpiDefinitie.verwijderd`,
+  `kpiDefinitie.volgordeGewijzigd`, `kanaal.aangemaakt`, `kanaal.hernoemd`,
+  `kanaal.verwijderd` en `kanaal.volgordeGewijzigd` (gebouwd op 19 oktober 2026). `details` bevat de naam en
   bij `kpiDefinitie.gewijzigd` de oude en de nieuwe waarde van elk gewijzigd
-  veld. Bij `kanaal.verwijderd` staat het aantal waarden en Organisaties dat
+  veld. Bij `kanaal.verwijderd` en `kpiDefinitie.verwijderd` staat het aantal waarden en Organisaties dat
   meeging.
 
 **Bewaartermijn.** De bewaartermijn van ingevulde scans

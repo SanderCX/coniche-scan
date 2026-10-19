@@ -1334,3 +1334,26 @@ select.veld-compact {
 .kpi-kanaal-toevoegen .btn {
   margin-top: 1.55rem;
 }
+
+.kpi-acties {
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+.kanaal-lijst {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+.kanaal-lijst li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.kanaal-lijst .kpi-tekst {
+  width: 16rem;
+}

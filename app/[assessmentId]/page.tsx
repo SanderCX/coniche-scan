@@ -7,6 +7,7 @@ import { actieveVragen } from "@/lib/assessment-structuur";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
+import { HelpFilm } from "@/components/help/HelpFilm";
 
 export default function AssessmentLandingPage({
   params,
@@ -28,6 +29,8 @@ export default function AssessmentLandingPage({
 
   const assessmentVast = assessment;
   const totaalVragen = actieveVragen(assessmentVast).length;
+  // De film toont staven op de schaal van 1 tot 5, dus alleen bij een scan met die schaal.
+  const metFilm = assessment.antwoordType !== "ja-nee-weetniet";
 
   return (
     <PageWithChrome>
@@ -81,9 +84,12 @@ export default function AssessmentLandingPage({
               </button>
               <InfoIcoon sleutel="info.startAssessment" />
             </div>
-            <Link href={`/${assessment.id}/voorbeeld`} className="btn btn-outline">
-              Bekijk wat je krijgt
-            </Link>
+            {/* Bij een scan met de film vervangt de knop onder de film deze link (CLAUDE.md, scherm 2). */}
+            {metFilm ? null : (
+              <Link href={`/${assessment.id}/voorbeeld`} className="btn btn-outline">
+                Bekijk wat je krijgt
+              </Link>
+            )}
           </div>
           <p className="text-xs" style={{ maxWidth: "26rem", margin: "1rem auto 0", color: "var(--ink-s)" }}>
             Deze scan vul je in via een persoonlijke link die Coniche met je deelt — neem contact
@@ -123,6 +129,20 @@ export default function AssessmentLandingPage({
             </div>
           ))}
         </div>
+
+        {/* De film Wat krijg ik (`help.md`, Films): Tussen de kaarten en Praktische informatie, met de knop naar de Voorbeeld-output.
+            Alleen bij een scan met een schaal van 1 tot 5: De film toont staven op die schaal. */}
+        {metFilm && (
+          <HelpFilm
+            naam="wat-krijg-ik"
+            opmerking="Alle cijfers in de film zijn voorbeelddata."
+            knop={
+              <Link href={`/${assessment.id}/voorbeeld`} className="btn btn-or">
+                Bekijk de voorbeeld-output
+              </Link>
+            }
+          />
+        )}
 
         <div className="card card-warm" style={{ marginTop: "2.5rem" }}>
           <h3>Praktische informatie</h3>

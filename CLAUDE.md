@@ -37,7 +37,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `visualisatie-quickscan.md` | Visualisaties van de Quickscan Ziekenhuis in percentages: eigen resultaat (twee standen), gemiddelde en spreiding, antwoorden per vraag en benchmark (besloten op 15 oktober 2026, gebouwd) |
 | `visualisatie-mijn-metingen.md` | Opmaak van de landingspagina "Mijn metingen" voor Respondent en Lead: kaarten, statussen, teaser van de uitkomst, respons, benchmarkkaart (voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026) |
 | `visualisatie-verkennen.md` | Admin-scherm Verkennen onder Resultaten: filteren, groeperen en vergelijken van alle Organisaties van één Assessment, met vier weergaven (besloten en gebouwd op 15 oktober 2026) |
-| `help.md` | De helppagina in de app. Een regel Help in het menu, uitleg per rol met illustratie, als Markdown-bestanden in `help/` (voorstel van 19 oktober 2026, ontworpen, nog niet gebouwd) |
+| `help.md` | De helppagina in de app. Een regel Help in het menu, uitleg per rol met illustratie, als Markdown-bestanden in `help/` (gebouwd op 19 oktober 2026) |
 | `backlog.md` | Bewust nog niet opgepakt |
 | `go-live-plan.md` | Actielijst naar productie |
 | `azure-plan.md` | Aanvulling op `go-live-plan.md` met de stappen voor de Azure-omgeving (Azure DevOps, Azure SQL, `coniche-scan.nl`) |
@@ -139,6 +139,11 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   vol), zodat een cel met een getal een zachte tint krijgt. Verschil in blauw
   en donkeroranje. Kolomkoppen en rijkoppen op één regel met een tooltip, kolommen
   van 96px, en een afstandsraster van 4px. De PDF-export valt er niet onder.
+- **Help**: Gebouwd op 19 oktober 2026 (`help.md`). Een helppagina per rol
+  (Respondent, Lead, Consultant en Admin) met 24 onderwerpen als Markdown in
+  `help/`, twee films met CSS-animaties en de rij "Help" in het Accountmenu
+  en in "Mijn gegevens". De inhoud is door Claude Code geschreven en wacht op
+  de beoordeling van Joost. Alleen twee onderwerpen hebben een illustratie.
 - **Quickscan Ziekenhuis**: Gebouwd op 14 oktober 2026
   (`content-ziekenhuis-quickscan.md`): Het eerste Assessment met
   antwoordType Ja / Nee / Weet ik niet, met doorloopflow en eigen
@@ -356,8 +361,9 @@ geen afwijking van de spec maar een gat erin.
    blok "Praktische informatie" met invultijd, direct resultaat en
    privacy. "Start assessment" staat direct onder de hero maar is
    uitgeschakeld, met de uitleg dat toegang via een persoonlijke link
-   loopt. Tussen de hero en "Praktische informatie" staat de film "Wat
-   krijg ik" met stapkaarten (`help.md`, Films), met daaronder de knop
+   loopt. Tussen de drie kaarten en "Praktische informatie" staat de film "Wat
+   krijg ik" met stapkaarten (`help.md`, Films, gebouwd op 19 oktober 2026,
+   niet bij een scan met Ja / Nee / Weet ik niet), met daaronder de knop
    "Bekijk de voorbeeld-output" naar scherm 3. Die knop vervangt de link
    "Bekijk wat je krijgt" verderop op de pagina. Alle cijfers in de film
    zijn voorbeelddata. Deze pagina
@@ -496,8 +502,8 @@ geen afwijking van de spec maar een gat erin.
      formulier bouwen. Opslaan schrijft direct naar `Respondent`, geen
      aparte bevestigingsstap.
    - **Dropdown-inhoud, rij 2, klikbaar**: "Help" → opent de helppagina
-     voor Respondent en Lead (`help.md`). Voorstel van 19 oktober 2026,
-     nog niet gebouwd. "Uitloggen" schuift daardoor naar rij 3.
+     voor Respondent en Lead (`help.md`), gebouwd op 19 oktober 2026.
+     "Uitloggen" schuift daardoor naar rij 3.
    - **Dropdown-inhoud, laatste rij, klikbaar**: "Uitloggen" → navigeert naar
      het nieuwe scherm "Toegang" (zie hieronder) en wist de lokale
      respondent-sessie in deze browser (de `code` die aan deze sessie

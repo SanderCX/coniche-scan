@@ -134,3 +134,87 @@ export function verwijderKanaal(kanaalId: string): BeheerResultaat<{ waarden: nu
   });
   return { ok: true, ...gevolgen };
 }
+
+/** Wat het verwijderen van een KPI meeneemt, voor de bevestiging: Het aantal waarden en Organisaties. */
+export function gevolgenKpi(kpiId: string): { waarden: number; organisaties: number } {
+  let waarden = 0;
+  let organisaties = 0;
+  for (const o of laadAlles()) {
+    const n = (o.kpiWaarden ?? []).filter((w) => w.kpiId === kpiId).length;
+    waarden += n;
+    if (n > 0) organisaties += 1;
+  }
+  return { waarden, organisaties };
+}
+
+/**
+ * Een KPI-definitie verwijderen, met al zijn waarden bij alle Organisaties en zijn korte naam. Gelogd als `kpiDefinitie.verwijderd`.
+ * Niet in het design van Joost (`beheerpagina.md`, punt 3, KPI's en kanalen, Nog niet besloten): Zo gebouwd met een bevestiging die het
+ * aantal noemt, zoals bij een kanaal.
+ */
+export function verwijderKpi(kpiId: string): BeheerResultaat<{ waarden: number; organisaties: number }> {
+  const { kpiDefinities, korteNamen } = getInstellingen();
+  const kpi = kpiDefinities.find((k) => k.id === kpiId);
+  if (!kpi) return { ok: false, reden: "KPI niet gevonden." };
+  const gevolgen = gevolgenKpi(kpiId);
+  if (gevolgen.waarden > 0) {
+    const alles = laadAlles();
+    for (const o of alles) if (o.kpiWaarden) o.kpiWaarden = o.kpiWaarden.filter((w) => w.kpiId !== kpiId);
+    slaAlles(alles);
+  }
+  const velden = { ...korteNamen.velden };
+  delete velden[`kpis.${kpiId}`];
+  schrijfInstellingen({ kpiDefinities: kpiDefinities.filter((k) => k.id !== kpiId), korteNamen: { ...korteNamen, velden } });
+  logAudit({
+    actie: "kpiDefinitie.verwijderd",
+    entiteitType: "kpiDefinitie",
+    entiteitId: kpi.id,
+    entiteitNaam: kpi.naam,
+    details: { kpiNaam: kpi.naam, aantalKpiWaarden: gevolgen.waarden, aantalOrganisaties: gevolgen.organisaties },
+  });
+  return { ok: true, ...gevolgen };
+}
+
+/** Een KPI of kanaal een plek omhoog of omlaag in de lijst. De volgorde is die van de tabel, de menu's en de kolommen. */
+function verplaats<T extends { id: string; volgorde: number }>(lijst: T[], id: string, richting: -1 | 1): T[] | null {
+  const op = [...lijst].sort((a, b) => a.volgorde - b.volgorde);
+  const i = op.findIndex((x) => x.id === id);
+  const j = i + richting;
+  if (i === -1 || j < 0 || j >= op.length) return null;
+  [op[i], op[j]] = [op[j], op[i]];
+  return op.map((x, n) => ({ ...x, volgorde: n + 1 }));
+}
+
+export function verplaatsKpi(kpiId: string, richting: -1 | 1): boolean {
+  const { kpiDefinities } = getInstellingen();
+  const nieuw = verplaats(kpiDefinities, kpiId, richting);
+  if (!nieuw) return false;
+  schrijfInstellingen({ kpiDefinities: nieuw });
+  const kpi = kpiDefinities.find((k) => k.id === kpiId)!;
+  logAudit({ actie: "kpiDefinitie.volgordeGewijzigd", entiteitType: "kpiDefinitie", entiteitId: kpiId, entiteitNaam: kpi.naam, details: { kpiNaam: kpi.naam } });
+  return true;
+}
+
+export function verplaatsKanaal(kanaalId: string, richting: -1 | 1): boolean {
+  const { kanalen } = getInstellingen();
+  const nieuw = verplaats(kanalen, kanaalId, richting);
+  if (!nieuw) return false;
+  schrijfInstellingen({ kanalen: nieuw });
+  const kanaal = kanalen.find((k) => k.id === kanaalId)!;
+  logAudit({ actie: "kanaal.volgordeGewijzigd", entiteitType: "kanaal", entiteitId: kanaalId, entiteitNaam: kanaal.naam, details: { kanaalNaam: kanaal.naam } });
+  return true;
+}
+
+/** Een kanaal hernoemen: Alleen de naam verandert, het id en alle KPI-waarden blijven. De naam blijft uniek, zonder verschil tussen hoofdletters. */
+export function hernoemKanaal(kanaalId: string, naam: string): BeheerResultaat<{ gewijzigd: boolean }> {
+  const schoon = naam.trim();
+  if (!schoon) return { ok: false, reden: "Vul een naam in." };
+  const { kanalen } = getInstellingen();
+  const kanaal = kanalen.find((k) => k.id === kanaalId);
+  if (!kanaal) return { ok: false, reden: "Kanaal niet gevonden." };
+  if (kanalen.some((k) => k.id !== kanaalId && gelijk(k.naam, schoon))) return { ok: false, reden: "Er is al een kanaal met deze naam." };
+  if (kanaal.naam === schoon) return { ok: true, gewijzigd: false };
+  schrijfInstellingen({ kanalen: kanalen.map((k) => (k.id === kanaalId ? { ...k, naam: schoon } : k)) });
+  logAudit({ actie: "kanaal.hernoemd", entiteitType: "kanaal", entiteitId: kanaalId, entiteitNaam: schoon, details: { oudeNaam: kanaal.naam, nieuweNaam: schoon } });
+  return { ok: true, gewijzigd: true };
+}

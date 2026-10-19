@@ -13,6 +13,7 @@
 @import "./styles/charts.css";
 @import "./styles/visualisatie.css";
 @import "./styles/mijn-metingen.css";
+@import "./styles/help.css";
 
 @theme inline {
   --font-sans: var(--font-epilogue);
