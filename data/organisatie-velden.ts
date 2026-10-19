@@ -1,8 +1,6 @@
 import { VeldDefinitie } from "@/lib/types";
 import { GEEN_ONDERSTEUNING } from "@/lib/techstack";
 
-const kanalen = ["Call", "Voicebot", "Livechat", "Chatbot", "E-mail", "Whatsapp"];
-
 const sbiSectoren = [
   "Landbouw, bosbouw en visserij",
   "Winning van delfstoffen",
@@ -415,16 +413,6 @@ export const organisatieVelden: VeldDefinitie[] = [
         ],
       },
       {
-        id: "contacten-per-jaar",
-        label: "Totaal aantal contacten per jaar, per kanaal",
-        type: "groep",
-        subvelden: kanalen.map((kanaal) => ({
-          id: `kanaal-${kanaal.toLowerCase()}`,
-          label: kanaal,
-          type: "getal" as const,
-        })),
-      },
-      {
         id: "adoptie-mijnomgeving",
         label: "Adoptie mijnomgeving/app",
         type: "percentage",
@@ -538,18 +526,6 @@ export const organisatieVelden: VeldDefinitie[] = [
           { id: "digital-percentage", label: "Percentage gericht op Digital", type: "percentage" },
         ],
       },
-    ],
-  },
-  {
-    id: "kpis",
-    label: "KPI's",
-    type: "groep",
-    subvelden: [
-      { id: "aht", label: "AHT", type: "getal", eenheid: "s" },
-      { id: "nps", label: "NPS", type: "getal" },
-      { id: "csat", label: "CSAT", type: "percentage" },
-      { id: "sla", label: "SLA", type: "percentage" },
-      { id: "ftr", label: "FTR", type: "percentage" },
     ],
   },
 ];

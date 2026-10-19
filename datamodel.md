@@ -253,7 +253,7 @@ Organisatie {
 
 ### Onderdeel
 
-**Voorstel van 19 oktober 2026, ontworpen, nog niet gebouwd.** Een Onderdeel is een deel van een Organisatie waarover een Meting gaat en waarvoor KPI-waarden kunnen worden ingevuld, zoals "Particulier" of "Team A". Tot nu toe was het onderdeel een tekst op de Meting. Nu bestaat het één keer per Organisatie, en gebruiken de Metingen en de KPI's dezelfde lijst.
+**Besloten door Joost, gebouwd op 19 oktober 2026.** Een Onderdeel is een deel van een Organisatie waarover een Meting gaat en waarvoor KPI-waarden kunnen worden ingevuld, zoals "Particulier" of "Team A". Tot nu toe was het onderdeel een tekst op de Meting. Nu bestaat het één keer per Organisatie, en gebruiken de Metingen en de KPI's dezelfde lijst.
 
 ```
 Onderdeel {
@@ -270,6 +270,7 @@ Onderdeel {
 - **Hernoemen** verandert de naam op één plek. De kolomkop bij de KPI's, de Metingen en de naam van elke Meting volgen. Een Meting met `labelHandmatig` houdt haar eigen naam.
 - **Verwijderen** kan alleen als er geen Meting aan hangt. De KPI-waarden van het Onderdeel verdwijnen mee, en de bevestiging noemt hoeveel (Verwijderen en datakoppelingen).
 - **Recht.** `organisaties.bewerken`. Aanmaken kan ook met `metingen.plannen`, omdat een Consultant bij het plannen van een Meting een nieuw team moet kunnen noemen.
+- **Zo gebouwd (afwijking: `Meting.onderdeel` blijft).** `Meting.onderdeelId` is er, maar het tekstveld `Meting.onderdeel` is niet vervallen: Het is de naam van het Onderdeel als kopie, zodat een Meting zonder de Organisatie erbij te lezen is en de vele plekken die de naam tonen niet allemaal de Organisatie hoeven op te zoeken. `zorgOnderdelenKloppend` (`lib/onderdelen.ts`) houdt de twee kloppend bij elke keer laden en bij elke schrijfactie (`slaAlles`): De naam bepaalt het Onderdeel (hoofdletterongevoelig, met de spelling van het bestaande Onderdeel), een naam die nog geen Onderdeel is maakt er een aan, en "Hele organisatie" is `null`. Hernoemen (`hernoemOnderdeel`) werkt de kopie en de naam van elke Meting bij, behalve bij `labelHandmatig`. De overgang loopt bij het laden en is stabiel: Een Onderdeel dat uit bestaande data ontstaat, krijgt een id uit een hash van de Organisatie en de naam, tot het is opgeslagen.
 
 ### Respondent (in de code: `OrganisatieLid`)
 
@@ -321,7 +322,7 @@ Meting {
   assessmentId: string
   label: string                     // de naam, zie Naam van een Meting
   labelHandmatig: boolean           // gebouwd op 14 oktober 2026, standaard false
-  onderdeelId: string | null        // voorstel van 19 oktober 2026, null is "Hele organisatie", zie Onderdeel. Gebouwd als tekstveld `onderdeel` (standaard "Hele organisatie", bijv. "Team A"), dat hierdoor vervalt
+  onderdeelId: string | null        // gebouwd op 19 oktober 2026, null is "Hele organisatie", zie Onderdeel. Het tekstveld `onderdeel` blijft staan als de naam van dat Onderdeel (zie "Zo gebouwd" bij Onderdeel)
   meetdatum?: date                  // gebouwd op 14 oktober 2026, zonder tijdstip
   samenstelling?: string[]          // gebouwd, metingIds, alleen bij een samengestelde Meting
   aangemaaktOp: datetime
@@ -331,7 +332,7 @@ Meting {
 **Onderdeel en meetdatum.** Het onderdeel zegt over welk deel van de
 organisatie een Meting gaat, bijvoorbeeld "Team A", en is standaard "Hele
 organisatie". Een Meting kiest een Onderdeel uit de lijst van de Organisatie
-(voorstel van 19 oktober 2026, zie Onderdeel). Waar de spec hieronder
+(gebouwd op 19 oktober 2026, zie Onderdeel). Waar de spec hieronder
 "onderdeel" schrijft, is dat de naam van dat Onderdeel, of "Hele organisatie"
 bij `onderdeelId: null`. De meetdatum is de dag waarop de Meting plaatsvindt. Respondenten
 mogen er daarna nog dagen over doen. Het is niet het moment waarop de Meting in
@@ -363,7 +364,7 @@ de app is aangemaakt (`aangemaaktOp`) en niet het moment van importeren.
   "Scans samenbrengen" en Wijzigen stellen het onderdeel voor uit het label: De
   tekst vóór " | ", anders "Hele organisatie". Het is een voorstel dat de
   beheerder ziet en kan aanpassen, nooit een stille wijziging. Met het Onderdeel
-  als object (voorstel van 19 oktober 2026) is het voorstel een keuze in de
+  als object (gebouwd op 19 oktober 2026) is het voorstel een keuze in de
   keuzelijst: Bestaat er een Onderdeel met die naam (hoofdletterongevoelig),
   dan staat dat gekozen. Anders staat er "Nieuw onderdeel…" met de naam
   ingevuld, en ontstaat het Onderdeel pas als de beheerder bevestigt.
@@ -441,7 +442,7 @@ worden. Het slot geldt voor een ingevulde scan (invullen en bewerken), een
 Respondent en een Organisatie. Later komt content erbij (Assessments,
 Content-pagina's). Het slot op een Organisatie geldt voor elke bewerking van
 die Organisatie: De Kenmerken, "KPI's invullen" en het toevoegen, wijzigen of
-verwijderen van een Onderdeel (voorstel van 19 oktober 2026).
+verwijderen van een Onderdeel (gebouwd op 19 oktober 2026).
 
 ```
 Bewerkslot {
@@ -612,10 +613,10 @@ verwijst wat niet meer bestaat.
   invullingen.
 - **Meting**: De meting en alle invullingen daarbinnen. Respondenten
   en het Onderdeel van de Meting blijven bestaan.
-- **Onderdeel** (voorstel van 19 oktober 2026): Alleen als er geen Meting
+- **Onderdeel** (gebouwd op 19 oktober 2026): Alleen als er geen Meting
   aan hangt. De KPI-waarden van het Onderdeel verdwijnen mee, en de
   bevestiging noemt het aantal.
-- **Kanaal** (voorstel van 19 oktober 2026): Het kanaal met al zijn
+- **Kanaal** (gebouwd op 19 oktober 2026): Het kanaal met al zijn
   KPI-waarden, bij alle Organisaties. De bevestiging noemt het aantal
   waarden en het aantal Organisaties.
 - **Organisatie**: Alles wat eronder hangt: Metingen, respondenten,
@@ -748,7 +749,7 @@ KorteNaam {
 
 **Volume en klantbasis**
 - Totaal aantal klanten (getal, met B2B/B2C-verdeling als percentage)
-- Contacten per jaar per kanaal: Voorstel van 19 oktober 2026, verhuisd
+- Contacten per jaar per kanaal: Gebouwd op 19 oktober 2026, verhuisd
   naar de KPI's (KPI's en kanalen, hieronder). Gebouwd als zes getalvelden met
   "niet van toepassing" toegestaan, die daarmee vervallen.
 - Adoptie mijnomgeving/app (percentage)
@@ -821,7 +822,7 @@ heeft daarvoor het element `techstackWfm`, en het element
   IT DevOps. Een bestaande waarde zonder groep wordt bij het laden `{ aantal }`)
 - IT DevOps-medewerkers (getal, met percentage gericht op Digital)
 
-**KPI's.** Voorstel van 19 oktober 2026: De KPI's zijn geen organisatievelden
+**KPI's.** Gebouwd op 19 oktober 2026: De KPI's zijn geen organisatievelden
 meer. Ze staan hieronder bij KPI's en kanalen. Gebouwd waren het vijf
 numerieke velden, AHT, NPS, CSAT, SLA en FTR (veld-id `kpis.aht` enzovoort).
 Verkennen gebruikt ze nog steeds als filter, als groepering (AHT met een
@@ -830,8 +831,8 @@ KPI's als kenmerk).
 
 ### KPI's en kanalen
 
-**Voorstel van 19 oktober 2026, ontworpen (`Claude outputs/kpi-design/`), nog
-niet gebouwd.** Het voorstel vervangt de vijf losse KPI-velden en de zes
+**Besloten door Joost (`Claude outputs/kpi-design/`), gebouwd op 19 oktober
+2026.** Het voorstel vervangt de vijf losse KPI-velden en de zes
 getalvelden voor contacten per kanaal. Een KPI-waarde hoort bij een plek: De
 hele organisatie, een Onderdeel, of een kanaal binnen een van die twee. Je vult
 alleen in wat je weet.
@@ -1405,16 +1406,16 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   organisatie. Alleen `Organisatie.naam` verandert, het `id` en alle
   koppelingen blijven gelijk.
 - `onderdeel.aangemaakt`, `onderdeel.hernoemd` en `onderdeel.verwijderd`
-  (voorstel van 19 oktober 2026). `details` bevat de naam van de Organisatie
+  (gebouwd op 19 oktober 2026). `details` bevat de naam van de Organisatie
   en de naam van het Onderdeel. Bij hernoemen staan de oude en de nieuwe naam
   erin, bij verwijderen het aantal KPI-waarden dat meeging.
-- `kpi.waardenGewijzigd` (voorstel van 19 oktober 2026). Eén gebeurtenis per plek
+- `kpi.waardenGewijzigd` (gebouwd op 19 oktober 2026). Eén gebeurtenis per plek
   die bij één keer Opslaan in "KPI's invullen" wijzigde, met één `groepId` voor
   de hele keer. `details` bevat de naam van de Organisatie, de plek (de naam van
   het Onderdeel of "Algemeen") en het aantal ingevulde, gewijzigde en gewiste
   waarden.
 - `kpiDefinitie.aangemaakt`, `kpiDefinitie.gewijzigd`, `kanaal.aangemaakt` en
-  `kanaal.verwijderd` (voorstel van 19 oktober 2026). `details` bevat de naam en
+  `kanaal.verwijderd` (gebouwd op 19 oktober 2026). `details` bevat de naam en
   bij `kpiDefinitie.gewijzigd` de oude en de nieuwe waarde van elk gewijzigd
   veld. Bij `kanaal.verwijderd` staat het aantal waarden en Organisaties dat
   meeging.

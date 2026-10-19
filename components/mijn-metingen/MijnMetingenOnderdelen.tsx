@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
 import { nodigLidUit } from "@/lib/db";
 import { voortgang } from "@/lib/scoring";
+import { balkVul } from "@/lib/format";
 import { volgendeUrl } from "@/lib/scan-routing";
 import { aantalAfgerondInMeting, isSamengesteld, gemiddeldeAntwoordenVoorMetingMetSamenstelling } from "@/lib/metingen";
 import { heeftMetingToegang } from "@/lib/lead-toegang";
@@ -46,11 +47,17 @@ function Chip({ klasse, children }: { klasse: string; children: React.ReactNode 
   );
 }
 
+/** De vulling van een balk: Hele pixels, minstens 4px boven nul (`stylesheet.md`, Balklijst). */
+function vul(percentage: number, kleur?: string): { className: string; style: React.CSSProperties } {
+  const b = balkVul(percentage);
+  return { className: b.className, style: { ...(b.style as React.CSSProperties), ...(kleur ? { background: kleur } : {}) } };
+}
+
 /** Een balk van 8px met een tekstalternatief ("23 van 60 vragen beantwoord"). */
 function Balk({ fractie, label, warm = false }: { fractie: number; label: string; warm?: boolean }) {
   return (
     <div className={`mm-balk ${warm ? "mm-balk--warm" : ""}`} role="img" aria-label={label}>
-      <div style={{ width: `${Math.round(Math.min(1, Math.max(0, fractie)) * 100)}%` }} />
+      <div {...vul(fractie * 100)} />
     </div>
   );
 }
@@ -95,7 +102,7 @@ function TeaserBlok({ teaser, label }: { teaser: Teaser; label: string }) {
                     <b className="mm-teaser-stip" style={{ left: `${r.fractie * 100}%`, background: r.kleur }} />
                   </>
                 ) : (
-                  <i style={{ width: `${Math.round(r.fractie * 100)}%`, background: r.kleur }} />
+                  <i {...vul(r.fractie * 100, r.kleur)} />
                 )}
               </span>
               <span className="mm-teaser-waarde">{r.waarde}</span>

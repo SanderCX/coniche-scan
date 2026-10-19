@@ -48,7 +48,9 @@
 /* Rijen: Naam, spoor en rechterkolom op een vast raster, zodat alle rijen onder elkaar uitlijnen. */
 .vis-rij {
   display: grid;
-  grid-template-columns: minmax(11rem, 17rem) minmax(0, 1fr) minmax(7.5rem, 13rem);
+  /* Vaste breedtes voor het label en de waarde (`stylesheet.md`, Balklijst): Elke rij is een eigen raster, dus een kolom die de
+     inhoud volgt, laat de sporen per rij anders beginnen en eindigen. */
+  grid-template-columns: 240px minmax(0, 1fr) 208px;
   align-items: center;
   gap: 1rem;
   padding: 0.25rem 0;
@@ -105,7 +107,7 @@
 /* Het spoor met de drie banden: 37,5% Basis op Orde, 25% Uitbouwen, 37,5% Sterk punt. */
 .vis-spoor {
   position: relative;
-  height: 2.2rem;
+  height: 36px;
   border-radius: 6px;
   background: linear-gradient(
     to right,
@@ -266,7 +268,9 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.8rem;
+  /* Minstens 32px tussen de groepen (schakelaar, Toon als, knop), zodat twee Info-iconen niet naast elkaar staan en een label niet
+     tegen de schakelaar plakt (`visualisatie-scores.md`, I, Toon als). */
+  gap: var(--sp-3) var(--sp-8);
   margin: 0 0 1.2rem;
 }
 
@@ -596,7 +600,7 @@
 }
 .qv-rij {
   display: grid;
-  grid-template-columns: 12rem minmax(0, 1fr) 8.5rem;
+  grid-template-columns: 192px minmax(0, 1fr) 136px;
   align-items: center;
   gap: 1rem;
   padding: 0.35rem 0;
@@ -620,7 +624,7 @@
 }
 .qv-bandnamen {
   display: grid;
-  grid-template-columns: 12rem minmax(0, 1fr) 8.5rem;
+  grid-template-columns: 192px minmax(0, 1fr) 136px;
   gap: 1rem;
   font-size: var(--fs-12);
   font-weight: 700;
@@ -637,7 +641,7 @@
 /* Een balk van 0 tot 100% met drie banden op 50% en 80%. */
 .qv-spoor {
   position: relative;
-  height: 1.7rem;
+  height: 28px;
   border-radius: 6px;
   background: linear-gradient(
     to right,
@@ -795,21 +799,29 @@
 }
 .qv-lijst-rij {
   display: grid;
-  grid-template-columns: 15rem minmax(0, 1fr) 9rem;
+  /* Label, spoor, waarde en de extra gegevens ("2 vragen") elk in een eigen kolom met een vaste breedte (`stylesheet.md`, Balklijst). */
+  grid-template-columns: 240px minmax(0, 1fr) 112px 80px;
   gap: 1rem;
   align-items: center;
   padding: 0.3rem 0;
   font-size: var(--fs-14);
 }
 .qv-balk {
-  height: 0.9rem;
-  border-radius: 100px;
+  height: var(--balk-h-m);
+  border-radius: var(--balk-r);
   background: var(--bg-mid);
   overflow: hidden;
 }
 .qv-balk > div {
   height: 100%;
-  border-radius: 100px;
+  border-radius: var(--balk-r);
+}
+.qv-extra {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .qv-keuze {
   display: flex;
@@ -819,8 +831,8 @@
 }
 .qv-stapel {
   display: flex;
-  height: 1.5rem;
-  border-radius: 6px;
+  height: var(--balk-h-l);
+  border-radius: var(--balk-r);
   overflow: hidden;
   background: var(--bg-mid);
 }
@@ -834,7 +846,7 @@
 }
 .qv-vraag-rij {
   display: grid;
-  grid-template-columns: 3rem minmax(0, 1fr) 15rem 5rem;
+  grid-template-columns: 48px minmax(0, 1fr) 240px 80px;
   gap: 1rem;
   align-items: center;
   padding: 0.5rem 0;
@@ -874,7 +886,7 @@
 /* De vergelijking tussen organisaties heeft rechts meer ruimte nodig: Percentage, verschil en positielabel. */
 .qv-rij--breed,
 .qv-bandnamen--breed {
-  grid-template-columns: 13rem minmax(0, 1fr) 14rem;
+  grid-template-columns: 208px minmax(0, 1fr) 224px;
 }
 .qv-rij--breed .qv-waarde {
   display: flex;
@@ -1441,4 +1453,21 @@
   border: 1px solid var(--border);
   border-radius: var(--r);
   padding: var(--sp-3) var(--sp-4);
+}
+
+/* Balklijst (`stylesheet.md`, Balklijst). Een balk is een percentage van het spoor (`--p`), afgerond op hele pixels en met minstens
+   4px bij een waarde boven nul. Een waarde van nul krijgt geen `.balk-vul`, dan staat alleen het spoor. De eerste `width` is de
+   terugval voor een browser zonder `round()`. */
+.balk-vul {
+  width: var(--p, 0%);
+  width: max(4px, round(var(--p, 0%), 1px));
+}
+
+/* Verkennen: De groep Kanaal bij een KPI met een waarde per kanaal. */
+.vk-kanaal-keuze {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
 }

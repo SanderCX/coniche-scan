@@ -1,3 +1,5 @@
+import { kpiExportRegels } from "./kpi";
+import { getInstellingen } from "./instellingen-store";
 import { Assessment, Organisatie, OrganisatieLid, ScanInvulling, ScanUitvoering } from "./types";
 import { alleBouwblokkenMetGroep, isVlakkeAssessment } from "./assessment-structuur";
 import { alleBouwblokResultaten, alleGroepResultaten, overallScore, voortgang } from "./scoring";
@@ -40,6 +42,7 @@ const KOLOMMEN = [
   "overall_score",
   "groepsScores",
   "organisatie_kenmerken",
+  "organisatie_kpis",
   "antwoorden",
   "opmerkingen_per_bouwblok",
 ];
@@ -196,6 +199,8 @@ function bouwRijRecord(ctx: CsvRijContext): Record<string, string> {
     overall_score: overallVeld,
     groepsScores: groepen,
     organisatie_kenmerken: JSON.stringify(organisatie.kenmerken),
+    // De KPI's en de contacten per kanaal staan niet meer in de kenmerken maar als KPI-waarden (`datamodel.md`, KPI's en kanalen).
+    organisatie_kpis: JSON.stringify(kpiExportRegels(organisatie, getInstellingen().kpiDefinities, getInstellingen().kanalen)),
     antwoorden: antwoordenVeld,
     opmerkingen_per_bouwblok: opmerkingenVeld,
   };
@@ -221,7 +226,7 @@ const INZAGE_KOLOMMEN = [
   ...KOLOMMEN.slice(0, KOLOMMEN.indexOf("respondent_team") + 1),
   "respondent_notities",
   "respondent_aangemaakt_op",
-  ...KOLOMMEN.slice(KOLOMMEN.indexOf("respondent_team") + 1).filter((k) => k !== "organisatie_kenmerken"),
+  ...KOLOMMEN.slice(KOLOMMEN.indexOf("respondent_team") + 1).filter((k) => k !== "organisatie_kenmerken" && k !== "organisatie_kpis"),
 ];
 
 export function genereerInzageCsv(

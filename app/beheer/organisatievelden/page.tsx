@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { InfoIcoon } from "@/components/InfoIcoon";
+import { KpiDefinitiesBeheer } from "@/components/beheer/KpiDefinitiesBeheer";
 import { KorteNamenTabel } from "@/components/beheer/KorteNamenTabel";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
@@ -9,7 +10,7 @@ import { magContentBeheren } from "@/lib/rechten";
 import { organisatieVelden } from "@/data/organisatie-velden";
 import { VeldDefinitie } from "@/lib/types";
 
-type Weergave = "velden" | "korteNamen";
+type Weergave = "velden" | "kpis" | "korteNamen";
 
 const TYPE_LABEL: Record<string, string> = {
   tekst: "Tekst",
@@ -73,6 +74,7 @@ export default function OrganisatieveldenPage() {
           ariaLabel="Weergave van de organisatievelden"
           opties={[
             { waarde: "velden", label: "Velden" },
+            { waarde: "kpis", label: "KPI's en kanalen" },
             { waarde: "korteNamen", label: "Korte namen" },
           ]}
           waarde={weergave}
@@ -80,7 +82,9 @@ export default function OrganisatieveldenPage() {
         />
       </div>
 
-      {weergave === "korteNamen" ? (
+      {weergave === "kpis" ? (
+        <KpiDefinitiesBeheer />
+      ) : weergave === "korteNamen" ? (
         <KorteNamenTabel />
       ) : (
         <>

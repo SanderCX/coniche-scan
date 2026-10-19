@@ -53,6 +53,12 @@
   /* Kolombreedte in tabellen en matrices (stylesheet.md, Kolomkop en rijkop) */
   --kolom-b: 96px;
 
+  /* Hoogte van een balk in een balklijst (`stylesheet.md`, Balklijst): Even pixels, één hoogte per lijst. */
+  --balk-h-s: 8px;   /* compacte lijst: Mijn metingen, categorieën */
+  --balk-h-m: 12px;  /* lijst met afdelingen of bouwblokken */
+  --balk-h-l: 16px;  /* gestapelde balk */
+  --balk-r: 4px;     /* afronding van elk uiteinde, nooit meer dan de halve hoogte */
+
   /* Eén hoogte voor velden en compacte knoppen die samen in een rij staan:
      de hoogte van de dropdown (stylesheet.md, Formulieren). */
   --control-h: 2.5rem;

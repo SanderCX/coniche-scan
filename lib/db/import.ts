@@ -1,3 +1,6 @@
+import { migreerKpiWaarden, pasKpiExportToe } from "../kpi";
+import { getInstellingen } from "../instellingen-store";
+import { zorgVoorOnderdeel } from "../onderdelen";
 import { Organisatie, ScanInvulling, ScanUitvoering } from "../types";
 import { nieuwId } from "../id";
 import { normaliseerEmail } from "../email";
@@ -176,6 +179,12 @@ export function voerLegacyImportUit(
     // (import-scans.md, "Kenmerken bij een nieuwe organisatie").
     if (rij.organisatieKenmerken && nieuwAangemaakt) {
       organisatie.kenmerken = { ...rij.organisatieKenmerken };
+      // Een eigen export van vóór de KPI's en kanalen heeft ze nog in `organisatie_kenmerken`: Omzetten (`datamodel.md`, Overgang).
+      migreerKpiWaarden(organisatie);
+      if (rij.organisatieKpis) {
+        const { kpiDefinities, kanalen } = getInstellingen();
+        pasKpiExportToe(organisatie, rij.organisatieKpis, kpiDefinities, kanalen, (naam) => zorgVoorOnderdeel(organisatie, naam)?.id ?? null);
+      }
     } else if ((rij.sectorTitel || rij.subsectorTitel) && !organisatie.kenmerken["sector-subsector"]) {
       organisatie.kenmerken["sector-subsector"] = {
         sector: rij.sectorTitel ?? "",

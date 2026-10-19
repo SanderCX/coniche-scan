@@ -191,7 +191,7 @@
 .mm-balk > div {
   height: 100%;
   background: var(--or);
-  border-radius: 4px;
+  border-radius: var(--balk-r);
 }
 .mm-teaser {
   display: grid;
@@ -237,7 +237,9 @@
 }
 .mm-teaser-rij {
   display: grid;
-  grid-template-columns: 170px 1fr auto;
+  /* Vaste breedte voor het label en de waarde, zodat de sporen in elke rij en in beide blokken op één lijn staan (`stylesheet.md`,
+     Balklijst). De Quickscan heeft een bredere waarde ("8/12 · 67%"). */
+  grid-template-columns: 170px minmax(0, 1fr) var(--mm-waarde-b, 48px);
   align-items: center;
   gap: var(--sp-3);
   font-size: var(--fs-14);
@@ -259,7 +261,10 @@
 .mm-teaser-balk i {
   display: block;
   height: 100%;
-  border-radius: 4px;
+  border-radius: var(--balk-r);
+}
+.mm-teaser-rijen:not(.mm-teaser-rijen--schaal) {
+  --mm-waarde-b: 104px;
 }
 /* Hele meting: Een stip op het gemiddelde en een grijze lijn van laagste tot hoogste score, op hetzelfde spoor van 1 tot 5. */
 .mm-teaser-rijen--stip .mm-teaser-balk {
@@ -290,11 +295,7 @@
   font-size: var(--fs-12);
   color: var(--ink-s);
 }
-.mm-teaser-rijen--schaal .mm-teaser-waarde {
-  width: 3rem;
-}
 .mm-teaser-waarde {
-  min-width: 3rem;
   text-align: right;
   font-weight: 700;
   color: var(--ink);
@@ -361,7 +362,7 @@
     gap: var(--sp-4);
   }
   .mm-teaser-rij {
-    grid-template-columns: 130px 1fr auto;
+    grid-template-columns: 130px minmax(0, 1fr) var(--mm-waarde-b, 48px);
   }
 }
 @media (max-width: 920px) {
@@ -373,7 +374,7 @@
     border-top: 1px solid var(--border);
   }
   .mm-teaser-rij {
-    grid-template-columns: 130px 1fr 40px;
+    grid-template-columns: 130px minmax(0, 1fr) var(--mm-waarde-b, 48px);
   }
   .mm-teaser {
     grid-template-columns: 1fr;

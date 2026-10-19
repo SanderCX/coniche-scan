@@ -488,8 +488,8 @@ export interface MatrixGroepRij {
 export interface MatrixWeergave {
   kolommen: { label: string; sublabel?: string; volledigeNaam?: string; aantalScans: number; totaal: number | null; totaalKlasse: Classificatie | null }[];
   rijen: MatrixRij[];
-  hoogsteMeting: { label: string; totaal: number } | null;
-  laagsteMeting: { label: string; totaal: number } | null;
+  hoogsteMeting: { label: string; sublabel?: string; totaal: number } | null;
+  laagsteMeting: { label: string; sublabel?: string; totaal: number } | null;
   grootsteVerschil: { naam: string; verschil: number } | null;
   aantalAfwijkend: number;
   /**
@@ -573,8 +573,8 @@ export function matrix(
   }
   const totalen = kolommen.map((k) => (k.aantalScans === 0 ? null : overallScore(assessment, k.antwoorden)));
   const metTotaal = kolommen
-    .map((k, i) => ({ label: k.label, totaal: totalen[i] }))
-    .filter((k): k is { label: string; totaal: number } => k.totaal !== null);
+    .map((k, i) => ({ label: k.label, sublabel: k.sublabel, totaal: totalen[i] }))
+    .filter((k): k is { label: string; sublabel: string | undefined; totaal: number } => k.totaal !== null);
   const hoogste = metTotaal.reduce<(typeof metTotaal)[number] | null>((m, k) => (m === null || k.totaal > m.totaal ? k : m), null);
   const laagste = metTotaal.reduce<(typeof metTotaal)[number] | null>((m, k) => (m === null || k.totaal < m.totaal ? k : m), null);
   const grootste = rijen.reduce<MatrixRij | null>((m, r) => (r.verschil !== null && (m === null || r.verschil > (m.verschil ?? -1)) ? r : m), null);

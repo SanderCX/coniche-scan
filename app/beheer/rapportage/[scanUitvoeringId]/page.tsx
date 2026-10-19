@@ -18,6 +18,7 @@ import {
   isSamengesteld,
   onderdeelVan,
   onderliggendeMetingen,
+  STANDAARD_ONDERDEEL,
   oudsteEerst,
   onderdeelEenheden,
   toonMeetdatum,
@@ -170,8 +171,9 @@ export default function RapportagePage({
               assessment,
               // Op meetdatum, de oudste links (`visualisatie-scores.md`, E, Volgorde van de kolommen).
               oudsteEerst(onderliggend).map((m) => ({
-                label: m.label,
-                sublabel: `${onderdeelVan(m)} · ${toonMeetdatum(m.meetdatum)}`,
+                label: onderdeelVan(m) === STANDAARD_ONDERDEEL ? m.label : onderdeelVan(m),
+                sublabel: toonMeetdatum(m.meetdatum),
+                volledigeNaam: `${m.label} · ${onderdeelVan(m)}`,
                 aantalScans: aantalAfgerondInMeting(organisatie, m),
                 antwoorden: gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, organisatie, m),
               })),

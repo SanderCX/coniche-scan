@@ -21,6 +21,8 @@ import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { RespondentFunctieKeuze } from "@/components/RespondentFunctieKeuze";
 import {
   OnderdeelMeetdatumVelden,
+  onderdeelFout,
+  onderdeelNaamVoorOpslaan,
   OnderdeelMeetdatumWaarde,
   beginWaarde,
 } from "@/components/beheer/OnderdeelMeetdatumVelden";
@@ -133,7 +135,7 @@ export function ScansSamenbrengenModal({
 
   // Bestaat de combinatie van onderdeel, Assessment en meetdatum al, dan is dat een waarschuwing met de Meting die er is:
   // De beheerder kiest die Meting hierboven, of gaat toch door (`datamodel.md`, Uniek).
-  const onderdeelNaam = waarde.onderdeel.trim() || STANDAARD_ONDERDEEL;
+  const onderdeelNaam = onderdeelNaamVoorOpslaan(organisatie, waarde);
   const botsendeMeting = nieuweMeting ? metingMetCombinatie(organisatie, onderdeelNaam, assessmentId, waarde.meetdatum) : undefined;
 
   const fouten = useMemo(
@@ -148,7 +150,7 @@ export function ScansSamenbrengenModal({
     [organisatie, scans, regels, doelKeuze, nieuweMeting]
   );
 
-  const doelGeldig = nieuweMeting ? isGeldigeDatum(waarde.meetdatum) : doelMetingen.some((m) => m.id === doelKeuze);
+  const doelGeldig = nieuweMeting ? isGeldigeDatum(waarde.meetdatum) && onderdeelFout(organisatie, waarde) === null : doelMetingen.some((m) => m.id === doelKeuze);
   const kanOpslaan = scans.length > 0 && doelGeldig && Object.keys(fouten).length === 0 && !bezet && !controleren;
 
   const [fout, setFout] = useState<string | null>(null);

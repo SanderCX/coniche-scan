@@ -1,3 +1,4 @@
+import { balkVul } from "@/lib/format";
 import { QuickscanAfdeling, QuickscanResultaat } from "@/lib/quickscan";
 import { Bandnamen, Hulplijnen, KLASSE_STIJL, getal } from "./gedeeld";
 
@@ -114,12 +115,16 @@ export function QuickscanOverzicht({ resultaat }: { resultaat: QuickscanResultaa
                 {b.gewicht !== 1 && <span className="gewicht-chip" style={{ marginLeft: "0.4rem" }}>{getal(b.gewicht)}×</span>}
               </span>
               <div className="qv-balk" aria-hidden="true">
-                <div style={{ width: `${b.percentage ?? 0}%`, background: s?.kleur ?? "var(--ink-s)" }} />
+                <div
+                  className={balkVul(b.percentage ?? 0).className}
+                  style={{ ...(balkVul(b.percentage ?? 0).style as React.CSSProperties), background: s?.kleur ?? "var(--ink-s)" }}
+                />
               </div>
               <span className="qv-waarde">
                 {getal(b.punten)}/{b.vragen} · <strong style={{ color: s?.tekst }}>{b.percentage ?? 0}%</strong>
-                {b.vragen < 3 && <span className="text-ink-s"> · {b.vragen} {b.vragen === 1 ? "vraag" : "vragen"}</span>}
               </span>
+              {/* Een aanvulling als "1 vraag" heeft een eigen kolom en staat nooit in de cel van de waarde (`stylesheet.md`, Balklijst). */}
+              <span className="qv-extra">{b.vragen < 3 ? `${b.vragen} ${b.vragen === 1 ? "vraag" : "vragen"}` : ""}</span>
             </div>
           );
         })}

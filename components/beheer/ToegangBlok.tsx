@@ -12,6 +12,8 @@ import { isGeldigeDatum, isSamengesteld, nieuwsteEerst } from "@/lib/metingen";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import {
   OnderdeelMeetdatumVelden,
+  onderdeelFout,
+  onderdeelNaamVoorOpslaan,
   OnderdeelMeetdatumWaarde,
   beginWaarde,
 } from "@/components/beheer/OnderdeelMeetdatumVelden";
@@ -78,7 +80,7 @@ export function ToegangBlok({
   const keuze = metingKeuze || (beschikbaar[0]?.id ?? NIEUWE_METING);
   const nieuweMeting = keuze === NIEUWE_METING;
   const kanSturen = nieuweMeting
-    ? nieuwAssessment !== "" && isGeldigeDatum(nieuwWaarde.meetdatum)
+    ? nieuwAssessment !== "" && isGeldigeDatum(nieuwWaarde.meetdatum) && onderdeelFout(organisatie, nieuwWaarde) === null
     : beschikbaar.some((m) => m.id === keuze);
 
   function stuur() {
@@ -88,7 +90,7 @@ export function ToegangBlok({
     if (nieuweMeting) {
       const r = maakMeting(organisatie.id, {
         assessmentId: nieuwAssessment,
-        onderdeel: nieuwWaarde.onderdeel,
+        onderdeel: onderdeelNaamVoorOpslaan(organisatie, nieuwWaarde),
         meetdatum: nieuwWaarde.meetdatum,
       });
       if (!r.ok) {

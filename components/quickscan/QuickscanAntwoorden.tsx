@@ -1,5 +1,6 @@
 "use client";
 
+import { Stapel } from "./Stapel";
 import { useState } from "react";
 import { Assessment, Antwoord } from "@/lib/types";
 import { AfdelingVerdeling, QuickscanScan, VraagVerdeling, quickscanVerdeling } from "@/lib/quickscan-groep";
@@ -101,11 +102,15 @@ function Verdeling({ verdeling }: { verdeling: AfdelingVerdeling[] }) {
           { label: "Vaakst Weet ik niet", ...vraagTegel(a.vaakstWeetNiet, "weetNiet") },
         ]}
       />
-      <div className="qv-stapel" style={{ marginTop: "0.6rem" }} role="img" aria-label={`Ja ${pct(a.ja)}%, Nee ${pct(a.nee)}%, Weet ik niet ${pct(a.weetNiet)}%`}>
-        <div style={{ width: `${pct(a.ja)}%`, background: ANTWOORD_KLEUR.ja }}>{a.ja || ""}</div>
-        <div style={{ width: `${pct(a.nee)}%`, background: ANTWOORD_KLEUR.nee }}>{a.nee || ""}</div>
-        <div style={{ width: `${pct(a.weetNiet)}%`, background: ANTWOORD_KLEUR.weetNiet, color: "var(--ink)" }}>{a.weetNiet || ""}</div>
-      </div>
+      <Stapel
+        style={{ marginTop: "0.6rem" }}
+        ariaLabel={`Ja ${pct(a.ja)}%, Nee ${pct(a.nee)}%, Weet ik niet ${pct(a.weetNiet)}%`}
+        delen={[
+          { waarde: a.ja, kleur: ANTWOORD_KLEUR.ja, titel: `Ja: ${a.ja}` },
+          { waarde: a.nee, kleur: ANTWOORD_KLEUR.nee, titel: `Nee: ${a.nee}` },
+          { waarde: a.weetNiet, kleur: ANTWOORD_KLEUR.weetNiet, tekstkleur: "var(--ink)", titel: `Weet ik niet: ${a.weetNiet}` },
+        ]}
+      />
       <p className="qv-legenda">
         <span><i style={{ background: ANTWOORD_KLEUR.ja }} />Ja</span>
         <span><i style={{ background: ANTWOORD_KLEUR.nee }} />Nee</span>
@@ -134,7 +139,6 @@ function Verdeling({ verdeling }: { verdeling: AfdelingVerdeling[] }) {
 
 function VraagRij({ v }: { v: VraagVerdeling }) {
   const totaal = v.ja + v.nee + v.weetNiet;
-  const breedte = (n: number) => (totaal === 0 ? 0 : (n / totaal) * 100);
   const klasse = v.jaPercentage === null ? null : klasseVanPercentage(v.jaPercentage);
   return (
     <div className="qv-vraag-rij">
@@ -147,11 +151,14 @@ function VraagRij({ v }: { v: VraagVerdeling }) {
           </span>
         )}
       </span>
-      <div className="qv-stapel" role="img" aria-label={`Ja ${v.ja}, Nee ${v.nee}, Weet ik niet ${v.weetNiet}`}>
-        {v.ja > 0 && <div style={{ width: `${breedte(v.ja)}%`, background: ANTWOORD_KLEUR.ja }}>{v.ja}</div>}
-        {v.nee > 0 && <div style={{ width: `${breedte(v.nee)}%`, background: ANTWOORD_KLEUR.nee }}>{v.nee}</div>}
-        {v.weetNiet > 0 && <div style={{ width: `${breedte(v.weetNiet)}%`, background: ANTWOORD_KLEUR.weetNiet, color: "var(--ink)" }}>{v.weetNiet}</div>}
-      </div>
+      <Stapel
+        ariaLabel={`Ja ${v.ja}, Nee ${v.nee}, Weet ik niet ${v.weetNiet}`}
+        delen={[
+          { waarde: v.ja, kleur: ANTWOORD_KLEUR.ja, titel: `Ja: ${v.ja}` },
+          { waarde: v.nee, kleur: ANTWOORD_KLEUR.nee, titel: `Nee: ${v.nee}` },
+          { waarde: v.weetNiet, kleur: ANTWOORD_KLEUR.weetNiet, tekstkleur: "var(--ink)", titel: `Weet ik niet: ${v.weetNiet}` },
+        ]}
+      />
       <span className="qv-waarde" style={{ color: klasse ? KLASSE_STIJL[klasse].tekst : undefined, fontWeight: 700 }}>
         {v.jaPercentage === null ? "–" : `${v.jaPercentage}% Ja`}
       </span>

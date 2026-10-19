@@ -9,6 +9,8 @@ export * from "./store";
 export * from "./organisaties";
 export * from "./metingen";
 export * from "./meting-plannen";
+export * from "./onderdelen";
+export * from "./kpi";
 export * from "./respondenten";
 export * from "./verplaatsen";
 export * from "./samenbrengen";

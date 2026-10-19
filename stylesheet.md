@@ -915,7 +915,7 @@ in een tooltip) en de lijst Respondenten zijn het voorbeeld.
 
 ### Balklijst (rijen met een balk)
 
-Voorstel van 19 oktober 2026. Joost zag op de landingspagina en in de Quickscan balken die optisch niet even breed of hoog waren. Een kolom die de breedte van zijn inhoud aanneemt, geeft dat effect, en dit is de regel die het voorkomt. Elke lijst met balken (de categorieën op Mijn metingen, de afdelingen en bouwblokken van de Quickscan, de rijen van de benchmark, de gestapelde balken bij Antwoorden) volgt deze regels.
+Gebouwd op 19 oktober 2026. Joost zag op de landingspagina en in de Quickscan balken die optisch niet even breed of hoog waren. Een kolom die de breedte van zijn inhoud aanneemt, geeft dat effect, en dit is de regel die het voorkomt. Elke lijst met balken (de categorieën op Mijn metingen, de afdelingen en bouwblokken van de Quickscan, de rijen van de benchmark, de gestapelde balken bij Antwoorden) volgt deze regels.
 
 - **Drie kolommen met een vaste breedte.** Elke rij is een raster met een label, een spoor en een waarde. Het label en de waarde hebben een vaste breedte per lijst en het spoor neemt de rest (`1fr`). Een kolom neemt nooit de breedte van de inhoud aan. Zo begint en eindigt het spoor in elke rij op dezelfde plaats, ook als het label of de waarde in de ene rij langer is.
 - **Extra gegevens.** Een aanvulling als "2 vragen" of "n.v.t." heeft een eigen kolom met een vaste breedte en staat nooit in dezelfde cel als de waarde. Anders is de waardekolom per rij anders breed en verschuift het spoor.
@@ -927,6 +927,7 @@ Voorstel van 19 oktober 2026. Joost zag op de landingspagina en in de Quickscan 
 - **Gestapelde balk (Ja, Nee en Weet ik niet).** Het hele spoor is in elke rij even breed en de segmenten verdelen het naar verhouding. Een getal staat alleen in het segment als het segment minstens 24px breed is. Anders staat het in de tooltip. Een antwoord dat niemand gaf, heeft geen segment.
 - **Sporen op één lijn.** Staan twee blokken naast elkaar (zoals Jouw scan en Hele meting), dan hebben ze dezelfde breedte voor label en waarde, zodat de sporen op één lijn staan.
 - **Controle.** Een test meet in elke lijst de breedte en de hoogte van de sporen en balken en faalt als die in één lijst verschillen.
+- **Zo gebouwd (19 oktober 2026).** De tokens `--balk-h-s`, `--balk-h-m`, `--balk-h-l` en `--balk-r` staan in `tokens.css`. De lijsten `.vis-rij` (240px, spoor, 208px), `.qv-rij`, `.qv-lijst-rij` (240px, spoor, 112px, 80px voor "1 vraag"), `.qv-vraag-rij` en `.mm-teaser-rij` hebben vaste kolommen, de sporen `.vis-spoor` (36px) en `.qv-spoor` (28px) zijn even. De vulling is `.balk-vul` (`max(4px, round(var(--p), 1px))`, `balkVul` in `lib/format.ts`). De gestapelde balk is `Stapel` (`components/quickscan/Stapel.tsx`) en meet zijn spoor in hele pixels, met het getal alleen in een segment van minstens 24px en een tooltip bij de rest. De controle is een test op de opmaak in plaats van een meting in de browser (`lib/balklijst.test.ts`): Die leest `app/styles/*.css` en faalt bij een kolom die de inhoud volgt of een hoogte die niet klopt.
 
 ### Filterchip, focuschip en slider (Verkennen)
 

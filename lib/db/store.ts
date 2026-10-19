@@ -5,6 +5,8 @@ import { demoOrganisatie } from "@/data/demo-organisatie";
 import { haalServerKopieOp, stuurNaarServer } from "../server-sync";
 import { migreerTechstackOndersteuning } from "@/lib/techstack";
 import { ruimOrganisatieOp } from "@/lib/metingen";
+import { zorgOnderdelenKloppend } from "@/lib/onderdelen";
+import { migreerKpiWaarden } from "@/lib/kpi";
 import { getBenchmarks, haalMetingenUitBenchmarks, legeToewijzingen, wisOmgezetteToewijzingen } from "@/lib/benchmark-store";
 import { getBenchmarksMetLeden } from "@/lib/benchmark-leden";
 import { ruimLeadToegangOp, toegangSleutel, zetLegacyBereikOm } from "@/lib/lead-toegang";
@@ -133,6 +135,11 @@ function normaliseerOrganisatie(invoer: Organisatie): Organisatie {
     leadOvergangMelding: ruw.leadOvergangMelding ?? null,
   };
   zetLegacyBereikOm(organisatie);
+  // Overgang van de tekst op de Meting naar Onderdelen (`datamodel.md`, Onderdeel): Idempotent, en stabiel tot het is opgeslagen.
+  zorgOnderdelenKloppend(organisatie);
+  // De KPI's en de contacten per kanaal zijn geen organisatievelden meer maar KPI-waarden (`datamodel.md`, KPI's en kanalen, Overgang).
+  organisatie.kpiWaarden = Array.isArray(ruw.kpiWaarden) ? ruw.kpiWaarden : [];
+  migreerKpiWaarden(organisatie);
   ruimLeadToegangOp(organisatie);
   return organisatie;
 }
@@ -158,6 +165,8 @@ export function slaAlles(alles: Organisatie[]): void {
   // onderliggende Metingen verdwijnt vanzelf (`datamodel.md`, Samengestelde Meting). Eén plek, zodat geen schrijfactie het vergeet.
   const verdwenen: { metingId: string; organisatieNaam: string }[] = [];
   for (const organisatie of alles) {
+    // Een Meting met een naam die nog geen Onderdeel is, maakt er een aan, en een hernoeming werkt de Metingen bij.
+    zorgOnderdelenKloppend(organisatie);
     const r = ruimOrganisatieOp(organisatie);
     for (const id of r.verwijderdeSamengesteldeIds) verdwenen.push({ metingId: id, organisatieNaam: organisatie.naam });
   }

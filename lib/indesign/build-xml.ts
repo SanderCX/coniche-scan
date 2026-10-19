@@ -12,6 +12,7 @@ import { radarChartSvg, barChartSvg } from "@/lib/pdf/charts";
 import { escapeXml, slug } from "./xml-utils";
 import { standaloneSvg, scoreAlgemeenSvg, top3ListSvg } from "./charts";
 import { kenmerkenXml } from "./kenmerken-xml";
+import type { KpiWaarde } from "../types";
 import { contentSectieXml } from "./content-sectie";
 
 export interface ExportIndesignPayload {
@@ -19,6 +20,8 @@ export interface ExportIndesignPayload {
   antwoorden: Record<string, number>;
   organisatieNaam: string;
   organisatieKenmerken: Record<string, unknown>;
+  /** De KPI-waarden van de Organisatie: De elementen `kpi…` en `contacten…` komen uit Algemeen (`export-indesign.md`). */
+  organisatieKpiWaarden?: KpiWaarde[];
   respondentNaam: string;
   respondentFunctie: string;
   respondentTeam: string;
@@ -71,7 +74,7 @@ export function buildIndesignExport(payload: ExportIndesignPayload): IndesignExp
 
   const xml =
     `<?xml version="1.0" encoding="UTF-8"?>\n<scanExport>` +
-    `<organisatie><naam>${escapeXml(organisatieNaam)}</naam>${kenmerkenXml(organisatieKenmerken)}</organisatie>` +
+    `<organisatie><naam>${escapeXml(organisatieNaam)}</naam>${kenmerkenXml(organisatieKenmerken, payload.organisatieKpiWaarden ?? [])}</organisatie>` +
     `<respondent><naam>${escapeXml(respondentNaam)}</naam><functie>${escapeXml(respondentFunctie || "n.v.t.")}</functie><team>${escapeXml(respondentTeam || "n.v.t.")}</team></respondent>` +
     `<meting><label>${escapeXml(metingLabel)}</label></meting>` +
     `<assessment><naam>${escapeXml(assessment.naam)}</naam><kortLabel>${escapeXml(kortLabel)}</kortLabel></assessment>` +

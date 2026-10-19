@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
-import { ScanInvulling } from "./types";
+import { Kanaal, KpiDefinitie, ScanInvulling } from "./types";
+import { STANDAARD_KANALEN, STANDAARD_KPIS } from "./kpi";
 import type { KorteNamen } from "./korte-namen";
 import { haalServerKopieOp, stuurNaarServer } from "./server-sync";
 import { logAudit } from "./audit-store";
@@ -50,6 +51,10 @@ export interface Instellingen {
    * weergavenamen zijn en de organisatievelden zelf vaste data zijn.
    */
   korteNamen: KorteNamen;
+  /** De KPI's en op welke plekken ze een waarde mogen hebben (`datamodel.md`, KPI's en kanalen). Beheerd door een Admin. */
+  kpiDefinities: KpiDefinitie[];
+  /** De kanalen, één lijst voor het hele platform. Beheerd door een Admin. */
+  kanalen: Kanaal[];
 }
 
 const STANDAARDWAARDEN: Instellingen = {
@@ -65,6 +70,8 @@ const STANDAARDWAARDEN: Instellingen = {
   verkennenMaxGroepen: 12,
   verkennenMinIngevuldPct: 40,
   korteNamen: { velden: {}, waarden: [] },
+  kpiDefinities: STANDAARD_KPIS,
+  kanalen: STANDAARD_KANALEN,
 };
 
 const KEY = "coniche-scan:instellingen";
@@ -112,6 +119,9 @@ function parseSnapshot(snapshot: string): Instellingen {
       ...STANDAARDWAARDEN,
       ...(oud !== undefined && rest.verkennenMinVergelijking === undefined ? { verkennenMinVergelijking: oud } : {}),
       ...rest,
+      // Ontbreekt bij instellingen van vóór de KPI's en kanalen: De startset geldt.
+      kpiDefinities: Array.isArray(rest.kpiDefinities) && rest.kpiDefinities.length > 0 ? rest.kpiDefinities : STANDAARD_KPIS,
+      kanalen: Array.isArray(rest.kanalen) && rest.kanalen.length > 0 ? rest.kanalen : STANDAARD_KANALEN,
     };
   } catch {
     return { ...STANDAARDWAARDEN };

@@ -25,8 +25,9 @@ import {
   getalWaarden,
   heatmap as bouwHeatmap,
   kanGroeperen,
+  metKanaal,
   kanalenVeld,
-  kenmerkWaarde,
+  lidWaarde,
   maakGroepen,
   mediaan,
   pasFiltersToe,
@@ -68,6 +69,8 @@ export default function VerkennenPage() {
   const [assessmentKeuze, setAssessmentKeuze] = useState<string>("");
   const [eenheid, setEenheid] = useState<VerkenEenheid>("organisaties");
   const [periodeInvoer, setPeriodeInvoer] = useState<PeriodeInvoer>(LEGE_PERIODE_INVOER);
+  // Het gekozen kanaal per KPI (`null` is Algemeen): Een KPI met `perKanaal` heeft een groep Kanaal bij het kenmerk.
+  const [kpiKanaal, setKpiKanaal] = useState<Record<string, string | null>>({});
   const [filters, setFilters] = useState<FilterStand>(LEGE_FILTERS);
   const [kenmerken, setKenmerken] = useState<string[]>([]);
   const [gekozenOp, setGekozenOp] = useState<string | null>(null);
@@ -81,7 +84,9 @@ export default function VerkennenPage() {
 
   const assessment = assessments.find((a) => a.id === assessmentKeuze) ?? assessments[0];
   // Het scherm rekent bij elke wijziging opnieuw: De pool is klein en er wordt niets opgeslagen.
-  const velden = filterVelden();
+  const bouwVelden = (kanaalPerKpi: Record<string, string | null>) =>
+    filterVelden(undefined, instellingen.kpiDefinities).map((v) => (v.kpi ? metKanaal(v, kanaalPerKpi[v.kpi.kpiId] ?? null) : v));
+  const velden = bouwVelden(kpiKanaal);
   // Bij de eenheid Onderdelen komen de kenmerken Organisatie en Onderdeel erbij (`visualisatie-verkennen.md`, Eenheid).
   const filterbaar = eenheid === "onderdelen" ? [...velden, ...onderdeelVelden()] : velden;
   const alleVelden = [...filterbaar, kanalenVeld()];
@@ -110,9 +115,11 @@ export default function VerkennenPage() {
           .filter((v): v is NonNullable<typeof v> => v !== undefined)
           .map((veld) => {
             const naam = veld.id === KANALEN_ID ? korte(KANALEN_ID, "Ingezette kanalen") : korte(veld.id, veldLabelZonderGroep(veld));
+            // Bij een KPI met een kanaal anders dan Algemeen staat het kanaal in de naam: "AHT Call-drempel".
+            const kanaalNaam = veld.kpi?.kanaalId ? instellingen.kanalen.find((k) => k.id === veld.kpi?.kanaalId)?.naam : undefined;
             return {
               veld,
-              naam: veld.type === "getal" ? `${naam}-drempel` : naam,
+              naam: veld.type === "getal" ? `${naam}${kanaalNaam ? ` ${kanaalNaam}` : ""}-drempel` : naam,
               bruikbaarheid: kanGroeperen(veld, poolLeden, gefilterdeLeden, drempels, woord),
             };
           })
@@ -132,6 +139,7 @@ export default function VerkennenPage() {
     gekozen?: string | null;
     eenheid?: VerkenEenheid;
     periode?: PeriodeInvoer;
+    kpiKanaal?: Record<string, string | null>;
   }) => {
     if (!pool || !assessment) return;
     const nieuweEenheid = verandering.eenheid ?? eenheid;
@@ -143,7 +151,9 @@ export default function VerkennenPage() {
       eenheidGewisseld || periodeGewijzigd
         ? bouwPool(organisaties, assessment, instellingen.benchmarkMinScans, nieuweEenheid, nieuwePeriode)
         : pool;
-    const nieuweFilterbaar = nieuweEenheid === "onderdelen" ? [...velden, ...onderdeelVelden()] : velden;
+    const nieuweKpiKanaal = verandering.kpiKanaal ?? kpiKanaal;
+    const nieuweVelden = bouwVelden(nieuweKpiKanaal);
+    const nieuweFilterbaar = nieuweEenheid === "onderdelen" ? [...nieuweVelden, ...onderdeelVelden()] : nieuweVelden;
     const nieuweAlle = [...nieuweFilterbaar, kanalenVeld()];
     const woord = nieuweEenheid === "onderdelen" ? "onderdelen" : "Organisaties";
     let nieuweKenmerken = verandering.kenmerken ?? kenmerken;
@@ -172,6 +182,7 @@ export default function VerkennenPage() {
       minPool: drempels.minPool,
     });
     setEenheid(nieuweEenheid);
+    setKpiKanaal(nieuweKpiKanaal);
     setPeriodeInvoer(nieuweInvoer);
     setKenmerken(nieuweKenmerken);
     setFilters(nieuweFilters);
@@ -227,7 +238,7 @@ export default function VerkennenPage() {
   const punten = verbandPunten(
     gefilterd,
     focusIds,
-    (l) => getalWaarde(kenmerkWaarde(l.organisatie, xVeld.id.split("."))),
+    (l) => getalWaarde(xDef ? lidWaarde(l, xDef) : undefined),
     (l) => (yIndex === -1 ? l.overall : l.scores[yIndex])
   );
   const yLabel = yIndex === -1 ? "Overall score" : pool.rijen[yIndex].bouwblok.naam;
@@ -271,6 +282,7 @@ export default function VerkennenPage() {
           value={assessment.id}
           onChange={(e) => {
             setAssessmentKeuze(e.target.value);
+            setKpiKanaal({});
             setPeriodeInvoer(LEGE_PERIODE_INVOER);
             setFilters(LEGE_FILTERS);
             setKenmerken([]);
@@ -317,6 +329,12 @@ export default function VerkennenPage() {
         onStand={(f) => wijzig({ filters: f })}
         onToevoegen={voegToe}
         onVerwijder={verwijder}
+        kpiKanaal={kpiKanaal}
+        onKpiKanaal={(kpiId, kanaalId) => {
+          // Wisselt de Admin van kanaal bij de KPI waarop gegroepeerd wordt, dan keert de drempel terug naar de mediaan van de nieuwe waarden.
+          if (gekozenOp === `kpis.${kpiId}`) setDrempel(null);
+          wijzig({ kpiKanaal: { ...kpiKanaal, [kpiId]: kanaalId } });
+        }}
         pool={pool.leden}
         gefilterd={gefilterd}
         zonderToestemming={pool.zonderToestemming}

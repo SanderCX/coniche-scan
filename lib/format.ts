@@ -13,3 +13,12 @@ export function parseGewicht(tekst: string): number | null {
 export function formatScore(score: number | null | undefined, decimalen = 1): string {
   return score === null || score === undefined ? "–" : score.toFixed(decimalen).replace(".", ",");
 }
+
+/**
+ * De klasse en stijl voor de vulling van een balk (`stylesheet.md`, Balklijst): Een percentage van het spoor, afgerond op hele
+ * pixels en met minstens 4px bij een waarde boven nul (`.balk-vul`). Bij nul staat alleen het spoor.
+ */
+export function balkVul(percentage: number): { className: string; style: Record<string, string | number> } {
+  const p = Math.min(100, Math.max(0, percentage));
+  return p > 0 ? { className: "balk-vul", style: { "--p": `${p}%` } } : { className: "", style: { width: 0 } };
+}

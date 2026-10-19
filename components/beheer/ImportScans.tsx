@@ -1,5 +1,6 @@
 "use client";
 
+import { OnderdeelVeld } from "@/components/beheer/OnderdeelMeetdatumVelden";
 import { useCallback, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { InfoIcoon } from "@/components/InfoIcoon";
@@ -656,12 +657,13 @@ export function ImportScans({ doel }: { doel: Organisatie }) {
                     {metOnderdelen && (
                       <td>
                         {(bronnamenPerDoel.get(doelVan(naam))?.size ?? 0) >= 2 ? (
-                          <input
-                            type="text"
-                            className="veld-compact"
-                            value={onderdeelPerBronnaam[naam.trim()] ?? naam.trim()}
-                            onChange={(e) => setOnderdeelPerBronnaam((prev) => ({ ...prev, [naam.trim()]: e.target.value }))}
-                            aria-label={`Onderdeel voor ${naam}`}
+                          <OnderdeelVeld
+                            compact
+                            organisatie={doel}
+                            idPrefix={`import-${naam.trim()}`}
+                            ariaLabel={`Onderdeel voor ${naam}`}
+                            waarde={{ onderdeel: onderdeelPerBronnaam[naam.trim()] ?? naam.trim() }}
+                            onChange={(o) => setOnderdeelPerBronnaam((prev) => ({ ...prev, [naam.trim()]: o.onderdeel }))}
                           />
                         ) : (
                           <span className="text-sm text-ink-m">Hele organisatie</span>

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { wijzigMeting } from "@/lib/db";
 import {
-  STANDAARD_ONDERDEEL,
   dubbeleCombinatieTekst,
   isGeldigeDatum,
   isSamengesteld,
@@ -13,7 +12,12 @@ import {
   standaardLabel,
 } from "@/lib/metingen";
 import { Organisatie, ScanUitvoering } from "@/lib/types";
-import { OnderdeelMeetdatumVelden } from "@/components/beheer/OnderdeelMeetdatumVelden";
+import {
+  OnderdeelMeetdatumVelden,
+  OnderdeelMeetdatumWaarde,
+  onderdeelFout,
+  onderdeelNaamVoorOpslaan,
+} from "@/components/beheer/OnderdeelMeetdatumVelden";
 
 /**
  * "Wijzigen" van een Meting (`beheerpagina.md`, punt 5): Achter het potlood naast de naam van de Meting, met alleen de velden
@@ -32,7 +36,8 @@ export function MetingWijzigenFormulier({
   onKlaar: () => void;
 }) {
   const samengesteld = isSamengesteld(meting);
-  const [waarde, setWaarde] = useState({ onderdeel: onderdeelVan(meting), meetdatum: meetdatumVan(meting) ?? "" });
+  const [waarde, setWaarde] = useState<OnderdeelMeetdatumWaarde>({ onderdeel: onderdeelVan(meting), meetdatum: meetdatumVan(meting) ?? "" });
+  const onderdeelNaam = onderdeelNaamVoorOpslaan(organisatie, waarde);
   const [naam, setNaam] = useState(meting.label);
   // De naam volgt onderdeel en meetdatum zolang de gebruiker hem niet zelf aanpast.
   const [naamAangepast, setNaamAangepast] = useState(meting.labelHandmatig === true);
@@ -40,20 +45,22 @@ export function MetingWijzigenFormulier({
 
   // De naam die de app zelf zou maken uit het onderdeel en de meetdatum zoals ze nu in het formulier staan.
   const standaard = standaardLabel({
-    onderdeel: waarde.onderdeel,
+    onderdeel: onderdeelNaam,
     meetdatum: isGeldigeDatum(waarde.meetdatum) ? waarde.meetdatum : meetdatumVan(meting) ?? undefined,
   });
   const getoondeNaam = naamAangepast ? naam : standaard;
   const dubbel = isGeldigeDatum(waarde.meetdatum)
-    ? metingMetCombinatie(organisatie, waarde.onderdeel, meting.assessmentId, waarde.meetdatum, meting.id)
+    ? metingMetCombinatie(organisatie, onderdeelNaam, meting.assessmentId, waarde.meetdatum, meting.id)
     : undefined;
 
   function opslaan(e: React.FormEvent) {
     e.preventDefault();
     setFout(null);
+    const onderdeelProbleem = onderdeelFout(organisatie, waarde);
+    if (onderdeelProbleem) return setFout(onderdeelProbleem);
     if (!samengesteld && waarde.meetdatum && !isGeldigeDatum(waarde.meetdatum)) return setFout("De meetdatum klopt niet.");
     const r = wijzigMeting(meting.id, {
-      onderdeel: waarde.onderdeel.trim() || STANDAARD_ONDERDEEL,
+      onderdeel: onderdeelNaam,
       ...(samengesteld ? {} : { meetdatum: waarde.meetdatum || null }),
       ...(naamAangepast ? { label: getoondeNaam } : { herstelLabel: true }),
     });

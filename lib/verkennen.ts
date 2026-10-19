@@ -4,7 +4,9 @@
  * De rekenregels zijn die van de benchmark tussen organisaties (`benchmark.md`): Per organisatie de meest recente Meting die aan
  * `benchmarkMinScans` voldoet, en elke organisatie telt even zwaar mee.
  */
-import { Assessment, Meetperiode, Organisatie, ScanUitvoering, VeldDefinitie, VerkenEenheid } from "./types";
+import { Assessment, Kanaal, KpiDefinitie, Meetperiode, Organisatie, ScanUitvoering, VeldDefinitie, VerkenEenheid } from "./types";
+import { kanaalIngezet as kanaalIngezetBijPlek, kpiWaardeVan } from "./kpi";
+import { getInstellingen } from "./instellingen-store";
 import { BouwblokRij, bouwblokRijen, kwantiel, rond1, steekproefSd } from "./visualisatie";
 import { bouwblokScoreRuw, overallScoreRuw } from "./scoring";
 import {
@@ -169,6 +171,14 @@ export interface FilterVeld {
   type: "select" | "getal";
   /** Eenheid van een getal (`VeldDefinitie.eenheid`, bij een percentage "%"). */
   eenheid?: string;
+  /**
+   * Alleen bij een KPI (`datamodel.md`, KPI's en kanalen; `visualisatie-verkennen.md`, KPI's als kenmerk): De KPI en het gekozen
+   * kanaal (`null` is Algemeen). De waarde van een lid is die van zijn plek: Algemeen bij de eenheid Organisaties, het onderdeel bij
+   * Onderdelen, bij dat kanaal. Zonder waarde valt het lid af, er is geen terugval op Algemeen.
+   */
+  kpi?: { kpiId: string; kanaalId: string | null };
+  /** Alleen bij een KPI: Mag hij per kanaal een waarde hebben? Dan staat er een groep Kanaal bij het kenmerk. */
+  kpiPerKanaal?: boolean;
 }
 
 /** Het afgeleide kenmerk "Ingezette kanalen": Alleen een filter, geen groepering (`visualisatie-verkennen.md`, Kenmerken en filters). */
@@ -176,7 +186,7 @@ export const KANALEN_ID = "__kanalen";
 export const KANALEN_LABEL = "Volume en klantbasis › Ingezette kanalen";
 
 /** Alle velden die als filter kunnen dienen: De bladeren van de organisatievelden, select of getal (percentage telt als getal). */
-export function filterVelden(velden: VeldDefinitie[] = organisatieVelden): FilterVeld[] {
+export function filterVelden(velden: VeldDefinitie[] = organisatieVelden, kpis: KpiDefinitie[] = getInstellingen().kpiDefinities): FilterVeld[] {
   const uit: FilterVeld[] = [];
   const loop = (lijst: VeldDefinitie[], pad: string[], namen: string[]) => {
     for (const v of lijst) {
@@ -195,7 +205,24 @@ export function filterVelden(velden: VeldDefinitie[] = organisatieVelden): Filte
     }
   };
   loop(velden, [], []);
+  // De KPI's zijn geen organisatievelden meer maar definities met waarden per plek en kanaal: Eén regel per KPI, op volgorde.
+  for (const kpi of [...kpis].sort((a, b) => a.volgorde - b.volgorde)) {
+    uit.push({
+      id: `kpis.${kpi.id}`,
+      label: `KPI's › ${kpi.naam}`,
+      pad: ["kpis", kpi.id],
+      type: "getal",
+      eenheid: kpi.eenheid && kpi.eenheid !== "aantal" ? kpi.eenheid : undefined,
+      kpi: { kpiId: kpi.id, kanaalId: null },
+      kpiPerKanaal: kpi.perKanaal,
+    });
+  }
   return uit;
+}
+
+/** Het veld met het gekozen kanaal (alleen bij een KPI met `perKanaal`): Zonder kanaal is het Algemeen. */
+export function metKanaal(veld: FilterVeld, kanaalId: string | null): FilterVeld {
+  return veld.kpi && veld.kpiPerKanaal ? { ...veld, kpi: { ...veld.kpi, kanaalId } } : veld;
 }
 
 /** Het afgeleide veld Ingezette kanalen, naast de organisatievelden in het menu Kenmerk toevoegen. */
@@ -219,10 +246,16 @@ export function onderdeelVelden(): FilterVeld[] {
  * De waarde van een kenmerk voor een lid van de pool. Een organisatieveld komt van de organisatie, Organisatie is haar id (de
  * naam staat in `waardeLabel`) en Onderdeel de naam van het onderdeel.
  */
-export function lidWaarde(lid: Pick<PoolLid, "organisatie" | "onderdeel">, veld: FilterVeld): unknown {
+export function lidWaarde(lid: Pick<PoolLid, "organisatie" | "onderdeel"> & Partial<Pick<PoolLid, "meting">>, veld: FilterVeld): unknown {
   if (veld.id === ORGANISATIE_ID) return lid.organisatie.id;
   if (veld.id === ONDERDEEL_ID) return lid.onderdeel;
+  if (veld.kpi) return kpiWaardeVan(lid.organisatie, veld.kpi.kpiId, { onderdeelId: plekVan(lid), kanaalId: veld.kpi.kanaalId }) ?? undefined;
   return kenmerkWaarde(lid.organisatie, veld.pad);
+}
+
+/** De plek van een lid voor een KPI-waarde: Algemeen bij de eenheid Organisaties, het onderdeel van de Meting bij Onderdelen. */
+export function plekVan(lid: Pick<PoolLid, "onderdeel"> & Partial<Pick<PoolLid, "meting">>): string | null {
+  return lid.onderdeel === undefined ? null : (lid.meting?.onderdeelId ?? null);
 }
 
 /** De tekst van een waarde bij een kenmerk: Voor Organisatie de naam bij het id, anders de waarde zelf. */
@@ -244,7 +277,12 @@ export function veldLabelZonderGroep(veld: FilterVeld): string {
 }
 
 /** Hoeveel van deze organisaties het veld hebben ingevuld (voor "37 van 50" in het filtermenu). */
-export function ingevuldAantal(organisaties: Pick<Organisatie, "kenmerken">[], veld: FilterVeld): number {
+export function ingevuldAantal(organisaties: Pick<Organisatie, "kenmerken" | "kpiWaarden">[], veld: FilterVeld): number {
+  // Een KPI telt de Organisaties met een waarde bij Algemeen voor het gekozen kanaal.
+  if (veld.kpi) {
+    const k = veld.kpi;
+    return organisaties.filter((o) => kpiWaardeVan(o, k.kpiId, { onderdeelId: null, kanaalId: k.kanaalId }) !== null).length;
+  }
   return organisaties.filter((o) => {
     const w = kenmerkWaarde(o, veld.pad);
     return w !== undefined && w !== null && w !== "";
@@ -261,30 +299,18 @@ export function kenmerkWaarde(organisatie: Pick<Organisatie, "kenmerken">, pad: 
   return huidig;
 }
 
-const KANAAL_PREFIX = ["volume-klantbasis", "contacten-per-jaar"];
-
-/** De kanalen uit de contacten per jaar, voor het filter "Ingezette kanalen". */
-export function kanaalVelden(): { id: string; naam: string; pad: string[] }[] {
-  const groep = organisatieVelden
-    .find((v) => v.id === KANAAL_PREFIX[0])
-    ?.subvelden?.find((v) => v.id === KANAAL_PREFIX[1]);
-  return (groep?.subvelden ?? []).map((v) => ({ id: v.id, naam: v.label, pad: [...KANAAL_PREFIX, v.id] }));
+/** De kanalen voor het filter "Ingezette kanalen": De lijst van de Admin (`datamodel.md`, KPI's en kanalen), op volgorde. */
+export function kanaalVelden(kanalen: Kanaal[] = getInstellingen().kanalen): { id: string; naam: string; pad: string[] }[] {
+  return [...kanalen].sort((a, b) => a.volgorde - b.volgorde).map((k) => ({ id: k.id, naam: k.naam, pad: [] }));
 }
 
 /**
- * Een kanaal is ingezet bij een waarde boven 0, niet ingezet bij 0 of "niet van toepassing", en onbekend bij een leeg veld
- * (`visualisatie-verkennen.md`, Filters). Geeft `null` bij onbekend.
+ * Is een kanaal ingezet bij een lid? Een waarde boven 0 voor de KPI Contacten per jaar bij de plek van het lid (Algemeen bij
+ * Organisaties, het onderdeel bij Onderdelen), niet ingezet bij 0, onbekend bij een leeg veld (`visualisatie-verkennen.md`, Filters).
+ * Geeft `null` bij onbekend.
  */
-export function kanaalIngezet(organisatie: Pick<Organisatie, "kenmerken">, pad: string[]): boolean | null {
-  const w = kenmerkWaarde(organisatie, pad);
-  if (w === undefined || w === null || w === "") return null;
-  if (typeof w === "number") return w > 0;
-  if (typeof w === "string") {
-    const n = Number(w.replace(",", "."));
-    if (Number.isFinite(n)) return n > 0;
-    return false;
-  }
-  return false;
+export function kanaalIngezet(lid: Pick<PoolLid, "organisatie" | "onderdeel"> & Partial<Pick<PoolLid, "meting">>, kanaalId: string): boolean | null {
+  return kanaalIngezetBijPlek(lid.organisatie, kanaalId, plekVan(lid));
 }
 
 export interface FilterStand {
@@ -322,7 +348,7 @@ export function pasFiltersToe(leden: PoolLid[], stand: FilterStand, velden: Filt
       const w = getalWaarde(lidWaarde(lid, veld));
       if (w === null || w < min || w > max) return false;
     }
-    for (const kanaal of kanalen) if (kanaalIngezet(lid.organisatie, kanaal.pad) !== true) return false;
+    for (const kanaal of kanalen) if (kanaalIngezet(lid, kanaal.id) !== true) return false;
     return true;
   });
 }
@@ -361,7 +387,7 @@ export function getalWaarden(leden: PoolLid[], veld: FilterVeld): number[] {
 
 /** Per kanaal het aantal organisaties in de pool dat het inzet. */
 export function kanaalAantallen(leden: PoolLid[]): { id: string; naam: string; aantal: number }[] {
-  return kanaalVelden().map((k) => ({ ...k, aantal: leden.filter((l) => kanaalIngezet(l.organisatie, k.pad) === true).length }));
+  return kanaalVelden().map((k) => ({ ...k, aantal: leden.filter((l) => kanaalIngezet(l, k.id) === true).length }));
 }
 
 /** Een histogram met `bakken` staven van `min` tot en met `max`. */

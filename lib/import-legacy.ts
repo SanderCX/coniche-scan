@@ -1,3 +1,4 @@
+import { KpiExportRegel, leesKpiExport } from "./kpi";
 import { Assessment, Bouwblok, ScanInvullingStatus } from "./types";
 import { alleBouwblokkenMetGroep, alleVragen } from "./assessment-structuur";
 import { organisatieVelden } from "@/data/organisatie-velden";
@@ -288,6 +289,8 @@ export interface GevalideerdeRij {
   subsectorTitel?: string;
   /** Alleen "nieuw": `Organisatie.kenmerken` rechtstreeks uit de export, toegepast bij het aanmaken van een nieuwe organisatie (nooit bij hergebruik van een bestaande, zie `voerLegacyImportUit`). */
   organisatieKenmerken?: Record<string, unknown>;
+  /** Alleen "nieuw": De KPI-waarden uit de kolom `organisatie_kpis` (`import-scans.md`), toegepast bij het aanmaken van een nieuwe organisatie. */
+  organisatieKpis?: KpiExportRegel[];
   respondentEmail: string;
   respondentNaam: string;
   respondentFunctie: string;
@@ -620,6 +623,8 @@ export interface NieuweExportCsvRow {
   gestart_op: string;
   afgerond_op: string;
   organisatie_kenmerken: string;
+  /** Voorstel van 19 oktober 2026 (`export-csv.md`): De KPI's en de contacten per kanaal. Ontbreekt in een export van vóór deze kolom. */
+  organisatie_kpis?: string;
   antwoorden: string;
   opmerkingen_per_bouwblok: string;
 }
@@ -780,6 +785,24 @@ export function valideerNieuweExportRijen(
       }
     }
 
+    let organisatieKpis: KpiExportRegel[] | undefined;
+    if (rij.organisatie_kpis) {
+      const gelezen = leesKpiExport(rij.organisatie_kpis);
+      if (gelezen === null) {
+        return {
+          ...basis,
+          ok: false,
+          status,
+          assessmentId: assessment.id,
+          assessmentNaam: assessment.naam,
+          probleem: "Kolom 'organisatie_kpis' is geen geldige lijst.",
+          antwoorden: {},
+          opmerkingenPerBouwblok: {},
+        };
+      }
+      organisatieKpis = gelezen;
+    }
+
     let items: NieuwAntwoordItem[] = [];
     if (rij.antwoorden) {
       try {
@@ -841,6 +864,7 @@ export function valideerNieuweExportRijen(
       assessmentId: assessment.id,
       assessmentNaam: assessment.naam,
       organisatieKenmerken,
+      ...(organisatieKpis ? { organisatieKpis } : {}),
       antwoorden,
       opmerkingenPerBouwblok,
     };

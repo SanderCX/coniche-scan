@@ -444,7 +444,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.verkennenMeetperiode` | Verkennen en het wijzigen van een opgeslagen verkenning, naast het label Meetperiode | Per Organisatie telt de laatste Meting met een meetdatum in deze periode. Zo kun je ronde 1 blijven vergelijken, ook als ronde 2 al deels binnen is. Zonder periode telt de meest recente Meting. Een Organisatie zonder Meting in de periode doet niet mee. |
 | `info.verkennenOpslaan` | Verkennen, naast de knop Opslaan als benchmark | Je slaat de filters op en niet de uitkomst. De groep volgt de filters: Komt er een Organisatie bij die erbij past, dan telt die mee. Daarna wijs je de benchmark toe aan een Lead van een Organisatie die erin zit, in het Leads-venster van die Organisatie. |
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
-| `info.kpiBlok` | Organisatie-detail, blok KPI's, naast de titel (voorstel van 19 oktober 2026) | Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet. |
+| `info.kpiBlok` | Organisatie-detail, blok KPI's, naast de titel | Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet. |
 | `info.kpiPlek` | Modal KPI's invullen, naast het label Plek | Kies voor welk deel van de organisatie je invult. Algemeen is de hele organisatie. |
 | `info.kpiKanalen` | Modal KPI's invullen, naast het label Kanalen uitsplitsen | Kies alleen de kanalen waarvoor je cijfers hebt. De kolom Algemeen blijft altijd staan. |
 | `info.kpiDefinities` | Organisatievelden, tab KPI's en kanalen, naast de titel KPI's | Per KPI bepaal je of hij per onderdeel en per kanaal ingevuld mag worden. Algemeen is altijd mogelijk. |
@@ -765,7 +765,7 @@ Teksten die niet aan één Assessment hangen (zoals de introtekst op
 De organisatievelden uit `datamodel.md` (volume en klantbasis,
 digitalisering, techstack, FTE) worden zelf ook beheerbaar: Label,
 type en vaste antwoordcategorieën. De KPI's en de kanalen hebben sinds het
-voorstel van 19 oktober 2026 een eigen tab (KPI's en kanalen, hieronder).
+19 oktober 2026 een eigen tab (KPI's en kanalen, hieronder).
 
 Dit punt gaat over de definitie van de velden en is Admin-only
 (`content.beheren`, Rechtenmatrix). Een Consultant ziet dit onderdeel
@@ -781,7 +781,7 @@ het antwoord daarom zelf kunnen vastleggen.
 zijn te lang voor de chips en lijsten van Verkennen. Een Admin geeft ze hier een
 korte naam (`visualisatie-verkennen.md`, Korte namen). De pagina heeft een
 schakelaar Velden | KPI's en kanalen | Korte namen (`.weergave-wissel`, de
-middelste tab is een voorstel van 19 oktober 2026), en de derde weergave is
+middelste tab is gebouwd op 19 oktober 2026), en de derde weergave is
 een tabel met de kolommen Soort (Veldnaam of Waarde), Veld, Origineel, Korte
 naam en In gebruik.
 
@@ -805,8 +805,7 @@ naam en In gebruik.
 - **Uitleg**: In een Info-icoon (`info.korteNamen`, punt 2a), niet als vaste
   tekst. Het visual design toont hem als vaste tekst.
 
-**KPI's en kanalen (voorstel van 19 oktober 2026, ontworpen, nog niet
-gebouwd).** De tab voor de definities uit `datamodel.md`, KPI's en kanalen.
+**KPI's en kanalen (gebouwd op 19 oktober 2026, ontworpen door Joost).** De tab voor de definities uit `datamodel.md`, KPI's en kanalen.
 Alleen voor een Admin (`content.beheren`). Het design staat in
 `Claude outputs/kpi-design/`, bord 4.
 
@@ -921,7 +920,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   filter Organisatie al ingesteld op deze organisatie (in de URL, zoals de
   andere filters). Zijn het er 5 of minder, dan is er geen link. Er komt
   geen link naar de lijst over alle organisaties heen.
-- **KPI's** (voorstel van 19 oktober 2026, ontworpen, nog niet gebouwd; design
+- **KPI's** (gebouwd op 19 oktober 2026, ontworpen; design
   in `Claude outputs/kpi-design/`, bord 1 en 2): Een eigen kaart onder de
   Kenmerken. De KPI's en de contacten per kanaal staan niet meer bij de
   Kenmerken (`datamodel.md`, KPI's en kanalen). De Kenmerken zelf zijn in het
@@ -959,7 +958,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   - **Zonder Onderdelen**: Dan toont de tabel alleen de kolom Algemeen, met
     eronder de regel "Er zijn nog geen onderdelen. De waarden gelden voor de
     hele organisatie en voor alle kanalen samen."
-- **KPI's invullen** (voorstel van 19 oktober 2026, ontworpen, nog niet gebouwd;
+- **KPI's invullen** (gebouwd op 19 oktober 2026, ontworpen;
   design bord 3): Een modal in plaats van een zijpaneel, omdat de specs alleen
   de modal kennen voor een formulier met "Annuleren" en "Opslaan" (zoals de modal
   Korte namen). `.modal-box--breed` (maximaal 720px), met `max-height: 88vh` en
@@ -1088,7 +1087,7 @@ door wat hieronder staat. Zie Overgang aan het eind van dit punt.
 Meetdatum (`datamodel.md`, Meting). Alle drie zijn verplicht.
 
 - **Onderdeel**: Een keuzelijst, voorgevuld met "Hele organisatie"
-  (voorstel van 19 oktober 2026, design bord 5a en 5b; gebouwd was een
+  (gebouwd op 19 oktober 2026, design bord 5a en 5b; daarvoor was het een
   tekstveld met suggesties). Zie Het veld Onderdeel hieronder.
 - **Meetdatum**: Een datumveld, leeg bij aanmaken, zodat de gebruiker bewust
   een datum kiest. Een datum in de toekomst mag, want een Meting kan vooraf
@@ -1105,8 +1104,7 @@ Meetdatum (`datamodel.md`, Meting). Alle drie zijn verplicht.
   "Wordt: …" verschuift niets in de rij (`stylesheet.md`, Formulieren,
   Veldenrij met labels en een knop).
 
-**Het veld Onderdeel** (voorstel van 19 oktober 2026, ontworpen, nog niet
-gebouwd). Het onderdeel is een Onderdeel van de Organisatie (`datamodel.md`,
+**Het veld Onderdeel** (gebouwd op 19 oktober 2026, ontworpen). Het onderdeel is een Onderdeel van de Organisatie (`datamodel.md`,
 Onderdeel), en geen tekst meer. Het veld is overal dezelfde keuzelijst: In "+
 Meting plannen", in Wijzigen van een Meting, in "Gemiddelde maken", in "Scans
 samenbrengen" (punt 6b) en bij de import (punt 8).
@@ -2187,10 +2185,10 @@ Wat er precies wordt verwijderd, staat in `datamodel.md` onder
 - **Respondent**: De persoon met al zijn ingevulde scans.
 - **Meting**: De meting met alle ingevulde scans daarin. Het Onderdeel blijft
   bestaan.
-- **Onderdeel** (voorstel van 19 oktober 2026): Alleen zonder Metingen, met de
+- **Onderdeel** (gebouwd op 19 oktober 2026): Alleen zonder Metingen, met de
   KPI-waarden van het Onderdeel. De knop staat uitgeschakeld zolang er Metingen
   zijn, met de reden.
-- **Kanaal** (voorstel van 19 oktober 2026): Het kanaal met al zijn KPI-waarden
+- **Kanaal** (gebouwd op 19 oktober 2026): Het kanaal met al zijn KPI-waarden
   bij alle Organisaties.
 - **Organisatie**: Alles wat eronder hangt, ook de Onderdelen en de KPI-waarden.
 - **Benchmark**: De benchmark met de vinkjes van Leads voor die benchmark.
