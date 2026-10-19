@@ -13,6 +13,8 @@ import {
 } from "@/lib/quickscan";
 import { formatGewicht } from "@/lib/format";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
+import { ScoreRing } from "@/components/ScoreRing";
+import { KLASSE_CHIP } from "@/lib/mijn-metingen";
 import { QuickscanOverzicht } from "@/components/quickscan/QuickscanOverzicht";
 
 /**
@@ -24,6 +26,8 @@ export const QUICKSCAN_KLASSE_KLEUR: Record<Classificatie, string> = {
   oranje: "#e8871e",
   rood: "#dc2626",
 };
+
+const KLASSE_VAR: Record<Classificatie, string> = { groen: "var(--stat-green)", oranje: "var(--stat-amber)", rood: "var(--stat-red)" };
 
 const TELLING_KLEUR = { ja: "#15803d", nee: "#dc2626", weetNiet: "#888884" } as const;
 
@@ -220,45 +224,44 @@ function QuickscanResultatenInhoud({
       )}
       {toonKop && <h1 className="page-title" style={{ marginBottom: "1.2rem" }}>{assessment.naam}</h1>}
 
+      {/* De totaalkaart met de ring (`content-ziekenhuis-quickscan.md`, Resultaten, 1): Links de klasse en de tellingen, rechts de `.score-ring`. */}
       <div className="card qs-totaal" style={{ borderLeft: `4px solid ${kleur}` }}>
         <div>
           <p className="eyebrow">OVERALL VOLWASSENHEID</p>
-          <p className="qs-totaal-percentage">
-            <span style={{ color: kleur }}>{r.percentage ?? 0}%</span>{" "}
-            {toonTellingen && (
-              <span className="qs-totaal-punten">
-                ({getal(r.punten)}/{getal(r.maximum)})
-              </span>
-            )}
-          </p>
           {klasse && (
             <p className="qs-totaal-klasse" style={{ color: kleur }}>
               {KLASSE_NAAM.totaal[klasse]}
             </p>
           )}
-          {respondentNaam && <p className="text-sm text-ink-m">Resultaat voor {respondentNaam}</p>}
-          {ondertitel && <p className="text-sm text-ink-m">{ondertitel}</p>}
+          {toonTellingen && (
+            <p className="text-sm text-ink-m" style={{ margin: 0 }}>
+              {getal(r.punten)} van {getal(r.maximum)} punten
+            </p>
+          )}
+          <p className="text-sm text-ink-m" style={{ margin: 0 }}>
+            {r.aantalVanToepassing} van {r.aantalAfdelingen} afdelingen beoordeeld
+          </p>
+          {respondentNaam && <p className="text-sm text-ink-m" style={{ margin: "0.4rem 0 0" }}>Resultaat voor {respondentNaam}</p>}
+          {ondertitel && <p className="text-sm text-ink-m" style={{ margin: "0.4rem 0 0" }}>{ondertitel}</p>}
           {nvtNamen.length > 0 && (
-            <p className="text-sm text-ink-s" style={{ margin: "0.3rem 0 0" }}>
-              {nvtNamen.map((n) => `${n} is niet van toepassing en telt niet mee`).join(". ")}.
+            <p className="text-sm text-ink-m" style={{ margin: "0.6rem 0 0" }}>
+              {nvtNamen.map((n) => `Vragen over ${n} zijn niet beantwoord. De afdeling telt niet mee in het totaal.`).join(" ")}
             </p>
           )}
         </div>
         <div className="qs-totaal-rechts">
-          <div className="classificatie-cirkel" style={{ ["--kleur" as string]: kleur } as React.CSSProperties}>
-            <span className="score" style={{ fontSize: "var(--fs-32)" }}>
-              {r.percentage ?? 0}%
-            </span>
-          </div>
-          <p className="text-sm text-ink-m" style={{ margin: "0.6rem 0 0", textAlign: "center" }}>
-            {r.aantalVanToepassing} van {r.aantalAfdelingen} afdelingen beoordeeld
-            {toonTellingen && (
-              <>
-                <br />
-                {getal(r.punten)} van {getal(r.maximum)} punten
-              </>
-            )}
-          </p>
+          {r.percentage !== null && r.klasse !== null && (
+            <ScoreRing
+              ring={{
+                fractie: r.percentage / 100,
+                kleur: KLASSE_VAR[r.klasse],
+                getal: `${r.percentage}%`,
+                klasseNaam: KLASSE_NAAM.totaal[r.klasse],
+                chipAchtergrond: KLASSE_CHIP[r.klasse].achtergrond,
+                chipTekst: KLASSE_CHIP[r.klasse].tekst,
+              }}
+            />
+          )}
         </div>
       </div>
 

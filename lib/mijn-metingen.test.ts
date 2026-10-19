@@ -140,6 +140,21 @@ describe("teaser van de Quickscan", () => {
   });
 });
 
+describe("een afdeling die niet is beantwoord", () => {
+  const vragen = alleVragen(ziekenhuisQuickscan);
+  const eerste = ziekenhuisQuickscan.categorieen![0];
+  const relevantie = Object.fromEntries((ziekenhuisQuickscan.categorieen ?? []).map((c) => [c.id, c.id !== eerste.id]));
+  const antwoorden = Object.fromEntries(vragen.map((v) => [v.id, "ja"])) as Record<string, Antwoord>;
+
+  it("blijft als rij staan, met een streepje en zonder balk, op de plek van het model", () => {
+    const t = teaserVoorScan(ziekenhuisQuickscan, antwoorden, relevantie)!;
+    expect(t.rijen.map((r) => r.sleutel)).toEqual((ziekenhuisQuickscan.categorieen ?? []).map((c) => c.id));
+    const rij = t.rijen[0];
+    expect(rij).toMatchObject({ nietBeantwoord: true, waarde: "–", fractie: 0 });
+    expect(t.rijen.slice(1).every((r) => !r.nietBeantwoord)).toBe(true);
+  });
+});
+
 describe("de ring bij een schaal", () => {
   it("vult tot (score - 1) / 4 in de volle kleur van de afgeronde score", () => {
     const t = teaserVoorScan(zorgscan, alle(3))!;

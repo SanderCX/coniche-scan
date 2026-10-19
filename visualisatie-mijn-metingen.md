@@ -181,6 +181,7 @@ Dezelfde kaart, in percentages en met klassekleuren. Alles hierboven geldt, beha
 - **Knoppen.** De hoofdknop van de eigen scan staat in dezelfde rij als "Resultaten hele meting" en "Respondenten uitnodigen", elk 232 px bij meer dan één knop.
 - **Quickscan.** Zijblok 220 px, namen van 136 px, getallen als percentage (de punten staan in de tooltip van de rij), balk en stip in de klassekleur van hun eigen percentage, schaal 0 tot 100%, chip in de celkleur van de klasse.
 - **Samengestelde Meting.** Geen respons en geen lijn: Haar scores komen uit gemiddelden van Metingen. De chip "Gemiddelde" blijft staan.
+- **Breedte, Lead zonder eigen scan en afdeling niet beantwoord** (Joost, gebouwd op 19 oktober 2026): Elke kaart met een paneel is op volle breedte (`mm-kaart--vol`). Zonder kolom Jij staat de groep als balk in de categoriekleur met bij meer dan één scan de lijn met eindstreepjes (`.mm-teaser-eind`), zonder stip. Een afdeling zonder beantwoorde vragen is een rij met "–" in `--ink-s` en de tooltip "Niet beantwoord" (`TeaserRij.nietBeantwoord`), met onder de rijen de uitlegregel. De ring is de gedeelde `.score-ring` (`components/ScoreRing.tsx`).
 - **Tekstalternatief.** De cirkel heeft "Totaalscore 3,0, Uitbouwen" en elke rij haar tekstalternatief met, bij een Lead, de groepswaarde.
 
 ## Knoppen

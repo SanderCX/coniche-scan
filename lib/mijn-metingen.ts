@@ -72,8 +72,13 @@ export interface TeaserRij {
   lijn?: { van: number; tot: number };
   /** Tekstalternatief van de rij, bijvoorbeeld "Overkoepelend, gemiddelde 2,7, laagste 2,0, hoogste 3,6". */
   alt: string;
-  /** De tekst rechts van de balk: "3,4" of "8/12 · 67%". */
+  /** De tekst rechts van de balk: "3,4" of "8/12 · 67%". Bij `nietBeantwoord` een streepje. */
   waarde: string;
+  /**
+   * Alleen bij de Quickscan: De vragen van de afdeling zijn in deze scan niet beantwoord. De rij blijft staan, zonder balk en met een
+   * streepje, en de afdeling telt niet mee in het totaal (`visualisatie-mijn-metingen.md`, Quickscan, Afdeling niet beantwoord).
+   */
+  nietBeantwoord?: boolean;
 }
 
 export interface Teaser {
@@ -112,7 +117,7 @@ const KLASSE_KLEUR: Record<Classificatie, string> = {
 };
 
 /** De celkleuren van de klassenchip bij een percentage (`visualisatie-quickscan.md`, Nieuwe stijlwaarden). */
-const KLASSE_CHIP: Record<Classificatie, { achtergrond: string; tekst: string }> = {
+export const KLASSE_CHIP: Record<Classificatie, { achtergrond: string; tekst: string }> = {
   groen: { achtergrond: "#e7f6ef", tekst: "#0e4d30" },
   oranje: { achtergrond: "#fdf2e3", tekst: "#6b3a00" },
   rood: { achtergrond: "#fdecec", tekst: "#7f1d1d" },
@@ -184,20 +189,31 @@ function quickscanTeaser(
   spreiding?: Map<string, { van: number; tot: number }>
 ): Teaser | null {
   if (resultaat.percentage === null || resultaat.klasse === null) return null;
-  const rijen: TeaserRij[] = resultaat.afdelingen
-    .filter((a) => a.vanToepassing && a.percentage !== null && a.klasse !== null)
-    .map((a) => ({
-      sleutel: a.categorie.id,
-      naam: a.categorie.naam,
-      kleur: KLASSE_KLEUR[a.klasse as Classificatie],
-      fractie: (a.percentage as number) / 100,
-      ...(spreiding?.get(a.categorie.id) ? { lijn: { van: spreiding.get(a.categorie.id)!.van / 100, tot: spreiding.get(a.categorie.id)!.tot / 100 } } : {}),
-      alt: spreiding?.get(a.categorie.id)
-        ? `${a.categorie.naam}, gemiddelde ${a.percentage}%, laagste ${spreiding.get(a.categorie.id)!.van}%, hoogste ${spreiding.get(a.categorie.id)!.tot}%`
-        : `${a.categorie.naam}, ${a.percentage}%`,
-      // Een scan toont "punten/maximum · percentage", de hele meting alleen het percentage.
-      waarde: metingModus ? `${a.percentage}%` : `${a.punten}/${a.maximum} · ${a.percentage}%`,
-    }));
+  // Een afdeling zonder beantwoorde vragen blijft als rij staan, zodat de volgorde gelijk blijft.
+  const rijen: TeaserRij[] = resultaat.afdelingen.map((a) =>
+    a.vanToepassing && a.percentage !== null && a.klasse !== null
+      ? {
+          sleutel: a.categorie.id,
+          naam: a.categorie.naam,
+          kleur: KLASSE_KLEUR[a.klasse as Classificatie],
+          fractie: (a.percentage as number) / 100,
+          ...(spreiding?.get(a.categorie.id) ? { lijn: { van: spreiding.get(a.categorie.id)!.van / 100, tot: spreiding.get(a.categorie.id)!.tot / 100 } } : {}),
+          alt: spreiding?.get(a.categorie.id)
+            ? `${a.categorie.naam}, gemiddelde ${a.percentage}%, laagste ${spreiding.get(a.categorie.id)!.van}%, hoogste ${spreiding.get(a.categorie.id)!.tot}%`
+            : `${a.categorie.naam}, ${a.percentage}%`,
+          // Een scan toont "punten/maximum · percentage", de hele meting alleen het percentage.
+          waarde: metingModus ? `${a.percentage}%` : `${a.punten}/${a.maximum} · ${a.percentage}%`,
+        }
+      : {
+          sleutel: a.categorie.id,
+          naam: a.categorie.naam,
+          kleur: "var(--ink-s)",
+          fractie: 0,
+          alt: `${a.categorie.naam}, niet beantwoord`,
+          waarde: "–",
+          nietBeantwoord: true,
+        }
+  );
   return {
     soort: "percentage",
     getal: `${resultaat.percentage}%`,
