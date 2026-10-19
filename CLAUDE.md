@@ -37,6 +37,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `visualisatie-quickscan.md` | Visualisaties van de Quickscan Ziekenhuis in percentages: eigen resultaat (twee standen), gemiddelde en spreiding, antwoorden per vraag en benchmark (besloten op 15 oktober 2026, gebouwd) |
 | `visualisatie-mijn-metingen.md` | Opmaak van de landingspagina "Mijn metingen" voor Respondent en Lead: kaarten, statussen, teaser van de uitkomst, respons, benchmarkkaart (voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026) |
 | `visualisatie-verkennen.md` | Admin-scherm Verkennen onder Resultaten: filteren, groeperen en vergelijken van alle Organisaties van één Assessment, met vier weergaven (besloten en gebouwd op 15 oktober 2026) |
+| `help.md` | De helppagina in de app. Een regel Help in het menu, uitleg per rol met illustratie, als Markdown-bestanden in `help/` (voorstel van 19 oktober 2026, ontworpen, nog niet gebouwd) |
 | `backlog.md` | Bewust nog niet opgepakt |
 | `go-live-plan.md` | Actielijst naar productie |
 | `azure-plan.md` | Aanvulling op `go-live-plan.md` met de stappen voor de Azure-omgeving (Azure DevOps, Azure SQL, `coniche-scan.nl`) |
@@ -56,6 +57,8 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
   tekst eronder (`stylesheet.md`, Info-icoon). Elke Info-icoon-tekst heeft
   een initiële waarde en is door een Admin aan te passen op de plek zelf
   (`beheerpagina.md`, punt 2a, Algemene teksten).
+- Verandert een spec iets wat een gebruiker ziet of doet, dan gaat het
+  bijbehorende helpbestand in `help/` mee (`help.md`, Actueel houden).
 - Een actie is een knop en geen link. Links zijn er alleen voor navigatie:
   kruimelpad, header, footer en verwijzingen in lopende tekst
   (`stylesheet.md`, Knoppen en links).
@@ -474,7 +477,10 @@ geen afwijking van de spec maar een gat erin.
      van `Respondent`. Hergebruik van het intake-formulier, geen nieuw
      formulier bouwen. Opslaan schrijft direct naar `Respondent`, geen
      aparte bevestigingsstap.
-   - **Dropdown-inhoud, rij 2, klikbaar**: "Uitloggen" → navigeert naar
+   - **Dropdown-inhoud, rij 2, klikbaar**: "Help" → opent de helppagina
+     voor Respondent en Lead (`help.md`). Voorstel van 19 oktober 2026,
+     nog niet gebouwd. "Uitloggen" schuift daardoor naar rij 3.
+   - **Dropdown-inhoud, laatste rij, klikbaar**: "Uitloggen" → navigeert naar
      het nieuwe scherm "Toegang" (zie hieronder) en wist de lokale
      respondent-sessie in deze browser (de `code` die aan deze sessie
      gekoppeld is, zie `datamodel.md`, Toegangscode). Respondenten

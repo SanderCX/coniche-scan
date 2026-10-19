@@ -34,6 +34,8 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 
 **Kleur nooit alleen.** Elke bol, balk en cel heeft een getal of label erbij.
 
+**Balken.** Alle balken in de weergaven volgen `stylesheet.md`, Balklijst. Een rij heeft een label, een spoor en een waarde in kolommen met een vaste breedte, en het spoor is in elke rij even lang. Een aanvulling als "1 vraag" of "2 vragen" heeft een eigen kolom. De balken in een lijst zijn even hoog: 12px in de lijsten met afdelingen en bouwblokken en 16px in de gestapelde balk bij Antwoorden. Een lang label ("Verpleegafdelingen · Mensen") wordt afgekapt, met de volledige naam in een tooltip, en maakt het spoor niet korter.
+
 **Alleen desktop**, zoals de rest van de app.
 
 ## 1. Per afdeling
