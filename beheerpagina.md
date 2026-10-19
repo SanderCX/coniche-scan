@@ -991,7 +991,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     volledige naam, want een korte naam hoort niet in het organisatie-detail
     (`datamodel.md`, Korte namen).
 - **KPI's** (gebouwd op 19 oktober 2026, ontworpen; design
-  in `Claude outputs/kpi-design/`, bord 1 en 2): Een eigen kaart onder de
+  in `Claude outputs/kpi-design/`, bord 1 en 2, de kolommen in bord 6): Een eigen kaart onder de
   Kenmerken. De KPI's en de contacten per kanaal staan niet meer bij de
   Kenmerken (`datamodel.md`, KPI's en kanalen). De Kenmerken zelf zijn in het
   design een compacte lijst met "Bewerken", uitgeschreven in het punt Kenmerken
@@ -1006,15 +1006,29 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     `--bg-warm` als achtergrond. De tabel staat in een vak met `overflow-x:
     auto`, met de eerste kolom vast (`position: sticky; left: 0`) zodra de
     tabel breder is dan het vak.
-  - **Kolomkop**: De volledige naam, zonder korte naam (korte namen staan niet
-    in het organisatie-detail). Eronder "n van m ingevuld" in 12px. Daarin is n
-    het aantal KPI's met een waarde bij het kanaal Algemeen voor die plek, en
-    m het aantal KPI's dat op die plek mag (bij Algemeen alle KPI's, bij een
-    Onderdeel de KPI's met `perOnderdeel`). Bij een Onderdeel staat een potlood
-    (`aria-label` "Onderdeel wijzigen") dat een basismodal opent met de naam,
-    "Verwijderen" (`.btn-danger`, uitgeschakeld zolang er Metingen zijn, met de
-    reden), "Annuleren" en "Opslaan". Dat potlood en die modal staan niet in het
-    design.
+  - **Kolomkop** (besloten op 19 oktober 2026, design bord 1 en 6, volgt
+    `stylesheet.md`, Kolomkop en rijkop): Elke kolom met cijfers is 96px breed
+    (`--kolom-b`), ook Algemeen, en de eerste kolom is 240px. Op de eerste regel
+    staat de naam in 14px, gewicht 700, rechts uitgelijnd, op één regel en met
+    een afkapping (`…`) als hij niet past. Een korte naam bestaat hier niet
+    (korte namen staan niet in het organisatie-detail), dus de volledige naam
+    wordt afgekapt. Op de tweede regel staat "n van m" in 12px, gewicht 400, in
+    `--ink-s`, zonder het woord "ingevuld". Daarin is n het aantal KPI's met een
+    waarde bij het kanaal Algemeen voor die plek, en m het aantal KPI's dat op
+    die plek mag (bij Algemeen alle KPI's, bij een Onderdeel de KPI's met
+    `perOnderdeel`). De tooltip (`title`) noemt de volledige naam, "n van m
+    KPI's ingevuld" en bij een Onderdeel "Klik om te wijzigen".
+    - **Onderdeel wijzigen**: De kop van een Onderdeel is zelf een knop (hover
+      `--bg-mid`, zichtbare focusring) die een basismodal opent met de naam,
+      "Verwijderen" (`.btn-danger`, uitgeschakeld zolang er Metingen zijn, met
+      de reden), "Annuleren" en "Opslaan". Er staat geen potlood in de kop. De
+      kop van Algemeen is geen knop. Die modal staat niet in het design.
+    - **Fout, geen variant**: Een kop op twee regels, een kolom die breder is
+      dan 96px, een kolom waarvan de breedte van de naam afhangt en een eenheid
+      op een tweede regel onder de KPI-naam.
+  - **KPI-naam en eenheid**: De eenheid staat achter de naam op dezelfde regel,
+    bijvoorbeeld "AHT (s)" en "SLA (%)", zodat elke rij 48px hoog is. Een
+    kanaalrij is 40px hoog.
   - **Cel**: De waarde, rechts uitgelijnd, met tabelcijfers. Een lege cel is
     een streepje in grijs. Mag de KPI niet op die plek (`perOnderdeel` uit),
     dan staat er "n.v.t." in grijs.

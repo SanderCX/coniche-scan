@@ -87,6 +87,8 @@ De teaser is een samenvatting en geen tweede resultatenpagina. Hij toont alleen 
 
 ### Quickscan (en andere Assessments met afdelingen)
 
+Vervangen door Kaart met cirkel, Quickscan hieronder. Onderstaande beschrijving geldt alleen nog als achtergrond.
+
 - Links het totaal als percentage in 48 px vet, gekleurd in de kleur van de klasse, met daaronder de klassenaam in 14 px vet ("Gemiddeld ontwikkeld") en daaronder "<punten> van <maximum> punten" in 12 px (bijvoorbeeld "35 van 60 punten").
 - Rechts één rij per afdeling, in de volgorde van het Assessment. Elke rij heeft naam, balk van 6 px en rechts "<punten>/<maximum> · <percentage>". Een afdeling die in deze scan niet is ingevuld, wordt weggelaten.
 - Balkkleur per afdeling volgt de statuskleuren van de Quickscan (`visualisatie-quickscan.md`): Groen vanaf 80%, oranje van 50 tot 80%, rood onder 50%. De kleur van het totaal volgt de klasse.
@@ -98,7 +100,7 @@ Voor een nieuw Assessment geldt: Heeft het categorieën, dan de eerste vorm. Hee
 Een Lead ziet op elke Meting-kaart waarvoor Resultaten is aangevinkt een blok "Hele meting". Dat geldt ook voor een Lead die geen respondent is. Het blok heeft dezelfde vorm als de teaser van een eigen scan, met drie verschillen:
 
 - Het getal is het gemiddelde van alle afgeronde scans van de Meting. De regel eronder is "Gemiddelde van <n> afgeronde scans" in plaats van punten.
-- De rijen tonen het gemiddelde met bij de Volwassenheidsscan de stip en lijn hierboven, zonder "x/15". Bij de Quickscan blijft het een balk van het percentage (zie Open punten).
+- De rijen tonen het gemiddelde met stip en lijn, zonder "x/15" (zie Kaart met cirkel, voor de Quickscan in percentages).
 - Rechtsboven staat een chip. "Tussenstand" (amber) zolang de Meting open is, "Eindstand" (groen) zodra hij is afgesloten.
 
 **Voorwaarden.** Het blok verschijnt alleen als aan alle drie is voldaan:
@@ -127,6 +129,43 @@ Heeft de gebruiker voor dezelfde Meting zowel een eigen scan als Resultaten, dan
 - **Rechts "Hele meting"**, achtergrond `--bg-warm` en een linkerrand van 1 px. Rechtsboven de chip Tussenstand of Eindstand. Daaronder de teaser van de hele meting, de respons en twee knoppen.
 
 De eerste knop in het linkerblok is de hoofdactie van de eigen scan. In het rechterblok is "Resultaten hele meting" de hoofdactie en "Respondenten uitnodigen" de nevenactie.
+
+## Kaart met cirkel (voorstel van 19 oktober 2026)
+
+Ontworpen in "Coniche Scan Mijn metingen", borden "Kaart met cirkel, voorstel (19 oktober)" (Volwassenheidsscan) en "Quickscan met cirkel, voorstel (19 oktober)" (Quickscan), nog niet gebouwd. Dit geldt voor alle Assessments met categorieën of afdelingen en vervangt voor hen de teaser "Jouw overall score" en de twee blokken naast elkaar uit Kaart: Lead en respondent. Hieronder staat eerst de kaart voor Assessments met categorieën, daarna de afwijkingen voor Assessments met afdelingen (Quickscan). Twee blokken van 500 px met een cirkel erbij passen niet naast elkaar, en Jij en Groep op één spoor laten het verschil per categorie direct zien.
+
+- **Paneel.** Onder de kop een paneel met achtergrond `--bg-warm`, rand `--border`, hoekstraal 10 px en padding 28 px 32 px. Links staat een zijblok van 200 px, rechts staan de rijen, met 40 px ertussen. Onder 720 px komt het zijblok boven de rijen.
+- **Cirkel.** 156 px, spoor `--bg-mid`, 14 px dik, afgeronde uiteinden, beginnend bovenaan en met de klok mee. De vulling is `(score − 1) / 4` van de omtrek, dus 3,0 is de helft. De kleur is de volle kleur van de afgeronde score (`stylesheet.md`, Drie niveaus van scorekleur, Vol): 3,0 is geel `--score-3` (`#eab308`). In de cirkel staat het getal in 36 px, gewicht 800, en daaronder "Totaalscore" in 12 px hoofdletters in `--ink-s`.
+- **Klassenchip.** Onder de cirkel, 24 px hoog, horizontale padding 12 px, 12 px vet, in de celkleur van de afgeronde score (`stylesheet.md`, tabel Cel). Bij 3,0 is dat "Uitbouwen" in `#fbf0b8` met tekst `#5c4800`. De chip is geen 32 px pil meer.
+- **Groep (alleen Lead met Resultaten aan).** Onder de chip staat na een lijn van 1 px `--border` het label "Groep, <n> scans" in 12 px hoofdletters en daaronder "<gemiddelde> <klasse>" in 14 px, waarin het getal vet is, bijvoorbeeld "2,8 Uitbouwen". De klasse van de groep volgt dezelfde regels als die van de eigen score.
+- **Stip op de cirkel (alleen Lead met zichtbare groep).** Het groepsgemiddelde staat ook op de cirkel, als stip van 14 px met een witte rand van 2 px in `--ink-m`, op de plek van het gemiddelde. De hoek is `(gemiddelde − 1) / 4 × 360°`, vanaf boven met de klok mee, dus 2,8 ligt iets voorbij de helft. De stip heeft geen categoriekleur en is niet in de ringkleur, omdat hij dan wegvalt tegen de vulling. Er is geen boog voor de laagste tot hoogste score, want die is op een cirkel moeilijk te lezen. Die spreiding blijft in de rijen. Onder de drempel van `benchmarkMinRespondenten` en bij een Respondent zonder Resultaten is er geen stip.
+- **Respondent zonder Resultaten.** Onder de chip staat "Afgerond op <datum>" in 14 px `--ink-s`. Er is geen groepsregel en geen tweede kolom.
+- **Rijen.** Eén rij per categorie, 40 px hoog, in de vaste volgorde. Links de naam (120 px, 14 px, `--ink-m`), dan het spoor, en rechts één getalkolom van 44 px (bij een Lead twee), rechts uitgelijnd. Boven de rijen staat het label "Per categorie" in 12 px hoofdletters, met aan de rechterkant de kolomkoppen "Jij" en, bij een Lead, "Groep". Het spoor is een schaal van 1 tot 5, met onder de laatste rij de ankers "1" en "5" (12 px, `--ink-s`). Alle sporen zijn even lang en even hoog (`stylesheet.md`, Balklijst).
+- **Jij.** Een balk van 8 px in de categoriekleur. Het getal is 14 px vet.
+- **Groep.** Een stip van 14 px in de categoriekleur met een witte rand van 2 px, op het gemiddelde, en een lijn van 2 px (`#b3b0a8`) van de laagste tot de hoogste score van een afgeronde scan in die categorie, op hetzelfde spoor. Het getal is 14 px gewoon in `--ink-m`. Zijn laagste en hoogste score gelijk, dan staat er alleen een stip en geen lijn.
+- **Categoriekleur en klassekleur.** Een rij is een categorie en heeft dus de categoriekleur (`stylesheet.md`, Categoriekleuren). De klassekleur staat in de cirkel en de chip. Onderdeel A in `visualisatie-scores.md` (Per bouwblok) heeft rijen met bouwblokken en houdt de klassekleur voor de stip.
+- **Legenda.** Alleen bij een Lead met zichtbare groep, onder de rijen, 12 px: "Jouw score" (balk), "Gemiddelde van de groep" (stip, ook op de cirkel) en "Laagste tot hoogste score" (lijn).
+- **Respons (alleen Lead).** Onderin het paneel, onder een lijn van 1 px `--border` en met 16 px ruimte. Een regel in 14 px `--ink-m`, "<n> van <m> respondenten afgerond". Rechts staat de chip "Compleet" (groen) als iedereen klaar is, met links ervan de datum van de laatst afgeronde scan in 14 px `--ink-s`, bijvoorbeeld "14 oktober 2026". Is niet iedereen klaar, dan staat rechts "Bijgewerkt <datum> · <percentage>" in 14 px `--ink-s`, met dezelfde datum. Daaronder een balk van 4 px met spoor `--border` en vulling `#b3b0a8`. De balk is niet oranje, want oranje is voor acties en categorieën. Het aantal respondenten en de datum staan er ook onder de drempel (Respons hierboven).
+- **Onder de drempel van `benchmarkMinRespondenten`.** Het paneel toont alleen de eigen balken en een regel "Resultaten van de groep volgen bij minstens <n> afgeronde scans" met de teller "<k> van <n>". Er is geen groepskolom, geen stip, geen lijn, geen groepsregel en geen legenda (Voorwaarden).
+- **Knoppen.** Onder het paneel, volgens Knoppen hierboven (40 px hoog, bij meer dan één knop 232 px breed, naast elkaar op één rij): Lead met eigen scan "Bekijk jouw resultaten" en "Resultaten hele meting" (hoofdacties) en "Respondenten uitnodigen" (nevenactie), een respondent alleen "Bekijk jouw resultaten".
+- **Geen chip Tussenstand of Eindstand.** In deze kaart vervalt die chip. Compleet of het percentage in de responsregel zegt al of de meting klaar is, en de datum staat daarnaast.
+- **Typografie.** Vier groottes (12, 14, 18 en 36 px) en twee gewichten (400 en 700), met 800 alleen voor het getal in de cirkel. De labels "Jouw overall score" en "Gemiddelde score · <n> scans" vervallen, omdat de cirkel en de kolomkoppen hetzelfde zeggen.
+- **Toegankelijkheid.** De cirkel heeft een tekstalternatief ("Totaalscore 3,0, Uitbouwen"). Per rij staat het tekstalternatief uit Volwassenheidsscan hierboven.
+
+### Quickscan (en andere Assessments met afdelingen)
+
+Dezelfde kaart, in percentages en met klassekleuren. Alles hierboven geldt, behalve de volgende punten.
+
+- **Cirkel.** Loopt van 0 tot 100%, dus de vulling is `percentage / 100` van de omtrek. In de cirkel staat het totaalpercentage, bijvoorbeeld "45%", in 36 px gewicht 800 met "Totaalscore" eronder. De kleur is de klassekleur van het totaal (`visualisatie-quickscan.md`, Klassekleuren): `--stat-red` onder 50%, `--stat-amber` van 50 tot en met 79% en `--stat-green` vanaf 80%. De score voor de kleur en de klasse is het afgeronde percentage.
+- **Chip.** De klassenaam van het totaal in de celkleur van die klasse (`visualisatie-quickscan.md`, Nieuwe stijlwaarden): "Aanzienlijke ontwikkelruimte" (`#fdecec`, tekst `#7f1d1d`), "Gemiddeld ontwikkeld" (`#fdf2e3`, tekst `#6b3a00`) of "Sterk ontwikkeld" (`#e7f6ef`, tekst `#0e4d30`). Het zijblok is 220 px breed in plaats van 200 px, omdat de langste naam anders niet past.
+- **Stip op de cirkel.** Zoals hierboven, met de hoek `percentage / 100 × 360°`. De groepsregel luidt "<percentage> <klassenaam>", bijvoorbeeld "58% Gemiddeld ontwikkeld".
+- **Rijen.** Eén rij per afdeling in de volgorde van het Assessment, met de naam in 136 px (afgekapt met `…` en de volledige naam in de tooltip), en daarachter hetzelfde spoor en dezelfde getalkolommen. Een afdeling die in deze scan niet is ingevuld, wordt weggelaten. De getallen zijn percentages ("53%"), afgerond op hele procenten. De punten ("8/15") staan niet meer in de rij en komen in de tooltip van de rij en in de resultaten.
+- **Schaal.** Van 0 tot 100%, met de ankers "0" en "100%" onder de laatste rij.
+- **Kleur van balk en stip.** De afdelingen hebben geen eigen kleur. De balk heeft de klassekleur van het eigen percentage van die afdeling, en de stip de klassekleur van het gemiddelde van de groep voor die afdeling. De lijn is `#b3b0a8`, zoals hierboven.
+- **Lijn.** Van de laagste tot de hoogste afdelingsscore van een afgeronde scan. Zijn die gelijk, dan alleen een stip.
+- **Kolomkop.** Het label boven de rijen is "Per afdeling".
+- **Respons, datum, knoppen, drempel.** Identiek aan de kaart hierboven.
+- **Zonder categorieën of afdelingen** (de AI-scan) staat alleen het totaal met de klassenchip, zonder cirkel en rijen.
 
 ## Knoppen
 
@@ -178,12 +217,10 @@ Alles volgt `stylesheet.md`. Voor deze pagina in het bijzonder:
 
 ## Open punten
 
-- Quickscan, Hele meting: Krijgt de rij per afdeling ook een stip en lijn op een schaal van 0 tot 100%, of blijft het een balk met het percentage? Het ontwerp van 19 oktober 2026 dekt alleen de Volwassenheidsscan.
 
 - **Laatst opgeslagen.** `ScanInvulling` heeft geen veld voor het laatste opslagmoment. Voorstel: `laatstOpgeslagenOp` (datum en tijd), gezet bij elk opslaan van een antwoord. Zonder dat veld vervalt de rechterhelft van de voortgangsregel.
 - **Tussenstand en eindstand.** Voorstel: Een Meting is open zolang er geen sluitingsdatum is gepasseerd en niet alle uitgenodigde scans zijn afgerond. Er is nog geen gedefinieerde "afgesloten Meting". Bevestigen of er een Admin-actie komt, of dat het automatisch uit de status volgt.
 - **Teaser in de PDF-export.** Niet bedoeld. De export blijft zoals beschreven in de exportspecs.
-- **Quickscan-teaser voor Lead.** Het ontwerp toont de Lead-teaser alleen voor de Volwassenheidsscan. De Quickscan-variant volgt dezelfde regels met afdelingen, maar is nog niet uitgetekend.
 - **Staten in het ontwerp.** "Te weinig scans" en "geen Resultaten" zitten nog niet in het design.
 - **Meerdere Metingen van hetzelfde Assessment.** Op een Lead-pagina met veel Metingen (bijvoorbeeld 8 in vier jaar) wordt de lijst lang. Voorstel: De nieuwste drie tonen en de rest achter "Oudere metingen tonen". Pas oppakken als het voorkomt.
 
