@@ -25,7 +25,7 @@ export function WeergaveMatrix({
   const { kolommen, rijen } = weergave;
   const soort = kolomSoort === "organisatie" ? "organisatie" : kolomSoort === "onderdeel" ? "onderdeel" : "Meting";
   // Alleen tussen organisaties is er een groep om van af te wijken (`visualisatie-scores.md`, E).
-  const groep = kolomSoort === "organisatie";
+  const groep = kolomSoort !== "meting";
   const teken = (n: number) => (n > 0 ? "▲ +" : n < 0 ? "▼ −" : "= ");
   const verschilCel = (n: number | null, sleutel: string) => (
     <td key={sleutel} className="vis-matrix-zij">

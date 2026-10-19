@@ -445,6 +445,16 @@ export type BenchmarkSoort = "vasteGroep" | "verkenning";
 /** De eenheid van een verkenning: Een lid is een Organisatie of een onderdeel (een Meting met een onderdeel). */
 export type VerkenEenheid = "organisaties" | "onderdelen";
 
+/**
+ * De Meetperiode van een verkenning (`benchmark.md`, Welke Meting telt waar): Een begin- en einddatum op de meetdatum van de Meting
+ * (`JJJJ-MM-DD`, beide inclusief). Per Organisatie, bij Onderdelen per onderdeel, telt de laatste Meting binnen de periode. Zonder
+ * periode telt de meest recente Meting.
+ */
+export interface Meetperiode {
+  van: string;
+  totEnMet: string;
+}
+
 /** Eén filter van een opgeslagen verkenning: Een kenmerk (een veld, `__kanalen`, `__organisatie` of `__onderdeel`) met de gekozen waarden. */
 export interface VerkenningFilter {
   kenmerk: string;
@@ -472,6 +482,8 @@ export interface Benchmark {
   eenheid?: VerkenEenheid;
   /** Alleen bij soort `verkenning`, minstens één. De leden zijn leeg en volgen bij elk gebruik uit deze filters. */
   filters?: VerkenningFilter[];
+  /** Alleen bij soort `verkenning` (voorstel van 19 oktober 2026): Ontbreekt het veld, dan telt per lid de meest recente Meting. */
+  meetperiode?: Meetperiode;
   /**
    * Alleen bij niveau `metingen` (`benchmark.md`, Niveau 2, Lezing): Hoe de Metingen gelezen worden. Ontbreekt het veld, dan
    * volgt de lezing uit de Metingen zelf (`lezingVan` in `lib/benchmark.ts`).

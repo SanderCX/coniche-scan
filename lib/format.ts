@@ -8,3 +8,8 @@ export function parseGewicht(tekst: string): number | null {
   const getal = Number(tekst.trim().replace(",", "."));
   return Number.isFinite(getal) && getal > 0 ? getal : null;
 }
+
+/** Een score met één decimaal en een decimale komma ("3,8"), of een streepje zonder waarde. Overal waar een score als tekst staat. */
+export function formatScore(score: number | null | undefined, decimalen = 1): string {
+  return score === null || score === undefined ? "–" : score.toFixed(decimalen).replace(".", ",");
+}

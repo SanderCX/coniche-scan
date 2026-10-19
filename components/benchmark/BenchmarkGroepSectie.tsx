@@ -7,11 +7,14 @@ import { alleBouwblokkenMetGroep, isVlakkeAssessment } from "@/lib/assessment-st
 import { classificatie } from "@/lib/scoring";
 import { gewichtMarkering } from "@/lib/weging";
 import { scoreKleur } from "@/lib/colors";
+import { formatScore } from "@/lib/format";
 import { ScoreCircle } from "@/components/ScoreCircle";
 import { RadarChartView } from "@/components/RadarChartView";
 import { CategoryBarChart } from "@/components/CategoryBarChart";
 import { WeergaveMatrix } from "@/components/visualisatie/WeergaveMatrix";
-import { matrix } from "@/lib/visualisatie";
+import { EenheidInvoer, bouwblokWoorden, matrix } from "@/lib/visualisatie";
+import { OnderdelenWeergaven } from "@/components/visualisatie/OnderdelenWeergaven";
+import { EENHEID_ORGANISATIE, eenheidOnderdeel } from "@/components/visualisatie/gedeeld";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { KlasseBadge } from "@/components/quickscan/gedeeld";
 
@@ -19,9 +22,17 @@ function Score({ waarde }: { waarde: number | null }) {
   if (waarde === null) return <span className="text-ink-s">–</span>;
   return (
     <span className="score-pill" style={{ ["--kleur" as string]: scoreKleur(waarde) } as React.CSSProperties}>
-      {waarde.toFixed(1)}
+      {formatScore(waarde)}
     </span>
   );
+}
+
+/** "5 Organisaties", of bij de eenheid Onderdelen "3 onderdelen van 1 Organisatie". Bij één is het enkelvoud. */
+export function verkenningTeller(rijen: { organisatie: { id: string } }[], metOnderdeel: boolean): string {
+  const organisaties = new Set(rijen.map((r) => r.organisatie.id)).size;
+  const organisatieTekst = `${organisaties} ${organisaties === 1 ? "Organisatie" : "Organisaties"}`;
+  if (!metOnderdeel) return organisatieTekst;
+  return `${rijen.length} ${rijen.length === 1 ? "onderdeel" : "onderdelen"} van ${organisatieTekst}`;
 }
 
 /**
@@ -37,26 +48,41 @@ export function BenchmarkGroepSectie({
   benchmarkId,
   minOrganisaties,
   metOnderdeel = false,
+  verkenning = false,
 }: {
   sectie: BenchmarkSectie;
   benchmarkId: string;
   minOrganisaties: number;
   /** Bij een verkenning met de eenheid Onderdelen staat het onderdeel achter de naam van de organisatie. */
   metOnderdeel?: boolean;
+  /** Bij een opgeslagen verkenning staat de teller per eenheid (`benchmark.md`, Teller). */
+  verkenning?: boolean;
 }) {
   const naamVan = (r: (typeof sectie.rijen)[number]) =>
     metOnderdeel ? poolLidNaam(r.organisatie, onderdeelVan(r.meting)) : r.organisatie.naam;
   const { assessment, rijen, ontbrekend, teller } = sectie;
   const resultaten = resultatenVan(assessment, sectie.groepAntwoorden);
   const vlak = isVlakkeAssessment(assessment);
-  const eenheid = assessment.bouwblokEenheidMeervoud;
+  const eenheid = bouwblokWoorden(assessment).meervoud;
   const onderDrempel = rijen.length < minOrganisaties;
+  // De leden als eenheden voor de weergaven A en B: Elk lid telt even zwaar mee, ongeacht het aantal scans.
+  const eenheden: EenheidInvoer[] = rijen.map((r) => ({
+    id: `${r.organisatie.id}:${r.meting.id}`,
+    label: naamVan(r),
+    sublabel: r.meting.label,
+    aantalScans: r.aantalAfgerond,
+    antwoorden: r.antwoorden,
+  }));
+  const eenheidTekst = metOnderdeel ? eenheidOnderdeel("onderdelen in de groep") : EENHEID_ORGANISATIE;
+  const enkeleOrganisatie = metOnderdeel && new Set(rijen.map((r) => r.organisatie.id)).size === 1;
+  const woorden = bouwblokWoorden(assessment);
+  const matrixKop = `Per ${woorden.enkelvoud} en per ${metOnderdeel ? "onderdeel" : "organisatie"}`;
 
   return (
     <section className="benchmark-sectie" aria-label={assessment.naam}>
       <h2>{assessment.naam}</h2>
       <p className="benchmark-teller" data-onder-drempel={onderDrempel || undefined}>
-        <strong>{`${teller.x} van ${teller.y} organisaties`}</strong>
+        <strong>{verkenning ? verkenningTeller(rijen, metOnderdeel) : `${teller.x} van ${teller.y} organisaties`}</strong>
         {onderDrempel && (
           <span>
             {" "}
@@ -111,53 +137,6 @@ export function BenchmarkGroepSectie({
         </table>
       ) : (
         <>
-          <table className="admin-table" style={{ marginBottom: "1.5rem" }}>
-            <thead>
-              <tr>
-                <th>Organisatie</th>
-                <th>Meting</th>
-                <th>Afgeronde scans</th>
-                <th>Overall</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {rijen.map((r) => (
-                <tr key={`${r.organisatie.id}:${r.meting.id}`}>
-                  <td>{naamVan(r)}</td>
-                  <td>{r.meting.label}</td>
-                  <td>{r.aantalAfgerond}</td>
-                  <td>
-                    <Score waarde={r.overall} />
-                  </td>
-                  <td className="cel-knop">
-                    <Link href={`/beheer/benchmark/${benchmarkId}/organisatie/${r.organisatie.id}`} className="btn btn-outline btn-compact">
-                      View
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Weergave E (`visualisatie-scores.md`): De matrix met de bouwblokken als rijen en de organisaties als kolommen (kop
-              met naam, label van de Meting en aantal scans). Alleen voor de Admin. */}
-          <h3>{`Per ${assessment.bouwblokEenheidEnkelvoud} en per organisatie`}</h3>
-          <WeergaveMatrix
-            assessment={assessment}
-            kolomSoort="organisatie"
-            weergave={matrix(
-              assessment,
-              rijen.map((r) => ({
-                label: metOnderdeel ? naamVan(r) : kopNaam(r.organisatie),
-                volledigeNaam: naamVan(r),
-                sublabel: r.meting.label,
-                aantalScans: r.aantalAfgerond,
-                antwoorden: r.antwoorden,
-              }))
-            )}
-          />
-
           <div className="resultaten-header" style={{ paddingTop: "1rem" }}>
             {resultaten.overall !== null && (
               <ScoreCircle score={resultaten.overall} classificatie={classificatie(resultaten.overall)} />
@@ -165,47 +144,118 @@ export function BenchmarkGroepSectie({
             <p className="mt-4 font-semibold text-ink-m">Gemiddelde van de groep</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <div className="chart-block">
-              <h3>Alle {eenheid}</h3>
-              <RadarChartView resultaten={resultaten.bouwblokken} naam="Groep" />
-            </div>
-            <div className="chart-block">
-              <h3>{vlak ? `Scores per ${assessment.bouwblokEenheidEnkelvoud}` : "Per categorie"}</h3>
-              <CategoryBarChart resultaten={resultaten.groepen} horizontaal={vlak} />
-            </div>
-          </div>
-
-          <h3 style={{ marginTop: "2rem" }}>Per {assessment.bouwblokEenheidEnkelvoud} en per vraag</h3>
-          <div className="benchmark-bouwblokken">
-            {alleBouwblokkenMetGroep(assessment).map(({ bouwblok }, i) => (
-              <details key={bouwblok.id} className="benchmark-bouwblok">
-                <summary>
-                  <span className="benchmark-bouwblok-naam">
-                    {bouwblok.volgnummer}. {bouwblok.naam}
-                    {gewichtMarkering(bouwblok) && (
-                      <span className="gewicht-chip" style={{ marginLeft: "0.4rem" }}>
-                        {gewichtMarkering(bouwblok)}
-                      </span>
-                    )}
-                  </span>
-                  <Score waarde={resultaten.bouwblokken[i]?.score ?? null} />
-                </summary>
-                <table className="admin-table">
+          <OnderdelenWeergaven
+            assessment={assessment}
+            eenheden={eenheden}
+            eenheid={eenheidTekst}
+            // Bij een opgeslagen verkenning op één Organisatie is het detail weergave I: Gemiddeld of Naast elkaar, met de onderdelen als
+            // eenheid (`benchmark.md`, Opgeslagen verkenning, Detail en perspectief). Anders alleen het gemiddelde met de lijn.
+            toonAlsKeuze={enkeleOrganisatie}
+            standaardToonAls="gemiddeld"
+            metAntwoorden={enkeleOrganisatie}
+            toonKaarten={enkeleOrganisatie}
+            overzicht={
+              <>
+                <table className="admin-table" style={{ marginBottom: "1.5rem" }}>
+                  <thead>
+                    <tr>
+                      <th>Organisatie</th>
+                      <th>Meting</th>
+                      <th>Afgeronde scans</th>
+                      <th>Overall</th>
+                      <th></th>
+                    </tr>
+                  </thead>
                   <tbody>
-                    {bouwblok.vragen.map((v) => (
-                      <tr key={v.id}>
-                        <td>{v.tekst}</td>
-                        <td style={{ whiteSpace: "nowrap", textAlign: "right" }}>
-                          <Score waarde={sectie.groepAntwoorden[v.id] ?? null} />
+                    {rijen.map((r) => (
+                      <tr key={`${r.organisatie.id}:${r.meting.id}`}>
+                        <td>{naamVan(r)}</td>
+                        <td>{r.meting.label}</td>
+                        <td>{r.aantalAfgerond}</td>
+                        <td>
+                          <Score waarde={r.overall} />
+                        </td>
+                        <td className="cel-knop">
+                          <Link href={`/beheer/benchmark/${benchmarkId}/organisatie/${r.organisatie.id}`} className="btn btn-outline btn-compact">
+                            View
+                          </Link>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-              </details>
-            ))}
-          </div>
+
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                  <div className="chart-block">
+                    <h3>Alle {eenheid}</h3>
+                    <RadarChartView resultaten={resultaten.bouwblokken} naam="Groep" />
+                  </div>
+                  <div className="chart-block">
+                    <h3>{vlak ? `Scores per ${woorden.enkelvoud}` : "Per categorie"}</h3>
+                    <CategoryBarChart resultaten={resultaten.groepen} horizontaal={vlak} />
+                  </div>
+                </div>
+
+
+                <h3 style={{ marginTop: "2rem" }}>Per {woorden.enkelvoud} en per vraag</h3>
+                <div className="benchmark-bouwblokken">
+                  {alleBouwblokkenMetGroep(assessment).map(({ bouwblok }, i) => (
+                    <details key={bouwblok.id} className="benchmark-bouwblok">
+                      <summary>
+                        <span className="benchmark-bouwblok-naam">
+                          {bouwblok.volgnummer}. {bouwblok.naam}
+                          {gewichtMarkering(bouwblok) && (
+                            <span className="gewicht-chip" style={{ marginLeft: "0.4rem" }}>
+                              {gewichtMarkering(bouwblok)}
+                            </span>
+                          )}
+                        </span>
+                        <Score waarde={resultaten.bouwblokken[i]?.score ?? null} />
+                      </summary>
+                      <table className="admin-table">
+                        <tbody>
+                          {bouwblok.vragen.map((v) => (
+                            <tr key={v.id}>
+                              <td>{v.tekst}</td>
+                              <td style={{ whiteSpace: "nowrap", textAlign: "right" }}>
+                                <Score waarde={sectie.groepAntwoorden[v.id] ?? null} />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </details>
+                  ))}
+                </div>
+
+              </>
+            }
+            extra={[
+              {
+                waarde: "matrix",
+                label: "Matrix",
+                inhoud: (
+                  <>
+                    <h3>{matrixKop}</h3>
+                    <WeergaveMatrix
+                      assessment={assessment}
+                      kolomSoort={metOnderdeel ? "onderdeel" : "organisatie"}
+                      weergave={matrix(
+                        assessment,
+                        rijen.map((r) => ({
+                          label: metOnderdeel ? naamVan(r) : kopNaam(r.organisatie),
+                          volledigeNaam: naamVan(r),
+                          sublabel: r.meting.label,
+                          aantalScans: r.aantalAfgerond,
+                          antwoorden: r.antwoorden,
+                        }))
+                      )}
+                    />
+                  </>
+                ),
+              },
+            ]}
+          />
         </>
       )}
     </section>

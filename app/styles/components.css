@@ -691,7 +691,7 @@ select.veld-compact:focus {
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--accent, var(--ink-s));
+  color: var(--accent-t, var(--accent, var(--ink-s)));
   margin-bottom: 0.15rem;
 }
 
@@ -752,7 +752,7 @@ select.veld-compact:focus {
 .sidebar-bouwblok.status-bezig .status-icoon {
   background: var(--accent, var(--or));
   border-color: var(--accent, var(--or));
-  color: #fff;
+  color: var(--accent-op, #fff);
 }
 
 .sidebar-bouwblok.status-afgerond .status-icoon {
@@ -799,7 +799,7 @@ select.veld-compact:focus {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--accent, var(--or));
+  color: var(--accent-t, var(--accent, var(--or)));
   font-size: var(--fs-18);
   line-height: 1;
   padding: 0.2rem;

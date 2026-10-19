@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useOrganisaties, slaLeadToegangOp, sluitLeadOvergangMelding } from "@/lib/db";
 import { useAssessments } from "@/lib/assessment-store";
 import { useBenchmarksMetLeden } from "@/lib/use-benchmarks";
-import { aantalOrganisatiesInLeden, isVerkenning } from "@/lib/verkenning-benchmark";
+import { aantalOrganisatiesInLeden, isVerkenning, redenGeenLid } from "@/lib/verkenning-benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { bouwBenchmarkSecties, niveauVan, viewsVoorLead } from "@/lib/benchmark";
 import {
@@ -108,8 +108,9 @@ export function LeadsVenster({
   const kolommenVan = (m: (typeof metingen)[number]) => (isSamengesteld(m) ? (["resultaten"] as const) : METING_WEERGAVEN);
 
   const benchmarkKolommen = benchmarks
-    .filter((b) => benchmarkGeldigVoorOrganisatie(b, organisatie.id))
-    .map((b) => {
+    .map((b) => ({ b, geenLid: isVerkenning(b) && !benchmarkGeldigVoorOrganisatie(b, organisatie.id) ? redenGeenLid(alleOrganisaties, b, organisatie.id, instellingen.benchmarkMinScans) : null }))
+    .filter(({ b, geenLid }) => benchmarkGeldigVoorOrganisatie(b, organisatie.id) || geenLid !== null)
+    .map(({ b, geenLid }) => {
       const niveau = niveauVan(b) as "organisaties" | "metingen";
       // Bij een opgeslagen verkenning telt de drempel Organisaties, ook bij de eenheid Onderdelen. Staat er in de filters maar één
       // Organisatie, dan geldt hij niet (`benchmark.md`, Opgeslagen verkenning, Filter op één Organisatie).
@@ -121,7 +122,7 @@ export function LeadsVenster({
         : niveau === "organisaties"
           ? viewsVoorLead(bouwBenchmarkSecties(b, assessments, alleOrganisaties), organisatie.id, instellingen.benchmarkMinOrganisaties).length > 0
           : true;
-      return { benchmark: b, niveau, voldoet, verkenning, aantalOrganisaties };
+      return { benchmark: b, niveau, voldoet: geenLid === null && voldoet, verkenning, aantalOrganisaties, geenLid };
     });
 
   const aantalKolommen = metingen.reduce((n, m) => n + kolommenVan(m).length, 0) + benchmarkKolommen.length;
@@ -277,9 +278,11 @@ export function LeadsVenster({
                           );
                         })
                       )}
-                      {benchmarkKolommen.map(({ benchmark, niveau, voldoet, verkenning, aantalOrganisaties }) => {
+                      {benchmarkKolommen.map(({ benchmark, niveau, voldoet, verkenning, aantalOrganisaties, geenLid }) => {
                         const reden = verkenning
-                          ? voldoet
+                          ? geenLid
+                            ? geenLid
+                            : voldoet
                             ? null
                             : `Te weinig Organisaties in deze groep: ${aantalOrganisaties}, minimaal ${instellingen.benchmarkMinOrganisaties}.`
                           : benchmarkCelReden({

@@ -9,6 +9,7 @@
 import { Assessment, Organisatie, ScanInvulling, ScanUitvoering } from "./types";
 import { alleVragen } from "./assessment-structuur";
 import { gemiddeldeAntwoordenVoorMeting } from "./scoring";
+import type { EenheidInvoer } from "./visualisatie";
 
 export const STANDAARD_ONDERDEEL = "Hele organisatie";
 
@@ -253,6 +254,27 @@ export function gemiddeldeAntwoordenVoorMetingMetSamenstelling(
     .filter((m) => afgerond(m.invullingen) > 0)
     .map((m) => gemiddeldeAntwoordenVoorMeting(assessment, m.invullingen));
   return middelAntwoordenVanSets(assessment, sets);
+}
+
+/**
+ * De onderdelen van een samengestelde Meting als eenheden voor de weergaven (`visualisatie-scores.md`, I): De onderliggende
+ * Metingen op meetdatum, de oudste eerst, elk met haar gemiddelde antwoord per vraag. Elk onderdeel telt even zwaar mee. Een
+ * onderliggende Meting zonder afgeronde scans telt niet mee, net als in het gemiddelde.
+ */
+export function onderdeelEenheden(
+  assessment: Assessment,
+  organisatie: Pick<Organisatie, "scanUitvoeringen">,
+  meting: ScanUitvoering
+): EenheidInvoer[] {
+  return oudsteEerst(onderliggendeMetingen(organisatie, meting))
+    .filter((m) => afgerond(m.invullingen) > 0)
+    .map((m) => ({
+      id: m.id,
+      label: m.label,
+      sublabel: `${onderdeelVan(m)} · ${toonMeetdatum(m.meetdatum)}`,
+      aantalScans: afgerond(m.invullingen),
+      antwoorden: gemiddeldeAntwoordenVoorMeting(assessment, m.invullingen),
+    }));
 }
 
 /* ---------- Opruimen ---------- */

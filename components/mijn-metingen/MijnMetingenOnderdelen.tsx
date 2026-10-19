@@ -79,16 +79,38 @@ function TeaserBlok({ teaser, label }: { teaser: Teaser; label: string }) {
         {teaser.sub && <span className="mm-sub">{teaser.sub}</span>}
       </div>
       {teaser.rijen.length > 0 && (
-        <div className="mm-teaser-rijen">
+        <div className={`mm-teaser-rijen ${teaser.stijl === "stip" ? "mm-teaser-rijen--stip" : ""} ${teaser.soort === "schaal" ? "mm-teaser-rijen--schaal" : ""}`}>
           {teaser.rijen.map((r) => (
-            <div key={r.sleutel} className="mm-teaser-rij">
+            <div key={r.sleutel} className="mm-teaser-rij" role="img" aria-label={r.alt}>
               <span className="mm-teaser-naam">{r.naam}</span>
               <span className="mm-teaser-balk" aria-hidden="true">
-                <i style={{ width: `${Math.round(r.fractie * 100)}%`, background: r.kleur }} />
+                {teaser.stijl === "stip" ? (
+                  <>
+                    {r.lijn && (
+                      <b
+                        className="mm-teaser-lijn"
+                        style={{ left: `${r.lijn.van * 100}%`, width: `${(r.lijn.tot - r.lijn.van) * 100}%` }}
+                      />
+                    )}
+                    <b className="mm-teaser-stip" style={{ left: `${r.fractie * 100}%`, background: r.kleur }} />
+                  </>
+                ) : (
+                  <i style={{ width: `${Math.round(r.fractie * 100)}%`, background: r.kleur }} />
+                )}
               </span>
               <span className="mm-teaser-waarde">{r.waarde}</span>
             </div>
           ))}
+          {teaser.ankers && (
+            <div className="mm-teaser-rij mm-teaser-ankers" aria-hidden="true">
+              <span />
+              <span className="mm-teaser-anker-spoor">
+                <span>1</span>
+                <span>5</span>
+              </span>
+              <span className="mm-teaser-waarde" />
+            </div>
+          )}
         </div>
       )}
     </div>

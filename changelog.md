@@ -1,5 +1,54 @@
 # Coniche Scan — Changelog
 
+## 2026-10-19 (2) — Specs van Joost, PR 127: onderdeel I en J van de scorevisualisaties (ronde B)
+
+Op verzoek van Sander gebouwd (`visualisatie-scores.md`, I en J).
+
+**Gedaan**:
+- **Eenheden**: De weergaven A en B rekenen met eenheden als pseudo-scans (`eenhedenGemiddeld`, `eenhedenSpreiding`), zodat een onderdeel of een
+  lid met haar gemiddelde antwoord per vraag meetelt zonder tweede rekenmethode. `eenhedenNaastElkaar`, de zes vormen (clip-path) en
+  `stapelStappen` voor Naast elkaar.
+- **Samengestelde Meting, vergelijking en verkenning op één Organisatie** (`OnderdelenWeergaven`): De schakelaar Overzicht, Per bouwblok, Spreiding
+  (vanaf 3) en Antwoorden (uitgeschakeld), "Toon als" Gemiddeld of Naast elkaar, en een kaart per onderdeel met vorm, naam, datum en totaalscore.
+  Bij een vergelijking met twee Metingen blijft Naast elkaar weergave C of H.
+- **Niveau 1 en het perspectief van een lid**: De benchmark tussen organisaties heeft de samenvatting bovenaan en de schakelaar Overzicht, Per bouwblok,
+  Spreiding en Matrix. Het perspectief van een lid heeft Overzicht, Per bouwblok (D) en Spreiding met de ring op het lid. De Admin ziet het
+  perspectief van een onderdeel ook op de organisatiepagina van de benchmark.
+- **Niveau 3**: Overzicht en Spreiding boven de lijst met scans.
+- **Labels en getallen**: "Bouwblok" waar de Assessment "bouwsteen" zegt (`bouwblokWoorden`), "onderdeel" als eenheid, en een decimale komma in de
+  scorecirkel, de resultaten, de matrix, de tegels en de tooltips (`formatScore`).
+- 7 nieuwe tests.
+
+**Keuzes waar de spec open liet**: Een Lead op een samengestelde Meting ziet geen namen van de onderliggende Metingen (`benchmark.md` wint van
+"voorlopig onder Resultaten" in I), dus wel Gemiddeld en Spreiding en geen Naast elkaar. Spreiding is er vanaf drie eenheden ook bij organisaties. De
+reden "Bouwblok" is toegepast op de beheer- en benchmarkschermen en niet in de doorloopflow van de respondent. Bij een benchmark tussen organisaties
+heeft Per bouwblok geen Toon als.
+
+## 2026-10-19 (1) — Specs van Joost, PR 127: Fundament in geel, staafdiagram, Mijn metingen en Meetperiode
+
+Op verzoek van Sander gebouwd (ronde A). Onderdeel I en J van `visualisatie-scores.md` (de weergaven bij een samengestelde Meting, niveau 1,
+het perspectief van een lid en de hoofdpagina van een Meting) zijn niet gebouwd.
+
+**Gedaan**:
+- **Fundament in merkgeel** (`stylesheet.md`, Categoriekleuren): `--fu` is `--ye`, de hex in `CATEGORIE_COLORS` is `#ffc043`. Tekst in of bij de kleur
+  staat in `--ink`: `lijnKleur`, `tekstOpKleur` en `accentStijl` (`lib/colors.ts`) zetten `--accent-t` en `--accent-op`, gebruikt in de sidebar,
+  de bouwsteenkop, de Toelichtingsmodal en het bouwstenenmodel. De sleutel `antraciet` blijft staan in de data.
+- **Staafdiagram per categorie**: Categoriekleuren, as van 1 tot 5, stippellijnen op 2,5 en 3,5 met de klassenamen, het getal van 16px vet boven de
+  balk met een decimale komma. Per bouwblok of domein blijft de scorekleur. De PDF blijft zoals hij was.
+- **Mijn metingen**: Het spoor loopt van 1 tot 5 (`schaalFractie`), in de eigen scan een balk van 8px, bij Hele meting een stip met een lijn van
+  laagste tot hoogste scan, de ankers 1 en 5, en een tekstalternatief per rij. De Quickscan houdt de balk met het percentage.
+- **Meetperiode** (`Benchmark.meetperiode`, `lib/verkennen.ts`): De keuze Meest recente of Periode in Verkennen en bij het wijzigen van een opgeslagen
+  verkenning, met de regel over wat telt en hoeveel er afvallen, en `info.verkennenMeetperiode`. `kiesPoolMetingen` volgt "Welke Meting telt waar":
+  Bij Organisaties ook een samengestelde Meting, bij Onderdelen nooit. De periode staat in het paneel, het detail, de Lead-pagina en de audit-log, en
+  het Leads-venster toont de reden "Geen Meting in de Meetperiode".
+- **Benchmark samenstellen**: Per organisatie en Assessment alle Metingen als keuze (naam, onderdeel, meetdatum, scans of "Gemiddelde van n Metingen",
+  "Zit in …"), de voorgestelde Meting staat zichtbaar aangevinkt. De teller van een verkenning volgt de eenheid ("3 onderdelen van 1 Organisatie").
+- 8 nieuwe en aangepaste tests.
+
+**Keuzes waar de spec open liet**: De einddatum van de Meetperiode is inclusief. Een Meting zonder meetdatum valt buiten elke periode. Bij een
+samengestelde Meting op Mijn metingen staat alleen de stip, zonder lijn. De reden "Geen onderdelen met een eigen Meting" is niet gebouwd, omdat de
+situatie niet voorkomt (zie `benchmark.md`). Met een onvolledige periode (één datum) telt de meest recente Meting.
+
 ## 2026-10-17 (1) — Specs van Joost, PR 125: opgeslagen verkenning en de eenheid Onderdelen
 
 Op verzoek van Sander gebouwd (`benchmark.md`, Opgeslagen verkenning, `visualisatie-verkennen.md`, Eenheid en Opslaan als benchmark).

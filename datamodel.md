@@ -1376,7 +1376,7 @@ Benchmark {
   filters?: { kenmerk: string, waarden: string[] }[]
                                     // alleen bij soort "verkenning", minstens één; kenmerk is een veld uit de organisatievelden
   meetperiode?: { van: date, totEnMet: date }
-                                    // voorstel van 19 oktober 2026, alleen bij soort "verkenning"; ontbreekt = per lid telt de meest recente Meting
+                                    // gebouwd op 19 oktober 2026, alleen bij soort "verkenning"; ontbreekt = per lid telt de meest recente Meting
   aangemaaktOp: datetime
   aangemaaktDoor: string            // Gebruiker
 }
@@ -1418,7 +1418,7 @@ bestaan zolang de benchmark bestaat.
   Lead gegeven (`benchmark.md`, View voor een Lead). Niveau 3 blijft een
   weergave voor de Admin.
 
-**`soort`, `eenheid`, `filters` en `meetperiode`** (`soort`, `eenheid` en `filters` gebouwd op 17 oktober 2026, `meetperiode` voorstel van 19 oktober 2026, `benchmark.md`,
+**`soort`, `eenheid`, `filters` en `meetperiode`** (`soort`, `eenheid` en `filters` gebouwd op 17 oktober 2026, `meetperiode` gebouwd op 19 oktober 2026, `benchmark.md`,
 Opgeslagen verkenning). Een benchmark met `soort: "verkenning"` slaat geen
 leden op. De leden worden bij elk gebruik berekend uit `filters`, met de
 poolregels van Verkennen. Bij `eenheid: "organisaties"` is een lid een

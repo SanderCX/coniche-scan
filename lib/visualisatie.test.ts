@@ -5,8 +5,17 @@ import { alleVragen } from "./assessment-structuur";
 import { bouwblokScore, overallScore } from "./scoring";
 import type { Assessment, ScanInvulling } from "./types";
 import {
+  MAX_NAAST_ELKAAR,
+  VORMEN,
   antwoordenPerVraag,
+  bouwblokWoorden,
   eenMeting,
+  eenhedenGemiddeld,
+  eenhedenNaastElkaar,
+  eenhedenSpreiding,
+  eenheidScanId,
+  stapelStappen,
+  vormVoor,
   initialenVan,
   groepStatistiek,
   klasseVan,
@@ -432,5 +441,75 @@ describe("H. Metingen naast elkaar", () => {
     const m = matrix(a, [kolom("A", 2), kolom("B", 3), kolom("C", 4)], { groepsvergelijking: false, lezing: "naastElkaar" });
     expect(m.metHoogste).toBe(false);
     expect(m.metVerschil).toBe(false);
+  });
+});
+
+
+describe("I. Eenheden: onderdelen en organisaties", () => {
+  const eenheid = (id: string, waarde: number, scans = 1) => ({
+    id,
+    label: `Onderdeel ${id}`,
+    aantalScans: scans,
+    antwoorden: Object.fromEntries(alleVragen(a).map((v) => [v.id, waarde])),
+  });
+
+  it("Gemiddeld: elk onderdeel telt even zwaar, ongeacht het aantal scans, met de lijn van laagste tot hoogste onderdeel", () => {
+    const w = eenhedenGemiddeld(a, [eenheid("a", 2, 5), eenheid("b", 4, 40)]);
+    expect(w.aantalScans).toBe(2);
+    expect(w.totaal).toBe(3);
+    for (const r of w.rijen) {
+      expect(r.score).toBe(3);
+      expect(r.laagste).toBe(2);
+      expect(r.hoogste).toBe(4);
+    }
+  });
+
+  it("Spreiding: een stip per onderdeel, met het id van de eenheid erbij, en een ring bij een focus die niet meetelt", () => {
+    const eenheden = [eenheid("a", 2), eenheid("b", 3), eenheid("c", 4)];
+    const w = eenhedenSpreiding(a, eenheden);
+    expect(w.aantalScans).toBe(3);
+    expect(w.rijen[0].punten.map((p) => p.id)).toEqual(["eenheid-a", "eenheid-b", "eenheid-c"]);
+    expect(w.rijen[0].gemiddelde).toBe(3);
+    const metFocus = eenhedenSpreiding(a, eenheden, "b");
+    expect(metFocus.rijen[0].punten.map((p) => p.id)).toEqual(["eenheid-a", "eenheid-c"]);
+    expect(metFocus.rijen[0].focusScore).toBe(3);
+    expect(eenheidScanId("b")).toBe("eenheid-b");
+  });
+
+  it("Naast elkaar: elk onderdeel een eigen vorm op zijn score, met de streep op het gemiddelde", () => {
+    const w = eenhedenNaastElkaar(a, [eenheid("a", 2), eenheid("b", 3), eenheid("c", 5)]);
+    expect(w.eenheden.map((e) => e.vorm)).toEqual(["cirkel", "ruit", "vierkant"]);
+    expect(w.rijen[0].punten.map((p) => [p.index, p.score, p.klasse])).toEqual([
+      [0, 2, "rood"],
+      [1, 3, "oranje"],
+      [2, 5, "groen"],
+    ]);
+    expect(w.rijen[0].gemiddelde).toBeCloseTo(10 / 3, 5);
+    expect(w.rijen[0].verschil).toBe(3);
+    expect(w.hoogste?.label).toBe("Onderdeel c");
+    expect(w.laagste?.label).toBe("Onderdeel a");
+  });
+
+  it("er zijn zes vormen, dus Naast elkaar is er bij hoogstens zes onderdelen", () => {
+    expect(VORMEN).toHaveLength(6);
+    expect(MAX_NAAST_ELKAAR).toBe(6);
+    expect(vormVoor(6)).toBe("cirkel");
+  });
+
+  it("onderdelen met dezelfde score staan onder elkaar gestapeld, in het midden uitgelijnd", () => {
+    expect(stapelStappen([3, 3, 3, 4])).toEqual([-1, 0, 1, 0]);
+    expect(stapelStappen([2, 3])).toEqual([0, 0]);
+    expect(stapelStappen([3, 3])).toEqual([-0.5, 0.5]);
+  });
+
+  it("het woord voor een bouwblok is bouwblok waar de Assessment bouwsteen zegt, en anders de eigen eenheid", () => {
+    expect(bouwblokWoorden({ bouwblokEenheidEnkelvoud: "Bouwsteen", bouwblokEenheidMeervoud: "bouwstenen" })).toEqual({
+      enkelvoud: "bouwblok",
+      meervoud: "bouwblokken",
+    });
+    expect(bouwblokWoorden({ bouwblokEenheidEnkelvoud: "Domein", bouwblokEenheidMeervoud: "domeinen" })).toEqual({
+      enkelvoud: "domein",
+      meervoud: "domeinen",
+    });
   });
 });

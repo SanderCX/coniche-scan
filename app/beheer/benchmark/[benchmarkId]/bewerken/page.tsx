@@ -76,10 +76,14 @@ export default function BenchmarkBewerkenPage({ params }: { params: Promise<{ be
           benchmark={benchmark}
           onAnnuleren={() => router.push(`/beheer/benchmark/${benchmark.id}`)}
           onOpslaan={(w) => {
-            const leden = ledenVoorVerkenning(organisaties, { ...benchmark, filters: w.filters }, instellingen.benchmarkMinScans);
+            const leden = ledenVoorVerkenning(
+              organisaties,
+              { ...benchmark, filters: w.filters, meetperiode: w.meetperiode ?? undefined },
+              instellingen.benchmarkMinScans
+            );
             wijzigBenchmark(
               benchmark.id,
-              { naam: w.naam, assessmentIds: benchmark.assessmentIds, leden: [], filters: w.filters },
+              { naam: w.naam, assessmentIds: benchmark.assessmentIds, leden: [], filters: w.filters, meetperiode: w.meetperiode },
               {
                 ...benchmarkNamen(benchmark.assessmentIds, leden, organisaties, assessments, "organisaties"),
                 filters: filterRegels(w.filters, maakFilterNamen(instellingen.korteNamen, organisaties)),

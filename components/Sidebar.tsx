@@ -1,7 +1,7 @@
 import { Assessment, ScanWeergave } from "@/lib/types";
 import { bouwblokStatus, categorieVanToepassing, voortgang } from "@/lib/scoring";
 import { actieveGroepen } from "@/lib/assessment-structuur";
-import { CATEGORIE_COLORS } from "@/lib/colors";
+import { CATEGORIE_COLORS, accentStijl } from "@/lib/colors";
 import { gewichtMarkering } from "@/lib/weging";
 
 export function Sidebar({
@@ -43,7 +43,7 @@ export function Sidebar({
                 {groep.naam && (
                   <p
                     className="sidebar-categorie-naam"
-                    style={kleur ? ({ ["--accent" as string]: kleur.hex } as React.CSSProperties) : undefined}
+                    style={kleur ? (accentStijl(kleur.hex) as React.CSSProperties) : undefined}
                   >
                     {groep.naam}
                     {nietVanToepassing && <span className="nvt-label">n.v.t.</span>}
@@ -64,7 +64,7 @@ export function Sidebar({
                           className={`sidebar-bouwblok status-${
                             nietVanToepassing ? "nvt" : status === "nog-niet-begonnen" ? "onbegonnen" : status
                           } w-full border-0 bg-transparent ${actief ? "actief" : ""}`}
-                          style={kleur ? ({ ["--accent" as string]: kleur.hex } as React.CSSProperties) : undefined}
+                          style={kleur ? (accentStijl(kleur.hex) as React.CSSProperties) : undefined}
                         >
                           <span className="status-icoon">
                             {nietVanToepassing ? (

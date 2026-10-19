@@ -1,3 +1,4 @@
+import { formatScore } from "@/lib/format";
 import { Classificatie } from "@/lib/types";
 import { CLASSIFICATIE_INFO, scoreKleur } from "@/lib/colors";
 
@@ -14,7 +15,7 @@ export function ScoreCircle({
       className="classificatie-cirkel"
       style={{ ["--kleur" as string]: scoreKleur(score) } as React.CSSProperties}
     >
-      <span className="score">{score.toFixed(1)}</span>
+      <span className="score">{formatScore(score)}</span>
       <span className="label">{info.label}</span>
     </div>
   );

@@ -4,7 +4,7 @@
  * De rekenregels zijn die van de benchmark tussen organisaties (`benchmark.md`): Per organisatie de meest recente Meting die aan
  * `benchmarkMinScans` voldoet, en elke organisatie telt even zwaar mee.
  */
-import { Assessment, Organisatie, ScanUitvoering, VeldDefinitie, VerkenEenheid } from "./types";
+import { Assessment, Meetperiode, Organisatie, ScanUitvoering, VeldDefinitie, VerkenEenheid } from "./types";
 import { BouwblokRij, bouwblokRijen, kwantiel, rond1, steekproefSd } from "./visualisatie";
 import { bouwblokScoreRuw, overallScoreRuw } from "./scoring";
 import {
@@ -13,8 +13,9 @@ import {
   vergelijkNieuwsteEerst,
   aantalAfgerondInMeting,
   isSamengesteld,
+  meetdatumVan,
+  toonMeetdatum,
   onderdeelVan,
-  onderliggendeMetingen,
   STANDAARD_ONDERDEEL,
 } from "./metingen";
 import { organisatieVelden } from "@/data/organisatie-velden";
@@ -42,6 +43,8 @@ export interface Pool {
   leden: PoolLid[];
   /** Organisaties met een bruikbare Meting maar zonder `benchmarkToegestaan`: Niet beschikbaar. */
   zonderToestemming: number;
+  /** Met een Meetperiode: Het aantal Organisaties (of onderdelen) met een bruikbare Meting, maar niet in de periode. Die doen niet mee. */
+  buitenPeriode: number;
 }
 
 /**
@@ -52,10 +55,11 @@ export function bouwPool(
   organisaties: Organisatie[],
   assessment: Assessment,
   minScans: number,
-  eenheid: VerkenEenheid = "organisaties"
+  eenheid: VerkenEenheid = "organisaties",
+  meetperiode?: Meetperiode | null
 ): Pool {
   const rijen = bouwblokRijen(assessment);
-  const { gekozen, zonderToestemming } = kiesPoolMetingen(organisaties, assessment.id, minScans, eenheid);
+  const { gekozen, zonderToestemming, buitenPeriode } = kiesPoolMetingen(organisaties, assessment.id, minScans, eenheid, meetperiode);
   const leden: PoolLid[] = gekozen.map((lid) => {
     const antwoorden = gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, lid.organisatie, lid.meting);
     return {
@@ -65,7 +69,7 @@ export function bouwPool(
       overall: overallScoreRuw(assessment, antwoorden),
     };
   });
-  return { rijen, leden, zonderToestemming };
+  return { rijen, leden, zonderToestemming, buitenPeriode };
 }
 
 /** De naam van een lid van de pool: De organisatie, of bij een onderdeel "{Organisatie}, {onderdeel}" (alleen de organisatie bij "Hele organisatie"). */
@@ -73,24 +77,50 @@ export function poolLidNaam(organisatie: Pick<Organisatie, "naam">, onderdeel: s
   return !onderdeel || onderdeel === STANDAARD_ONDERDEEL ? organisatie.naam : `${organisatie.naam}, ${onderdeel}`;
 }
 
+/** Valt de meetdatum van de Meting in de periode (beide inclusief)? Een Meting zonder meetdatum valt er nooit in. */
+export function inMeetperiode(meting: Pick<ScanUitvoering, "meetdatum">, periode: Meetperiode): boolean {
+  const datum = meetdatumVan(meting);
+  return datum !== null && datum >= periode.van && datum <= periode.totEnMet;
+}
+
+/** "12-01-2026 tot en met 10-02-2026", voor de regel in het paneel, het detail, de Lead en de audit-log. */
+export function meetperiodeTekst(periode: Meetperiode): string {
+  return `${toonMeetdatum(periode.van)} tot en met ${toonMeetdatum(periode.totEnMet)}`;
+}
+
+/** Is de periode bruikbaar? Beide datums gevuld en de begindatum niet na de einddatum. */
+export function geldigeMeetperiode(periode: Partial<Meetperiode> | null | undefined): periode is Meetperiode {
+  return !!periode && !!periode.van && !!periode.totEnMet && periode.van <= periode.totEnMet;
+}
+
 /**
- * De Metingen die in de pool komen, zonder scores (`visualisatie-verkennen.md`, Pool en Eenheid). Bij de eenheid Organisaties
- * telt per organisatie de meest recente Meting die aan `minScans` voldoet. Bij Onderdelen telt per onderdeel (de naam van het
- * onderdeel binnen een organisatie) de meest recente zo'n Meting. Een samengestelde Meting en haar eigen onderliggende Metingen
- * tellen niet allebei mee: Komt de samengestelde Meting in de pool, dan vallen haar onderliggende Metingen eruit (voorstel,
- * een open punt in `benchmark.md`). Alleen organisaties met `benchmarkToegestaan`, de rest telt als "zonder toestemming".
+ * De Metingen die in de pool komen, zonder scores (`benchmark.md`, Welke Meting telt waar; `visualisatie-verkennen.md`, Pool,
+ * Eenheid en Meetperiode). Alleen Metingen met minstens `minScans` afgeronde scans. Bij de eenheid Organisaties telt per organisatie
+ * de laatste Meting binnen de Meetperiode, gewoon of samengesteld, en zonder periode de meest recente. Bij Onderdelen tellen alleen
+ * gewone Metingen: Per onderdeel (de naam van het onderdeel binnen een organisatie) de laatste Meting binnen de periode, of de meest
+ * recente. Een samengestelde Meting doet daar nooit mee, want haar onderdelen zijn de onderliggende Metingen zelf. Alleen
+ * organisaties met `benchmarkToegestaan`, de rest telt als "zonder toestemming". Een organisatie (of onderdeel) met een bruikbare
+ * Meting maar niet in de periode telt als "buiten de periode".
  */
 export function kiesPoolMetingen(
   organisaties: Organisatie[],
   assessmentId: string,
   minScans: number,
-  eenheid: VerkenEenheid
-): { gekozen: Omit<PoolLid, "aantalScans" | "scores" | "overall">[]; zonderToestemming: number } {
+  eenheid: VerkenEenheid,
+  meetperiode?: Meetperiode | null
+): { gekozen: Omit<PoolLid, "aantalScans" | "scores" | "overall">[]; zonderToestemming: number; buitenPeriode: number } {
   const gekozen: Omit<PoolLid, "aantalScans" | "scores" | "overall">[] = [];
   let zonderToestemming = 0;
+  let buitenPeriode = 0;
+  const periode = geldigeMeetperiode(meetperiode) ? meetperiode : null;
   for (const organisatie of organisaties) {
     const kandidaten = organisatie.scanUitvoeringen
-      .filter((m) => m.assessmentId === assessmentId && voldoetAanMinScans(organisatie, m, minScans))
+      .filter(
+        (m) =>
+          m.assessmentId === assessmentId &&
+          (eenheid === "organisaties" || !isSamengesteld(m)) &&
+          voldoetAanMinScans(organisatie, m, minScans)
+      )
       .sort(vergelijkNieuwsteEerst);
     if (kandidaten.length === 0) continue;
     if (!organisatie.benchmarkToegestaan) {
@@ -98,17 +128,22 @@ export function kiesPoolMetingen(
       continue;
     }
     if (eenheid === "organisaties") {
-      gekozen.push({ id: organisatie.id, naam: organisatie.naam, organisatie, meting: kandidaten[0] });
+      const meting = periode ? kandidaten.find((m) => inMeetperiode(m, periode)) : kandidaten[0];
+      if (!meting) {
+        buitenPeriode += 1;
+        continue;
+      }
+      gekozen.push({ id: organisatie.id, naam: organisatie.naam, organisatie, meting });
       continue;
     }
+    const alleOnderdelen = new Set(kandidaten.map(onderdeelVan));
     const perOnderdeel = new Map<string, ScanUitvoering>();
-    for (const m of kandidaten) if (!perOnderdeel.has(onderdeelVan(m))) perOnderdeel.set(onderdeelVan(m), m);
-    const gekozenMetingen = [...perOnderdeel.values()];
-    const onderliggend = new Set(
-      gekozenMetingen.filter(isSamengesteld).flatMap((m) => onderliggendeMetingen(organisatie, m).map((o) => o.id))
-    );
-    for (const meting of gekozenMetingen) {
-      if (onderliggend.has(meting.id)) continue;
+    for (const m of kandidaten) {
+      if (periode && !inMeetperiode(m, periode)) continue;
+      if (!perOnderdeel.has(onderdeelVan(m))) perOnderdeel.set(onderdeelVan(m), m);
+    }
+    buitenPeriode += alleOnderdelen.size - perOnderdeel.size;
+    for (const meting of perOnderdeel.values()) {
       const onderdeel = onderdeelVan(meting);
       gekozen.push({
         id: `${organisatie.id}:${meting.id}`,
@@ -120,7 +155,7 @@ export function kiesPoolMetingen(
     }
   }
   gekozen.sort((a, b) => a.naam.localeCompare(b.naam, "nl"));
-  return { gekozen, zonderToestemming };
+  return { gekozen, zonderToestemming, buitenPeriode };
 }
 
 /* ---------- Filters uit de organisatievelden ---------- */

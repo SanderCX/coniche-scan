@@ -107,6 +107,15 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   (organisatievelden die je toevoegt en waarop je filtert en groepeert)
   beginnen leeg, zonder groepering is de hele pool de focus. Gebouwd op 15
   oktober 2026 (visual design versie 6).
+- **Ronde van 19 oktober 2026** (Joost, PR 127), gebouwd: Fundament in merkgeel, het
+  staafdiagram per categorie in categoriekleuren met stippellijnen, Mijn metingen
+  met een spoor van 1 tot 5 en stip en lijn bij Hele meting, de Meetperiode bij
+  Verkennen en bij een opgeslagen verkenning (`benchmark.md`, Welke Meting telt
+  waar), het samenstellen van een benchmark met alle Metingen als keuze, en
+  onderdeel I en J van `visualisatie-scores.md`: Dezelfde schakelaar op de
+  samengestelde Meting, de vergelijking, de benchmark tussen organisaties, het
+  perspectief van een lid en de hoofdpagina van een Meting, met Toon als
+  (Gemiddeld of Naast elkaar met zes vormen) en Spreiding tussen onderdelen.
 - **Opmaakronde**: Besloten door Joost en gebouwd op 15 oktober 2026
   (`stylesheet.md`). Acht lettergroottes in even px (12, 14, 16, 18,
   24, 32, 40, 48) in plaats van zo'n 17 maten, met de paginatitel op 32px.
@@ -231,7 +240,7 @@ laagste 3 de verbeterkansen.
 ## 2. Kleuren per categorie
 
 Overkoepelend oranje, Organisatie blauw, Proces & Tech paars, Mens groen,
-Fundament geel (het merkgeel `#ffc043`, voorstel van 19 oktober 2026, daarvoor antraciet). Fundament is alleen een vulling, dus tekst in en bij die kleur staat in `--ink` (`stylesheet.md`, Categoriekleuren). De interactieve flow gebruikt deze kleuren; de
+Fundament geel (het merkgeel `#ffc043`, gebouwd op 19 oktober 2026, daarvoor antraciet). Fundament is alleen een vulling, dus tekst in en bij die kleur staat in `--ink` (`stylesheet.md`, Categoriekleuren). De interactieve flow gebruikt deze kleuren; de
 PDF-export gebruikt overal oranje.
 
 Alle opmaakwaarden (hexcodes, tekstkleuren, scorekleuren, knopstaten)
@@ -534,7 +543,7 @@ geen afwijking van de spec maar een gat erin.
    scheidingslijn, dan "← Terug naar Mijn metingen".
 6. **Resultatenscherm**: Overall score met classificatiecirkel en
    voortgang, radar van alle bouwblokken, staafdiagram per categorie
-   (in de categoriekleuren, met de klassegrenzen als stippellijn, voorstel van 19 oktober 2026, voorheen volgde de kleur de score), top 3 sterktes en verbeterkansen, legenda.
+   (in de categoriekleuren, met de klassegrenzen als stippellijn, gebouwd op 19 oktober 2026, voorheen volgde de kleur de score), top 3 sterktes en verbeterkansen, legenda.
    **Bij AI-volwassenheid** (geen categorielaag, `content-ai-scan.md`)
    vervalt het staafdiagram per categorie: In plaats daarvan "Scores per
    Domein", een horizontale balk per domein individueel, gesorteerd van

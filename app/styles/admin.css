@@ -906,6 +906,40 @@ select.veld-compact {
   margin: 0.8rem 0 0.2rem 1.7rem;
 }
 
+/* Samenstellen van een benchmark: Per organisatie en Assessment de lijst met alle Metingen als keuze (`benchmark.md`, Samenstellen). */
+.benchmark-meting-keuze {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 18rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.benchmark-meting-keuze legend {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+  margin-bottom: var(--sp-2);
+  padding: 0;
+}
+.benchmark-meting-optie {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  font-size: var(--fs-14);
+  cursor: pointer;
+}
+.benchmark-meting-optie input {
+  margin-top: 3px;
+}
+.benchmark-meting-optie > span {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Een kaart in de Assessment-lijst met een actie erin (beheerpagina.md, punt 1, Assessment verwijderen). De kaart is
    de wrapper en loopt over de volle breedte van de lijst. De link vult de kaart, de knop staat in een eigen laatste
    kolom, rechts uitgelijnd en verticaal gecentreerd. De knop staat niet in de link zelf (een knop in een <a> is ongeldig). */

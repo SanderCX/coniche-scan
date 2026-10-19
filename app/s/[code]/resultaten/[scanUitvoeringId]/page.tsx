@@ -15,6 +15,7 @@ import {
   aantalAfgerondInMeting,
   gemiddeldeAntwoordenVoorMetingMetSamenstelling,
   isSamengesteld,
+  onderdeelEenheden,
 } from "@/lib/metingen";
 import { useBenchmarks } from "@/lib/benchmark-store";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
@@ -56,7 +57,7 @@ export default function LeadResultatenPage({
     );
   }
 
-  // Bij een samengestelde Meting ziet de Lead alleen het gemiddelde, niet de onderliggende Metingen (`benchmark.md`).
+  // Bij een samengestelde Meting ziet de Lead de namen van de onderliggende Metingen niet (`benchmark.md`): Wel Gemiddeld en Spreiding tussen onderdelen, zonder namen.
   const samengesteld = isSamengesteld(scanUitvoering);
   const magExporteren = heeftMetingToegang(gegevens.organisatie, gegevens.lid.id, "exporteren", scanUitvoering.id);
   const magSpreiding = !samengesteld && heeftMetingToegang(gegevens.organisatie, gegevens.lid.id, "spreiding", scanUitvoering.id);
@@ -184,6 +185,8 @@ export default function LeadResultatenPage({
             }
             quickscan={quickscan}
             spreidingToegestaan={magSpreiding}
+            onderdelen={samengesteld ? onderdeelEenheden(assessment, gegevens.organisatie, scanUitvoering) : undefined}
+            onderdelenNamen={false}
             antwoordenToegestaan={magAntwoorden}
             antwoordenAnoniem={gegevens.organisatie.antwoordenMetNamen !== true}
             bereikAltijd={false}

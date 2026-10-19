@@ -84,7 +84,7 @@ Deze regels gelden voor alle weergaven. G wijkt af in de kleuren en heeft geen b
 - Een dunne lijn van de laagste tot de hoogste bouwblokscore van een afgeronde scan.
 - Rechts het gemiddelde als getal, vet.
 
-**Staafdiagram per categorie in het Overzicht** (voorstel van 19 oktober 2026). De balken krijgen de categoriekleuren in plaats van de klassekleur, met de klassegrenzen als stippellijn en het getal boven elke balk (`stylesheet.md`, Categoriekleuren). Dit geldt voor het Overzicht van een Meting, van een samengestelde Meting en van het groepsgemiddelde in een benchmark, en voor het scherm van de respondent (`CLAUDE.md`, scherm 6). De PDF-export blijft zoals beschreven in de exportspecs.
+**Staafdiagram per categorie in het Overzicht** (gebouwd op 19 oktober 2026). De balken krijgen de categoriekleuren in plaats van de klassekleur, met de klassegrenzen als stippellijn en het getal boven elke balk (`stylesheet.md`, Categoriekleuren). Dit geldt voor het Overzicht van een Meting, van een samengestelde Meting en van het groepsgemiddelde in een benchmark, en voor het scherm van de respondent (`CLAUDE.md`, scherm 6). De PDF-export blijft zoals beschreven in de exportspecs.
 
 **Tegels.** Totaalscore met de klasse, hoogste bouwblok (score en naam), laagste bouwblok (score en naam), en de verdeling van de bouwblokken over de drie klassen.
 
@@ -229,7 +229,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 ## I. Dezelfde opties voor een samengestelde Meting en een vergelijking
 
-**Voorstel van 16 oktober 2026, ontworpen in "Coniche Scan Resultaten en onderdelen" (versie 3), nog niet gebouwd.** Een Meting, een samengestelde Meting en een vergelijking binnen een organisatie krijgen dezelfde schakelaar en dezelfde weergaven. Joost wilde alle opties op alle drie de resultaatschermen. Wat anders is, volgt uit de eenheid: Bij een Meting is de eenheid een afgeronde scan, bij een samengestelde Meting en een vergelijking is het een onderdeel (een Meting).
+**Voorstel van 16 oktober 2026, ontworpen in "Coniche Scan Resultaten en onderdelen" (versie 3), gebouwd op 19 oktober 2026.** Een Meting, een samengestelde Meting en een vergelijking binnen een organisatie krijgen dezelfde schakelaar en dezelfde weergaven. Joost wilde alle opties op alle drie de resultaatschermen. Wat anders is, volgt uit de eenheid: Bij een Meting is de eenheid een afgeronde scan, bij een samengestelde Meting en een vergelijking is het een onderdeel (een Meting).
 
 **Schakelaar.** Overzicht, Per bouwblok, Spreiding en Antwoorden (Navigatie). Antwoorden is er alleen bij één Meting, want een samengestelde Meting heeft geen scans en een vergelijking mengt Metingen. Bij de andere twee staat Antwoorden uitgeschakeld.
 
@@ -255,13 +255,13 @@ Zo blijft de rij tegels gelijk aan die van een Meting (gebouwd). De eerdere teks
 
 **Overzicht.** Bij een samengestelde Meting en een vergelijking staat onder het Overzicht een kaart per onderdeel met de vorm, de naam, de meetdatum en de totaalscore in de klassekleur.
 
-**Wie ziet het.** Dezelfde regels als bij de bestaande weergaven. Een Lead ziet een samengestelde Meting alleen als hij Resultaten heeft (`benchmark.md`, View voor een Lead). Voor een vergelijking geldt wat bij Niveau 2 staat. Een samengestelde Meting heeft in het Leads-venster alleen de kolom Resultaten. Gemiddeld, Naast elkaar en Spreiding tussen onderdelen vallen daar voorlopig onder.
+**Wie ziet het.** Dezelfde regels als bij de bestaande weergaven. Een Lead ziet een samengestelde Meting alleen als hij Resultaten heeft (`benchmark.md`, View voor een Lead). Voor een vergelijking geldt wat bij Niveau 2 staat. Een samengestelde Meting heeft in het Leads-venster alleen de kolom Resultaten. Gemiddeld, Naast elkaar en Spreiding tussen onderdelen vallen daar voorlopig onder. Zo gebouwd op 19 oktober 2026 (Gebouwd op 19 oktober 2026: I en J): Een Lead krijgt Gemiddeld en Spreiding, zonder Naast elkaar en zonder kaarten per onderdeel, omdat die de namen van de onderliggende Metingen tonen en `benchmark.md` die voor een Lead verbergt.
 
 **Open.** Of Spreiding tussen onderdelen een eigen vinkje voor een Lead krijgt. De stippen zijn onderdelen van zijn eigen Organisatie, dus anonimiteit speelt niet, maar het Leads-venster kent bij een samengestelde Meting nu alleen Resultaten. Daarnaast of Naast elkaar bij meer dan zes onderdelen een andere vormentaal nodig heeft.
 
 ## J. Dekking per scherm en de gaten in de bouw
 
-**Voorstel van 19 oktober 2026, nog niet gebouwd.** Joost liep de gebouwde app na met twaalf screenshots en zag dat de weergaven van de Meting niet overal terugkomen. Het gaat om de benchmark op niveau 1, het perspectief per lid, de opgeslagen verkenning en de hoofdpagina van een Meting met scans. Deze sectie zegt wat elk scherm moet tonen. Elk scherm met scores krijgt dezelfde schakelaar (Navigatie en onderdeel I), met de weergaven die bij zijn eenheid horen.
+**Voorstel van 19 oktober 2026, gebouwd op 19 oktober 2026.** Joost liep de gebouwde app na met twaalf screenshots en zag dat de weergaven van de Meting niet overal terugkomen. Het gaat om de benchmark op niveau 1, het perspectief per lid, de opgeslagen verkenning en de hoofdpagina van een Meting met scans. Deze sectie zegt wat elk scherm moet tonen. Elk scherm met scores krijgt dezelfde schakelaar (Navigatie en onderdeel I), met de weergaven die bij zijn eenheid horen.
 
 **Niveau 1, detail van een benchmark.** De schakelaar staat boven de weergave, met de samenvatting van de groep bovenaan (het groepsgemiddelde, zoals een Respondent zijn eigen scan ziet). De volgorde is Overzicht, Per bouwblok, Spreiding tussen Organisaties en de matrix (E).
 
@@ -282,15 +282,56 @@ Zo blijft de rij tegels gelijk aan die van een Meting (gebouwd). De eerdere teks
 
 | Scherm | Overzicht | Per bouwblok | Spreiding | Antwoorden | Stand |
 |---|---|---|---|---|---|
-| Meting met scans (niveau 3) | Ja | Ja (A) | Ja (B) | Ja (G) | Hoofdpagina mist Overzicht en Spreiding |
-| Samengestelde Meting | Ja | Ja | Ja vanaf 3 onderdelen | Nee | Ontworpen, niet gebouwd |
-| Vergelijking binnen een organisatie (niveau 2) | Ja | Ja (C of H) | Ja vanaf 3 Metingen | Nee | Matrix en C of H gebouwd, de rest niet |
-| Benchmark tussen organisaties (niveau 1) | Ja | Ja (D) | Ja | Nee | Alleen lijst en per bouwblok gebouwd |
-| Perspectief van een lid (niveau 1) | Ja | Ja | Ja | Nee | Alleen samenvatting en positie gebouwd |
-| Opgeslagen verkenning, Organisaties | Ja | Ja | Ja | Nee | Valt onder niveau 1 |
-| Opgeslagen verkenning, Onderdelen op één Organisatie | Ja | Ja | Ja vanaf 3 onderdelen | Nee | Detail is weergave I, nog niet gebouwd |
+| Meting met scans (niveau 3) | Ja | Ja (A) | Ja (B) | Ja (G) | Gebouwd: De hoofdpagina in een benchmark heeft Overzicht en Spreiding boven de lijst |
+| Samengestelde Meting | Ja | Ja | Ja vanaf 3 onderdelen | Uitgeschakeld | Gebouwd |
+| Vergelijking binnen een organisatie (niveau 2) | Ja | Ja (C of H, Gemiddeld, of Naast elkaar met vormen) | Ja vanaf 3 Metingen | Uitgeschakeld | Gebouwd |
+| Benchmark tussen organisaties (niveau 1) | Ja | Ja (stip op het groepsgemiddelde met de lijn van laagste tot hoogste lid) | Ja vanaf 3 leden | Nee | Gebouwd, met de matrix als vierde weergave |
+| Perspectief van een lid (niveau 1) | Ja | Ja (D) | Ja vanaf 3 leden, met de ring op het lid | Nee | Gebouwd |
+| Opgeslagen verkenning, Organisaties | Ja | Ja | Ja | Nee | Gebouwd, valt onder niveau 1 |
+| Opgeslagen verkenning, Onderdelen op één Organisatie | Ja | Ja | Ja vanaf 3 onderdelen | Uitgeschakeld | Gebouwd: Het detail is weergave I met Toon als |
 
 Antwoorden per vraag is er alleen bij één Meting. Voor de andere schermen is dat uitgesteld.
+
+## Gebouwd op 19 oktober 2026: I en J
+
+Gebouwd (`lib/visualisatie.ts`, `components/visualisatie/OnderdelenWeergaven.tsx`, `WeergaveMeerdere.tsx`, `VormTeken.tsx`). De
+weergaven A en B rekenen met eenheden alsof het scans zijn (`eenhedenGemiddeld`, `eenhedenSpreiding`): Elk onderdeel of lid
+is een pseudo-scan met haar gemiddelde antwoord per vraag, dus er is geen tweede rekenmethode. Naast elkaar met zes vormen
+(`eenhedenNaastElkaar`, `VORMEN`, met clip-path in `visualisatie.css`) en de stapeling van gelijke scores (`stapelStappen`).
+
+**Plekken**
+
+- **Samengestelde Meting** (`MetingWeergaven` met `onderdelen`): De schakelaar met Overzicht, Per bouwblok, Spreiding en Antwoorden
+  (uitgeschakeld, `info.antwoordenGeenScans`), "Toon als" met Gemiddeld (standaard) en Naast elkaar (`?toon=naast`), en onder het
+  Overzicht een kaart per onderdeel (`OnderdelenKaarten`) met vorm, naam, meetdatum en totaalscore.
+- **Vergelijking binnen een organisatie** (`MetingenVergelijkingView`): Dezelfde schakelaar met eigen stand (niet in de
+  adresbalk), Naast elkaar als standaard. Bij precies twee Metingen is Naast elkaar weergave C of H naar de lezing, bij drie tot en
+  met zes Metingen staan de vormen er, wat ook de eerdere beperking tot twee Metingen in C en H opheft voor Naast elkaar.
+- **Benchmark tussen organisaties** (`BenchmarkGroepSectie`): De samenvatting van de groep bovenaan, daaronder de schakelaar
+  Overzicht, Per bouwblok, Spreiding en Matrix. Bij een opgeslagen verkenning op één Organisatie met de eenheid Onderdelen is het
+  detail weergave I, met Toon als en Antwoorden uitgeschakeld.
+- **Perspectief van een lid** (`BenchmarkOrganisatieView`): Overzicht, Per bouwblok (D) en Spreiding (B met de ring op het lid, de
+  overige leden zijn de vergelijkgroep: `VergelijkingsView.spreidingLeden`). De Admin ziet het perspectief van een onderdeel
+  ook op `/beheer/benchmark/[id]/organisatie/[id]` (`leadViewsOnderdelen`).
+- **Hoofdpagina van een Meting met scans** (`BenchmarkScanSectie`, niveau 3): Overzicht en Spreiding boven de lijst. De view van
+  één scan houdt de samenvatting van de Respondent met daaronder de positie ten opzichte van de groep, zonder schakelaar.
+- **Labels en getallen**: `bouwblokWoorden` geeft "bouwblok" waar de Assessment "bouwsteen" zegt, in de weergaven van de
+  resultaten, de benchmark en Verkennen, en "onderdeel" als eenheid (de matrix heeft de tegels Hoogste en Laagste onderdeel, de
+  kop "Per bouwblok en per onderdeel"). Scores staan overal met een decimale komma (`formatScore`, ook op het scherm van de
+  respondent).
+
+**Afwijkingen en keuzes**
+
+- Spreiding is er vanaf drie eenheden, ook bij organisaties (in I stond dat alleen voor onderdelen). De uitgeschakelde pil heeft een
+  tooltip, bij onderdelen ook `info.spreidingOnderdelen`.
+- Een Lead op een samengestelde Meting ziet de namen van de onderliggende Metingen niet (`benchmark.md`, Onderdeel en samengestelde
+  Meting, wint van de regel "vallen daar voorlopig onder" in I): Voor hem staan Overzicht, Per bouwblok met Gemiddeld en Spreiding,
+  zonder Toon als en zonder kaarten per onderdeel. De stippen in Spreiding hebben geen naam.
+- Naast elkaar is er bij twee tot en met zes onderdelen (`info.toonAlsTeVeel` bij meer). Bij één onderdeel valt er niets te vergelijken.
+- Bij een benchmark tussen organisaties heeft Per bouwblok geen Toon als: Het is het gemiddelde met de lijn van laagste tot hoogste
+  lid. De kwartielbanden van D staan alleen in het perspectief van een lid.
+- Voor de Admin op `/beheer/benchmark/[id]/organisatie/[id]` bij de eenheid Onderdelen tonen alleen onderdelen die voldoen aan
+  `benchmarkMinOrganisaties` (of de uitzondering bij één Organisatie) een view, zoals voor een Lead.
 
 ## Gebouwd
 
@@ -338,7 +379,7 @@ Gebouwd op 13 oktober 2026. De berekeningen staan in `lib/visualisatie.ts` (met 
 **Nog niet gebouwd**
 
 - Export van deze weergaven naar PDF, CSV en InDesign.
-- Meer dan twee Metingen in C en H.
+- Meer dan twee Metingen in C en H zelf (Naast elkaar met vormen bij drie tot en met zes Metingen is er sinds 19 oktober 2026).
 - Een kolom met het verschil binnen een groep per onderdeel in E (open, zie Volgorde van de kolommen).
 - Een eigen drempel voor de band en de kwartielen in D.
 

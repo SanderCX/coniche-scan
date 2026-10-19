@@ -6,7 +6,7 @@ import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenuVoorCode } from "@/components/MijnGegevensMenuVoorCode";
 import { Modal } from "@/components/Modal";
 import { bouwstenenGroepen, BouwsteenContent } from "@/data/bouwstenen-content";
-import { CATEGORIE_COLORS } from "@/lib/colors";
+import { CATEGORIE_COLORS, lijnKleur, tekstOpKleur } from "@/lib/colors";
 
 interface Geselecteerd {
   bouwsteen: BouwsteenContent;
@@ -63,7 +63,7 @@ function BouwsteenKaart({
           right: "0.9rem",
           fontSize: "var(--fs-12)",
           fontWeight: 700,
-          color: actief ? "rgba(255,255,255,0.75)" : "var(--ink-s)",
+          color: actief ? (tekstOpKleur(kleur) === "#fff" ? "rgba(255,255,255,0.75)" : "var(--ink)") : "var(--ink-s)",
         }}
       >
         {bouwsteen.nummer}
@@ -71,7 +71,7 @@ function BouwsteenKaart({
       <span
         className="text-sm font-semibold"
         style={{
-          color: actief ? "#fff" : "var(--ink)",
+          color: actief ? tekstOpKleur(kleur) : "var(--ink)",
           overflowWrap: "break-word",
           minWidth: 0,
         }}
@@ -337,7 +337,7 @@ function BouwstenenInhoud() {
             >
               <p
                 className="text-xs font-bold"
-                style={{ color: geselecteerd.kleur, letterSpacing: "0.08em", marginBottom: "0.2rem" }}
+                style={{ color: lijnKleur(geselecteerd.kleur), letterSpacing: "0.08em", marginBottom: "0.2rem" }}
               >
                 CENTRALE VRAAG
               </p>

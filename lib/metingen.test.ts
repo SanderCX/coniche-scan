@@ -12,6 +12,7 @@ import {
   laatsteMeetdatum,
   metingMetCombinatie,
   nieuwsteEerst,
+  onderdeelEenheden,
   oudsteEerst,
   ruimOrganisatieOp,
   selectieHeeftZelfdeOnderdeel,
@@ -395,5 +396,20 @@ describe("samengestelde Meting maken en verwijderen", () => {
     if (!r.ok) throw new Error("mislukt");
     expect(db.wijzigSamengesteldeMeting(r.meting.id, { metingIds: ["A", "C"], minScans: 3 }).ok).toBe(true);
     expect(laad().scanUitvoeringen.find((m) => m.id === r.meting.id)).toMatchObject({ samenstelling: ["A", "C"], meetdatum: "2026-09-30" });
+  });
+});
+
+describe("onderdelen van een samengestelde Meting", () => {
+  it("zijn de onderliggende Metingen op meetdatum met hun eigen gemiddelde, een Meting zonder scans valt weg", () => {
+    const a = meting("A", { onderdeel: "Team A", meetdatum: "2026-03-01", invullingen: [inv("a1", "A", "L1", 2), inv("a2", "A", "L2", 4)] });
+    const b = meting("B", { onderdeel: "Team B", meetdatum: "2026-01-01", invullingen: [inv("b1", "B", "L1", 5)] });
+    const leeg = meting("C", { onderdeel: "Team C", meetdatum: "2026-02-01" });
+    const s = meting("S", { samenstelling: ["A", "B", "C"] });
+    const o = org({ scanUitvoeringen: [a, b, leeg, s] });
+    const eenheden = onderdeelEenheden(A, o, s);
+    expect(eenheden.map((e) => e.id)).toEqual(["B", "A"]);
+    expect(eenheden[0].sublabel).toBe("Team B · 01-01-2026");
+    expect(eenheden[1].aantalScans).toBe(2);
+    expect(overallScore(A, eenheden[1].antwoorden)).toBe(3);
   });
 });

@@ -150,7 +150,8 @@ vinkje vanzelf als een Organisatie niet meer aan de filters voldoet.
   tegenover de onderdelen van andere Organisaties als anoniem gemiddelde, de drempel telt Organisaties. Bij een filter op één
   Organisatie geldt de drempel niet. De lead-pagina toont de naam en de filters van een verkenning, niet de ledenlijst.
 - Nog niet: Een Consultant die opslaat, en de peildatum bij een verkenning (die is nu "vandaag").
-- Nog niet (voorstel van 19 oktober 2026): De Meetperiode en de regels onder Welke Meting telt waar, het detail en het perspectief van een opgeslagen verkenning, en de teller per eenheid bij het samenstellen. Gebouwd telt per Organisatie of per onderdeel de meest recente Meting met genoeg scans.
+- Gebouwd op 19 oktober 2026: De Meetperiode en de regels onder Welke Meting telt waar (`lib/verkennen.ts`, `kiesPoolMetingen`), de teller per eenheid in het detail en het samenstellen met alle Metingen als keuze. Op de Meetperiode staat een Lead-reden in het Leads-venster ("Geen Meting in de Meetperiode"). De reden "Geen onderdelen met een eigen Meting" is niet gebouwd: Een samengestelde Meting voldoet alleen aan `benchmarkMinScans` als haar onderliggende Metingen dat doen, en die tellen dan zelf mee als onderdeel, dus de situatie komt niet voor.
+- Gebouwd op 19 oktober 2026: Het detail en het perspectief van een opgeslagen verkenning (`visualisatie-scores.md`, onderdeel I en J).
 
 ### Drempels
 
@@ -200,7 +201,7 @@ Een Meting die verwijst naar andere Metingen (`Meting.samenstelling`) en daarvan
 
 ### Welke Meting telt waar
 
-**Besloten op 19 oktober 2026.** Dit is de ene plek waar staat welke Meting meedoet. De andere specs verwijzen hiernaar.
+**Besloten op 19 oktober 2026 en gebouwd op 19 oktober 2026.** Dit is de ene plek waar staat welke Meting meedoet. De andere specs verwijzen hiernaar.
 
 - **Vaste groep (niveau 1).** Per Organisatie en Assessment kiest de Admin bij het samenstellen één Meting, gewoon of samengesteld, van welke meetdatum ook (Samenstellen, stap 3). De keuze ligt vast.
 - **Verkenning, eenheid Organisaties.** Per Organisatie telt de laatste Meting, gewoon of samengesteld, met een meetdatum in de Meetperiode van de verkenning. Zonder Meetperiode telt de meest recente Meting. De Meting heeft minstens `benchmarkMinScans` afgeronde scans. Een Organisatie zonder zo'n Meting doet niet mee.

@@ -66,8 +66,12 @@ export interface TeaserRij {
   naam: string;
   /** Kleur van de balk (een CSS-waarde). */
   kleur: string;
-  /** 0 tot en met 1. */
+  /** 0 tot en met 1. Bij een schaal van 1 tot 5 is dat (score − 1) / 4: Het spoor begint op 1 (`visualisatie-mijn-metingen.md`, Schaal). */
   fractie: number;
+  /** Alleen bij de hele Meting met een schaal: De laagste en hoogste score van een afgeronde scan, op dezelfde schaal als `fractie`. */
+  lijn?: { van: number; tot: number };
+  /** Tekstalternatief van de rij, bijvoorbeeld "Overkoepelend, gemiddelde 2,7, laagste 2,0, hoogste 3,6". */
+  alt: string;
   /** De tekst rechts van de balk: "3,4" of "8/12 · 67%". */
   waarde: string;
 }
@@ -84,6 +88,13 @@ export interface Teaser {
   pilTekst: string | null;
   /** Regel onder het getal: "35 van 60 punten". Bij de hele Meting leeg: Het aantal scans staat achter de titel. */
   sub: string | null;
+  /**
+   * `balk`: Een balk van 8px (eigen scan, en de Quickscan). `stip`: Een stip op het gemiddelde met een lijn van laagste tot hoogste
+   * (hele Meting, voorstel van 19 oktober 2026). Alleen `stip` en `balk` met een schaal van 1 tot 5 tonen de ankers "1" en "5".
+   */
+  stijl: "balk" | "stip";
+  /** De ankers "1" en "5" onder de onderste rij: Alleen bij een schaal van 1 tot 5. */
+  ankers: boolean;
   /** Alleen bij de hele Meting: Het aantal afgeronde scans waarover het gemiddelde gaat, voor achter de titel ("6 scans"). */
   aantalScans?: number;
   rijen: TeaserRij[];
@@ -102,7 +113,17 @@ export function celStap(score: number): 1 | 2 | 3 | 4 | 5 {
   return Math.min(5, Math.max(1, Math.round(Number(score.toFixed(1))))) as 1 | 2 | 3 | 4 | 5;
 }
 
-function schaalTeaser(assessment: Assessment, antwoorden: Record<string, Antwoord>, aantalScans?: number): Teaser | null {
+/** Een score op de schaal 1 tot 5 als fractie van het spoor (0 tot en met 1). */
+export function schaalFractie(score: number): number {
+  return Math.min(1, Math.max(0, (score - 1) / 4));
+}
+
+function schaalTeaser(
+  assessment: Assessment,
+  antwoorden: Record<string, Antwoord>,
+  aantalScans?: number,
+  spreiding?: Map<string, { van: number; tot: number }>
+): Teaser | null {
   const overall = overallScore(assessment, antwoorden);
   if (overall === null) return null;
   const stap = celStap(overall);
@@ -113,12 +134,17 @@ function schaalTeaser(assessment: Assessment, antwoorden: Record<string, Antwoor
     const groepen = alleGroepResultaten(assessment, alleBouwblokResultaten(assessment, antwoorden), antwoorden);
     for (const g of groepen) {
       if (g.score === null) continue;
+      const bereik = spreiding?.get(g.groepId);
       rijen.push({
         sleutel: g.groepId,
         naam: g.groepNaam,
         // `Categorie.kleur` is een sleutel ("blauw"), de hex staat in `CATEGORIE_COLORS` (`stylesheet.md`, Categoriekleuren).
         kleur: (g.kleur && CATEGORIE_COLORS[g.kleur as keyof typeof CATEGORIE_COLORS]?.hex) || "var(--or)",
-        fractie: g.score / 5,
+        fractie: schaalFractie(g.score),
+        ...(bereik ? { lijn: { van: schaalFractie(bereik.van), tot: schaalFractie(bereik.tot) } } : {}),
+        alt: bereik
+          ? `${g.groepNaam}, gemiddelde ${komma(g.score)}, laagste ${komma(bereik.van)}, hoogste ${komma(bereik.tot)}`
+          : `${g.groepNaam}, ${aantalScans === undefined ? "jouw score" : "gemiddelde"} ${komma(g.score)}`,
         waarde: komma(g.score),
       });
     }
@@ -131,6 +157,8 @@ function schaalTeaser(assessment: Assessment, antwoorden: Record<string, Antwoor
     pilAchtergrond: `var(--score-${stap}-cel)`,
     pilTekst: `var(--score-${stap}-cel-tekst)`,
     sub: null,
+    stijl: aantalScans !== undefined ? "stip" : "balk",
+    ankers: rijen.length > 0,
     ...(aantalScans !== undefined ? { aantalScans } : {}),
     rijen,
   };
@@ -145,6 +173,7 @@ function quickscanTeaser(resultaat: QuickscanResultaat, metingModus: boolean, n?
       naam: a.categorie.naam,
       kleur: KLASSE_KLEUR[a.klasse as Classificatie],
       fractie: (a.percentage as number) / 100,
+      alt: `${a.categorie.naam}, ${a.percentage}%`,
       // Een scan toont "punten/maximum · percentage", de hele meting alleen het percentage.
       waarde: metingModus ? `${a.percentage}%` : `${a.punten}/${a.maximum} · ${a.percentage}%`,
     }));
@@ -156,6 +185,9 @@ function quickscanTeaser(resultaat: QuickscanResultaat, metingModus: boolean, n?
     pilAchtergrond: null,
     pilTekst: null,
     sub: metingModus ? null : `${komma(resultaat.punten, 0)} van ${komma(resultaat.maximum, 0)} punten`,
+    // De Quickscan houdt een balk met het percentage tot Joost beslist over stip en lijn (`visualisatie-mijn-metingen.md`, Open punten).
+    stijl: "balk",
+    ankers: false,
     ...(metingModus ? { aantalScans: n } : {}),
     rijen,
   };
@@ -177,6 +209,21 @@ export function teaserVoorScan(
   return schaalTeaser(assessment, antwoorden);
 }
 
+/** Per categorie de laagste en hoogste score van een afgeronde scan. Leeg zonder categorielaag. */
+function spreidingPerGroep(assessment: Assessment, afgerond: ScanInvulling[]): Map<string, { van: number; tot: number }> {
+  const uit = new Map<string, { van: number; tot: number }>();
+  if (isVlakkeAssessment(assessment)) return uit;
+  for (const scan of afgerond) {
+    const groepen = alleGroepResultaten(assessment, alleBouwblokResultaten(assessment, scan.antwoorden), scan.antwoorden);
+    for (const g of groepen) {
+      if (g.score === null) continue;
+      const huidig = uit.get(g.groepId);
+      uit.set(g.groepId, huidig ? { van: Math.min(huidig.van, g.score), tot: Math.max(huidig.tot, g.score) } : { van: g.score, tot: g.score });
+    }
+  }
+  return uit;
+}
+
 /**
  * De teaser van de hele Meting (Lead): Het gemiddelde van alle afgeronde scans, met "Gemiddelde van n afgeronde scans" onder het
  * getal en zonder "x/y" in de rijen. `null` zonder afgeronde scans.
@@ -189,7 +236,7 @@ export function teaserVoorMeting(assessment: Assessment, invullingen: ScanInvull
     return quickscanTeaser(resultaat, true, afgerond.length);
   }
   const gemiddeld = gemiddeldeAntwoordenVoorMeting(assessment, afgerond);
-  return schaalTeaser(assessment, gemiddeld, afgerond.length);
+  return schaalTeaser(assessment, gemiddeld, afgerond.length, spreidingPerGroep(assessment, afgerond));
 }
 
 /* ---------- Secties en respons ---------- */

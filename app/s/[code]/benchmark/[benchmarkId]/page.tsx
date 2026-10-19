@@ -5,6 +5,7 @@ import { useRespondentPerToegangscode, useOrganisaties } from "@/lib/db";
 import { useAssessments } from "@/lib/assessment-store";
 import { useBenchmarkMetLeden } from "@/lib/use-benchmarks";
 import { filterRegels, isVerkenning } from "@/lib/verkenning-benchmark";
+import { meetperiodeTekst } from "@/lib/verkennen";
 import { maakFilterNamen } from "@/lib/verkenning-namen";
 import { leadViewsVoorBenchmark } from "@/lib/benchmark";
 import { benchmarkGeldigVoorOrganisatie, heeftBenchmarkToegang, metingIdsMetWeergave } from "@/lib/lead-toegang";
@@ -74,6 +75,7 @@ export default function LeadBenchmarkPage({ params }: { params: Promise<{ code: 
               {regels.map((r) => (
                 <li key={r}>{r}</li>
               ))}
+              {benchmark.meetperiode && <li>Meetperiode {meetperiodeTekst(benchmark.meetperiode)}</li>}
             </ul>
           </div>
         )}

@@ -2,24 +2,9 @@
 
 import { useState } from "react";
 import { Assessment } from "@/lib/types";
-import { RijSpreiding, SpreidingWeergave, sorteerOpSpreiding } from "@/lib/visualisatie";
-import { Rij, Schaalkop, Tegels, pct, toon, vorigeGroepen } from "./gedeeld";
+import { RijSpreiding, SpreidingWeergave, Vorm, sorteerOpSpreiding, stapelStappen } from "@/lib/visualisatie";
+import { EENHEID_SCAN, EenheidTeksten, Rij, Schaalkop, Tegels, pct, toon, vorigeGroepen } from "./gedeeld";
 
-/**
- * Scans met dezelfde score staan onder elkaar gestapeld, in het midden van de rij uitgelijnd: Bij n scans op dezelfde score
- * staat de k-de op `(k − (n − 1) / 2)` stapjes van het midden.
- */
-function gestapeld(scores: number[]): { score: number; stap: number }[] {
-  const aantal = new Map<string, number>();
-  for (const s of scores) aantal.set(s.toFixed(3), (aantal.get(s.toFixed(3)) ?? 0) + 1);
-  const geteld = new Map<string, number>();
-  return scores.map((score) => {
-    const sleutel = score.toFixed(3);
-    const k = geteld.get(sleutel) ?? 0;
-    geteld.set(sleutel, k + 1);
-    return { score, stap: k - ((aantal.get(sleutel) ?? 1) - 1) / 2 };
-  });
-}
 
 /**
  * Weergave B, "Spreiding" en "Positie in de Meting" (`visualisatie-scores.md`, B): Per bouwblok een stip per scan op de
@@ -30,9 +15,15 @@ function gestapeld(scores: number[]): { score: number; stap: number }[] {
 export function WeergaveSpreiding({
   assessment,
   weergave,
+  eenheid = EENHEID_SCAN,
+  vormVan,
 }: {
   assessment: Assessment;
   weergave: SpreidingWeergave;
+  /** De eenheid van een stip: Een scan, een onderdeel of een organisatie (`visualisatie-scores.md`, I en J). */
+  eenheid?: EenheidTeksten;
+  /** Bij Naast elkaar de vorm van een stip, naar het id van de eenheid (`eenheidScanId`). Zonder dit zijn het grijze cirkels. */
+  vormVan?: (id: string) => Vorm | undefined;
 }) {
   const [opSpreiding, setOpSpreiding] = useState(false);
   const metFocus = weergave.aantalOnderGemiddelde !== null;
@@ -44,7 +35,7 @@ export function WeergaveSpreiding({
     <div className="vis" data-weergave="spreiding">
       <Tegels
         tegels={[
-          { label: "Respondenten", waarde: String(weergave.aantalScans), sub: "afgeronde scans" },
+          { label: eenheid.telLabel, waarde: String(weergave.aantalScans), sub: eenheid.telSub },
           {
             label: "Meest verdeeld",
             waarde: weergave.meestVerdeeld ? toon(weergave.meestVerdeeld.sd, 2) : "–",
@@ -84,14 +75,18 @@ export function WeergaveSpreiding({
               )
             }
           >
-            {gestapeld(r.scores).map((p, k) => (
-              <span
-                key={k}
-                className="vis-stip vis-stip--spreiding"
-                aria-hidden="true"
-                style={{ left: `${pct(p.score)}%`, top: `calc(50% + ${p.stap * 0.55}rem)` }}
-              />
-            ))}
+            {stapelStappen(r.punten.map((p) => p.score)).map((stap, k) => {
+              const p = r.punten[k];
+              const vorm = vormVan?.(p.id);
+              return (
+                <span
+                  key={p.id}
+                  className={`vis-stip vis-stip--spreiding ${vorm ? `vis-stip--groot vis-vorm--${vorm}` : ""}`}
+                  aria-hidden="true"
+                  style={{ left: `${pct(p.score)}%`, top: `calc(50% + ${stap * 0.55}rem)` }}
+                />
+              );
+            })}
             {r.gemiddelde !== null && <span className="vis-streep" style={{ left: `${pct(r.gemiddelde)}%` }} />}
             {r.focusScore !== null && (
               <span className="vis-stip vis-stip--focus" style={{ left: `${pct(r.focusScore)}%` }} aria-label={`Deze scan: ${toon(r.focusScore)}`} />
@@ -100,7 +95,7 @@ export function WeergaveSpreiding({
         );
       })}
       <p className="vis-onderschrift">
-        Elke grijze stip is één scan{metFocus ? ", de oranje ring is deze scan" : ""}. De streep is het gemiddelde
+        {vormVan ? `Elke grijze vorm is één ${eenheid.enkelvoud}` : `Elke grijze stip is één ${eenheid.enkelvoud}`}{metFocus ? `, de oranje ring is ${eenheid.enkelvoud === "afgeronde scan" ? "deze scan" : "deze " + eenheid.enkelvoud}` : ""}. De streep is het gemiddelde
         {metFocus ? " van de anderen" : ""}. Eensgezind: standaardafwijking onder 0,55, Wisselend tot 0,8, Verdeeld daarboven.
       </p>
     </div>

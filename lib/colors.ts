@@ -2,11 +2,10 @@ import { BeheerRol, Classificatie } from "./types";
 
 /**
  * Officiële Coniche-huisstijlkleuren per categorie (stylesheet.md,
- * Categoriekleuren). Alle vijf zijn zelf donker genoeg voor tekst op wit en
- * voor witte tekst erop — geen aparte tekstvariant meer nodig (v1-
- * aanpassingen.md punt 15). Fundament was eerder "goud" (`--ye`, te licht
- * om als tekst/achtergrond-onder-witte-tekst te lezen), nu "antraciet"
- * (`--fu`).
+ * Categoriekleuren). Fundament is sinds 19 oktober 2026 het merkgeel
+ * (`--fu` = `--ye`). Geel is alleen een vulling: tekst in of bij die kleur
+ * staat in `--ink` (zie `lijnKleur` en `tekstOpKleur`). De sleutel
+ * "antraciet" blijft staan omdat hij in opgeslagen data zit.
  */
 export const CATEGORIE_COLORS: Record<
   string,
@@ -16,8 +15,26 @@ export const CATEGORIE_COLORS: Record<
   blauw: { bg: "bg-bl", text: "text-bl", border: "border-bl", hex: "#225ba0" },
   paars: { bg: "bg-pu", text: "text-pu", border: "border-pu", hex: "#392944" },
   groen: { bg: "bg-gr", text: "text-gr", border: "border-gr", hex: "#197f4e" },
-  antraciet: { bg: "bg-fu", text: "text-fu", border: "border-fu", hex: "#44403c" },
+  antraciet: { bg: "bg-fu", text: "text-fu", border: "border-fu", hex: "#ffc043" },
 };
+
+/** Het merkgeel van Fundament: Te licht voor witte tekst en voor tekst of een dunne lijn in de kleur zelf. */
+const LICHTE_CATEGORIEKLEUREN = new Set(["#ffc043"]);
+
+/** Kleur voor tekst of een dunne lijn in de categoriekleur: Voor Fundament `--ink`. */
+export function lijnKleur(hex: string): string {
+  return LICHTE_CATEGORIEKLEUREN.has(hex.toLowerCase()) ? "var(--ink)" : hex;
+}
+
+/** Tekstkleur op een vulling in de categoriekleur: Wit, behalve op Fundament (`--ink`). */
+export function tekstOpKleur(hex: string): string {
+  return LICHTE_CATEGORIEKLEUREN.has(hex.toLowerCase()) ? "var(--ink)" : "#fff";
+}
+
+/** Stijlvariabelen voor een categorie: `--accent` (vulling), `--accent-t` (tekst of lijn in de kleur) en `--accent-op` (tekst op de vulling). */
+export function accentStijl(hex: string): Record<string, string> {
+  return { "--accent": hex, "--accent-t": lijnKleur(hex), "--accent-op": tekstOpKleur(hex) };
+}
 
 /**
  * Rolkleuren (stylesheet.md, "Rolkleuren"): los van de categoriekleuren

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { Assessment, Benchmark, BenchmarkLid, Organisatie } from "@/lib/types";
+import { isSamengesteld, onderdeelVan, samengesteldeMetingenMet, toonMeetdatum } from "@/lib/metingen";
 import {
   aantalAfgerond,
   kandidaatOrganisaties,
@@ -15,7 +16,7 @@ import {
 /**
  * Samenstellen of wijzigen van een benchmark (`benchmark.md`, Samenstellen; `beheerpagina.md`, punt 14): Eerst de
  * Assessments, daarna de organisaties met het optionele sectorfilter, en per organisatie de Meting per Assessment in
- * dezelfde lijst. Naast elk gekozen Assessment loopt de teller "X van Y organisaties" mee, met een waarschuwingskleur zodra
+ * dezelfde lijst, met alle Metingen als keuze (gewone en samengestelde) en de voorgestelde Meting zichtbaar aangevinkt. Naast elk gekozen Assessment loopt de teller "X van Y organisaties" mee, met een waarschuwingskleur zodra
  * die onder de minimale groepsgrootte zakt. Het sectorfilter is een zoekhulp en wordt niet opgeslagen.
  */
 export interface BenchmarkFormWaarden {
@@ -284,19 +285,34 @@ export function BenchmarkForm({
                           );
                         }
                         return (
-                          <div key={assessmentId} className="admin-field" style={{ marginBottom: 0 }}>
-                            <label>{naamA}</label>
-                            <select
-                              value={metingVoor(k.organisatie.id, assessmentId) ?? ""}
-                              onChange={(e) => kiesMeting(k.organisatie.id, assessmentId, e.target.value)}
-                            >
-                              {per.metingen.map((m) => (
-                                <option key={m.meting.id} value={m.meting.id}>
-                                  {m.meting.label} · {scansTekst(m.aantalAfgerond, true)}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                          <fieldset key={assessmentId} className="benchmark-meting-keuze">
+                            <legend>{naamA}</legend>
+                            {per.metingen.map((m) => {
+                              const gekozenId = metingVoor(k.organisatie.id, assessmentId);
+                              const samengesteld = isSamengesteld(m.meting);
+                              const zitIn = samengesteldeMetingenMet(k.organisatie, m.meting.id);
+                              return (
+                                <label key={m.meting.id} className="benchmark-meting-optie">
+                                  <input
+                                    type="radio"
+                                    name={`meting-${k.organisatie.id}-${assessmentId}`}
+                                    checked={gekozenId === m.meting.id}
+                                    onChange={() => kiesMeting(k.organisatie.id, assessmentId, m.meting.id)}
+                                  />
+                                  <span>
+                                    <strong>{m.meting.label}</strong>
+                                    <span className="text-sm text-ink-s">
+                                      {onderdeelVan(m.meting)} · {toonMeetdatum(m.meting.meetdatum)} ·{" "}
+                                      {samengesteld
+                                        ? `Gemiddelde van ${m.meting.samenstelling?.length ?? 0} Metingen`
+                                        : scansTekst(m.aantalAfgerond, true)}
+                                      {zitIn.length > 0 && ` · Zit in ${zitIn.map((z) => z.label).join(", ")}`}
+                                    </span>
+                                  </span>
+                                </label>
+                              );
+                            })}
+                          </fieldset>
                         );
                       })}
                     </div>

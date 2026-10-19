@@ -19,6 +19,7 @@ import {
   onderdeelVan,
   onderliggendeMetingen,
   oudsteEerst,
+  onderdeelEenheden,
   toonMeetdatum,
 } from "@/lib/metingen";
 import { useBenchmarks } from "@/lib/benchmark-store";
@@ -151,7 +152,9 @@ export default function RapportagePage({
           }
           quickscan={quickscan}
           spreidingToegestaan={!samengesteld}
-          antwoordenToegestaan={!samengesteld}
+          // Bij een samengestelde Meting staat Antwoorden uitgeschakeld in de schakelaar, met een Info-icoon (`visualisatie-scores.md`, I).
+          antwoordenToegestaan
+          onderdelen={samengesteld ? onderdeelEenheden(assessment, organisatie, scanUitvoering) : undefined}
           bereikAltijd
           vergelijkingen={vergelijkingen}
           toonBenchmarkLink={isAdmin(ingelogd)}

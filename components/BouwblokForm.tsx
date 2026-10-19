@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Antwoord, Bouwblok, Categorie, ScanWeergave, SchaalLabel } from "@/lib/types";
-import { CATEGORIE_COLORS } from "@/lib/colors";
+import { CATEGORIE_COLORS, accentStijl, lijnKleur } from "@/lib/colors";
 import { toelichtingVoor } from "@/lib/bouwblok-info";
 import { gewichtMarkering } from "@/lib/weging";
 import { ScaleRadio } from "./ScaleRadio";
@@ -57,7 +57,7 @@ export function BouwblokForm({
 }) {
   const kleur = categorieKleur ? CATEGORIE_COLORS[categorieKleur] : undefined;
   const accentStyle = kleur
-    ? ({ ["--accent" as string]: kleur.hex } as React.CSSProperties)
+    ? (accentStijl(kleur.hex) as React.CSSProperties)
     : undefined;
   const toonVragen = !afdeling || afdeling.relevantie === true;
   const alleBeantwoord = toonVragen
@@ -149,7 +149,7 @@ export function BouwblokForm({
             <p
               className="text-xs font-bold"
               style={{
-                color: toelichtingInfo.accentColor,
+                color: lijnKleur(toelichtingInfo.accentColor),
                 letterSpacing: "0.08em",
                 marginBottom: "0.2rem",
               }}

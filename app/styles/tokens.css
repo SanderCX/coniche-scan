@@ -17,7 +17,7 @@
   --ye-l: #ffcb57;
 
   --pu: #392944; /* Proces & Tech — toegevoegd vanuit het merkpalet */
-  --fu: #44403c; /* Fundament, antraciet — vervangt --ye (v1-aanpassingen.md 15) */
+  --fu: var(--ye); /* Fundament, merkgeel #ffc043 (19 oktober 2026, was antraciet) */
 
   --ink: #1c1c1a;
   --ink-m: #4d4d49;

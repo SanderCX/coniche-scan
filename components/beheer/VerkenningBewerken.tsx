@@ -3,14 +3,16 @@
 import { useState } from "react";
 import { useOrganisaties } from "@/lib/db";
 import { useInstellingen } from "@/lib/instellingen-store";
-import { Benchmark, VerkenningFilter } from "@/lib/types";
+import { Benchmark, Meetperiode, VerkenningFilter } from "@/lib/types";
 import { ledenVoorVerkenning, filterRegels } from "@/lib/verkenning-benchmark";
 import { maakFilterNamen } from "@/lib/verkenning-namen";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { MAX_NAAM_BENCHMARK } from "@/components/verkennen/OpslaanAlsBenchmark";
+import { MeetperiodeKeuze, PeriodeInvoer, invoerVanPeriode, periodeVanInvoer } from "@/components/verkennen/MeetperiodeKeuze";
+import { kiesPoolMetingen } from "@/lib/verkennen";
 
 /**
- * Een opgeslagen verkenning wijzigen (`benchmark.md`, Opgeslagen verkenning, Aanpassen): De naam en de filters. Het Assessment en
+ * Een opgeslagen verkenning wijzigen (`benchmark.md`, Opgeslagen verkenning, Aanpassen): De naam, de filters en de Meetperiode. Het Assessment en
  * de eenheid zijn niet te wijzigen, daarvoor maakt de Admin een nieuwe verkenning. Een waarde of een filter haal je weg met het
  * kruisje, er blijft minstens één filter met een waarde. Staan er Leads aan, dan zegt de bevestiging hoeveel vinkjes vervallen
  * doordat een Organisatie buiten de groep valt.
@@ -21,13 +23,14 @@ export function VerkenningBewerken({
   onAnnuleren,
 }: {
   benchmark: Benchmark;
-  onOpslaan: (w: { naam: string; filters: VerkenningFilter[] }) => void;
+  onOpslaan: (w: { naam: string; filters: VerkenningFilter[]; meetperiode: Meetperiode | null }) => void;
   onAnnuleren: () => void;
 }) {
   const organisaties = useOrganisaties();
   const { korteNamen, benchmarkMinScans } = useInstellingen();
   const [naam, setNaam] = useState(benchmark.naam);
   const [filters, setFilters] = useState<VerkenningFilter[]>(benchmark.filters ?? []);
+  const [periodeInvoer, setPeriodeInvoer] = useState<PeriodeInvoer>(invoerVanPeriode(benchmark.meetperiode));
   const [bevestig, setBevestig] = useState(false);
   const namen = maakFilterNamen(korteNamen, organisaties);
 
@@ -38,7 +41,10 @@ export function VerkenningBewerken({
         .filter((f) => f.waarden.length > 0)
     );
   const geldig = naam.trim() !== "" && filters.length > 0;
-  const nieuweLeden = ledenVoorVerkenning(organisaties, { ...benchmark, filters }, benchmarkMinScans);
+  const meetperiode = periodeVanInvoer(periodeInvoer);
+  const eenheid = benchmark.eenheid ?? "organisaties";
+  const nieuweLeden = ledenVoorVerkenning(organisaties, { ...benchmark, filters, meetperiode: meetperiode ?? undefined }, benchmarkMinScans);
+  const buitenPeriode = kiesPoolMetingen(organisaties, benchmark.assessmentIds[0], benchmarkMinScans, eenheid, meetperiode).buitenPeriode;
   const nieuweOrganisaties = new Set(nieuweLeden.map((l) => l.organisatieId));
   // Vinkjes van Leads voor een Organisatie die door de wijziging buiten de groep valt.
   const vervallen = organisaties
@@ -47,7 +53,7 @@ export function VerkenningBewerken({
   const regels = filterRegels(filters, namen);
 
   function klaar() {
-    onOpslaan({ naam: naam.trim().slice(0, MAX_NAAM_BENCHMARK), filters });
+    onOpslaan({ naam: naam.trim().slice(0, MAX_NAAM_BENCHMARK), filters, meetperiode });
   }
 
   return (
@@ -98,6 +104,14 @@ export function VerkenningBewerken({
           daarna sla je een nieuwe verkenning op.
         </p>
       </div>
+
+      <MeetperiodeKeuze
+        invoer={periodeInvoer}
+        onChange={setPeriodeInvoer}
+        eenheidWoord={eenheid === "onderdelen" ? "onderdelen" : "Organisaties"}
+        buitenPeriode={buitenPeriode}
+        idVoorvoegsel="verkenning-bewerken"
+      />
 
       <div className="btn-rij">
         <button type="button" className="btn btn-or btn-compact" disabled={!geldig} onClick={() => (vervallen > 0 ? setBevestig(true) : klaar())}>

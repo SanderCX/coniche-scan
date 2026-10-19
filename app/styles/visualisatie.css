@@ -1325,8 +1325,120 @@
   gap: var(--sp-2);
   margin: var(--sp-4) 0 0;
 }
+/* Meetperiode: Op een eigen regel onder Eenheid, de toelichting over de hele breedte eronder. */
+.vk-eenheid--periode {
+  flex-wrap: wrap;
+}
+.vk-periode-velden {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.vk-periode-velden .admin-field {
+  margin: 0;
+}
+.vk-periode-velden .admin-field input {
+  width: 10.5rem;
+}
+.vk-periode-regel {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
 .vk-voet {
   margin: var(--sp-3) 0 0;
   font-size: var(--fs-12);
   color: var(--ink-s);
+}
+
+/* Naast elkaar bij meer dan twee onderdelen: Zes vormen (`visualisatie-scores.md`, I). De vorm onderscheidt de onderdelen, niet de
+   kleur. Een vorm is een stip op het spoor (`.vis-stip`) of een teken in de legenda (`.vis-vorm-teken`). */
+.vis-vorm-teken {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  margin-right: 0.15rem;
+  vertical-align: -0.12em;
+  background: var(--vis-kleur, var(--ink-s));
+}
+.vis-vorm--cirkel {
+  border-radius: 50%;
+}
+.vis-vorm--ruit {
+  border-radius: 2px;
+  transform: rotate(45deg) scale(0.8);
+}
+.vis-vorm--vierkant {
+  border-radius: 2px;
+  transform: scale(0.85);
+}
+.vis-vorm--driehoek-omhoog {
+  border-radius: 0;
+  clip-path: polygon(50% 5%, 100% 95%, 0 95%);
+}
+.vis-vorm--driehoek-omlaag {
+  border-radius: 0;
+  clip-path: polygon(0 5%, 100% 5%, 50% 95%);
+}
+.vis-vorm--plus {
+  border-radius: 0;
+  clip-path: polygon(35% 0, 65% 0, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0 65%, 0 35%, 35% 35%);
+}
+/* Een stip met vorm in de rij krijgt geen rand en geen schaduw, de vorm is het signaal. */
+.vis-stip.vis-vorm--driehoek-omhoog,
+.vis-stip.vis-vorm--driehoek-omlaag,
+.vis-stip.vis-vorm--plus {
+  border: 0;
+  box-shadow: none;
+}
+.vis-legenda-rij {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+  margin: 0 0 0.8rem;
+}
+.vis-onderdeel-kaarten {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+.vis-onderdeel-kaart {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.vis-onderdeel-kaart-kop {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-weight: 700;
+  color: var(--ink);
+}
+.vis-onderdeel-kaart-datum {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.vis-onderdeel-kaart-score {
+  font-size: var(--fs-32);
+  font-weight: 800;
+  line-height: 1.1;
+}
+.vis-toon-als {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.vis-melding-klein {
+  font-size: var(--fs-14);
+  color: var(--ink-m);
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: var(--sp-3) var(--sp-4);
 }

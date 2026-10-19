@@ -6,6 +6,8 @@ import {
   LEGE_FILTERS,
   bouwPool,
   filterVelden,
+  geldigeMeetperiode,
+  meetperiodeTekst,
   KANALEN_REDEN,
   onderdeelVelden,
   selectOpties,
@@ -332,6 +334,67 @@ describe("kanalen, nul procent en het besluit over de groepering", () => {
     expect(kanGroeperen(onderdeelVeld, pool.leden, pool.leden, drempels, "onderdelen").reden).toContain("Filter eerst op één Organisatie");
     const alleen = pool.leden.filter((l) => l.organisatie.id === meerdere.id);
     expect(kanGroeperen(onderdeelVeld, alleen, alleen, drempels, "onderdelen").ok).toBe(true);
+  });
+
+  describe("de Meetperiode", () => {
+    const scans = org("tmp", 3).scanUitvoeringen[0].invullingen;
+    const meting = (id: string, onderdeel: string, datum: string | undefined, samenstelling?: string[]) =>
+      ({ id, organisatieId: "x", assessmentId: assessment.id, label: id, onderdeel, meetdatum: datum, aangemaaktOp: "2026-01-01", invullingen: scans, ...(samenstelling ? { samenstelling } : {}) }) as unknown as Organisatie["scanUitvoeringen"][number];
+    const mijnOrg = (naam: string, metingen: Organisatie["scanUitvoeringen"]) => {
+      const o = org(naam, 3);
+      o.naam = naam;
+      o.scanUitvoeringen = metingen;
+      return o;
+    };
+
+    it("zonder periode telt de meest recente Meting, met periode de laatste binnen de periode", () => {
+      const a = mijnOrg("A", [meting("a1", "Hele organisatie", "2026-01-20"), meting("a2", "Hele organisatie", "2026-10-05")]);
+      expect(bouwPool([a], assessment, 3, "organisaties").leden[0].meting.id).toBe("a2");
+      const ronde1 = bouwPool([a], assessment, 3, "organisaties", { van: "2026-01-12", totEnMet: "2026-02-10" });
+      expect(ronde1.leden[0].meting.id).toBe("a1");
+      expect(ronde1.buitenPeriode).toBe(0);
+    });
+
+    it("begin- en einddatum zijn beide inclusief", () => {
+      const a = mijnOrg("A", [meting("a1", "Hele organisatie", "2026-01-12")]);
+      expect(bouwPool([a], assessment, 3, "organisaties", { van: "2026-01-12", totEnMet: "2026-01-12" }).leden).toHaveLength(1);
+    });
+
+    it("een Organisatie zonder Meting in de periode doet niet mee en telt als buiten de periode", () => {
+      const a = mijnOrg("A", [meting("a1", "Hele organisatie", "2026-01-20")]);
+      const b = mijnOrg("B", [meting("b1", "Hele organisatie", "2026-10-05"), meting("b0", "Hele organisatie", undefined)]);
+      const pool = bouwPool([a, b], assessment, 3, "organisaties", { van: "2026-01-12", totEnMet: "2026-02-10" });
+      expect(pool.leden.map((l) => l.naam)).toEqual(["A"]);
+      expect(pool.buitenPeriode).toBe(1);
+    });
+
+    it("een samengestelde Meting mag bij Organisaties meedoen, bij Onderdelen nooit", () => {
+      const o = mijnOrg("A", [
+        meting("a1", "Team A", "2026-01-20"),
+        meting("a2", "Team B", "2026-02-01"),
+        meting("a3", "Hele organisatie", "2026-10-05", ["a1", "a2"]),
+      ]);
+      expect(bouwPool([o], assessment, 3, "organisaties").leden[0].meting.id).toBe("a3");
+      const onderdelen = bouwPool([o], assessment, 3, "onderdelen");
+      expect(onderdelen.leden.map((l) => l.meting.id).sort()).toEqual(["a1", "a2"]);
+    });
+
+    it("bij Onderdelen telt per onderdeel de laatste Meting in de periode, en valt een onderdeel erbuiten af", () => {
+      const o = mijnOrg("A", [
+        meting("a1", "Team A", "2026-01-20"),
+        meting("a2", "Team A", "2026-10-05"),
+        meting("b1", "Team B", "2026-10-06"),
+      ]);
+      const pool = bouwPool([o], assessment, 3, "onderdelen", { van: "2026-01-01", totEnMet: "2026-02-28" });
+      expect(pool.leden.map((l) => l.meting.id)).toEqual(["a1"]);
+      expect(pool.buitenPeriode).toBe(1);
+    });
+
+    it("een onbruikbare periode telt als geen periode", () => {
+      expect(geldigeMeetperiode({ van: "2026-02-01", totEnMet: "2026-01-01" })).toBe(false);
+      expect(geldigeMeetperiode({ van: "2026-01-01" })).toBe(false);
+      expect(meetperiodeTekst({ van: "2026-01-12", totEnMet: "2026-02-10" })).toBe("12-01-2026 tot en met 10-02-2026");
+    });
   });
 
   it("de sector blijft een select", () => {

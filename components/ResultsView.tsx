@@ -1,3 +1,4 @@
+import { formatScore } from "@/lib/format";
 import Link from "next/link";
 import { Antwoord, Assessment } from "@/lib/types";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
@@ -121,7 +122,7 @@ export function ResultsView({
                   className="score-pill"
                   style={{ ["--kleur" as string]: scoreKleur(r.score) } as React.CSSProperties}
                 >
-                  {r.score.toFixed(1)}
+                  {formatScore(r.score)}
                 </span>
               </li>
             ))}
@@ -148,7 +149,7 @@ export function ResultsView({
                   className="score-pill"
                   style={{ ["--kleur" as string]: scoreKleur(r.score) } as React.CSSProperties}
                 >
-                  {r.score.toFixed(1)}
+                  {formatScore(r.score)}
                 </span>
               </li>
             ))}

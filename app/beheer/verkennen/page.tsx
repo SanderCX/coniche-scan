@@ -8,7 +8,7 @@ import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magVerkennen } from "@/lib/rechten";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { korteNaamVeld, korteNaamWaarde } from "@/lib/korte-namen";
-import { VerkenEenheid } from "@/lib/types";
+import { Meetperiode, VerkenEenheid } from "@/lib/types";
 import {
   FilterStand,
   Groepering,
@@ -39,6 +39,7 @@ import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
 import { KenmerkenKaart, SNEL_BEGINNEN, SNEL_BEGINNEN_ONDERDELEN } from "@/components/verkennen/KenmerkenKaart";
+import { LEGE_PERIODE_INVOER, MeetperiodeKeuze, PeriodeInvoer, periodeVanInvoer } from "@/components/verkennen/MeetperiodeKeuze";
 import { OpslaanAlsBenchmark } from "@/components/verkennen/OpslaanAlsBenchmark";
 import { GroeperOptie, Vergelijken } from "@/components/verkennen/Vergelijken";
 import { Sortering, WeergaveGroepRest } from "@/components/verkennen/WeergaveGroepRest";
@@ -66,6 +67,7 @@ export default function VerkennenPage() {
 
   const [assessmentKeuze, setAssessmentKeuze] = useState<string>("");
   const [eenheid, setEenheid] = useState<VerkenEenheid>("organisaties");
+  const [periodeInvoer, setPeriodeInvoer] = useState<PeriodeInvoer>(LEGE_PERIODE_INVOER);
   const [filters, setFilters] = useState<FilterStand>(LEGE_FILTERS);
   const [kenmerken, setKenmerken] = useState<string[]>([]);
   const [gekozenOp, setGekozenOp] = useState<string | null>(null);
@@ -84,7 +86,8 @@ export default function VerkennenPage() {
   const filterbaar = eenheid === "onderdelen" ? [...velden, ...onderdeelVelden()] : velden;
   const alleVelden = [...filterbaar, kanalenVeld()];
   const eenheidWoord = eenheid === "onderdelen" ? "onderdelen" : "Organisaties";
-  const pool = assessment ? bouwPool(organisaties, assessment, instellingen.benchmarkMinScans, eenheid) : null;
+  const meetperiode = periodeVanInvoer(periodeInvoer);
+  const pool = assessment ? bouwPool(organisaties, assessment, instellingen.benchmarkMinScans, eenheid, meetperiode) : null;
   const gefilterd = pool ? pasFiltersToe(pool.leden, filters, filterbaar) : [];
   const drempels = {
     minPool: instellingen.verkennenMinPool,
@@ -123,11 +126,23 @@ export default function VerkennenPage() {
    * melding en Herstel): De groepering en de melding worden opnieuw bepaald. Een melding beschrijft zo één gebeurtenis en
    * verdwijnt bij de volgende wijziging, en een kenmerk dat weer kan groeperen wordt zonder melding gekozen.
    */
-  const wijzig = (verandering: { kenmerken?: string[]; filters?: FilterStand; gekozen?: string | null; eenheid?: VerkenEenheid }) => {
+  const wijzig = (verandering: {
+    kenmerken?: string[];
+    filters?: FilterStand;
+    gekozen?: string | null;
+    eenheid?: VerkenEenheid;
+    periode?: PeriodeInvoer;
+  }) => {
     if (!pool || !assessment) return;
     const nieuweEenheid = verandering.eenheid ?? eenheid;
     const eenheidGewisseld = nieuweEenheid !== eenheid;
-    const nieuwePool = eenheidGewisseld ? bouwPool(organisaties, assessment, instellingen.benchmarkMinScans, nieuweEenheid) : pool;
+    const nieuweInvoer = verandering.periode ?? periodeInvoer;
+    const nieuwePeriode: Meetperiode | null = periodeVanInvoer(nieuweInvoer);
+    const periodeGewijzigd = nieuwePeriode?.van !== meetperiode?.van || nieuwePeriode?.totEnMet !== meetperiode?.totEnMet;
+    const nieuwePool =
+      eenheidGewisseld || periodeGewijzigd
+        ? bouwPool(organisaties, assessment, instellingen.benchmarkMinScans, nieuweEenheid, nieuwePeriode)
+        : pool;
     const nieuweFilterbaar = nieuweEenheid === "onderdelen" ? [...velden, ...onderdeelVelden()] : velden;
     const nieuweAlle = [...nieuweFilterbaar, kanalenVeld()];
     const woord = nieuweEenheid === "onderdelen" ? "onderdelen" : "Organisaties";
@@ -157,6 +172,7 @@ export default function VerkennenPage() {
       minPool: drempels.minPool,
     });
     setEenheid(nieuweEenheid);
+    setPeriodeInvoer(nieuweInvoer);
     setKenmerken(nieuweKenmerken);
     setFilters(nieuweFilters);
     if (eenheidGewisseld) setFocusKeuze(undefined);
@@ -255,6 +271,7 @@ export default function VerkennenPage() {
           value={assessment.id}
           onChange={(e) => {
             setAssessmentKeuze(e.target.value);
+            setPeriodeInvoer(LEGE_PERIODE_INVOER);
             setFilters(LEGE_FILTERS);
             setKenmerken([]);
             setGekozenOp(null);
@@ -286,6 +303,13 @@ export default function VerkennenPage() {
         />
       </div>
 
+      <MeetperiodeKeuze
+        invoer={periodeInvoer}
+        onChange={(periode) => wijzig({ periode })}
+        eenheidWoord={eenheidWoord}
+        buitenPeriode={pool.buitenPeriode}
+      />
+
       <KenmerkenKaart
         velden={alleVelden}
         kenmerken={kenmerken}
@@ -302,6 +326,7 @@ export default function VerkennenPage() {
           <OpslaanAlsBenchmark
             assessment={assessment}
             eenheid={eenheid}
+            meetperiode={meetperiode}
             stand={filters}
             poolGrootte={pool.leden.length}
             gefilterd={gefilterd}
