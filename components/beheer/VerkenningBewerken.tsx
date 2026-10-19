@@ -124,7 +124,7 @@ export function VerkenningBewerken({
 
       <BevestigModal
         open={bevestig}
-        titel="Verkenning wijzigen"
+        titel="Verkenning bewerken"
         bericht={`Door deze wijziging valt er minstens één Organisatie buiten de groep. ${vervallen} vinkje${vervallen === 1 ? "" : "s"} van Leads ${vervallen === 1 ? "vervalt" : "vervallen"}.`}
         bevestigLabel="Opslaan"
         bevestigVariant="primair"

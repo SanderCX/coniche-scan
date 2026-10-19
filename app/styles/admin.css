@@ -1357,3 +1357,64 @@ select.veld-compact {
 .kanaal-lijst .kpi-tekst {
   width: 16rem;
 }
+
+/* ---------- Kaart Kenmerken op het organisatie-detail (`beheerpagina.md`, punt 4, Kenmerken) ---------- */
+.kenmerken-kaart {
+  margin: var(--sp-6) 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: var(--sp-4) var(--sp-6) var(--sp-6);
+  background: var(--bg);
+}
+.kenmerken-kop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+.kenmerken-kop h2 {
+  margin: 0;
+  font-size: var(--fs-18);
+  font-weight: 700;
+}
+.kenmerken-raster {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-4) var(--sp-8);
+  margin: 0;
+}
+.kenmerken-raster dt {
+  font-size: var(--fs-12);
+  font-weight: 400;
+  color: var(--ink-s);
+  line-height: 1.4;
+}
+.kenmerken-raster dd {
+  margin: 0;
+  font-size: var(--fs-16);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.kenmerken-leeg {
+  margin: 0;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.kenmerken-modal {
+  margin-top: var(--sp-4);
+}
+.kenmerken-form-raster {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 var(--sp-4);
+  align-items: start;
+}
+.kenmerken-form-raster > .veld-groep--breed {
+  grid-column: 1 / -1;
+}
+.kenmerken-modal-knoppen {
+  justify-content: flex-end;
+  margin-top: var(--sp-4);
+}

@@ -53,20 +53,20 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
   return (
     <div className="admin-main admin-main--breed">
       <Kruimelpad delen={kruimelsVoorMeting(organisatie, meting, via)} />
-      {labelBewerken ? (
+      {labelBewerken && (
         <MetingWijzigenFormulier organisatie={organisatie} meting={meting} onKlaar={() => setLabelBewerken(false)} />
-      ) : (
+      )}
         <div className="titel-rij">
           <h1>
             {meting.label} <span className="admin-badge status-uitgenodigd" style={{ verticalAlign: "middle" }}>Gemiddelde</span>
           </h1>
-          <button type="button" className="titel-potlood" aria-label="Meting wijzigen (onderdeel en naam)" title="Meting wijzigen (onderdeel en naam)" onClick={() => setLabelBewerken(true)}>
+          <button type="button" className="titel-potlood" aria-label="Meting bewerken (onderdeel en naam)" title="Meting bewerken (onderdeel en naam)" onClick={() => setLabelBewerken(true)}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </div>
-      )}
+
       <p className="text-sm text-ink-m">
         {assessment?.naam ?? "Onbekend type"} · {organisatie.naam}
         {` · meetdatum ${toonMeetdatum(meting.meetdatum)}`} · onderdeel {onderdeelVan(meting)}
@@ -90,7 +90,7 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
           </Link>
         )}
         <button type="button" className="btn btn-outline btn-compact" onClick={() => setWijzigenOpen(true)}>
-          Samenstelling wijzigen
+          Samenstelling bewerken
         </button>
         <button type="button" className="btn btn-danger btn-compact" onClick={() => setVerwijderenOpen(true)}>
           Verwijderen
@@ -139,7 +139,7 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
         <p className="text-sm text-ink-m">Deze Meting doet mee aan {inBenchmarks} {inBenchmarks === 1 ? "benchmark" : "benchmarks"}.</p>
       )}
 
-      <Modal open={wijzigenOpen} onClose={() => setWijzigenOpen(false)} title="Samenstelling wijzigen">
+      <Modal open={wijzigenOpen} onClose={() => setWijzigenOpen(false)} title="Samenstelling bewerken">
         {wijzigenOpen && (
           <SamengesteldeMetingFormulier
             organisatie={organisatie}

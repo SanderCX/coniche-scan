@@ -143,7 +143,7 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
 
       <div className="btn-rij" style={{ margin: "1rem 0 0", maxWidth: "22rem" }}>
         <Link href={`/beheer/benchmark/${benchmark.id}/bewerken`} className="btn btn-outline btn-compact">
-          Wijzigen
+          Bewerken
         </Link>
         <button type="button" className="btn btn-danger btn-compact" onClick={() => setVerwijderenOpen(true)}>
           Verwijderen

@@ -908,8 +908,10 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   (`organisatie.antwoordenNamenGewijzigd`). Zie punt 6a, Namen bij Antwoorden.
 - **Naam wijzigen** (`organisaties.bewerken`, dus Admin voor alle
   organisaties en Consultant voor zijn eigen): Op het organisatie-detail
-  staat de naam in de kop met een potlood ernaast. Een klik maakt van de
-  naam een invoerveld met "Opslaan" en "Annuleren". Er gelden dezelfde
+  staat de naam in de kop met een potlood ernaast. Een klik opent een modal
+  met de velden Naam en Korte naam, met "Annuleren" en "Opslaan" (twee velden,
+  dus een modal volgens `stylesheet.md`, Bewerken: op de plek of in een modal,
+  gebouwd op 19 oktober 2026). Er gelden dezelfde
   regels als bij Aanmaken: De naam is verplicht en wordt getrimd. Na opslaan
   staat de nieuwe naam direct in de kop, het kruimelpad, de lijst en overal
   waar de organisatie wordt genoemd (Respondent-overzicht, Resultaten,
@@ -932,7 +934,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   filter Organisatie al ingesteld op deze organisatie (in de URL, zoals de
   andere filters). Zijn het er 5 of minder, dan is er geen link. Er komt
   geen link naar de lijst over alle organisaties heen.
-- **Kenmerken** (uitgeschreven op 19 oktober 2026 naar de gebouwde kaart; design
+- **Kenmerken** (uitgeschreven op 19 oktober 2026 naar de gebouwde kaart, gebouwd op 19 oktober 2026, zie "Zo gebouwd" onderaan dit punt; design
   in `Claude outputs/kpi-design/`, bord 1 en 2, linksboven): De kaart bovenaan
   het organisatie-detail, boven de kaarten KPI's en Metingen. Ze toont de
   waarden van de organisatievelden (`datamodel.md`, Organisatievelden) als een
@@ -981,7 +983,8 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   - **Wat de kaart niet bevat**: De KPI's en de contacten per kanaal staan in de
     kaart eronder (hieronder). De Meting, het benchmarkvinkje en de Leads hebben
     eigen blokken.
-  - **Open**: Controleer in de gebouwde kaart de volgorde van de velden
+  - **Zo gebouwd (19 oktober 2026)**: `KenmerkenKaart` (`components/beheer/KenmerkenKaart.tsx`) en de opmaak in `lib/kenmerken-weergave.ts`, met een test. De kaart staat bovenaan het organisatie-detail, daaronder de kaart KPI's en dan Metingen. Het raster volgt de volgorde van de lijst in `organisatie-velden.ts`, dus Digitalisering staat na Volume en klantbasis. Een veld dat de spec niet noemt, valt terug op zijn label en waarde. De modal gebruikt het bestaande formulier (`KenmerkenForm`) in twee kolommen, met een groep van groepen (Volume en klantbasis, Techstack, FTE) over de volle breedte. Het label voor FTE van de klantcontactmedewerkers is "Klantcontactmedewerkers, inhouse" met "140, 70% inhouse", en het aandeel BPO staat niet in de kaart (alleen in het formulier). Voor IT DevOps staat "12, 25% digital". De blokken Benchmark en Namen tonen (Admin) staan onder het blok Leads, zonder eigen kop, omdat de kop Organisatiekenmerken vervalt. Het Bewerkslot geldt al zolang het organisatie-detail open is.
+  - **Open, beantwoord**: Controleer in de gebouwde kaart de volgorde van de velden
     (in de schermafbeelding staat Digitalisering tussen CRM en Conversational AI,
     terwijl de lijst in `organisatie-velden.ts` ze apart groepeert) en of bij
     Sector de volledige SBI-naam of een korte naam staat. De spec vraagt de
@@ -1214,9 +1217,10 @@ voor de bestaande Metingen die na het wegvallen van de rondes nog geen
 meetdatum hebben. Gelogd als `meting.meetdatumGewijzigd` (`datamodel.md`,
 Audit), één gebeurtenis per Meting.
 
-**Wijzigen**: Een potlood naast de naam van de Meting in het Meting-overzicht.
-Het opent op dezelfde plek de velden Onderdeel, Meetdatum en Naam, met Opslaan
-en Annuleren, en verder niets. Naam is voorgevuld met de huidige naam. Pas je
+**Bewerken**: Een potlood naast de naam van de Meting in het Meting-overzicht.
+Het opent een modal (drie velden, `stylesheet.md`, Bewerken: op de plek of in
+een modal, gebouwd op 19 oktober 2026) met de velden Onderdeel, Meetdatum en
+Naam, met Annuleren en Opslaan, en verder niets. Naam is voorgevuld met de huidige naam. Pas je
 de naam aan, dan volgt hij onderdeel en meetdatum niet meer
 (`Meting.labelHandmatig`). Een knop "Standaardnaam herstellen" naast het veld
 zet hem terug. Het assessment-type ligt vast na aanmaken, want achteraf wijzigen

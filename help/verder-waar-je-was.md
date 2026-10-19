@@ -17,7 +17,7 @@ Je antwoorden worden bewaard terwijl je invult. Open je persoonlijke link opnieu
 1. **Je persoonlijke link.** Bewaar de link of de e-mail waarin je hem kreeg. De link blijft werken zolang je als Respondent bestaat.
 2. **De status Bezig.** Op Mijn metingen staat je scan als Bezig, met hoeveel vragen je al beantwoordde en wanneer je laatst opsloeg.
 3. **De knop "Ga verder".** Die brengt je terug in de scan.
-4. **Mijn gegevens.** In het menu rechtsboven kun je je gegevens wijzigen of uitloggen. Uitloggen sluit alleen deze sessie. Je antwoorden blijven bewaard.
+4. **Mijn gegevens.** In het menu rechtsboven kun je je gegevens bekijken of bewerken, of uitloggen. Uitloggen sluit alleen deze sessie. Je antwoorden blijven bewaard.
 
 ## Zie ook
 - [Een scan invullen](een-scan-invullen)

@@ -68,8 +68,8 @@ export function KpiBlok({ organisatie }: { organisatie: Organisatie }) {
                         <button
                           type="button"
                           className="vk-potlood"
-                          aria-label="Onderdeel wijzigen"
-                          title="Onderdeel wijzigen"
+                          aria-label="Onderdeel bewerken"
+                          title="Onderdeel bewerken"
                           onClick={() => setModal({ soort: "wijzigen", onderdeelId: onderdeel.id })}
                         >
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
