@@ -575,8 +575,10 @@ geen afwijking van de spec maar een gat erin.
    afgerond, dan begint `.nav-right` direct met de 4 vaste links, geen
    losse scheidingslijn. Dan de 4 vaste content-links, dan de
    scheidingslijn, dan "← Terug naar Mijn metingen".
-6. **Resultatenscherm**: Overall score in de ring (`.score-ring`,
-   `stylesheet.md`, Resultaten, besloten op 19 oktober 2026) en
+6. **Resultatenscherm**: Bovenaan de Resultaatkop met eyebrow, titel, subregel
+   en totaalkaart (voorstel van 19 oktober 2026, `stylesheet.md`,
+   Resultaatkop, voor elke scan dezelfde). De overall score staat daarin in de
+   ring (`.score-ring`, `stylesheet.md`, Resultaten, besloten op 19 oktober 2026) en
    voortgang, radar van alle bouwblokken, staafdiagram per categorie
    (in de categoriekleuren, met de klassegrenzen als stippellijn, gebouwd op 19 oktober 2026, voorheen volgde de kleur de score), top 3 sterktes en verbeterkansen, legenda.
    **Bij AI-volwassenheid** (geen categorielaag, `content-ai-scan.md`)

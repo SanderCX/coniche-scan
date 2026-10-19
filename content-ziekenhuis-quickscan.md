@@ -187,24 +187,19 @@ componenten en tokens uit `stylesheet.md` (kaart, badge, voortgangsbalk,
 scorekleuren). Klassen en grenzen: `CLAUDE.md`, sectie 1,
 Classificatie. Van boven naar beneden:
 
-1. **Totaalkaart** (besloten op 19 oktober 2026, design bord "Totaalkaart
-   resultaten met ring, voorstel (19 oktober)"). Een kaart met padding
-   28px 32px. Links staan het label "OVERALL VOLWASSENHEID" in 12px
-   hoofdletters, daaronder de klassenaam van de totaalscore in 18px, gewicht
-   700 en klassekleur, dan "{punten} van {maximum} punten" en "{x} van 4
-   afdelingen beoordeeld" in 14px `--ink-m`. Rechts staat de ring
-   (`.score-ring`, `stylesheet.md`, Resultaten) met het totaalpercentage erin
-   en de klassenaam als chip eronder. Het grote percentage links met
-   "({punten}/{maximum})" vervalt, omdat het getal nu in de ring staat. Alleen
-   de afdelingen die van toepassing zijn tellen mee, dus bij één afdeling met
-   14 Ja staat er "93%", "14 van 15 punten" en "1 van 4 afdelingen
-   beoordeeld". Een afdeling die niet meetelt staat bij naam onder de regels,
-   in 14px `--ink-m`, bijvoorbeeld "Vragen over Verpleegafdeling zijn niet
-   beantwoord. De afdeling telt niet mee in het totaal." De tekst noemt niet
-   dat de afdeling niet relevant is, omdat iemand van die afdeling het kan
-   lezen. Met weging staan hier de gewogen punten (`datamodel.md`,
-   Scoreberekening). Op de eigen resultaten van een Respondent staat geen
-   groepsstip op de ring. Gebouwd op 19 oktober 2026 in `components/QuickscanResultaten.tsx`.
+1. **Resultaatkop** (voorstel van 19 oktober 2026, `stylesheet.md`,
+   Resultaatkop, vervangt de totaalkaart van 19 oktober 2026 met het label
+   "OVERALL VOLWASSENHEID" en de gekleurde klassenaam). Dezelfde kop als bij de
+   andere scans: Eyebrow, titel, subregel en een totaalkaart met de ring, de
+   klassechip en de feiten "{x} van 4 afdelingen beoordeeld" en "{punten} van
+   {maximum} punten". Alleen de afdelingen die van toepassing zijn tellen mee,
+   dus bij één afdeling met 14 Ja staat er "93%" en "14 van 15 punten". Een
+   afdeling die niet meetelt staat bij naam onder de feiten, in 14px `--ink-s`,
+   bijvoorbeeld "Vragen over Verpleegafdeling zijn niet beantwoord. De afdeling
+   telt niet mee in het totaal." De tekst noemt niet dat de afdeling niet
+   relevant is, omdat iemand van die afdeling het kan lezen. Met weging staan
+   hier de gewogen punten (`datamodel.md`, Scoreberekening). Op de eigen
+   resultaten van een Respondent staat geen groepsstip op de ring. De totaalkaart van 19 oktober 2026 is gebouwd in `components/QuickscanResultaten.tsx`; de Resultaatkop vervangt haar en is nog niet gebouwd.
 2. **Scores per afdeling.** Een kaart per categorie, twee kolommen, in
    de volgorde van de afdelingen. Een afdeling die niet van toepassing is
    krijgt een grijze kaart met de naam doorgestreept, de tekst "Niet van
@@ -219,18 +214,31 @@ Classificatie. Van boven naar beneden:
    - Het blok "Verdieping op dimensies": Per bouwblok van de afdeling de
      naam, een balk in de klassekleur van dat bouwblok en "x/y (z%)", in
      de volgorde van de bouwblokken.
-   - Onder de balken de `aandachtZin` en twee chips, zie Regels
-     hieronder.
-3. **Sterkste afdeling en Meeste ontwikkelruimte.** Twee kaarten naast
-   elkaar. "Sterkste afdeling" (groen) toont de afdeling met het hoogste
-   percentage, "Meeste ontwikkelruimte" (rood) die met het laagste, elk
-   met "x/y (z%)". Afdelingen die niet van toepassing zijn doen niet mee.
-   Bij gelijkstand staan alle gelijke afdelingen in de kaart. Is er maar
-   één afdeling van toepassing, of zijn alle gelijk, dan verdwijnen beide
-   kaarten.
+   - Onder de balken de `aandachtZin` (14px, `--ink-s`) en, in plaats van twee
+     omrande chips, twee gewone regels van 12px in `--ink-m` met een stip van
+     8px ervoor (rood bij "Grootste aandachtspunt", groen bij "Relatief sterkste
+     basis"), zie Regels hieronder. Voorstel van 19 oktober 2026, omdat de kaart
+     met vier omrande en gekleurde elementen druk was. Het aantal gekleurde
+     elementen per kaart is nu de rand, de chip met de klasse, de balken en de
+     twee stippen.
+3. **Sterkste afdeling en Meeste ontwikkelruimte.** Voorstel van 19 oktober
+   2026: Geen kaarten met een gekleurde rand, maar dezelfde component als "Top 3
+   Sterktes" en "Top 3 Verbeterkansen" bij de andere scans, twee kolommen naast
+   elkaar. Boven elke kolom staat de kop in 16px, gewicht 700 ("Sterkste
+   afdeling" en "Meeste ontwikkelruimte"), daaronder per afdeling een rij (kaart
+   van `--bg-warm`, `1px solid var(--border)`, 10px radius, padding 12px 16px) met
+   links de naam van de afdeling in 14px `--ink` en rechts het percentage in 16px,
+   gewicht 600, in de klassekleur. Het hoogste percentage is de sterkste
+   afdeling, het laagste de meeste ontwikkelruimte. Afdelingen die niet van
+   toepassing zijn doen niet mee. Bij gelijkstand staat elke gelijke afdeling als
+   eigen rij onder de kop. Is er maar één afdeling van toepassing, of zijn alle
+   gelijk, dan verdwijnt het blok. Het staat onder de Scores per afdeling, zoals
+   de top 3 bij de andere scans onder de grafieken staat.
 4. **Classificatie.** Een legenda met de drie klassen: Naam,
    percentagegrens en, omdat alle afdelingen hier 15 vragen hebben, de
-   punten per afdeling. Zijn de aantallen vragen per afdeling ooit
+   punten per afdeling. Voorstel van 19 oktober 2026: Alleen de stip draagt
+   de klassekleur, de naam staat in `--ink` (`stylesheet.md`, Resultaatkop,
+   Opbouw van de hele pagina). Zijn de aantallen vragen per afdeling ooit
    ongelijk, dan toont de legenda alleen percentages.
 
 De radar, het staafdiagram per categorie, de top 3 en "Scores per

@@ -429,6 +429,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.benchmarkInstellingen` | Instellingen, Drempels en termijnen, formulier Benchmark | Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. Het aantal dagen tussen Metingen is voor een vergelijking met de lezing Naast elkaar: Liggen de meetdata verder uit elkaar, dan krijg je bij het opslaan een waarschuwing. Opslaan blijft mogelijk. |
 | `info.verkennen` | Verkennen, naast de paginatitel | Verkennen werkt op de pool van één Assessment: De Organisaties met toestemming voor benchmark die een Meting hebben met genoeg afgeronde scans, per Organisatie de Meting die telt volgens de Meetperiode, of de meest recente als je geen periode kiest. Elke Organisatie telt even zwaar mee. Het scherm slaat niets op en een Lead ziet het nooit. |
 | `info.verkennenDrempels` | Instellingen, Drempels en termijnen, formulier Verkennen | Een groep met minder organisaties dan het minimum is gestreept en krijgt in de heatmap geen cijfers. Heeft de focus of de rest minder organisaties dan de waarschuwingsgrens, dan staat er een waarschuwing dat verschillen voorzichtig gelezen moeten worden. Dat is geen blokkade. |
+| `info.organisatieToegang` | Organisatie-detail, kaart Toegang, naast de titel | De eigenaar is de Consultant die de organisatie heeft aangemaakt. Een toegewezen Consultant mag deze organisatie ook zien en beheren, en dezelfde gegevens inzien. Intrekken haalt die toegang weer weg. |
 | `info.benchmarkVlag` | Organisatie-detail, bij de schakelaar "Doet mee aan benchmark" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks. |
 | `info.leadToegangCel` | Leads-venster van de organisatie, in een grijze cel | De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark. Bij een Verkenning met te weinig Organisaties staat er: "Te weinig Organisaties in deze groep: {n}, minimaal {min}." |
 | `info.antwoordenMetNamen` | Organisatie-detail, bij de schakelaar "Namen tonen bij Antwoorden" | Uit: Leads zien de antwoorden als R1 tot en met Rn. Aan: Leads zien de namen van de respondenten. Stem dit af met de opdrachtgever voordat je het aanzet. Het geldt voor alle Leads van deze organisatie. |
@@ -879,18 +880,46 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   betekent dat de naam zelf geldt. Staat in het aanmaak- en bewerkformulier
   onder Naam, met een Info-icoon (`info.korteNaamOrganisatie`).
 - **Organisatie-toegang toewijzen** (Admin-only, ook weer intrekken):
-  Op de organisatiedetailpagina, naast Kenmerken, één of meer
-  Consultants toevoegen die deze organisatie ook mogen zien en
-  beheren, bovenop de eigenaar. Zelfde soort multi-select-patroon als
-  de selectievakjes in het Leads-venster (punt 6a), nu op Gebruikers in plaats
-  van Respondenten. Intrekken van een toewijzing is de spiegel van
-  toewijzen, geen aparte permissie. Dit scherm toont ook, los van de
-  toewijs-actie zelf, wie de eigenaar is (`aangemaaktDoor`) en wie
-  toegewezen is — die twee blijven zichtbaar als apart onderscheid,
-  ook al vallen ze in de rechtenmatrix allebei onder hetzelfde bereik
-  "eigen".
-- **Benchmark-vlag** (Admin-only): Op het organisatie-detail, naast
-  Kenmerken, een schakelaar "Doet mee aan benchmark"
+  Eén of meer Consultants die deze organisatie ook mogen zien en beheren,
+  bovenop de eigenaar. Intrekken van een toewijzing is de spiegel van
+  toewijzen, geen aparte permissie. De eigenaar (`aangemaaktDoor`) en wie
+  toegewezen is blijven twee onderscheiden dingen, ook al vallen ze in de
+  rechtenmatrix allebei onder hetzelfde bereik "eigen". Voorstel van
+  19 oktober 2026: Dit is de kaart Toegang, en niet langer een uitklapbaar
+  blok met losse tekst en selectievakjes. Het gaat over wie bij de gegevens van
+  de organisatie mag, en hoort dus bij de kaart Afspraken, in één rij met
+  die kaart.
+  - **Plek**: Onder de kaart Kenmerken, links van de kaart Afspraken (twee
+    kaarten van gelijke breedte, 24px ertussen). Alleen voor een Admin.
+  - **Kop**: De titel Toegang met een Info-icoon (`info.organisatieToegang`).
+    De uitleg staat in het Info-icoon en niet als vaste tekst eronder. Rechts de
+    knop "+ Consultant toewijzen" (`.btn-or .btn-compact`).
+  - **Eigenaar**: Eén rij met het label Eigenaar en de naam van de
+    `aangemaaktDoor`, met een badge "Eigenaar". Er is geen knop om hem in te
+    trekken.
+  - **Toegewezen Consultants**: Eén rij per Consultant met naam en e-mailadres
+    en rechts een knop "Intrekken" (`.btn-outline .btn-compact`). Intrekken vraagt
+    een korte bevestiging. Is niemand toegewezen, dan staat er "Nog niemand
+    toegewezen." in `--ink-s` (14px).
+  - **Toewijzen**: "+ Consultant toewijzen" opent een modal met een lijst van
+    de actieve Consultants die nog geen toegang hebben, elk met een
+    selectievakje, en onderin "Annuleren" en "Toewijzen". Het zijn meerdere
+    keuzes in een lijst, dus een modal (`stylesheet.md`, Bewerken: Op de plek of
+    in een modal). Is er geen Consultant meer om toe te wijzen, dan is de knop
+    uitgeschakeld.
+  - **Regel onder de naam**: De regel "Aangemaakt door: … · Ook toegewezen aan: …"
+    onder de paginatitel blijft staan, voor iedereen die de organisatie ziet,
+    als alleen-lezen tekst. De kaart Toegang is de plek om het te wijzigen.
+  - **Logging**: Zoals nu (`datamodel.md`, Audit).
+- **Afspraken** (voorstel van 19 oktober 2026, Admin-only): Een smalle kaart
+  direct onder de kaart Kenmerken en boven de kaart KPI's, rechts van de kaart
+  Toegang, met de titel "Afspraken" en de twee schakelaars hieronder naast
+  elkaar in één rij, elk met Info-icoon. Ze leggen vast wat met de organisatie
+  is afgesproken over haar gegevens, en staan uit bij een nieuwe organisatie.
+  Daarom horen ze bovenaan en niet onderaan de pagina: Een Admin ziet in één
+  blik wat aan staat. Een Consultant en een Lead zien de kaart niet.
+- **Benchmark-vlag** (Admin-only): In de kaart Afspraken, links, een
+  schakelaar "Doet mee aan benchmark"
   (`Organisatie.benchmarkToegestaan`, `datamodel.md` deel 3). Hij staat
   uit bij een nieuwe organisatie. Een Admin zet hem aan nadat dit met de
   organisatie is afgesproken, bijvoorbeeld via contract of mail. Uitzetten
@@ -898,8 +927,8 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   meedoet. De leden van de organisatie vallen dan uit die benchmarks.
   Wijzigen wordt gelogd (`organisatie.benchmarkVlagGewijzigd`). Zie
   `benchmark.md`, Toestemming en privacy.
-- **Namen tonen bij Antwoorden** (Admin-only): Op het organisatie-detail,
-  naast de Benchmark-vlag, een schakelaar (`Organisatie.antwoordenMetNamen`,
+- **Namen tonen bij Antwoorden** (Admin-only): In de kaart Afspraken,
+  rechts van de Benchmark-vlag, een schakelaar (`Organisatie.antwoordenMetNamen`,
   `datamodel.md` deel 3). Hij staat uit bij een nieuwe organisatie. Uit: Leads
   zien bij Antwoorden R1 tot en met Rn. Aan: Ze zien de namen. Een Admin zet
   hem aan na afstemming met de opdrachtgever. Aanzetten gaat na een
@@ -944,7 +973,8 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     rechts de knop "Bewerken" (`.btn-outline .btn-compact`, vraagt
     `organisaties.bewerken`). Een Lead of Respondent ziet deze kaart niet.
   - **Raster**: Vier kolommen van gelijke breedte, 32px tussen de kolommen en
-    16px tussen de rijen, met de velden rij na rij van links naar rechts. Per veld
+    16px tussen de rijen, met de velden rij na rij van links naar rechts, in de volgorde die
+    onder Volgorde staat. Per veld
     staat het label boven de waarde, op twee regels en zonder lijnen of vlakken
     ertussen.
   - **Label**: 12px, gewicht 400, in `--ink-s`. Het label is de veldnaam
@@ -954,7 +984,9 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   - **Waarde**: 16px, gewicht 600, in `--ink`, op één regel. Past ze niet, dan
     breekt ze af op een spatie en blijft het label bij de eerste regel staan. De
     waarde staat letterlijk zoals ze is opgeslagen, dus ook bij "Anders…" in de
-    spelling van de invoer. Een korte naam komt hier niet voor.
+    spelling van de invoer. Bij een keuzelijst met korte namen (Sector, Subsector,
+    de techstack-leveranciers) staat de korte naam (`datamodel.md`, Korte namen),
+    met de originele naam in de tooltip.
   - **Opmaak per soort veld**: Getallen met duizendtalpunt en komma als
     decimaalteken (410.000). Een percentage met het procentteken direct achter het
     getal (38%). Bij meer delen staan de delen achter elkaar: "410.000, 15 / 85%"
@@ -984,12 +1016,29 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     kaart eronder (hieronder). De Meting, het benchmarkvinkje en de Leads hebben
     eigen blokken.
   - **Zo gebouwd (19 oktober 2026)**: `KenmerkenKaart` (`components/beheer/KenmerkenKaart.tsx`) en de opmaak in `lib/kenmerken-weergave.ts`, met een test. De kaart staat bovenaan het organisatie-detail, daaronder de kaart KPI's en dan Metingen. Het raster volgt de volgorde van de lijst in `organisatie-velden.ts`, dus Digitalisering staat na Volume en klantbasis. Een veld dat de spec niet noemt, valt terug op zijn label en waarde. De modal gebruikt het bestaande formulier (`KenmerkenForm`) in twee kolommen, met een groep van groepen (Volume en klantbasis, Techstack, FTE) over de volle breedte. Het label voor FTE van de klantcontactmedewerkers is "Klantcontactmedewerkers, inhouse" met "140, 70% inhouse", en het aandeel BPO staat niet in de kaart (alleen in het formulier). Voor IT DevOps staat "12, 25% digital". De blokken Benchmark en Namen tonen (Admin) staan onder het blok Leads, zonder eigen kop, omdat de kop Organisatiekenmerken vervalt. Het Bewerkslot geldt al zolang het organisatie-detail open is.
-  - **Open, beantwoord**: Controleer in de gebouwde kaart de volgorde van de velden
-    (in de schermafbeelding staat Digitalisering tussen CRM en Conversational AI,
-    terwijl de lijst in `organisatie-velden.ts` ze apart groepeert) en of bij
-    Sector de volledige SBI-naam of een korte naam staat. De spec vraagt de
-    volledige naam, want een korte naam hoort niet in het organisatie-detail
-    (`datamodel.md`, Korte namen).
+  - **Volgorde**: De spec bepaalt de volgorde, niet de code. De velden staan in
+    de volgorde van `datamodel.md`, Organisatievelden: Sector, Subsector, Totaal
+    aantal klanten, Adoptie mijnomgeving/app, Percentage 2026, Ambitie 2030 (de
+    laatste twee samen als "Digitalisering 2026 / 2030"), de zes
+    techstack-categorieën (Contact center, WFM, CRM, Kennismanagement,
+    Conversational AI, LLM-oplossing), Klantcontactmedewerkers (FTE), Klantcontact
+    management & support en IT DevOps-medewerkers. Lege velden vallen weg, de rest
+    schuift op. De gebouwde kaart moet deze volgorde volgen. Wijkt ze af
+    (de schermafbeelding van 19 oktober 2026 zet Digitalisering tussen CRM en
+    Conversational AI), dan wordt de code aangepast en niet de spec. Bij Sector
+    staat de korte naam, met de volledige SBI-naam (`sbi-indeling.md`) in de
+    tooltip (zie de bullet hieronder).
+
+  - **Korte namen in kaart en formulier** (besluit van 19 oktober 2026, nog niet gebouwd): De korte
+    namen die een Admin heeft ingevuld (tab Korte namen) staan ook in het
+    organisatie-detail. In de kaart Kenmerken toont Sector de korte naam, met de
+    originele SBI-titel in de tooltip. In het formulier tonen de keuzelijsten
+    Sector en Subsector de korte naam per optie, in de volgorde van
+    `sbi-indeling.md`, met de originele titel in de tooltip van de optie en
+    doorzoekbaar in het zoekveld. Een waarde zonder korte naam toont het
+    origineel. Bewaard wordt altijd het origineel (`Organisatie.kenmerken`), dus
+    een korte naam wijzigen verandert geen gegevens. De exports, de import en de
+    PDF houden het origineel (`datamodel.md`, Korte namen).
 - **KPI's** (gebouwd op 19 oktober 2026, ontworpen; design
   in `Claude outputs/kpi-design/`, bord 1 en 2, de kolommen in bord 6): Een eigen kaart onder de
   Kenmerken. De KPI's en de contacten per kanaal staan niet meer bij de
