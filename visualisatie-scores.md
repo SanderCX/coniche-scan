@@ -84,6 +84,8 @@ Deze regels gelden voor alle weergaven. G wijkt af in de kleuren en heeft geen b
 - Een dunne lijn van de laagste tot de hoogste bouwblokscore van een afgeronde scan.
 - Rechts het gemiddelde als getal, vet.
 
+**Staafdiagram per categorie in het Overzicht** (voorstel van 19 oktober 2026). De balken krijgen de categoriekleuren in plaats van de klassekleur, met de klassegrenzen als stippellijn en het getal boven elke balk (`stylesheet.md`, Categoriekleuren). Dit geldt voor het Overzicht van een Meting, van een samengestelde Meting en van het groepsgemiddelde in een benchmark, en voor het scherm van de respondent (`CLAUDE.md`, scherm 6). De PDF-export blijft zoals beschreven in de exportspecs.
+
 **Tegels.** Totaalscore met de klasse, hoogste bouwblok (score en naam), laagste bouwblok (score en naam), en de verdeling van de bouwblokken over de drie klassen.
 
 **Drempel.** De lijn van laagste tot hoogste toont de score van één scan en is bij weinig scans herleidbaar. Voor een Admin staat de lijn altijd aan. Voor een Lead staat de lijn pas aan vanaf `benchmarkMinRespondenten` (voorstel, startwaarde 5, zie `benchmark.md`, Niveau 3).
@@ -256,6 +258,39 @@ Zo blijft de rij tegels gelijk aan die van een Meting (gebouwd). De eerdere teks
 **Wie ziet het.** Dezelfde regels als bij de bestaande weergaven. Een Lead ziet een samengestelde Meting alleen als hij Resultaten heeft (`benchmark.md`, View voor een Lead). Voor een vergelijking geldt wat bij Niveau 2 staat. Een samengestelde Meting heeft in het Leads-venster alleen de kolom Resultaten. Gemiddeld, Naast elkaar en Spreiding tussen onderdelen vallen daar voorlopig onder.
 
 **Open.** Of Spreiding tussen onderdelen een eigen vinkje voor een Lead krijgt. De stippen zijn onderdelen van zijn eigen Organisatie, dus anonimiteit speelt niet, maar het Leads-venster kent bij een samengestelde Meting nu alleen Resultaten. Daarnaast of Naast elkaar bij meer dan zes onderdelen een andere vormentaal nodig heeft.
+
+## J. Dekking per scherm en de gaten in de bouw
+
+**Voorstel van 19 oktober 2026, nog niet gebouwd.** Joost liep de gebouwde app na met twaalf screenshots en zag dat de weergaven van de Meting niet overal terugkomen. Het gaat om de benchmark op niveau 1, het perspectief per lid, de opgeslagen verkenning en de hoofdpagina van een Meting met scans. Deze sectie zegt wat elk scherm moet tonen. Elk scherm met scores krijgt dezelfde schakelaar (Navigatie en onderdeel I), met de weergaven die bij zijn eenheid horen.
+
+**Niveau 1, detail van een benchmark.** De schakelaar staat boven de weergave, met de samenvatting van de groep bovenaan (het groepsgemiddelde, zoals een Respondent zijn eigen scan ziet). De volgorde is Overzicht, Per bouwblok, Spreiding tussen Organisaties en de matrix (E).
+
+- **Overzicht.** Het staafdiagram per categorie en de totaalscore van de groep, met de leden als kaarten of lijst.
+- **Per bouwblok.** Weergave D: Per bouwblok een stip op het groepsgemiddelde en de band van laagste tot hoogste lid.
+- **Spreiding tussen Organisaties.** Weergave B met een stip per lid. De namen blijven uit beeld voor een Lead.
+- **Matrix.** Weergave E, bij Eenheid Onderdelen met de onderdelen als kolommen.
+
+**Perspectief van een lid (niveau 1).** Een Organisatie tegenover de rest van de groep, met dezelfde schakelaar. Bij een opgeslagen verkenning op één Organisatie is er geen rest. Dan staat het onderdeel tegenover de overige onderdelen (`benchmark.md`, Opgeslagen verkenning, Detail en perspectief).
+
+**Niveau 3, de hoofdpagina van een Meting met scans.** Boven de lijst met scans staan Overzicht en Spreiding, zonder de positie-ring die bij het perspectief van één scan hoort. Alleen de namen in de lijst was te kaal. Kiest de gebruiker een scan, dan volgt de samenvatting van die Respondent met daaronder de positie ten opzichte van de groep.
+
+**Labels volgen de eenheid.** Bij Eenheid Onderdelen staat "Hoogste onderdeel" en "Laagste onderdeel" in plaats van Organisatie, "Per bouwblok en per onderdeel" als kop, en de teller "3 onderdelen van 1 Organisatie". In elke tekst staat "Bouwblok" en niet "Bouwsteen".
+
+**Getallen.** Overal een decimale komma, dus 3,8 en niet 3.8. Dat geldt ook voor de tegels en de tooltips.
+
+**Dekking.** Per scherm staat welke weergave erin hoort en wat de stand is.
+
+| Scherm | Overzicht | Per bouwblok | Spreiding | Antwoorden | Stand |
+|---|---|---|---|---|---|
+| Meting met scans (niveau 3) | Ja | Ja (A) | Ja (B) | Ja (G) | Hoofdpagina mist Overzicht en Spreiding |
+| Samengestelde Meting | Ja | Ja | Ja vanaf 3 onderdelen | Nee | Ontworpen, niet gebouwd |
+| Vergelijking binnen een organisatie (niveau 2) | Ja | Ja (C of H) | Ja vanaf 3 Metingen | Nee | Matrix en C of H gebouwd, de rest niet |
+| Benchmark tussen organisaties (niveau 1) | Ja | Ja (D) | Ja | Nee | Alleen lijst en per bouwblok gebouwd |
+| Perspectief van een lid (niveau 1) | Ja | Ja | Ja | Nee | Alleen samenvatting en positie gebouwd |
+| Opgeslagen verkenning, Organisaties | Ja | Ja | Ja | Nee | Valt onder niveau 1 |
+| Opgeslagen verkenning, Onderdelen op één Organisatie | Ja | Ja | Ja vanaf 3 onderdelen | Nee | Detail is weergave I, nog niet gebouwd |
+
+Antwoorden per vraag is er alleen bij één Meting. Voor de andere schermen is dat uitgesteld.
 
 ## Gebouwd
 

@@ -54,7 +54,7 @@ Stand van `tokens.css`, aangevuld met `--nav-h`:
   --ye-l: #ffcb57;
 
   --pu: #392944;          /* Proces & Tech */
-  --fu: #44403c;          /* Fundament, antraciet (voorstel) */
+  --fu: var(--ye);        /* Fundament, merkgeel #ffc043 (voorstel van 19 oktober 2026, was antraciet #44403c) */
 
   --ink: #1c1c1a;
   --ink-m: #4d4d49;
@@ -117,15 +117,19 @@ Stand van `tokens.css`, aangevuld met `--nav-h`:
 - Mens: `--gr`
 - Fundament: `--fu`
 
-Elke categoriekleur moet leesbaar zijn als tekst op wit en onder witte
-tekst (bijv. het "bezig"-rondje in de sidebar). Daarom is Fundament niet
-geel of goud. Voorstel is een warm antraciet (`#44403c`), dat past bij de
-warme grijstinten van de huisstijl en ruim voldoende contrast heeft.
-Alternatief als het te ingetogen oogt: Petrol (`#1f6f78`), dat zich
-duidelijk onderscheidt van de andere vier categoriekleuren.
+**Voorstel van 19 oktober 2026 (Joost), ontworpen in "Coniche Scan Mijn metingen" (bord Kaart en Per categorie).** Fundament wordt het merkgeel (`--ye`, `#ffc043`), zodat de vijf categorieën de merkkleurfamilies volgen: oranje, blauw, paars, groen en geel. Daarvoor stond Fundament op antraciet, en samen met het donkere paars van Proces & Tech was dat te somber en te gelijkend. Een verdiept geel of oker is geprobeerd en afgekeurd, want dat oogde bruin.
 
-Er is geen aparte tekstvariant per categorie meer nodig: Alle vijf
-categoriekleuren zijn zelf donker genoeg.
+Gevolg van geel: Het contrast met wit is 1,6. De regel dat een categoriekleur leesbaar is als tekst op wit en onder witte tekst geldt daarom niet voor Fundament.
+
+- Fundament is alleen een vulling: een balk, een stip, een accentrand, een rondje.
+- Tekst in of bij een Fundament-vulling staat in `--ink`. Witte tekst op Fundament is niet toegestaan. Bij Proces & Tech en de andere vier blijft witte tekst op de kleur zoals nu.
+- Een dunne lijn of tekst in de kleur zelf (bijvoorbeeld een kopje in de categoriekleur) gebruikt voor Fundament `--ink`.
+- Een stip in Fundament op een lichte achtergrond heeft de witte rand van 2 px die alle stippen hebben, zodat hij zichtbaar blijft.
+- Het sidebar-rondje "bezig" voor Fundament houdt de kleur en krijgt geen witte tekst of icoon.
+
+De Light-variant van geel (`--ye-l`, `#ffcb57`) is te licht om als tweede tint te dienen en blijft ongebruikt.
+
+**Staafdiagram per categorie.** De balken hebben de categoriekleur, zodat de grafiek dezelfde kleuren heeft als de kaarten op Mijn metingen. De klasse van een categorie staat daarmee niet meer in de balkkleur. De klassegrenzen 2,5 en 3,5 staan als grijze stippellijn (`#9a978f`) door de grafiek met de namen Basis op Orde, Uitbouwen en Sterk punt in `--ink-s`. Het getal staat in 16 px vet boven elke balk. De as loopt van 1 tot 5 en de balk begint op 1, zoals alle schalen van de scores. De band achter de balken (zie Scorekleur hieronder) vervalt in dit diagram.
 
 De Light-varianten zijn beschikbaar waar een tweede tint nodig is, bijv.
 bij hover.
@@ -178,8 +182,7 @@ onderdeel hoort, ligt vast:
   balk, bol of streep op een schaal. Overal waar een score op een schaal van
   1 tot 5 (of 0 tot 100%) staat, hoort de band erachter, in de weergaven
   waarvoor `visualisatie-scores.md` hem noemt en daarnaast in het
-  spreidingsdiagram en de weergave Per bouwblok van Verkennen, de
-  staafdiagrammen per categorie en als twee ringen op 2,5 en 3,5 in de radar.
+  spreidingsdiagram en de weergave Per bouwblok van Verkennen en als twee ringen op 2,5 en 3,5 in de radar. Het staafdiagram per categorie heeft geen band maar twee stippellijnen (Categoriekleuren).
 - **Cel** (`--score-N-cel`, met tekst `--score-N-cel-tekst`): De vulling van een
   cel met een getal erin: De matrix, de eerste kolom van de heatmap in Verkennen
   en de antwoorden in Antwoorden. De vijf stappen zijn zachter dan de volle
@@ -1027,7 +1030,7 @@ Eerder gebruikte categoriekleuren die niet (meer) gebruikt worden:
 | Organisatie | `#0da2e7` | `--bl` |
 | Proces & Tech | `#7c3bed` | `--pu` |
 | Mens | `#21c45d` | `--gr` |
-| Fundament | `#e7b008`, `#ffc043`, `#8a6d00` | `--fu` |
+| Fundament | `#e7b008`, `#8a6d00`, en sinds 19 oktober 2026 ook het antraciet `#44403c` | `--fu` (het merkgeel `#ffc043`) |
 
 ## Open punten
 

@@ -1375,6 +1375,8 @@ Benchmark {
                                     // alleen bij soort "verkenning"
   filters?: { kenmerk: string, waarden: string[] }[]
                                     // alleen bij soort "verkenning", minstens één; kenmerk is een veld uit de organisatievelden
+  meetperiode?: { van: date, totEnMet: date }
+                                    // voorstel van 19 oktober 2026, alleen bij soort "verkenning"; ontbreekt = per lid telt de meest recente Meting
   aangemaaktOp: datetime
   aangemaaktDoor: string            // Gebruiker
 }
@@ -1416,13 +1418,17 @@ bestaan zolang de benchmark bestaat.
   Lead gegeven (`benchmark.md`, View voor een Lead). Niveau 3 blijft een
   weergave voor de Admin.
 
-**`soort`, `eenheid` en `filters`** (gebouwd op 17 oktober 2026, `benchmark.md`,
+**`soort`, `eenheid`, `filters` en `meetperiode`** (`soort`, `eenheid` en `filters` gebouwd op 17 oktober 2026, `meetperiode` voorstel van 19 oktober 2026, `benchmark.md`,
 Opgeslagen verkenning). Een benchmark met `soort: "verkenning"` slaat geen
 leden op. De leden worden bij elk gebruik berekend uit `filters`, met de
 poolregels van Verkennen. Bij `eenheid: "organisaties"` is een lid een
 Organisatie, bij `onderdelen` een onderdeel. `assessmentIds` heeft bij een
 verkenning precies één waarde. Het Assessment en de eenheid zijn niet te
-wijzigen, de naam en de filters wel. De groepering, de focus en de drempel van
+wijzigen, de naam, de filters en de `meetperiode` wel. Per lid telt de laatste Meting
+met een `meetdatum` in de periode (`benchmark.md`, Welke Meting telt waar). Bij
+`eenheid: "onderdelen"` tellen alleen gewone Metingen met een onderdeel mee, nooit een
+samengestelde Meting. Een periode is geen filter en telt niet mee voor de eis van minstens
+één filter. De groepering, de focus en de drempel van
 een getalkenmerk uit Verkennen worden niet opgeslagen. Voldoet een Organisatie
 niet meer aan de filters, dan vervalt het vinkje van haar Leads (`LeadToegang`).
 
