@@ -158,11 +158,21 @@
 .film-vraag-hint { margin: 0; font-size: var(--fs-12); color: var(--ink-s); }
 .film-resultaat { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: var(--sp-6); align-items: center; }
 .film-totaal { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
+/* De ring heeft de volle kleur van de afgeronde score: 3,4 rondt af op 3 en is dus geel (`--score-3`, `help.md`, Films, Ring). Gevuld tot (3,4 - 1) / 4. */
 .film-cirkel {
+  position: relative;
   display: inline-flex; align-items: center; justify-content: center;
   width: 96px; height: 96px; border-radius: 50%;
-  background: var(--score-3); color: var(--ink);
+  background: conic-gradient(var(--score-3) 0 60%, var(--bg-mid) 0);
+  color: var(--ink);
   font-size: var(--fs-32); font-weight: 800;
+  isolation: isolate;
+}
+.film-cirkel::before {
+  content: "";
+  position: absolute; inset: 10px; z-index: -1;
+  border-radius: 50%;
+  background: var(--bg-warm);
 }
 .film-klasse { font-size: var(--fs-14); font-weight: 700; color: var(--ink); }
 .film-rijen { display: grid; gap: var(--sp-3); }

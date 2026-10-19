@@ -14,7 +14,7 @@ const getalFormaat = new Intl.NumberFormat("nl-NL", { maximumFractionDigits: 6 }
 /**
  * Het blok KPI's in het organisatie-detail (`beheerpagina.md`, punt 4, KPI's; `datamodel.md`, KPI's en kanalen): Een eigen kaart onder
  * de Kenmerken, met de KPI's in de rijen en de kolom Algemeen en de Onderdelen op alfabet. Een KPI met waarden per kanaal klapt open
- * tot een rij per kanaal. "+ Onderdeel toevoegen" en het potlood bij een Onderdeel openen een basismodal, "KPI's invullen" een brede
+ * tot een rij per kanaal. "+ Onderdeel toevoegen" en de kop van een Onderdeel openen een basismodal, "KPI's invullen" een brede
  * modal. Het Bewerkslot van de Organisatie geldt voor de hele pagina (`MetBewerkslot`).
  */
 export function KpiBlok({ organisatie }: { organisatie: Organisatie }) {
@@ -53,34 +53,37 @@ export function KpiBlok({ organisatie }: { organisatie: Organisatie }) {
       </div>
 
       <div className="kpi-tabel-wrap">
-        <table className="kpi-tabel">
+        <table className="kpi-tabel" style={{ width: `calc(var(--kpi-eerste-b) + ${kolommen.length} * var(--kolom-b))` }}>
+          <colgroup>
+            <col style={{ width: "var(--kpi-eerste-b)" }} />
+            {kolommen.map((k) => (
+              <col key={k.id ?? "algemeen"} style={{ width: "var(--kolom-b)" }} />
+            ))}
+          </colgroup>
           <thead>
             <tr>
               <th className="kpi-eerste">KPI</th>
               {kolommen.map((k) => {
                 const t = kpiIngevuldTelling(organisatie, kpis, k.id);
                 const onderdeel = k.id === null ? undefined : onderdelen.find((o) => o.id === k.id);
-                return (
-                  <th key={k.id ?? "algemeen"} className={k.id === null ? "kpi-algemeen" : undefined}>
-                    <span className="kpi-kolomnaam">
-                      <span title={k.naam}>{k.naam}</span>
-                      {onderdeel && (
-                        <button
-                          type="button"
-                          className="vk-potlood"
-                          aria-label="Onderdeel bewerken"
-                          title="Onderdeel bewerken"
-                          onClick={() => setModal({ soort: "wijzigen", onderdeelId: onderdeel.id })}
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        </button>
-                      )}
-                    </span>
+                const tooltip = `${k.naam}\n${t.n} van ${t.m} KPI's ingevuld${onderdeel ? "\nKlik om te bewerken" : ""}`;
+                const inhoud = (
+                  <>
+                    <span className="kpi-kolomnaam">{k.naam}</span>
                     <span className="kpi-kolomsub">
-                      {t.n} van {t.m} ingevuld
+                      {t.n} van {t.m}
                     </span>
+                  </>
+                );
+                return (
+                  <th key={k.id ?? "algemeen"} className={k.id === null ? "kpi-algemeen" : undefined} title={tooltip}>
+                    {onderdeel ? (
+                      <button type="button" className="kpi-kop-knop" onClick={() => setModal({ soort: "wijzigen", onderdeelId: onderdeel.id })}>
+                        {inhoud}
+                      </button>
+                    ) : (
+                      <div className="kpi-kop-vast">{inhoud}</div>
+                    )}
                   </th>
                 );
               })}
@@ -99,6 +102,7 @@ export function KpiBlok({ organisatie }: { organisatie: Organisatie }) {
                 <Fragment key={kpi.id}>
                   <tr>
                     <th scope="row" className="kpi-eerste">
+                      <div className="kpi-eerste-inhoud">
                       {metWaarden.length > 0 ? (
                         <button
                           type="button"
@@ -117,15 +121,16 @@ export function KpiBlok({ organisatie }: { organisatie: Organisatie }) {
                       ) : (
                         <span className="kpi-chevron-leeg" aria-hidden="true" />
                       )}
-                      <span className="kpi-naam">
-                        <span>{kpi.naam}</span>
-                        {kpi.eenheid && kpi.eenheid !== "aantal" && <span className="kpi-eenheid">{kpi.eenheid}</span>}
+                      <span className="kpi-naam" title={kpi.naam}>
+                        {kpi.naam}
+                        {kpi.eenheid && kpi.eenheid !== "aantal" && <span className="kpi-eenheid"> ({kpi.eenheid})</span>}
                       </span>
                       {metWaarden.length > 0 && (
                         <span className="kpi-kanalen-aantal">
                           {metWaarden.length} {metWaarden.length === 1 ? "kanaal" : "kanalen"}
                         </span>
                       )}
+                      </div>
                     </th>
                     {kolommen.map((k) => (
                       <td key={k.id ?? "algemeen"} className={k.id === null ? "kpi-algemeen" : undefined}>

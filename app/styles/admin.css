@@ -1194,11 +1194,43 @@ select.veld-compact {
 .kpi-tabel .kpi-algemeen {
   background: var(--bg-warm);
 }
+/* Kolomkop van het blok KPI's (`beheerpagina.md`, punt 4, KPI's, Kolomkop): 96px per kolom en 240px voor de eerste, de naam op één regel
+   met een afkapping en daaronder "n van m". Het Onderdeel is zelf de knop die de modal opent. */
+.kpi-tabel {
+  --kpi-eerste-b: 240px;
+  table-layout: fixed;
+}
+.kpi-tabel .kpi-eerste {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kpi-kop-vast,
+.kpi-kop-knop {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: var(--sp-1) 0;
+  border: 0;
+  border-radius: var(--r);
+  background: transparent;
+  font: inherit;
+  text-align: right;
+}
+.kpi-kop-knop {
+  cursor: pointer;
+}
+.kpi-kop-knop:hover {
+  background: var(--bg-mid);
+}
 .kpi-kolomnaam {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-1);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: var(--fs-14);
+  font-weight: 700;
   color: var(--ink);
 }
 .kpi-kolomsub {
@@ -1206,15 +1238,32 @@ select.veld-compact {
   font-size: var(--fs-12);
   font-weight: 400;
   color: var(--ink-s);
+  white-space: nowrap;
+}
+.kpi-eerste-inhoud {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.kpi-eerste-inhoud > * {
+  flex: none;
 }
 .kpi-naam {
-  display: inline-flex;
-  flex-direction: column;
+  flex: 1 1 auto !important;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .kpi-eenheid {
-  font-size: var(--fs-12);
   font-weight: 400;
   color: var(--ink-s);
+}
+.kpi-tabel tbody tr:not(.kpi-kanaalrij) > * {
+  height: 48px;
+}
+.kpi-tabel .kpi-kanaalrij > * {
+  height: 40px;
 }
 .kpi-leeg,
 .kpi-nvt {

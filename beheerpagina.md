@@ -1006,7 +1006,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     `--bg-warm` als achtergrond. De tabel staat in een vak met `overflow-x:
     auto`, met de eerste kolom vast (`position: sticky; left: 0`) zodra de
     tabel breder is dan het vak.
-  - **Kolomkop** (besloten op 19 oktober 2026, design bord 1 en 6, volgt
+  - **Kolomkop** (besloten en gebouwd op 19 oktober 2026, design bord 1 en 6, volgt
     `stylesheet.md`, Kolomkop en rijkop): Elke kolom met cijfers is 96px breed
     (`--kolom-b`), ook Algemeen, en de eerste kolom is 240px. Op de eerste regel
     staat de naam in 14px, gewicht 700, rechts uitgelijnd, op één regel en met
@@ -1017,7 +1017,10 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     waarde bij het kanaal Algemeen voor die plek, en m het aantal KPI's dat op
     die plek mag (bij Algemeen alle KPI's, bij een Onderdeel de KPI's met
     `perOnderdeel`). De tooltip (`title`) noemt de volledige naam, "n van m
-    KPI's ingevuld" en bij een Onderdeel "Klik om te wijzigen".
+    KPI's ingevuld" en bij een Onderdeel "Klik om te wijzigen". Zo gebouwd met
+    "Klik om te bewerken", volgens de regel Bewerken in `stylesheet.md`. De
+    tabel heeft vaste kolommen (`table-layout: fixed`, 240px en 96px) en elke rij
+    is 48px hoog (gemeten in de browser), een kanaalrij 40px.
     - **Onderdeel wijzigen**: De kop van een Onderdeel is zelf een knop (hover
       `--bg-mid`, zichtbare focusring) die een basismodal opent met de naam,
       "Verwijderen" (`.btn-danger`, uitgeschakeld zolang er Metingen zijn, met

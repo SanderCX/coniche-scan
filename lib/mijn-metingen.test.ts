@@ -119,6 +119,34 @@ describe("teaser van de Quickscan", () => {
     expect(t.stijl).toBe("balk");
     expect(t.ankers).toBe(false);
   });
+
+  it("de ring van de Kaart met cirkel loopt van 0 tot 100% in de klassekleur, met een chip in de celkleur", () => {
+    const t = teaserVoorScan(ziekenhuisQuickscan, antwoorden(54), relevantie)!;
+    expect(t.ring.fractie).toBeCloseTo(0.9);
+    expect(t.ring.kleur).toBe("var(--stat-green)");
+    expect(t.ring.chipAchtergrond).toBe("#e7f6ef");
+    const laag = teaserVoorScan(ziekenhuisQuickscan, antwoorden(12), relevantie)!;
+    expect(laag.ring.kleur).toBe("var(--stat-red)");
+    expect(laag.ring.chipTekst).toBe("#7f1d1d");
+  });
+
+  it("de hele meting heeft per afdeling een lijn van laagste tot hoogste percentage", () => {
+    const scans = [15, 45].map((n, i) => ({ id: `s${i}`, status: "afgerond", antwoorden: antwoorden(n), relevantie })) as unknown as ScanInvulling[];
+    const t = teaserVoorMeting(ziekenhuisQuickscan, scans)!;
+    const metLijn = t.rijen.filter((r) => r.lijn);
+    expect(metLijn.length).toBe(t.rijen.length);
+    for (const r of metLijn) expect(r.lijn!.van).toBeLessThanOrEqual(r.lijn!.tot);
+    expect(metLijn.some((r) => r.lijn!.van < r.lijn!.tot)).toBe(true);
+  });
+});
+
+describe("de ring bij een schaal", () => {
+  it("vult tot (score - 1) / 4 in de volle kleur van de afgeronde score", () => {
+    const t = teaserVoorScan(zorgscan, alle(3))!;
+    expect(t.ring.fractie).toBeCloseTo(0.5);
+    expect(t.ring.kleur).toBe("var(--score-3)");
+    expect(t.ring.chipAchtergrond).toBe("var(--score-3-cel)");
+  });
 });
 
 describe("secties en respons", () => {

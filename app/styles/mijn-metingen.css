@@ -392,3 +392,209 @@
     flex-wrap: wrap;
   }
 }
+
+/* ---------- Kaart met cirkel (`visualisatie-mijn-metingen.md`, Kaart met cirkel) ----------
+   Een paneel met links het zijblok (cirkel, chip, groep) en rechts de rijen met Jij en Groep op één spoor. */
+.mm-paneel {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: var(--sp-8) calc(var(--sp-8) + var(--sp-2));
+  align-items: start;
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px 32px;
+  font-variant-numeric: tabular-nums;
+}
+.mm-paneel--quick {
+  grid-template-columns: 220px minmax(0, 1fr);
+}
+.mm-zij {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  text-align: center;
+}
+.mm-cirkel {
+  position: relative;
+  width: 156px;
+  height: 156px;
+}
+.mm-cirkel svg {
+  display: block;
+}
+.mm-cirkel-tekst {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
+}
+.mm-cirkel-getal {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ink);
+}
+.mm-cirkel-label {
+  font-size: var(--fs-12);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.mm-cirkel-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 var(--sp-3);
+  border-radius: 12px;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.mm-zij-groep {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  margin-top: var(--sp-1);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-14);
+  color: var(--ink-m);
+}
+.mm-paneel-rijen {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.mm-paneel-rij {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) repeat(var(--mm-kolommen, 1), 44px);
+  align-items: center;
+  gap: var(--sp-3);
+  height: 40px;
+  font-size: var(--fs-14);
+}
+.mm-paneel--quick .mm-paneel-rij {
+  grid-template-columns: 136px minmax(0, 1fr) repeat(var(--mm-kolommen, 1), 44px);
+}
+.mm-paneel-kop {
+  height: auto;
+  padding-bottom: var(--sp-2);
+}
+.mm-kolomkop {
+  text-align: right;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  color: var(--ink-s);
+}
+.mm-paneel-naam {
+  color: var(--ink-m);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mm-paneel-spoor {
+  display: block;
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg-mid);
+}
+.mm-paneel-spoor i {
+  display: block;
+  height: 100%;
+  border-radius: var(--balk-r);
+}
+.mm-paneel-waarde {
+  text-align: right;
+  white-space: nowrap;
+  color: var(--ink-m);
+}
+.mm-paneel-waarde--jij {
+  font-weight: 700;
+  color: var(--ink);
+}
+.mm-paneel-ankers {
+  height: auto;
+  margin-top: calc(var(--sp-1) * -1);
+}
+.mm-paneel-anker-spoor {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.mm-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-6);
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-12);
+  color: var(--ink-m);
+}
+.mm-legenda span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.mm-legenda-balk {
+  width: 24px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--ink-s);
+}
+.mm-legenda-stip {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ink-s);
+  border: 2px solid var(--bg-warm);
+  box-sizing: border-box;
+}
+.mm-legenda-lijn {
+  width: 24px;
+  height: 2px;
+  background: #b3b0a8;
+}
+.mm-wacht-regel {
+  margin: var(--sp-4) 0 0;
+}
+.mm-paneel-respons {
+  grid-column: 1 / -1;
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+.mm-paneel-respons .mm-voortgang-rij {
+  margin-bottom: var(--sp-3);
+}
+.mm-respons-rechts {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.mm-sub-14 {
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.mm-respons-balk {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+.mm-respons-balk > div {
+  height: 100%;
+  background: #b3b0a8;
+}
+@media (max-width: 720px) {
+  .mm-paneel,
+  .mm-paneel--quick {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
