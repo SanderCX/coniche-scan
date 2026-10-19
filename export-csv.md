@@ -54,7 +54,7 @@ Meetdatum en onderdeel).
 | `organisatie_naam` | `Organisatie.naam` | |
 | `meting_label` | `Meting.label` | bijv. "Nulmeting 2026" |
 | `meting_meetdatum` | `Meting.meetdatum` | ISO-datum, bijv. "2026-10-14", leeg bij een Meting zonder meetdatum |
-| `onderdeel` | `Meting.onderdeel` (voorstel van 19 oktober 2026: de naam van het Onderdeel) | bijv. "Team A", of "Hele organisatie" |
+| `onderdeel` | `Meting.onderdeel` (sinds 19 oktober 2026 de naam van het Onderdeel) | bijv. "Team A", of "Hele organisatie" |
 | `assessment_naam` | `Assessment.naam` | bijv. "Klantcontact Volwassenheid" |
 | `respondent_naam` | `Respondent.naam` | leeg zolang de intake niet is gestart |
 | `respondent_email` | `Respondent.email` | |
@@ -101,7 +101,7 @@ een oudere CSV-export kan afwijken van de actuele score.
 |---|---|
 | `organisatie_kenmerken` | JSON-kolom, letterlijk `Organisatie.kenmerken` (`{ [veldId]: waarde }`, `datamodel.md`) |
 
-**Voorstel van 19 oktober 2026, nog niet uitgewerkt.** De KPI's en de contacten per kanaal staan niet meer in `Organisatie.kenmerken` maar als `KpiWaarde` (`datamodel.md`, KPI's en kanalen). Voorstel: Een tweede JSON-kolom `organisatie_kpis` met een lijst van onderdeel (de naam, leeg bij Algemeen), kanaal (de naam, leeg bij Algemeen), KPI en waarde. De kolom `onderdeel` blijft de naam van het Onderdeel, en "Hele organisatie" bij een Meting zonder Onderdeel. Een export van vóór deze wijziging heeft de KPI's nog in `organisatie_kenmerken` (`import-scans.md`).
+**Gebouwd op 19 oktober 2026.** De KPI's en de contacten per kanaal staan niet meer in `Organisatie.kenmerken` maar als `KpiWaarde` (`datamodel.md`, KPI's en kanalen). Voorstel: Een tweede JSON-kolom `organisatie_kpis` met een lijst van onderdeel (de naam, leeg bij Algemeen), kanaal (de naam, leeg bij Algemeen), KPI en waarde. De kolom `onderdeel` blijft de naam van het Onderdeel, en "Hele organisatie" bij een Meting zonder Onderdeel. Een export van vóór deze wijziging heeft de KPI's nog in `organisatie_kenmerken` (`import-scans.md`).
 
 **Bewust één JSON-kolom, geen kolom per veld** (dus geen aparte
 `sector`, `subsector`, `nps`, etc.). Organisatievelden zijn nu vaste

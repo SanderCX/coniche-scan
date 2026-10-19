@@ -188,13 +188,6 @@ export function selectieHeeftZelfdeOnderdeel(metingen: Pick<ScanUitvoering, "ond
   return false;
 }
 
-/** De onderdelen die in deze organisatie al voorkomen, als suggestie bij een nieuwe Meting. */
-export function bestaandeOnderdelen(organisatie: Pick<Organisatie, "scanUitvoeringen">): string[] {
-  const set = new Set<string>();
-  for (const m of organisatie.scanUitvoeringen) set.add(onderdeelVan(m));
-  return [...set].sort((a, b) => a.localeCompare(b, "nl"));
-}
-
 /* ---------- Samengestelde Meting ---------- */
 
 /** De onderliggende Metingen van een samengestelde Meting die nog bestaan. */

@@ -55,7 +55,7 @@ export function FilterMenu({
         v.id === ORGANISATIE_ID || v.id === ONDERDEEL_ID
           ? pool.length
           : v.id === KANALEN_ID
-          ? pool.filter((l) => kanaalVelden().some((k) => kanaalIngezet(l.organisatie, k.pad) !== null)).length
+          ? pool.filter((l) => kanaalVelden().some((k) => kanaalIngezet(l, k.id) !== null)).length
           : ingevuldAantal(organisaties, v);
       return { veld: v, korte, aantal, groep: veldGroep(v) };
     })

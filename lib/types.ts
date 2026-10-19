@@ -245,9 +245,53 @@ export interface Gebruiker {
  * vóór deze refactor. Voor een echte database is normaliseren naar losse
  * tabellen de voor de hand liggende vervolgstap, niet nu gedaan.
  */
+/** Een kanaal waarop contact verloopt (`datamodel.md`, KPI's en kanalen). Eén lijst voor het hele platform, beheerd door een Admin. */
+export interface Kanaal {
+  id: string;
+  /** Uniek, hoofdletterongevoelig. */
+  naam: string;
+  volgorde: number;
+}
+
+/** Een KPI en op welke plekken er een waarde voor mag staan (`datamodel.md`, KPI's en kanalen). Algemeen mag altijd. */
+export interface KpiDefinitie {
+  /** Bijvoorbeeld "aht": Het pad `kpis.aht` in de korte namen en in een opgeslagen verkenning. */
+  id: string;
+  naam: string;
+  /** Bijvoorbeeld "s", "%" of "aantal", of `null` zonder eenheid. */
+  eenheid: string | null;
+  perOnderdeel: boolean;
+  perKanaal: boolean;
+  volgorde: number;
+}
+
+/**
+ * Eén KPI-waarde (`datamodel.md`, KPI's en kanalen): Uniek op Organisatie, Onderdeel, kanaal en KPI. `onderdeelId: null` is
+ * Algemeen (de hele organisatie), `kanaalId: null` is Algemeen bij het kanaal (alle kanalen samen). Een lege cel is geen record.
+ */
+export interface KpiWaarde {
+  organisatieId: string;
+  onderdeelId: string | null;
+  kanaalId: string | null;
+  kpiId: string;
+  waarde: number;
+}
+
+/** Een deel van een Organisatie waarover een Meting gaat en waarvoor KPI-waarden kunnen staan (`datamodel.md`, Onderdeel). */
+export interface Onderdeel {
+  id: string;
+  organisatieId: string;
+  naam: string;
+  aangemaaktOp: string;
+}
+
 export interface Organisatie {
   id: string;
   naam: string;
+  /** De Onderdelen van deze Organisatie, één keer per Organisatie. "Hele organisatie" is er geen van. Ontbreekt bij data van vóór dit veld. */
+  onderdelen?: Onderdeel[];
+  /** De KPI-waarden van deze Organisatie, per plek (Onderdeel), kanaal en KPI (`datamodel.md`, KPI's en kanalen). Ontbreekt bij data van vóór dit veld. */
+  kpiWaarden?: KpiWaarde[];
   /**
    * Weergavenaam voor kolomkoppen in matrices en heatmaps (`datamodel.md`, Organisatie), maximaal 30 tekens. Leeg of ontbrekend
    * betekent dat `naam` zelf geldt.
@@ -373,6 +417,13 @@ export interface ScanUitvoering {
    * geldt dan als "Hele organisatie" (`lib/metingen.ts`, `onderdeelVan`).
    */
   onderdeel?: string;
+  /**
+   * Het Onderdeel van de Organisatie waar de Meting over gaat (`datamodel.md`, Onderdeel, voorstel van 19 oktober 2026): `null`
+   * is "Hele organisatie". Afgeleid uit `onderdeel` bij elke schrijfactie (`lib/onderdelen.ts`, `zorgOnderdelenKloppend`).
+   * `onderdeel` blijft de naam van dat Onderdeel, zodat een Meting zonder de Organisatie erbij te lezen is. Een hernoeming
+   * werkt hem in dezelfde schrijfactie bij.
+   */
+  onderdeelId?: string | null;
   /**
    * Alleen bij een samengestelde Meting (`benchmark.md`, Onderdeel en samengestelde Meting): De Meting-id's waarvan ze het
    * gemiddelde is. Een samengestelde Meting heeft geen Respondenten en geen `invullingen`.

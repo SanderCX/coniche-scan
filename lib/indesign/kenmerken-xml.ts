@@ -7,6 +7,8 @@
  */
 import { escapeXml } from "./xml-utils";
 import { ondersteuningVan } from "../techstack";
+import { KPI_CONTACTEN, kpiWaardeVan } from "../kpi";
+import type { KpiWaarde } from "../types";
 
 const NVT = "n.v.t.";
 
@@ -37,13 +39,18 @@ function tekstEl(naam: string, waarde: unknown): string {
   return `<${naam}>${escapeXml(tekst(waarde))}</${naam}>`;
 }
 
-export function kenmerkenXml(kenmerken: Record<string, unknown>): string {
+/**
+ * De KPI's en de contacten per kanaal komen uit de KPI-waarden bij Algemeen (`export-indesign.md`, voorstel van 19 oktober 2026): De
+ * elementen blijven bestaan zodat het sjabloon werkt. Waarden per Onderdeel en kanalen die een Admin toevoegt, krijgen geen element
+ * zolang het sjabloon er niet om vraagt.
+ */
+export function kenmerkenXml(kenmerken: Record<string, unknown>, kpiWaarden: KpiWaarde[] = []): string {
+  const algemeen = (kpiId: string, kanaalId: string | null = null) => kpiWaardeVan({ kpiWaarden }, kpiId, { onderdeelId: null, kanaalId }) ?? undefined;
   const sectorSubsector = kenmerken["sector-subsector"];
   const volume = kenmerken["volume-klantbasis"];
   const digitalisering = kenmerken["digitalisering"];
   const techstack = kenmerken["techstack"];
   const fte = kenmerken["fte"];
-  const kpis = kenmerken["kpis"];
 
   const delen = [
     tekstEl("sector", pad(sectorSubsector, "sector")),
@@ -53,12 +60,12 @@ export function kenmerkenXml(kenmerken: Record<string, unknown>): string {
       b2bPercentage: pad(volume, "totaal-klanten", "b2b-percentage"),
       b2cPercentage: pad(volume, "totaal-klanten", "b2c-percentage"),
     }),
-    el("contactenCall", { waarde: pad(volume, "contacten-per-jaar", "kanaal-call") }),
-    el("contactenVoicebot", { waarde: pad(volume, "contacten-per-jaar", "kanaal-voicebot") }),
-    el("contactenLivechat", { waarde: pad(volume, "contacten-per-jaar", "kanaal-livechat") }),
-    el("contactenChatbot", { waarde: pad(volume, "contacten-per-jaar", "kanaal-chatbot") }),
-    el("contactenEmail", { waarde: pad(volume, "contacten-per-jaar", "kanaal-e-mail") }),
-    el("contactenWhatsapp", { waarde: pad(volume, "contacten-per-jaar", "kanaal-whatsapp") }),
+    el("contactenCall", { waarde: algemeen(KPI_CONTACTEN, "kanaal-call") }),
+    el("contactenVoicebot", { waarde: algemeen(KPI_CONTACTEN, "kanaal-voicebot") }),
+    el("contactenLivechat", { waarde: algemeen(KPI_CONTACTEN, "kanaal-livechat") }),
+    el("contactenChatbot", { waarde: algemeen(KPI_CONTACTEN, "kanaal-chatbot") }),
+    el("contactenEmail", { waarde: algemeen(KPI_CONTACTEN, "kanaal-e-mail") }),
+    el("contactenWhatsapp", { waarde: algemeen(KPI_CONTACTEN, "kanaal-whatsapp") }),
     el("adoptieMijnomgeving", { percentage: pad(volume, "adoptie-mijnomgeving") }),
     el("digitaliseringPercentage2026", { percentage: pad(digitalisering, "percentage-2026") }),
     el("digitaliseringAmbitie2030", { percentage: pad(digitalisering, "ambitie-2030") }),
@@ -97,11 +104,11 @@ export function kenmerkenXml(kenmerken: Record<string, unknown>): string {
       waarde: pad(fte, "fte-it-devops", "aantal"),
       percentageDigital: pad(fte, "fte-it-devops", "digital-percentage"),
     }),
-    el("kpiAht", { waarde: pad(kpis, "aht") }),
-    el("kpiNps", { waarde: pad(kpis, "nps") }),
-    el("kpiCsat", { waarde: pad(kpis, "csat") }),
-    el("kpiSla", { waarde: pad(kpis, "sla") }),
-    el("kpiFtr", { waarde: pad(kpis, "ftr") }),
+    el("kpiAht", { waarde: algemeen("aht") }),
+    el("kpiNps", { waarde: algemeen("nps") }),
+    el("kpiCsat", { waarde: algemeen("csat") }),
+    el("kpiSla", { waarde: algemeen("sla") }),
+    el("kpiFtr", { waarde: algemeen("ftr") }),
   ];
 
   return `<kenmerken>${delen.join("")}</kenmerken>`;

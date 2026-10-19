@@ -7,6 +7,9 @@ import { KorteNamenTabel } from "@/components/beheer/KorteNamenTabel";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { korteNaamVeld, korteNaamWaarde } from "@/lib/korte-namen";
+import { Kanaal } from "@/lib/types";
+import { kpiWaardeVan } from "@/lib/kpi";
+import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
 import {
   FilterStand,
   FilterVeld,
@@ -19,6 +22,7 @@ import {
   heeftFilters,
   ingevuldAantal,
   kanaalAantallen,
+  plekVan,
   selectOpties,
   veldLabelZonderGroep,
   waardeLabel,
@@ -28,6 +32,43 @@ import {
 export const SNEL_BEGINNEN = ["techstack.techstack-crm.leverancier", "sector-subsector.sector", "kpis.aht"];
 /** Bij de eenheid Onderdelen staat Organisatie erbij (`visualisatie-verkennen.md`, Eenheid). */
 export const SNEL_BEGINNEN_ONDERDELEN = [...SNEL_BEGINNEN, ORGANISATIE_ID];
+
+/**
+ * De groep Kanaal bij een KPI met `perKanaal` (`visualisatie-verkennen.md`, KPI's als kenmerk): Algemeen en de kanalen waarvoor minstens
+ * één eenheid in de pool een waarde heeft voor deze KPI. Algemeen staat gekozen bij het toevoegen.
+ */
+function KanaalKeuze({
+  kpiId,
+  gekozen,
+  onKies,
+  pool,
+  kanalen,
+  naam,
+}: {
+  kpiId: string;
+  gekozen: string | null;
+  onKies: (kanaalId: string | null) => void;
+  pool: PoolLid[];
+  kanalen: Kanaal[];
+  naam: string;
+}) {
+  const beschikbaar = [...kanalen]
+    .sort((a, b) => a.volgorde - b.volgorde)
+    .filter((k) => pool.some((l) => kpiWaardeVan(l.organisatie, kpiId, { onderdeelId: plekVan(l), kanaalId: k.id }) !== null));
+  const waarde = gekozen && beschikbaar.some((k) => k.id === gekozen) ? gekozen : ALGEMEEN;
+  return (
+    <div className="vk-kanaal-keuze">
+      <span className="text-xs text-ink-s">Kanaal</span>
+      <WeergaveWissel<string>
+        ariaLabel={`Kanaal bij ${naam}`}
+        opties={[{ waarde: ALGEMEEN, label: "Algemeen" }, ...beschikbaar.map((k) => ({ waarde: k.id, label: k.naam }))]}
+        waarde={waarde}
+        onChange={(w) => onKies(w === ALGEMEEN ? null : w)}
+      />
+    </div>
+  );
+}
+const ALGEMEEN = "__algemeen__";
 
 /**
  * De kaart Kenmerken (`visualisatie-verkennen.md`, Kenmerken en filters): Het scherm begint leeg. Een toegevoegd kenmerk is
@@ -42,6 +83,8 @@ export function KenmerkenKaart({
   onStand,
   onToevoegen,
   onVerwijder,
+  kpiKanaal = {},
+  onKpiKanaal,
   pool,
   gefilterd,
   zonderToestemming,
@@ -56,6 +99,9 @@ export function KenmerkenKaart({
   onStand: (stand: FilterStand) => void;
   onToevoegen: (id: string) => void;
   onVerwijder: (id: string) => void;
+  /** Het gekozen kanaal per KPI (`null` of ontbrekend is Algemeen), voor de groep Kanaal bij een KPI met `perKanaal`. */
+  kpiKanaal?: Record<string, string | null>;
+  onKpiKanaal?: (kpiId: string, kanaalId: string | null) => void;
   pool: PoolLid[];
   gefilterd: PoolLid[];
   zonderToestemming: number;
@@ -65,7 +111,7 @@ export function KenmerkenKaart({
   /** Onder de teller en de balk, bijvoorbeeld de knop Opslaan als benchmark. */
   onderTeller?: React.ReactNode;
 }) {
-  const { korteNamen, verkennenMinIngevuldPct } = useInstellingen();
+  const { korteNamen, verkennenMinIngevuldPct, kanalen: alleKanalen } = useInstellingen();
   const [modalVeld, setModalVeld] = useState<string | null>(null);
   const perId = new Map(velden.map((v) => [v.id, v]));
   const rijen = kenmerken.map((id) => perId.get(id)).filter((v): v is FilterVeld => v !== undefined);
@@ -164,10 +210,22 @@ export function KenmerkenKaart({
                 {selectOpties(pool, veld).length === 0 && <span className="text-sm text-ink-s">Geen waarden in de pool.</span>}
               </div>
             ) : (
+              <>
+                {veld.kpi && veld.kpiPerKanaal && onKpiKanaal && (
+                  <KanaalKeuze
+                    kpiId={veld.kpi.kpiId}
+                    gekozen={kpiKanaal[veld.kpi.kpiId] ?? null}
+                    onKies={(k) => onKpiKanaal(veld.kpi!.kpiId, k)}
+                    pool={pool}
+                    kanalen={alleKanalen}
+                    naam={naamVan(veld)}
+                  />
+                )}
               <p className="text-sm text-ink-m" style={{ margin: 0 }}>
                 Getal, {getalWaarden(pool, veld).length || ingevuldAantal(organisaties, veld)} van {pool.length} ingevuld. Te gebruiken bij
                 Groeperen op.
               </p>
+              </>
             )}
           </div>
         ))

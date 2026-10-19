@@ -169,6 +169,36 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Kies waarover je vergelijkt. Bij Organisaties telt elke Organisatie één keer, met één Meting (zie Meetperiode). Bij Onderdelen telt elk onderdeel van een Organisatie apart, en elk onderdeel telt even zwaar mee.",
   },
   {
+    sleutel: "info.kpiBlok",
+    plek: "Organisatie-detail, blok KPI's, naast de titel",
+    tekst: "Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet.",
+  },
+  {
+    sleutel: "info.kpiPlek",
+    plek: "Modal KPI's invullen, naast het label Plek",
+    tekst: "Kies voor welk deel van de organisatie je invult. Algemeen is de hele organisatie.",
+  },
+  {
+    sleutel: "info.kpiKanalen",
+    plek: "Modal KPI's invullen, naast het label Kanalen uitsplitsen",
+    tekst: "Kies alleen de kanalen waarvoor je cijfers hebt. De kolom Algemeen blijft altijd staan.",
+  },
+  {
+    sleutel: "info.kpiDefinities",
+    plek: "Organisatievelden, tab KPI's en kanalen, naast de titel KPI's",
+    tekst: "Per KPI bepaal je of hij per onderdeel en per kanaal ingevuld mag worden. Algemeen is altijd mogelijk.",
+  },
+  {
+    sleutel: "info.kanalen",
+    plek: "Organisatievelden, tab KPI's en kanalen, naast de titel Kanalen",
+    tekst: "De lijst met kanalen die bij een KPI kunnen staan. Een kanaal telt als ingezet bij een volume boven 0.",
+  },
+  {
+    sleutel: "info.metingOnderdeel",
+    plek: "Meting plannen en de andere formulieren met een veld Onderdeel, naast het label Onderdeel",
+    tekst: "Kies een onderdeel van deze organisatie of maak een nieuw onderdeel aan. Een nieuw onderdeel verschijnt ook als kolom bij de KPI's.",
+  },
+  {
     sleutel: "info.verkennenMeetperiode",
     plek: "Verkennen en het wijzigen van een opgeslagen verkenning, naast het label Meetperiode",
     tekst:

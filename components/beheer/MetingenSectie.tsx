@@ -25,6 +25,8 @@ import { SamengesteldeMetingFormulier } from "@/components/beheer/SamengesteldeM
 import { ScansSamenbrengenModal } from "@/components/beheer/ScansSamenbrengenModal";
 import {
   OnderdeelMeetdatumVelden,
+  onderdeelFout,
+  onderdeelNaamVoorOpslaan,
   OnderdeelMeetdatumWaarde,
   beginWaarde,
   metingNaam,
@@ -52,18 +54,19 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
 
   const keuzeAssessment = assessmentId || assessments[0]?.id || "";
   const waarde = concept ?? beginWaarde();
-  const dubbel = keuzeAssessment
-    ? metingMetCombinatie(organisatie, waarde.onderdeel, keuzeAssessment, waarde.meetdatum)
-    : undefined;
+  const onderdeelNaam = onderdeelNaamVoorOpslaan(organisatie, waarde);
+  const dubbel = keuzeAssessment ? metingMetCombinatie(organisatie, onderdeelNaam, keuzeAssessment, waarde.meetdatum) : undefined;
 
   function plan(e: React.FormEvent) {
     e.preventDefault();
     setFout(null);
     if (!keuzeAssessment) return;
+    const onderdeelProbleem = onderdeelFout(organisatie, waarde);
+    if (onderdeelProbleem) return setFout(onderdeelProbleem);
     if (!isGeldigeDatum(waarde.meetdatum)) return setFout("Kies een meetdatum.");
     const r = maakMeting(organisatie.id, {
       assessmentId: keuzeAssessment,
-      onderdeel: waarde.onderdeel,
+      onderdeel: onderdeelNaam,
       meetdatum: waarde.meetdatum,
     });
     if (!r.ok) return setFout(r.reden);

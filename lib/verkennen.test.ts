@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { zorgscan } from "@/data/zorgscan-assessment";
 import { alleVragen } from "./assessment-structuur";
+import { migreerKpiWaarden } from "./kpi";
 import type { Organisatie, ScanInvulling } from "./types";
 import {
   LEGE_FILTERS,
@@ -20,6 +21,10 @@ import {
   histogram,
   kanGroeperen,
   kanaalIngezet,
+  metKanaal,
+  getalWaarden,
+  ingevuldAantal,
+  lidWaarde,
   maakGroepen,
   mediaan,
   pasFiltersToe,
@@ -41,7 +46,7 @@ function scan(id: string, waarde: number): ScanInvulling {
 
 function org(id: string, waarde: number, opties: { vlag?: boolean; scans?: number; kenmerken?: Organisatie["kenmerken"] } = {}): Organisatie {
   const n = opties.scans ?? 3;
-  return {
+  const o = {
     id, naam: `Org ${id}`, kenmerken: opties.kenmerken ?? {}, leden: [], aangemaaktDoor: null, toegewezenAan: [],
     benchmarkToegestaan: opties.vlag ?? true, aangemaaktOp: "x", gewijzigdOp: "x",
     scanUitvoeringen: [
@@ -51,6 +56,9 @@ function org(id: string, waarde: number, opties: { vlag?: boolean; scans?: numbe
       },
     ],
   } as unknown as Organisatie;
+  // De KPI's staan als KPI-waarden: De overgang zet de oude vorm in `kenmerken.kpis` en de contacten per kanaal om (`lib/kpi.ts`).
+  migreerKpiWaarden(o);
+  return o;
 }
 
 const kenmerken = (sector: string, aht?: number, call?: number): Organisatie["kenmerken"] => ({
@@ -105,11 +113,67 @@ describe("filters", () => {
   });
 
   it("een kanaal is ingezet boven 0, niet bij 0 en onbekend als het veld leeg is", () => {
-    expect(kanaalIngezet(orgs[0], ["volume-klantbasis", "contacten-per-jaar", "kanaal-call"])).toBe(true);
-    expect(kanaalIngezet(orgs[1], ["volume-klantbasis", "contacten-per-jaar", "kanaal-call"])).toBe(false);
-    expect(kanaalIngezet(orgs[2], ["volume-klantbasis", "contacten-per-jaar", "kanaal-call"])).toBeNull();
+    expect(kanaalIngezet(leden[0], "kanaal-call")).toBe(true);
+    expect(kanaalIngezet(leden[1], "kanaal-call")).toBe(false);
+    expect(kanaalIngezet(leden[2], "kanaal-call")).toBeNull();
     const f = pasFiltersToe(leden, { ...LEGE_FILTERS, kanalen: ["kanaal-call"] });
     expect(f.map((l) => l.organisatie.id)).toEqual(["a", "d"]);
+  });
+});
+
+describe("KPI's als kenmerk", () => {
+  const kpiOrg = (id: string, waarden: { onderdeelId: string | null; kanaalId: string | null; waarde: number }[], onderdelen: string[] = []) => {
+    const o = org(id, 3);
+    o.onderdelen = onderdelen.map((n) => ({ id: `od-${n}`, organisatieId: id, naam: n, aangemaaktOp: "x" }));
+    o.kpiWaarden = waarden.map((w) => ({ organisatieId: id, kpiId: "aht", ...w }));
+    return o;
+  };
+
+  it("filterVelden kent een regel per KPI, met een kanaal bij een KPI per kanaal", () => {
+    const aht = filterVelden().find((v) => v.id === "kpis.aht")!;
+    expect(aht.kpi).toEqual({ kpiId: "aht", kanaalId: null });
+    expect(aht.kpiPerKanaal).toBe(true);
+    expect(aht.eenheid).toBe("s");
+    expect(filterVelden().find((v) => v.id === "kpis.nps")?.kpiPerKanaal).toBe(false);
+    // Contacten per jaar heeft de eenheid "aantal": Die staat niet achter de drempel.
+    expect(filterVelden().find((v) => v.id === "kpis.contacten")?.eenheid).toBeUndefined();
+  });
+
+  it("bij Organisaties telt de waarde bij Algemeen, bij het gekozen kanaal", () => {
+    const orgs = [
+      kpiOrg("a", [{ onderdeelId: null, kanaalId: null, waarde: 300 }, { onderdeelId: null, kanaalId: "kanaal-call", waarde: 250 }]),
+      kpiOrg("b", [{ onderdeelId: null, kanaalId: null, waarde: 500 }]),
+    ];
+    const pool = bouwPool(orgs, assessment, 3);
+    const algemeen = metKanaal(filterVelden().find((v) => v.id === "kpis.aht")!, null);
+    const call = metKanaal(algemeen, "kanaal-call");
+    expect(getalWaarden(pool.leden, algemeen)).toEqual([300, 500]);
+    // Een Organisatie zonder waarde bij het kanaal valt af: Er is geen terugval op Algemeen.
+    expect(getalWaarden(pool.leden, call)).toEqual([250]);
+    expect(ingevuldAantal(orgs, call)).toBe(1);
+  });
+
+  it("bij Onderdelen telt de waarde van het onderdeel en niet die van de Organisatie", () => {
+    const meting = (id: string, onderdeel: string) => ({
+      id, organisatieId: "a", assessmentId: assessment.id, label: id, onderdeel, meetdatum: "2026-02-01", aangemaaktOp: "2026-01-01",
+      invullingen: org("tmp", 3).scanUitvoeringen[0].invullingen,
+    });
+    const o = kpiOrg("a", [{ onderdeelId: null, kanaalId: null, waarde: 400 }, { onderdeelId: "od-Team A", kanaalId: null, waarde: 200 }], ["Team A"]);
+    o.scanUitvoeringen = [meting("m1", "Team A"), meting("m2", "Team B")] as unknown as Organisatie["scanUitvoeringen"];
+    o.scanUitvoeringen[0].onderdeelId = "od-Team A";
+    o.scanUitvoeringen[1].onderdeelId = "od-Team B";
+    const pool = bouwPool([o], assessment, 3, "onderdelen");
+    const aht = metKanaal(filterVelden().find((v) => v.id === "kpis.aht")!, null);
+    const waarden = Object.fromEntries(pool.leden.map((l) => [l.onderdeel, lidWaarde(l, aht)]));
+    expect(waarden).toEqual({ "Team A": 200, "Team B": undefined });
+  });
+
+  it("ingezette kanalen volgen de plek van de eenheid", () => {
+    const o = kpiOrg("a", [{ onderdeelId: null, kanaalId: "kanaal-call", waarde: 0 }]);
+    o.kpiWaarden = [{ organisatieId: "a", kpiId: "contacten", onderdeelId: null, kanaalId: "kanaal-call", waarde: 10 }];
+    const pool = bouwPool([o], assessment, 3);
+    expect(kanaalIngezet(pool.leden[0], "kanaal-call")).toBe(true);
+    expect(kanaalIngezet(pool.leden[0], "kanaal-chatbot")).toBeNull();
   });
 });
 

@@ -20,6 +20,10 @@ const TYPE_LABEL: Record<string, string> = {
   benchmark: "Benchmark",
   assessment: "Assessment",
   korteNaam: "Korte naam",
+  onderdeel: "Onderdeel",
+  kpi: "KPI-waarden",
+  kpiDefinitie: "KPI",
+  kanaal: "Kanaal",
 };
 
 /** Het deel van de actie vóór de punt, bijv. "organisatie" bij "organisatie.verwijderd". */
@@ -69,6 +73,16 @@ const DETAIL_LABEL: Record<string, string> = {
   doelMeting: "Naar Meting",
   oudLabel: "Oud label",
   oudeNaam: "Oude naam",
+  nieuweNaam: "Nieuwe naam",
+  onderdeelNaam: "Onderdeel",
+  aantalKpiWaarden: "KPI-waarden die meegingen",
+  plek: "Plek",
+  aantalIngevuld: "Ingevuld",
+  aantalGewijzigd: "Gewijzigd",
+  aantalGewist: "Gewist",
+  kanaalNaam: "Kanaal",
+  kpiNaam: "KPI",
+  wijzigingen: "Wijzigingen",
   bouwblokNaam: "Bouwblok",
   oudGewicht: "Oud gewicht",
   nieuwGewicht: "Nieuw gewicht",

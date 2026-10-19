@@ -462,7 +462,7 @@ meetdatum (`datamodel.md`, Meting). De import leidt ze af uit wat hij al weet.
   zijn gekoppeld. In de voorbeeldweergave staat dan per bronnaam een veld
   "Onderdeel", voorgevuld met de bronnaam en aanpasbaar. Bij één bronnaam is het
   onderdeel "Hele organisatie". Bij de eigen export geldt het onderdeel uit de
-  kolom `onderdeel`, als die er is (`export-csv.md`). Voorstel van 19 oktober
+  kolom `onderdeel`, als die er is (`export-csv.md`). Gebouwd op 19 oktober
   2026: Het veld is de keuzelijst Onderdeel (`beheerpagina.md`, punt 5, Het veld
   Onderdeel). De bronnaam staat gekozen als er een Onderdeel met die naam
   bestaat (hoofdletterongevoelig), anders als "Nieuw onderdeel…" met de bronnaam

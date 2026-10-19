@@ -166,7 +166,7 @@ Geen nieuwe contentbron: Dezelfde velden als de PDF-export
 </scanExport>
 ```
 
-**Voorstel van 19 oktober 2026 (KPI's en kanalen), nog niet uitgewerkt.** De
+**Gebouwd op 19 oktober 2026 (KPI's en kanalen).** De
 elementen `contactenCall` tot en met `contactenWhatsapp` en `kpiAht` tot en met
 `kpiFtr` blijven bestaan, zodat het sjabloon blijft werken. Ze komen uit de
 `KpiWaarde`'s bij Algemeen (`datamodel.md`, KPI's en kanalen, Gevolgen voor

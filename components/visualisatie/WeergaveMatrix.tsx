@@ -1,3 +1,4 @@
+import { bouwblokWoorden } from "@/lib/visualisatie";
 import { Assessment } from "@/lib/types";
 import { HogerKant, KLASSE_LABEL, MatrixWeergave } from "@/lib/visualisatie";
 import { SYMBOOL_EERSTE, SYMBOOL_TWEEDE } from "./WeergaveNaastElkaar";
@@ -12,6 +13,12 @@ import { Tegels, toon } from "./gedeeld";
  * een kolom Verschil (de nieuwere min de oudere) per bouwblok, per categorie en voor de totaalscore. Alleen voor een Admin: De
  * kolomkoppen tonen de namen. Bij veel kolommen scrolt de matrix horizontaal met een vaste eerste kolom.
  */
+/** De kop boven de rijen: "Bouwblok" en niet "Bouwsteen" (`visualisatie-scores.md`, E). */
+function bouwblokKop(assessment: Assessment): string {
+  const w = bouwblokWoorden(assessment).enkelvoud;
+  return w.charAt(0).toUpperCase() + w.slice(1);
+}
+
 export function WeergaveMatrix({
   assessment,
   weergave,
@@ -26,6 +33,9 @@ export function WeergaveMatrix({
   const soort = kolomSoort === "organisatie" ? "organisatie" : kolomSoort === "onderdeel" ? "onderdeel" : "Meting";
   // Alleen tussen organisaties is er een groep om van af te wijken (`visualisatie-scores.md`, E).
   const groep = kolomSoort !== "meting";
+  // Bij Metingen staan onder de totaalscore het onderdeel en de meetdatum, zoals in de kolomkop, en niet alleen de naam van de Meting.
+  const tegelSub = (m: { label: string; sublabel?: string } | null | undefined) =>
+    m ? (kolomSoort === "meting" && m.sublabel ? `${m.label} · ${m.sublabel}` : m.label) : undefined;
   const teken = (n: number) => (n > 0 ? "▲ +" : n < 0 ? "▼ −" : "= ");
   const verschilCel = (n: number | null, sleutel: string) => (
     <td key={sleutel} className="vis-matrix-zij">
@@ -50,8 +60,8 @@ export function WeergaveMatrix({
     <div className="vis" data-weergave="matrix">
       <Tegels
         tegels={[
-          { label: `Hoogste ${soort}`, waarde: toon(weergave.hoogsteMeting?.totaal), sub: weergave.hoogsteMeting?.label },
-          { label: `Laagste ${soort}`, waarde: toon(weergave.laagsteMeting?.totaal), sub: weergave.laagsteMeting?.label },
+          { label: `Hoogste ${soort}`, waarde: toon(weergave.hoogsteMeting?.totaal), sub: tegelSub(weergave.hoogsteMeting) },
+          { label: `Laagste ${soort}`, waarde: toon(weergave.laagsteMeting?.totaal), sub: tegelSub(weergave.laagsteMeting) },
           {
             label: "Grootste verschil",
             waarde: toon(weergave.grootsteVerschil?.verschil),
@@ -66,7 +76,7 @@ export function WeergaveMatrix({
         <table className="vis-matrix">
           <thead>
             <tr>
-              <th className="vis-matrix-naam">{assessment.bouwblokLabel}</th>
+              <th className="vis-matrix-naam">{bouwblokKop(assessment)}</th>
               {kolommen.map((k, i) => (
                 // Een kop breekt nooit over meerdere regels (`stylesheet.md`, Kolomkop en rijkop): De naam staat op één regel met
                 // een afkapping, een tweede regel van 12px (de meetdatum bij Metingen, anders "n = 5"). Al het andere staat in

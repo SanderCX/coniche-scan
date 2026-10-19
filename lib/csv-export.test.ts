@@ -57,6 +57,23 @@ describe("CSV groepsScores met gewicht", () => {
   });
 });
 
+describe("organisatie_kpis", () => {
+  it("is een JSON-kolom met de KPI-waarden van de Organisatie, onderdeel en kanaal op naam", () => {
+    const o = organisatie(aiVolwassenheid, [scan(aiVolwassenheid, "afgerond")]);
+    o.onderdelen = [{ id: "od1", organisatieId: o.id, naam: "Team A", aangemaaktOp: "x" }];
+    o.kpiWaarden = [
+      { organisatieId: o.id, kpiId: "aht", onderdeelId: null, kanaalId: null, waarde: 300 },
+      { organisatieId: o.id, kpiId: "aht", onderdeelId: "od1", kanaalId: "kanaal-call", waarde: 280 },
+    ];
+    const csv = genereerScansCsv([{ organisatie: o, scanUitvoering: o.scanUitvoeringen[0], lid, invulling: o.scanUitvoeringen[0].invullingen[0], assessment: aiVolwassenheid }]);
+    expect(JSON.parse(kolom(csv, "organisatie_kpis"))).toEqual([
+      { onderdeel: "", kanaal: "", kpi: "aht", kpiNaam: "AHT", waarde: 300 },
+      { onderdeel: "Team A", kanaal: "Call", kpi: "aht", kpiNaam: "AHT", waarde: 280 },
+    ]);
+    expect(kolom(csv, "organisatie_kenmerken")).not.toContain("kpis");
+  });
+});
+
 describe("Inzage (AVG)", () => {
   it("geeft één rij per scan, ook onafgeronde, met notities en aangemaakt-op, zonder organisatiekenmerken", () => {
     const o = organisatie(aiVolwassenheid, [scan(aiVolwassenheid, "bezig")]);
@@ -66,6 +83,7 @@ describe("Inzage (AVG)", () => {
     expect(kop).toContain("respondent_notities");
     expect(kop).toContain("respondent_aangemaakt_op");
     expect(kop).not.toContain("organisatie_kenmerken");
+    expect(kop).not.toContain("organisatie_kpis");
     expect(kolom(csv, "status")).toBe("bezig");
     expect(kolom(csv, "respondent_notities")).toBe("Let op");
     expect(csv).not.toContain("abc"); // geen toegangscode

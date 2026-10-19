@@ -1,5 +1,6 @@
 "use client";
 
+import { OnderdeelVeld, onderdeelFout, onderdeelNaamVoorOpslaan } from "@/components/beheer/OnderdeelMeetdatumVelden";
 import { useState } from "react";
 import { useAssessments } from "@/lib/assessment-store";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
@@ -53,7 +54,11 @@ export function SamengesteldeMetingFormulier({
   });
 
   const [assessmentId, setAssessmentId] = useState(bestaande?.assessmentId ?? assessmentIds[0] ?? "");
-  const [onderdeel, setOnderdeel] = useState(bestaande ? onderdeelVan(bestaande) : STANDAARD_ONDERDEEL);
+  const [onderdeelWaarde, setOnderdeelWaarde] = useState<{ onderdeel: string; nieuw?: boolean }>({
+    onderdeel: bestaande ? onderdeelVan(bestaande) : STANDAARD_ONDERDEEL,
+  });
+  const onderdeelProbleem = onderdeelFout(organisatie, { ...onderdeelWaarde, meetdatum: "" });
+  const onderdeel = onderdeelNaamVoorOpslaan(organisatie, { ...onderdeelWaarde, meetdatum: "" });
   const [gekozen, setGekozen] = useState<string[]>(bestaande?.samenstelling ?? []);
   const [fout, setFout] = useState<string | null>(null);
 
@@ -78,6 +83,7 @@ export function SamengesteldeMetingFormulier({
   function opslaan(e: React.FormEvent) {
     e.preventDefault();
     setFout(null);
+    if (onderdeelProbleem) return setFout(onderdeelProbleem);
     if (bestaande) {
       const r = wijzigSamengesteldeMeting(bestaande.id, { onderdeel, metingIds: actueel, minScans: benchmarkMinScans });
       if (!r.ok) return setFout(r.reden);
@@ -124,8 +130,7 @@ export function SamengesteldeMetingFormulier({
         </select>
       </div>
       <div className="admin-field">
-        <label htmlFor="gemiddelde-onderdeel">Onderdeel</label>
-        <input id="gemiddelde-onderdeel" type="text" value={onderdeel} onChange={(e) => setOnderdeel(e.target.value)} />
+        <OnderdeelVeld organisatie={organisatie} waarde={onderdeelWaarde} onChange={setOnderdeelWaarde} idPrefix="gemiddelde" />
         {voorstelLabel && (
           <p className="text-sm text-ink-s" style={{ margin: "0.3rem 0 0" }}>
             Wordt: {voorstelLabel} (meetdatum {toonMeetdatum(meetdatum)}, de laatste van de gekozen Metingen)

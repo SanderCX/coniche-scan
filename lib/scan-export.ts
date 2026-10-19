@@ -71,6 +71,7 @@ export function exporteerScanIndesign({ organisatie, scanUitvoering, lid, invull
     antwoorden: numeriekeAntwoorden(invulling.antwoorden),
     organisatieNaam: organisatie.naam,
     organisatieKenmerken: organisatie.kenmerken,
+    organisatieKpiWaarden: organisatie.kpiWaarden ?? [],
     respondentNaam: lid.naam ?? lid.email,
     respondentFunctie: lid.functie,
     respondentTeam: lid.team,

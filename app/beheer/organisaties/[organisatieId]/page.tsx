@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useOrganisatie, updateOrganisatie, hernoemOrganisatie } from "@/lib/db";
 import { organisatieVelden } from "@/data/organisatie-velden";
 import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
+import { KpiBlok } from "@/components/beheer/KpiBlok";
 import { BenchmarkVlag } from "@/components/beheer/BenchmarkVlag";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { RespondentStatusBadge } from "@/components/beheer/overzicht-helpers";
@@ -255,6 +256,7 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
           <span className={`admin-save-state ${kenmerkenOpgeslagen ? "zichtbaar" : ""}`}>Opgeslagen ✓</span>
         </>
       )}
+      <KpiBlok organisatie={organisatie} />
     </div>
   );
 }

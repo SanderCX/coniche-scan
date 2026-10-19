@@ -1109,3 +1109,228 @@ select.veld-compact {
 .lead-tabel td.lead-tabel-cel input[type="checkbox"] {
   vertical-align: middle;
 }
+
+/* Het veld Onderdeel in de stand "Nieuw onderdeel…": Een tekstveld met een kruisje in het veld dat terugkeert naar de lijst (`beheerpagina.md`, punt 5). */
+.onderdeel-nieuw {
+  position: relative;
+}
+.onderdeel-nieuw input {
+  padding-right: 2.25rem;
+}
+.onderdeel-nieuw-terug {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--ink-s);
+  font-size: var(--fs-18);
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.onderdeel-nieuw-terug:hover {
+  color: var(--ink);
+  background: var(--bg-mid);
+}
+
+/* Het blok KPI's in het organisatie-detail en de modal KPI's invullen (`beheerpagina.md`, punt 4). */
+.kpi-blok {
+  margin: var(--sp-8) 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: var(--sp-4) var(--sp-6) var(--sp-6);
+  background: var(--bg);
+}
+.kpi-kop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-4);
+}
+.kpi-tabel-wrap,
+.kpi-invoer-wrap {
+  overflow-x: auto;
+}
+.kpi-tabel,
+.kpi-invoer {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-14);
+  font-variant-numeric: tabular-nums;
+}
+.kpi-tabel th,
+.kpi-tabel td,
+.kpi-invoer th,
+.kpi-invoer td {
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.kpi-tabel thead th,
+.kpi-invoer thead th {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  color: var(--ink-s);
+  vertical-align: bottom;
+}
+.kpi-tabel .kpi-eerste,
+.kpi-invoer .kpi-eerste {
+  text-align: left;
+  position: sticky;
+  left: 0;
+  background: var(--bg);
+  min-width: 14rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.kpi-tabel .kpi-algemeen {
+  background: var(--bg-warm);
+}
+.kpi-kolomnaam {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  font-size: var(--fs-14);
+  color: var(--ink);
+}
+.kpi-kolomsub {
+  display: block;
+  font-size: var(--fs-12);
+  font-weight: 400;
+  color: var(--ink-s);
+}
+.kpi-naam {
+  display: inline-flex;
+  flex-direction: column;
+}
+.kpi-eenheid {
+  font-size: var(--fs-12);
+  font-weight: 400;
+  color: var(--ink-s);
+}
+.kpi-leeg,
+.kpi-nvt {
+  color: var(--ink-s);
+}
+.kpi-nvt {
+  font-size: var(--fs-12);
+}
+.kpi-chevron,
+.kpi-chevron-leeg {
+  display: inline-block;
+  width: 1.25rem;
+  margin-right: var(--sp-1);
+  border: 0;
+  background: transparent;
+  color: var(--ink-m);
+  cursor: pointer;
+  padding: 0;
+}
+.kpi-kanalen-aantal {
+  margin-left: var(--sp-2);
+  font-size: var(--fs-12);
+  font-weight: 400;
+  color: var(--ink-s);
+}
+.kpi-kanaalnaam {
+  padding-left: calc(var(--sp-3) + 1.5rem);
+  font-weight: 400;
+}
+.kpi-kanaalrij td {
+  color: var(--ink-m);
+}
+.kpi-keuze {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin: var(--sp-4) 0;
+}
+.kpi-keuze-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+  min-width: 11rem;
+}
+.kpi-cel {
+  width: var(--kolom-b);
+  height: var(--control-h);
+  padding: 0 var(--sp-3);
+  text-align: right;
+  font: inherit;
+  border: 1px solid var(--border-d);
+  border-radius: var(--r);
+  background: #fff;
+  color: var(--ink);
+  box-sizing: border-box;
+}
+.kpi-cel:focus {
+  outline: none;
+  border-color: var(--or);
+  box-shadow: 0 0 0 3px var(--or-faint);
+}
+.kpi-cel--nvt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-mid);
+  border-color: var(--border);
+  color: var(--ink-s);
+  font-size: var(--fs-12);
+}
+
+/* De tab KPI's en kanalen (`beheerpagina.md`, punt 3). */
+.kpi-beheer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+.kpi-beheer .kpi-blok {
+  margin: 0;
+}
+.kpi-tekst {
+  width: 14rem;
+  height: var(--control-h);
+  padding: 0 var(--sp-3);
+  font: inherit;
+  border: 1px solid var(--border-d);
+  border-radius: var(--r);
+  background: #fff;
+  color: var(--ink);
+  box-sizing: border-box;
+}
+.kpi-tekst--smal {
+  width: 9rem;
+}
+.kpi-tekst:focus {
+  outline: none;
+  border-color: var(--or);
+  box-shadow: 0 0 0 3px var(--or-faint);
+}
+.kpi-vinkje {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.kpi-kanaal-toevoegen {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+.kpi-kanaal-toevoegen .btn {
+  margin-top: 1.55rem;
+}

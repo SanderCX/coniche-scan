@@ -1,7 +1,7 @@
 import { formatScore } from "@/lib/format";
 import Link from "next/link";
 import { MetingenVergelijking } from "@/lib/benchmark";
-import { onderdeelVan, toonMeetdatum } from "@/lib/metingen";
+import { STANDAARD_ONDERDEEL, onderdeelVan, toonMeetdatum } from "@/lib/metingen";
 import { bouwblokWoorden, matrix, naastElkaarUitAntwoorden, tussenMetingenUitAntwoorden } from "@/lib/visualisatie";
 import { scoreKleur } from "@/lib/colors";
 import { WeergaveVergelijking } from "@/components/visualisatie/WeergaveVergelijking";
@@ -136,8 +136,11 @@ export function MetingenVergelijkingView({
                 weergave={matrix(
                   assessment,
                   metingen.map((m) => ({
-                    label: m.meting.label,
+                    // Eerste regel van de kop: Het onderdeel, want veel Metingen heten gelijk ("0-meting"). Heeft de Meting geen
+                    // onderdeel, dan staat er de naam van de Meting. De tweede regel is de meetdatum, de rest staat in de tooltip.
+                    label: onderdeelVan(m.meting) === STANDAARD_ONDERDEEL ? m.meting.label : onderdeelVan(m.meting),
                     sublabel: toonMeetdatum(m.meting.meetdatum),
+                    volledigeNaam: `${m.meting.label} · ${onderdeelVan(m.meting)}`,
                     aantalScans: m.aantalAfgerond,
                     antwoorden: m.antwoorden,
                   })),

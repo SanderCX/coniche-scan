@@ -1,5 +1,34 @@
 # Coniche Scan — Changelog
 
+## 2026-10-19 (3) — Specs van Joost, PR 129: balklijst, Onderdeel als object en KPI's per plek en kanaal
+
+Op verzoek van Sander gebouwd (`stylesheet.md`, Balklijst; `datamodel.md`, Onderdeel en KPI's en kanalen; `beheerpagina.md`, punt 3 en 4; `visualisatie-verkennen.md`,
+KPI's als kenmerk). De helppagina (`help.md`) is niet gebouwd: De inhoud en de films moeten eerst met Joost worden afgestemd.
+
+**Gedaan**:
+- **Balklijst**: Vaste kolommen voor label, waarde en extra gegevens (`.vis-rij`, `.qv-rij`, `.qv-lijst-rij` met een eigen kolom voor "1 vraag",
+  `.qv-vraag-rij`, `.mm-teaser-rij`), balken van 8, 12 en 16px met een afronding van 4px, vullingen in hele pixels met minstens 4px (`balkVul`), en de gestapelde
+  balk als `Stapel` met het getal pas vanaf 24px en een tooltip. Sporen met even hoogtes (36 en 28px). De controle staat in `lib/balklijst.test.ts`.
+- **Kleinere punten uit PR 129**: De matrix toont het onderdeel op de eerste regel van de kolomkop en de meetdatum op de tweede, de tegels Hoogste en Laagste Meting noemen
+  onderdeel en datum, en de kop boven de rijen is "Bouwblok". Minstens 32px tussen de schakelaar en "Toon als".
+- **Onderdeel als object** (`lib/onderdelen.ts`, `lib/db/onderdelen.ts`): `Organisatie.onderdelen`, `Meting.onderdeelId`, de overgang bij het laden, `maakOnderdeel`,
+  `hernoemOnderdeel` (de Metingen volgen) en `verwijderOnderdeel` (alleen zonder Meting, met de KPI-waarden), gelogd als `onderdeel.aangemaakt`, `.hernoemd` en `.verwijderd`.
+  Het veld Onderdeel is overal een keuzelijst met "Nieuw onderdeel…" (`OnderdeelVeld`, in Meting plannen, Wijzigen, Gemiddelde maken, Scans samenbrengen, de uitnodiging
+  en de import), met `info.metingOnderdeel`.
+- **KPI's en kanalen** (`lib/kpi.ts`, `lib/kpi-beheer.ts`, `lib/db/kpi.ts`): `KpiWaarde`, de definities en kanalen bij de instellingen, de overgang van `kenmerken.kpis` en
+  de zes contactenvelden naar KPI-waarden, het blok KPI's met de tabel, het openklappen per kanaal en de modals voor Onderdelen, "KPI's invullen" en de tab KPI's en kanalen
+  bij Organisatievelden (alleen Admin). Gelogd als `kpi.waardenGewijzigd` (één gebeurtenis per plek, één `groepId`), `kpiDefinitie.*` en `kanaal.*`.
+- **Verkennen**: Eén regel per KPI, met een groep Kanaal bij een KPI met een waarde per kanaal, de waarde van de plek van de eenheid zonder terugval op Algemeen, de naam
+  "AHT Call-drempel", en Ingezette kanalen uit de KPI Contacten per jaar.
+- **Exports en import**: InDesign haalt `kpi…` en `contacten…` uit Algemeen, de CSV heeft de JSON-kolom `organisatie_kpis` (niet in de AVG-inzage) en de import leest die en
+  zet een oudere export met KPI's in `organisatie_kenmerken` om.
+- 45 nieuwe tests.
+
+**Keuzes waar de spec open liet**: `Meting.onderdeel` blijft staan als de naam van het Onderdeel (een kopie die bij elke schrijfactie wordt bijgewerkt) in plaats van te
+vervallen, omdat de naam op tientallen plekken zonder de Organisatie wordt getoond. De test voor de balklijst leest de opmaak en meet niet in een browser. Een KPI-waarde
+heeft geen eenheid in het invoerveld, alleen onder de naam. Bij een kanaal dat een Admin verwijdert, valt een opgeslagen verkenning met dat kanaal in het filter er stil
+omheen (het filter wordt genegeerd). Opslaan als benchmark bewaart geen KPI en kanaal, want Verkennen heeft nog geen filter op bereik.
+
 ## 2026-10-19 (2) — Specs van Joost, PR 127: onderdeel I en J van de scorevisualisaties (ronde B)
 
 Op verzoek van Sander gebouwd (`visualisatie-scores.md`, I en J).
