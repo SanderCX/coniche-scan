@@ -119,6 +119,12 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   samengestelde Meting, de vergelijking, de benchmark tussen organisaties, het
   perspectief van een lid en de hoofdpagina van een Meting, met Toon als
   (Gemiddeld of Naast elkaar met zes vormen) en Spreiding tussen onderdelen.
+- **Radar en staafdiagram** (Joost, PR 141, gebouwd op 19 oktober 2026): De radar met
+  genummerde knooppunten en de namen in een tooltip, het staafdiagram per categorie
+  zonder getal boven de balk (tooltip met naam en klasse), beide naast elkaar in
+  twee kaarten, de top 3 in de tint van de score en de Quickscan-rijen Sterkste en
+  Meeste in de tint van de klasse (`stylesheet.md`, Radar en staafdiagram op het
+  resultaatscherm).
 - **KPI's per plek en kanaal** (gebouwd op 19 oktober 2026, besloten door
   Joost): Een KPI-waarde hoort bij de hele
   organisatie, een Onderdeel of een kanaal, en je vult alleen in wat je weet
@@ -585,7 +591,7 @@ geen afwijking van de spec maar een gat erin.
    ring (`.score-ring`, `stylesheet.md`, Resultaten, besloten op 19 oktober 2026) en
    voortgang, radar van alle bouwblokken en staafdiagram per categorie naast elkaar
    (genummerde knooppunten met de namen in een tooltip, zonder getallen in de balken,
-   voorstel van 19 oktober 2026, `stylesheet.md`, Radar en staafdiagram op het resultaatscherm;
+   gebouwd op 19 oktober 2026, `stylesheet.md`, Radar en staafdiagram op het resultaatscherm;
    het staafdiagram in de categoriekleuren, met de klassegrenzen als stippellijn, gebouwd op 19 oktober 2026, voorheen volgde de kleur de score), top 3 sterktes en verbeterkansen, legenda.
    **Bij AI-volwassenheid** (geen categorielaag, `content-ai-scan.md`)
    vervalt het staafdiagram per categorie: In plaats daarvan "Scores per

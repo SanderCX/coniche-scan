@@ -145,6 +145,8 @@ export interface BouwblokResultaat {
   gewicht: number;
   groepId: string;
   groepNaam: string | null;
+  /** De sleutel van de categoriekleur ("blauw"), voor de knooppunten van de radar (`stylesheet.md`, Radar). */
+  groepKleur?: string | null;
   score: number | null;
 }
 
@@ -152,10 +154,11 @@ export function alleBouwblokResultaten(
   assessment: Assessment,
   antwoorden: Record<string, Antwoord>
 ): BouwblokResultaat[] {
-  return alleBouwblokkenMetGroep(assessment).map(({ bouwblok, groepId, groepNaam }) => ({
+  return alleBouwblokkenMetGroep(assessment).map(({ bouwblok, groepId, groepNaam, groepKleur }) => ({
     bouwblok,
     groepId,
     groepNaam,
+    groepKleur,
     gewicht: gewichtVan(bouwblok),
     score: bouwblokScore(bouwblok, antwoorden),
   }));

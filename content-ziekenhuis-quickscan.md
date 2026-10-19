@@ -233,7 +233,7 @@ Classificatie. Van boven naar beneden:
    chip van die klasse. Links staat de naam van de afdeling in 14px `--ink` en
    rechts het percentage in 16px, gewicht 600, in de tekstkleur van de chip van
    die klasse (`stylesheet.md`, Scorekleuren). Een voorstel van 19 oktober 2026
-   (eerder `--bg-warm` met een neutrale rand). Het hoogste percentage is de sterkste
+   (eerder `--bg-warm` met een neutrale rand), de tint in de klasse gebouwd op 19 oktober 2026 (`KLASSE_STIJL[klasse].vulling`, `.rand` en `.tekst`). Het hoogste percentage is de sterkste
    afdeling, het laagste de meeste ontwikkelruimte. Afdelingen die niet van
    toepassing zijn doen niet mee. Bij gelijkstand staat elke gelijke afdeling als
    eigen rij onder de kop. Is er maar één afdeling van toepassing, of zijn alle

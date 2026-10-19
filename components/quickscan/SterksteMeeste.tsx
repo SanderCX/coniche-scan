@@ -13,7 +13,12 @@ function Kolom({ titel, afdelingen }: { titel: string; afdelingen: AfdelingRij[]
       <h3 className="qs-uitgelicht-kop">{titel}</h3>
       <div className="qs-uitgelicht-rijen">
         {afdelingen.map((a) => (
-          <div key={a.categorie.id} className="qs-uitgelicht-rij">
+          // De rij heeft de tint van de klasse van de afdeling, zoals de chip en de kaart erboven (`content-ziekenhuis-quickscan.md`, Resultaten, 3).
+          <div
+            key={a.categorie.id}
+            className="qs-uitgelicht-rij"
+            style={a.klasse ? { background: KLASSE_STIJL[a.klasse].vulling, borderColor: KLASSE_STIJL[a.klasse].rand } : undefined}
+          >
             <span>{a.categorie.naam}</span>
             <strong style={{ color: a.klasse ? KLASSE_STIJL[a.klasse].tekst : undefined }}>{a.percentage ?? 0}%</strong>
           </div>

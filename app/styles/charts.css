@@ -67,12 +67,264 @@
   }
 }
 
-/* De tooltip van het staafdiagram per categorie: De naam en de klasse. */
+/* De tooltip van de radar en het staafdiagram (`stylesheet.md`, Staafdiagram per categorie): `--ink` met witte tekst, 12px, 8px radius en padding
+   8px 12px, met een pijltje naar het element. Hij verschijnt bij hover en bij toetsenbordfocus. */
 .grafiek-tooltip {
-  padding: var(--sp-2) var(--sp-3);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  display: none;
+  position: absolute;
+  z-index: 30;
+  padding: 8px 12px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 8px;
   font-size: var(--fs-12);
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-align: left;
+  pointer-events: none;
+}
+.grafiek-tooltip strong {
+  display: block;
+  font-weight: 700;
+}
+.grafiek-tooltip span {
+  display: block;
+}
+.grafiek-tooltip::after {
+  content: "";
+  position: absolute;
+  border: 6px solid transparent;
+}
+.cat-balk:hover > .grafiek-tooltip,
+.cat-balk:focus > .grafiek-tooltip,
+.radar-knoop:hover > .grafiek-tooltip,
+.radar-knoop:focus > .grafiek-tooltip {
+  display: block;
+}
+
+/* Staafdiagram per categorie (`components/CategorieStaafdiagram.tsx`): De plot is 520px breed (104px per categorie). */
+.cat-chart {
+  width: 100%;
+}
+.cat-plot {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  max-width: 552px;
+  padding-top: var(--sp-6);
+}
+.cat-as {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 240px;
+  padding-right: var(--sp-2);
+  font-size: var(--fs-12);
+  color: var(--ink-m);
+  text-align: right;
+}
+.cat-as span {
+  line-height: 0;
+}
+.cat-gebied {
+  position: relative;
+  min-width: 0;
+}
+.cat-raster {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 240px;
+}
+.cat-lijn {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--q) * 1%);
+  border-top: 1px solid var(--border);
+}
+.cat-lijn--klasse {
+  border-top: 1px dashed #9a978f;
+}
+.cat-kolommen {
+  position: relative;
+  display: flex;
+}
+.cat-item {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cat-spoor {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 240px;
+}
+.cat-balk {
+  position: relative;
+  width: 56px;
+  height: calc(var(--p) * 1%);
+  padding: 0;
+  border: 0;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+}
+.cat-balk .grafiek-tooltip {
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.cat-balk .grafiek-tooltip::after {
+  top: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border-top-color: var(--ink);
+}
+.cat-naam {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+  white-space: nowrap;
+}
+.cat-uitleg {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+@media (max-width: 640px) {
+  .cat-plot {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 0;
+  }
+  .cat-as {
+    display: none;
+  }
+  .cat-raster {
+    top: 0;
+    bottom: 0;
+    height: auto;
+    left: 128px;
+  }
+  .cat-lijn {
+    top: 0;
+    bottom: 0;
+    left: calc(var(--q) * 1%);
+    right: auto;
+    border-top: 0;
+    border-left: 1px solid var(--border);
+  }
+  .cat-lijn--klasse {
+    border-left: 1px dashed #9a978f;
+  }
+  .cat-kolommen {
+    flex-direction: column;
+    gap: var(--sp-3);
+  }
+  .cat-item {
+    flex-direction: row;
+  }
+  .cat-naam {
+    order: -1;
+    width: 120px;
+    margin: 0 var(--sp-2) 0 0;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cat-spoor {
+    flex: 1;
+    width: auto;
+    height: 28px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .cat-balk {
+    width: calc(var(--p) * 1%);
+    height: 24px;
+    border-radius: 0 6px 6px 0;
+  }
+}
+
+/* Radar met genummerde knooppunten (`components/RadarChartView.tsx`). */
+.radar-vlak {
+  position: relative;
+  width: 100%;
+  max-width: 432px;
+  margin: 0 auto;
+}
+.radar-vlak svg {
+  display: block;
+}
+.radar-knoop {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 2px solid var(--knoop-kleur);
+  border-radius: 50%;
+  background: #fff;
   color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  cursor: pointer;
+}
+.radar-knoop:hover,
+.radar-knoop:focus {
+  background: var(--knoop-kleur);
+  color: var(--knoop-tekst);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--knoop-kleur);
+  z-index: 20;
+}
+.radar-knoop .grafiek-tooltip {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.radar-knoop--rechts .grafiek-tooltip {
+  right: calc(100% + 24px);
+}
+.radar-knoop--links .grafiek-tooltip {
+  left: calc(100% + 24px);
+}
+.radar-knoop--rechts .grafiek-tooltip::after {
+  left: 100%;
+  top: 50%;
+  margin-top: -6px;
+  border-left-color: var(--ink);
+}
+.radar-knoop--links .grafiek-tooltip::after {
+  right: 100%;
+  top: 50%;
+  margin-top: -6px;
+  border-right-color: var(--ink);
+}
+.radar-categorieen {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2) var(--sp-4);
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-12);
+  color: var(--ink-m);
+}
+.radar-categorieen span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.radar-categorieen i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }

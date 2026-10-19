@@ -1075,8 +1075,13 @@ select.veld-compact:focus {
 /* ---------- Top 3 lijstjes ---------- */
 .top3-grid {
   display: grid;
-  gap: 2rem;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--sp-6);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.top3-grid h3 {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-16);
+  font-weight: 700;
 }
 
 .top3-lijst {
@@ -1085,22 +1090,52 @@ select.veld-compact:focus {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: var(--sp-2);
 }
 
 .top3-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.8rem 1rem;
-  border-radius: var(--r);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: 10px;
   background: var(--bg-warm);
   border: 1px solid var(--border);
 }
+.top3-item > span:first-child {
+  font-size: var(--fs-14);
+  color: var(--ink);
+}
 
 .top3-item .score-pill {
-  font-weight: 800;
-  color: var(--kleur);
+  font-size: var(--fs-16);
+  font-weight: 600;
+  color: var(--score-tekst, var(--ink));
+}
+
+/* De radar en het staafdiagram naast elkaar (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm). */
+.resultaat-kaarten {
+  display: grid;
+  grid-template-columns: 480px minmax(0, 1fr);
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-8);
+}
+.resultaat-kaart {
+  min-width: 0;
+  padding: var(--sp-6);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.resultaat-kaart h3 {
+  margin: 0 0 var(--sp-4);
+  font-size: var(--fs-18);
+  font-weight: 700;
+}
+@media (max-width: 1199px) {
+  .resultaat-kaarten {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* ---------- Voortgang resultaten ---------- */
