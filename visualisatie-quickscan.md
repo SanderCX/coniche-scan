@@ -68,7 +68,7 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 
 **Data.** Per afdeling tellen alleen de afgeronde scans waarin de afdeling relevant is. Per scan en bouwblok is de score het aantal Ja gedeeld door het aantal vragen. Het gemiddelde van een bouwblok is het gemiddelde van die scores over de relevante scans. Het gemiddelde van een afdeling komt op dezelfde manier uit de afdelingsscores (punten gedeeld door 15). Het totaal van de Meting is alle punten van alle relevante afdelingen gedeeld door alle mogelijke punten (open punt 2).
 
-**Tegels.** Afgeronde scans (met het aantal uitgenodigden), Totaal van de Meting met de klasse, Sterkste afdeling en Meeste ontwikkelruimte, elk met het gemiddelde.
+**Tegels.** Afgeronde scans (met het aantal uitgenodigden) en Totaal van de Meting met de klasse. Sterkste afdeling en Meeste ontwikkelruimte zijn geen tegels meer (voorstel van 19 oktober 2026): Ze staan als twee kolommen met rijen, zoals Top 3 bij de andere scans (`content-ziekenhuis-quickscan.md`, Resultaten, punt 3), elk met het gemiddelde, onder de afdelingskaarten. De Resultaatkop (`stylesheet.md`) staat bovenaan met het gemiddelde van de Meting in de ring.
 
 **Opbouw per afdeling.** Een kaart met de naam, "Relevant voor x van y respondenten", het gemiddelde van de afdeling en de klasse. Bij een afdeling die voor een deel van de respondenten niet van toepassing is, staat erbij hoeveel dat er zijn. Daaronder een rij per dimensie met:
 

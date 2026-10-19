@@ -271,6 +271,7 @@ Onderdeel {
 - **Verwijderen** kan alleen als er geen Meting aan hangt. De KPI-waarden van het Onderdeel verdwijnen mee, en de bevestiging noemt hoeveel (Verwijderen en datakoppelingen).
 - **Recht.** `organisaties.bewerken`. Aanmaken kan ook met `metingen.plannen`, omdat een Consultant bij het plannen van een Meting een nieuw team moet kunnen noemen.
 - **Zo gebouwd (afwijking: `Meting.onderdeel` blijft).** `Meting.onderdeelId` is er, maar het tekstveld `Meting.onderdeel` is niet vervallen: Het is de naam van het Onderdeel als kopie, zodat een Meting zonder de Organisatie erbij te lezen is en de vele plekken die de naam tonen niet allemaal de Organisatie hoeven op te zoeken. `zorgOnderdelenKloppend` (`lib/onderdelen.ts`) houdt de twee kloppend bij elke keer laden en bij elke schrijfactie (`slaAlles`): De naam bepaalt het Onderdeel (hoofdletterongevoelig, met de spelling van het bestaande Onderdeel), een naam die nog geen Onderdeel is maakt er een aan, en "Hele organisatie" is `null`. Hernoemen (`hernoemOnderdeel`) werkt de kopie en de naam van elke Meting bij, behalve bij `labelHandmatig`. De overgang loopt bij het laden en is stabiel: Een Onderdeel dat uit bestaande data ontstaat, krijgt een id uit een hash van de Organisatie en de naam, tot het is opgeslagen.
+- **Besluit 19 oktober 2026: `Meting.onderdeel` vervalt.** Het is gebouwd als kopie van de naam van het Onderdeel, naast `Meting.onderdeelId`. De spec heeft die kopie niet nodig: De naam komt uit het Onderdeel via `onderdeelId`, en een tweede veld voor dezelfde informatie kan na een hernoeming uit de pas lopen. Op te ruimen: Het veld verdwijnt uit het type, `zorgOnderdelenKloppend` en `hernoemOnderdeel` hoeven de kopie niet meer bij te houden, en de plekken die de naam tonen zoeken het Onderdeel op via `onderdeelId`. De overgang (hieronder) leest de tekst nog één keer om de Onderdelen aan te maken. Hernoemen van een Onderdeel werkt de naam van de Metingen bij, behalve bij `labelHandmatig`, zoals nu.
 
 ### Respondent (in de code: `OrganisatieLid`)
 
@@ -729,7 +730,7 @@ KorteNaam {
 - Een veldnaam heeft zijn korte naam in `VeldDefinitie.korteNaam`. `KorteNaam` is er voor waarden.
 - Een lege of ontbrekende korte naam betekent het origineel.
 - De rij hoort bij de combinatie van veld en waarde. Bij een waarde via "Anders…" ontstaat de rij pas zodra een Admin een korte naam invult. Verdwijnt de waarde uit de lijst en uit alle Organisaties, dan kan de rij weg (Data-integriteit, `beheerpagina.md`, punt 13).
-- De korte naam staat in Verkennen en in andere schermen waar ruimte krap is. Hij staat niet in het organisatie-detail, de exports en de import, want daar blijft het origineel staan.
+- De korte naam staat in Verkennen, in het organisatie-detail (de kaart Kenmerken en de keuzelijsten Sector en Subsector in het formulier, met het origineel in de tooltip) en in andere schermen waar ruimte krap is. Hij staat niet in de exports, de import en de PDF, want daar blijft het origineel staan. Besloten op 19 oktober 2026: Eerder stond het organisatie-detail bij de uitzonderingen, maar de lange SBI-titels in de keuzelijsten waren onwerkbaar.
 - Wijzigen vraagt `content.beheren` (alleen Admin) en wordt gelogd (zie Audit).
 - **Opslag zoals gebouwd.** De korte namen staan niet op de definities (`organisatie-velden.ts` is vaste data) maar bij de
   instellingen: `Instellingen.korteNamen = { velden: { [veldId]: string }, waarden: KorteNaam[] }`, met het veld-id als pad
@@ -924,11 +925,11 @@ KpiWaarde {
    `organisatie_kenmerken`, wordt bij import op dezelfde manier omgezet
    (`import-scans.md`).
 
-**Gevolgen voor andere specs, nog niet uitgewerkt.**
+**Gevolgen voor andere specs, gebouwd op 19 oktober 2026.**
 
 - `export-csv.md`: De kolom `onderdeel` blijft de naam van het Onderdeel.
   `organisatie_kenmerken` bevat de KPI's en de contacten per kanaal niet meer.
-  Voorstel: Een JSON-kolom `organisatie_kpis` met een lijst van onderdeel,
+  Gebouwd: Een JSON-kolom `organisatie_kpis` met een lijst van onderdeel,
   kanaal, KPI en waarde, naast `organisatie_kenmerken`.
 - `import-scans.md`: De kolom `onderdeel` zoekt het Onderdeel bij de Organisatie
   of stelt een nieuw voor (Onderdeel uit het label voorstellen). De kolom

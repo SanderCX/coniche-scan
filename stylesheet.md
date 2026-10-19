@@ -130,7 +130,7 @@ Gevolg van geel: Het contrast met wit is 1,6. De regel dat een categoriekleur le
 
 De Light-variant van geel (`--ye-l`, `#ffcb57`) is te licht om als tweede tint te dienen en blijft ongebruikt.
 
-**Staafdiagram per categorie (gebouwd op 19 oktober 2026).** De balken hebben de categoriekleur, zodat de grafiek dezelfde kleuren heeft als de kaarten op Mijn metingen. De klasse van een categorie staat daarmee niet meer in de balkkleur. De klassegrenzen 2,5 en 3,5 staan als grijze stippellijn (`#9a978f`) door de grafiek met de namen Basis op Orde, Uitbouwen en Sterk punt in `--ink-s`. Het getal staat in 16 px vet boven elke balk. De as loopt van 1 tot 5 en de balk begint op 1, zoals alle schalen van de scores. De band achter de balken (zie Scorekleur hieronder) vervalt in dit diagram.
+**Staafdiagram per categorie (gebouwd op 19 oktober 2026).** De balken hebben de categoriekleur, zodat de grafiek dezelfde kleuren heeft als de kaarten op Mijn metingen. De klasse van een categorie staat daarmee niet meer in de balkkleur. De klassegrenzen 2,5 en 3,5 staan als grijze stippellijn (`#9a978f`) door de grafiek met de namen Basis op Orde, Uitbouwen en Sterk punt in `--ink-s`. Het getal staat boven elke balk in 14 px, gewicht 500, in `--ink` (voorstel van 19 oktober 2026, eerder 16 px vet, dat opviel tegenover de rest van de pagina). De tooltip van een balk toont de naam en de klasse ("Organisatie · Uitbouwen") en niet nog eens het getal, omdat het getal er al staat. Alle vijf de categorienamen staan onder hun balk, op één regel (`white-space: nowrap`, 12 px, `--ink-s`) en worden nooit overgeslagen. Elke categorie krijgt daarvoor minstens 104px breedte, dus de grafiek is minstens 520px breed en een label kan nooit een buurlabel verdringen. Staat er ergens een categorie zonder naam, dan is dat een fout. De as loopt van 1 tot 5 en de balk begint op 1, zoals alle schalen van de scores. De band achter de balken (zie Scorekleur hieronder) vervalt in dit diagram.
 
 De Light-varianten zijn beschikbaar waar een tweede tint nodig is, bijv.
 bij hover.
@@ -691,7 +691,7 @@ tekst aan de linkerkant van de rand af staat. Rechts is de `padding-right`
 `2.5rem`, zodat een lange optie niet onder de chevron doorloopt. Bij focus
 krijgt het veld dezelfde rand en ring als `.field`.
 
-### Bewerken: op de plek of in een modal
+### Bewerken: Op de plek of in een modal
 
 Eén regel voor elke bewerkactie in de app. Een enkel veld bewerk je op de plek
 zelf: Een potlood naast de waarde, die dan een invoerveld met "Opslaan" en
@@ -756,6 +756,24 @@ bekijken/wijzigen" in "Mijn gegevens" houdt zijn naam, want die staat zo in
   zie Categoriekleuren. Het staafdiagram per bouwblok of domein (AI-scan, geen
   categorielaag) houdt de scorekleur per balk (`--score-1` t/m `--score-5`).
   Radar als SVG.
+
+### Resultaatkop
+
+Voorstel van 19 oktober 2026, design in `Claude outputs/resultaatkop/`. Eén kop bovenaan elk resultaatscherm van een scan: De resultaten van een respondent (scherm 6), de resultatenpagina van een Meting en de voorbeeld-output. Hij is voor de schaalscans en de Quickscan dezelfde component, met dezelfde opbouw en maten. Van boven naar beneden:
+
+- **Eyebrow**: 12px, hoofdletters, `--or`. "Jouw resultaat" bij een respondent, "Resultaat van de Meting" bij een Meting en "Voorbeeld-output" in de voorbeeld-output.
+- **Titel**: `.page-title` (32px), de naam van het Assessment, op één regel. Alleen in de voorbeeld-output staat rechts de knop "← Terug" (`CLAUDE.md`, scherm 3).
+- **Subregel**: 14px, `--ink-s`, de gegevens gescheiden door " · ". Bij een respondent de naam, de Meting en de afrondingsdatum ("Joost · Meting oktober 2026 · afgerond op 15 oktober 2026"). Bij een Meting de Meting, de Organisatie en het aantal afgeronde scans.
+- **Totaalkaart** (kaart, 10px radius, padding 24px 32px): Links de ring (`.score-ring`, 128px) met de score erin in 32px (`--fs-32`), gewicht 700, en eronder het label "TOTAALSCORE" in 12px (`--fs-12`) `--ink-s`, in hoofdletters met een letterafstand van `0.04em`. Het getal van 40px past niet rustig in de ring. Bij de schaalscans staat in de ring het getal ("4,1"), bij de Quickscan het percentage ("58%"). Rechts, met 32px ertussen: De klassenaam als chip (gevuld in de klassekleur met de tekstkleur van de klasse, `stylesheet.md`, Scorekleuren), daaronder bij een schaalscan de uitleg van de klasse in 14px `--ink-m` (`CLAUDE.md`, sectie 1, Classificatie), en daaronder de feiten in 14px `--ink-s`, elk op een eigen regel: "60 van 60 vragen beantwoord" of "Gemiddelde van 3 afgeronde scans" bij een schaalscan, en "4 van 4 afdelingen beoordeeld", "{punten} van {maximum} punten" en eventueel "Gemiddelde van 3 afgeronde scans" bij de Quickscan. De Quickscan heeft geen uitleg per klasse.
+- **Kleur**: Alleen de ring en de chip dragen scorekleur. Alle tekst staat in `--ink`, `--ink-m` of `--ink-s`. De klassenaam staat dus niet nog eens als gekleurde tekst naast de ring, en het score-getal niet in kleur.
+- **Wat vervalt**: De losse ring boven de titel (schaalscans) en de kaart met het label "OVERALL VOLWASSENHEID" en de gekleurde klassenaam (Quickscan). De regels over weging en over afdelingen die niet meetellen blijven, onder de feiten, in 14px `--ink-s`.
+
+**Opbouw van de hele pagina** (voorstel van 19 oktober 2026; de designs `01-resultaatkop-schaalscan` en `02-quickscan-meting` tonen de volledige pagina, met de nav). Van boven naar beneden:
+
+- **Respondent (scherm 6)**: De nav van de respondentkant (Visie, Bouwstenen, AI, 2030, een scheidingslijn, "← Terug naar Mijn metingen", een scheidingslijn en "Mijn gegevens"), geen kruimelpad en geen schakelaar. Daaronder de Resultaatkop, de kaart Per categorie met het staafdiagram, Top 3 sterktes en Top 3 verbeterkansen, en de Classificatie.
+- **Meting in beheer (schaalscan en Quickscan)**: De beheer-nav (Assessments, Organisaties, Resultaten, Accountmenu) en het kruimelpad, bijvoorbeeld Resultaten › Bedrijf A › Meting oktober 2026 › Resultaten van de Meting (`beheerpagina.md`, Navigatie in beheer). Daaronder de Resultaatkop met de eyebrow "Resultaat van de Meting", dan de weergave-schakelaar met rechts ervan de knop "Vergelijking" en het Info-icoon (`visualisatie-scores.md`, Navigatie), dan de totaalkaart en de inhoud van de gekozen weergave. Bij de Quickscan zijn dat Scores per afdeling en Sterkste afdeling en Meeste ontwikkelruimte (`content-ziekenhuis-quickscan.md`, Resultaten). De Classificatie staat altijd onderaan.
+- **Classificatie** (`.legenda`): Kop in 18px, gewicht 700, zoals de andere koppen van een sectie. Daaronder de klassen in drie kolommen. Per klasse een stip van 10px in de klassekleur, de naam in 14px, gewicht 700, `--ink`, en de grenzen in 14px `--ink-s`. De naam staat dus niet in kleur. Bij de Quickscan staan de punten per afdeling erbij, bij de schaalscans de scoregrenzen ("Vanaf 3,5").
+- **Eyebrow bij een Meting**: De gebouwde pagina toont hier "OKT 2026". Het voorstel is "Resultaat van de Meting", met de Meting in de subregel, zodat de eyebrow bij elke Resultaatkop hetzelfde soort tekst is.
 
 ### Beheer
 
