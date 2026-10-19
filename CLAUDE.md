@@ -37,6 +37,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `visualisatie-quickscan.md` | Visualisaties van de Quickscan Ziekenhuis in percentages: eigen resultaat (twee standen), gemiddelde en spreiding, antwoorden per vraag en benchmark (besloten op 15 oktober 2026, gebouwd) |
 | `visualisatie-mijn-metingen.md` | Opmaak van de landingspagina "Mijn metingen" voor Respondent en Lead: kaarten, statussen, teaser van de uitkomst, respons, benchmarkkaart (voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026) |
 | `visualisatie-verkennen.md` | Admin-scherm Verkennen onder Resultaten: filteren, groeperen en vergelijken van alle Organisaties van één Assessment, met vier weergaven (besloten en gebouwd op 15 oktober 2026) |
+| `help.md` | De helppagina in de app. Een regel Help in het menu, uitleg per rol met illustratie, als Markdown-bestanden in `help/` (voorstel van 19 oktober 2026, ontworpen, nog niet gebouwd) |
 | `backlog.md` | Bewust nog niet opgepakt |
 | `go-live-plan.md` | Actielijst naar productie |
 | `azure-plan.md` | Aanvulling op `go-live-plan.md` met de stappen voor de Azure-omgeving (Azure DevOps, Azure SQL, `coniche-scan.nl`) |
@@ -56,6 +57,8 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
   tekst eronder (`stylesheet.md`, Info-icoon). Elke Info-icoon-tekst heeft
   een initiële waarde en is door een Admin aan te passen op de plek zelf
   (`beheerpagina.md`, punt 2a, Algemene teksten).
+- Verandert een spec iets wat een gebruiker ziet of doet, dan gaat het
+  bijbehorende helpbestand in `help/` mee (`help.md`, Actueel houden).
 - Een actie is een knop en geen link. Links zijn er alleen voor navigatie:
   kruimelpad, header, footer en verwijzingen in lopende tekst
   (`stylesheet.md`, Knoppen en links).
@@ -116,6 +119,15 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   samengestelde Meting, de vergelijking, de benchmark tussen organisaties, het
   perspectief van een lid en de hoofdpagina van een Meting, met Toon als
   (Gemiddeld of Naast elkaar met zes vormen) en Spreiding tussen onderdelen.
+- **KPI's per plek en kanaal** (voorstel van 19 oktober 2026, besloten door
+  Joost, ontworpen, nog niet gebouwd): Een KPI-waarde hoort bij de hele
+  organisatie, een Onderdeel of een kanaal, en je vult alleen in wat je weet
+  (`datamodel.md`, Onderdeel en KPI's en kanalen). Het Onderdeel wordt een eigen
+  object en vervangt de tekst op de Meting. In het organisatie-detail staat een
+  eigen blok KPI's en een modal "KPI's invullen" (`beheerpagina.md`, punt 4). De
+  KPI's en kanalen zelf beheert een Admin (punt 3), en Verkennen kiest per KPI
+  een kanaal (`visualisatie-verkennen.md`, KPI's als kenmerk). Het design staat
+  in `Claude outputs/kpi-design/`: Zes borden als `.dc.html` met een PNG per bord.
 - **Opmaakronde**: Besloten door Joost en gebouwd op 15 oktober 2026
   (`stylesheet.md`). Acht lettergroottes in even px (12, 14, 16, 18,
   24, 32, 40, 48) in plaats van zo'n 17 maten, met de paginatitel op 32px.
@@ -138,7 +150,9 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
 In de interface en in alle specs: **Organisatie**, **Meting** (een
 afname van één scan-type bij één organisatie, voor één onderdeel op één meetdatum), **Respondent** (de
 persoon), **Ingevulde scan** (één invulling door één respondent binnen
-één meting). Niet "leden" of "scanuitvoering". In de code heten sommige
+één meting), **Onderdeel** (een deel van een Organisatie met een eigen naam en
+eigen KPI-waarden, voorstel van 19 oktober 2026). Niet "leden" of
+"scanuitvoering". In de code heten sommige
 typen nog anders; dat staat in het datamodel.
 
 ---
@@ -339,7 +353,11 @@ geen afwijking van de spec maar een gat erin.
    blok "Praktische informatie" met invultijd, direct resultaat en
    privacy. "Start assessment" staat direct onder de hero maar is
    uitgeschakeld, met de uitleg dat toegang via een persoonlijke link
-   loopt. Verderop "Bekijk wat je krijgt" (naar scherm 3). Deze pagina
+   loopt. Tussen de hero en "Praktische informatie" staat de film "Wat
+   krijg ik" met stapkaarten (`help.md`, Films), met daaronder de knop
+   "Bekijk de voorbeeld-output" naar scherm 3. Die knop vervangt de link
+   "Bekijk wat je krijgt" verderop op de pagina. Alle cijfers in de film
+   zijn voorbeelddata. Deze pagina
    wordt later mogelijk een leadgenerator met "Toegang aanvragen"
    (`backlog.md`).
 3. **Voorbeeld-output**: Dezelfde resultaatcomponenten als scherm 6, met
@@ -474,7 +492,10 @@ geen afwijking van de spec maar een gat erin.
      van `Respondent`. Hergebruik van het intake-formulier, geen nieuw
      formulier bouwen. Opslaan schrijft direct naar `Respondent`, geen
      aparte bevestigingsstap.
-   - **Dropdown-inhoud, rij 2, klikbaar**: "Uitloggen" → navigeert naar
+   - **Dropdown-inhoud, rij 2, klikbaar**: "Help" → opent de helppagina
+     voor Respondent en Lead (`help.md`). Voorstel van 19 oktober 2026,
+     nog niet gebouwd. "Uitloggen" schuift daardoor naar rij 3.
+   - **Dropdown-inhoud, laatste rij, klikbaar**: "Uitloggen" → navigeert naar
      het nieuwe scherm "Toegang" (zie hieronder) en wist de lokale
      respondent-sessie in deze browser (de `code` die aan deze sessie
      gekoppeld is, zie `datamodel.md`, Toegangscode). Respondenten

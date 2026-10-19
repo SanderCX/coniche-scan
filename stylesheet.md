@@ -117,11 +117,11 @@ Stand van `tokens.css`, aangevuld met `--nav-h`:
 - Mens: `--gr`
 - Fundament: `--fu`
 
-**Besloten door Joost en gebouwd op 19 oktober 2026, ontworpen in "Coniche Scan Mijn metingen" (bord Kaart en Per categorie).** Fundament wordt het merkgeel (`--ye`, `#ffc043`), zodat de vijf categorieën de merkkleurfamilies volgen: oranje, blauw, paars, groen en geel. Daarvoor stond Fundament op antraciet, en samen met het donkere paars van Proces & Tech was dat te somber en te gelijkend. Een verdiept geel of oker is geprobeerd en afgekeurd, want dat oogde bruin.
+**Besloten door Joost en gebouwd op 19 oktober 2026, ontworpen in "Coniche Scan Mijn metingen" (bord Kaart en Per categorie).** Fundament wordt het merkgeel (`--ye`, `#ffc043`), zodat de vijf categorieën de merkkleurfamilies volgen: Oranje, blauw, paars, groen en geel. Daarvoor stond Fundament op antraciet, en samen met het donkere paars van Proces & Tech was dat te somber en te gelijkend. Een verdiept geel of oker is geprobeerd en afgekeurd, want dat oogde bruin.
 
 Gevolg van geel: Het contrast met wit is 1,6. De regel dat een categoriekleur leesbaar is als tekst op wit en onder witte tekst geldt daarom niet voor Fundament.
 
-- Fundament is alleen een vulling: een balk, een stip, een accentrand, een rondje.
+- Fundament is alleen een vulling: Een balk, een stip, een accentrand, een rondje.
 - Tekst in of bij een Fundament-vulling staat in `--ink`. Witte tekst op Fundament is niet toegestaan. Bij Proces & Tech en de andere vier blijft witte tekst op de kleur zoals nu.
 - Een dunne lijn of tekst in de kleur zelf (bijvoorbeeld een kopje in de categoriekleur) gebruikt voor Fundament `--ink`.
 - Een stip in Fundament op een lichte achtergrond heeft de witte rand van 2 px die alle stippen hebben, zodat hij zichtbaar blijft.
@@ -895,6 +895,9 @@ in een tooltip) en de lijst Respondenten zijn het voorbeeld.
   voor een kort gegeven als "n = 11". Al het andere staat in de tooltip:
   de volledige naam, het label en de meetdatum van de Meting en het aantal
   scans. Een tooltip volgt het patroon van de initialen in Antwoorden.
+  Bij Metingen als kolom is de eerste regel het onderdeel en de tweede de
+  meetdatum, omdat de naam van de Meting (bijvoorbeeld "0-meting") vaak voor
+  alle kolommen gelijk is (`visualisatie-scores.md`, onderdeel E).
 - **Namen van Organisaties in een kop**: De korte naam van de Organisatie
   (`Organisatie.korteNaam`, optioneel, `datamodel.md`) en anders de naam zelf.
 - **Rijkop** (bouwblok, vraag, groep): Eén regel, `white-space: nowrap`, met
@@ -909,6 +912,21 @@ in een tooltip) en de lijst Respondenten zijn het voorbeeld.
   is, een kolom die breder wordt dan 96px en een rijkop die op twee regels
   breekt.
 
+
+### Balklijst (rijen met een balk)
+
+Voorstel van 19 oktober 2026. Joost zag op de landingspagina en in de Quickscan balken die optisch niet even breed of hoog waren. Een kolom die de breedte van zijn inhoud aanneemt, geeft dat effect, en dit is de regel die het voorkomt. Elke lijst met balken (de categorieën op Mijn metingen, de afdelingen en bouwblokken van de Quickscan, de rijen van de benchmark, de gestapelde balken bij Antwoorden) volgt deze regels.
+
+- **Drie kolommen met een vaste breedte.** Elke rij is een raster met een label, een spoor en een waarde. Het label en de waarde hebben een vaste breedte per lijst en het spoor neemt de rest (`1fr`). Een kolom neemt nooit de breedte van de inhoud aan. Zo begint en eindigt het spoor in elke rij op dezelfde plaats, ook als het label of de waarde in de ene rij langer is.
+- **Extra gegevens.** Een aanvulling als "2 vragen" of "n.v.t." heeft een eigen kolom met een vaste breedte en staat nooit in dezelfde cel als de waarde. Anders is de waardekolom per rij anders breed en verschuift het spoor.
+- **Label.** Eén regel, afgekapt met een tooltip voor de volledige tekst (`Kolomkop en rijkop`). Een lang label ("Verpleegafdelingen · Mensen") maakt het spoor niet korter.
+- **Waarde.** Rechts uitgelijnd, met cijfers van gelijke breedte (`font-variant-numeric: tabular-nums`).
+- **Hoogte.** Eén hoogte per lijst, in even pixels, zodat de rand scherp is: 8px in een compacte lijst (Mijn metingen, categorieën), 12px in een lijst met afdelingen of bouwblokken, 16px in een gestapelde balk. De hoogte hangt niet af van de inhoud of van de kleur.
+- **Lengte.** De balk is een percentage van het spoor, op de schaal van de weergave (1 tot 5 bij scores, 0 tot 100% bij percentages). De lengte wordt afgerond op hele pixels. Een waarde boven nul krijgt minstens 4px, zodat een lage score zichtbaar blijft. Bij een waarde van nul staat alleen het spoor.
+- **Uiteinden.** Alle uiteinden van een balk hebben dezelfde afronding (4px, nooit meer dan de halve hoogte). Een rand of schaduw maakt een balk niet dikker. Een lichte kleur zoals het merkgeel krijgt dezelfde hoogte en geen rand, en het getal ernaast draagt de leesbaarheid.
+- **Gestapelde balk (Ja, Nee en Weet ik niet).** Het hele spoor is in elke rij even breed en de segmenten verdelen het naar verhouding. Een getal staat alleen in het segment als het segment minstens 24px breed is. Anders staat het in de tooltip. Een antwoord dat niemand gaf, heeft geen segment.
+- **Sporen op één lijn.** Staan twee blokken naast elkaar (zoals Jouw scan en Hele meting), dan hebben ze dezelfde breedte voor label en waarde, zodat de sporen op één lijn staan.
+- **Controle.** Een test meet in elke lijst de breedte en de hoogte van de sporen en balken en faalt als die in één lijst verschillen.
 
 ### Filterchip, focuschip en slider (Verkennen)
 

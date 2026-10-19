@@ -70,10 +70,12 @@ losse elementen naast elkaar.
   tussen haakjes (bijv. "admin@coniche.nl (Consultant)"). Voor elke rol
   daarna de klikbare rij "Mijn account" (zie Mijn account hieronder) en voor
   een Admin daaronder de klikbare rij "Instellingen", die de pagina
-  Instellingen opent (zie Instellingen hieronder). Boven de laatste rij
+  Instellingen opent (zie Instellingen hieronder). Daaronder staat voor elke
+  rol de klikbare rij "Help", die de helppagina opent (`help.md`, voorstel van
+  19 oktober 2026, nog niet gebouwd). Boven de laatste rij
   staat een scheidingslijn. Laatste rij, klikbaar: "Uitloggen". Een
   Consultant heeft geen rij "Instellingen": Zijn menu bestaat uit de eerste
-  rij, "Mijn account" en "Uitloggen". Functionaliteit van uitloggen blijft
+  rij, "Mijn account", "Help" en "Uitloggen". Functionaliteit van uitloggen blijft
   ongewijzigd ten opzichte van nu.
 - **Actieve staat**: Zolang een pagina onder Instellingen open is, heeft de
   knop van het Accountmenu een duidelijke actieve staat, zoals een actieve
@@ -425,7 +427,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.positieMeting` | Resultaten van één scan, naast de uitgeschakelde weergave "Positie in de Meting" | De positie van een scan tegenover de andere scans in de Meting is er pas bij voldoende afgeronde scans. Bij minder is een scan te herleiden naar een persoon. Het minimum staat bij Drempels en termijnen (aantal respondenten per Meting). |
 | `info.mijnAccountWachtwoord` | Mijn account, naast de uitgeschakelde knop "Wachtwoord wijzigen" | Wachtwoord wijzigen komt met de echte inlog. Tot die tijd vraag je een Admin om je wachtwoord te wijzigen. |
 | `info.benchmarkInstellingen` | Instellingen, Drempels en termijnen, formulier Benchmark | Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. Het aantal dagen tussen Metingen is voor een vergelijking met de lezing Naast elkaar: Liggen de meetdata verder uit elkaar, dan krijg je bij het opslaan een waarschuwing. Opslaan blijft mogelijk. |
-| `info.verkennen` | Verkennen, naast de paginatitel | Verkennen werkt op de pool van één Assessment: De Organisaties met toestemming voor benchmark die een Meting hebben met genoeg afgeronde scans, de meest recente per Organisatie. Elke Organisatie telt even zwaar mee. Het scherm slaat niets op en een Lead ziet het nooit. |
+| `info.verkennen` | Verkennen, naast de paginatitel | Verkennen werkt op de pool van één Assessment: De Organisaties met toestemming voor benchmark die een Meting hebben met genoeg afgeronde scans, per Organisatie de Meting die telt volgens de Meetperiode, of de meest recente als je geen periode kiest. Elke Organisatie telt even zwaar mee. Het scherm slaat niets op en een Lead ziet het nooit. |
 | `info.verkennenDrempels` | Instellingen, Drempels en termijnen, formulier Verkennen | Een groep met minder organisaties dan het minimum is gestreept en krijgt in de heatmap geen cijfers. Heeft de focus of de rest minder organisaties dan de waarschuwingsgrens, dan staat er een waarschuwing dat verschillen voorzichtig gelezen moeten worden. Dat is geen blokkade. |
 | `info.benchmarkVlag` | Organisatie-detail, bij de schakelaar "Doet mee aan benchmark" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks. |
 | `info.leadToegangCel` | Leads-venster van de organisatie, in een grijze cel | De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark. Bij een Verkenning met te weinig Organisaties staat er: "Te weinig Organisaties in deze groep: {n}, minimaal {min}." |
@@ -438,10 +440,16 @@ standaardteksten zoals ze nu in de app staan):
 | `info.verkennenInstellingen` | Instellingen, Drempels en termijnen, formulier Verkennen | Grenzen voor Verkennen. Een groep onder het minimum is gestreept en krijgt geen cijfers. Bij een kleinere focus of rest staat een waarschuwing. In een kleinere pool kun je niet groeperen. Een kenmerk met meer waarden dan het maximum of een lagere invulling dan het minimum kan niet groeperen. |
 | `info.verkennenKenmerken` | Verkennen, kaart Kenmerken, naast de titel | Zet hier een kenmerk neer om op te filteren en om op te groeperen. Een kenmerk zonder gekozen waarde filtert niets. Filteren op bereik bij getallen volgt later. |
 | `info.verkennenGroeperen` | Verkennen, naast het label Groeperen op | Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties. Is er nog geen kenmerk, dan staat er: Er is nog geen kenmerk om op te groeperen. Voeg bij Kenmerken een kenmerk toe, dan kun je de Organisaties erop in groepen verdelen. |
-| `info.verkennenEenheid` | Verkennen, naast het label Eenheid | Kies waarover je vergelijkt. Bij Organisaties telt elke Organisatie één keer, met één Meting (zie Meetperiode). Bij Onderdelen telt elk onderdeel van een Organisatie apart, en elk onderdeel telt even zwaar mee. |
+| `info.verkennenEenheid` | Verkennen, naast het label Eenheid | Kies waarover je vergelijkt. Bij Organisaties telt elke Organisatie één keer, met de Meting uit de Meetperiode. Bij Onderdelen telt elk onderdeel van een Organisatie apart, en elk onderdeel telt even zwaar mee. Een samengestelde Meting telt bij Onderdelen niet mee. |
 | `info.verkennenMeetperiode` | Verkennen en het wijzigen van een opgeslagen verkenning, naast het label Meetperiode | Per Organisatie telt de laatste Meting met een meetdatum in deze periode. Zo kun je ronde 1 blijven vergelijken, ook als ronde 2 al deels binnen is. Zonder periode telt de meest recente Meting. Een Organisatie zonder Meting in de periode doet niet mee. |
 | `info.verkennenOpslaan` | Verkennen, naast de knop Opslaan als benchmark | Je slaat de filters op en niet de uitkomst. De groep volgt de filters: Komt er een Organisatie bij die erbij past, dan telt die mee. Daarna wijs je de benchmark toe aan een Lead van een Organisatie die erin zit, in het Leads-venster van die Organisatie. |
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
+| `info.kpiBlok` | Organisatie-detail, blok KPI's, naast de titel (voorstel van 19 oktober 2026) | Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet. |
+| `info.kpiPlek` | Modal KPI's invullen, naast het label Plek | Kies voor welk deel van de organisatie je invult. Algemeen is de hele organisatie. |
+| `info.kpiKanalen` | Modal KPI's invullen, naast het label Kanalen uitsplitsen | Kies alleen de kanalen waarvoor je cijfers hebt. De kolom Algemeen blijft altijd staan. |
+| `info.kpiDefinities` | Organisatievelden, tab KPI's en kanalen, naast de titel KPI's | Per KPI bepaal je of hij per onderdeel en per kanaal ingevuld mag worden. Algemeen is altijd mogelijk. |
+| `info.kanalen` | Organisatievelden, tab KPI's en kanalen, naast de titel Kanalen | De lijst met kanalen die bij een KPI kunnen staan. Een kanaal telt als ingezet bij een volume boven 0. |
+| `info.metingOnderdeel` | Meting plannen en de andere formulieren met een veld Onderdeel, naast het label Onderdeel | Kies een onderdeel van deze organisatie of maak een nieuw onderdeel aan. Een nieuw onderdeel verschijnt ook als kolom bij de KPI's. |
 
 Elk nieuw Info-icoon krijgt hier een regel en een regel in
 `data/info-teksten.ts`. Een standaardtekst bevat geen verwijzing naar een
@@ -755,8 +763,9 @@ Teksten die niet aan één Assessment hangen (zoals de introtekst op
 #### 3. Organisatievelden
 
 De organisatievelden uit `datamodel.md` (volume en klantbasis,
-digitalisering, techstack, FTE, KPI's) worden zelf ook beheerbaar: Label,
-type en vaste antwoordcategorieën.
+digitalisering, techstack, FTE) worden zelf ook beheerbaar: Label,
+type en vaste antwoordcategorieën. De KPI's en de kanalen hebben sinds het
+voorstel van 19 oktober 2026 een eigen tab (KPI's en kanalen, hieronder).
 
 Dit punt gaat over de definitie van de velden en is Admin-only
 (`content.beheren`, Rechtenmatrix). Een Consultant ziet dit onderdeel
@@ -771,7 +780,8 @@ het antwoord daarom zelf kunnen vastleggen.
 "Activiteiten op het gebied van financiële dienstverlening en verzekeringen"
 zijn te lang voor de chips en lijsten van Verkennen. Een Admin geeft ze hier een
 korte naam (`visualisatie-verkennen.md`, Korte namen). De pagina heeft een
-schakelaar Velden | Korte namen (`.weergave-wissel`), en de tweede weergave is
+schakelaar Velden | KPI's en kanalen | Korte namen (`.weergave-wissel`, de
+middelste tab is een voorstel van 19 oktober 2026), en de derde weergave is
 een tabel met de kolommen Soort (Veldnaam of Waarde), Veld, Origineel, Korte
 naam en In gebruik.
 
@@ -794,6 +804,36 @@ naam en In gebruik.
   wordt gelogd als `korteNaam.gewijzigd` (`datamodel.md`, Audit).
 - **Uitleg**: In een Info-icoon (`info.korteNamen`, punt 2a), niet als vaste
   tekst. Het visual design toont hem als vaste tekst.
+
+**KPI's en kanalen (voorstel van 19 oktober 2026, ontworpen, nog niet
+gebouwd).** De tab voor de definities uit `datamodel.md`, KPI's en kanalen.
+Alleen voor een Admin (`content.beheren`). Het design staat in
+`Claude outputs/kpi-design/`, bord 4.
+
+- **Kaart KPI's.** Titel met een Info-icoon (`info.kpiDefinities`) en rechts de
+  knop "+ KPI toevoegen" (`.btn-or .btn-compact`). Daaronder een tabel met de
+  kolommen Naam (invoerveld), Eenheid (invoerveld), Per onderdeel (vinkje), Per
+  kanaal (vinkje) en Korte naam (invoerveld, met de naam als placeholder). De
+  rijen staan in de volgorde van aanmaken.
+- **Vinkjes.** Een vinkje staat uitgeschakeld zolang er waarden op dat niveau
+  staan, met de reden en het aantal waarden in een Info-icoon
+  (`datamodel.md`, KPI's en kanalen, Wat een KPI mag).
+- **Kaart Kanalen.** Titel met een Info-icoon (`info.kanalen`). Elk kanaal is
+  een verwijderbare keuzepil (`.pil` met kruisje, `stylesheet.md`), in de
+  volgorde van de lijst. Daaronder een invoerveld "Nieuw kanaal" en de knop "+
+  Kanaal toevoegen" (`.btn-or .btn-compact`). Een naam die hoofdletterongevoelig
+  al bestaat, geeft een melding bij het veld. Toevoegen en verwijderen gebeuren
+  direct. Het kruisje opent de bevestigingsmodal, die het aantal waarden en
+  Organisaties noemt (`datamodel.md`, Verwijderen en datakoppelingen).
+- **Opslaan.** De wijzigingen in de tabel KPI's gaan op "Opslaan", met
+  "Annuleren" ernaast (`.btn-or .btn-compact` en `.btn-outline .btn-compact`),
+  zoals bij Korte namen. Het design toont deze knoppen niet.
+- **Recht en log.** `content.beheren`. Gelogd als `kpiDefinitie.aangemaakt`,
+  `kpiDefinitie.gewijzigd`, `kanaal.aangemaakt` en `kanaal.verwijderd`, en voor
+  de korte naam als `korteNaam.gewijzigd` (`datamodel.md`, Audit).
+- **Nog niet besloten, niet in het design.** Het hernoemen van een kanaal, het
+  verwijderen van een KPI-definitie en het wijzigen van de volgorde van KPI's
+  en kanalen.
 
 #### 4. Organisaties
 
@@ -881,6 +921,77 @@ naam en In gebruik.
   filter Organisatie al ingesteld op deze organisatie (in de URL, zoals de
   andere filters). Zijn het er 5 of minder, dan is er geen link. Er komt
   geen link naar de lijst over alle organisaties heen.
+- **KPI's** (voorstel van 19 oktober 2026, ontworpen, nog niet gebouwd; design
+  in `Claude outputs/kpi-design/`, bord 1 en 2): Een eigen kaart onder de
+  Kenmerken. De KPI's en de contacten per kanaal staan niet meer bij de
+  Kenmerken (`datamodel.md`, KPI's en kanalen). De Kenmerken zelf zijn in het
+  design een compacte lijst met "Bewerken". Dat is een illustratie, want de
+  spec van de Kenmerken verandert alleen doordat de KPI's eruit zijn.
+  - **Kop**: De titel KPI's met een Info-icoon (`info.kpiBlok`). Rechts "+
+    Onderdeel toevoegen" (`.btn-or .btn-compact`) en "KPI's invullen"
+    (`.btn-outline .btn-compact`). Beide vragen `organisaties.bewerken`. "+
+    Onderdeel toevoegen" opent een basismodal met het veld Naam, "Annuleren" en
+    "Opslaan". Die modal staat niet in het design.
+  - **Tabel**: In de eerste kolom de KPI's in de volgorde van de definities.
+    Daarna de kolom Algemeen en dan de Onderdelen op alfabet. Algemeen heeft
+    `--bg-warm` als achtergrond. De tabel staat in een vak met `overflow-x:
+    auto`, met de eerste kolom vast (`position: sticky; left: 0`) zodra de
+    tabel breder is dan het vak.
+  - **Kolomkop**: De volledige naam, zonder korte naam (korte namen staan niet
+    in het organisatie-detail). Eronder "n van m ingevuld" in 12px. Daarin is n
+    het aantal KPI's met een waarde bij het kanaal Algemeen voor die plek, en
+    m het aantal KPI's dat op die plek mag (bij Algemeen alle KPI's, bij een
+    Onderdeel de KPI's met `perOnderdeel`). Bij een Onderdeel staat een potlood
+    (`aria-label` "Onderdeel wijzigen") dat een basismodal opent met de naam,
+    "Verwijderen" (`.btn-danger`, uitgeschakeld zolang er Metingen zijn, met de
+    reden), "Annuleren" en "Opslaan". Dat potlood en die modal staan niet in het
+    design.
+  - **Cel**: De waarde, rechts uitgelijnd, met tabelcijfers. Een lege cel is
+    een streepje in grijs. Mag de KPI niet op die plek (`perOnderdeel` uit),
+    dan staat er "n.v.t." in grijs.
+  - **Kanalen per KPI**: Een KPI met `perKanaal` en minstens één kanaalwaarde in
+    de tabel heeft voor de naam een chevron en achter de naam "n kanalen" in
+    12px grijs, met n het aantal kanalen met minstens één waarde. Een klik
+    klapt de KPI open: Per kanaal met minstens één waarde een rij, in de
+    volgorde van de kanalenlijst, met een streepje bij lege cellen. Een KPI
+    zonder kanaalwaarden heeft geen chevron. Standaard staat elke KPI dicht en
+    de stand wordt niet bewaard.
+  - **Zonder Onderdelen**: Dan toont de tabel alleen de kolom Algemeen, met
+    eronder de regel "Er zijn nog geen onderdelen. De waarden gelden voor de
+    hele organisatie en voor alle kanalen samen."
+- **KPI's invullen** (voorstel van 19 oktober 2026, ontworpen, nog niet gebouwd;
+  design bord 3): Een modal in plaats van een zijpaneel, omdat de specs alleen
+  de modal kennen voor een formulier met "Annuleren" en "Opslaan" (zoals de modal
+  Korte namen). `.modal-box--breed` (maximaal 720px), met `max-height: 88vh` en
+  scrollen binnen de modal.
+  - **Kop**: De titel "KPI's invullen" als `h2` van 18px
+    (`.modal-overlay .modal-box h2`), met de naam van de Organisatie eronder
+    in 14px, en een kruisje. Sluiten werkt ook met Esc en een klik naast de
+    modal.
+  - **Plek**: Een pilvormige groep (`.pil-groep`, `stylesheet.md`) met Algemeen
+    en daarna de Onderdelen op alfabet, met een Info-icoon (`info.kpiPlek`).
+    Algemeen staat gekozen bij het openen. Een Organisatie zonder Onderdelen
+    toont geen groep.
+  - **Kanalen uitsplitsen**: Keuzepillen (`.pil`, meerdere tegelijk te kiezen)
+    voor elk kanaal van de lijst, met een Info-icoon (`info.kpiKanalen`). Een
+    kanaal met een ingevulde waarde bij deze plek staat gekozen. Je kunt het pas
+    uitzetten als zijn kolom leeg is, anders staat de pil uitgeschakeld met de
+    reden. Een KPI zonder `perKanaal` heeft geen kolom per kanaal.
+  - **Invoertabel**: De KPI's in de rijen, in de volgorde van de definities.
+    Onder de naam staat de eenheid in 12px, behalve bij "aantal" en bij een lege
+    eenheid. De kolommen zijn Algemeen en daarna de gekozen kanalen, in de
+    volgorde van de kanalenlijst. Elke cel is een invoerveld (`.field`, 96px,
+    rechts uitgelijnd, `stylesheet.md`, Formulieren), met een streepje als
+    placeholder. Een cel waar de KPI niet mag (geen `perKanaal` in een
+    kanaalkolom, geen `perOnderdeel` bij een Onderdeel) is een grijs vak met
+    "n.v.t." dat de focus niet krijgt. Een cel leegmaken wist de waarde.
+  - **Concept**: Wisselen van plek behoudt wat is ingevuld. Eén "Opslaan"
+    bewaart de wijzigingen van alle plekken, "Annuleren" gooit ze allemaal weg.
+    Beide staan rechts in een `.btn-rij` onderaan, "Annuleren" als
+    `.btn-outline .btn-compact` en "Opslaan" als `.btn-or .btn-compact`.
+  - **Slot en log**: Openen neemt het Bewerkslot van de Organisatie
+    (`datamodel.md`, Bewerkslot). Opslaan logt `kpi.waardenGewijzigd`, één
+    gebeurtenis per plek met wijzigingen.
 - **Data ouder dan de bewaartermijn** (`datamodel.md` deel 2,
   Bewaartermijn ingevulde scans). De twee instellingen (bewaartermijn en
   verlengtermijn) staan bij Drempels en termijnen (punt 10) en zijn Admin-only.
@@ -976,9 +1087,9 @@ door wat hieronder staat. Zie Overgang aan het eind van dit punt.
 **Wat je invult.** Bij aanmaken drie velden: Assessment-type, Onderdeel en
 Meetdatum (`datamodel.md`, Meting). Alle drie zijn verplicht.
 
-- **Onderdeel**: Een tekstveld, voorgevuld met "Hele organisatie", met als
-  suggesties de onderdelen die deze organisatie al heeft ("Team A", "Team B"),
-  zodat dezelfde naam niet op twee manieren wordt gespeld.
+- **Onderdeel**: Een keuzelijst, voorgevuld met "Hele organisatie"
+  (voorstel van 19 oktober 2026, design bord 5a en 5b; gebouwd was een
+  tekstveld met suggesties). Zie Het veld Onderdeel hieronder.
 - **Meetdatum**: Een datumveld, leeg bij aanmaken, zodat de gebruiker bewust
   een datum kiest. Een datum in de toekomst mag, want een Meting kan vooraf
   worden gepland.
@@ -993,6 +1104,34 @@ Meetdatum (`datamodel.md`, Meting). Alle drie zijn verplicht.
   op één lijn, en "+ Meting plannen" staat op de hoogte van de velden. De regel
   "Wordt: …" verschuift niets in de rij (`stylesheet.md`, Formulieren,
   Veldenrij met labels en een knop).
+
+**Het veld Onderdeel** (voorstel van 19 oktober 2026, ontworpen, nog niet
+gebouwd). Het onderdeel is een Onderdeel van de Organisatie (`datamodel.md`,
+Onderdeel), en geen tekst meer. Het veld is overal dezelfde keuzelijst: In "+
+Meting plannen", in Wijzigen van een Meting, in "Gemiddelde maken", in "Scans
+samenbrengen" (punt 6b) en bij de import (punt 8).
+
+- **Opties**: Eerst "Hele organisatie", dan de Onderdelen van deze Organisatie
+  op alfabet (hoofdletterongevoelig), dan een scheidingslijn en onderaan
+  "Nieuw onderdeel…". Dat is dezelfde volgorde als bij "Anders…"
+  (`datamodel.md`, Organisatievelden). De gekozen optie heeft een vinkje. De
+  scheidingslijn mag ontbreken als de browser hem in een `select.field` niet
+  toont.
+- **Nieuw onderdeel…**: Het veld wordt een tekstveld met als placeholder "Naam
+  van het onderdeel" en een kruisje in het veld (`aria-label` "Terug naar de
+  lijst met onderdelen") dat terugkeert naar de lijst. Het Onderdeel ontstaat
+  pas bij "+ Meting plannen" of bij Opslaan van het formulier. Annuleren laat
+  niets achter.
+- **Naam**: De regels van een Onderdeel gelden (`datamodel.md`, Onderdeel). Een
+  lege naam laat Opslaan niet toe, met de melding "Vul een naam in." bij het
+  veld. Een naam die hoofdletterongevoelig overeenkomt met een bestaand
+  Onderdeel kiest dat Onderdeel, met zijn eigen spelling. De naam "Hele
+  organisatie" kiest "Hele organisatie".
+- **Wordt**: De regel "Wordt: …" onder Meetdatum gebruikt de ingetypte naam.
+- **Uitleg**: In een Info-icoon naast het label (`info.metingOnderdeel`, punt 2a).
+  Alle labels in de rij blijven even hoog, ook die zonder icoon.
+- **Recht**: `metingen.plannen`, ook voor het aanmaken van het Onderdeel
+  (`datamodel.md`, Rechtenmatrix).
 
 **Lijst Metingen in het organisatie-detail**: Eén lijst, op meetdatum, de
 nieuwste bovenaan. Per Meting een rij met de naam, het Assessment, de
@@ -2018,7 +2157,8 @@ de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat zelf niets op
   groene regel met de naam en de verwijzing naar het Leads-venster
   (`visualisatie-verkennen.md`, Opslaan als benchmark).
 - **Kenmerken**: De kaart Kenmerken (`visualisatie-verkennen.md`, Kenmerken
-  en filters). Het scherm begint leeg, met "Snel beginnen" (CRM-pakket,
+  en filters). Een KPI staat erin met een keuze van het kanaal (voorstel van 19
+  oktober 2026, `visualisatie-verkennen.md`, KPI's als kenmerk). Het scherm begint leeg, met "Snel beginnen" (CRM-pakket,
   Sector, AHT) en een knop "Kenmerk toevoegen" met een menu per groep van
   velden met zoekveld. Per kenmerk een rij met de korte naam, een potlood voor
   de korte namen van dat veld (punt 3), een kruisje en de keuzepillen met het
@@ -2045,8 +2185,14 @@ Wat er precies wordt verwijderd, staat in `datamodel.md` onder
 - **Ingevulde scan**: Alleen die invulling. De respondent en zijn link
   blijven bestaan.
 - **Respondent**: De persoon met al zijn ingevulde scans.
-- **Meting**: De meting met alle ingevulde scans daarin.
-- **Organisatie**: Alles wat eronder hangt.
+- **Meting**: De meting met alle ingevulde scans daarin. Het Onderdeel blijft
+  bestaan.
+- **Onderdeel** (voorstel van 19 oktober 2026): Alleen zonder Metingen, met de
+  KPI-waarden van het Onderdeel. De knop staat uitgeschakeld zolang er Metingen
+  zijn, met de reden.
+- **Kanaal** (voorstel van 19 oktober 2026): Het kanaal met al zijn KPI-waarden
+  bij alle Organisaties.
+- **Organisatie**: Alles wat eronder hangt, ook de Onderdelen en de KPI-waarden.
 - **Benchmark**: De benchmark met de vinkjes van Leads voor die benchmark.
   Organisaties, Metingen en scans blijven bestaan.
 

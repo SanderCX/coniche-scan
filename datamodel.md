@@ -249,7 +249,27 @@ Organisatie {
 }
 ```
 
-`kenmerken` volgt de organisatievelden (zie hieronder).
+`kenmerken` volgt de organisatievelden (zie hieronder). De KPI's en de contacten per kanaal staan niet meer in `kenmerken` maar als `KpiWaarde` (KPI's en kanalen, bij de organisatievelden).
+
+### Onderdeel
+
+**Voorstel van 19 oktober 2026, ontworpen, nog niet gebouwd.** Een Onderdeel is een deel van een Organisatie waarover een Meting gaat en waarvoor KPI-waarden kunnen worden ingevuld, zoals "Particulier" of "Team A". Tot nu toe was het onderdeel een tekst op de Meting. Nu bestaat het één keer per Organisatie, en gebruiken de Metingen en de KPI's dezelfde lijst.
+
+```
+Onderdeel {
+  id: string
+  organisatieId: string
+  naam: string
+  aangemaaktOp: datetime
+}
+```
+
+- **Hele organisatie is geen Onderdeel.** Het is de vaste standaard. Een Meting zonder onderdeel heeft `onderdeelId: null`, en een KPI-waarde met `onderdeelId: null` geldt voor de hele organisatie. De naam "Hele organisatie" is gereserveerd, ook in andere hoofdletters.
+- **Naam.** Verplicht en getrimd, zoals de naam van een Organisatie. Uniek binnen de Organisatie, zonder verschil tussen hoofdletters en kleine letters. Komt een ingetypte naam hoofdletterongevoelig overeen met een bestaand Onderdeel, dan geldt dat Onderdeel met zijn eigen spelling (zoals bij "Anders…", zie Organisatievelden).
+- **Aanmaken** kan op twee plekken die dezelfde lijst gebruiken: In het KPI-blok van het organisatie-detail ("+ Onderdeel toevoegen") en in elk formulier met een veld Onderdeel (`beheerpagina.md`, punt 5, Het veld Onderdeel). Een Onderdeel mag bestaan zonder Meting en zonder KPI-waarden.
+- **Hernoemen** verandert de naam op één plek. De kolomkop bij de KPI's, de Metingen en de naam van elke Meting volgen. Een Meting met `labelHandmatig` houdt haar eigen naam.
+- **Verwijderen** kan alleen als er geen Meting aan hangt. De KPI-waarden van het Onderdeel verdwijnen mee, en de bevestiging noemt hoeveel (Verwijderen en datakoppelingen).
+- **Recht.** `organisaties.bewerken`. Aanmaken kan ook met `metingen.plannen`, omdat een Consultant bij het plannen van een Meting een nieuw team moet kunnen noemen.
 
 ### Respondent (in de code: `OrganisatieLid`)
 
@@ -301,7 +321,7 @@ Meting {
   assessmentId: string
   label: string                     // de naam, zie Naam van een Meting
   labelHandmatig: boolean           // gebouwd op 14 oktober 2026, standaard false
-  onderdeel: string                 // gebouwd, standaard "Hele organisatie", bijv. "Team A"
+  onderdeelId: string | null        // voorstel van 19 oktober 2026, null is "Hele organisatie", zie Onderdeel. Gebouwd als tekstveld `onderdeel` (standaard "Hele organisatie", bijv. "Team A"), dat hierdoor vervalt
   meetdatum?: date                  // gebouwd op 14 oktober 2026, zonder tijdstip
   samenstelling?: string[]          // gebouwd, metingIds, alleen bij een samengestelde Meting
   aangemaaktOp: datetime
@@ -310,7 +330,10 @@ Meting {
 
 **Onderdeel en meetdatum.** Het onderdeel zegt over welk deel van de
 organisatie een Meting gaat, bijvoorbeeld "Team A", en is standaard "Hele
-organisatie". De meetdatum is de dag waarop de Meting plaatsvindt. Respondenten
+organisatie". Een Meting kiest een Onderdeel uit de lijst van de Organisatie
+(voorstel van 19 oktober 2026, zie Onderdeel). Waar de spec hieronder
+"onderdeel" schrijft, is dat de naam van dat Onderdeel, of "Hele organisatie"
+bij `onderdeelId: null`. De meetdatum is de dag waarop de Meting plaatsvindt. Respondenten
 mogen er daarna nog dagen over doen. Het is niet het moment waarop de Meting in
 de app is aangemaakt (`aangemaaktOp`) en niet het moment van importeren.
 
@@ -339,7 +362,11 @@ de app is aangemaakt (`aangemaaktOp`) en niet het moment van importeren.
   label een onderdeel noemt (bijv. "Zuid-Nederland | 0-meting" na een import).
   "Scans samenbrengen" en Wijzigen stellen het onderdeel voor uit het label: De
   tekst vóór " | ", anders "Hele organisatie". Het is een voorstel dat de
-  beheerder ziet en kan aanpassen, nooit een stille wijziging.
+  beheerder ziet en kan aanpassen, nooit een stille wijziging. Met het Onderdeel
+  als object (voorstel van 19 oktober 2026) is het voorstel een keuze in de
+  keuzelijst: Bestaat er een Onderdeel met die naam (hoofdletterongevoelig),
+  dan staat dat gekozen. Anders staat er "Nieuw onderdeel…" met de naam
+  ingevuld, en ontstaat het Onderdeel pas als de beheerder bevestigt.
 - **Overgang van de rondes (gebouwd op 14 oktober 2026).** `Ronde` en
   `Meting.rondeId` vervallen. De Metingen houden hun `label`, onderdeel en
   `samenstelling`. De meetdatum is leeg. Een Admin of Consultant vult hem in
@@ -412,7 +439,9 @@ Optionele categorieën).
 Een record dat iemand bewerkt, kan niet tegelijk door een ander bewerkt
 worden. Het slot geldt voor een ingevulde scan (invullen en bewerken), een
 Respondent en een Organisatie. Later komt content erbij (Assessments,
-Content-pagina's).
+Content-pagina's). Het slot op een Organisatie geldt voor elke bewerking van
+die Organisatie: De Kenmerken, "KPI's invullen" en het toevoegen, wijzigen of
+verwijderen van een Onderdeel (voorstel van 19 oktober 2026).
 
 ```
 Bewerkslot {
@@ -582,9 +611,16 @@ verwijst wat niet meer bestaat.
 - **Respondent**: De respondent, zijn toegangscode en al zijn
   invullingen.
 - **Meting**: De meting en alle invullingen daarbinnen. Respondenten
-  blijven bestaan.
+  en het Onderdeel van de Meting blijven bestaan.
+- **Onderdeel** (voorstel van 19 oktober 2026): Alleen als er geen Meting
+  aan hangt. De KPI-waarden van het Onderdeel verdwijnen mee, en de
+  bevestiging noemt het aantal.
+- **Kanaal** (voorstel van 19 oktober 2026): Het kanaal met al zijn
+  KPI-waarden, bij alle Organisaties. De bevestiging noemt het aantal
+  waarden en het aantal Organisaties.
 - **Organisatie**: Alles wat eronder hangt: Metingen, respondenten,
-  toegangscodes, invullingen, antwoorden en opmerkingen. Het
+  toegangscodes, invullingen, antwoorden en opmerkingen, en (voorstel van
+  19 oktober 2026) Onderdelen en KPI-waarden. Het
   assessment-type en de content blijven staan.
 - **Assessment**: Alleen als er geen enkele Meting van dit Assessment
   bestaat, bij welke organisatie dan ook (ook geen Meting zonder scans).
@@ -712,8 +748,9 @@ KorteNaam {
 
 **Volume en klantbasis**
 - Totaal aantal klanten (getal, met B2B/B2C-verdeling als percentage)
-- Contacten per jaar per kanaal: Call, Voicebot, Livechat, Chatbot,
-  E-mail, Whatsapp (elk een getal, "niet van toepassing" toegestaan)
+- Contacten per jaar per kanaal: Voorstel van 19 oktober 2026, verhuisd
+  naar de KPI's (KPI's en kanalen, hieronder). Gebouwd als zes getalvelden met
+  "niet van toepassing" toegestaan, die daarmee vervallen.
 - Adoptie mijnomgeving/app (percentage)
 
 **Digitalisering**
@@ -784,14 +821,136 @@ heeft daarvoor het element `techstackWfm`, en het element
   IT DevOps. Een bestaande waarde zonder groep wordt bij het laden `{ aantal }`)
 - IT DevOps-medewerkers (getal, met percentage gericht op Digital)
 
-**KPI's**, elk een numeriek veld: AHT, NPS, CSAT, SLA, FTR.
+**KPI's.** Voorstel van 19 oktober 2026: De KPI's zijn geen organisatievelden
+meer. Ze staan hieronder bij KPI's en kanalen. Gebouwd waren het vijf
+numerieke velden, AHT, NPS, CSAT, SLA en FTR (veld-id `kpis.aht` enzovoort).
+Verkennen gebruikt ze nog steeds als filter, als groepering (AHT met een
+drempel) en als as in het spreidingsdiagram (`visualisatie-verkennen.md`,
+KPI's als kenmerk).
 
-Verkennen (`visualisatie-verkennen.md`) gebruikt deze velden als filter, als
-groepering (AHT met een drempel) en als as in het spreidingsdiagram. Voorstel,
-nog niet besloten: AHT per kanaal. AHT wordt dan een subveld bij elk kanaal in
-plaats van één los KPI-veld, zodat een filter "kanaal ingezet" kan samengaan met
-een AHT-slider voor dat kanaal. Dit raakt de bestaande data en de exports en
-staat in `backlog.md`.
+### KPI's en kanalen
+
+**Voorstel van 19 oktober 2026, ontworpen (`Claude outputs/kpi-design/`), nog
+niet gebouwd.** Het voorstel vervangt de vijf losse KPI-velden en de zes
+getalvelden voor contacten per kanaal. Een KPI-waarde hoort bij een plek: De
+hele organisatie, een Onderdeel, of een kanaal binnen een van die twee. Je vult
+alleen in wat je weet.
+
+```
+Kanaal {
+  id: string
+  naam: string                      // uniek, hoofdletterongevoelig
+  volgorde: number
+}
+
+KpiDefinitie {
+  id: string                        // bijv. "aht", gebruikt in het pad `kpis.aht`
+  naam: string
+  eenheid: string | null            // bijv. "s", "%" of "aantal"
+  perOnderdeel: boolean             // mag een waarde per Onderdeel hebben
+  perKanaal: boolean                // mag een waarde per kanaal hebben
+  volgorde: number
+}
+
+KpiWaarde {
+  organisatieId: string
+  onderdeelId: string | null        // null is Algemeen, de hele organisatie
+  kanaalId: string | null           // null is Algemeen, alle kanalen samen
+  kpiId: string
+  waarde: number
+}
+```
+
+- **Algemeen.** `onderdeelId: null` is Algemeen bij de plek en `kanaalId: null`
+  is Algemeen bij het kanaal. De waarde Algemeen bij Algemeen is wat tot nu toe
+  het enige KPI-veld was.
+- **Algemeen is een gewone waarde.** De app rekent hem niet uit de onderdelen of
+  de kanalen en overschrijft hem nooit. Een gebruiker vult Algemeen in zolang de
+  details onbekend zijn. Komen die er, dan vervangt de gebruiker hem zelf of
+  laat hem staan. Er is geen weging op volume.
+- **Eén waarde per combinatie.** Uniek op Organisatie, Onderdeel, kanaal en
+  KPI. Een lege cel is geen record, en een cel leegmaken verwijdert het record.
+  0 is een geldige waarde. De waarde is een getal, met een komma of een punt als
+  decimaalteken bij invoer.
+- **Wat een KPI mag.** `perOnderdeel` en `perKanaal` bepalen op welke plekken
+  een waarde kan staan. Een KPI zonder `perKanaal` heeft alleen het kanaal
+  Algemeen. Een Admin kan een vlag niet uitzetten zolang er waarden op dat
+  niveau staan. Het vinkje staat dan uitgeschakeld, met de reden en het aantal
+  waarden.
+- **Eenheid.** Tekst of leeg. De eenheid staat als subregel onder de KPI-naam in
+  de invoertabel, behalve bij "aantal" en bij een lege eenheid, en dient als
+  eenheid bij de drempel in Verkennen (`VeldDefinitie.eenheid` doet dat nu).
+- **Kanalen.** Eén lijst voor het hele platform, beheerd door een Admin
+  (`content.beheren`). Startwaarde: Call, Voicebot, Livechat, Chatbot, E-mail en
+  Whatsapp, in deze volgorde. Een kanaal telt als ingezet bij een waarde boven 0
+  voor de KPI Contacten per jaar (`visualisatie-verkennen.md`, Ingezette
+  kanalen). Een leeg veld is onbekend en telt niet als "niet ingezet".
+- **Startset KPI's**, aanpasbaar door een Admin: Contacten per jaar (aantal, per
+  Onderdeel, per kanaal), AHT (s, per Onderdeel, per kanaal), NPS (geen eenheid,
+  per Onderdeel, niet per kanaal), CSAT (geen eenheid, per Onderdeel, per
+  kanaal), SLA (%, per Onderdeel, per kanaal) en FTR (%, per Onderdeel, per
+  kanaal).
+- **Korte naam.** Een KPI heeft een korte naam zoals een organisatieveld. Hij
+  staat in `Instellingen.korteNamen.velden` onder het pad `kpis.<id>`, dus een
+  bestaande korte naam van `kpis.aht` blijft werken. Wijzigen wordt gelogd als
+  `korteNaam.gewijzigd`.
+- **Geen tijd.** Een waarde heeft geen peildatum. De huidige waarde telt. Een
+  peildatum komt later (`backlog.md`). De sleutel wordt dan uitgebreid en
+  bestaande waarden krijgen een lege datum.
+- **Recht en slot.** Waarden invullen vraagt `organisaties.bewerken` en neemt het
+  Bewerkslot van de Organisatie. De definities van KPI's en kanalen vragen
+  `content.beheren`.
+
+**Overgang van wat er is gebouwd.**
+
+1. Per Organisatie wordt elke tekst in `Meting.onderdeel` die niet "Hele
+   organisatie" is, een Onderdeel. Teksten die hoofdletterongevoelig en
+   zonder voor- en achterspaties gelijk zijn, worden één Onderdeel, met de
+   spelling die het vaakst voorkomt (bij gelijke aantallen die van de oudste
+   Meting). De Metingen krijgen `onderdeelId`. "Hele organisatie" wordt `null`.
+2. De KPI-velden in `Organisatie.kenmerken` worden `KpiWaarde` met
+   `onderdeelId: null` en `kanaalId: null`.
+3. De zes getalvelden voor contacten per kanaal worden `KpiWaarde` voor de KPI
+   Contacten per jaar, met het kanaal erbij. "Niet van toepassing" wordt 0. Voor
+   Verkennen en voor Ingezette kanalen is dat gelijk, want beide tellen "niet
+   van toepassing" als niet ingezet. De waarde Algemeen voor Contacten per jaar
+   bestond niet en blijft leeg.
+4. De kanalenlijst en de startset KPI's worden aangemaakt zoals hierboven.
+5. Een opgeslagen verkenning die naar `kpis.aht` of een ander KPI-veld verwijst,
+   verwijst daarna naar de KPI met het kanaal Algemeen. Een filter op ingezette
+   kanalen blijft werken.
+6. Een CSV van de eigen export uit de tijd voor deze wijziging, met KPI's in
+   `organisatie_kenmerken`, wordt bij import op dezelfde manier omgezet
+   (`import-scans.md`).
+
+**Gevolgen voor andere specs, nog niet uitgewerkt.**
+
+- `export-csv.md`: De kolom `onderdeel` blijft de naam van het Onderdeel.
+  `organisatie_kenmerken` bevat de KPI's en de contacten per kanaal niet meer.
+  Voorstel: Een JSON-kolom `organisatie_kpis` met een lijst van onderdeel,
+  kanaal, KPI en waarde, naast `organisatie_kenmerken`.
+- `import-scans.md`: De kolom `onderdeel` zoekt het Onderdeel bij de Organisatie
+  of stelt een nieuw voor (Onderdeel uit het label voorstellen). De kolom
+  `organisatie_kpis` wordt teruggelezen, en bij een bestaande Organisatie
+  overschrijft ze niets, zoals `organisatie_kenmerken`.
+- `export-indesign.md`: De elementen `kpiAht`, `kpiNps`, `kpiCsat`, `kpiSla` en
+  `kpiFtr` krijgen de waarde Algemeen bij Algemeen, zodat het sjabloon blijft
+  werken. De elementen `contactenCall` tot en met `contactenWhatsapp` krijgen de
+  waarde van de KPI Contacten per jaar bij dat kanaal, bij Algemeen. Een kanaal
+  dat een Admin toevoegt, krijgt geen element zolang het sjabloon er niet om
+  vraagt. Waarden per Onderdeel volgen als het sjabloon ze vraagt.
+- `benchmark.md` en `visualisatie-scores.md`: Waar ze het onderdeel van een
+  Meting tonen of vergelijken, is dat de naam van het Onderdeel. Er verandert
+  niets aan de regels.
+- Help (`help.md`): Er is nog geen helpbestand voor Admin en Consultant. Bij het
+  schrijven ervan horen "KPI's invullen" en het veld Onderdeel erbij.
+
+**Open punten.**
+
+- Of "niet van toepassing" bij een kanaal een eigen stand moet blijven in plaats
+  van 0 (Overgang, punt 3).
+- Het verwijderen van een KPI-definitie en het hernoemen van een kanaal staan
+  niet in het design (`beheerpagina.md`, punt 3, KPI's en kanalen).
 
 ---
 
@@ -1245,6 +1404,20 @@ gebeurtenis, zonder persoonsgegevens uit scans.
 - `organisatie.hernoemd`. `details` bevat de oude en de nieuwe naam van de
   organisatie. Alleen `Organisatie.naam` verandert, het `id` en alle
   koppelingen blijven gelijk.
+- `onderdeel.aangemaakt`, `onderdeel.hernoemd` en `onderdeel.verwijderd`
+  (voorstel van 19 oktober 2026). `details` bevat de naam van de Organisatie
+  en de naam van het Onderdeel. Bij hernoemen staan de oude en de nieuwe naam
+  erin, bij verwijderen het aantal KPI-waarden dat meeging.
+- `kpi.waardenGewijzigd` (voorstel van 19 oktober 2026). Eén gebeurtenis per plek
+  die bij één keer Opslaan in "KPI's invullen" wijzigde, met één `groepId` voor
+  de hele keer. `details` bevat de naam van de Organisatie, de plek (de naam van
+  het Onderdeel of "Algemeen") en het aantal ingevulde, gewijzigde en gewiste
+  waarden.
+- `kpiDefinitie.aangemaakt`, `kpiDefinitie.gewijzigd`, `kanaal.aangemaakt` en
+  `kanaal.verwijderd` (voorstel van 19 oktober 2026). `details` bevat de naam en
+  bij `kpiDefinitie.gewijzigd` de oude en de nieuwe waarde van elk gewijzigd
+  veld. Bij `kanaal.verwijderd` staat het aantal waarden en Organisaties dat
+  meeging.
 
 **Bewaartermijn.** De bewaartermijn van ingevulde scans
 (`bewaarTermijnDagen`, zie Bewaartermijn ingevulde scans hierboven)
@@ -1266,12 +1439,12 @@ Een streepje betekent geen toegang.
 | `gebruikers.beheren` | alle | - | - | - |
 | `account.bewerken` (eigen naam en wachtwoord) | zelf | zelf | - | - |
 | `rollen.toekennen` | alle | - | - | - |
-| `content.beheren` (ook de definitie van organisatievelden) | alle | - | - | - |
+| `content.beheren` (ook de definitie van organisatievelden, KPI's en kanalen) | alle | - | - | - |
 | `organisaties.aanmaken` | alle | ja | - | - |
 | `organisaties.toewijzen` (aan een Consultant) | alle | - | - | - |
-| `organisaties.bewerken` (incl. kenmerken) | alle | eigen | te bevestigen | - |
+| `organisaties.bewerken` (incl. kenmerken, KPI-waarden en Onderdelen) | alle | eigen | te bevestigen | - |
 | `organisaties.verwijderen` | alle | eigen | - | - |
-| `metingen.plannen` | alle | eigen | - | - |
+| `metingen.plannen` (ook een nieuw Onderdeel aanmaken in het formulier) | alle | eigen | - | - |
 | `respondenten.uitnodigen` | alle | eigen | aangevinkte Metingen (Uitnodigen) | - |
 | `respondenten.leadToekennen` (het Leads-venster en de Lead-rol) | alle | - | - | - |
 | `respondenten.verwijderen` | alle | eigen | - | - |
