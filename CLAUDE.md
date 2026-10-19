@@ -342,7 +342,11 @@ geen afwijking van de spec maar een gat erin.
    blok "Praktische informatie" met invultijd, direct resultaat en
    privacy. "Start assessment" staat direct onder de hero maar is
    uitgeschakeld, met de uitleg dat toegang via een persoonlijke link
-   loopt. Verderop "Bekijk wat je krijgt" (naar scherm 3). Deze pagina
+   loopt. Tussen de hero en "Praktische informatie" staat de film "Wat
+   krijg ik" met stapkaarten (`help.md`, Films), met daaronder de knop
+   "Bekijk de voorbeeld-output" naar scherm 3. Die knop vervangt de link
+   "Bekijk wat je krijgt" verderop op de pagina. Alle cijfers in de film
+   zijn voorbeelddata. Deze pagina
    wordt later mogelijk een leadgenerator met "Toegang aanvragen"
    (`backlog.md`).
 3. **Voorbeeld-output**: Dezelfde resultaatcomponenten als scherm 6, met

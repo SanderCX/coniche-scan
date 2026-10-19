@@ -1,6 +1,6 @@
 # Coniche Scan: Help
 
-**Voorstel van 19 oktober 2026, ontworpen in "Coniche Scan Help" (borden Help voor Respondent en Lead, Help voor Admin en Consultant en Help in het accountmenu), nog niet gebouwd.** Sander vroeg om een overzichtelijke helppagina die de werking van alle onderdelen beschrijft, in een variant voor de Respondent en Lead en een voor de Admin en Consultant, met plaatje en praatje.
+**Voorstel van 19 oktober 2026, ontworpen in "Coniche Scan Help" (borden Help voor Respondent en Lead, Help voor Admin en Consultant, Help in het accountmenu, Animatie: Meetperiode kiezen en Wat krijg je), nog niet gebouwd.** Sander vroeg om een overzichtelijke helppagina die de werking van alle onderdelen beschrijft, in een variant voor de Respondent en Lead en een voor de Admin en Consultant, met plaatje en praatje.
 
 ## Wat het is
 
@@ -42,7 +42,7 @@ De rol bepaalt welke onderwerpen er zijn. Een onderwerp dat de gebruiker niet ka
   1. Een regel Help met een badge voor de rol (bijvoorbeeld "Respondent en Lead" of "Admin").
   2. De titel en daaronder één alinea die zegt waar het onderwerp over gaat.
   3. De kaart "In het kort" met twee tot vier zinnen.
-  4. De illustratie in een kaart met een kop, het label "Voorbeeld met voorbeelddata" en, waar nodig, een legenda.
+  4. De illustratie in een kaart met een kop, het label "Voorbeeld met voorbeelddata" en, waar nodig, een legenda. Heeft het onderwerp een film (Films), dan staat die in een eigen kaart vóór de illustratie, onder "In het kort".
   5. Een kop "Wat je ziet" of "Wat elke keuze doet" met een genummerde lijst. De nummers staan ook als markering in de illustratie, zodat tekst en plaatje bij elkaar horen.
   6. Optioneel een voorbeeld uit de praktijk in een kaart.
   7. Optioneel een kader "Let op" voor een grens, een uitzondering of een gevolg dat de gebruiker moet weten.
@@ -63,6 +63,7 @@ De inhoud staat als Markdown-bestanden in de repo, in de map `help/`. Een onderw
   - `rollen`: De rollen die het onderwerp zien, uit Respondent, Lead, Consultant en Admin.
   - `toegang`: Alleen bij Lead. De toegang die hij nodig heeft, bijvoorbeeld `resultaten`, `spreiding`, `antwoorden` of `benchmark`.
   - `afbeelding`: De naam van het SVG-bestand in `help/afbeeldingen/`, of leeg.
+  - `film`: De naam van de film (Films), of leeg.
   - `bronnen`: De specs waaruit het onderwerp volgt, bijvoorbeeld `visualisatie-verkennen.md`.
   - `bijgewerkt`: De datum van de laatste inhoudelijke wijziging.
 - **Tekst.** De vaste koppen uit Opbouw van de pagina staan als koppen in het bestand, in die volgorde. De genummerde lijst in het bestand heeft dezelfde nummers als de markeringen in de afbeelding.
@@ -88,9 +89,27 @@ De inhoud staat als Markdown-bestanden in de repo, in de map `help/`. Een onderw
 - **Toegankelijkheid.** Een tekstalternatief dat zegt wat de illustratie laat zien, en tekst met voldoende contrast.
 - **Bijwerken.** Verandert een scherm dat in een illustratie staat, dan wordt de illustratie mee aangepast (Actueel houden).
 
+## Films
+
+Een film is een korte bewegende uitleg bij een onderwerp. Hij is een toevoeging en nooit de enige plek waar iets staat. Alles wat de film laat zien, staat ook in gewone tekst op dezelfde pagina, zodat het ook leesbaar is voor wie de film niet ziet of niet wil afspelen.
+
+- **Twee films in de eerste versie.**
+  - **Wat krijg ik** (16 seconden), voor Respondent en Lead. Hij staat in Help in het onderwerp "Je resultaten lezen" en op de Assessment-landingspagina (`CLAUDE.md`, sectie 3, scherm 2). De film laat drie stappen zien. Eerst beantwoordt een Respondent een voorbeeldvraag met een score van 1 tot 5. Dan verschijnt direct het resultaat, met de totaalscore en de score per categorie als staven. Als laatste komen bij elke categorie de stip met het gemiddelde van de groep en de grijze lijn van de laagste tot de hoogste score erbij, met een legenda. Dat laatste is wat een Lead extra ziet (`visualisatie-scores.md`, onderdeel A, Drempel).
+  - **De Meetperiode kiezen** (12 seconden), voor Admin en Consultant. Hij staat in Help in het onderwerp "Verkennen". De film laat zien hoe de keuze bij Meetperiode van "Meest recente" naar "Periode" gaat, hoe de twee datums erbij komen en hoe het aantal Organisaties in de pool daalt van 38 naar 32 van de 44.
+- **Een film per onderwerp, kort.** Meer films komen alleen als een onderwerp er duidelijk beter van wordt. Elke film heeft eigen voorbeelddata en laat nooit echte Organisaties of Respondenten zien.
+- **Gebouwd met CSS-animaties**, geen video. De film gebruikt dezelfde kleuren, balken en componenten als de app, zodat hij meeverandert met de stylesheet. Getallen hebben een decimale komma.
+- **Stapkaarten.** Onder de film staan altijd drie of vier kaarten met een nummer en één zin per stap. Het nummer van de stap die loopt, is oranje en de kaart krijgt een oranje rand. De kaarten zijn ook het tekstalternatief. Een film zonder stapkaarten is niet af.
+- **Pauzeknop.** Rechtsboven in de kaart staat een knop "Pauzeer" die wisselt naar "Afspelen". De film start vanzelf en herhaalt zichzelf. De knop is bereikbaar met het toetsenbord.
+- **Verminderde beweging.** Staat in het systeem de voorkeur voor verminderde beweging aan, dan staat de film stil op het eindbeeld (bij Wat krijg ik het resultaat met de groep) en blijft de pauzeknop weg.
+- **Tekstalternatief.** De film heeft een beschrijving voor schermlezers die zegt wat er gebeurt, in een of twee zinnen.
+- **Label.** Boven de film staat "Voorbeeld met voorbeelddata" met de duur.
+- **Drempel in de film.** De film toont de stip en de lijn van de groep zonder getal voor het minimum. De stapkaart zegt dat een Lead gemiddelde en spreiding ziet zodra er genoeg scans zijn. De grens is een instelling die een Admin kan aanpassen (beginwaarde 5, `visualisatie-scores.md`, onderdeel A), en de Help zet dat getal dus niet in de film. Het kader "Let op" bij "Je resultaten lezen" noemt de beginwaarde.
+- **Op de Assessment-landingspagina.** De film staat tussen de hero en het blok "Praktische informatie", met dezelfde stapkaarten en daaronder de knop "Bekijk de voorbeeld-output" naar de Voorbeeld-output (scherm 3). Alle cijfers in de film zijn voorbeelddata, en dat staat er ook bij. In Help staat de film zonder die knop.
+- **Waar niet.** Er is geen film voor de Respondent die een scan invult. Daar loopt niets af waar een film bij helpt.
+
 ## Eerste set onderwerpen
 
-De eerste versie bevat de onderwerpen hieronder. Twee ervan zijn in het ontwerp uitgewerkt en dienen als voorbeeld voor de rest. De andere schrijft Claude Code op basis van de specs, waarna Joost de inhoud beoordeelt.
+De eerste versie bevat de onderwerpen hieronder. Twee ervan zijn in het ontwerp uitgewerkt, elk met een film, en dienen als voorbeeld voor de rest. De andere schrijft Claude Code op basis van de specs, waarna Joost de inhoud beoordeelt.
 
 - **Respondent en Lead.** Zo werkt de scan, Een scan invullen, Verder waar je was gebleven, Mijn metingen (`visualisatie-mijn-metingen.md`), **Je resultaten lezen** (uitgewerkt, `visualisatie-scores.md`, onderdeel A en `visualisatie-mijn-metingen.md`), Je score vergelijken, Resultaten van je Organisatie, Spreiding binnen een Meting (`visualisatie-scores.md`, onderdeel B), Benchmark en vergelijking (`benchmark.md`, View voor een Lead).
 - **Admin en Consultant.** Zo werkt Coniche Scan, Rollen en rechten, Een scan aanmaken, Respondenten toevoegen, Metingen en onderdelen, Een samengestelde Meting maken (`benchmark.md`, Samengestelde Meting), Resultaten van een Meting, Leads toegang geven (`beheerpagina.md`, punt 6a), **Verkennen** (uitgewerkt, `visualisatie-verkennen.md`, met de Meetperiode), Benchmarks (`benchmark.md`), Gebruikers en Instellingen en drempels (beide alleen Admin, `beheerpagina.md`, Instellingen).
@@ -112,6 +131,7 @@ Het onderwerp "Verkennen" legt de drie keuzes bovenaan uit (Assessment, Eenheid,
 - Of een Info-icoon doorlinkt naar het bijbehorende onderwerp (bijvoorbeeld "Meer uitleg" onder de korte tekst).
 - Of de zoekfunctie in een latere versie ook op trefwoorden werkt, zoals "drempel" en "periode".
 - Of een Admin de helpteksten op de plek zelf kan aanpassen, zoals de Info-iconen (`beheerpagina.md`, punt 2a). Voorstel: Nee, de teksten zijn onderdeel van de release.
+- Of de films later ook op de publieke schermen buiten scherm 2 komen, en of er een film bij komt voor Samenstellen of een opgeslagen verkenning. Voorstel: Pas na gebruik van de eerste twee.
 - De exacte route van de pagina en hoe die past bij de bestaande routes. Dat beslist Sander.
 
 ## Gebouwd
