@@ -1,5 +1,22 @@
 # Coniche Scan — Changelog
 
+## 2026-10-19 (5) — Specs van Joost, PR 133: kaart Kenmerken en de regel Bewerken
+
+Op verzoek van Sander gebouwd (`beheerpagina.md`, punt 4, Kenmerken; `stylesheet.md`, Bewerken: op de plek of in een modal; `help.md`). Helpbestand: `help/score-vergelijken.md`.
+
+**Gedaan**:
+- **Kaart Kenmerken** (`components/beheer/KenmerkenKaart.tsx`, `lib/kenmerken-weergave.ts`): Bovenaan het organisatie-detail een raster van vier kolommen met label en waarde,
+  met de opmaak uit de spec ("410.000, 15 / 85%", "31% / 60%", "Pakket 1, extern ondersteund"), zonder lege velden en met "Er zijn nog geen kenmerken ingevuld.". "Bewerken" opent een
+  modal met het bestaande formulier in twee kolommen. De volgorde van het detail is nu Kenmerken, KPI's, Metingen, Respondenten en Leads. Het formulier onderaan en het kopje Organisatiekenmerken
+  zijn vervallen.
+- **Regel Bewerken**: De naam van een Organisatie (naam en korte naam), en een Meting (onderdeel, meetdatum en naam) staan niet meer in een formulier op de pagina maar in een modal.
+  Knoppen, potloden en titels die "Wijzigen" heetten, heten "Bewerken" (Onderdeel, Meting, samenstelling, benchmark, verkenning en weging).
+- **Help**: Een slotalinea over de reikwijdte in `help/score-vergelijken.md` en "bewerken" in plaats van "wijzigen" in `help/verder-waar-je-was.md`.
+- 5 nieuwe tests (`lib/kenmerken-weergave.test.ts`).
+
+**Keuzes waar de spec open liet**: Het raster volgt de lijst met organisatievelden, dus Digitalisering staat na Volume en klantbasis en de Sector is de volledige SBI-naam. Het aandeel BPO staat niet in de
+kaart. Een groep van groepen (Volume en klantbasis, Techstack, FTE) staat in de modal over de volle breedte. "Gegevens bekijken/wijzigen" in "Mijn gegevens" houdt zijn naam, omdat die in `CLAUDE.md` staat.
+
 ## 2026-10-19 (4) — De helppagina en de laatste punten van de KPI-definities
 
 Op verzoek van Sander gebouwd (`help.md`; `beheerpagina.md`, punt 3, KPI's en kanalen). Helpbestanden: Alle 24 bestanden in `help/` zijn nieuw. De specs van Joost hadden

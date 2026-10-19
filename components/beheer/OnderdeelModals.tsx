@@ -91,7 +91,7 @@ export function OnderdeelWijzigenModal({ organisatie, onderdeel, onSluit }: { or
 
   return (
     <>
-      <Modal open onClose={onSluit} title="Onderdeel wijzigen">
+      <Modal open onClose={onSluit} title="Onderdeel bewerken">
         <form onSubmit={opslaan}>
           <div className="admin-field">
             <label htmlFor="onderdeel-wijzig-naam">Naam</label>

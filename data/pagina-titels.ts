@@ -58,7 +58,7 @@ const PAGINA_TITELS: { route: string; titel: string }[] = [
   { route: "/beheer/benchmark", titel: "Benchmarks" },
   { route: "/beheer/benchmark/nieuw", titel: "Nieuwe benchmark" },
   { route: "/beheer/benchmark/[benchmarkId]", titel: "Benchmark" },
-  { route: "/beheer/benchmark/[benchmarkId]/bewerken", titel: "Benchmark wijzigen" },
+  { route: "/beheer/benchmark/[benchmarkId]/bewerken", titel: "Benchmark bewerken" },
   { route: "/beheer/benchmark/[benchmarkId]/organisatie/[organisatieId]", titel: "Benchmark per organisatie" },
   { route: "/beheer/benchmark/[benchmarkId]/meting/[metingId]", titel: "Benchmark per Meting" },
   { route: "/beheer/benchmark/[benchmarkId]/scan/[invullingId]", titel: "Benchmark per scan" },

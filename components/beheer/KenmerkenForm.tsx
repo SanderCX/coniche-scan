@@ -66,7 +66,7 @@ function VeldInput({
     const opEenRegel = subvelden.length > 0 && subvelden.every((sub) => sub.type !== "groep");
     const veldPerId = Object.fromEntries(subvelden.map((sub) => [sub.id, sub]));
     return (
-      <fieldset className="veld-groep">
+      <fieldset className={`veld-groep ${subvelden.some((sub) => sub.type === "groep") ? "veld-groep--breed" : ""}`}>
         <legend>{veld.label}</legend>
         <div className={opEenRegel ? "veld-rij" : undefined}>
           {subvelden.map((sub) => (
@@ -160,14 +160,16 @@ export function KenmerkenForm({
   velden,
   waarden,
   onChange,
+  className,
 }: {
   velden: VeldDefinitie[];
   waarden: Record<string, unknown>;
   onChange: (waarden: Record<string, unknown>) => void;
+  className?: string;
 }) {
   const veldPerId = Object.fromEntries(velden.map((veld) => [veld.id, veld]));
   return (
-    <div>
+    <div className={className}>
       {velden.map((veld) => (
         <VeldInput
           key={veld.id}

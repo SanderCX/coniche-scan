@@ -701,7 +701,12 @@ invullen, een Onderdeel wijzigen, Mijn gegevens. De pagina erachter verspringt
 dan niet en het Bewerkslot blijft zichtbaar. Een Respondent-overzicht dat al
 een modal is, wisselt zijn blok Gegevens naar een formulier binnen die modal en
 opent geen tweede. Een knop die bewerken start heet "Bewerken" of draagt een
-potlood, nooit "Wijzigen".
+potlood, nooit "Wijzigen". Gebouwd op 19 oktober 2026 voor de Organisatie
+(naam en korte naam), de Meting (onderdeel, meetdatum en naam), de Kenmerken, het
+Onderdeel, de samenstelling, de Verkenning en de Weging, en de knoppen en titels
+die "Wijzigen" heetten heten nu "Bewerken". Het menu-item "Gegevens
+bekijken/wijzigen" in "Mijn gegevens" houdt zijn naam, want die staat zo in
+`CLAUDE.md`, sectie 3.
 
 ### Doorloopflow
 

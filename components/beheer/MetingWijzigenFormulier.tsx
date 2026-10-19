@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { wijzigMeting } from "@/lib/db";
 import {
   dubbeleCombinatieTekst,
@@ -20,7 +21,8 @@ import {
 } from "@/components/beheer/OnderdeelMeetdatumVelden";
 
 /**
- * "Wijzigen" van een Meting (`beheerpagina.md`, punt 5): Achter het potlood naast de naam van de Meting, met alleen de velden
+ * "Bewerken" van een Meting (`beheerpagina.md`, punt 5): Een modal achter het potlood naast de naam van de Meting (drie velden, dus een
+ * modal volgens `stylesheet.md`, Bewerken: op de plek of in een modal), met alleen de velden
  * Onderdeel, Meetdatum en Naam en verder niets. De naam is voorgevuld met de huidige naam. Pas je hem aan, dan volgt hij
  * onderdeel en meetdatum niet meer (`Meting.labelHandmatig`), en "Standaardnaam herstellen" zet hem terug. Het Assessment ligt
  * vast. Een samengestelde Meting heeft geen eigen meetdatum: Ze volgt de onderliggende Metingen. Dezelfde combinatie als een
@@ -69,8 +71,15 @@ export function MetingWijzigenFormulier({
   }
 
   return (
-    <form onSubmit={opslaan} style={{ marginBottom: "0.8rem" }}>
-      <div className="flex flex-wrap items-start gap-3">
+    <OverzichtModal label="Meting bewerken" onSluit={onKlaar}>
+    <form onSubmit={opslaan}>
+      <div className="overzicht-kop">
+        <h2>Meting bewerken</h2>
+        <p className="text-sm text-ink-m" style={{ margin: 0 }}>
+          {meting.label}
+        </p>
+      </div>
+      <div className="flex flex-wrap items-start gap-3" style={{ marginTop: "var(--sp-4)" }}>
         <OnderdeelMeetdatumVelden
           organisatie={organisatie}
           waarde={waarde}
@@ -92,34 +101,30 @@ export function MetingWijzigenFormulier({
             }}
           />
         </div>
-        <div className="admin-field" style={{ marginBottom: 0 }}>
-          <label aria-hidden="true" style={{ visibility: "hidden" }}>
-            &nbsp;
-          </label>
-          <span className="knoppenrij">
-            <button type="submit" className="btn btn-or btn-compact">
-              Opslaan
-            </button>
-            <button type="button" className="btn btn-outline btn-compact" onClick={onKlaar}>
-              Annuleren
-            </button>
-            {(naamAangepast || meting.labelHandmatig) && getoondeNaam !== standaard && (
-              <button
-                type="button"
-                className="btn btn-outline btn-compact"
-                onClick={() => {
-                  setNaamAangepast(false);
-                  setNaam(standaard);
-                }}
-              >
-                Standaardnaam herstellen
-              </button>
-            )}
-          </span>
-        </div>
       </div>
       {dubbel && <p className="overzicht-melding" style={{ margin: "0.6rem 0 0" }}>{dubbeleCombinatieTekst(dubbel.label)}</p>}
       {fout && <p className="overzicht-melding fout" style={{ margin: "0.6rem 0 0" }}>{fout}</p>}
+      <div className="btn-rij" style={{ justifyContent: "flex-end", marginTop: "var(--sp-4)" }}>
+        {(naamAangepast || meting.labelHandmatig) && getoondeNaam !== standaard && (
+          <button
+            type="button"
+            className="btn btn-outline btn-compact"
+            onClick={() => {
+              setNaamAangepast(false);
+              setNaam(standaard);
+            }}
+          >
+            Standaardnaam herstellen
+          </button>
+        )}
+        <button type="button" className="btn btn-outline btn-compact" onClick={onKlaar}>
+          Annuleren
+        </button>
+        <button type="submit" className="btn btn-or btn-compact">
+          Opslaan
+        </button>
+      </div>
     </form>
+    </OverzichtModal>
   );
 }

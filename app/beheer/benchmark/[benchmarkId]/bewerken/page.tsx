@@ -67,10 +67,10 @@ export default function BenchmarkBewerkenPage({ params }: { params: Promise<{ be
           { label: "Resultaten", href: "/beheer/resultaten/metingen" },
           { label: "Benchmarks", href: "/beheer/benchmark" },
           { label: benchmark.naam, href: `/beheer/benchmark/${benchmark.id}` },
-          { label: "Wijzigen" },
+          { label: "Bewerken" },
         ]}
       />
-      <h1>{isVerkenning(benchmark) ? "Verkenning wijzigen" : "Benchmark wijzigen"}</h1>
+      <h1>{isVerkenning(benchmark) ? "Verkenning bewerken" : "Benchmark bewerken"}</h1>
       {isVerkenning(benchmark) && (
         <VerkenningBewerken
           benchmark={benchmark}

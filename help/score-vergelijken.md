@@ -22,5 +22,7 @@ Je vergelijkt je score met de klassen, met je andere categorieën en met de bouw
 ## Let op
 Bij sommige scans weegt een bouwblok zwaarder mee in de categoriescore en de totaalscore. Een factor zoals "2×" naast de naam laat dat zien. De score van het bouwblok zelf blijft gewoon het gemiddelde van de vragen.
 
+Dit onderwerp gaat over de Klantcontact Volwassenheidsscan en de Zorgscan. Bij de AI-scan staan de domeinen in een eigen overzicht, zonder categorieën. De Quickscan werkt met percentages en de klassen Goed op orde, Gemiddeld inzicht en Ontwikkelruimte.
+
 ## Zie ook
 - [Je resultaten lezen](resultaten-lezen)

@@ -3,8 +3,8 @@
 import { use, useState } from "react";
 import Link from "next/link";
 import { useOrganisatie, updateOrganisatie, hernoemOrganisatie } from "@/lib/db";
-import { organisatieVelden } from "@/data/organisatie-velden";
-import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
+import { OverzichtModal } from "@/components/beheer/OverzichtModal";
+import { KenmerkenKaart } from "@/components/beheer/KenmerkenKaart";
 import { KpiBlok } from "@/components/beheer/KpiBlok";
 import { BenchmarkVlag } from "@/components/beheer/BenchmarkVlag";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
@@ -25,8 +25,8 @@ import { MAX_KORTE_NAAM } from "@/lib/korte-namen";
 const MAX_RIJEN = 5;
 
 /**
- * De naam in de kop met een potlood (`beheerpagina.md`, punt 4, Naam wijzigen): Een klik maakt van de naam een invoerveld
- * met "Opslaan" en "Annuleren". De naam is verplicht en wordt getrimd. Wie dit scherm ziet, mag de organisatie bewerken
+ * De naam in de kop met een potlood (`beheerpagina.md`, punt 4, Naam wijzigen): Een klik opent een modal met de velden Naam en Korte naam
+ * (twee velden, dus een modal volgens `stylesheet.md`, Bewerken: op de plek of in een modal), met "Annuleren" en "Opslaan". De naam is verplicht en wordt getrimd. Wie dit scherm ziet, mag de organisatie bewerken
  * (`organisaties.bewerken`: Admin alle, Consultant eigen).
  */
 function OrganisatieNaam({ organisatieId, naam, korteNaam }: { organisatieId: string; naam: string; korteNaam: string }) {
@@ -56,45 +56,6 @@ function OrganisatieNaam({ organisatieId, naam, korteNaam }: { organisatieId: st
     setBewerken(false);
   }
 
-  if (bewerken) {
-    return (
-      <form onSubmit={slaOp} className="flex flex-wrap items-start gap-2" style={{ margin: "0.4rem 0 0.6rem" }}>
-        <div className="admin-field" style={{ marginBottom: 0, minWidth: "20rem", flex: "0 1 28rem" }}>
-          <input
-            type="text"
-            autoFocus
-            required
-            aria-label="Naam van de organisatie"
-            value={concept}
-            onChange={(e) => setConcept(e.target.value)}
-            onKeyDown={(e) => e.key === "Escape" && setBewerken(false)}
-          />
-          {fout && <p className="overzicht-melding fout" style={{ marginTop: "0.4rem" }}>{fout}</p>}
-        </div>
-        <div className="admin-field" style={{ marginBottom: 0, minWidth: "12rem" }}>
-          <div className="knop-met-icoon">
-            <input
-              type="text"
-              aria-label="Korte naam van de organisatie"
-              placeholder="Korte naam"
-              maxLength={MAX_KORTE_NAAM}
-              value={conceptKort}
-              onChange={(e) => setConceptKort(e.target.value)}
-              onKeyDown={(e) => e.key === "Escape" && setBewerken(false)}
-            />
-            <InfoIcoon naastVeld sleutel="info.korteNaamOrganisatie" />
-          </div>
-        </div>
-        <button type="submit" className="btn btn-or btn-compact">
-          Opslaan
-        </button>
-        <button type="button" className="btn btn-outline btn-compact" onClick={() => setBewerken(false)}>
-          Annuleren
-        </button>
-      </form>
-    );
-  }
-
   return (
     <div className="titel-rij">
       <h1>{naam}</h1>
@@ -103,11 +64,50 @@ function OrganisatieNaam({ organisatieId, naam, korteNaam }: { organisatieId: st
           Korte naam: {korteNaam}
         </span>
       )}
-      <button type="button" className="titel-potlood" aria-label="Naam wijzigen" title="Naam wijzigen" onClick={start}>
+      <button type="button" className="titel-potlood" aria-label="Naam bewerken" title="Naam bewerken" onClick={start}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
+      {bewerken && (
+        <OverzichtModal label="Organisatie bewerken" onSluit={() => setBewerken(false)}>
+          <form onSubmit={slaOp}>
+            <div className="overzicht-kop">
+              <h2>Organisatie bewerken</h2>
+            </div>
+            <div className="admin-field" style={{ marginTop: "var(--sp-4)" }}>
+              <label htmlFor="org-naam">Naam</label>
+              <input id="org-naam" type="text" autoFocus required value={concept} onChange={(e) => setConcept(e.target.value)} />
+              {fout && (
+                <p className="overzicht-melding fout" style={{ marginTop: "0.4rem" }}>
+                  {fout}
+                </p>
+              )}
+            </div>
+            <div className="admin-field">
+              <label htmlFor="org-korte-naam" style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                Korte naam
+                <InfoIcoon sleutel="info.korteNaamOrganisatie" />
+              </label>
+              <input
+                id="org-korte-naam"
+                type="text"
+                maxLength={MAX_KORTE_NAAM}
+                value={conceptKort}
+                onChange={(e) => setConceptKort(e.target.value)}
+              />
+            </div>
+            <div className="btn-rij" style={{ justifyContent: "flex-end" }}>
+              <button type="button" className="btn btn-outline btn-compact" onClick={() => setBewerken(false)}>
+                Annuleren
+              </button>
+              <button type="submit" className="btn btn-or btn-compact">
+                Opslaan
+              </button>
+            </div>
+          </form>
+        </OverzichtModal>
+      )}
     </div>
   );
 }
@@ -131,7 +131,6 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
   const ingelogd = useIngelogdeGebruiker();
   const alleGebruikers = useGebruikers();
   const { open } = useBeheerOverzicht();
-  const [kenmerkenOpgeslagen, setKenmerkenOpgeslagen] = useState(false);
 
   if (!organisatie) {
     return (
@@ -155,8 +154,6 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
 
   function handleKenmerkenOpslaan(kenmerken: Record<string, unknown>) {
     updateOrganisatie(organisatieId, (o) => ({ ...o, kenmerken }));
-    setKenmerkenOpgeslagen(true);
-    setTimeout(() => setKenmerkenOpgeslagen(false), 1600);
   }
 
   function handleToegangWisselen(consultantId: string, toegewezen: boolean) {
@@ -203,6 +200,9 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
         </details>
       )}
 
+      <KenmerkenKaart organisatie={organisatie} onOpslaan={handleKenmerkenOpslaan} />
+      <KpiBlok organisatie={organisatie} />
+
       <MetingenSectie organisatie={organisatie} />
 
       <h2>Respondenten</h2>
@@ -245,18 +245,8 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
       )}
       {magLeadToekennen(ingelogd) && <LeadsBlok organisatie={organisatie} />}
 
-      <h2>Organisatiekenmerken</h2>
       {magBenchmarkBeheren(ingelogd) && <BenchmarkVlag organisatie={organisatie} />}
       {magLeadToekennen(ingelogd) && <AntwoordenNamenSchakelaar organisatie={organisatie} />}
-      {organisatieVelden.length === 0 ? (
-        <p className="admin-notice">Geen organisatievelden gedefinieerd.</p>
-      ) : (
-        <>
-          <KenmerkenForm velden={organisatieVelden} waarden={organisatie.kenmerken} onChange={handleKenmerkenOpslaan} />
-          <span className={`admin-save-state ${kenmerkenOpgeslagen ? "zichtbaar" : ""}`}>Opgeslagen ✓</span>
-        </>
-      )}
-      <KpiBlok organisatie={organisatie} />
     </div>
   );
 }

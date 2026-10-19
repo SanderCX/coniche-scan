@@ -194,18 +194,18 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
     <div className="admin-main admin-main--breed">
       <Kruimelpad delen={kruimelsVoorMeting(organisatie, scanUitvoering, viaResultaten)} />
 
-      {labelBewerken ? (
+      {labelBewerken && (
         <MetingWijzigenFormulier organisatie={organisatie} meting={scanUitvoering} onKlaar={() => setLabelBewerken(false)} />
-      ) : (
+      )}
         <div className="titel-rij">
           <h1>{scanUitvoering.label}</h1>
-          <button type="button" className="titel-potlood" aria-label="Meting wijzigen (onderdeel, meetdatum en naam)" title="Meting wijzigen (onderdeel, meetdatum en naam)" onClick={() => setLabelBewerken(true)}>
+          <button type="button" className="titel-potlood" aria-label="Meting bewerken (onderdeel, meetdatum en naam)" title="Meting bewerken (onderdeel, meetdatum en naam)" onClick={() => setLabelBewerken(true)}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </div>
-      )}
+
       <p className="text-sm text-ink-m">
         {assessment.naam} ·{" "}
         <Link href={`/beheer/organisaties/${organisatie.id}`} style={{ color: "var(--or)" }}>

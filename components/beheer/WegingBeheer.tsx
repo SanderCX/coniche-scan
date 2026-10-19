@@ -74,7 +74,7 @@ export function WegingBeheer({ assessment }: { assessment: Assessment }) {
 
       <BevestigModal
         open={bevestigen}
-        titel="Weging wijzigen"
+        titel="Weging bewerken"
         bericht={
           <div className="space-y-2 text-sm">
             <p>
