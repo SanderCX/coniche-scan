@@ -1,5 +1,23 @@
 # Coniche Scan — Changelog
 
+## 2026-10-19 (6) — Specs van Joost, PR 134: KPI-kolomkop, Quickscan-ruimte, de ring in de film en de Kaart met cirkel
+
+Op verzoek van Sander gebouwd (`beheerpagina.md`, punt 4, KPI's; `visualisatie-quickscan.md`, 3, Ruimte en lagen; `visualisatie-mijn-metingen.md`, Kaart met cirkel; `help.md`, Films). Helpbestanden: Geen, want de film
+zelf is aangepast en de onderwerpen veranderen niet.
+
+**Gedaan**:
+- **KPI-kolomkop**: Vaste kolommen van 96px (eerste 240px), de naam op één regel met een afkapping en "n van m" eronder, de kop van een Onderdeel als knop die de modal opent (het potlood vervalt), de eenheid achter
+  de naam ("AHT (s)") en rijen van 48px. Gemeten in de browser.
+- **Quickscan, Gemiddelde en spreiding**: Vier vaste kolommen (280, minstens 360, 64 en 176px), rijen van 48px, de streep van 32px achter de bollen en bollen en streep die binnen het spoor blijven. Getest met
+  synthetische scans op een tijdelijke pagina, die weer is verwijderd.
+- **Film Wat krijg ik**: De cirkel is een ring met de volle kleur van de afgeronde score (3,4 rondt af op 3, geel), gevuld tot 60%.
+- **Kaart met cirkel op Mijn metingen** (`CirkelPaneel`): Voor een Respondent, een Lead en een Lead die ook invult, met de cirkel, de klassenchip, de groep als stip op de cirkel, Jij en Groep op één spoor, de legenda,
+  de respons met datum en de lage-drempelstand. De Quickscan heeft dezelfde kaart in percentages, met nu ook een lijn van laagste tot hoogste percentage per afdeling in de teaser van de hele Meting. De chip
+  Tussenstand of Eindstand vervalt in deze kaart. 3 nieuwe tests in `lib/mijn-metingen.test.ts`.
+
+**Keuzes waar de spec open liet**: Een Lead zonder eigen scan krijgt het paneel met de groep als hoofdcirkel (zonder stip en legenda). Een Lead die invult maar nog niet is afgerond, en een Assessment zonder categorieën, houden de
+oude kaart. Het tooltipwoord bij een Onderdeel is "Klik om te bewerken" in plaats van "wijzigen". De Kaart met cirkel is een voorstel van Joost dat nog niet formeel is besloten: Het is gebouwd op verzoek van Sander.
+
 ## 2026-10-19 (5) — Specs van Joost, PR 133: kaart Kenmerken en de regel Bewerken
 
 Op verzoek van Sander gebouwd (`beheerpagina.md`, punt 4, Kenmerken; `stylesheet.md`, Bewerken: op de plek of in een modal; `help.md`). Helpbestand: `help/score-vergelijken.md`.

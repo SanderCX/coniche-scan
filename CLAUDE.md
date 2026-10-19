@@ -139,6 +139,10 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   vol), zodat een cel met een getal een zachte tint krijgt. Verschil in blauw
   en donkeroranje. Kolomkoppen en rijkoppen op één regel met een tooltip, kolommen
   van 96px, en een afstandsraster van 4px. De PDF-export valt er niet onder.
+- **Kaart met cirkel op Mijn metingen** (gebouwd op 19 oktober 2026,
+  `visualisatie-mijn-metingen.md`): Een paneel met een cirkel met de totaalscore,
+  de klassenchip en bij een Lead de groep, met Jij en Groep op één spoor per
+  categorie of afdeling. Voor Assessments met categorieën of afdelingen.
 - **Help**: Gebouwd op 19 oktober 2026 (`help.md`). Een helppagina per rol
   (Respondent, Lead, Consultant en Admin) met 24 onderwerpen als Markdown in
   `help/`, twee films met CSS-animaties en de rij "Help" in het Accountmenu

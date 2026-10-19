@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
+import { CirkelPaneel } from "@/components/mijn-metingen/CirkelPaneel";
 import { nodigLidUit } from "@/lib/db";
 import { voortgang } from "@/lib/scoring";
 import { balkVul } from "@/lib/format";
@@ -176,6 +177,11 @@ function metingSub(scanUitvoering: ScanUitvoering, afgerondOp?: string | null): 
 
 /* ---------- Eigen scan ---------- */
 
+/** De teaser van een afgeronde eigen scan, voor de Kaart met cirkel. `null` zolang de scan niet is afgerond. */
+function eigenTeaser(assessment: Assessment | undefined, invulling: ScanInvulling): Teaser | null {
+  return invulling.status === "afgerond" && assessment ? teaserVoorScan(assessment, invulling.antwoorden, invulling.relevantie) : null;
+}
+
 /** De inhoud van een eigen scan per status: De zin, de voortgang of de teaser, met de hoofdknop. */
 function EigenScanInhoud({
   code,
@@ -229,6 +235,7 @@ export function RespondentKaart({
   invulling: ScanInvulling;
 }) {
   const chip = STATUS_CHIP[invulling.status];
+  const teaser = eigenTeaser(assessment, invulling);
   return (
     <article className={`mm-kaart ${invulling.status === "afgerond" ? "mm-kaart--vol" : ""}`}>
       <KaartKop
@@ -237,7 +244,11 @@ export function RespondentKaart({
         sub={metingSub(scanUitvoering, invulling.status === "afgerond" ? invulling.afgerondOp : null)}
         rechts={<Chip klasse={chip.klasse}>{chip.tekst}</Chip>}
       />
-      <EigenScanInhoud assessment={assessment} invulling={invulling} />
+      {teaser && teaser.rijen.length > 0 ? (
+        <CirkelPaneel eigen={teaser} groep={null} afgerondOp={invulling.afgerondOp} />
+      ) : (
+        <EigenScanInhoud assessment={assessment} invulling={invulling} />
+      )}
       <div className="mm-knoppen">
         <Link href={volgendeUrl(invulling.id, invulling.status)} className="btn btn-or btn-compact mm-knop">
           {HOOFDACTIE[invulling.status]}
@@ -258,7 +269,30 @@ interface LeadInvoer {
   minRespondenten: number;
 }
 
-/** Het blok "Hele meting": Teaser (of de reden dat die er nog niet is), respons en de knoppen die aan staan. */
+/** Wat een Lead van de hele Meting ziet: Het aantal afgeronde scans, de teaser (alleen met Resultaten aan en genoeg scans) en de respons. */
+function groepGegevens({ assessment, scanUitvoering, organisatie, lid, minRespondenten }: LeadInvoer) {
+  const afgerond = aantalAfgerondInMeting(organisatie, scanUitvoering);
+  const aanResultaten = heeftMetingToegang(organisatie, lid.id, "resultaten", scanUitvoering.id);
+  let teaser: Teaser | null = null;
+  if (assessment && aanResultaten && afgerond >= minRespondenten) {
+    teaser = isSamengesteld(scanUitvoering)
+      ? teaserVoorGemiddelden(assessment, gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, organisatie, scanUitvoering), afgerond)
+      : teaserVoorMeting(assessment, scanUitvoering.invullingen);
+  }
+  const laatst = scanUitvoering.invullingen
+    .filter((i) => i.status === "afgerond" && i.afgerondOp)
+    .map((i) => i.afgerondOp as string)
+    .sort()
+    .pop();
+  const respons = { ...responsVan(scanUitvoering.invullingen), laatsteDatum: langeDatum(dagVan(laatst)) };
+  return { afgerond, aanResultaten, teaser, respons, paneel: !!teaser && teaser.rijen.length > 0 };
+}
+
+/**
+ * Het blok "Hele meting": Teaser (of de reden dat die er nog niet is), respons en de knoppen die aan staan. Met `paneel` staan de
+ * teaser en de respons al in de Kaart met cirkel en blijven alleen de knoppen over. `voorKnop` is de hoofdknop van de eigen scan,
+ * die in dezelfde rij staat.
+ */
 function HeleMeting({
   code,
   assessment,
@@ -268,7 +302,9 @@ function HeleMeting({
   minRespondenten,
   hoofdLabel,
   teaserLabel,
-}: LeadInvoer & { hoofdLabel: string; teaserLabel: string }) {
+  paneel = false,
+  voorKnop,
+}: LeadInvoer & { hoofdLabel: string; teaserLabel: string; paneel?: boolean; voorKnop?: React.ReactNode }) {
   const [uitnodigen, setUitnodigen] = useState(false);
   const [email, setEmail] = useState("");
   const [melding, setMelding] = useState<string | null>(null);
@@ -297,11 +333,12 @@ function HeleMeting({
   const toonResultaten = aan("resultaten") && afgerond > 0;
   const toonUitnodigen = aan("uitnodigen") && !samengesteld;
   // Staat alleen Uitnodigen aan, dan is dat de hoofdactie.
-  const paar = toonResultaten && toonUitnodigen;
+  const paar = [voorKnop, toonResultaten, toonUitnodigen].filter(Boolean).length > 1;
 
   return (
     <>
-      {aan("resultaten") &&
+      {!paneel &&
+        aan("resultaten") &&
         (afgerond >= minRespondenten && teaser ? (
           <TeaserBlok teaser={teaser} label={teaserLabel} />
         ) : (
@@ -315,9 +352,10 @@ function HeleMeting({
             <Balk fractie={Math.min(1, afgerond / minRespondenten)} label={`${afgerond} van ${minRespondenten} afgeronde scans`} warm />
           </div>
         ))}
-      {!samengesteld && <ResponsBlok respons={respons} warm />}
+      {!paneel && !samengesteld && <ResponsBlok respons={respons} warm />}
       {samengesteld && <p className="mm-sub">Gemiddelde van de onderliggende Metingen, {afgerond} afgeronde scans.</p>}
       <div className={`mm-knoppen ${paar ? "mm-knoppen--paar" : ""}`}>
+        {voorKnop}
         {toonResultaten && (
           <Link href={basis} className="btn btn-or btn-compact mm-knop">
             {hoofdLabel}
@@ -326,7 +364,7 @@ function HeleMeting({
         {toonUitnodigen && (
           <button
             type="button"
-            className={`btn btn-compact mm-knop ${toonResultaten ? "btn-outline" : "btn-or"}`}
+            className={`btn btn-compact mm-knop ${toonResultaten || voorKnop ? "btn-outline" : "btn-or"}`}
             aria-expanded={uitnodigen}
             onClick={() => setUitnodigen(!uitnodigen)}
           >
@@ -364,6 +402,8 @@ function StandChip({ scanUitvoering }: { scanUitvoering: ScanUitvoering }) {
 
 export function LeadKaart(invoer: LeadInvoer) {
   const { assessment, scanUitvoering } = invoer;
+  const g = groepGegevens(invoer);
+  const samengesteld = isSamengesteld(scanUitvoering);
   return (
     <article className="mm-kaart">
       <KaartKop
@@ -373,11 +413,13 @@ export function LeadKaart(invoer: LeadInvoer) {
         rechts={
           <>
             <span className="mm-rolchip">Lead</span>
-            <StandChip scanUitvoering={scanUitvoering} />
+            {/* In de Kaart met cirkel vervalt de chip Tussenstand of Eindstand: De respons zegt het al. */}
+            {(!g.paneel || samengesteld) && <StandChip scanUitvoering={scanUitvoering} />}
           </>
         }
       />
-      <HeleMeting {...invoer} hoofdLabel="Resultaten" teaserLabel="Hele meting" />
+      {g.paneel && <CirkelPaneel eigen={null} groep={g.teaser} respons={samengesteld ? undefined : g.respons} />}
+      <HeleMeting {...invoer} hoofdLabel="Resultaten" teaserLabel="Hele meting" paneel={g.paneel} />
     </article>
   );
 }
@@ -386,6 +428,45 @@ export function LeadKaart(invoer: LeadInvoer) {
 export function LeadEnRespondentKaart({ invulling, ...invoer }: LeadInvoer & { invulling: ScanInvulling }) {
   const { assessment, scanUitvoering } = invoer;
   const chip = STATUS_CHIP[invulling.status];
+  const eigen = eigenTeaser(assessment, invulling);
+  const g = groepGegevens(invoer);
+  // Met een afgeronde eigen scan en categorieën of afdelingen: Eén Kaart met cirkel met Jij en Groep op één spoor in plaats van twee blokken.
+  if (eigen && eigen.rijen.length > 0) {
+    const samengesteld = isSamengesteld(scanUitvoering);
+    return (
+      <article className="mm-kaart mm-kaart--vol">
+        <KaartKop
+          assessment={assessment}
+          titel={assessment?.naam ?? "Onbekend type"}
+          sub={metingSub(scanUitvoering)}
+          rechts={
+            <>
+              <span className="mm-rolchip">Respondent</span>
+              <span className="mm-rolchip">Lead</span>
+            </>
+          }
+        />
+        <CirkelPaneel
+          eigen={eigen}
+          groep={g.paneel ? g.teaser : null}
+          groepWacht={g.aanResultaten && !g.teaser ? { afgerond: g.afgerond, minimum: invoer.minRespondenten } : undefined}
+          respons={samengesteld ? undefined : g.respons}
+          afgerondOp={invulling.afgerondOp}
+        />
+        <HeleMeting
+          {...invoer}
+          hoofdLabel="Resultaten hele meting"
+          teaserLabel="Gemiddelde score"
+          paneel
+          voorKnop={
+            <Link href={volgendeUrl(invulling.id, invulling.status)} className="btn btn-or btn-compact mm-knop">
+              {HOOFDACTIE[invulling.status]}
+            </Link>
+          }
+        />
+      </article>
+    );
+  }
   return (
     <article className="mm-kaart mm-kaart--vol">
       <KaartKop

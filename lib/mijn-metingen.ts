@@ -98,12 +98,24 @@ export interface Teaser {
   /** Alleen bij de hele Meting: Het aantal afgeronde scans waarover het gemiddelde gaat, voor achter de titel ("6 scans"). */
   aantalScans?: number;
   rijen: TeaserRij[];
+  /**
+   * Voor de Kaart met cirkel (`visualisatie-mijn-metingen.md`, voorstel van 19 oktober 2026): De vulling van de ring (0 tot en met 1) en
+   * de volle kleur van de afgeronde score of klasse, en de kleuren van de klassenchip.
+   */
+  ring: { fractie: number; kleur: string; chipAchtergrond: string; chipTekst: string };
 }
 
 const KLASSE_KLEUR: Record<Classificatie, string> = {
   groen: "var(--stat-green)",
   oranje: "var(--stat-amber)",
   rood: "var(--stat-red)",
+};
+
+/** De celkleuren van de klassenchip bij een percentage (`visualisatie-quickscan.md`, Nieuwe stijlwaarden). */
+const KLASSE_CHIP: Record<Classificatie, { achtergrond: string; tekst: string }> = {
+  groen: { achtergrond: "#e7f6ef", tekst: "#0e4d30" },
+  oranje: { achtergrond: "#fdf2e3", tekst: "#6b3a00" },
+  rood: { achtergrond: "#fdecec", tekst: "#7f1d1d" },
 };
 
 const komma = (n: number, dec = 1) => n.toFixed(dec).replace(".", ",");
@@ -161,10 +173,16 @@ function schaalTeaser(
     ankers: rijen.length > 0,
     ...(aantalScans !== undefined ? { aantalScans } : {}),
     rijen,
+    ring: { fractie: schaalFractie(overall), kleur: `var(--score-${stap})`, chipAchtergrond: `var(--score-${stap}-cel)`, chipTekst: `var(--score-${stap}-cel-tekst)` },
   };
 }
 
-function quickscanTeaser(resultaat: QuickscanResultaat, metingModus: boolean, n?: number): Teaser | null {
+function quickscanTeaser(
+  resultaat: QuickscanResultaat,
+  metingModus: boolean,
+  n?: number,
+  spreiding?: Map<string, { van: number; tot: number }>
+): Teaser | null {
   if (resultaat.percentage === null || resultaat.klasse === null) return null;
   const rijen: TeaserRij[] = resultaat.afdelingen
     .filter((a) => a.vanToepassing && a.percentage !== null && a.klasse !== null)
@@ -173,7 +191,10 @@ function quickscanTeaser(resultaat: QuickscanResultaat, metingModus: boolean, n?
       naam: a.categorie.naam,
       kleur: KLASSE_KLEUR[a.klasse as Classificatie],
       fractie: (a.percentage as number) / 100,
-      alt: `${a.categorie.naam}, ${a.percentage}%`,
+      ...(spreiding?.get(a.categorie.id) ? { lijn: { van: spreiding.get(a.categorie.id)!.van / 100, tot: spreiding.get(a.categorie.id)!.tot / 100 } } : {}),
+      alt: spreiding?.get(a.categorie.id)
+        ? `${a.categorie.naam}, gemiddelde ${a.percentage}%, laagste ${spreiding.get(a.categorie.id)!.van}%, hoogste ${spreiding.get(a.categorie.id)!.tot}%`
+        : `${a.categorie.naam}, ${a.percentage}%`,
       // Een scan toont "punten/maximum · percentage", de hele meting alleen het percentage.
       waarde: metingModus ? `${a.percentage}%` : `${a.punten}/${a.maximum} · ${a.percentage}%`,
     }));
@@ -190,6 +211,12 @@ function quickscanTeaser(resultaat: QuickscanResultaat, metingModus: boolean, n?
     ankers: false,
     ...(metingModus ? { aantalScans: n } : {}),
     rijen,
+    ring: {
+      fractie: resultaat.percentage / 100,
+      kleur: KLASSE_KLEUR[resultaat.klasse],
+      chipAchtergrond: KLASSE_CHIP[resultaat.klasse].achtergrond,
+      chipTekst: KLASSE_CHIP[resultaat.klasse].tekst,
+    },
   };
 }
 
@@ -224,6 +251,19 @@ function spreidingPerGroep(assessment: Assessment, afgerond: ScanInvulling[]): M
   return uit;
 }
 
+/** Per afdeling het laagste en hoogste percentage van een afgeronde scan waarin de afdeling van toepassing is (Quickscan). */
+function spreidingPerAfdeling(assessment: Assessment, afgerond: ScanInvulling[]): Map<string, { van: number; tot: number }> {
+  const uit = new Map<string, { van: number; tot: number }>();
+  for (const scan of afgerond) {
+    for (const a of quickscanResultaat(assessment, scan.antwoorden, scan.relevantie).afdelingen) {
+      if (!a.vanToepassing || a.percentage === null) continue;
+      const huidig = uit.get(a.categorie.id);
+      uit.set(a.categorie.id, huidig ? { van: Math.min(huidig.van, a.percentage), tot: Math.max(huidig.tot, a.percentage) } : { van: a.percentage, tot: a.percentage });
+    }
+  }
+  return uit;
+}
+
 /**
  * De teaser van de hele Meting (Lead): Het gemiddelde van alle afgeronde scans, met "Gemiddelde van n afgeronde scans" onder het
  * getal en zonder "x/y" in de rijen. `null` zonder afgeronde scans.
@@ -233,7 +273,7 @@ export function teaserVoorMeting(assessment: Assessment, invullingen: ScanInvull
   if (afgerond.length === 0) return null;
   if (isJaNeeWeetNiet(assessment)) {
     const resultaat = metingAlsResultaat(quickscanMeting(assessment, quickscanScansVan(afgerond)));
-    return quickscanTeaser(resultaat, true, afgerond.length);
+    return quickscanTeaser(resultaat, true, afgerond.length, spreidingPerAfdeling(assessment, afgerond));
   }
   const gemiddeld = gemiddeldeAntwoordenVoorMeting(assessment, afgerond);
   return schaalTeaser(assessment, gemiddeld, afgerond.length, spreidingPerGroep(assessment, afgerond));

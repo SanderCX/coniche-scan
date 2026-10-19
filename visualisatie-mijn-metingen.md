@@ -130,9 +130,9 @@ Heeft de gebruiker voor dezelfde Meting zowel een eigen scan als Resultaten, dan
 
 De eerste knop in het linkerblok is de hoofdactie van de eigen scan. In het rechterblok is "Resultaten hele meting" de hoofdactie en "Respondenten uitnodigen" de nevenactie.
 
-## Kaart met cirkel (voorstel van 19 oktober 2026)
+## Kaart met cirkel (voorstel van 19 oktober 2026, gebouwd op 19 oktober 2026)
 
-Ontworpen in "Coniche Scan Mijn metingen", borden "Kaart met cirkel, voorstel (19 oktober)" (Volwassenheidsscan) en "Quickscan met cirkel, voorstel (19 oktober)" (Quickscan), nog niet gebouwd. Dit geldt voor alle Assessments met categorieën of afdelingen en vervangt voor hen de teaser "Jouw overall score" en de twee blokken naast elkaar uit Kaart: Lead en respondent. Hieronder staat eerst de kaart voor Assessments met categorieën, daarna de afwijkingen voor Assessments met afdelingen (Quickscan). Twee blokken van 500 px met een cirkel erbij passen niet naast elkaar, en Jij en Groep op één spoor laten het verschil per categorie direct zien.
+Ontworpen in "Coniche Scan Mijn metingen", borden "Kaart met cirkel, voorstel (19 oktober)" (Volwassenheidsscan) en "Quickscan met cirkel, voorstel (19 oktober)" (Quickscan), gebouwd op 19 oktober 2026 (zie Zo gebouwd hieronder). Dit geldt voor alle Assessments met categorieën of afdelingen en vervangt voor hen de teaser "Jouw overall score" en de twee blokken naast elkaar uit Kaart: Lead en respondent. Hieronder staat eerst de kaart voor Assessments met categorieën, daarna de afwijkingen voor Assessments met afdelingen (Quickscan). Twee blokken van 500 px met een cirkel erbij passen niet naast elkaar, en Jij en Groep op één spoor laten het verschil per categorie direct zien.
 
 - **Paneel.** Onder de kop een paneel met achtergrond `--bg-warm`, rand `--border`, hoekstraal 10 px en padding 28 px 32 px. Links staat een zijblok van 200 px, rechts staan de rijen, met 40 px ertussen. Onder 720 px komt het zijblok boven de rijen.
 - **Cirkel.** 156 px, spoor `--bg-mid`, 14 px dik, afgeronde uiteinden, beginnend bovenaan en met de klok mee. De vulling is `(score − 1) / 4` van de omtrek, dus 3,0 is de helft. De kleur is de volle kleur van de afgeronde score (`stylesheet.md`, Drie niveaus van scorekleur, Vol): 3,0 is geel `--score-3` (`#eab308`). In de cirkel staat het getal in 36 px, gewicht 800, en daaronder "Totaalscore" in 12 px hoofdletters in `--ink-s`.
@@ -166,6 +166,18 @@ Dezelfde kaart, in percentages en met klassekleuren. Alles hierboven geldt, beha
 - **Kolomkop.** Het label boven de rijen is "Per afdeling".
 - **Respons, datum, knoppen, drempel.** Identiek aan de kaart hierboven.
 - **Zonder categorieën of afdelingen** (de AI-scan) staat alleen het totaal met de klassenchip, zonder cirkel en rijen.
+
+### Zo gebouwd (19 oktober 2026)
+
+`CirkelPaneel` (`components/mijn-metingen/CirkelPaneel.tsx`) en de opmaak in `app/styles/mijn-metingen.css`, met de gegevens in `lib/mijn-metingen.ts` (`Teaser.ring`, en bij de Quickscan de lijn van laagste tot hoogste percentage per afdeling).
+
+- **Wanneer het paneel er staat.** Bij een afgeronde eigen scan, bij een Lead met Resultaten en genoeg afgeronde scans, en bij beide, voor een Assessment met categorieën of afdelingen. Een Assessment zonder categorieën (de AI-scan) houdt de teaser met alleen het totaal en de klassenpil. Een Lead die ook invult maar zijn eigen scan nog niet heeft afgerond, houdt de twee blokken Jouw scan en Hele meting.
+- **Lead zonder eigen scan.** Het paneel toont de groep: De cirkel is het gemiddelde van de Meting, onder de chip staat "Groep, n scans", en de rijen hebben alleen stip, lijn en de kolom Groep. Er is dan geen stip op de cirkel en geen legenda, want er is niets om mee te vergelijken. De spec beschrijft deze stand niet.
+- **Onder de drempel.** Een Lead die ook invult krijgt het paneel met de eigen balken en onder de rijen de regel "Resultaten van de groep volgen bij minstens n afgeronde scans (k van n)". Een Lead zonder eigen scan houdt het blok "Resultaten volgen bij minstens n afgeronde scans" met de teller.
+- **Knoppen.** De hoofdknop van de eigen scan staat in dezelfde rij als "Resultaten hele meting" en "Respondenten uitnodigen", elk 232 px bij meer dan één knop.
+- **Quickscan.** Zijblok 220 px, namen van 136 px, getallen als percentage (de punten staan in de tooltip van de rij), balk en stip in de klassekleur van hun eigen percentage, schaal 0 tot 100%, chip in de celkleur van de klasse.
+- **Samengestelde Meting.** Geen respons en geen lijn: Haar scores komen uit gemiddelden van Metingen. De chip "Gemiddelde" blijft staan.
+- **Tekstalternatief.** De cirkel heeft "Totaalscore 3,0, Uitbouwen" en elke rij haar tekstalternatief met, bij een Lead, de groepswaarde.
 
 ## Knoppen
 

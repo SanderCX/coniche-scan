@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { MetingAfdeling, MetingBouwblok, QuickscanMeting, SpreidingUitkomst } from "@/lib/quickscan-groep";
 import { Tegels } from "@/components/visualisatie/gedeeld";
-import { Bandnamen, Hulplijnen, KLASSE_STIJL, KlasseBadge, getal } from "./gedeeld";
+import { Hulplijnen, KLASSE_STIJL, KlasseBadge, getal } from "./gedeeld";
 
 function SpreidingLabel({ u }: { u: SpreidingUitkomst | null }) {
   if (!u) return null;
@@ -132,7 +132,16 @@ function AfdelingKaart({
         Relevant voor {a.relevanteScans} van {a.alleScans} respondenten
         {a.relevanteScans < a.alleScans && ` (${a.alleScans - a.relevanteScans} vond de afdeling niet van toepassing)`}.
       </p>
-      <Bandnamen rechts="Gemiddelde" />
+      <div className="qv-rij qv-rij--spreiding qv-bandnamen" aria-hidden="true">
+        <div />
+        <div className="qv-bandnamen-spoor">
+          <span style={{ width: "50%" }}>Ontwikkelruimte</span>
+          <span style={{ width: "30%" }}>Gemiddeld inzicht</span>
+          <span style={{ width: "20%" }}>Goed op orde</span>
+        </div>
+        <div style={{ justifyContent: "flex-end" }}>Gemiddelde</div>
+        <div />
+      </div>
       {dimensies.map((b) => (
         <DimensieRij key={b.bouwblok.id} b={b} />
       ))}
@@ -140,30 +149,43 @@ function AfdelingKaart({
   );
 }
 
+/**
+ * Een rij per dimensie (`visualisatie-quickscan.md`, 3, Ruimte en lagen): Vier kolommen met een vaste breedte (label 280px, spoor,
+ * gemiddelde 64px en spreidingslabel 176px), minstens 48px hoog. In het spoor liggen van onder naar boven de banden, de stippellijnen,
+ * de streep op het gemiddelde (32px, achter de bollen) en de bollen, die binnen het spoor blijven. Alles staat op één regel.
+ */
 function DimensieRij({ b }: { b: MetingBouwblok }) {
   const s = b.klasse ? KLASSE_STIJL[b.klasse] : null;
+  // Bij minder dan 3 vragen staat het aantal in het spreidingslabel en niet ook achter de naam.
+  const metAantal = b.vragen >= 3;
+  const naamTekst = `${b.bouwblok.naam}${metAantal ? ` · ${b.vragen} vragen` : ""}`;
   return (
-    <div className="qv-rij">
-      <span className="qv-naam">
+    <div className="qv-rij qv-rij--spreiding">
+      <span className="qv-naam qv-naam--een" title={b.bouwblok.naam}>
         {b.bouwblok.naam}
         {b.gewicht !== 1 && <span className="gewicht-chip" style={{ marginLeft: "0.4rem" }}>{getal(b.gewicht)}×</span>}
-        <span className="text-ink-s" style={{ fontWeight: 400 }}> · {b.vragen} {b.vragen === 1 ? "vraag" : "vragen"}</span>
+        {metAantal && <span className="text-ink-s" style={{ fontWeight: 400, fontSize: "var(--fs-12)" }}> · {b.vragen} vragen</span>}
+        <span className="sr-only">{naamTekst}</span>
       </span>
-      <div className="qv-spoor">
+      <div className="qv-spoor qv-spoor--lagen">
         <Hulplijnen />
+        {b.gemiddelde !== null && (
+          <span className="qv-streep qv-streep--laag" style={{ left: `clamp(1px, ${b.gemiddelde}%, calc(100% - 1px))` }} title={`Gemiddelde: ${b.percentage}%`} />
+        )}
         {b.bollen.map((bol) => (
           <span
             key={bol.percentage}
             className={`qv-bol qv-bol--groep ${bol.aantal === 1 ? "qv-bol--een" : ""}`}
-            style={{ left: `${bol.percentage}%` }}
+            style={{ left: `clamp(${bol.aantal === 1 ? 7 : 12}px, ${bol.percentage}%, calc(100% - ${bol.aantal === 1 ? 7 : 12}px))` }}
           >
             {bol.aantal > 1 ? bol.aantal : ""}
           </span>
         ))}
-        {b.gemiddelde !== null && <span className="qv-streep" style={{ left: `${b.gemiddelde}%` }} title={`Gemiddelde: ${b.percentage}%`} />}
       </div>
-      <span className="qv-waarde">
-        <strong style={{ color: s?.tekst }}>{b.percentage ?? 0}%</strong>
+      <span className="qv-gemiddelde" style={{ color: s?.tekst }}>
+        {b.percentage ?? 0}%
+      </span>
+      <span className="qv-spreiding">
         <SpreidingLabel u={b.spreiding} />
       </span>
     </div>

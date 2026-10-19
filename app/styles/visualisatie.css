@@ -883,6 +883,75 @@
   min-width: 2rem;
 }
 
+/* Gemiddelde en spreiding van de Quickscan (`visualisatie-quickscan.md`, 3, Ruimte en lagen): Vier kolommen met een vaste breedte, minstens 48px per rij,
+   alles op één regel en de lagen in het spoor van onder naar boven: banden, stippellijnen, streep en bollen. */
+.qv-kaart--spreiding,
+.qv-kaart:has(.qv-rij--spreiding) {
+  padding: var(--sp-6);
+  overflow-x: auto;
+}
+.qv-rij--spreiding,
+.qv-bandnamen.qv-rij--spreiding {
+  grid-template-columns: 280px minmax(360px, 1fr) 64px 176px;
+  gap: var(--sp-6);
+  min-height: 48px;
+  padding: 0;
+}
+.qv-bandnamen.qv-rij--spreiding {
+  min-height: 0;
+  padding-bottom: var(--sp-2);
+  white-space: nowrap;
+}
+.qv-bandnamen-spoor {
+  display: flex;
+}
+.qv-naam--een {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.qv-spoor--lagen {
+  height: 12px;
+  box-sizing: border-box;
+  border-radius: 6px;
+}
+.qv-spoor--lagen .qv-streep--laag {
+  top: 50%;
+  bottom: auto;
+  height: 32px;
+  margin-top: -16px;
+  z-index: 1;
+}
+.qv-spoor--lagen .qv-bol {
+  z-index: 2;
+}
+.qv-spoor--lagen .qv-bol--groep {
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+}
+.qv-spoor--lagen .qv-bol--een {
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+}
+.qv-gemiddelde {
+  font-size: var(--fs-16);
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+.qv-spreiding {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.qv-spreiding .qv-label {
+  margin-left: 0;
+  white-space: nowrap;
+}
+
 /* De vergelijking tussen organisaties heeft rechts meer ruimte nodig: Percentage, verschil en positielabel. */
 .qv-rij--breed,
 .qv-bandnamen--breed {
