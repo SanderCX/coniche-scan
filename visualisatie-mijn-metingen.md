@@ -14,7 +14,7 @@ Van boven naar beneden:
 
 1. **Kop.** Boven de titel het label "Mijn metingen" (12 px, hoofdletters, `--or`). Daaronder "Welkom terug, <voornaam>" als h1 van 48 px. Heeft de gebruiker geen voornaam, dan staat er "Welkom terug". Daaronder de naam van de Organisatie met een gebouwicon, en de introtekst uit `mijnMetingenIntro` (`datamodel.md`, Algemene teksten). De introtekst is beheerbaar en staat niet vast in de code. Het ontwerp toont per rol een andere tekst, dat is voorbeeldtekst.
 2. **Secties.** Welke secties er zijn hangt af van de rol (zie Varianten). Elke sectie heeft een label in `.lbl`-stijl met het aantal erachter: "Nog te doen, 2".
-3. **Kaarten** in een raster. Twee kaarten naast elkaar vanaf 1120 px breedte, daaronder onder elkaar. Een kaart met een teaser mag de volle breedte nemen.
+3. **Kaarten** in een raster. Twee kaarten naast elkaar vanaf 1120 px breedte, daaronder onder elkaar. Een kaart met een teaser of een paneel met cirkel (Kaart met cirkel) heeft altijd de volle breedte, ook als hij alleen een Lead-weergave heeft.
 
 De vier vaste content-links blijven in de header staan, zoals in `CLAUDE.md` beschreven. Op deze pagina is er geen terugknop.
 
@@ -134,11 +134,13 @@ De eerste knop in het linkerblok is de hoofdactie van de eigen scan. In het rech
 
 Ontworpen in "Coniche Scan Mijn metingen", borden "Kaart met cirkel, voorstel (19 oktober)" (Volwassenheidsscan) en "Quickscan met cirkel, voorstel (19 oktober)" (Quickscan), gebouwd op 19 oktober 2026 (zie Zo gebouwd hieronder). Dit geldt voor alle Assessments met categorieën of afdelingen en vervangt voor hen de teaser "Jouw overall score" en de twee blokken naast elkaar uit Kaart: Lead en respondent. Hieronder staat eerst de kaart voor Assessments met categorieën, daarna de afwijkingen voor Assessments met afdelingen (Quickscan). Twee blokken van 500 px met een cirkel erbij passen niet naast elkaar, en Jij en Groep op één spoor laten het verschil per categorie direct zien.
 
+- **Breedte.** Elke kaart met een paneel is op volle breedte van de pagina, dus ook de kaart van een Lead zonder eigen scan en de kaart van een Lead die ook respondent is. Alle kaarten met een paneel zijn zo even breed en staan onder elkaar. Het paneel heeft minstens ongeveer 720 px nodig (zijblok 200 px, tussenruimte 40 px, rijen minstens 420 px en padding 64 px). In een halve kolom breken de responsregel, de datum en de as ("1" en "5") af. Zie het scherm van 19 oktober 2026, waar de smalle Lead-kaart naast een brede kaart stond.
 - **Paneel.** Onder de kop een paneel met achtergrond `--bg-warm`, rand `--border`, hoekstraal 10 px en padding 28 px 32 px. Links staat een zijblok van 200 px, rechts staan de rijen, met 40 px ertussen. Onder 720 px komt het zijblok boven de rijen.
 - **Cirkel.** 156 px, spoor `--bg-mid`, 14 px dik, afgeronde uiteinden, beginnend bovenaan en met de klok mee. De vulling is `(score − 1) / 4` van de omtrek, dus 3,0 is de helft. De kleur is de volle kleur van de afgeronde score (`stylesheet.md`, Drie niveaus van scorekleur, Vol): 3,0 is geel `--score-3` (`#eab308`). In de cirkel staat het getal in 36 px, gewicht 800, en daaronder "Totaalscore" in 12 px hoofdletters in `--ink-s`.
 - **Klassenchip.** Onder de cirkel, 24 px hoog, horizontale padding 12 px, 12 px vet, in de celkleur van de afgeronde score (`stylesheet.md`, tabel Cel). Bij 3,0 is dat "Uitbouwen" in `#fbf0b8` met tekst `#5c4800`. De chip is geen 32 px pil meer.
 - **Groep (alleen Lead met Resultaten aan).** Onder de chip staat na een lijn van 1 px `--border` het label "Groep, <n> scans" in 12 px hoofdletters en daaronder "<gemiddelde> <klasse>" in 14 px, waarin het getal vet is, bijvoorbeeld "2,8 Uitbouwen". De klasse van de groep volgt dezelfde regels als die van de eigen score.
 - **Stip op de cirkel (alleen Lead met zichtbare groep).** Het groepsgemiddelde staat ook op de cirkel, als stip van 14 px met een witte rand van 2 px in `--ink-m`, op de plek van het gemiddelde. De hoek is `(gemiddelde − 1) / 4 × 360°`, vanaf boven met de klok mee, dus 2,8 ligt iets voorbij de helft. De stip heeft geen categoriekleur en is niet in de ringkleur, omdat hij dan wegvalt tegen de vulling. Er is geen boog voor de laagste tot hoogste score, want die is op een cirkel moeilijk te lezen. Die spreiding blijft in de rijen. Onder de drempel van `benchmarkMinRespondenten` en bij een Respondent zonder Resultaten is er geen stip.
+- **Lead zonder eigen scan.** Zonder kolom Jij staat de groep als gevulde balk van 8 px in de categoriekleur, die op het gemiddelde eindigt, in plaats van een stip op een leeg spoor. Het getal staat in de ene kolom Groep. Bij meer dan één scan staat de spreiding erbij als lijn van 2 px (`#b3b0a8`) van de laagste tot de hoogste score, met een eindstreepje van 2 px breed en 12 px hoog op beide uiteinden, zodat de lijn ook zichtbaar is waar hij over de balk loopt. Er is dan geen stip. Bij één scan is er alleen de balk. De legenda noemt "Gemiddelde van de groep" (balk) en, bij meer dan één scan, "Laagste tot hoogste score" (lijn). De ring toont het gemiddelde van de groep zonder stip. Design: bord "Kaart met cirkel, voorstel (19 oktober)", onderaan.
 - **Respondent zonder Resultaten.** Onder de chip staat "Afgerond op <datum>" in 14 px `--ink-s`. Er is geen groepsregel en geen tweede kolom.
 - **Rijen.** Eén rij per categorie, 40 px hoog, in de vaste volgorde. Links de naam (120 px, 14 px, `--ink-m`), dan het spoor, en rechts één getalkolom van 44 px (bij een Lead twee), rechts uitgelijnd. Boven de rijen staat het label "Per categorie" in 12 px hoofdletters, met aan de rechterkant de kolomkoppen "Jij" en, bij een Lead, "Groep". Het spoor is een schaal van 1 tot 5, met onder de laatste rij de ankers "1" en "5" (12 px, `--ink-s`). Alle sporen zijn even lang en even hoog (`stylesheet.md`, Balklijst).
 - **Jij.** Een balk van 8 px in de categoriekleur. Het getal is 14 px vet.
@@ -149,6 +151,7 @@ Ontworpen in "Coniche Scan Mijn metingen", borden "Kaart met cirkel, voorstel (1
 - **Onder de drempel van `benchmarkMinRespondenten`.** Het paneel toont alleen de eigen balken en een regel "Resultaten van de groep volgen bij minstens <n> afgeronde scans" met de teller "<k> van <n>". Er is geen groepskolom, geen stip, geen lijn, geen groepsregel en geen legenda (Voorwaarden).
 - **Knoppen.** Onder het paneel, volgens Knoppen hierboven (40 px hoog, bij meer dan één knop 232 px breed, naast elkaar op één rij): Lead met eigen scan "Bekijk jouw resultaten" en "Resultaten hele meting" (hoofdacties) en "Respondenten uitnodigen" (nevenactie), een respondent alleen "Bekijk jouw resultaten".
 - **Geen chip Tussenstand of Eindstand.** In deze kaart vervalt die chip. Compleet of het percentage in de responsregel zegt al of de meting klaar is, en de datum staat daarnaast.
+- **Zelfde ring op het resultatenscherm.** De cirkel is de `.score-ring` van `stylesheet.md` (Resultaten) en wordt ook gebruikt in de totaalkaart van het resultatenscherm, voor de Volwassenheidsscan en de Quickscan. Daar vervangt ze de oude classificatiecirkel. Voor de Quickscan staat de opbouw in `content-ziekenhuis-quickscan.md`, Resultaten. De totaalkaart van de Volwassenheidsscan is nog niet opnieuw getekend en krijgt alleen de nieuwe ring, met de rest van de kaart zoals nu (Open punten).
 - **Typografie.** Vier groottes (12, 14, 18 en 36 px) en twee gewichten (400 en 700), met 800 alleen voor het getal in de cirkel. De labels "Jouw overall score" en "Gemiddelde score · <n> scans" vervallen, omdat de cirkel en de kolomkoppen hetzelfde zeggen.
 - **Toegankelijkheid.** De cirkel heeft een tekstalternatief ("Totaalscore 3,0, Uitbouwen"). Per rij staat het tekstalternatief uit Volwassenheidsscan hierboven.
 
@@ -160,6 +163,7 @@ Dezelfde kaart, in percentages en met klassekleuren. Alles hierboven geldt, beha
 - **Chip.** De klassenaam van het totaal in de celkleur van die klasse (`visualisatie-quickscan.md`, Nieuwe stijlwaarden): "Aanzienlijke ontwikkelruimte" (`#fdecec`, tekst `#7f1d1d`), "Gemiddeld ontwikkeld" (`#fdf2e3`, tekst `#6b3a00`) of "Sterk ontwikkeld" (`#e7f6ef`, tekst `#0e4d30`). Het zijblok is 220 px breed in plaats van 200 px, omdat de langste naam anders niet past.
 - **Stip op de cirkel.** Zoals hierboven, met de hoek `percentage / 100 × 360°`. De groepsregel luidt "<percentage> <klassenaam>", bijvoorbeeld "58% Gemiddeld ontwikkeld".
 - **Rijen.** Eén rij per afdeling in de volgorde van het Assessment, met de naam in 136 px (afgekapt met `…` en de volledige naam in de tooltip), en daarachter hetzelfde spoor en dezelfde getalkolommen. Een afdeling die in deze scan niet is ingevuld, wordt weggelaten. De getallen zijn percentages ("53%"), afgerond op hele procenten. De punten ("8/15") staan niet meer in de rij en komen in de tooltip van de rij en in de resultaten.
+- **Afdeling niet beantwoord.** Een afdeling waarvan de vragen in deze scan niet zijn beantwoord, blijft als rij staan, zodat de volgorde gelijk blijft. De tekst zegt wat er is gebeurd en niet dat de afdeling niet relevant is, omdat iemand van die afdeling het kan lezen. De naam staat in `--ink-s`, het spoor is leeg en in de kolom Jij staat een streepje ("–", 14 px gewoon, `--ink-s`) in plaats van een percentage. De tooltip van de rij luidt "Niet beantwoord". Onder de rijen staat een regel in 12 px `--ink-s`: "– Niet beantwoord. Het totaal telt alleen de beantwoorde afdelingen." De afdeling telt niet mee in het totaal en in de ring. Bij een Lead blijven stip, lijn en groepspercentage van die afdeling staan als andere scans de afdeling wel hebben. Heeft geen enkele scan een waarde, dan is er ook geen groepskolom voor die rij en staat er een streepje in beide kolommen.
 - **Schaal.** Van 0 tot 100%, met de ankers "0" en "100%" onder de laatste rij.
 - **Kleur van balk en stip.** De afdelingen hebben geen eigen kleur. De balk heeft de klassekleur van het eigen percentage van die afdeling, en de stip de klassekleur van het gemiddelde van de groep voor die afdeling. De lijn is `#b3b0a8`, zoals hierboven.
 - **Lijn.** Van de laagste tot de hoogste afdelingsscore van een afgeronde scan. Zijn die gelijk, dan alleen een stip.
@@ -209,7 +213,7 @@ Alles volgt `stylesheet.md`. Voor deze pagina in het bijzonder:
 
 ## Responsive
 
-- Vanaf 1120 px: Twee kaarten naast elkaar, teaser-kaarten volle breedte.
+- Vanaf 1120 px: Twee kaarten naast elkaar, kaarten met een teaser of een paneel met cirkel altijd op volle breedte.
 - Onder 920 px: Kaarten onder elkaar, de blokken Jouw scan en Hele meting onder elkaar, de teaser-rijen smaller (naam 130 px, waarde 40 px).
 - Onder 640 px: De h1 is 32 px, knoppen op 100% breedte, de teaser-balken onder het getal.
 
@@ -229,6 +233,7 @@ Alles volgt `stylesheet.md`. Voor deze pagina in het bijzonder:
 
 ## Open punten
 
+- Totaalkaart van de Volwassenheidsscan op het resultatenscherm: De ring staat vast, de rest van de kaart is nog niet opnieuw getekend.
 
 - **Laatst opgeslagen.** `ScanInvulling` heeft geen veld voor het laatste opslagmoment. Voorstel: `laatstOpgeslagenOp` (datum en tijd), gezet bij elk opslaan van een antwoord. Zonder dat veld vervalt de rechterhelft van de voortgangsregel.
 - **Tussenstand en eindstand.** Voorstel: Een Meting is open zolang er geen sluitingsdatum is gepasseerd en niet alle uitgenodigde scans zijn afgerond. Er is nog geen gedefinieerde "afgesloten Meting". Bevestigen of er een Admin-actie komt, of dat het automatisch uit de status volgt.
@@ -255,7 +260,7 @@ Gebouwd op 15 oktober 2026. De pagina is `app/s/[code]/page.tsx`, de kaarten sta
 - **"Respondenten uitnodigen"** opent onder de knoppen het invoerveld voor een e-mailadres.
 - **Benchmarkkaart.** Titel is `Benchmark.naam`. De regel noemt het aantal organisaties alleen bij `benchmarkMinOrganisaties`. Bij
   niveau 2 staat "Vergelijking van Metingen".
-- **Smalle blokken.** In een kaart of blok smaller dan 560px staat het getal boven de rijen (container query), zodat de balken
+- **Smalle blokken.** Vervallen voor een kaart met een paneel, want die is altijd breed. Voor andere kaarten: In een kaart of blok smaller dan 560px staat het getal boven de rijen (container query), zodat de balken
   breed genoeg blijven naast een tweede blok.
 - **Een Lead is altijd als Lead herkenbaar** (op verzoek van Sander): Naast de naam van de Organisatie in de kop staat de
   rolchip "Lead", ook als er geen Meting of vergelijking voor hem aanstaat. Zijn er geen Lead-kaarten, dan staat er een korte

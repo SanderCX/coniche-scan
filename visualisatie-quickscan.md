@@ -44,8 +44,8 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 
 **Aanscherpingen.**
 
-- De totaalkaart noemt de afdelingen die niet meetellen bij naam ("Patiëntenservice is niet van toepassing en telt niet mee").
-- De ring in de totaalkaart is gekleurd in de klassekleur van het totaal.
+- De totaalkaart noemt de afdelingen die niet meetellen bij naam ("Vragen over Patiëntenservice zijn niet beantwoord. De afdeling telt niet mee in het totaal").
+- De ring in de totaalkaart is de `.score-ring` van `stylesheet.md` (Resultaten): Een boog die voor `percentage / 100` gevuld is, in de klassekleur van het totaal, met het percentage in de ring en de klassenaam als chip eronder. Ze is dezelfde als op Mijn metingen (besloten op 19 oktober 2026).
 - De kaart "Niet van toepassing" zegt dat de antwoorden bewaard blijven als de respondent de keuze later wijzigt.
 - De legenda toont per klasse de grens in procenten en de punten per afdeling (12 tot en met 15, 8 tot en met 11, 0 tot en met 7 van 15).
 - De chips "Grootste aandachtspunt" en "Relatief sterkste basis" staan onder elkaar, rood en groen omrand, met de `aandachtZin` erboven.
