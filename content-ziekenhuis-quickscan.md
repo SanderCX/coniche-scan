@@ -204,7 +204,7 @@ Classificatie. Van boven naar beneden:
    dat de afdeling niet relevant is, omdat iemand van die afdeling het kan
    lezen. Met weging staan hier de gewogen punten (`datamodel.md`,
    Scoreberekening). Op de eigen resultaten van een Respondent staat geen
-   groepsstip op de ring.
+   groepsstip op de ring. Gebouwd op 19 oktober 2026 in `components/QuickscanResultaten.tsx`.
 2. **Scores per afdeling.** Een kaart per categorie, twee kolommen, in
    de volgorde van de afdelingen. Een afdeling die niet van toepassing is
    krijgt een grijze kaart met de naam doorgestreept, de tekst "Niet van

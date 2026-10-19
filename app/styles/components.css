@@ -886,28 +886,52 @@ select.veld-compact:focus {
 }
 
 /* ---------- Classificatie / legenda ---------- */
-.classificatie-cirkel {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
+/* De ring van de totaalscore (`stylesheet.md`, Resultaten, `.score-ring`). */
+.score-ring-blok {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: 0 auto;
+}
+.score-ring {
+  position: relative;
+  width: 156px;
+  height: 156px;
+}
+.score-ring svg {
+  display: block;
+}
+.score-ring-tekst {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 8px solid var(--kleur, var(--stat-amber));
-  margin: 0 auto;
+  gap: var(--sp-1);
 }
-
-.classificatie-cirkel .score {
-  font-size: var(--fs-40);
+.score-ring-getal {
+  font-size: var(--fs-36);
   font-weight: 800;
+  line-height: 1;
   color: var(--ink);
 }
-
-.classificatie-cirkel .label {
+.score-ring-label {
+  font-size: var(--fs-12);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.score-ring-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 var(--sp-3);
+  border-radius: 12px;
   font-size: var(--fs-12);
   font-weight: 700;
-  color: var(--kleur, var(--stat-amber));
+  white-space: nowrap;
 }
 
 .legenda {
@@ -1235,24 +1259,15 @@ select.veld-compact:focus {
 .qs-totaal {
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: var(--sp-8);
   justify-content: space-between;
   align-items: center;
-}
-.qs-totaal-percentage {
-  font-size: var(--fs-48);
-  font-weight: 800;
-  line-height: 1.1;
-  margin: 0.2rem 0 0;
-}
-.qs-totaal-punten {
-  font-size: var(--fs-18);
-  font-weight: 600;
-  color: var(--ink-m);
+  padding: 28px 32px;
 }
 .qs-totaal-klasse {
+  font-size: var(--fs-18);
   font-weight: 700;
-  margin: 0.3rem 0 0;
+  margin: var(--sp-2) 0 var(--sp-1);
 }
 .qs-totaal-rechts {
   min-width: 11rem;

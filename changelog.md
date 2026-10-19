@@ -1,5 +1,19 @@
 # Coniche Scan — Changelog
 
+## 2026-10-19 (7) — Specs van Joost, PR 137: de `.score-ring` voor de totaalscore op Mijn metingen en de resultaten
+
+Op verzoek van Sander gebouwd (`stylesheet.md`, Resultaten; `content-ziekenhuis-quickscan.md`, Resultaten; `visualisatie-mijn-metingen.md`, Kaart met cirkel). Helpbestanden: Geen aanpassing.
+
+**Gedaan**:
+- **Eén ring** (`components/ScoreRing.tsx`, `.score-ring`): Dezelfde ring op Mijn metingen, het resultatenscherm van een scan met een schaal (`ScoreCircle`, ook in de voorbeeld-output en de benchmark) en de totaalkaart
+  van de Quickscan. De oude classificatiecirkel is uit de interface verdwenen (de PDF houdt de zijne). `--fs-36` is toegevoegd.
+- **Quickscan-totaalkaart**: De nieuwe opbouw met de klasse in 18px, "{punten} van {maximum} punten", "{x} van 4 afdelingen beoordeeld" en de ring met chip. De zin over een afdeling die niet meetelt luidt nu "Vragen over
+  {afdeling} zijn niet beantwoord. De afdeling telt niet mee in het totaal."
+- **Mijn metingen**: Een kaart met een paneel is altijd op volle breedte, een Lead zonder eigen scan krijgt de groep als balk met lijn en eindstreepjes, en een niet-beantwoorde Quickscan-afdeling blijft als rij staan met "–" en
+  een uitlegregel. 1 nieuwe test.
+
+**Keuzes waar de spec open liet**: Het getal in de ring is `--fs-36`, het oude `--text-3xl` van Tailwind (40px) blijft staan omdat niets het gebruikt.
+
 ## 2026-10-19 (6) — Specs van Joost, PR 134: KPI-kolomkop, Quickscan-ruimte, de ring in de film en de Kaart met cirkel
 
 Op verzoek van Sander gebouwd (`beheerpagina.md`, punt 4, KPI's; `visualisatie-quickscan.md`, 3, Ruimte en lagen; `visualisatie-mijn-metingen.md`, Kaart met cirkel; `help.md`, Films). Helpbestanden: Geen, want de film

@@ -1,6 +1,7 @@
 "use client";
 
 import { balkVul } from "@/lib/format";
+import { ScoreRing, ringVanTeaser } from "@/components/ScoreRing";
 import { Respons, Teaser, langeDatum } from "@/lib/mijn-metingen";
 import { dagVan } from "@/lib/metingen";
 
@@ -10,52 +11,6 @@ import { dagVan } from "@/lib/metingen";
  * Groep op één spoor. Eén paneel voor een Respondent, een Lead en een Lead die ook invult, voor elk Assessment met categorieën of
  * afdelingen. De groep staat er alleen bij een Lead met Resultaten en genoeg afgeronde scans.
  */
-
-const CIRKEL = 156;
-const DIKTE = 14;
-const STRAAL = (CIRKEL - DIKTE) / 2;
-const OMTREK = 2 * Math.PI * STRAAL;
-
-/** De cirkel: Spoor, vulling vanaf boven met de klok mee en bij een groep een stip op het gemiddelde. */
-function Cirkel({ teaser, stipFractie, alt }: { teaser: Teaser; stipFractie?: number; alt: string }) {
-  const fractie = Math.min(1, Math.max(0, teaser.ring.fractie));
-  const hoek = ((stipFractie ?? 0) * 2 * Math.PI) as number;
-  const midden = CIRKEL / 2;
-  return (
-    <div className="mm-cirkel" role="img" aria-label={alt}>
-      <svg width={CIRKEL} height={CIRKEL} viewBox={`0 0 ${CIRKEL} ${CIRKEL}`} aria-hidden="true">
-        <circle cx={midden} cy={midden} r={STRAAL} fill="none" stroke="var(--bg-mid)" strokeWidth={DIKTE} />
-        {fractie > 0 && (
-          <circle
-            cx={midden}
-            cy={midden}
-            r={STRAAL}
-            fill="none"
-            stroke={teaser.ring.kleur}
-            strokeWidth={DIKTE}
-            strokeLinecap="round"
-            strokeDasharray={`${fractie * OMTREK} ${OMTREK}`}
-            transform={`rotate(-90 ${midden} ${midden})`}
-          />
-        )}
-        {stipFractie !== undefined && (
-          <circle
-            cx={midden + STRAAL * Math.sin(hoek)}
-            cy={midden - STRAAL * Math.cos(hoek)}
-            r={7}
-            fill="var(--ink-m)"
-            stroke="var(--bg-warm)"
-            strokeWidth={2}
-          />
-        )}
-      </svg>
-      <div className="mm-cirkel-tekst">
-        <span className="mm-cirkel-getal">{teaser.getal}</span>
-        <span className="mm-cirkel-label">Totaalscore</span>
-      </div>
-    </div>
-  );
-}
 
 export function CirkelPaneel({
   eigen,
@@ -87,14 +42,11 @@ export function CirkelPaneel({
   return (
     <div className={`mm-paneel ${quick ? "mm-paneel--quick" : ""}`}>
       <div className="mm-zij">
-        <Cirkel
-          teaser={hoofd}
+        <ScoreRing
+          ring={ringVanTeaser(hoofd)}
           stipFractie={metJij && groep ? groep.ring.fractie : undefined}
           alt={`Totaalscore ${hoofd.getal}${klasse ? `, ${klasse}` : ""}`}
         />
-        <span className="mm-cirkel-chip" style={{ background: hoofd.ring.chipAchtergrond, color: hoofd.ring.chipTekst }}>
-          {klasse}
-        </span>
         {metJij && groep && (
           <div className="mm-zij-groep">
             <span className="mm-label-klein">Groep, {groepAantal} scans</span>
@@ -124,23 +76,42 @@ export function CirkelPaneel({
         </div>
         {hoofd.rijen.map((r) => {
           const g = groepRij.get(r.sleutel);
-          const alt = [r.alt, metJij && g ? `groep ${g.waarde}` : ""].filter(Boolean).join(", ");
+          const jijLeeg = r.nietBeantwoord === true;
+          const groepLeeg = !g || g.nietBeantwoord === true;
+          const alt = [r.alt, metJij && g && !g.nietBeantwoord ? `groep ${g.waarde}` : ""].filter(Boolean).join(", ");
+          const titel = jijLeeg ? "Niet beantwoord" : quick && metJij ? r.waarde : undefined;
           return (
-            <div key={r.sleutel} className="mm-paneel-rij" role="img" aria-label={alt} title={quick && metJij ? r.waarde : undefined}>
-              <span className="mm-paneel-naam" title={r.naam}>
+            <div key={r.sleutel} className="mm-paneel-rij" role="img" aria-label={alt} title={titel}>
+              <span className={`mm-paneel-naam ${jijLeeg && metJij ? "mm-paneel-naam--leeg" : ""}`} title={r.naam}>
                 {r.naam}
               </span>
               <span className="mm-paneel-spoor" aria-hidden="true">
-                {metJij && <i {...vul(r.fractie * 100, r.kleur)} />}
-                {metGroep && g && (
+                {metJij && !jijLeeg && <i {...vul(r.fractie * 100, r.kleur)} />}
+                {metGroep && !groepLeeg && g && (
                   <>
-                    {g.lijn && <b className="mm-teaser-lijn" style={{ left: `${g.lijn.van * 100}%`, width: `${(g.lijn.tot - g.lijn.van) * 100}%` }} />}
-                    <b className="mm-teaser-stip" style={{ left: `${g.fractie * 100}%`, background: g.kleur }} />
+                    {/* Met een Jij: Een stip op het gemiddelde. Zonder Jij: Een balk tot het gemiddelde, want een stip op een leeg spoor valt weg. */}
+                    {!metJij && <i {...vul(g.fractie * 100, g.kleur)} />}
+                    {g.lijn && (metJij || (groep?.aantalScans ?? 0) > 1) && (
+                      <>
+                        <b className="mm-teaser-lijn" style={{ left: `${g.lijn.van * 100}%`, width: `${(g.lijn.tot - g.lijn.van) * 100}%` }} />
+                        {!metJij && (
+                          <>
+                            <b className="mm-teaser-eind" style={{ left: `${g.lijn.van * 100}%` }} />
+                            <b className="mm-teaser-eind" style={{ left: `${g.lijn.tot * 100}%` }} />
+                          </>
+                        )}
+                      </>
+                    )}
+                    {metJij && <b className="mm-teaser-stip" style={{ left: `${g.fractie * 100}%`, background: g.kleur }} />}
                   </>
                 )}
               </span>
-              {metJij && <span className="mm-paneel-waarde mm-paneel-waarde--jij">{quick ? r.waarde.split(" · ").pop() : r.waarde}</span>}
-              {metGroep && <span className="mm-paneel-waarde">{g?.waarde ?? ""}</span>}
+              {metJij && (
+                <span className={`mm-paneel-waarde ${jijLeeg ? "mm-paneel-waarde--leeg" : "mm-paneel-waarde--jij"}`}>
+                  {jijLeeg ? "–" : quick ? r.waarde.split(" · ").pop() : r.waarde}
+                </span>
+              )}
+              {metGroep && <span className="mm-paneel-waarde">{groepLeeg ? "–" : g.waarde}</span>}
             </div>
           );
         })}
@@ -153,12 +124,24 @@ export function CirkelPaneel({
           {metJij && <span />}
           {metGroep && <span />}
         </div>
-        {metJij && metGroep && (
+        {metGroep && (
           <p className="mm-legenda">
-            <span><i className="mm-legenda-balk" /> Jouw score</span>
-            <span><i className="mm-legenda-stip" /> Gemiddelde van de groep</span>
-            <span><i className="mm-legenda-lijn" /> Laagste tot hoogste score</span>
+            {metJij ? (
+              <>
+                <span><i className="mm-legenda-balk" /> Jouw score</span>
+                <span><i className="mm-legenda-stip" /> Gemiddelde van de groep</span>
+                <span><i className="mm-legenda-lijn" /> Laagste tot hoogste score</span>
+              </>
+            ) : (
+              <>
+                <span><i className="mm-legenda-balk" /> Gemiddelde van de groep</span>
+                {(groep?.aantalScans ?? 0) > 1 && <span><i className="mm-legenda-lijn" /> Laagste tot hoogste score</span>}
+              </>
+            )}
           </p>
+        )}
+        {quick && hoofd.rijen.some((r) => r.nietBeantwoord) && (
+          <p className="mm-sub mm-wacht-regel">– Niet beantwoord. Het totaal telt alleen de beantwoorde afdelingen.</p>
         )}
         {metJij && groepWacht && (
           <p className="mm-sub mm-wacht-regel">

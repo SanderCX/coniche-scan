@@ -745,7 +745,12 @@ bekijken/wijzigen" in "Mijn gegevens" houdt zijn naam, want die staat zo in
   12px hoofdletters eronder. Onder de ring staat de klassenchip in de celkleur.
   Een groepsstip (14px, `--ink-m`, witte rand van 2px) staat alleen waar een
   groep zichtbaar is. De PDF-export houdt zijn eigen cirkel
-  (`export-pdf-visual-volwassenheidsscan.md`).
+  (`export-pdf-visual-volwassenheidsscan.md`). **Zo gebouwd (19 oktober 2026)**:
+  `components/ScoreRing.tsx` (`.score-ring` in `components.css`) is de ene
+  component voor Mijn metingen (`CirkelPaneel`), het resultatenscherm
+  (`ScoreCircle`, ook in de voorbeeld-output en de benchmark) en de totaalkaart van
+  de Quickscan. De klasse `.classificatie-cirkel` bestaat alleen nog in de PDF.
+  `--fs-36` staat in `tokens.css`, `--fs-40` is niet meer in gebruik.
 - `.legenda` voor de legenda.
 - Staafdiagram per categorie (`components/CategoryBarChart.tsx`): De categoriekleur,
   zie Categoriekleuren. Het staafdiagram per bouwblok of domein (AI-scan, geen

@@ -405,7 +405,8 @@ export function LeadKaart(invoer: LeadInvoer) {
   const g = groepGegevens(invoer);
   const samengesteld = isSamengesteld(scanUitvoering);
   return (
-    <article className="mm-kaart">
+    // Een kaart met een paneel heeft altijd de volle breedte.
+    <article className={`mm-kaart ${g.paneel ? "mm-kaart--vol" : ""}`}>
       <KaartKop
         assessment={assessment}
         titel={assessment?.naam ?? "Onbekend type"}

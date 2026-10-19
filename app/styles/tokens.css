@@ -38,7 +38,8 @@
   --fs-18: 18px;   /* inleidende regel, h3, titel van modals en beheerblokken, h2 in beheer */
   --fs-24: 24px;   /* kop van een bouwblok en van een Assessment-kaart */
   --fs-32: 32px;   /* paginatitel, h2 op publieke pagina's */
-  --fs-40: 40px;   /* score in de classificatiecirkel */
+  --fs-36: 36px;   /* getal in de .score-ring */
+  --fs-40: 40px;   /* vervallen voor de ring, nog niet meer in gebruik */
   --fs-48: 48px;   /* h1 op publieke pagina's */
 
   /* Afstanden, raster van 4px (stylesheet.md, Afstanden) */
