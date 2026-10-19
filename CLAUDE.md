@@ -575,7 +575,8 @@ geen afwijking van de spec maar een gat erin.
    afgerond, dan begint `.nav-right` direct met de 4 vaste links, geen
    losse scheidingslijn. Dan de 4 vaste content-links, dan de
    scheidingslijn, dan "← Terug naar Mijn metingen".
-6. **Resultatenscherm**: Overall score met classificatiecirkel en
+6. **Resultatenscherm**: Overall score in de ring (`.score-ring`,
+   `stylesheet.md`, Resultaten, besloten op 19 oktober 2026) en
    voortgang, radar van alle bouwblokken, staafdiagram per categorie
    (in de categoriekleuren, met de klassegrenzen als stippellijn, gebouwd op 19 oktober 2026, voorheen volgde de kleur de score), top 3 sterktes en verbeterkansen, legenda.
    **Bij AI-volwassenheid** (geen categorielaag, `content-ai-scan.md`)
@@ -584,7 +585,8 @@ geen afwijking van de spec maar een gat erin.
    hoog naar laag (`Assessment.scoresPerGroepGesorteerd`).
 
    **Bij Ja / Nee / Weet ik niet (Quickscan)** heeft het scherm een eigen
-   opbouw: Een totaalkaart, een kaart per afdeling (categorie) met
+   opbouw: Een totaalkaart (met de ring, `content-ziekenhuis-quickscan.md`,
+   Resultaten), een kaart per afdeling (categorie) met
    verdieping op de bouwblokken (dimensies), "Sterkste afdeling" en
    "Meeste ontwikkelruimte", en de legenda van de drie klassen. Radar,
    staafdiagram per categorie en top 3 vervallen. Een afdeling die niet

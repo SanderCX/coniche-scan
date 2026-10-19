@@ -187,14 +187,24 @@ componenten en tokens uit `stylesheet.md` (kaart, badge, voortgangsbalk,
 scorekleuren). Klassen en grenzen: `CLAUDE.md`, sectie 1,
 Classificatie. Van boven naar beneden:
 
-1. **Totaalkaart.** Links het label "OVERALL VOLWASSENHEID", het
-   totaalpercentage groot met "({punten}/{maximum})" ernaast en daaronder
-   de klassenaam van de totaalscore in klassekleur. Rechts
-   een cirkel met het percentage, "{x} van 4 afdelingen beoordeeld" en
-   "{punten} van {maximum} punten". Alleen de afdelingen die van
-   toepassing zijn tellen mee, dus bij één afdeling met 14 Ja staat er
-   "93%", "(14/15)" en "1 van 4 afdelingen beoordeeld". Met weging staan
-   hier de gewogen punten (`datamodel.md`, Scoreberekening).
+1. **Totaalkaart** (besloten op 19 oktober 2026, design bord "Totaalkaart
+   resultaten met ring, voorstel (19 oktober)"). Een kaart met padding
+   28px 32px. Links staan het label "OVERALL VOLWASSENHEID" in 12px
+   hoofdletters, daaronder de klassenaam van de totaalscore in 18px, gewicht
+   700 en klassekleur, dan "{punten} van {maximum} punten" en "{x} van 4
+   afdelingen beoordeeld" in 14px `--ink-m`. Rechts staat de ring
+   (`.score-ring`, `stylesheet.md`, Resultaten) met het totaalpercentage erin
+   en de klassenaam als chip eronder. Het grote percentage links met
+   "({punten}/{maximum})" vervalt, omdat het getal nu in de ring staat. Alleen
+   de afdelingen die van toepassing zijn tellen mee, dus bij één afdeling met
+   14 Ja staat er "93%", "14 van 15 punten" en "1 van 4 afdelingen
+   beoordeeld". Een afdeling die niet meetelt staat bij naam onder de regels,
+   in 14px `--ink-m`, bijvoorbeeld "Vragen over Verpleegafdeling zijn niet
+   beantwoord. De afdeling telt niet mee in het totaal." De tekst noemt niet
+   dat de afdeling niet relevant is, omdat iemand van die afdeling het kan
+   lezen. Met weging staan hier de gewogen punten (`datamodel.md`,
+   Scoreberekening). Op de eigen resultaten van een Respondent staat geen
+   groepsstip op de ring.
 2. **Scores per afdeling.** Een kaart per categorie, twee kolommen, in
    de volgorde van de afdelingen. Een afdeling die niet van toepassing is
    krijgt een grijze kaart met de naam doorgestreept, de tekst "Niet van

@@ -160,7 +160,7 @@ en 3,5) samenvallen met de afrondingsgrenzen:
 Een classificatielabel neemt de kleur van de afgeronde score over.
 
 Gebruikt voor: Scores per bouwblok en per categorie, de overall score,
-de classificatiecirkel, de staafdiagrammen, de top 3 en de legenda. Niet
+de ring van de totaalscore, de staafdiagrammen, de top 3 en de legenda. Niet
 voor de antwoordopties in de vragenlijst zelf, om respondenten niet
 richting een kleur te sturen.
 
@@ -189,7 +189,7 @@ onderdeel hoort, ligt vast:
   en de antwoorden in Antwoorden. De vijf stappen zijn zachter dan de volle
   kleuren, zodat een tabel vol getallen rustig blijft.
 - **Vol** (`--score-N`): Alleen voor kleine tekens en vlakken zonder lopende
-  tekst: De classificatiecirkel, een stip, een bol, een balk, de ring in een
+  tekst: De ring van de totaalscore (`.score-ring`), een stip, een bol, een balk, de ring in een
   totaalkaart en de marker bij een legenda-item.
 
 Een cel met een getal gebruikt dus nooit de volle kleur. De matrix in A tot en
@@ -264,7 +264,8 @@ onder (zie boven).
 | `--fs-18` | 18px | Inleidende regel op publieke pagina's, h3, titel van modals en beheerblokken, koppen in de privacypagina en de overzichtsmodal, `.admin-main h2` |
 | `--fs-24` | 24px | Kop van een bouwblok en van een Assessment-kaart |
 | `--fs-32` | 32px | Paginatitel (beheer, resultaten, voorbeeld-output), h2 op publieke pagina's |
-| `--fs-40` | 40px | Score in de classificatiecirkel |
+| `--fs-36` | 36px | Getal in de `.score-ring` |
+| `--fs-40` | 40px | Vervallen voor de ring. Alleen nog in gebruik als een ander onderdeel dit token noemt |
 | `--fs-48` | 48px | h1 op publieke pagina's |
 
 - **Wat er vervalt**: De tokens `--fs-xs`, `--fs-s`, `--fs-m` en `--fs-l`, de maten
@@ -731,8 +732,21 @@ bekijken/wijzigen" in "Mijn gegevens" houdt zijn naam, want die staat zo in
 
 ### Resultaten
 
-- `.classificatie-cirkel` en `.legenda` voor de overall score en de
-  legenda.
+- `.score-ring` (besloten op 19 oktober 2026, design bord "Totaalkaart
+  resultaten met ring, voorstel (19 oktober)" en `visualisatie-mijn-metingen.md`,
+  Kaart met cirkel) vervangt de classificatiecirkel overal op het scherm. Eén
+  component voor de totaalscore op Mijn metingen en op het resultatenscherm:
+  156px, een spoor in `--bg-mid` en een boog van 14px met afgeronde uiteinden,
+  beginnend bovenaan en met de klok mee. De vulling is `(score − 1) / 4` bij een
+  score van 1 tot 5 en `percentage / 100` bij een percentage. De kleur van de
+  boog is de volle kleur van de afgeronde score (`--score-N`) of, bij de
+  Quickscan, de klassekleur (`--stat-red`, `--stat-amber`, `--stat-green`). In de
+  ring staat het getal in 36px (`--fs-36`), gewicht 800, met "Totaalscore" in
+  12px hoofdletters eronder. Onder de ring staat de klassenchip in de celkleur.
+  Een groepsstip (14px, `--ink-m`, witte rand van 2px) staat alleen waar een
+  groep zichtbaar is. De PDF-export houdt zijn eigen cirkel
+  (`export-pdf-visual-volwassenheidsscan.md`).
+- `.legenda` voor de legenda.
 - Staafdiagram per categorie (`components/CategoryBarChart.tsx`): De categoriekleur,
   zie Categoriekleuren. Het staafdiagram per bouwblok of domein (AI-scan, geen
   categorielaag) houdt de scorekleur per balk (`--score-1` t/m `--score-5`).
