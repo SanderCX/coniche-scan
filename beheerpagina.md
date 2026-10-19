@@ -932,12 +932,67 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   filter Organisatie al ingesteld op deze organisatie (in de URL, zoals de
   andere filters). Zijn het er 5 of minder, dan is er geen link. Er komt
   geen link naar de lijst over alle organisaties heen.
+- **Kenmerken** (uitgeschreven op 19 oktober 2026 naar de gebouwde kaart; design
+  in `Claude outputs/kpi-design/`, bord 1 en 2, linksboven): De kaart bovenaan
+  het organisatie-detail, boven de kaarten KPI's en Metingen. Ze toont de
+  waarden van de organisatievelden (`datamodel.md`, Organisatievelden) als een
+  rustig raster, en laat bewerken op dezelfde plek.
+  - **Kaart**: Zoals Kaarten in `stylesheet.md` (wit, `1px solid var(--border)`,
+    `border-radius: 10px`). Bovenin links de titel Kenmerken (18px, gewicht 700),
+    rechts de knop "Bewerken" (`.btn-outline .btn-compact`, vraagt
+    `organisaties.bewerken`). Een Lead of Respondent ziet deze kaart niet.
+  - **Raster**: Vier kolommen van gelijke breedte, 32px tussen de kolommen en
+    16px tussen de rijen, met de velden rij na rij van links naar rechts. Per veld
+    staat het label boven de waarde, op twee regels en zonder lijnen of vlakken
+    ertussen.
+  - **Label**: 12px, gewicht 400, in `--ink-s`. Het label is de veldnaam
+    (`VeldDefinitie.label`, nooit de korte naam). Heeft de waarde meer delen, dan
+    noemt het label die delen in dezelfde volgorde, gescheiden door een komma
+    of een schuine streep met een spatie aan weerskanten: "Klanten, B2B / B2C".
+  - **Waarde**: 16px, gewicht 600, in `--ink`, op één regel. Past ze niet, dan
+    breekt ze af op een spatie en blijft het label bij de eerste regel staan. De
+    waarde staat letterlijk zoals ze is opgeslagen, dus ook bij "Anders…" in de
+    spelling van de invoer. Een korte naam komt hier niet voor.
+  - **Opmaak per soort veld**: Getallen met duizendtalpunt en komma als
+    decimaalteken (410.000). Een percentage met het procentteken direct achter het
+    getal (38%). Bij meer delen staan de delen achter elkaar: "410.000, 15 / 85%"
+    (aantal klanten, daarna B2B / B2C), "140, 70% inhouse" (FTE, daarna het
+    aandeel inhouse) en "31% / 60%" (digitalisering 2026 / 2030). Een
+    techstack-categorie toont de oplossing en daarachter hoe ze wordt
+    ondersteund: "Pakket 1, extern ondersteund" of, bij "Geen ondersteuning",
+    "Pakket 1, zelf ondersteund". Deploymentmodel en cloudleverancier staan alleen
+    in het formulier. Een keuze als "Nog niet ingezet" is een waarde en staat er
+    gewoon.
+  - **Lege velden**: Een veld zonder waarde staat niet in het raster, zodat de
+    kaart alleen laat zien wat bekend is. Is geen enkel veld ingevuld, dan staat
+    er in plaats van het raster de tekst "Er zijn nog geen kenmerken ingevuld."
+    in `--ink-s` (14px), met "Bewerken" rechtsboven zoals altijd.
+  - **Bewerken** (voorstel van 19 oktober 2026, volgt de regel Bewerken in
+    `stylesheet.md`): "Bewerken" opent een modal (`.modal-box--breed`, titel
+    "Kenmerken bewerken" met de naam van de Organisatie eronder) met de velden
+    van `datamodel.md`, Organisatievelden, in een raster van twee kolommen. Het
+    zijn er te veel om in de kaart zelf te bewerken, en een formulier in de kaart
+    verspringt de pagina. Onderin "Annuleren" (`.btn-outline`) en "Opslaan"
+    (`.btn-or`), rechts uitgelijnd. Opslaan schrijft naar
+    `Organisatie.kenmerken`, sluit de modal en de kaart toont de nieuwe waarden.
+    Annuleren en het kruisje gooien de wijzigingen weg. Terwijl de modal open
+    staat, geldt het Bewerkslot (`datamodel.md`, Bewerkslot). Een veld dat van een
+    ander veld afhangt (Subsector bij Sector) volgt de regels uit het datamodel.
+  - **Wat de kaart niet bevat**: De KPI's en de contacten per kanaal staan in de
+    kaart eronder (hieronder). De Meting, het benchmarkvinkje en de Leads hebben
+    eigen blokken.
+  - **Open**: Controleer in de gebouwde kaart de volgorde van de velden
+    (in de schermafbeelding staat Digitalisering tussen CRM en Conversational AI,
+    terwijl de lijst in `organisatie-velden.ts` ze apart groepeert) en of bij
+    Sector de volledige SBI-naam of een korte naam staat. De spec vraagt de
+    volledige naam, want een korte naam hoort niet in het organisatie-detail
+    (`datamodel.md`, Korte namen).
 - **KPI's** (gebouwd op 19 oktober 2026, ontworpen; design
   in `Claude outputs/kpi-design/`, bord 1 en 2): Een eigen kaart onder de
   Kenmerken. De KPI's en de contacten per kanaal staan niet meer bij de
   Kenmerken (`datamodel.md`, KPI's en kanalen). De Kenmerken zelf zijn in het
-  design een compacte lijst met "Bewerken". Dat is een illustratie, want de
-  spec van de Kenmerken verandert alleen doordat de KPI's eruit zijn.
+  design een compacte lijst met "Bewerken", uitgeschreven in het punt Kenmerken
+  hierboven. De spec van de Kenmerken verandert alleen doordat de KPI's eruit zijn.
   - **Kop**: De titel KPI's met een Info-icoon (`info.kpiBlok`). Rechts "+
     Onderdeel toevoegen" (`.btn-or .btn-compact`) en "KPI's invullen"
     (`.btn-outline .btn-compact`). Beide vragen `organisaties.bewerken`. "+

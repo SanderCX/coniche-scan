@@ -690,6 +690,19 @@ tekst aan de linkerkant van de rand af staat. Rechts is de `padding-right`
 `2.5rem`, zodat een lange optie niet onder de chevron doorloopt. Bij focus
 krijgt het veld dezelfde rand en ring als `.field`.
 
+### Bewerken: op de plek of in een modal
+
+Eén regel voor elke bewerkactie in de app. Een enkel veld bewerk je op de plek
+zelf: Een potlood naast de waarde, die dan een invoerveld met "Opslaan" en
+"Annuleren" wordt (de naam van een Organisatie). Zijn het twee of meer velden,
+of staat er een tabel of keuzelijst in, dan opent een modal
+(`.modal-box--breed`, "Opslaan" en "Annuleren" onderin): Kenmerken, KPI's
+invullen, een Onderdeel wijzigen, Mijn gegevens. De pagina erachter verspringt
+dan niet en het Bewerkslot blijft zichtbaar. Een Respondent-overzicht dat al
+een modal is, wisselt zijn blok Gegevens naar een formulier binnen die modal en
+opent geen tweede. Een knop die bewerken start heet "Bewerken" of draagt een
+potlood, nooit "Wijzigen".
+
 ### Doorloopflow
 
 - **Layout**: Sidebar 300px, hoofdgedeelte flexibel. Het logo staat
