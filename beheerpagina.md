@@ -885,7 +885,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   toewijzen, geen aparte permissie. De eigenaar (`aangemaaktDoor`) en wie
   toegewezen is blijven twee onderscheiden dingen, ook al vallen ze in de
   rechtenmatrix allebei onder hetzelfde bereik "eigen". Voorstel van
-  19 oktober 2026: Dit is de kaart Toegang, en niet langer een uitklapbaar
+  19 oktober 2026, gebouwd op 19 oktober 2026 (`components/beheer/ToegangKaart.tsx`): Dit is de kaart Toegang, en niet langer een uitklapbaar
   blok met losse tekst en selectievakjes. Het gaat over wie bij de gegevens van
   de organisatie mag, en hoort dus bij de kaart Afspraken, in één rij met
   die kaart.
@@ -911,7 +911,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     onder de paginatitel blijft staan, voor iedereen die de organisatie ziet,
     als alleen-lezen tekst. De kaart Toegang is de plek om het te wijzigen.
   - **Logging**: Zoals nu (`datamodel.md`, Audit).
-- **Afspraken** (voorstel van 19 oktober 2026, Admin-only): Een smalle kaart
+- **Afspraken** (voorstel van 19 oktober 2026, gebouwd op 19 oktober 2026 in `components/beheer/AfsprakenKaart.tsx`, Admin-only): Een smalle kaart
   direct onder de kaart Kenmerken en boven de kaart KPI's, rechts van de kaart
   Toegang, met de titel "Afspraken" en de twee schakelaars hieronder naast
   elkaar in één rij, elk met Info-icoon. Ze leggen vast wat met de organisatie
@@ -1029,7 +1029,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     staat de korte naam, met de volledige SBI-naam (`sbi-indeling.md`) in de
     tooltip (zie de bullet hieronder).
 
-  - **Korte namen in kaart en formulier** (besluit van 19 oktober 2026, nog niet gebouwd): De korte
+  - **Korte namen in kaart en formulier** (besluit van 19 oktober 2026, gebouwd op 19 oktober 2026: Sector, Subsector en de techstack-leveranciers in de kaart, en Sector en Subsector in het formulier als keuzelijst met zoekveld, `components/ZoekSelect.tsx`): De korte
     namen die een Admin heeft ingevuld (tab Korte namen) staan ook in het
     organisatie-detail. In de kaart Kenmerken toont Sector de korte naam, met de
     originele SBI-titel in de tooltip. In het formulier tonen de keuzelijsten

@@ -6,10 +6,9 @@
  * Onderdeel maar de vaste standaard (`onderdeelId: null`) en de naam is gereserveerd. De naam is verplicht, getrimd en uniek
  * binnen de Organisatie zonder verschil tussen hoofdletters en kleine letters.
  *
- * `Meting.onderdeel` blijft de naam van het Onderdeel (een kopie, zodat een Meting zonder de Organisatie te lezen is) en
- * `Meting.onderdeelId` volgt uit die naam. `zorgOnderdelenKloppend` brengt de twee bij elke schrijfactie en bij elke keer laden
- * in overeenstemming: Een Meting met een naam die nog geen Onderdeel is, maakt er een aan, en de spelling van het bestaande
- * Onderdeel wint van wat de Meting had.
+ * Een Meting verwijst met `onderdeelId` naar haar Onderdeel en heeft zelf geen naam van het Onderdeel meer (besloten op 19 oktober
+ * 2026): Plekken die de naam tonen, zoeken het Onderdeel op (`onderdeelNaamVan`). Alleen bij het laden van oude data wordt de tekst
+ * `onderdeel` nog één keer gelezen om de Onderdelen aan te maken (`zorgOnderdelenKloppend`) en daarna verwijderd.
  */
 import { Onderdeel, Organisatie, ScanUitvoering } from "./types";
 import { nieuwId } from "./id";
@@ -81,19 +80,24 @@ export function nieuwOnderdeel(organisatieId: string, naam: string): Onderdeel {
   return { id: nieuwId(), organisatieId, naam, aangemaaktOp: new Date().toISOString() };
 }
 
+/** Een Meting zoals ze vóór 19 oktober 2026 werd bewaard, met de naam van het Onderdeel als tekst. Alleen voor de overgang. */
+type MetingMetTekst = ScanUitvoering & { onderdeel?: string };
+
 /**
- * De overgang van de tekst op de Meting naar Onderdelen en het kloppend houden daarna (`datamodel.md`, Onderdeel en KPI's en
- * kanalen, Overgang). Per Organisatie wordt elke naam in `Meting.onderdeel` die niet "Hele organisatie" is, een Onderdeel. Namen die
- * hoofdletterongevoelig en zonder voor- en achterspaties gelijk zijn, worden één Onderdeel, met de spelling die het vaakst
- * voorkomt (bij gelijke aantallen die van de oudste Meting). Daarna volgt `onderdeelId` de naam, en de naam de spelling van het
- * Onderdeel. Idempotent. Muteert de organisatie.
+ * De overgang van de tekst op de Meting naar Onderdelen (`datamodel.md`, Onderdeel en KPI's en kanalen, Overgang). Per Organisatie wordt
+ * elke naam in de oude tekst `onderdeel` die niet "Hele organisatie" is, een Onderdeel. Namen die hoofdletterongevoelig en zonder voor- en
+ * achterspaties gelijk zijn, worden één Onderdeel, met de spelling die het vaakst voorkomt (bij gelijke aantallen die van de oudste Meting).
+ * Daarna krijgt de Meting haar `onderdeelId` en verdwijnt de tekst. Een Meting die al een `onderdeelId` heeft, verliest alleen de tekst.
+ * Idempotent. Muteert de organisatie.
  */
 export function zorgOnderdelenKloppend(organisatie: Organisatie): void {
   const lijst = Array.isArray(organisatie.onderdelen) ? organisatie.onderdelen : [];
   organisatie.onderdelen = lijst;
+  const metingen = organisatie.scanUitvoeringen as MetingMetTekst[];
   // Welke spelling wint voor een naam die nog geen Onderdeel is: De meest voorkomende, bij gelijkspel die van de oudste Meting.
   const onbekend = new Map<string, { telling: Map<string, number>; oudste: { spelling: string; aangemaaktOp: string } }>();
-  for (const m of organisatie.scanUitvoeringen) {
+  for (const m of metingen) {
+    if (m.onderdeelId) continue;
     const ruw = m.onderdeel?.trim().replace(/\s+/g, " ");
     if (!ruw || isHeleOrganisatie(ruw) || vindOnderdeel(organisatie, ruw)) continue;
     const s = sleutelVan(ruw);
@@ -113,22 +117,23 @@ export function zorgOnderdelenKloppend(organisatie: Organisatie): void {
       aangemaaktOp: e.oudste.aangemaaktOp,
     });
   }
-  for (const m of organisatie.scanUitvoeringen) koppelMeting(organisatie, m);
+  for (const m of metingen) koppelMeting(organisatie, m);
 }
 
-/** Zet `onderdeelId` en de spelling van `onderdeel` van één Meting naar het Onderdeel met die naam. */
-function koppelMeting(organisatie: Organisatie, meting: ScanUitvoering): void {
+/** Geeft de Meting haar `onderdeelId` uit de oude tekst en haalt de tekst weg. */
+function koppelMeting(organisatie: Organisatie, meting: MetingMetTekst): void {
   const ruw = meting.onderdeel?.trim();
-  if (!ruw || isHeleOrganisatie(ruw)) {
-    meting.onderdeelId = null;
-    if (ruw) meting.onderdeel = HELE_ORGANISATIE;
-    return;
+  if (meting.onderdeelId === undefined || meting.onderdeelId === null) {
+    if (!ruw || isHeleOrganisatie(ruw)) meting.onderdeelId = null;
+    else meting.onderdeelId = vindOnderdeel(organisatie, ruw)?.id ?? null;
   }
-  const o = vindOnderdeel(organisatie, ruw);
-  if (o) {
-    meting.onderdeelId = o.id;
-    meting.onderdeel = o.naam;
-  }
+  delete meting.onderdeel;
+}
+
+/** De naam van het Onderdeel van een Meting: "Hele organisatie" bij `onderdeelId: null` of een Onderdeel dat er niet meer is. */
+export function onderdeelNaamVan(organisatie: Pick<Organisatie, "onderdelen">, meting: Pick<ScanUitvoering, "onderdeelId">): string {
+  if (!meting.onderdeelId) return HELE_ORGANISATIE;
+  return onderdelenVan(organisatie).find((o) => o.id === meting.onderdeelId)?.naam ?? HELE_ORGANISATIE;
 }
 
 /**

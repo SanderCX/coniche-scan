@@ -5,6 +5,7 @@ import { use, useState } from "react";
 import { useRespondentPerToegangscode } from "@/lib/db";
 import { heeftMetingToegang, metingIdsMetWeergave } from "@/lib/lead-toegang";
 import { useAssessment } from "@/lib/assessment-store";
+import { ResultaatKop } from "@/components/Resultaatkop";
 import { ResultsView } from "@/components/ResultsView";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
@@ -157,13 +158,17 @@ export default function LeadResultatenPage({
       identiteitMenu={<MijnGegevensMenu lid={gegevens.lid} />}
     >
       <div className="container section" style={{ maxWidth: "64rem" }}>
-        <span className="eyebrow">{scanUitvoering.label}</span>
-        <h1 className="page-title">{assessment.naam}</h1>
-        <p className="text-sm text-ink-m">
-          {samengesteld
-            ? "Gemiddelde van de onderdelen, elk even zwaar"
-            : `Gemiddelde over ${afgerond.length} ${afgerond.length === 1 ? "afgeronde respondent" : "afgeronde respondenten"}`}
-        </p>
+        <ResultaatKop
+          eyebrow="Resultaat van de Meting"
+          titel={assessment.naam}
+          subregel={[
+            scanUitvoering.label,
+            gegevens.organisatie.naam,
+            samengesteld
+              ? "Gemiddelde van de onderdelen, elk even zwaar"
+              : `${afgerond.length} ${afgerond.length === 1 ? "afgeronde scan" : "afgeronde scans"}`,
+          ]}
+        />
         <div className="mt-8">
           <MetingWeergaven
             assessment={assessment}
@@ -180,7 +185,7 @@ export default function LeadResultatenPage({
                   ondertitel={`Gemiddelde van ${afgerond.length} afgeronde ${afgerond.length === 1 ? "scan" : "scans"}`}
                 />
               ) : (
-                <ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />
+                <ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} gemiddeldeVan={afgerond.length} />
               )
             }
             quickscan={quickscan}

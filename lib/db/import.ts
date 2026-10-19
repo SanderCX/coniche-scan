@@ -10,7 +10,7 @@ import { genereerUniekeToegangscode } from "./respondenten";
 import { AuditInvoer, logAudit } from "../audit-store";
 import { getGebruikers } from "../gebruikers-store";
 import { metingContext, organisatieContext } from "../audit-context";
-import { STANDAARD_ONDERDEEL, isGeldigeDatum } from "../metingen";
+import { STANDAARD_ONDERDEEL, isGeldigeDatum, onderdeelVan } from "../metingen";
 
 /** Import van scans uit een CSV (import-scans.md): schrijft rijen weg als Organisatie, Respondent, Meting en scan. */
 
@@ -246,7 +246,7 @@ export function voerLegacyImportUit(
           label,
           // Een geïmporteerde naam blijft staan tot de beheerder hem wijzigt (`datamodel.md`, Naam van een Meting).
           labelHandmatig: true,
-          onderdeel,
+          onderdeelId: zorgVoorOnderdeel(organisatie, onderdeel)?.id ?? null,
           ...(beginDatum ? { meetdatum: beginDatum } : {}),
           aangemaaktOp: new Date().toISOString(),
           invullingen: [],
@@ -309,7 +309,7 @@ export function voerLegacyImportUit(
       label: scanUitvoering.label,
       bronnaam,
       meetdatum: scanUitvoering.meetdatum ?? null,
-      onderdeel: scanUitvoering.onderdeel ?? onderdeel,
+      onderdeel: onderdeelVan(organisatie, scanUitvoering),
     });
     geimporteerd++;
   }

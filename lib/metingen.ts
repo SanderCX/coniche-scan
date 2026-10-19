@@ -9,6 +9,7 @@
 import { Assessment, Organisatie, ScanInvulling, ScanUitvoering } from "./types";
 import { alleVragen } from "./assessment-structuur";
 import { gemiddeldeAntwoordenVoorMeting } from "./scoring";
+import { onderdeelNaamVan } from "./onderdelen";
 import type { EenheidInvoer } from "./visualisatie";
 
 export const STANDAARD_ONDERDEEL = "Hele organisatie";
@@ -16,9 +17,9 @@ export const STANDAARD_ONDERDEEL = "Hele organisatie";
 /** De tekst op de plek van de meetdatum bij een Meting zonder datum. */
 export const DATUM_ONTBREEKT = "Datum ontbreekt";
 
-export function onderdeelVan(meting: Pick<ScanUitvoering, "onderdeel">): string {
-  const o = meting.onderdeel?.trim();
-  return o ? o : STANDAARD_ONDERDEEL;
+/** De naam van het Onderdeel van een Meting, opgezocht via `onderdeelId` bij de Organisatie. "Hele organisatie" zonder Onderdeel. */
+export function onderdeelVan(organisatie: Pick<Organisatie, "onderdelen">, meting: Pick<ScanUitvoering, "onderdeelId">): string {
+  return onderdeelNaamVan(organisatie, meting);
 }
 
 export function isSamengesteld(meting: Pick<ScanUitvoering, "samenstelling">): boolean {
@@ -90,8 +91,8 @@ export function genereerLabel(onderdeel: string, meetdatum?: string | null): str
 }
 
 /** De naam die de app zelf zou maken voor deze Meting, uit haar huidige onderdeel en meetdatum. */
-export function standaardLabel(meting: Pick<ScanUitvoering, "onderdeel" | "meetdatum">): string {
-  return genereerLabel(onderdeelVan(meting), meetdatumVan(meting));
+export function standaardLabel(onderdeelNaam: string, meting: Pick<ScanUitvoering, "meetdatum">): string {
+  return genereerLabel(onderdeelNaam, meetdatumVan(meting));
 }
 
 /** Vergelijkt twee Metingen voor "nieuwste eerst": Op meetdatum, een Meting zonder meetdatum achteraan, dan op naam. */
@@ -142,8 +143,8 @@ export function laatsteMeetdatum(metingen: Pick<ScanUitvoering, "meetdatum">[]):
  * 0-meting" geeft "Zuid-Nederland"), en zonder " | " "Hele organisatie". Het is een voorstel dat de beheerder ziet en kan
  * aanpassen, nooit een stille wijziging.
  */
-export function stelOnderdeelVoor(meting: Pick<ScanUitvoering, "label" | "onderdeel">): string {
-  const eigen = meting.onderdeel?.trim();
+export function stelOnderdeelVoor(meting: Pick<ScanUitvoering, "label">, huidigeNaam: string): string {
+  const eigen = huidigeNaam.trim();
   if (eigen && eigen !== STANDAARD_ONDERDEEL) return eigen;
   const index = meting.label.indexOf(" | ");
   const voor = index > 0 ? meting.label.slice(0, index).trim() : "";
@@ -156,7 +157,7 @@ export function stelOnderdeelVoor(meting: Pick<ScanUitvoering, "label" | "onderd
  * combinatie om te vergelijken.
  */
 export function metingMetCombinatie(
-  organisatie: Pick<Organisatie, "scanUitvoeringen">,
+  organisatie: Pick<Organisatie, "scanUitvoeringen" | "onderdelen">,
   onderdeel: string,
   assessmentId: string,
   meetdatum: string | null | undefined,
@@ -165,7 +166,7 @@ export function metingMetCombinatie(
   if (!isGeldigeDatum(meetdatum)) return undefined;
   const o = onderdeel.trim() || STANDAARD_ONDERDEEL;
   return organisatie.scanUitvoeringen.find(
-    (m) => m.id !== uitgezonderd && m.assessmentId === assessmentId && onderdeelVan(m) === o && meetdatumVan(m) === meetdatum
+    (m) => m.id !== uitgezonderd && m.assessmentId === assessmentId && onderdeelVan(organisatie, m) === o && meetdatumVan(m) === meetdatum
   );
 }
 
@@ -178,10 +179,10 @@ export function dubbeleCombinatieTekst(bestaandLabel: string): string {
  * Staan er in een selectie twee Metingen met hetzelfde onderdeel en Assessment? Dan zegt een gemiddelde over twee momenten
  * van hetzelfde onderdeel weinig over de ontwikkeling (`benchmark.md`, Waarschuwing bij dezelfde combinatie).
  */
-export function selectieHeeftZelfdeOnderdeel(metingen: Pick<ScanUitvoering, "onderdeel" | "assessmentId">[]): boolean {
+export function selectieHeeftZelfdeOnderdeel(metingen: Pick<ScanUitvoering, "onderdeelId" | "assessmentId">[]): boolean {
   const gezien = new Set<string>();
   for (const m of metingen) {
-    const k = `${m.assessmentId}::${onderdeelVan(m)}`;
+    const k = `${m.assessmentId}::${m.onderdeelId ?? ""}`;
     if (gezien.has(k)) return true;
     gezien.add(k);
   }
@@ -256,7 +257,7 @@ export function gemiddeldeAntwoordenVoorMetingMetSamenstelling(
  */
 export function onderdeelEenheden(
   assessment: Assessment,
-  organisatie: Pick<Organisatie, "scanUitvoeringen">,
+  organisatie: Pick<Organisatie, "scanUitvoeringen" | "onderdelen">,
   meting: ScanUitvoering
 ): EenheidInvoer[] {
   return oudsteEerst(onderliggendeMetingen(organisatie, meting))
@@ -264,7 +265,7 @@ export function onderdeelEenheden(
     .map((m) => ({
       id: m.id,
       label: m.label,
-      sublabel: `${onderdeelVan(m)} · ${toonMeetdatum(m.meetdatum)}`,
+      sublabel: `${onderdeelVan(organisatie, m)} · ${toonMeetdatum(m.meetdatum)}`,
       aantalScans: afgerond(m.invullingen),
       antwoorden: gemiddeldeAntwoordenVoorMeting(assessment, m.invullingen),
     }));

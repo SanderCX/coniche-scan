@@ -302,7 +302,7 @@ export function BenchmarkForm({
                                   <span>
                                     <strong>{m.meting.label}</strong>
                                     <span className="text-sm text-ink-s">
-                                      {onderdeelVan(m.meting)} · {toonMeetdatum(m.meting.meetdatum)} ·{" "}
+                                      {onderdeelVan(k.organisatie, m.meting)} · {toonMeetdatum(m.meting.meetdatum)} ·{" "}
                                       {samengesteld
                                         ? `Gemiddelde van ${m.meting.samenstelling?.length ?? 0} Metingen`
                                         : scansTekst(m.aantalAfgerond, true)}

@@ -77,7 +77,7 @@ function MetingenInhoud() {
             organisatie: org.naam,
             meting: m.label,
             meetdatum: meetdatumVan(m) ?? "",
-            onderdeel: onderdeelVan(m),
+            onderdeel: onderdeelVan(org, m),
             assessment: assessments.find((a) => a.id === m.assessmentId)?.naam ?? "Onbekend type",
             samengesteld,
             afgerond: samengesteld ? 0 : m.invullingen.filter((i) => i.status === "afgerond").length,

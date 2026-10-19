@@ -4,6 +4,9 @@ import { VeldDefinitie } from "@/lib/types";
 import { useOrganisaties } from "@/lib/db";
 import { gebruikteWaarden } from "@/lib/kenmerken-opties";
 import { KeuzelijstMetEigenOptie } from "@/components/KeuzelijstMetEigenOptie";
+import { ZoekSelect } from "@/components/ZoekSelect";
+import { useInstellingen } from "@/lib/instellingen-store";
+import { korteNaamWaarde } from "@/lib/korte-namen";
 
 /**
  * Een keuzelijst (op alfabet, of in aangeleverde volgorde bij `voorop`) met vaste opties en "Anders…" onderaan voor een
@@ -36,6 +39,39 @@ function SelectMetEigenOptie({
         ariaLabel={veld.label}
       />
     </div>
+  );
+}
+
+/** Sector en Subsector: Een keuzelijst met zoekveld die de korte naam toont en het origineel bewaart (`datamodel.md`, Korte namen). */
+function KorteNamenSelect({
+  pad,
+  waarde,
+  opties,
+  onChange,
+  placeholder,
+  disabled,
+  ariaLabel,
+}: {
+  pad: string[];
+  waarde: string;
+  opties: string[];
+  onChange: (waarde: unknown) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  ariaLabel?: string;
+}) {
+  const { korteNamen } = useInstellingen();
+  const veldId = pad.join(".");
+  return (
+    <ZoekSelect
+      waarde={waarde}
+      opties={opties}
+      naam={(o) => korteNaamWaarde(korteNamen, veldId, o)}
+      onChange={onChange}
+      placeholder={placeholder}
+      disabled={disabled}
+      ariaLabel={ariaLabel}
+    />
   );
 }
 
@@ -102,14 +138,7 @@ function VeldInput({
     return (
       <div className="admin-field">
         <label>{veld.label}</label>
-        <select value={(waarde as string) ?? ""} onChange={(e) => onChange(e.target.value)}>
-          <option value="">Kies...</option>
-          {(veld.opties ?? []).map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </select>
+        <KorteNamenSelect pad={pad} waarde={(waarde as string) ?? ""} opties={veld.opties ?? []} onChange={onChange} ariaLabel={veld.label} />
       </div>
     );
   }
@@ -123,19 +152,15 @@ function VeldInput({
     return (
       <div className="admin-field">
         <label>{veld.label}</label>
-        <select
-          value={(waarde as string) ?? ""}
+        <KorteNamenSelect
+          pad={pad}
+          waarde={(waarde as string) ?? ""}
+          opties={opties}
+          onChange={onChange}
+          placeholder={placeholder}
           disabled={!ouderWaarde}
-          title={!ouderWaarde ? placeholder : undefined}
-          onChange={(e) => onChange(e.target.value)}
-        >
-          <option value="">{placeholder}</option>
-          {opties.map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </select>
+          ariaLabel={veld.label}
+        />
       </div>
     );
   }

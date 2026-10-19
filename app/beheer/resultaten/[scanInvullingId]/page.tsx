@@ -8,6 +8,8 @@ import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magOrganisatieToegang } from "@/lib/rechten";
 import { ResultsView } from "@/components/ResultsView";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { langeDatum } from "@/lib/mijn-metingen";
+import { dagVan } from "@/lib/metingen";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { ExporterenNavKnop } from "@/components/beheer/ExporterenNavKnop";
 import { useBeheerNavActions } from "@/components/beheer/BeheerNavActions";
@@ -94,13 +96,14 @@ function ScanWeergaven({
   const zoek = useSearchParams();
   const instellingen = useInstellingen();
   const scans = aantalAfgerond(scanUitvoering);
+  const subregel = [lid.naam || lid.email, scanUitvoering.label, invulling.afgerondOp ? `afgerond op ${langeDatum(dagVan(invulling.afgerondOp))}` : null];
   const genoeg = scans >= instellingen.benchmarkMinRespondenten;
   const weergave: "scan" | "positie" = zoek.get("weergave") === "positie" && genoeg ? "positie" : "scan";
   // "Positie in de Meting" is de spreiding op de schaal van 1 tot 5. Een Assessment met Ja / Nee / Weet ik niet heeft eigen
   // weergaven op de resultatenpagina van de Meting (`visualisatie-quickscan.md`, 3), en het scherm van de scan heeft zelf de
   // schakelaar Per afdeling en Overzicht.
   if (isJaNeeWeetNiet(assessment)) {
-    return <ResultsView assessment={assessment} antwoorden={invulling.antwoorden} relevantie={invulling.relevantie} respondentNaam={lid.naam} />;
+    return <ResultsView assessment={assessment} antwoorden={invulling.antwoorden} relevantie={invulling.relevantie} respondentNaam={lid.naam} eyebrow="Resultaat van de scan" subregel={subregel} />;
   }
 
   function zet(waarde: "scan" | "positie") {
@@ -130,7 +133,7 @@ function ScanWeergaven({
         />
       </div>
       {weergave === "scan" ? (
-        <ResultsView assessment={assessment} antwoorden={invulling.antwoorden} relevantie={invulling.relevantie} respondentNaam={lid.naam} />
+        <ResultsView assessment={assessment} antwoorden={invulling.antwoorden} relevantie={invulling.relevantie} respondentNaam={lid.naam} eyebrow="Resultaat van de scan" subregel={subregel} />
       ) : (
         <>
           <h1 style={{ marginTop: 0 }}>{assessment.naam}</h1>

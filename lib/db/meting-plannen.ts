@@ -1,5 +1,6 @@
 import { Organisatie, ScanUitvoering } from "../types";
 import { nieuwId } from "../id";
+import { zorgVoorOnderdeel } from "../onderdelen";
 import { laadAlles, slaAlles } from "./store";
 import { logAudit, nieuweGroepId } from "../audit-store";
 import { metingContext } from "../audit-context";
@@ -49,7 +50,9 @@ export function maakMeting(organisatieId: string, input: MetingInvoer): Resultaa
   const organisatie = vindOrganisatie(alles, organisatieId);
   if (!organisatie) return { ok: false, reden: "Organisatie niet gevonden." };
   if (!isGeldigeDatum(input.meetdatum)) return { ok: false, reden: "Kies een meetdatum." };
-  const onderdeel = input.onderdeel?.trim() || STANDAARD_ONDERDEEL;
+  // Een nieuwe naam maakt hier het Onderdeel aan (`zorgVoorOnderdeel`), een bestaande naam kiest dat Onderdeel met zijn eigen spelling.
+  const od = zorgVoorOnderdeel(organisatie, input.onderdeel ?? "");
+  const onderdeel = od?.naam ?? STANDAARD_ONDERDEEL;
   const dubbel = metingMetCombinatie(organisatie, onderdeel, input.assessmentId, input.meetdatum);
 
   const meting: ScanUitvoering = {
@@ -57,7 +60,7 @@ export function maakMeting(organisatieId: string, input: MetingInvoer): Resultaa
     organisatieId,
     assessmentId: input.assessmentId,
     label: genereerLabel(onderdeel, input.meetdatum),
-    onderdeel,
+    onderdeelId: od?.id ?? null,
     meetdatum: input.meetdatum,
     aangemaaktOp: new Date().toISOString(),
     invullingen: [],
@@ -103,19 +106,23 @@ export function wijzigMeting(metingId: string, wijziging: MetingWijziging): Resu
   const naam = wijziging.label?.trim();
   if (wijziging.label !== undefined && !naam) return { ok: false, reden: "De naam is verplicht." };
 
-  const oud = { label: meting.label, onderdeel: onderdeelVan(meting), meetdatum: meetdatumVan(meting) };
-  const onderdeel = wijziging.onderdeel !== undefined ? wijziging.onderdeel.trim() || STANDAARD_ONDERDEEL : oud.onderdeel;
+  const oud = { label: meting.label, onderdeel: onderdeelVan(organisatie, meting), meetdatum: meetdatumVan(meting) };
+  let onderdeel = oud.onderdeel;
+  if (wijziging.onderdeel !== undefined) {
+    const od = zorgVoorOnderdeel(organisatie, wijziging.onderdeel);
+    meting.onderdeelId = od?.id ?? null;
+    onderdeel = od?.naam ?? STANDAARD_ONDERDEEL;
+  }
   const meetdatum = wijziging.meetdatum === undefined ? oud.meetdatum : wijziging.meetdatum;
 
-  meting.onderdeel = onderdeel;
   if (meetdatum) meting.meetdatum = meetdatum;
   else delete meting.meetdatum;
 
   if (wijziging.herstelLabel) {
     meting.labelHandmatig = false;
-    meting.label = standaardLabel(meting);
+    meting.label = standaardLabel(onderdeel, meting);
   } else if (naam !== undefined) {
-    if (naam === standaardLabel(meting)) {
+    if (naam === standaardLabel(onderdeel, meting)) {
       meting.labelHandmatig = false;
       meting.label = naam;
     } else {
@@ -123,7 +130,7 @@ export function wijzigMeting(metingId: string, wijziging: MetingWijziging): Resu
       meting.label = naam;
     }
   } else if (!meting.labelHandmatig) {
-    meting.label = standaardLabel(meting);
+    meting.label = standaardLabel(onderdeel, meting);
   }
 
   const dubbel = metingMetCombinatie(organisatie, onderdeel, meting.assessmentId, meetdatum, meting.id);
@@ -197,7 +204,7 @@ export function zetMeetdatum(
     if (oud === meetdatum) continue;
     geraakt.push({ meting, oud, oudLabel: meting.label });
     meting.meetdatum = meetdatum;
-    if (!meting.labelHandmatig) meting.label = standaardLabel(meting);
+    if (!meting.labelHandmatig) meting.label = standaardLabel(onderdeelVan(organisatie, meting), meting);
   }
   if (geraakt.length === 0) return { ok: true, gewijzigd: 0, overgeslagen };
   slaAlles(alles);
@@ -256,7 +263,8 @@ export function maakSamengesteldeMeting(organisatieId: string, invoer: Samengest
   if (!organisatie) return { ok: false, reden: "Organisatie niet gevonden." };
   const fout = valideerSamenstelling(organisatie, invoer);
   if (fout) return { ok: false, reden: fout };
-  const onderdeel = invoer.onderdeel?.trim() || STANDAARD_ONDERDEEL;
+  const od = zorgVoorOnderdeel(organisatie, invoer.onderdeel ?? "");
+  const onderdeel = od?.naam ?? STANDAARD_ONDERDEEL;
   const ids = [...new Set(invoer.metingIds)];
   const gekozen = ids.map((id) => organisatie.scanUitvoeringen.find((m) => m.id === id)!);
   const meetdatum = laatsteMeetdatum(gekozen)!;
@@ -265,7 +273,7 @@ export function maakSamengesteldeMeting(organisatieId: string, invoer: Samengest
     organisatieId,
     assessmentId: invoer.assessmentId,
     label: genereerLabel(onderdeel, meetdatum),
-    onderdeel,
+    onderdeelId: od?.id ?? null,
     meetdatum,
     samenstelling: ids,
     aangemaaktOp: new Date().toISOString(),
@@ -302,10 +310,10 @@ export function wijzigSamengesteldeMeting(
   });
   if (fout) return { ok: false, reden: fout };
   meting.samenstelling = [...new Set(wijziging.metingIds)];
-  meting.onderdeel = wijziging.onderdeel !== undefined ? wijziging.onderdeel.trim() || STANDAARD_ONDERDEEL : onderdeelVan(meting);
+  if (wijziging.onderdeel !== undefined) meting.onderdeelId = zorgVoorOnderdeel(organisatie, wijziging.onderdeel)?.id ?? null;
   const datum = laatsteMeetdatum(onderliggendeMetingen(organisatie, meting));
   if (datum) meting.meetdatum = datum;
-  if (!meting.labelHandmatig) meting.label = standaardLabel(meting);
+  if (!meting.labelHandmatig) meting.label = standaardLabel(onderdeelVan(organisatie, meting), meting);
   slaAlles(alles);
   logAudit({
     actie: "meting.samengesteldGewijzigd",

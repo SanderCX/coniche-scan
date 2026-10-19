@@ -12,6 +12,7 @@ import {
   metingMetCombinatie,
   oudsteEerst,
   meetdatumVan,
+  onderdeelVan,
   stelOnderdeelVoor,
 } from "@/lib/metingen";
 import { SlotType, useBewerkslot } from "@/lib/bewerkslot";
@@ -115,7 +116,7 @@ export function ScansSamenbrengenModal({
   // Het onderdeel van de nieuwe Meting: Voorgesteld uit het oude label van de eerste scan, nooit blind "Hele organisatie". De
   // meetdatum is voorgevuld met de oudste meetdatum van de Metingen waaruit de scans komen (`beheerpagina.md`, punt 6b).
   const [nieuw, setNieuw] = useState<OnderdeelMeetdatumWaarde | null>(null); // `null`: De beginwaarde
-  const voorstelOnderdeel = scans[0] ? stelOnderdeelVoor(scans[0].meting) : STANDAARD_ONDERDEEL;
+  const voorstelOnderdeel = scans[0] ? stelOnderdeelVoor(scans[0].meting, onderdeelVan(organisatie, scans[0].meting)) : STANDAARD_ONDERDEEL;
   const voorstelDatum = oudsteEerst(scans.map((s) => s.meting)).map(meetdatumVan).find((d) => d !== null) ?? "";
   const waarde = nieuw ?? beginWaarde(voorstelOnderdeel, voorstelDatum);
   const nieuweMeting = doelKeuze === NIEUWE_METING;

@@ -59,7 +59,7 @@ export function BenchmarkGroepSectie({
   verkenning?: boolean;
 }) {
   const naamVan = (r: (typeof sectie.rijen)[number]) =>
-    metOnderdeel ? poolLidNaam(r.organisatie, onderdeelVan(r.meting)) : r.organisatie.naam;
+    metOnderdeel ? poolLidNaam(r.organisatie, onderdeelVan(r.organisatie, r.meting)) : r.organisatie.naam;
   const { assessment, rijen, ontbrekend, teller } = sectie;
   const resultaten = resultatenVan(assessment, sectie.groepAntwoorden);
   const vlak = isVlakkeAssessment(assessment);

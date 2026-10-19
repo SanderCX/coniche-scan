@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MetingAfdeling, MetingBouwblok, QuickscanMeting, SpreidingUitkomst } from "@/lib/quickscan-groep";
 import { Tegels } from "@/components/visualisatie/gedeeld";
+import { SterksteMeeste } from "./SterksteMeeste";
 import { Hulplijnen, KLASSE_STIJL, KlasseBadge, getal } from "./gedeeld";
 
 function SpreidingLabel({ u }: { u: SpreidingUitkomst | null }) {
@@ -38,12 +39,6 @@ export function QuickscanGemiddeldeSpreiding({
 }) {
   const [opSpreiding, setOpSpreiding] = useState(false);
   if (meting.aantalScans === 0) return <p className="admin-notice">Er zijn nog geen afgeronde scans in deze Meting.</p>;
-  const gemiddeldeTegel = (lijst: MetingAfdeling[]) =>
-    lijst.length === 0
-      ? { waarde: "–", sub: undefined }
-      : { waarde: lijst.map((a) => a.categorie.naam).join(", "), sub: `${lijst[0].percentage}%` };
-  const sterkste = gemiddeldeTegel(meting.sterkste);
-  const meeste = gemiddeldeTegel(meting.meesteOntwikkelruimte);
 
   return (
     <div className="vis" data-weergave="quickscan-spreiding">
@@ -59,8 +54,6 @@ export function QuickscanGemiddeldeSpreiding({
             waarde: meting.percentage === null ? "–" : `${meting.percentage}%`,
             sub: meting.klasse ? (meting.klasse === "groen" ? "Sterk ontwikkeld" : meting.klasse === "oranje" ? "Gemiddeld ontwikkeld" : "Aanzienlijke ontwikkelruimte") : undefined,
           },
-          { label: "Sterkste afdeling", ...sterkste },
-          { label: "Meeste ontwikkelruimte", ...meeste },
         ]}
       />
       <div className="vis-acties">
@@ -72,6 +65,7 @@ export function QuickscanGemiddeldeSpreiding({
       {meting.afdelingen.map((a) => (
         <AfdelingKaart key={a.categorie.id} afdeling={a} opSpreiding={opSpreiding} minRespondenten={minRespondenten} />
       ))}
+      <SterksteMeeste sterkste={meting.sterkste} meeste={meting.meesteOntwikkelruimte} />
       <p className="vis-onderschrift">
         Een grijze bol is het aantal respondenten met die score, een zwarte streep is het gemiddelde. De spreiding is de
         standaardafwijking in procentpunten: onder 14 eensgezind, van 14 tot 20 wisselend, vanaf 20 verdeeld.

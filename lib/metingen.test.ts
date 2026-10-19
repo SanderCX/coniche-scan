@@ -21,6 +21,7 @@ import {
   toonMeetdatum,
   voldoetAanMinScans,
 } from "./metingen";
+import { onderdeelNaamVan, zorgOnderdelenKloppend } from "./onderdelen";
 import type { Organisatie, ScanInvulling, ScanUitvoering } from "./types";
 
 const opslag = new Map<string, string>();
@@ -47,14 +48,20 @@ const inv = (id: string, metingId: string, lidId: string, waarde: number, status
   id, scanUitvoeringId: metingId, organisatieLidId: lidId, status, aangemaaktOp: "x", uitgenodigdOp: "x", gestartOp: null, afgerondOp: null,
   antwoorden: Object.fromEntries(alleVragen(A).map((v) => [v.id, waarde])), opmerkingenPerBouwblok: {}, bewaarVerlengdTot: null,
 });
-const meting = (id: string, extra: Partial<ScanUitvoering> = {}): ScanUitvoering => ({
-  id, organisatieId: "O", assessmentId: A.id, label: id, aangemaaktOp: "2026-01-01T00:00:00.000Z", invullingen: [], ...extra,
-});
+/** `onderdeel` is de oude tekst op de Meting: `org()` zet hem om in een Onderdeel en een `onderdeelId` (`zorgOnderdelenKloppend`). */
+const meting = (id: string, extra: Partial<ScanUitvoering> & { onderdeel?: string } = {}): ScanUitvoering =>
+  ({ id, organisatieId: "O", assessmentId: A.id, label: id, aangemaaktOp: "2026-01-01T00:00:00.000Z", invullingen: [], ...extra }) as ScanUitvoering;
 const lid = (id: string) => ({ id, organisatieId: "O", email: `${id}@x.nl`, naam: id, functie: "", team: "", notities: "", toegangscode: `c${id}`, aangemaaktOp: "x" });
-const org = (extra: Partial<Organisatie> = {}): Organisatie => ({
-  id: "O", naam: "Org", kenmerken: {}, leden: [lid("L1"), lid("L2")], scanUitvoeringen: [], aangemaaktDoor: null, toegewezenAan: [],
-  benchmarkToegestaan: false, aangemaaktOp: "x", gewijzigdOp: "x", ...extra,
-});
+const org = (extra: Partial<Organisatie> = {}): Organisatie => {
+  const o: Organisatie = {
+    id: "O", naam: "Org", kenmerken: {}, leden: [lid("L1"), lid("L2")], scanUitvoeringen: [], aangemaaktDoor: null, toegewezenAan: [],
+    benchmarkToegestaan: false, aangemaaktOp: "x", gewijzigdOp: "x", ...extra,
+  };
+  zorgOnderdelenKloppend(o);
+  return o;
+};
+/** De naam van het Onderdeel van de eerste Meting in de opslag. */
+const eersteOnderdeel = () => onderdeelNaamVan(laad(), laad().scanUitvoeringen[0]);
 const zet = (o: Organisatie) => opslag.set(KEY, JSON.stringify([o]));
 const laad = () => (JSON.parse(opslag.get(KEY)!) as Organisatie[])[0];
 const audit = () => (JSON.parse(opslag.get("coniche-scan:audit") ?? "[]") as { actie: string; details: Record<string, unknown> | null }[]);
@@ -97,8 +104,8 @@ describe("naam van een Meting", () => {
 
   it("is zonder meetdatum alleen het onderdeel", () => {
     expect(genereerLabel("Team A", null)).toBe("Team A");
-    expect(standaardLabel({ onderdeel: "Team B", meetdatum: "2026-01-02" })).toBe("Team B | jan 2026");
-    expect(standaardLabel({})).toBe("Hele organisatie");
+    expect(standaardLabel("Team B", { meetdatum: "2026-01-02" })).toBe("Team B | jan 2026");
+    expect(standaardLabel("Hele organisatie", {})).toBe("Hele organisatie");
   });
 });
 
@@ -167,9 +174,9 @@ describe("samengestelde Meting: berekening", () => {
   });
 
   it("waarschuwt voor twee Metingen met hetzelfde onderdeel en Assessment", () => {
-    expect(selectieHeeftZelfdeOnderdeel([{ onderdeel: "Team A", assessmentId: "x" }, { onderdeel: "Team B", assessmentId: "x" }])).toBe(false);
-    expect(selectieHeeftZelfdeOnderdeel([{ onderdeel: "Team A", assessmentId: "x" }, { onderdeel: "Team A", assessmentId: "x" }])).toBe(true);
-    expect(selectieHeeftZelfdeOnderdeel([{ assessmentId: "x" }, { onderdeel: "Hele organisatie", assessmentId: "x" }])).toBe(true);
+    expect(selectieHeeftZelfdeOnderdeel([{ onderdeelId: "a", assessmentId: "x" }, { onderdeelId: "b", assessmentId: "x" }])).toBe(false);
+    expect(selectieHeeftZelfdeOnderdeel([{ onderdeelId: "a", assessmentId: "x" }, { onderdeelId: "a", assessmentId: "x" }])).toBe(true);
+    expect(selectieHeeftZelfdeOnderdeel([{ assessmentId: "x" }, { onderdeelId: null, assessmentId: "x" }])).toBe(true);
   });
 });
 
@@ -209,7 +216,9 @@ describe("Metingen plannen en wijzigen", () => {
     const r = db.maakMeting("O", { assessmentId: A.id, onderdeel: "Team A", meetdatum: "2026-10-14" });
     expect(r.ok).toBe(true);
     const m = laad().scanUitvoeringen[0];
-    expect(m).toMatchObject({ label: "Team A | okt 2026", onderdeel: "Team A", meetdatum: "2026-10-14" });
+    expect(m).toMatchObject({ label: "Team A | okt 2026", meetdatum: "2026-10-14" });
+    expect(eersteOnderdeel()).toBe("Team A");
+    expect(m).not.toHaveProperty("onderdeel");
     expect(m.labelHandmatig).toBeFalsy();
     expect(audit().find((e) => e.actie === "meting.aangemaakt")?.details).toMatchObject({ onderdeel: "Team A", meetdatum: "2026-10-14" });
   });
@@ -236,7 +245,8 @@ describe("Metingen plannen en wijzigen", () => {
     if (!r.ok) throw new Error("mislukt");
     const w = db.wijzigMeting(r.meting.id, { onderdeel: "Team B", meetdatum: "2027-02-01" });
     expect(w.ok).toBe(true);
-    expect(laad().scanUitvoeringen[0]).toMatchObject({ label: "Team B | feb 2027", onderdeel: "Team B", meetdatum: "2027-02-01" });
+    expect(laad().scanUitvoeringen[0]).toMatchObject({ label: "Team B | feb 2027", meetdatum: "2027-02-01" });
+    expect(eersteOnderdeel()).toBe("Team B");
     const datumLog = audit().find((e) => e.actie === "meting.meetdatumGewijzigd");
     expect(datumLog?.details).toMatchObject({ oudeMeetdatum: "2026-10-14", nieuweMeetdatum: "2027-02-01" });
   });
@@ -298,9 +308,9 @@ describe("Metingen plannen en wijzigen", () => {
   });
 
   it("stelt het onderdeel voor uit het label: De tekst vóór ' | ', een eigen onderdeel blijft, anders Hele organisatie", () => {
-    expect(stelOnderdeelVoor({ label: "Zuid-Nederland | 0-meting" })).toBe("Zuid-Nederland");
-    expect(stelOnderdeelVoor({ label: "Zuid-Nederland | 0-meting", onderdeel: "Eigen" })).toBe("Eigen");
-    expect(stelOnderdeelVoor({ label: "Legacy-import 2026" })).toBe("Hele organisatie");
+    expect(stelOnderdeelVoor({ label: "Zuid-Nederland | 0-meting" }, "Hele organisatie")).toBe("Zuid-Nederland");
+    expect(stelOnderdeelVoor({ label: "Zuid-Nederland | 0-meting" }, "Eigen")).toBe("Eigen");
+    expect(stelOnderdeelVoor({ label: "Legacy-import 2026" }, "Hele organisatie")).toBe("Hele organisatie");
   });
 });
 
@@ -317,7 +327,9 @@ describe("overgang van de rondes bij het laden", () => {
       ])
     );
     const o = db.laadAlles()[0];
-    expect(o.scanUitvoeringen[0]).toMatchObject({ label: "Team A | 0-meting", onderdeel: "Team A", labelHandmatig: true });
+    expect(o.scanUitvoeringen[0]).toMatchObject({ label: "Team A | 0-meting", labelHandmatig: true });
+    expect(onderdeelNaamVan(o, o.scanUitvoeringen[0])).toBe("Team A");
+    expect(o.scanUitvoeringen[0]).not.toHaveProperty("onderdeel");
     expect(o.scanUitvoeringen[0].meetdatum).toBeUndefined();
     expect(Object.keys(o)).not.toContain("rondes");
     expect(Object.keys(o.scanUitvoeringen[0])).not.toContain("rondeId");
@@ -344,7 +356,7 @@ describe("samengestelde Meting maken en verwijderen", () => {
     const r = db.maakSamengesteldeMeting("O", { assessmentId: A.id, metingIds: ["A", "B"], minScans: 3 });
     expect(r.ok).toBe(true);
     const s = laad().scanUitvoeringen.find((m) => m.samenstelling)!;
-    expect(s).toMatchObject({ onderdeel: "Hele organisatie", meetdatum: "2026-06-10", label: "jun 2026", invullingen: [] });
+    expect(s).toMatchObject({ onderdeelId: null, meetdatum: "2026-06-10", label: "jun 2026", invullingen: [] });
     expect(audit().find((e) => e.actie === "meting.samengesteldAangemaakt")?.details).toMatchObject({ onderliggendeMetingen: ["A", "B"] });
   });
 

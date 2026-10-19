@@ -7,6 +7,7 @@ import { useScanUitvoering } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { isAdmin, magOrganisatieToegang } from "@/lib/rechten";
+import { ResultaatKop } from "@/components/Resultaatkop";
 import { ResultsView } from "@/components/ResultsView";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { MetingWeergaven } from "@/components/visualisatie/MetingWeergaven";
@@ -124,13 +125,17 @@ export default function RapportagePage({
       <Kruimelpad
         delen={kruimelsVoorMeting(organisatie, scanUitvoering, via, "Resultaten van de Meting")}
       />
-      <span className="eyebrow">{scanUitvoering.label}</span>
-      <h1>{assessment.naam}</h1>
-      <p className="text-sm text-ink-m">
-        {samengesteld
-          ? `Gemiddelde van ${onderliggend.length} ${onderliggend.length === 1 ? "Meting" : "Metingen"}, elk even zwaar`
-          : `Gemiddelde over ${aantalAfgerond} ${aantalAfgerond === 1 ? "afgeronde respondent" : "afgeronde respondenten"}`}
-      </p>
+      <ResultaatKop
+        eyebrow="Resultaat van de Meting"
+        titel={assessment.naam}
+        subregel={[
+          scanUitvoering.label,
+          organisatie.naam,
+          samengesteld
+            ? `Gemiddelde van ${onderliggend.length} ${onderliggend.length === 1 ? "Meting" : "Metingen"}, elk even zwaar`
+            : `${aantalAfgerond} ${aantalAfgerond === 1 ? "afgeronde scan" : "afgeronde scans"}`,
+        ]}
+      />
 
       <div className="mt-8">
         <MetingWeergaven
@@ -148,7 +153,7 @@ export default function RapportagePage({
                 ondertitel={`Gemiddelde van ${aantalAfgerond} afgeronde ${aantalAfgerond === 1 ? "scan" : "scans"}`}
               />
             ) : (
-              <ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} />
+              <ResultsView assessment={assessment} antwoorden={gemiddeldeAntwoorden} toonKop={false} gemiddeldeVan={aantalAfgerond} />
             )
           }
           quickscan={quickscan}
@@ -171,9 +176,9 @@ export default function RapportagePage({
               assessment,
               // Op meetdatum, de oudste links (`visualisatie-scores.md`, E, Volgorde van de kolommen).
               oudsteEerst(onderliggend).map((m) => ({
-                label: onderdeelVan(m) === STANDAARD_ONDERDEEL ? m.label : onderdeelVan(m),
+                label: onderdeelVan(organisatie, m) === STANDAARD_ONDERDEEL ? m.label : onderdeelVan(organisatie, m),
                 sublabel: toonMeetdatum(m.meetdatum),
-                volledigeNaam: `${m.label} · ${onderdeelVan(m)}`,
+                volledigeNaam: `${m.label} · ${onderdeelVan(organisatie, m)}`,
                 aantalScans: aantalAfgerondInMeting(organisatie, m),
                 antwoorden: gemiddeldeAntwoordenVoorMetingMetSamenstelling(assessment, organisatie, m),
               })),

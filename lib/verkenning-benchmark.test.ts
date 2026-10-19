@@ -1,3 +1,4 @@
+import { zorgOnderdelenKloppend } from "./onderdelen";
 import { describe, expect, it } from "vitest";
 import { zorgscan } from "@/data/zorgscan-assessment";
 import { alleVragen } from "./assessment-structuur";
@@ -26,7 +27,7 @@ const scan = (id: string): ScanInvulling =>
 
 function org(id: string, sector: string, opties: { vlag?: boolean; onderdelen?: string[] } = {}): Organisatie {
   const onderdelen = opties.onderdelen ?? ["Hele organisatie"];
-  return {
+  const o = {
     id, naam: `Org ${id}`, kenmerken: { "sector-subsector": { sector } }, leden: [], aangemaaktDoor: null, toegewezenAan: [],
     benchmarkToegestaan: opties.vlag ?? true, aangemaaktOp: "x", gewijzigdOp: "x",
     scanUitvoeringen: onderdelen.map((o, i) => ({
@@ -34,6 +35,9 @@ function org(id: string, sector: string, opties: { vlag?: boolean; onderdelen?: 
       meetdatum: "2026-02-01", invullingen: [scan(`${id}-${i}-a`), scan(`${id}-${i}-b`), scan(`${id}-${i}-c`)],
     })),
   } as unknown as Organisatie;
+  // De oude tekst op de Meting wordt een Onderdeel met een `onderdeelId`.
+  zorgOnderdelenKloppend(o);
+  return o;
 }
 
 const verkenning = (filters: Benchmark["filters"], eenheid: Benchmark["eenheid"] = "organisaties"): Benchmark =>

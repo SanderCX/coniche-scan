@@ -5,10 +5,13 @@
  */
 import type { VeldDefinitie } from "./types";
 import { ondersteuningVan } from "./techstack";
+import { KorteNamen, korteNaamWaarde } from "./korte-namen";
 
 export interface KenmerkItem {
   label: string;
   waarde: string;
+  /** Het origineel als `waarde` een korte naam is (`datamodel.md`, Korte namen): Staat in de tooltip. */
+  origineel?: string;
 }
 
 type Obj = Record<string, unknown>;
@@ -41,8 +44,8 @@ function reeksProcent(delen: unknown[]): string | null {
 
 const samen = (...delen: (string | null | undefined)[]): string => delen.filter((d): d is string => !!d).join(", ");
 
-function techstackWaarde(item: Obj, leverancier: string): string {
-  const oplossing = tekst(item[leverancier]);
+function techstackWaarde(item: Obj, leverancier: string, naam: (w: string) => string = (w) => w): string {
+  const oplossing = naam(tekst(item[leverancier]));
   const hoe = ondersteuningVan(item);
   return samen(oplossing, hoe === "extern" ? "extern ondersteund" : hoe === "zelf" ? "zelf ondersteund" : null);
 }
@@ -61,17 +64,19 @@ function algemeen(veld: VeldDefinitie, waarde: unknown): KenmerkItem[] {
  * Het raster, in de volgorde van de lijst met organisatievelden. Bekende velden hebben de opmaak uit de spec. Een nieuw veld valt
  * terug op label en waarde (`algemeen`), zodat er niets uit het raster valt.
  */
-export function kenmerkenRaster(velden: VeldDefinitie[], kenmerken: Record<string, unknown>): KenmerkItem[] {
+export function kenmerkenRaster(velden: VeldDefinitie[], kenmerken: Record<string, unknown>, korteNamen?: KorteNamen): KenmerkItem[] {
   const items: KenmerkItem[] = [];
-  const voeg = (label: string, waarde: string | null | undefined) => {
-    if (waarde) items.push({ label, waarde });
+  const voeg = (label: string, waarde: string | null | undefined, origineel?: string) => {
+    if (waarde) items.push({ label, waarde, ...(origineel && origineel !== waarde ? { origineel } : {}) });
   };
+  /** Een waarde uit een keuzelijst met korte namen: De korte naam, met het origineel in de tooltip. */
+  const kort = (veldId: string, waarde: string): [string, string] => [korteNaamWaarde(korteNamen, veldId, waarde), waarde];
   for (const veld of velden) {
     const w = obj(kenmerken[veld.id]);
     switch (veld.id) {
       case "sector-subsector":
-        voeg("Sector", tekst(w.sector));
-        voeg("Subsector", tekst(w.subsector));
+        if (tekst(w.sector)) voeg("Sector", ...kort("sector-subsector.sector", tekst(w.sector)));
+        if (tekst(w.subsector)) voeg("Subsector", ...kort("sector-subsector.subsector", tekst(w.subsector)));
         break;
       case "volume-klantbasis": {
         const klanten = obj(w["totaal-klanten"]);
@@ -88,7 +93,9 @@ export function kenmerkenRaster(velden: VeldDefinitie[], kenmerken: Record<strin
           if (cat.label === "LLM-oplossing") {
             voeg(cat.label, samen(tekst(item.leverancier), tekst(item.toegangsroute)));
           } else {
-            voeg(cat.label, techstackWaarde(item, "leverancier"));
+            const vol = techstackWaarde(item, "leverancier");
+            const kortWaarde = techstackWaarde(item, "leverancier", (w) => (w ? korteNaamWaarde(korteNamen, `techstack.${cat.id}.leverancier`, w) : w));
+            voeg(cat.label, kortWaarde, vol);
           }
         }
         break;

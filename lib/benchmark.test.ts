@@ -328,7 +328,9 @@ describe("de view van een Lead op alle niveaus", () => {
 });
 
 describe("niveau 2: de lezing", () => {
-  const meting = (onderdeel: string, meetdatum?: string) => ({ onderdeel, meetdatum });
+  // Een Onderdeel is hier een id; de naam staat in `orgNamen` voor `redenOntwikkeling`.
+  const meting = (onderdeel: string, meetdatum?: string) => ({ onderdeelId: onderdeel, meetdatum });
+  const orgNamen = { onderdelen: ["Team A", "Team B"].map((n) => ({ id: n, organisatieId: "O", naam: n, aangemaaktOp: "x" })) };
 
   it("stelt Ontwikkeling over tijd voor bij hetzelfde onderdeel en verschillende meetdata, anders Naast elkaar", () => {
     expect(voorstelLezing([meting("Team A", "2026-10-01"), meting("Team A", "2027-10-01")])).toBe("ontwikkeling");
@@ -340,18 +342,18 @@ describe("niveau 2: de lezing", () => {
 
   it("een benchmark zonder lezing volgt haar leden, een opgeslagen lezing wint", () => {
     const o = orgMetMetingen([3, 3]);
-    o.scanUitvoeringen[0].onderdeel = "Team A";
-    o.scanUitvoeringen[1].onderdeel = "Team A";
+    o.scanUitvoeringen[0].onderdeelId = "Team A";
+    o.scanUitvoeringen[1].onderdeelId = "Team A";
     expect(lezingVan(metingenBenchmark(["m0", "m1"]), [o])).toBe("ontwikkeling");
     expect(lezingVan({ ...metingenBenchmark(["m0", "m1"]), lezing: "naastElkaar" }, [o])).toBe("naastElkaar");
-    o.scanUitvoeringen[1].onderdeel = "Team B";
+    o.scanUitvoeringen[1].onderdeelId = "Team B";
     expect(lezingVan(metingenBenchmark(["m0", "m1"]), [o])).toBe("naastElkaar");
   });
 
   it("Ontwikkeling over tijd staat alleen een Meting met hetzelfde onderdeel toe en geen gelijke meetdata", () => {
-    expect(redenOntwikkeling(meting("Team B"), [])).toBeNull();
-    expect(redenOntwikkeling(meting("Team A"), [meting("Team A")])).toBeNull();
-    expect(redenOntwikkeling(meting("Team B"), [meting("Team A")])).toContain("Team A");
+    expect(redenOntwikkeling(orgNamen, meting("Team B"), [])).toBeNull();
+    expect(redenOntwikkeling(orgNamen, meting("Team A"), [meting("Team A")])).toBeNull();
+    expect(redenOntwikkeling(orgNamen, meting("Team B"), [meting("Team A")])).toContain("Team A");
     expect(gelijkeMeetdata([meting("A", "2026-10-01"), meting("A", "2026-10-01")])).toBe(true);
     expect(gelijkeMeetdata([meting("A", "2026-10-01"), meting("A", "2026-10-02")])).toBe(false);
     expect(gelijkeMeetdata([meting("A"), meting("A")])).toBe(false);
@@ -381,8 +383,12 @@ describe("niveau 2: de lezing", () => {
 describe("Lead-view van een opgeslagen verkenning met de eenheid Onderdelen", () => {
   const metOnderdelen = (id: string, onderdelen: string[], scans = 3): Organisatie => ({
     ...org(id, scans),
+    // "Hele organisatie" is geen Onderdeel maar `onderdeelId: null`.
+    onderdelen: onderdelen
+      .filter((o) => o !== "Hele organisatie")
+      .map((o) => ({ id: `od-${id}-${o}`, organisatieId: id, naam: o, aangemaaktOp: "x" })),
     scanUitvoeringen: onderdelen.map((o, i) => ({
-      id: `m-${id}-${i}`, organisatieId: id, assessmentId: assessment.id, label: o, onderdeel: o, aangemaaktOp: "x", meetdatum: "2026-01-01",
+      id: `m-${id}-${i}`, organisatieId: id, assessmentId: assessment.id, label: o, onderdeelId: o === "Hele organisatie" ? null : `od-${id}-${o}`, aangemaaktOp: "x", meetdatum: "2026-01-01",
       invullingen: Array.from({ length: scans }, (_, k) => invulling(`${id}-${i}-${k}`, k + i + id.charCodeAt(0))),
     })),
   });

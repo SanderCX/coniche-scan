@@ -55,7 +55,7 @@ export function SamengesteldeMetingFormulier({
 
   const [assessmentId, setAssessmentId] = useState(bestaande?.assessmentId ?? assessmentIds[0] ?? "");
   const [onderdeelWaarde, setOnderdeelWaarde] = useState<{ onderdeel: string; nieuw?: boolean }>({
-    onderdeel: bestaande ? onderdeelVan(bestaande) : STANDAARD_ONDERDEEL,
+    onderdeel: bestaande ? onderdeelVan(organisatie, bestaande) : STANDAARD_ONDERDEEL,
   });
   const onderdeelProbleem = onderdeelFout(organisatie, { ...onderdeelWaarde, meetdatum: "" });
   const onderdeel = onderdeelNaamVoorOpslaan(organisatie, { ...onderdeelWaarde, meetdatum: "" });
@@ -149,7 +149,7 @@ export function SamengesteldeMetingFormulier({
                 <span>
                   {m.label}{" "}
                   <span className="text-ink-s">
-                    — {onderdeelVan(m)} · {toonMeetdatum(meetdatumVan(m))} · {aantalAfgerondInMeting(organisatie, m)} afgeronde scans
+                    — {onderdeelVan(organisatie, m)} · {toonMeetdatum(meetdatumVan(m))} · {aantalAfgerondInMeting(organisatie, m)} afgeronde scans
                   </span>
                   {nee && <span className="text-ink-s"> · {nee}</span>}
                 </span>

@@ -1,5 +1,23 @@
 # Coniche Scan — Changelog
 
+## 2026-10-19 (8) — Specs van Joost, PR 139: de Resultaatkop, Toegang en Afspraken, korte namen in Kenmerken en `Meting.onderdeel` vervalt
+
+Op verzoek van Sander gebouwd (`stylesheet.md`, Resultaatkop; `content-ziekenhuis-quickscan.md`, Resultaten; `visualisatie-quickscan.md`, 3; `beheerpagina.md`, punt 4; `datamodel.md`, Onderdeel en Korte namen). Helpbestanden: `help/resultaten-lezen.md` en `help/mijn-metingen.md`.
+
+**Gedaan**:
+- **Resultaatkop** (`components/Resultaatkop.tsx`): `ResultaatKop` (eyebrow, titel, subregel) en `Totaalkaart` (ring van 128px, chip, uitleg en feiten) voor het resultaatscherm van een respondent, de resultatenpagina van
+  een Meting (met de schakelaar ertussen) en de voorbeeld-output (met "← Terug" rechts). De Classificatie heeft een kop en alleen een gekleurde stip. De Quickscan-totaalkaart van eerder vandaag is erin opgegaan.
+- **Quickscan**: Sterkste afdeling en Meeste ontwikkelruimte als twee kolommen met rijen (`SterksteMeeste`, ook onder Gemiddelde en spreiding, waar de tegels vervallen), de chips in de afdelingskaart als gewone regels met
+  een stip, en de `aandachtZin` in 14px.
+- **Staafdiagram per categorie**: Getal in 14px, tooltip met naam en klasse, alle namen op één regel en minstens 104px per categorie.
+- **Organisatie-detail**: De kaarten Toegang (eigenaar, toegewezen Consultants met Intrekken, toewijzen in een modal, `info.organisatieToegang`) en Afspraken (Benchmark-vlag en Namen tonen) naast elkaar onder Kenmerken, de Kenmerken
+  in de volgorde van de spec, en de korte namen in de kaart en in Sector en Subsector in het formulier (`ZoekSelect`: een keuzelijst met zoekveld, de korte naam per optie en het origineel in de tooltip).
+- **`Meting.onderdeel` vervalt**: De naam komt uit het Onderdeel via `onderdeelId` (`onderdeelVan(organisatie, meting)`), de oude tekst wordt bij het laden nog één keer gelezen om de Onderdelen aan te maken en verdwijnt dan,
+  en het aanmaken, wijzigen, importeren en samenbrengen kiest of maakt het Onderdeel met `zorgVoorOnderdeel`. De tests zijn omgezet naar `onderdeelId`. 1 nieuwe test voor de korte namen in de kaart.
+
+**Keuzes waar de spec open liet**: Het zoekveld bij Sector en Subsector is een eigen keuzelijst (`ZoekSelect`) omdat een gewone keuzelijst de originele titel niet doorzoekbaar maakt. De ring op de benchmarkviews blijft 156px, omdat de spec de
+Resultaatkop alleen voor een resultaatscherm van een scan noemt. De opgeslagen data in localStorage bevat de oude tekst tot de eerstvolgende schrijfactie.
+
 ## 2026-10-19 (7) — Specs van Joost, PR 137: de `.score-ring` voor de totaalscore op Mijn metingen en de resultaten
 
 Op verzoek van Sander gebouwd (`stylesheet.md`, Resultaten; `content-ziekenhuis-quickscan.md`, Resultaten; `visualisatie-mijn-metingen.md`, Kaart met cirkel). Helpbestanden: Geen aanpassing.

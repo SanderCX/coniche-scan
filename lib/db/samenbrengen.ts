@@ -6,7 +6,8 @@ import { zoekScanInvulling } from "./scans";
 import { genereerUniekeToegangscode } from "./respondenten";
 import { logAudit, nieuweGroepId } from "../audit-store";
 import { metingContext, organisatieContext } from "../audit-context";
-import { STANDAARD_ONDERDEEL, genereerLabel, isGeldigeDatum, isSamengesteld, meetdatumVan } from "../metingen";
+import { STANDAARD_ONDERDEEL, genereerLabel, isGeldigeDatum, isSamengesteld, meetdatumVan, onderdeelVan } from "../metingen";
+import { zorgVoorOnderdeel } from "../onderdelen";
 import { SamenbrengBron, SamenbrengRegel, controleerSamenbrengen } from "../samenbrengen";
 
 /**
@@ -76,15 +77,15 @@ export function brengScansSamen(
   if (Object.keys(fouten).length > 0) return { ok: false, reden: "Niet alle regels kloppen.", fouten };
 
   if (doel.soort === "nieuw") {
-    const onderdeel = doel.onderdeel?.trim() || STANDAARD_ONDERDEEL;
     if (!isGeldigeDatum(doel.meetdatum)) return { ok: false, reden: "Kies een meetdatum." };
-    const label = genereerLabel(onderdeel, doel.meetdatum);
+    const od = zorgVoorOnderdeel(organisatie, doel.onderdeel ?? "");
+    const label = genereerLabel(od?.naam ?? STANDAARD_ONDERDEEL, doel.meetdatum);
     doelMeting = {
       id: nieuwId(),
       organisatieId: organisatie.id,
       assessmentId,
       label,
-      onderdeel,
+      onderdeelId: od?.id ?? null,
       meetdatum: doel.meetdatum,
       aangemaaktOp: new Date().toISOString(),
       invullingen: [],
@@ -104,7 +105,7 @@ export function brengScansSamen(
       entiteitId: doelM.id,
       entiteitNaam: doelM.label,
       groepId,
-      details: { ...metingContext(organisatie, doelM), onderdeel: doelM.onderdeel ?? STANDAARD_ONDERDEEL, meetdatum: meetdatumVan(doelM) },
+      details: { ...metingContext(organisatie, doelM), onderdeel: onderdeelVan(organisatie, doelM), meetdatum: meetdatumVan(doelM) },
     });
   }
 

@@ -46,7 +46,7 @@ export function MetingenVergelijkingView({
   const eenheden: EenheidInvoer[] = metingen.map((m) => ({
     id: m.meting.id,
     label: m.meting.label,
-    sublabel: `${onderdeelVan(m.meting)} · ${toonMeetdatum(m.meting.meetdatum)}`,
+    sublabel: `${onderdeelVan(m.organisatie, m.meting)} · ${toonMeetdatum(m.meting.meetdatum)}`,
     aantalScans: m.aantalAfgerond,
     antwoorden: m.antwoorden,
   }));
@@ -105,7 +105,7 @@ export function MetingenVergelijkingView({
                   {metingen.map((m) => (
                     <tr key={m.meting.id}>
                       <td>{m.meting.label}</td>
-                      <td>{onderdeelVan(m.meting)}</td>
+                      <td>{onderdeelVan(m.organisatie, m.meting)}</td>
                       <td>{toonMeetdatum(m.meting.meetdatum)}</td>
                       <td>{m.aantalAfgerond}</td>
                       <td>
@@ -138,9 +138,9 @@ export function MetingenVergelijkingView({
                   metingen.map((m) => ({
                     // Eerste regel van de kop: Het onderdeel, want veel Metingen heten gelijk ("0-meting"). Heeft de Meting geen
                     // onderdeel, dan staat er de naam van de Meting. De tweede regel is de meetdatum, de rest staat in de tooltip.
-                    label: onderdeelVan(m.meting) === STANDAARD_ONDERDEEL ? m.meting.label : onderdeelVan(m.meting),
+                    label: onderdeelVan(m.organisatie, m.meting) === STANDAARD_ONDERDEEL ? m.meting.label : onderdeelVan(m.organisatie, m.meting),
                     sublabel: toonMeetdatum(m.meting.meetdatum),
-                    volledigeNaam: `${m.meting.label} · ${onderdeelVan(m.meting)}`,
+                    volledigeNaam: `${m.meting.label} · ${onderdeelVan(m.organisatie, m.meting)}`,
                     aantalScans: m.aantalAfgerond,
                     antwoorden: m.antwoorden,
                   })),

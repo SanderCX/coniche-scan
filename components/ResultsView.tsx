@@ -13,10 +13,15 @@ import {
   voortgang,
 } from "@/lib/scoring";
 import { gewichtMarkering } from "@/lib/weging";
-import { CLASSIFICATIE_INFO, CLASSIFICATIE_SCORES, SCORE_KLEUR, scoreKleur } from "@/lib/colors";
-import { ScoreCircle } from "./ScoreCircle";
+import { CLASSIFICATIE_INFO, scoreKleur } from "@/lib/colors";
+import { ResultaatKop, Totaalkaart } from "./Resultaatkop";
+import { ringVanScore } from "@/lib/score-ring";
 import { RadarChartView } from "./RadarChartView";
 import { CategoryBarChart } from "./CategoryBarChart";
+
+/** De stip bij een klasse: De klassekleur (`stylesheet.md`, Resultaatkop, Classificatie). */
+const STAT_KLEUR = { rood: "var(--stat-red)", oranje: "var(--stat-amber)", groen: "var(--stat-green)" } as const;
+const GRENS_TEKST = { rood: "Onder 2,5", oranje: "2,5 tot en met 3,49", groen: "Vanaf 3,5" } as const;
 
 export function ResultsView({
   assessment,
@@ -26,6 +31,10 @@ export function ResultsView({
   isPreview = false,
   bouwblokHref,
   toonKop = true,
+  eyebrow = "Jouw resultaat",
+  subregel,
+  kopRechts,
+  gemiddeldeVan,
 }: {
   assessment: Assessment;
   antwoorden: Record<string, Antwoord>;
@@ -41,6 +50,14 @@ export function ResultsView({
    * respondenten (`beheerpagina.md`, punt 4, Eén kop). Die twee staan alleen op het resultatenscherm van één scan.
    */
   toonKop?: boolean;
+  /** De eyebrow van de Resultaatkop ("Jouw resultaat", "Voorbeeld-output"). */
+  eyebrow?: string;
+  /** De subregel van de Resultaatkop, bijvoorbeeld de naam, de Meting en de afrondingsdatum. Standaard de naam van de respondent. */
+  subregel?: (string | null | undefined | false)[];
+  /** Rechts naast de titel, alleen in de voorbeeld-output: "← Terug". */
+  kopRechts?: React.ReactNode;
+  /** Bij het gemiddelde van een Meting: Het aantal afgeronde scans, voor het feit "Gemiddelde van n afgeronde scans". */
+  gemiddeldeVan?: number;
 }) {
   // Een Assessment met Ja / Nee / Weet ik niet heeft een eigen opbouw (`content-ziekenhuis-quickscan.md`, Resultaten).
   if (isJaNeeWeetNiet(assessment)) {
@@ -52,6 +69,9 @@ export function ResultsView({
         respondentNaam={respondentNaam}
         isPreview={isPreview}
         toonKop={toonKop}
+        eyebrow={eyebrow}
+        subregel={subregel}
+        kopRechts={kopRechts}
       />
     );
   }
@@ -67,27 +87,21 @@ export function ResultsView({
 
   return (
     <div>
+
+      {toonKop && <ResultaatKop eyebrow={eyebrow} titel={assessment.naam} subregel={subregel ?? [respondentNaam]} rechts={kopRechts} />}
       {isPreview && (
         <div className="preview-banner">
           Dit is een voorbeeld met demo-data — zo ziet jouw resultatenscherm eruit na afronding
           van de scan.
         </div>
       )}
-
-      <div className="resultaten-header">
-        {overall !== null && <ScoreCircle score={overall} classificatie={classificatie(overall)} />}
-        <p className="mt-4 font-semibold text-ink-m">
-          {respondentNaam ? `Resultaat voor ${respondentNaam}` : "Overall score"}
-        </p>
-        {toonKop && (
-          <>
-            <h1 className="page-title mt-1">{assessment.naam}</h1>
-            <p className="resultaten-voortgang">
-              {beantwoord} van {totaal} vragen beantwoord
-            </p>
-          </>
-        )}
-      </div>
+      {overall !== null && (
+        <Totaalkaart
+          ring={ringVanScore(overall, classificatie(overall))}
+          uitleg={CLASSIFICATIE_INFO[classificatie(overall)].omschrijving}
+          feiten={[gemiddeldeVan !== undefined ? `Gemiddelde van ${gemiddeldeVan} afgeronde ${gemiddeldeVan === 1 ? "scan" : "scans"}` : `${beantwoord} van ${totaal} vragen beantwoord`]}
+        />
+      )}
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <div className="chart-block">
@@ -158,25 +172,16 @@ export function ResultsView({
       </div>
 
       <div>
-        <h3>Legenda</h3>
-        <div className="legenda">
+        <h3 style={{ fontWeight: 700 }}>Classificatie</h3>
+        <div className="classificatie-legenda">
           {(["rood", "oranje", "groen"] as const).map((c) => {
             const info = CLASSIFICATIE_INFO[c];
-            const scores = CLASSIFICATIE_SCORES[c];
             return (
-              <div key={c} className="legenda-item">
-                <span className="legenda-stippen">
-                  {scores.map((s) => (
-                    <span
-                      key={s}
-                      className="legenda-stip"
-                      style={{ ["--kleur" as string]: SCORE_KLEUR[s].hex } as React.CSSProperties}
-                    />
-                  ))}
-                </span>
+              <div key={c} className="classificatie-item">
+                <span className="classificatie-stip" style={{ background: STAT_KLEUR[c] }} />
                 <div>
-                  <h3 style={{ color: SCORE_KLEUR[scores[0]].hex }}>{info.label}</h3>
-                  <p>{info.omschrijving}</p>
+                  <strong>{info.label}</strong>
+                  <p>{GRENS_TEKST[c]}</p>
                 </div>
               </div>
             );
