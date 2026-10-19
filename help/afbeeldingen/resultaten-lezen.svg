@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 330" role="img" width="100%">
+<title>Staafdiagram Per categorie met per categorie een staaf voor je eigen score, een stip met het gemiddelde van de groep, een grijze lijn van de laagste tot de hoogste score en twee stippellijnen bij 2,5 en 3,5</title>
+<rect x="0" y="0" width="800" height="330" rx="10" fill="var(--bg)"/>
+<line x1="60" y1="250" x2="640" y2="250" stroke="var(--border)" stroke-width="1"/><text x="48" y="254" text-anchor="end" font-size="12" fill="var(--ink-s)">1</text>
+<line x1="60" y1="195" x2="640" y2="195" stroke="var(--border)" stroke-width="1"/><text x="48" y="199" text-anchor="end" font-size="12" fill="var(--ink-s)">2</text>
+<line x1="60" y1="140" x2="640" y2="140" stroke="var(--border)" stroke-width="1"/><text x="48" y="144" text-anchor="end" font-size="12" fill="var(--ink-s)">3</text>
+<line x1="60" y1="85" x2="640" y2="85" stroke="var(--border)" stroke-width="1"/><text x="48" y="89" text-anchor="end" font-size="12" fill="var(--ink-s)">4</text>
+<line x1="60" y1="30" x2="640" y2="30" stroke="var(--border)" stroke-width="1"/><text x="48" y="34" text-anchor="end" font-size="12" fill="var(--ink-s)">5</text>
+<line x1="60" y1="167.5" x2="640" y2="167.5" stroke="#9a978f" stroke-width="1.5" stroke-dasharray="5 5"/>
+<line x1="60" y1="112.5" x2="640" y2="112.5" stroke="#9a978f" stroke-width="1.5" stroke-dasharray="5 5"/>
+<text x="650" y="171.5" font-size="12" fill="var(--ink-s)">2,5: grens Uitbouwen</text>
+<text x="650" y="116.5" font-size="12" fill="var(--ink-s)">3,5: grens Sterk punt</text>
+<rect x="100" y="156.5" width="48" height="93.5" fill="var(--or)" rx="3"/>
+<text x="124" y="148.5" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">2,7</text>
+<line x1="168" y1="118.0" x2="168" y2="195.0" stroke="#b3b0a8" stroke-width="2"/>
+<circle cx="168" cy="145.5" r="7" fill="var(--or)" stroke="#fff" stroke-width="2"/>
+<text x="134" y="272" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink-m)">Overkoepelend</text>
+<rect x="208" y="118.0" width="48" height="132.0" fill="var(--bl)" rx="3"/>
+<text x="232" y="110.0" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">3,4</text>
+<line x1="276" y1="79.50000000000003" x2="276" y2="151.0" stroke="#b3b0a8" stroke-width="2"/>
+<circle cx="276" cy="112.5" r="7" fill="var(--bl)" stroke="#fff" stroke-width="2"/>
+<text x="242" y="272" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink-m)">Organisatie</text>
+<rect x="316" y="134.5" width="48" height="115.5" fill="var(--pu)" rx="3"/>
+<text x="340" y="126.5" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">3,1</text>
+<line x1="384" y1="90.5" x2="384" y2="167.5" stroke="#b3b0a8" stroke-width="2"/>
+<circle cx="384" cy="129.0" r="7" fill="var(--pu)" stroke="#fff" stroke-width="2"/>
+<text x="350" y="272" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink-m)">Proces & Tech</text>
+<rect x="424" y="96.0" width="48" height="154.0" fill="var(--gr)" rx="3"/>
+<text x="448" y="88.0" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">3,8</text>
+<line x1="492" y1="62.99999999999997" x2="492" y2="140.0" stroke="#b3b0a8" stroke-width="2"/>
+<circle cx="492" cy="101.5" r="7" fill="var(--gr)" stroke="#fff" stroke-width="2"/>
+<text x="458" y="272" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink-m)">Mens</text>
+<rect x="532" y="178.5" width="48" height="71.5" fill="var(--ye)" rx="3"/>
+<text x="556" y="170.5" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">2,3</text>
+<line x1="600" y1="140.0" x2="600" y2="200.5" stroke="#b3b0a8" stroke-width="2"/>
+<circle cx="600" cy="167.5" r="7" fill="var(--ye)" stroke="#fff" stroke-width="2"/>
+<text x="566" y="272" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink-m)">Fundament</text>
+<g data-nr="1"><circle cx="76" cy="162.5" r="11" fill="var(--ink)"/><text x="76" y="167.0" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">1</text></g>
+<g data-nr="2"><circle cx="180" cy="111.5" r="11" fill="var(--ink)"/><text x="180" y="116.0" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">2</text></g>
+<g data-nr="3"><circle cx="250" cy="65.50000000000003" r="11" fill="var(--ink)"/><text x="250" y="70.00000000000003" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">3</text></g>
+<g data-nr="4"><circle cx="34" cy="112.5" r="11" fill="var(--ink)"/><text x="34" y="117.0" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">4</text></g>
+<text x="60" y="310" font-size="12" fill="var(--ink-s)">Scores van 1 tot 5. Voorbeelddata.</text>
+</svg>

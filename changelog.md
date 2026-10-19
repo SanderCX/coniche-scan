@@ -1,5 +1,27 @@
 # Coniche Scan — Changelog
 
+## 2026-10-19 (4) — De helppagina en de laatste punten van de KPI-definities
+
+Op verzoek van Sander gebouwd (`help.md`; `beheerpagina.md`, punt 3, KPI's en kanalen). Helpbestanden: Alle 24 bestanden in `help/` zijn nieuw. De specs van Joost hadden
+voor de KPI-definities drie punten die niet in het design stonden (hernoemen, verwijderen en volgorde), die ik heb ingevuld.
+
+**Gedaan**:
+- **Help** (`help.md`): De pagina `/help` (Respondent en Lead, met `?code=`) en `/beheer/help` (Admin en Consultant), met zijbalk, zoekveld, inhoudsopgave per groep en
+  het artikel in de vaste opbouw. De rij "Help" staat in het Accountmenu en in "Mijn gegevens". Wat een rol ziet volgt uit `HELP_GROEPEN` en `rollen` en, voor een Lead,
+  uit zijn vinkjes (`lib/help.ts`).
+- **Inhoud en controle**: 24 onderwerpen in `help/*.md` met kopgegevens, twee SVG's, `scripts/bouw-help.ts` (draait voor `dev` en `build`, schrijft
+  `data/help-onderwerpen.ts`) en `controleerHelp` in `lib/help-bron.ts`. `lib/help.test.ts` bewaakt de bronnen, de rollen en de schrijfregels (geen gedachtestreepjes, geen
+  namen van instellingen). Het bouwen ging van Node 24 type stripping uit, dus `allowImportingTsExtensions` staat aan in `tsconfig.json`.
+- **Films**: "Wat krijg ik" (16 seconden) en "De Meetperiode kiezen" (12 seconden) als CSS-animaties met stapkaarten, pauzeknop en eindbeeld bij verminderde beweging
+  (`components/help/HelpFilm.tsx`, `app/styles/help.css`). Wat krijg ik staat ook op de Assessment-landingspagina, met de knop "Bekijk de voorbeeld-output" in plaats van
+  "Bekijk wat je krijgt" in de hero.
+- **KPI-definities**: Een kanaal hernoemen (invoerveld in de lijst Kanalen), een KPI verwijderen (met bevestiging die de waarden noemt), en de volgorde van KPI's en kanalen
+  wijzigen met ↑ en ↓. Gelogd als `kanaal.hernoemd`, `kpiDefinitie.verwijderd`, `kpiDefinitie.volgordeGewijzigd` en `kanaal.volgordeGewijzigd`. Test in `lib/kpi.test.ts`.
+
+**Keuzes waar de spec open liet**: De routes (`/help` en `/beheer/help`, de route was open). "Je score vergelijken" is ingevuld als uitleg van klassen, categorieën, radar en top 3.
+"Leads toegang geven" is alleen voor een Admin, omdat het Leads-venster dat is. De film staat niet bij de Quickscan, want hij toont staven op de schaal van 1 tot 5. Alleen de
+twee uitgewerkte onderwerpen hebben een illustratie. De inhoud wacht op de beoordeling van Joost.
+
 ## 2026-10-19 (3) — Specs van Joost, PR 129: balklijst, Onderdeel als object en KPI's per plek en kanaal
 
 Op verzoek van Sander gebouwd (`stylesheet.md`, Balklijst; `datamodel.md`, Onderdeel en KPI's en kanalen; `beheerpagina.md`, punt 3 en 4; `visualisatie-verkennen.md`,

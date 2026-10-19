@@ -18,6 +18,7 @@ import {
   pasKpiWijzigingenToe,
   toonKpiGetal,
 } from "./kpi";
+import { getInstellingen } from "./instellingen-store";
 import { zorgVoorOnderdeel } from "./onderdelen";
 import type { Organisatie } from "./types";
 
@@ -247,5 +248,32 @@ describe("opslag van waarden en definities", () => {
     const kpi = beheer.maakKpi("Eerste reactietijd");
     expect(kpi.ok && kpi.kpi.id).toBe("eerste-reactietijd");
     expect(audit().map((e) => e.actie)).toEqual(expect.arrayContaining(["kanaal.aangemaakt", "kpiDefinitie.aangemaakt"]));
+  });
+
+  it("een KPI verwijderen neemt zijn waarden en korte naam mee, en de volgorde en een kanaalnaam zijn te wijzigen", () => {
+    zet(org());
+    db.bewaarKpiWaarden("O", [
+      { kpiId: "aht", onderdeelId: null, kanaalId: null, waarde: 300 },
+      { kpiId: "nps", onderdeelId: null, kanaalId: null, waarde: 40 },
+    ]);
+    expect(beheer.gevolgenKpi("aht")).toEqual({ waarden: 1, organisaties: 1 });
+    expect(beheer.verwijderKpi("aht")).toMatchObject({ ok: true, waarden: 1 });
+    expect(db.laadAlles()[0].kpiWaarden?.map((w) => w.kpiId)).toEqual(["nps"]);
+    expect(getInstellingen().kpiDefinities.some((k) => k.id === "aht")).toBe(false);
+    expect(audit().find((e) => e.actie === "kpiDefinitie.verwijderd")?.details).toMatchObject({ aantalKpiWaarden: 1 });
+
+    const eerste = [...getInstellingen().kpiDefinities].sort((a, b) => a.volgorde - b.volgorde)[0].id;
+    expect(beheer.verplaatsKpi(eerste, -1)).toBe(false);
+    expect(beheer.verplaatsKpi(eerste, 1)).toBe(true);
+    const nu = [...getInstellingen().kpiDefinities].sort((a, b) => a.volgorde - b.volgorde);
+    expect(nu[1].id).toBe(eerste);
+    expect(nu.map((k) => k.volgorde)).toEqual(nu.map((_, i) => i + 1));
+
+    expect(beheer.hernoemKanaal("kanaal-call", "Telefoon")).toMatchObject({ ok: true, gewijzigd: true });
+    expect(beheer.hernoemKanaal("kanaal-call", "e-mail").ok).toBe(false);
+    expect(beheer.hernoemKanaal("kanaal-call", " ").ok).toBe(false);
+    expect(getInstellingen().kanalen.find((k) => k.id === "kanaal-call")?.naam).toBe("Telefoon");
+    expect(beheer.verplaatsKanaal("kanaal-call", 1)).toBe(true);
+    expect(audit().map((e) => e.actie)).toEqual(expect.arrayContaining(["kanaal.hernoemd", "kanaal.volgordeGewijzigd", "kpiDefinitie.volgordeGewijzigd"]));
   });
 });

@@ -122,6 +122,7 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
   const [accountOpen, setAccountOpen] = useState(false);
   const heeftInstellingen = magGebruikersBeheren(gebruiker);
   const inInstellingen = INSTELLINGEN_PADEN.some((p) => pathname.startsWith(p));
+  const inHelp = pathname.startsWith("/beheer/help");
 
   const links = [
     ...(magContentBeheren(gebruiker)
@@ -173,6 +174,7 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
                   ...(heeftInstellingen
                     ? [{ label: "Instellingen", onClick: () => router.push("/beheer/gebruikers"), actief: inInstellingen }]
                     : []),
+                  { label: "Help", onClick: () => router.push("/beheer/help"), actief: inHelp },
                   { label: "Uitloggen", onClick: logout, scheidingVoor: true },
                 ]}
               />

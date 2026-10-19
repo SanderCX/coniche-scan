@@ -71,8 +71,8 @@ losse elementen naast elkaar.
   daarna de klikbare rij "Mijn account" (zie Mijn account hieronder) en voor
   een Admin daaronder de klikbare rij "Instellingen", die de pagina
   Instellingen opent (zie Instellingen hieronder). Daaronder staat voor elke
-  rol de klikbare rij "Help", die de helppagina opent (`help.md`, voorstel van
-  19 oktober 2026, nog niet gebouwd). Boven de laatste rij
+  rol de klikbare rij "Help", die de helppagina opent (`help.md`, gebouwd op
+  19 oktober 2026). Boven de laatste rij
   staat een scheidingslijn. Laatste rij, klikbaar: "Uitloggen". Een
   Consultant heeft geen rij "Instellingen": Zijn menu bestaat uit de eerste
   rij, "Mijn account", "Help" en "Uitloggen". Functionaliteit van uitloggen blijft
@@ -830,9 +830,21 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
 - **Recht en log.** `content.beheren`. Gelogd als `kpiDefinitie.aangemaakt`,
   `kpiDefinitie.gewijzigd`, `kanaal.aangemaakt` en `kanaal.verwijderd`, en voor
   de korte naam als `korteNaam.gewijzigd` (`datamodel.md`, Audit).
-- **Nog niet besloten, niet in het design.** Het hernoemen van een kanaal, het
-  verwijderen van een KPI-definitie en het wijzigen van de volgorde van KPI's
-  en kanalen.
+- **Hernoemen, verwijderen en volgorde (gebouwd op 19 oktober 2026, niet in het
+  design van Joost).** Door Claude Code ingevuld, Joost beoordeelt het.
+  - **Een kanaal hernoemen**: De naam in de lijst Kanalen is een invoerveld. Enter
+    of het verlaten van het veld bewaart, Esc zet de naam terug. Alleen de naam
+    verandert, het id en alle KPI-waarden blijven. De naam blijft hoofdletterongevoelig
+    uniek. Gelogd als `kanaal.hernoemd`.
+  - **Een KPI verwijderen**: Een knop "Verwijderen" achter de rij, met een
+    bevestiging die het aantal waarden en Organisaties noemt, zoals bij een kanaal.
+    De waarden bij alle Organisaties en de korte naam gaan mee. Gelogd als
+    `kpiDefinitie.verwijderd`. De knop is uitgeschakeld zolang er niet-opgeslagen
+    wijzigingen in de tabel staan.
+  - **Volgorde**: Elke KPI en elk kanaal heeft knoppen ↑ en ↓ om een plek te
+    verschuiven. De volgorde geldt voor de tabel, de menu's en de kolommen. Gelogd
+    als `kpiDefinitie.volgordeGewijzigd` en `kanaal.volgordeGewijzigd`. De kanalen
+    staan daarmee als lijst met een invoerveld per kanaal in plaats van als pillen.
 
 #### 4. Organisaties
 

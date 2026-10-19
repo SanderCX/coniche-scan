@@ -5,7 +5,7 @@ import { InfoIcoon } from "@/components/InfoIcoon";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { bewaarKorteNamen, MAX_KORTE_NAAM } from "@/lib/korte-namen";
-import { gevolgenKanaal, maakKanaal, maakKpi, vlagBlokkade, verwijderKanaal, wijzigKpis } from "@/lib/kpi-beheer";
+import { gevolgenKanaal, gevolgenKpi, hernoemKanaal, maakKanaal, maakKpi, vlagBlokkade, verplaatsKanaal, verplaatsKpi, verwijderKanaal, verwijderKpi, wijzigKpis } from "@/lib/kpi-beheer";
 
 interface Concept {
   id: string | null;
@@ -14,6 +14,10 @@ interface Concept {
   perOnderdeel: boolean;
   perKanaal: boolean;
   korteNaam: string;
+}
+
+function zonder(namen: Record<string, string>, id: string): Record<string, string> {
+  return Object.fromEntries(Object.entries(namen).filter(([sleutel]) => sleutel !== id));
 }
 
 /**
@@ -40,6 +44,10 @@ export function KpiDefinitiesBeheer() {
   const [nieuwKanaal, setNieuwKanaal] = useState("");
   const [kanaalFout, setKanaalFout] = useState<string | null>(null);
   const [kanaalWeg, setKanaalWeg] = useState<string | null>(null);
+  const [kpiWeg, setKpiWeg] = useState<string | null>(null);
+  // De naam waaraan een kanaal wordt gewijzigd, tot Enter of het verlaten van het veld.
+  const [kanaalNamen, setKanaalNamen] = useState<Record<string, string>>({});
+  const [kanaalNaamFout, setKanaalNaamFout] = useState<{ id: string; reden: string } | null>(null);
 
   const wijzig = (index: number, patch: Partial<Concept>) => {
     setOpgeslagen(false);
@@ -84,8 +92,21 @@ export function KpiDefinitiesBeheer() {
     setKanaalFout(null);
   }
 
+  function bewaarKanaalNaam(id: string) {
+    const nieuw = kanaalNamen[id];
+    if (nieuw === undefined) return;
+    const r = hernoemKanaal(id, nieuw);
+    if (!r.ok) return setKanaalNaamFout({ id, reden: r.reden });
+    setKanaalNaamFout(null);
+    setKanaalNamen(zonder(kanaalNamen, id));
+  }
+
   const weg = kanaalWeg ? kanalen.find((k) => k.id === kanaalWeg) : undefined;
   const gevolgen = kanaalWeg ? gevolgenKanaal(kanaalWeg) : { waarden: 0, organisaties: 0 };
+  const kpiVerwijder = kpiWeg ? kpis.find((k) => k.id === kpiWeg) : undefined;
+  const kpiGevolgen = kpiWeg ? gevolgenKpi(kpiWeg) : { waarden: 0, organisaties: 0 };
+  // Verplaatsen en verwijderen werken op de opgeslagen stand: Eerst opslaan of annuleren.
+  const kanActies = concept === null;
 
   return (
     <div className="kpi-beheer">
@@ -115,6 +136,7 @@ export function KpiDefinitiesBeheer() {
                 <th>Per onderdeel</th>
                 <th>Per kanaal</th>
                 <th style={{ textAlign: "left" }}>Korte naam</th>
+                <th aria-label="Volgorde en verwijderen" />
               </tr>
             </thead>
             <tbody>
@@ -168,6 +190,25 @@ export function KpiDefinitiesBeheer() {
                         onChange={(e) => wijzig(i, { korteNaam: e.target.value })}
                       />
                     </td>
+                    <td className="kpi-acties">
+                      {r.id === null ? (
+                        <button type="button" className="btn btn-outline btn-compact" onClick={() => setConcept(rijen.filter((_, j) => j !== i))}>
+                          Verwijderen
+                        </button>
+                      ) : (
+                        <>
+                          <button type="button" className="btn btn-outline btn-compact" aria-label={`${r.naam} een plek omhoog`} disabled={!kanActies || i === 0} onClick={() => verplaatsKpi(r.id!, -1)}>
+                            ↑
+                          </button>
+                          <button type="button" className="btn btn-outline btn-compact" aria-label={`${r.naam} een plek omlaag`} disabled={!kanActies || i === rijen.length - 1} onClick={() => verplaatsKpi(r.id!, 1)}>
+                            ↓
+                          </button>
+                          <button type="button" className="btn btn-outline btn-compact" aria-label={`${r.naam} verwijderen`} disabled={!kanActies} onClick={() => setKpiWeg(r.id)}>
+                            Verwijderen
+                          </button>
+                        </>
+                      )}
+                    </td>
                   </tr>
                 );
               })}
@@ -195,16 +236,47 @@ export function KpiDefinitiesBeheer() {
           <h2 style={{ margin: 0 }}>Kanalen</h2>
           <InfoIcoon sleutel="info.kanalen" />
         </div>
-        <div className="vk-chips" style={{ margin: 0 }}>
+        <ul className="kanaal-lijst">
           {[...kanalen]
             .sort((a, b) => a.volgorde - b.volgorde)
-            .map((k) => (
-              <button key={k.id} type="button" className="pil" aria-label={`${k.naam} verwijderen`} onClick={() => setKanaalWeg(k.id)}>
-                {k.naam}
-                <span aria-hidden="true">×</span>
-              </button>
+            .map((k, i, alle) => (
+              <li key={k.id}>
+                <input
+                  type="text"
+                  className="kpi-tekst"
+                  aria-label={`Naam van kanaal ${k.naam}`}
+                  aria-invalid={kanaalNaamFout?.id === k.id ? true : undefined}
+                  value={kanaalNamen[k.id] ?? k.naam}
+                  onChange={(e) => {
+                    setKanaalNaamFout(null);
+                    setKanaalNamen({ ...kanaalNamen, [k.id]: e.target.value });
+                  }}
+                  onBlur={() => bewaarKanaalNaam(k.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") bewaarKanaalNaam(k.id);
+                    if (e.key === "Escape") {
+                      setKanaalNaamFout(null);
+                      setKanaalNamen(zonder(kanaalNamen, k.id));
+                    }
+                  }}
+                />
+                <button type="button" className="btn btn-outline btn-compact" aria-label={`${k.naam} een plek omhoog`} disabled={i === 0} onClick={() => verplaatsKanaal(k.id, -1)}>
+                  ↑
+                </button>
+                <button type="button" className="btn btn-outline btn-compact" aria-label={`${k.naam} een plek omlaag`} disabled={i === alle.length - 1} onClick={() => verplaatsKanaal(k.id, 1)}>
+                  ↓
+                </button>
+                <button type="button" className="btn btn-outline btn-compact" aria-label={`${k.naam} verwijderen`} onClick={() => setKanaalWeg(k.id)}>
+                  Verwijderen
+                </button>
+                {kanaalNaamFout?.id === k.id && (
+                  <span className="text-xs" style={{ color: "var(--stat-red)" }} role="alert">
+                    {kanaalNaamFout.reden}
+                  </span>
+                )}
+              </li>
             ))}
-        </div>
+        </ul>
         <form onSubmit={voegKanaalToe} className="kpi-kanaal-toevoegen">
           <div className="admin-field" style={{ marginBottom: 0 }}>
             <label htmlFor="nieuw-kanaal">Nieuw kanaal</label>
@@ -234,6 +306,20 @@ export function KpiDefinitiesBeheer() {
           setKanaalWeg(null);
         }}
         onAnnuleren={() => setKanaalWeg(null)}
+      />
+      <BevestigModal
+        open={kpiVerwijder !== undefined}
+        titel="KPI verwijderen"
+        bericht={
+          kpiGevolgen.waarden > 0
+            ? `De KPI "${kpiVerwijder?.naam}" wordt verwijderd, met ${kpiGevolgen.waarden} ${kpiGevolgen.waarden === 1 ? "waarde" : "waarden"} bij ${kpiGevolgen.organisaties} ${kpiGevolgen.organisaties === 1 ? "Organisatie" : "Organisaties"}. Dit kan niet ongedaan worden gemaakt.`
+            : `De KPI "${kpiVerwijder?.naam}" wordt verwijderd. Er staan geen waarden bij. Dit kan niet ongedaan worden gemaakt.`
+        }
+        onBevestigen={() => {
+          if (kpiWeg) verwijderKpi(kpiWeg);
+          setKpiWeg(null);
+        }}
+        onAnnuleren={() => setKpiWeg(null)}
       />
     </div>
   );

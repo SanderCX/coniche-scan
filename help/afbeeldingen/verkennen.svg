@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 300" role="img" width="100%">
+<title>Bovenkant van het scherm Verkennen met een keuzelijst Assessment, de keuze Eenheid, de keuze Meetperiode met twee datums en de teller met het aantal Organisaties in de pool</title>
+<rect x="0" y="0" width="680" height="300" rx="10" fill="var(--bg)" stroke="var(--border)"/>
+<text x="60" y="40" font-size="12" font-weight="700" letter-spacing="1.2" fill="var(--ink-s)">ASSESSMENT</text>
+<rect x="60" y="50" width="300" height="40" rx="6" fill="#fff" stroke="var(--border-d)"/><text x="76" y="75" font-size="14" fill="var(--ink)">Klantcontact Volwassenheid</text><path d="M336 66 l6 7 l6 -7 z" fill="var(--ink-m)"/>
+<g data-nr="1"><circle cx="40" cy="70" r="11" fill="var(--ink)"/><text x="40" y="74.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">1</text></g>
+<text x="400" y="40" font-size="12" font-weight="700" letter-spacing="1.2" fill="var(--ink-s)">EENHEID</text>
+<rect x="400" y="52" width="110" height="32" rx="16" fill="var(--or)" stroke="var(--or)"/><text x="455.0" y="73" text-anchor="middle" font-size="14" font-weight="600" fill="#fff">Organisaties</text><rect x="518" y="52" width="100" height="32" rx="16" fill="#fff" stroke="var(--border-d)"/><text x="568.0" y="73" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink-m)">Onderdelen</text>
+<g data-nr="2"><circle cx="382" cy="68" r="11" fill="var(--ink)"/><text x="382" y="72.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">2</text></g>
+<text x="60" y="128" font-size="12" font-weight="700" letter-spacing="1.2" fill="var(--ink-s)">MEETPERIODE</text>
+<rect x="60" y="140" width="130" height="32" rx="16" fill="#fff" stroke="var(--border-d)"/><text x="125.0" y="161" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink-m)">Meest recente</text><rect x="198" y="140" width="90" height="32" rx="16" fill="var(--or)" stroke="var(--or)"/><text x="243.0" y="161" text-anchor="middle" font-size="14" font-weight="600" fill="#fff">Periode</text>
+<rect x="310" y="136" width="130" height="40" rx="6" fill="#fff" stroke="var(--border-d)"/><text x="326" y="161" font-size="14" fill="var(--ink)">12-01-2026</text>
+<text x="450" y="161" font-size="14" fill="var(--ink-m)">tot en met</text>
+<rect x="528" y="136" width="130" height="40" rx="6" fill="#fff" stroke="var(--border-d)"/><text x="544" y="161" font-size="14" fill="var(--ink)">10-02-2026</text>
+<g data-nr="3"><circle cx="40" cy="156" r="11" fill="var(--ink)"/><text x="40" y="160.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">3</text></g>
+<text x="60" y="204" font-size="12" fill="var(--ink-s)">Per organisatie telt de laatste Meting tussen 12-01-2026 en 10-02-2026.</text>
+<line x1="60" y1="224" x2="640" y2="224" stroke="var(--border)"/>
+<text x="60" y="252" font-size="14" font-weight="700" fill="var(--ink)">32 van 44 Organisaties in de pool</text>
+<rect x="60" y="264" width="580" height="8" rx="4" fill="var(--bg-mid)"/><rect x="60" y="264" width="422" height="8" rx="4" fill="var(--or)"/>
+<g data-nr="4"><circle cx="40" cy="250" r="11" fill="var(--ink)"/><text x="40" y="254.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">4</text></g>
+<text x="60" y="292" font-size="12" fill="var(--ink-s)">Voorbeelddata.</text>
+</svg>

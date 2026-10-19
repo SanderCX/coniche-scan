@@ -13,6 +13,8 @@ const PAGINA_TITELS: { route: string; titel: string }[] = [
   { route: "/bouwstenen", titel: "Bouwstenen" },
   { route: "/ai-scan", titel: "AI" },
   { route: "/klantcontact-2030", titel: "2030" },
+  { route: "/help", titel: "Help" },
+  { route: "/help/[onderwerp]", titel: "Help" },
   { route: "/[assessmentId]", titel: "Assessment" },
   { route: "/[assessmentId]/voorbeeld", titel: "Voorbeeld-output" },
 
@@ -25,6 +27,8 @@ const PAGINA_TITELS: { route: string; titel: string }[] = [
   { route: "/scan/[respondentId]/resultaten", titel: "Resultaten" },
 
   // Beheer
+  { route: "/beheer/help", titel: "Help" },
+  { route: "/beheer/help/[onderwerp]", titel: "Help" },
   { route: "/beheer", titel: "Beheer" },
   { route: "/beheer/applicatie", titel: "Instellingen" },
   { route: "/beheer/instellingen", titel: "Instellingen" },
