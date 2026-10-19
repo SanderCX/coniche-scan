@@ -583,8 +583,10 @@ geen afwijking van de spec maar een gat erin.
    en totaalkaart (voorstel van 19 oktober 2026, `stylesheet.md`,
    Resultaatkop, voor elke scan dezelfde). De overall score staat daarin in de
    ring (`.score-ring`, `stylesheet.md`, Resultaten, besloten op 19 oktober 2026) en
-   voortgang, radar van alle bouwblokken, staafdiagram per categorie
-   (in de categoriekleuren, met de klassegrenzen als stippellijn, gebouwd op 19 oktober 2026, voorheen volgde de kleur de score), top 3 sterktes en verbeterkansen, legenda.
+   voortgang, radar van alle bouwblokken en staafdiagram per categorie naast elkaar
+   (genummerde knooppunten met de namen in een tooltip, zonder getallen in de balken,
+   voorstel van 19 oktober 2026, `stylesheet.md`, Radar en staafdiagram op het resultaatscherm;
+   het staafdiagram in de categoriekleuren, met de klassegrenzen als stippellijn, gebouwd op 19 oktober 2026, voorheen volgde de kleur de score), top 3 sterktes en verbeterkansen, legenda.
    **Bij AI-volwassenheid** (geen categorielaag, `content-ai-scan.md`)
    vervalt het staafdiagram per categorie: In plaats daarvan "Scores per
    Domein", een horizontale balk per domein individueel, gesorteerd van
@@ -608,7 +610,7 @@ geen afwijking van de spec maar een gat erin.
    benchmark binnen een organisatie of een Meting, en Exporteren.
 
    **Weging in de resultaten**: Een bouwblok met een gewicht ongelijk
-   aan 1 toont zijn factor ("2×") bij de naam, in de radar-legenda en de
+   aan 1 toont zijn factor ("2×") bij de naam, in de tooltip van de radar en in de
    lijst per bouwblok, en in de top 3 als het daarin staat. De getoonde
    bouwblokscore zelf blijft ongewogen. Categoriescore en overall zijn
    gewogen (zie Scoringslogica). Geen factor bij gewicht 1. Dezelfde

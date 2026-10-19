@@ -226,9 +226,14 @@ Classificatie. Van boven naar beneden:
    Sterktes" en "Top 3 Verbeterkansen" bij de andere scans, twee kolommen naast
    elkaar. Boven elke kolom staat de kop in 16px, gewicht 700 ("Sterkste
    afdeling" en "Meeste ontwikkelruimte"), daaronder per afdeling een rij (kaart
-   van `--bg-warm`, `1px solid var(--border)`, 10px radius, padding 12px 16px) met
-   links de naam van de afdeling in 14px `--ink` en rechts het percentage in 16px,
-   gewicht 600, in de klassekleur. Het hoogste percentage is de sterkste
+   van 10px radius en padding 12px 16px) in de tint van de klasse van die
+   afdeling, zoals de chip en de kaart van de afdeling erboven: Achtergrond
+   `--stat-green-faint` (Goed op orde), `--stat-amber-faint` (Gemiddeld inzicht)
+   of `--stat-red-faint` (Ontwikkelruimte), met `1px solid` in de randkleur van de
+   chip van die klasse. Links staat de naam van de afdeling in 14px `--ink` en
+   rechts het percentage in 16px, gewicht 600, in de tekstkleur van de chip van
+   die klasse (`stylesheet.md`, Scorekleuren). Een voorstel van 19 oktober 2026
+   (eerder `--bg-warm` met een neutrale rand). Het hoogste percentage is de sterkste
    afdeling, het laagste de meeste ontwikkelruimte. Afdelingen die niet van
    toepassing zijn doen niet mee. Bij gelijkstand staat elke gelijke afdeling als
    eigen rij onder de kop. Is er maar één afdeling van toepassing, of zijn alle
