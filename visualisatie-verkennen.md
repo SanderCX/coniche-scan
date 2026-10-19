@@ -41,7 +41,7 @@ De tab Verkennen onder de hoofdlink Resultaten, naast Metingen en Benchmarks, al
 
 ## Meetperiode
 
-**Besloten op 19 oktober 2026, ontworpen in "Coniche Scan Verkennen".** Naast Assessment en Eenheid staat de keuze Meetperiode, op een eigen regel eronder, als pilvormige groep met "Meest recente" en "Periode". De volgorde bovenaan is Assessment, Eenheid, Meetperiode. De pillen zijn even hoog als de keuzelijst van het Assessment.
+**Besloten op 19 oktober 2026, ontworpen in "Coniche Scan Verkennen", gebouwd op 19 oktober 2026.** Naast Assessment en Eenheid staat de keuze Meetperiode, op een eigen regel eronder, als pilvormige groep met "Meest recente" en "Periode". De volgorde bovenaan is Assessment, Eenheid, Meetperiode. De pillen zijn even hoog als de keuzelijst van het Assessment.
 
 - **Meest recente.** De standaard. Per Organisatie, bij de eenheid Onderdelen per onderdeel, telt de meest recente Meting. Onder de keuze staat "Per organisatie telt de meest recente Meting."
 - **Periode.** Twee datumvelden, "tot en met" ertussen. Per Organisatie (of onderdeel) telt de laatste Meting met een meetdatum in die periode. Zo blijft een eerdere ronde te vergelijken, ook als een nieuwe ronde al deels binnen is. Het gebruik is bijvoorbeeld half januari tot begin februari voor de eerste meting en een periode in oktober voor de volgende.

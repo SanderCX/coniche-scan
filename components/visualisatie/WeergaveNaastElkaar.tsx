@@ -1,5 +1,5 @@
 import { Assessment } from "@/lib/types";
-import { KLASSE_LABEL, NaastElkaarWeergave } from "@/lib/visualisatie";
+import { KLASSE_LABEL, NaastElkaarWeergave, bouwblokWoorden } from "@/lib/visualisatie";
 import { KLASSE_KLEUR, Rij, Schaalkop, Tegels, pct, toon, vorigeGroepen } from "./gedeeld";
 
 /** De twee symbolen van weergave H: Een cirkel voor de eerste Meting en een ruit voor de tweede (`visualisatie-scores.md`, H). */
@@ -43,9 +43,9 @@ export function WeergaveNaastElkaar({
       <Tegels
         tegels={[
           { label: "Totaalscore", waarde: `${toon(weergave.totaalEerste)} | ${toon(weergave.totaalTweede)}`, sub: `${eersteLabel} | ${tweedeLabel}` },
-          { label: `${SYMBOOL_EERSTE} scoort hoger`, waarde: String(weergave.eersteHoger), sub: assessment.bouwblokEenheidMeervoud },
-          { label: `${SYMBOOL_TWEEDE} scoort hoger`, waarde: String(weergave.tweedeHoger), sub: assessment.bouwblokEenheidMeervoud },
-          { label: "Gelijk", waarde: String(weergave.gelijk), sub: assessment.bouwblokEenheidMeervoud },
+          { label: `${SYMBOOL_EERSTE} scoort hoger`, waarde: String(weergave.eersteHoger), sub: bouwblokWoorden(assessment).meervoud },
+          { label: `${SYMBOOL_TWEEDE} scoort hoger`, waarde: String(weergave.tweedeHoger), sub: bouwblokWoorden(assessment).meervoud },
+          { label: "Gelijk", waarde: String(weergave.gelijk), sub: bouwblokWoorden(assessment).meervoud },
         ]}
       />
       <Schaalkop rechts="Verschil" />

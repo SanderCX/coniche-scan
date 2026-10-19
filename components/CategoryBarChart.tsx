@@ -1,8 +1,8 @@
 "use client";
 
-import { Bar, BarChart, Cell, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, Cell, LabelList, Legend, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { GroepResultaat } from "@/lib/scoring";
-import { scoreKleur } from "@/lib/colors";
+import { CATEGORIE_COLORS, scoreKleur } from "@/lib/colors";
 import { formatGewicht } from "@/lib/format";
 
 /**
@@ -31,7 +31,13 @@ export function CategoryBarChart({
   const data = resultaten.map((r, i) => ({
     naam: r.gewicht && r.gewicht !== 1 ? `${r.groepNaam} (${formatGewicht(r.gewicht)}×)` : r.groepNaam,
     score: r.score ?? 0,
-    kleur: r.score !== null ? scoreKleur(r.score) : "#e8e6e1",
+    // Per categorie de categoriekleur (`stylesheet.md`, Categoriekleuren). Per bouwblok (horizontaal) blijft de scorekleur.
+    kleur:
+      r.score === null
+        ? "#e8e6e1"
+        : !horizontaal && r.kleur && CATEGORIE_COLORS[r.kleur]
+          ? CATEGORIE_COLORS[r.kleur].hex
+          : scoreKleur(r.score),
     vergelijking: vergelijking?.[i]?.score ?? 0,
   }));
   const hoogtePerRij = vergelijking ? 64 : 44;
@@ -52,7 +58,7 @@ export function CategoryBarChart({
               width={140}
               tick={{ fontSize: 12, fill: "#4d4d49" }}
             />
-            <Tooltip formatter={(value) => Number(value).toFixed(1)} />
+            <Tooltip formatter={(value) => Number(value).toFixed(1).replace(".", ",")} />
             {vergelijking && <Legend wrapperStyle={{ fontSize: 12 }} />}
             <Bar dataKey="score" name={naam} radius={[0, 6, 6, 0]}>
               {data.map((entry, i) => (
@@ -66,18 +72,33 @@ export function CategoryBarChart({
     );
   }
 
+  // Vorm van het staafdiagram per categorie (`stylesheet.md`, Categoriekleuren): as van 1 tot 5, de balk begint op 1, de klassegrenzen
+  // 2,5 en 3,5 als grijze stippellijn met de klassenamen aan de rechterkant, en het getal in 16px vet boven elke balk.
+  const lijnProps = { stroke: "#9a978f", strokeDasharray: "4 4", strokeWidth: 1 } as const;
+  const klasseLabel = (value: string) => ({ value, position: "right" as const, fill: "var(--ink-s)", fontSize: 12 });
   return (
     <div className="h-72 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 8, right: 16, left: -16, bottom: 8 }}>
+        <BarChart data={data} margin={{ top: 24, right: 96, left: -16, bottom: 8 }}>
           <XAxis dataKey="naam" tick={{ fontSize: 12, fill: "#4d4d49" }} />
-          <YAxis domain={[0, 5]} ticks={[0, 1, 2, 3, 4, 5]} tick={{ fontSize: 12, fill: "#4d4d49" }} />
-          <Tooltip formatter={(value) => Number(value).toFixed(1)} />
+          <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 12, fill: "#4d4d49" }} allowDataOverflow />
+          <Tooltip formatter={(value) => Number(value).toFixed(1).replace(".", ",")} />
           {vergelijking && <Legend wrapperStyle={{ fontSize: 12 }} />}
+          <ReferenceLine y={2.5} {...lijnProps} />
+          <ReferenceLine y={3.5} {...lijnProps} />
+          <ReferenceLine y={1.75} stroke="none" label={klasseLabel("Basis op Orde")} />
+          <ReferenceLine y={3} stroke="none" label={klasseLabel("Uitbouwen")} />
+          <ReferenceLine y={4.25} stroke="none" label={klasseLabel("Sterk punt")} />
           <Bar dataKey="score" name={naam} radius={[6, 6, 0, 0]}>
             {data.map((entry, i) => (
               <Cell key={i} fill={entry.kleur} />
             ))}
+            <LabelList
+              dataKey="score"
+              position="top"
+              formatter={(value) => Number(value).toFixed(1).replace(".", ",")}
+              style={{ fontSize: 16, fontWeight: 700, fill: "var(--ink)" }}
+            />
           </Bar>
           {vergelijking && <Bar dataKey="vergelijking" name={vergelijkingNaam} fill="#b8b5ae" radius={[6, 6, 0, 0]} />}
         </BarChart>

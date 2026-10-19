@@ -8,6 +8,7 @@ import { ruimBenchmarkVinkjesOp, useOrganisaties } from "@/lib/db";
 import { sluitBenchmarkMeldingen, verwijderBenchmark } from "@/lib/benchmark-store";
 import { useBenchmarkMetLeden } from "@/lib/use-benchmarks";
 import { filterRegels, isVerkenning, onbekendeKenmerken } from "@/lib/verkenning-benchmark";
+import { meetperiodeTekst } from "@/lib/verkennen";
 import { maakFilterNamen } from "@/lib/verkenning-namen";
 import {
   benchmarkNamen,
@@ -111,6 +112,7 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
               {regels.map((r) => (
                 <li key={r}>{r}</li>
               ))}
+              {benchmark.meetperiode && <li>Meetperiode {meetperiodeTekst(benchmark.meetperiode)}</li>}
             </ul>
           </div>
           <p className="text-sm text-ink-m" style={{ margin: 0 }}>
@@ -186,6 +188,7 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
             benchmarkId={benchmark.id}
             minOrganisaties={instellingen.benchmarkMinOrganisaties}
             metOnderdeel={verkenning && benchmark.eenheid === "onderdelen"}
+            verkenning={verkenning}
           />
         ))
       )}

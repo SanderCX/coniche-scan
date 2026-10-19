@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
-import { Benchmark, BenchmarkLezing, BenchmarkLid, BenchmarkNiveau, BenchmarkSoort, BenchmarkToewijzing, VerkenEenheid, VerkenningFilter } from "./types";
+import { Benchmark, BenchmarkLezing, Meetperiode, BenchmarkLid, BenchmarkNiveau, BenchmarkSoort, BenchmarkToewijzing, VerkenEenheid, VerkenningFilter } from "./types";
 import { nieuwId } from "./id";
+import { geldigeMeetperiode, meetperiodeTekst } from "./verkennen";
 import { logAudit } from "./audit-store";
 
 /**
@@ -109,6 +110,8 @@ export function maakBenchmark(
     soort?: BenchmarkSoort;
     eenheid?: VerkenEenheid;
     filters?: VerkenningFilter[];
+    /** Alleen bij een verkenning (voorstel van 19 oktober 2026): Leeg betekent dat de meest recente Meting telt. */
+    meetperiode?: Meetperiode | null;
     assessmentIds: string[];
     leden: BenchmarkLid[];
     aangemaaktDoor: string;
@@ -122,7 +125,12 @@ export function maakBenchmark(
     niveau: input.niveau ?? "organisaties",
     ...(input.lezing ? { lezing: input.lezing } : {}),
     ...(input.soort === "verkenning"
-      ? { soort: "verkenning" as const, eenheid: input.eenheid ?? "organisaties", filters: input.filters ?? [] }
+      ? {
+          soort: "verkenning" as const,
+          eenheid: input.eenheid ?? "organisaties",
+          filters: input.filters ?? [],
+          ...(geldigeMeetperiode(input.meetperiode) ? { meetperiode: { van: input.meetperiode.van, totEnMet: input.meetperiode.totEnMet } } : {}),
+        }
       : {}),
     assessmentIds: input.assessmentIds,
     // Bij een verkenning volgen de leden uit de filters en staan ze niet in de opslag.
@@ -142,6 +150,7 @@ export function maakBenchmark(
       benchmarkNaam: benchmark.naam,
       niveau: benchmark.niveau,
       ...(benchmark.soort === "verkenning" ? { soort: "verkenning", eenheid: benchmark.eenheid } : {}),
+      ...(benchmark.meetperiode ? { meetperiode: meetperiodeTekst(benchmark.meetperiode) } : {}),
       ...(benchmark.lezing ? { lezing: benchmark.lezing } : {}),
       ...namen,
     },
@@ -152,7 +161,15 @@ export function maakBenchmark(
 /** Wijzigt de samenstelling. Leden van een Assessment dat niet meer gekozen is, vallen weg. */
 export function wijzigBenchmark(
   id: string,
-  input: { naam: string; assessmentIds: string[]; leden: BenchmarkLid[]; lezing?: BenchmarkLezing; filters?: VerkenningFilter[] },
+  input: {
+    naam: string;
+    assessmentIds: string[];
+    leden: BenchmarkLid[];
+    lezing?: BenchmarkLezing;
+    filters?: VerkenningFilter[];
+    /** Alleen bij een verkenning: `null` haalt de periode weg, ontbreekt het veld dan blijft ze zoals ze was. */
+    meetperiode?: Meetperiode | null;
+  },
   namen: BenchmarkNamen
 ): void {
   const opslag = laad();
@@ -162,6 +179,10 @@ export function wijzigBenchmark(
   if (benchmark.soort === "verkenning") {
     // Alleen de naam en de filters zijn te wijzigen: Het Assessment en de eenheid blijven (`benchmark.md`, Opgeslagen verkenning, Aanpassen).
     if (input.filters) benchmark.filters = input.filters;
+    if (input.meetperiode !== undefined) {
+      if (geldigeMeetperiode(input.meetperiode)) benchmark.meetperiode = { van: input.meetperiode.van, totEnMet: input.meetperiode.totEnMet };
+      else delete benchmark.meetperiode;
+    }
   } else {
     benchmark.assessmentIds = input.assessmentIds;
     benchmark.leden = input.leden.filter((l) => input.assessmentIds.includes(l.assessmentId));
@@ -180,6 +201,7 @@ export function wijzigBenchmark(
       benchmarkNaam: benchmark.naam,
       niveau: benchmark.niveau ?? "organisaties",
       ...(benchmark.soort === "verkenning" ? { soort: "verkenning", eenheid: benchmark.eenheid } : {}),
+      ...(benchmark.meetperiode ? { meetperiode: meetperiodeTekst(benchmark.meetperiode) } : {}),
       ...(benchmark.lezing ? { lezing: benchmark.lezing } : {}),
       ...namen,
     },

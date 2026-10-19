@@ -25,6 +25,17 @@ export const KLASSE_LABEL: Record<Classificatie, string> = {
   groen: "Sterk punt",
 };
 
+/**
+ * Het woord voor een bouwblok in de weergaven van de resultaten, de benchmark en Verkennen: "bouwblok" waar de Assessment het
+ * "bouwsteen" noemt (`visualisatie-scores.md`, J: "Bouwblok" en niet "Bouwsteen"), anders de eigen eenheid van de Assessment
+ * (bijvoorbeeld "domein" bij de AI-scan). De respondent ziet in zijn eigen scan het woord van de Assessment.
+ */
+export function bouwblokWoorden(assessment: Pick<Assessment, "bouwblokEenheidEnkelvoud" | "bouwblokEenheidMeervoud">): { enkelvoud: string; meervoud: string } {
+  const enkelvoud = assessment.bouwblokEenheidEnkelvoud;
+  if (enkelvoud.toLowerCase() === "bouwsteen") return { enkelvoud: "bouwblok", meervoud: "bouwblokken" };
+  return { enkelvoud: enkelvoud.toLowerCase(), meervoud: assessment.bouwblokEenheidMeervoud.toLowerCase() };
+}
+
 /** Eén decimaal, met `toFixed(1)` zoals de rest van de app (`CLAUDE.md`, Afronding). */
 export function rond1(n: number): number {
   return Number(n.toFixed(1));
@@ -141,6 +152,8 @@ export interface RijSpreiding {
   rij: BouwblokRij;
   /** De ruwe bouwblokscore van elke scan in de vergelijkgroep (bij een scan-view zonder die scan). */
   scores: number[];
+  /** Dezelfde scores met het id van de scan (of de eenheid) erbij, in dezelfde volgorde. Voor de vorm van een stip bij onderdelen. */
+  punten: { id: string; score: number }[];
   gemiddelde: number | null;
   sd: number | null;
   label: SpreidingsLabel | null;
@@ -169,13 +182,17 @@ export function spreiding(assessment: Assessment, invullingen: ScanInvulling[], 
   const focus = focusInvullingId ? scans.find((s) => s.id === focusInvullingId) : undefined;
   const groep = focus ? scans.filter((s) => s.id !== focus.id) : scans;
   const rijen: RijSpreiding[] = bouwblokRijen(assessment).map((rij) => {
-    const scores = groep.map((s) => bouwblokScoreRuw(rij.bouwblok, s.antwoorden)).filter((w): w is number => w !== null);
+    const punten = groep
+      .map((s) => ({ id: s.id, score: bouwblokScoreRuw(rij.bouwblok, s.antwoorden) }))
+      .filter((p): p is { id: string; score: number } => p.score !== null);
+    const scores = punten.map((p) => p.score);
     const gem = gemiddelde(scores);
     const sd = steekproefSd(scores);
     const focusScore = focus ? bouwblokScoreRuw(rij.bouwblok, focus.antwoorden) : null;
     return {
       rij,
       scores,
+      punten,
       gemiddelde: gem,
       sd,
       label: sd === null ? null : spreidingsLabel(sd),
@@ -764,4 +781,161 @@ export function antwoordenPerVraag(
     laagsteVraag: laagste,
     hoogsteVraag: hoogste,
   };
+}
+
+
+/* ---------- I. Eenheden: onderdelen, Metingen en organisaties ---------- */
+
+/**
+ * Een eenheid in een groep (`visualisatie-scores.md`, I en J): Bij een samengestelde Meting en een vergelijking een onderdeel (een
+ * Meting), bij een benchmark tussen organisaties een lid. Elke eenheid heeft haar gemiddelde antwoord per vraag en telt even zwaar
+ * mee, ongeacht het aantal scans (`datamodel.md`, Gemiddelde over een groep leden). De weergaven A en B rekenen met de eenheden
+ * alsof het scans zijn, zodat er geen tweede rekenmethode bij komt.
+ */
+export interface EenheidInvoer {
+  id: string;
+  label: string;
+  /** Onder de naam, bijvoorbeeld de meetdatum. */
+  sublabel?: string;
+  aantalScans: number;
+  antwoorden: Record<string, number>;
+}
+
+/** De eenheden als afgeronde scans met het gemiddelde antwoord van de eenheid. Het id is `eenheid-<id>`. */
+export function eenhedenAlsScans(eenheden: EenheidInvoer[]): ScanInvulling[] {
+  return eenheden.map(
+    (e) =>
+      ({
+        id: eenheidScanId(e.id),
+        scanUitvoeringId: "",
+        organisatieLidId: "",
+        status: "afgerond",
+        antwoorden: e.antwoorden,
+        opmerkingenPerBouwblok: {},
+        aangemaaktOp: "",
+        uitgenodigdOp: "",
+        gestartOp: null,
+        afgerondOp: null,
+        bewaarVerlengdTot: null,
+      }) as ScanInvulling
+  );
+}
+
+export function eenheidScanId(id: string): string {
+  return `eenheid-${id}`;
+}
+
+/** Weergave A over eenheden: Een stip op het gemiddelde van de eenheden en een lijn van de laagste tot de hoogste eenheid. */
+export function eenhedenGemiddeld(assessment: Assessment, eenheden: EenheidInvoer[]): EenMetingWeergave {
+  return eenMeting(assessment, eenhedenAlsScans(eenheden));
+}
+
+/** Weergave B over eenheden (Spreiding tussen onderdelen of organisaties). Met `focusId` krijgt die eenheid de ring en telt ze niet mee. */
+export function eenhedenSpreiding(assessment: Assessment, eenheden: EenheidInvoer[], focusId?: string): SpreidingWeergave {
+  return spreiding(assessment, eenhedenAlsScans(eenheden), focusId ? eenheidScanId(focusId) : undefined);
+}
+
+/** Spreiding tussen onderdelen is er vanaf drie onderdelen: Bij twee zegt een standaardafwijking weinig (`visualisatie-scores.md`, I). */
+export const MIN_ONDERDELEN_SPREIDING = 3;
+
+/** De zes vormen van Naast elkaar, in de volgorde waarin de onderdelen ze krijgen (`visualisatie-scores.md`, I). */
+export type Vorm = "cirkel" | "ruit" | "vierkant" | "driehoek-omhoog" | "driehoek-omlaag" | "plus";
+export const VORMEN: Vorm[] = ["cirkel", "ruit", "vierkant", "driehoek-omhoog", "driehoek-omlaag", "plus"];
+export const VORM_NAAM: Record<Vorm, string> = {
+  cirkel: "cirkel",
+  ruit: "ruit",
+  vierkant: "vierkant",
+  "driehoek-omhoog": "driehoek omhoog",
+  "driehoek-omlaag": "driehoek omlaag",
+  plus: "plus",
+};
+/** Naast elkaar is er bij hoogstens zes onderdelen: Er zijn zes vormen. */
+export const MAX_NAAST_ELKAAR = VORMEN.length;
+
+/** De vorm van de eenheid op deze plek in de invoer. */
+export function vormVoor(index: number): Vorm {
+  return VORMEN[index % VORMEN.length];
+}
+
+export interface PuntMeerdere {
+  /** De index van de eenheid in de invoer, en dus van haar vorm. */
+  index: number;
+  score: number;
+  klasse: Classificatie;
+}
+
+export interface RijMeerdere {
+  rij: BouwblokRij;
+  punten: PuntMeerdere[];
+  /** Het gemiddelde van de eenheden op deze rij (de streep). */
+  gemiddelde: number | null;
+  /** Hoogste min laagste getoonde score van de rij. */
+  verschil: number | null;
+}
+
+export interface MeerdereWeergave {
+  eenheden: { id: string; label: string; sublabel?: string; vorm: Vorm; aantalScans: number; totaal: number | null; totaalKlasse: Classificatie | null }[];
+  rijen: RijMeerdere[];
+  hoogste: { label: string; totaal: number } | null;
+  laagste: { label: string; totaal: number } | null;
+  grootsteVerschil: { naam: string; verschil: number } | null;
+}
+
+/**
+ * Weergave A als Naast elkaar bij meer dan twee eenheden (`visualisatie-scores.md`, I): Elke eenheid heeft een eigen vorm op haar
+ * eigen score, gekleurd naar de klasse, met de streep op het gemiddelde. Eenheden met dezelfde score staan onder elkaar
+ * gestapeld. De vorm onderscheidt de eenheden, niet de kleur.
+ */
+export function eenhedenNaastElkaar(assessment: Assessment, eenheden: EenheidInvoer[]): MeerdereWeergave {
+  const rijen: RijMeerdere[] = bouwblokRijen(assessment).map((rij) => {
+    const punten: PuntMeerdere[] = [];
+    eenheden.forEach((e, index) => {
+      const score = bouwblokScore(rij.bouwblok, e.antwoorden);
+      const klasse = klasseVan(score);
+      if (score !== null && klasse) punten.push({ index, score, klasse });
+    });
+    const gem = gemiddelde(punten.map((p) => p.score));
+    const scores = punten.map((p) => p.score);
+    return {
+      rij,
+      punten,
+      gemiddelde: gem,
+      verschil: scores.length > 0 ? rond1(Math.max(...scores) - Math.min(...scores)) : null,
+    };
+  });
+  const totalen = eenheden.map((e) => (e.aantalScans === 0 ? null : overallScore(assessment, e.antwoorden)));
+  const metTotaal = eenheden
+    .map((e, i) => ({ label: e.label, totaal: totalen[i] }))
+    .filter((k): k is { label: string; totaal: number } => k.totaal !== null);
+  const hoogste = metTotaal.reduce<(typeof metTotaal)[number] | null>((m, k) => (m === null || k.totaal > m.totaal ? k : m), null);
+  const laagste = metTotaal.reduce<(typeof metTotaal)[number] | null>((m, k) => (m === null || k.totaal < m.totaal ? k : m), null);
+  const grootste = rijen.reduce<RijMeerdere | null>((m, r) => (r.verschil !== null && (m === null || r.verschil > (m.verschil ?? -1)) ? r : m), null);
+  return {
+    eenheden: eenheden.map((e, i) => ({
+      id: e.id,
+      label: e.label,
+      sublabel: e.sublabel,
+      vorm: vormVoor(i),
+      aantalScans: e.aantalScans,
+      totaal: totalen[i],
+      totaalKlasse: klasseVan(totalen[i]),
+    })),
+    rijen,
+    hoogste,
+    laagste,
+    grootsteVerschil: grootste && grootste.verschil !== null ? { naam: grootste.rij.bouwblok.naam, verschil: grootste.verschil } : null,
+  };
+}
+
+/** Eenheden met dezelfde score op een rij staan onder elkaar, in het midden uitgelijnd: De k-de van n op `k − (n − 1) / 2` stapjes. */
+export function stapelStappen(scores: number[]): number[] {
+  const aantal = new Map<string, number>();
+  for (const s of scores) aantal.set(s.toFixed(3), (aantal.get(s.toFixed(3)) ?? 0) + 1);
+  const geteld = new Map<string, number>();
+  return scores.map((score) => {
+    const sleutel = score.toFixed(3);
+    const k = geteld.get(sleutel) ?? 0;
+    geteld.set(sleutel, k + 1);
+    return k - ((aantal.get(sleutel) ?? 1) - 1) / 2;
+  });
 }

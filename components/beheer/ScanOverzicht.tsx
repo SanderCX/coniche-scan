@@ -1,5 +1,6 @@
 "use client";
 
+import { formatScore } from "@/lib/format";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { useState } from "react";
 import Link from "next/link";
@@ -161,7 +162,7 @@ export function ScanOverzicht({
                   <>
                     <dt>Overall score</dt>
                     <dd>
-                      <strong style={{ color: scoreKleur(score) }}>{score.toFixed(1)}</strong> · {NIVEAU_LABEL[classificatie(score)]}
+                      <strong style={{ color: scoreKleur(score) }}>{formatScore(score)}</strong> · {NIVEAU_LABEL[classificatie(score)]}
                     </dd>
                   </>
                 )}

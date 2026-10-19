@@ -250,15 +250,48 @@
 }
 .mm-teaser-balk {
   display: block;
-  height: 6px;
-  border-radius: 3px;
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
   background: var(--bg-mid);
   overflow: hidden;
 }
 .mm-teaser-balk i {
   display: block;
   height: 100%;
-  border-radius: 3px;
+  border-radius: 4px;
+}
+/* Hele meting: Een stip op het gemiddelde en een grijze lijn van laagste tot hoogste score, op hetzelfde spoor van 1 tot 5. */
+.mm-teaser-rijen--stip .mm-teaser-balk {
+  overflow: visible;
+  background: var(--bg-mid);
+}
+.mm-teaser-lijn {
+  position: absolute;
+  top: 3px;
+  height: 2px;
+  background: #b3b0a8;
+}
+.mm-teaser-stip {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+  transform: translate(-50%, -50%);
+}
+.mm-teaser-ankers {
+  margin-top: calc(var(--sp-1) * -1);
+}
+.mm-teaser-anker-spoor {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.mm-teaser-rijen--schaal .mm-teaser-waarde {
+  width: 3rem;
 }
 .mm-teaser-waarde {
   min-width: 3rem;

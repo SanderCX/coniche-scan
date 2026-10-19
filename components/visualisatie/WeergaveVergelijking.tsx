@@ -1,5 +1,5 @@
 import { Assessment } from "@/lib/types";
-import { KLASSE_LABEL, TussenMetingenWeergave } from "@/lib/visualisatie";
+import { KLASSE_LABEL, TussenMetingenWeergave, bouwblokWoorden } from "@/lib/visualisatie";
 import { KLASSE_KLEUR, Rij, Schaalkop, Tegels, pct, toon, vorigeGroepen } from "./gedeeld";
 
 function teken(n: number): string {
@@ -29,9 +29,9 @@ export function WeergaveVergelijking({
       <Tegels
         tegels={[
           { label: "Totaalscore", waarde: `${toon(weergave.totaalVorig)} → ${toon(weergave.totaalHuidig)}`, sub: `${vorigLabel} → ${huidigLabel}` },
-          { label: "Gestegen", waarde: String(weergave.gestegen), sub: `${assessment.bouwblokEenheidMeervoud}` },
-          { label: "Gedaald", waarde: String(weergave.gedaald), sub: `${assessment.bouwblokEenheidMeervoud}` },
-          { label: "Van klasse gewisseld", waarde: String(weergave.gewisseld), sub: `${assessment.bouwblokEenheidMeervoud}` },
+          { label: "Gestegen", waarde: String(weergave.gestegen), sub: `${bouwblokWoorden(assessment).meervoud}` },
+          { label: "Gedaald", waarde: String(weergave.gedaald), sub: `${bouwblokWoorden(assessment).meervoud}` },
+          { label: "Van klasse gewisseld", waarde: String(weergave.gewisseld), sub: `${bouwblokWoorden(assessment).meervoud}` },
         ]}
       />
       <Schaalkop rechts="Verschil" />

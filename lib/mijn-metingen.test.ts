@@ -55,7 +55,10 @@ describe("teaser", () => {
     expect(t.getal).toBe("4,0");
     expect(t.klasseNaam).toBe("Sterk punt");
     expect(t.rijen).toHaveLength(5);
-    expect(t.rijen[0].fractie).toBeCloseTo(0.8, 5);
+    // Het spoor loopt van 1 tot 5: Een 4,0 staat op 75%, niet op 80% (`visualisatie-mijn-metingen.md`, Schaal).
+    expect(t.rijen[0].fractie).toBeCloseTo(0.75, 5);
+    expect(t.stijl).toBe("balk");
+    expect(t.rijen[0].alt).toBe("Overkoepelend, jouw score 4,0");
     expect(t.pilAchtergrond).toBe("var(--score-4-cel)");
   });
 
@@ -65,6 +68,17 @@ describe("teaser", () => {
     expect(t.sub).toBeNull();
     expect(t.aantalScans).toBe(2);
     expect(t.klasseNaam).toBe("Uitbouwen");
+  });
+
+  it("de hele meting toont een stip op het gemiddelde met een lijn van laagste tot hoogste score", () => {
+    const t = teaserVoorMeting(zorgscan, [scan(2), scan(4)])!;
+    expect(t.stijl).toBe("stip");
+    expect(t.ankers).toBe(true);
+    // Gemiddelde 3,0 op 50% van het spoor, laagste 2,0 op 25%, hoogste 4,0 op 75%.
+    expect(t.rijen[0].fractie).toBeCloseTo(0.5, 5);
+    expect(t.rijen[0].lijn?.van).toBeCloseTo(0.25, 5);
+    expect(t.rijen[0].lijn?.tot).toBeCloseTo(0.75, 5);
+    expect(t.rijen[0].alt).toBe("Overkoepelend, gemiddelde 3,0, laagste 2,0, hoogste 4,0");
   });
 
   it("zonder afgeronde scans is er geen teaser", () => {
@@ -101,6 +115,9 @@ describe("teaser van de Quickscan", () => {
     expect(t.sub).toBeNull();
     expect(t.aantalScans).toBe(2);
     expect(t.rijen.every((r) => /^\d+%$/.test(r.waarde))).toBe(true);
+    // De Quickscan houdt de balk met het percentage.
+    expect(t.stijl).toBe("balk");
+    expect(t.ankers).toBe(false);
   });
 });
 

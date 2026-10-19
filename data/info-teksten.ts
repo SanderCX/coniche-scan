@@ -166,7 +166,13 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     sleutel: "info.verkennenEenheid",
     plek: "Verkennen, naast het label Eenheid",
     tekst:
-      "Kies waarover je vergelijkt. Bij Organisaties telt elke Organisatie één keer, met haar meest recente Meting. Bij Onderdelen telt elk onderdeel van een Organisatie apart, en elk onderdeel telt even zwaar mee.",
+      "Kies waarover je vergelijkt. Bij Organisaties telt elke Organisatie één keer, met één Meting (zie Meetperiode). Bij Onderdelen telt elk onderdeel van een Organisatie apart, en elk onderdeel telt even zwaar mee.",
+  },
+  {
+    sleutel: "info.verkennenMeetperiode",
+    plek: "Verkennen en het wijzigen van een opgeslagen verkenning, naast het label Meetperiode",
+    tekst:
+      "Per Organisatie telt de laatste Meting met een meetdatum in deze periode. Zo kun je ronde 1 blijven vergelijken, ook als ronde 2 al deels binnen is. Zonder periode telt de meest recente Meting. Een Organisatie zonder Meting in de periode doet niet mee.",
   },
   {
     sleutel: "info.verkennenOpslaan",
@@ -209,6 +215,28 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     plek: "Benchmark binnen een Meting aanmaken of wijzigen, achter de uitgeschakelde knop",
     tekst:
       "Een benchmark binnen een Meting heeft een naam nodig, een organisatie, een Assessment en een Meting. Een Meting is alleen te kiezen met genoeg afgeronde scans.",
+  },
+  {
+    sleutel: "info.spreidingOnderdelen",
+    plek: "Resultaten van een samengestelde Meting, een vergelijking en een benchmark, naast de uitgeschakelde weergave Spreiding",
+    tekst: "Spreiding tussen onderdelen is er vanaf 3 onderdelen. Bij twee zegt een standaardafwijking weinig.",
+  },
+  {
+    sleutel: "info.antwoordenGeenScans",
+    plek: "Resultaten van een samengestelde Meting en een vergelijking, naast de uitgeschakelde weergave Antwoorden",
+    tekst:
+      "Antwoorden per vraag is er alleen bij één Meting met scans. Een samengestelde Meting heeft geen scans en een vergelijking mengt Metingen.",
+  },
+  {
+    sleutel: "info.toonAls",
+    plek: "Resultaten van een samengestelde Meting en een vergelijking, naast het label Toon als",
+    tekst:
+      "Gemiddeld telt elk onderdeel even zwaar mee, ongeacht het aantal scans, en laat niet zien welk onderdeel waar zit. Naast elkaar geeft elk onderdeel een eigen vorm op zijn eigen score. De vorm onderscheidt de onderdelen, niet de kleur.",
+  },
+  {
+    sleutel: "info.toonAlsTeVeel",
+    plek: "Resultaten van een samengestelde Meting en een vergelijking, naast de uitgeschakelde keuze Naast elkaar",
+    tekst: "Naast elkaar is er bij hoogstens zes onderdelen, want er zijn zes vormen. Bij meer onderdelen toont de weergave het gemiddelde.",
   },
   {
     sleutel: "info.vergelijkMetingen",

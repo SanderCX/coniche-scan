@@ -10,6 +10,8 @@ import {
   ledenVoorVerkenning,
   materialiseerBenchmark,
   onbekendeKenmerken,
+  REDEN_GEEN_METING_IN_PERIODE,
+  redenGeenLid,
   redenNietOpslaan,
   standVanFilters,
 } from "./verkenning-benchmark";
@@ -68,6 +70,21 @@ describe("opgeslagen verkenning", () => {
     const leden = ledenVoorVerkenning([...orgs, univé], b, 3);
     expect(leden.map((l) => l.organisatieId)).toEqual(["u", "u"]);
     expect(new Set(leden.map((l) => l.metingId)).size).toBe(2);
+  });
+
+  it("de Meetperiode bepaalt welke Meting telt, en een Organisatie erbuiten krijgt een reden", () => {
+    const nieuw = org("n", "Industrie");
+    nieuw.scanUitvoeringen[0].meetdatum = "2026-10-05";
+    const oud = org("o", "Industrie");
+    oud.scanUitvoeringen[0].meetdatum = "2026-01-20";
+    const b = { ...verkenning([{ kenmerk: "sector-subsector.sector", waarden: ["Industrie"] }]), meetperiode: { van: "2026-01-12", totEnMet: "2026-02-10" } };
+    expect(ledenVoorVerkenning([nieuw, oud], b, 3).map((l) => l.organisatieId)).toEqual(["o"]);
+    expect(redenGeenLid([nieuw, oud], b, "n", 3)).toBe(REDEN_GEEN_METING_IN_PERIODE);
+    expect(redenGeenLid([nieuw, oud], b, "o", 3)).toBeNull();
+    // Zonder periode doen beiden mee.
+    expect(redenGeenLid([nieuw, oud], { ...b, meetperiode: undefined }, "n", 3)).toBeNull();
+    // Een Organisatie die niet aan de filters voldoet krijgt geen reden.
+    expect(redenGeenLid([nieuw, org("c", "Onderwijs")], b, "c", 3)).toBeNull();
   });
 
   it("materialiseren vult de leden bij een verkenning en laat een vaste groep staan", () => {

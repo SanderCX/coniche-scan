@@ -54,7 +54,7 @@ Stand van `tokens.css`, aangevuld met `--nav-h`:
   --ye-l: #ffcb57;
 
   --pu: #392944;          /* Proces & Tech */
-  --fu: var(--ye);        /* Fundament, merkgeel #ffc043 (voorstel van 19 oktober 2026, was antraciet #44403c) */
+  --fu: var(--ye);        /* Fundament, merkgeel #ffc043 (gebouwd op 19 oktober 2026, was antraciet #44403c) */
 
   --ink: #1c1c1a;
   --ink-m: #4d4d49;
@@ -117,7 +117,7 @@ Stand van `tokens.css`, aangevuld met `--nav-h`:
 - Mens: `--gr`
 - Fundament: `--fu`
 
-**Voorstel van 19 oktober 2026 (Joost), ontworpen in "Coniche Scan Mijn metingen" (bord Kaart en Per categorie).** Fundament wordt het merkgeel (`--ye`, `#ffc043`), zodat de vijf categorieën de merkkleurfamilies volgen: oranje, blauw, paars, groen en geel. Daarvoor stond Fundament op antraciet, en samen met het donkere paars van Proces & Tech was dat te somber en te gelijkend. Een verdiept geel of oker is geprobeerd en afgekeurd, want dat oogde bruin.
+**Besloten door Joost en gebouwd op 19 oktober 2026, ontworpen in "Coniche Scan Mijn metingen" (bord Kaart en Per categorie).** Fundament wordt het merkgeel (`--ye`, `#ffc043`), zodat de vijf categorieën de merkkleurfamilies volgen: oranje, blauw, paars, groen en geel. Daarvoor stond Fundament op antraciet, en samen met het donkere paars van Proces & Tech was dat te somber en te gelijkend. Een verdiept geel of oker is geprobeerd en afgekeurd, want dat oogde bruin.
 
 Gevolg van geel: Het contrast met wit is 1,6. De regel dat een categoriekleur leesbaar is als tekst op wit en onder witte tekst geldt daarom niet voor Fundament.
 
@@ -126,10 +126,11 @@ Gevolg van geel: Het contrast met wit is 1,6. De regel dat een categoriekleur le
 - Een dunne lijn of tekst in de kleur zelf (bijvoorbeeld een kopje in de categoriekleur) gebruikt voor Fundament `--ink`.
 - Een stip in Fundament op een lichte achtergrond heeft de witte rand van 2 px die alle stippen hebben, zodat hij zichtbaar blijft.
 - Het sidebar-rondje "bezig" voor Fundament houdt de kleur en krijgt geen witte tekst of icoon.
+- **Zo gebouwd**: `lijnKleur`, `tekstOpKleur` en `accentStijl` in `lib/colors.ts` zetten naast `--accent` ook `--accent-t` (tekst of lijn in de kleur) en `--accent-op` (tekst op de vulling). De sleutel `antraciet` van de categorie blijft staan omdat hij in opgeslagen data zit, alleen de hex is geel geworden.
 
 De Light-variant van geel (`--ye-l`, `#ffcb57`) is te licht om als tweede tint te dienen en blijft ongebruikt.
 
-**Staafdiagram per categorie.** De balken hebben de categoriekleur, zodat de grafiek dezelfde kleuren heeft als de kaarten op Mijn metingen. De klasse van een categorie staat daarmee niet meer in de balkkleur. De klassegrenzen 2,5 en 3,5 staan als grijze stippellijn (`#9a978f`) door de grafiek met de namen Basis op Orde, Uitbouwen en Sterk punt in `--ink-s`. Het getal staat in 16 px vet boven elke balk. De as loopt van 1 tot 5 en de balk begint op 1, zoals alle schalen van de scores. De band achter de balken (zie Scorekleur hieronder) vervalt in dit diagram.
+**Staafdiagram per categorie (gebouwd op 19 oktober 2026).** De balken hebben de categoriekleur, zodat de grafiek dezelfde kleuren heeft als de kaarten op Mijn metingen. De klasse van een categorie staat daarmee niet meer in de balkkleur. De klassegrenzen 2,5 en 3,5 staan als grijze stippellijn (`#9a978f`) door de grafiek met de namen Basis op Orde, Uitbouwen en Sterk punt in `--ink-s`. Het getal staat in 16 px vet boven elke balk. De as loopt van 1 tot 5 en de balk begint op 1, zoals alle schalen van de scores. De band achter de balken (zie Scorekleur hieronder) vervalt in dit diagram.
 
 De Light-varianten zijn beschikbaar waar een tweede tint nodig is, bijv.
 bij hover.
@@ -714,8 +715,9 @@ krijgt het veld dezelfde rand en ring als `.field`.
 
 - `.classificatie-cirkel` en `.legenda` voor de overall score en de
   legenda.
-- Staafdiagram (`charts.css`): Kleur volgt de scorekleur van die balk
-  (`--kleur` gezet op `--score-1` t/m `--score-5`), niet de categorie.
+- Staafdiagram per categorie (`components/CategoryBarChart.tsx`): De categoriekleur,
+  zie Categoriekleuren. Het staafdiagram per bouwblok of domein (AI-scan, geen
+  categorielaag) houdt de scorekleur per balk (`--score-1` t/m `--score-5`).
   Radar als SVG.
 
 ### Beheer

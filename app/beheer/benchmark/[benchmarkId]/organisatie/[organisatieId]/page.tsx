@@ -4,7 +4,8 @@ import { use } from "react";
 import { useAssessments } from "@/lib/assessment-store";
 import { useOrganisaties } from "@/lib/db";
 import { useBenchmark } from "@/lib/benchmark-store";
-import { bouwBenchmarkSecties, bouwOrganisatieView, niveauVan } from "@/lib/benchmark";
+import { bouwBenchmarkSecties, bouwOrganisatieView, leadViewsOnderdelen, niveauVan } from "@/lib/benchmark";
+import { isVerkenning } from "@/lib/verkenning-benchmark";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magBenchmarkBeheren } from "@/lib/rechten";
@@ -51,6 +52,12 @@ export default function BenchmarkOrganisatiePage({
     .map((s) => bouwOrganisatieView(s, organisatie.id, instellingen.benchmarkMinOrganisaties))
     .filter((v) => v !== null);
   const peildatum = new Date();
+  // Bij een opgeslagen verkenning met de eenheid Onderdelen is er per eigen onderdeel een view: Het onderdeel tegenover de rest van
+  // de groep, of bij een filter op één Organisatie tegenover de overige onderdelen (`benchmark.md`, Detail en perspectief).
+  const onderdeelViews =
+    isVerkenning(benchmark) && benchmark.eenheid === "onderdelen"
+      ? leadViewsOnderdelen(benchmark, secties, organisatie, instellingen.benchmarkMinOrganisaties)
+      : null;
 
   return (
     <div className="admin-main admin-main--breed">
@@ -68,7 +75,21 @@ export default function BenchmarkOrganisatiePage({
         van andere organisaties.
       </p>
 
-      {views.length === 0 ? (
+      {onderdeelViews ? (
+        onderdeelViews.length === 0 ? (
+          <p className="admin-notice" style={{ marginTop: "1.5rem" }}>
+            Deze organisatie heeft in deze benchmark geen onderdeel met een eigen Meting in de groep.
+          </p>
+        ) : (
+          onderdeelViews.flatMap((o) =>
+            o.niveau === "organisaties"
+              ? o.views.map((v) => (
+                  <BenchmarkOrganisatieView key={`${o.eigenNaam}-${v.assessment.id}`} view={v} organisatieNaam={o.eigenNaam} peildatum={peildatum} />
+                ))
+              : []
+          )
+        )
+      ) : views.length === 0 ? (
         <p className="admin-notice" style={{ marginTop: "1.5rem" }}>
           Deze organisatie heeft in deze benchmark geen lid meer.
         </p>

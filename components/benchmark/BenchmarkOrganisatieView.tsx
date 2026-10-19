@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { VergelijkingsView } from "@/lib/benchmark";
 import { BenchmarkNiveau } from "@/lib/types";
 import { isVlakkeAssessment } from "@/lib/assessment-structuur";
@@ -7,6 +10,10 @@ import { RadarChartView } from "@/components/RadarChartView";
 import { CategoryBarChart } from "@/components/CategoryBarChart";
 import { WeergaveGroep } from "@/components/visualisatie/WeergaveGroep";
 import { WeergaveSpreiding } from "@/components/visualisatie/WeergaveSpreiding";
+import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
+import { EENHEID_ORGANISATIE, eenheidOnderdeel } from "@/components/visualisatie/gedeeld";
+import { MIN_ONDERDELEN_SPREIDING, bouwblokWoorden } from "@/lib/visualisatie";
+import { formatScore } from "@/lib/format";
 import { QuickscanBenchmarkView } from "@/components/quickscan/QuickscanBenchmarkView";
 
 const datumFormat = new Intl.DateTimeFormat("nl-NL", { dateStyle: "long" });
@@ -53,8 +60,10 @@ export function BenchmarkOrganisatieView({
   niveau?: BenchmarkNiveau;
 }) {
   const tekst = TEKSTEN[niveau];
+  const [weergave, setWeergave] = useState<"overzicht" | "bouwblok" | "spreiding">("overzicht");
   const { assessment, organisatie, rest } = view;
   const vlak = isVlakkeAssessment(assessment);
+  const woorden = bouwblokWoorden(assessment);
   // Een Assessment met Ja / Nee / Weet ik niet heeft een eigen weergave in percentages (`visualisatie-quickscan.md`, 5).
   if (view.quickscan) {
     return (
@@ -85,35 +94,71 @@ export function BenchmarkOrganisatieView({
         )}
         <p className="mt-4 font-semibold text-ink-m">
           Overall score van {organisatieNaam}
-          {rest.overall !== null && <> · {tekst.restKort} {organisatieNaam}: {rest.overall.toFixed(1)}</>}
+          {rest.overall !== null && <> · {tekst.restKort} {organisatieNaam}: {formatScore(rest.overall)}</>}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div className="chart-block">
-          <h3>Alle {assessment.bouwblokEenheidMeervoud}</h3>
-          <RadarChartView resultaten={organisatie.bouwblokken} vergelijking={rest.bouwblokken} naam={organisatieNaam} vergelijkingNaam={tekst.rest} />
-        </div>
-        <div className="chart-block">
-          <h3>{vlak ? `Scores per ${assessment.bouwblokEenheidEnkelvoud}` : "Per categorie"}</h3>
-          <CategoryBarChart
-            resultaten={organisatie.groepen}
-            vergelijking={rest.groepen}
-            horizontaal={vlak}
-            naam={organisatieNaam}
-            vergelijkingNaam={tekst.rest}
+      {/* Bij de view van één scan staan de samenvatting van de Respondent en de positie ten opzichte van de groep onder elkaar
+          (`visualisatie-scores.md`, J, Niveau 3). Bij een organisatie en een Meting wisselt de schakelaar de weergave. */}
+      {niveau !== "scans" && (
+        <div className="vis-acties">
+          <WeergaveWissel
+            ariaLabel="Weergave van de resultaten"
+            opties={[
+              { waarde: "overzicht", label: "Overzicht" },
+              { waarde: "bouwblok", label: "Per bouwblok" },
+              {
+                waarde: "spreiding",
+                label: "Spreiding",
+                disabled: !view.spreidingLeden || view.aantalInGroep < MIN_ONDERDELEN_SPREIDING,
+                title: `Spreiding is er vanaf ${MIN_ONDERDELEN_SPREIDING} leden in de groep`,
+              },
+            ]}
+            waarde={weergave}
+            onChange={setWeergave}
           />
         </div>
-      </div>
+      )}
 
-      <h3 style={{ marginTop: "2rem" }}>
-        {niveau === "scans" ? `Positie per ${assessment.bouwblokEenheidEnkelvoud}` : `Verschil per ${assessment.bouwblokEenheidEnkelvoud}`}
-      </h3>
-      {niveau === "scans" && view.spreiding ? (
-        <WeergaveSpreiding assessment={assessment} weergave={view.spreiding} />
-      ) : view.groep ? (
-        <WeergaveGroep assessment={assessment} weergave={view.groep} eigenNaam={organisatieNaam} />
-      ) : null}
+      {(weergave === "overzicht" || niveau === "scans") && (
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div className="chart-block">
+            <h3>Alle {woorden.meervoud}</h3>
+            <RadarChartView resultaten={organisatie.bouwblokken} vergelijking={rest.bouwblokken} naam={organisatieNaam} vergelijkingNaam={tekst.rest} />
+          </div>
+          <div className="chart-block">
+            <h3>{vlak ? `Scores per ${woorden.enkelvoud}` : "Per categorie"}</h3>
+            <CategoryBarChart
+              resultaten={organisatie.groepen}
+              vergelijking={rest.groepen}
+              horizontaal={vlak}
+              naam={organisatieNaam}
+              vergelijkingNaam={tekst.rest}
+            />
+          </div>
+        </div>
+      )}
+
+      {(weergave === "bouwblok" || niveau === "scans") && (
+        <>
+          <h3 style={{ marginTop: "2rem" }}>
+            {niveau === "scans" ? `Positie per ${woorden.enkelvoud}` : `Verschil per ${woorden.enkelvoud}`}
+          </h3>
+          {niveau === "scans" && view.spreiding ? (
+            <WeergaveSpreiding assessment={assessment} weergave={view.spreiding} />
+          ) : view.groep ? (
+            <WeergaveGroep assessment={assessment} weergave={view.groep} eigenNaam={organisatieNaam} />
+          ) : null}
+        </>
+      )}
+
+      {weergave === "spreiding" && view.spreidingLeden && (
+        <WeergaveSpreiding
+          assessment={assessment}
+          weergave={view.spreidingLeden}
+          eenheid={niveau === "metingen" ? eenheidOnderdeel("Metingen in deze vergelijking") : EENHEID_ORGANISATIE}
+        />
+      )}
 
       <p className="benchmark-voetnoot">
         {tekst.voetnoot(view.aantalAnderen)} · peildatum {datumFormat.format(peildatum)}

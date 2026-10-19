@@ -1,5 +1,6 @@
 "use client";
 
+import { formatScore } from "@/lib/format";
 import { useState } from "react";
 import Link from "next/link";
 import { useAssessments } from "@/lib/assessment-store";
@@ -44,7 +45,7 @@ function ScoreEnVoortgang({ meting, assessment }: { meting: ScanUitvoering; asse
           className="admin-badge"
           style={{ background: `var(--score-${Math.min(5, Math.max(1, Math.round(score)))}-faint)`, color: scoreKleur(score) }}
         >
-          {score.toFixed(1)}
+          {formatScore(score)}
         </span>
       )}
       {!volledigAfgerond && (

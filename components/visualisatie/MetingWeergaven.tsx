@@ -11,13 +11,15 @@ import {
   gemiddeldeAntwoordenVoorMetingMetSamenstelling,
   isSamengesteld,
 } from "@/lib/metingen";
-import { antwoordenPerVraag, eenMeting, spreiding } from "@/lib/visualisatie";
+import { EenheidInvoer, MIN_ONDERDELEN_SPREIDING, antwoordenPerVraag, eenMeting, spreiding } from "@/lib/visualisatie";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { WeergaveWissel } from "./WeergaveWissel";
 import { WeergaveBouwblok } from "./WeergaveBouwblok";
 import { WeergaveSpreiding } from "./WeergaveSpreiding";
 import { WeergaveAntwoorden } from "./WeergaveAntwoorden";
+import { OnderdelenInhoud, OnderdelenKaarten, ToonAls, ToonAlsKeuze, effectiefToonAls, onderdelenOpties } from "./OnderdelenWeergaven";
+import { eenheidOnderdeel } from "./gedeeld";
 import { QuickscanScan, QuickscanMeting } from "@/lib/quickscan-groep";
 import { QuickscanGemiddeldeSpreiding } from "@/components/quickscan/QuickscanGemiddeldeSpreiding";
 import { QuickscanAntwoorden } from "@/components/quickscan/QuickscanAntwoorden";
@@ -55,6 +57,18 @@ interface Props {
   spreidingToegestaan: boolean;
   /** Wie de weergave Antwoorden (G) mag zien: Een Admin en Consultant, en een Lead met het vinkje in het Leads-venster. */
   antwoordenToegestaan: boolean;
+  /**
+   * Bij een samengestelde Meting (`visualisatie-scores.md`, I): De onderdelen, dat zijn de onderliggende Metingen met hun gemiddelde
+   * antwoord per vraag, de oudste eerst. De weergaven rekenen dan met de onderdelen als eenheid in plaats van met scans, en rechts
+   * van de schakelaar staat "Toon als" (Gemiddeld, de standaard, of Naast elkaar).
+   */
+  onderdelen?: EenheidInvoer[];
+  /**
+   * Bij `onderdelen`: Mogen de namen van de onderdelen in beeld? Een Lead ziet de onderliggende Metingen van een samengestelde Meting
+   * niet (`benchmark.md`, Onderdeel en samengestelde Meting): Voor hem staat er geen kaart per onderdeel en geen Naast elkaar,
+   * alleen Gemiddeld en Spreiding, waar geen namen in staan. Standaard aan (Admin en Consultant).
+   */
+  onderdelenNamen?: boolean;
   /** Antwoorden zonder namen (R1 tot en met Rn): Voor een Lead als `Organisatie.antwoordenMetNamen` uit staat. */
   antwoordenAnoniem?: boolean;
   /** De lijn van laagste tot hoogste score: Voor een Admin altijd, voor een Lead pas vanaf `benchmarkMinRespondenten`. */
@@ -90,6 +104,8 @@ function MetingWeergavenInhoud({
   spreidingToegestaan,
   antwoordenToegestaan,
   antwoordenAnoniem = false,
+  onderdelen,
+  onderdelenNamen = true,
   bereikAltijd,
   vergelijkingen,
   toonBenchmarkLink,
@@ -102,12 +118,16 @@ function MetingWeergavenInhoud({
   const benchmarks = useBenchmarks();
 
   const weergaveParam = zoek.get("weergave");
+  const spreidingBeschikbaar = onderdelen ? onderdelen.length >= MIN_ONDERDELEN_SPREIDING : spreidingToegestaan;
   const weergave: Weergave =
     (weergaveParam === "bouwblok" && !quickscan) ||
-    (weergaveParam === "spreiding" && spreidingToegestaan) ||
+    (weergaveParam === "spreiding" && spreidingBeschikbaar) ||
     (weergaveParam === "antwoorden" && antwoordenToegestaan && !isSamengesteld(scanUitvoering))
       ? weergaveParam
       : "overzicht";
+  // Bij een samengestelde Meting is Gemiddeld de standaard (`?toon=naast` voor Naast elkaar).
+  const toonAls: ToonAls =
+    onderdelen && onderdelenNamen ? effectiefToonAls(zoek.get("toon") === "naast" ? "naast" : "gemiddeld", onderdelen.length) : "gemiddeld";
 
   const huidigeScans = aantalAfgerondInMeting(organisatie, scanUitvoering);
 
@@ -152,7 +172,10 @@ function MetingWeergavenInhoud({
       })
     : [];
 
-  const opties: { waarde: Weergave; label: string; disabled?: boolean }[] = [
+  const opties: { waarde: Weergave; label: string; disabled?: boolean; title?: string; infoSleutel?: string }[] = onderdelen
+    ? // Een samengestelde Meting: Dezelfde vier weergaven, Antwoorden uitgeschakeld (`visualisatie-scores.md`, I).
+      onderdelenOpties(onderdelen.length, antwoordenToegestaan)
+    : [
     { waarde: "overzicht", label: "Overzicht" },
     ...(quickscan ? [] : [{ waarde: "bouwblok" as Weergave, label: "Per bouwblok" }]),
     ...(spreidingToegestaan
@@ -171,6 +194,9 @@ function MetingWeergavenInhoud({
           waarde={weergave}
           onChange={(w) => zet({ weergave: w === "overzicht" ? null : w })}
         />
+        {onderdelen && onderdelenNamen && (
+          <ToonAlsKeuze waarde={toonAls} onChange={(t) => zet({ toon: t === "naast" ? "naast" : null })} aantal={onderdelen.length} />
+        )}
         {vergelijkingen !== undefined && vergelijkingen.length === 0 && (
           <span className="knop-met-icoon">
             <button type="button" className="btn btn-outline btn-compact" disabled>
@@ -193,6 +219,16 @@ function MetingWeergavenInhoud({
       </div>
 
       {weergave === "overzicht" && overzicht}
+      {onderdelen && onderdelenNamen && weergave === "overzicht" && <OnderdelenKaarten assessment={assessment} eenheden={onderdelen} />}
+      {onderdelen && (weergave === "bouwblok" || weergave === "spreiding") && (
+        <OnderdelenInhoud
+          assessment={assessment}
+          eenheden={onderdelen}
+          eenheid={eenheidOnderdeel("Metingen in deze samenstelling")}
+          weergave={weergave}
+          toonAls={toonAls}
+        />
+      )}
       {quickscan && weergave === "spreiding" && (
         <QuickscanGemiddeldeSpreiding
           meting={quickscan.meting}
@@ -208,10 +244,10 @@ function MetingWeergavenInhoud({
           anoniem={antwoordenAnoniem}
         />
       )}
-      {!quickscan && weergave === "bouwblok" && (
+      {!quickscan && !onderdelen && weergave === "bouwblok" && (
         <WeergaveBouwblok assessment={assessment} weergave={eenMeting(assessment, invullingenVan(scanUitvoering))} toonBereik={toonBereik && !isSamengesteld(scanUitvoering)} />
       )}
-      {!quickscan && weergave === "spreiding" && (
+      {!quickscan && !onderdelen && weergave === "spreiding" && (
         <WeergaveSpreiding assessment={assessment} weergave={spreiding(assessment, scanUitvoering.invullingen)} />
       )}
 

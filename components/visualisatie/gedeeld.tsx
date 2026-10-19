@@ -103,3 +103,25 @@ export function Rij({
 export function vorigeGroepen(rijen: { rij: BouwblokRij }[]): (string | null)[] {
   return rijen.map((r, i) => (i === 0 ? null : rijen[i - 1].rij.groepId));
 }
+
+/**
+ * De woorden voor de eenheid van een groep in de weergaven A en B (`visualisatie-scores.md`, I en J): Bij een Meting is dat een
+ * afgeronde scan, bij een samengestelde Meting en een vergelijking een onderdeel, bij een benchmark een organisatie.
+ */
+export interface EenheidTeksten {
+  enkelvoud: string;
+  meervoud: string;
+  /** De eerste tegel bij Spreiding: "Respondenten", "Onderdelen" of "Organisaties". */
+  telLabel: string;
+  /** De regel onder het aantal in die tegel. */
+  telSub: string;
+}
+
+export const EENHEID_SCAN: EenheidTeksten = { enkelvoud: "afgeronde scan", meervoud: "afgeronde scans", telLabel: "Respondenten", telSub: "afgeronde scans" };
+
+/** Een onderdeel: "Metingen in deze samenstelling" bij een samengestelde Meting, "onderdelen in deze vergelijking" bij een vergelijking. */
+export function eenheidOnderdeel(telSub: string): EenheidTeksten {
+  return { enkelvoud: "onderdeel", meervoud: "onderdelen", telLabel: "Onderdelen", telSub };
+}
+
+export const EENHEID_ORGANISATIE: EenheidTeksten = { enkelvoud: "organisatie", meervoud: "organisaties", telLabel: "Organisaties", telSub: "in de groep" };

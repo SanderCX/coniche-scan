@@ -11,7 +11,7 @@ import {
   vergelijkOudsteEerst,
   voldoetAanMinScans,
 } from "./metingen";
-import { SpreidingWeergave, spreiding, tussenOrganisaties, TussenOrganisatiesWeergave } from "./visualisatie";
+import { SpreidingWeergave, eenhedenSpreiding, spreiding, tussenOrganisaties, TussenOrganisatiesWeergave } from "./visualisatie";
 import { isJaNeeWeetNiet } from "./quickscan";
 import { isVerkenning } from "./verkenning-benchmark";
 import { poolLidNaam } from "./verkennen";
@@ -266,6 +266,12 @@ export interface VergelijkingsView {
    * scan-view (`bouwScanView`). De stippen hebben geen naam.
    */
   spreiding?: SpreidingWeergave;
+  /**
+   * Weergave B op niveau 1 en 2 (`visualisatie-scores.md`, J): Een stip per lid van de groep met een oranje ring op het lid van
+   * de view, zonder namen. De overige leden zijn de vergelijkgroep, het lid zelf telt niet mee in het gemiddelde. `null` zonder
+   * andere leden. Bij een scan-view staat de spreiding in `spreiding`.
+   */
+  spreidingLeden?: SpreidingWeergave | null;
   /** Weergave 5 voor een Assessment met Ja / Nee / Weet ik niet (`visualisatie-quickscan.md`, 5). De andere velden zijn dan leeg. */
   quickscan?: BenchmarkViewQs;
 }
@@ -302,6 +308,17 @@ function maakVergelijking(
     verschillen,
     voldoetAanDrempel: aantalInGroep >= drempel && anderen.length > 0,
     groep: anderen.length > 0 ? tussenOrganisaties(assessment, eigen, anderen) : null,
+    spreidingLeden:
+      anderen.length > 0
+        ? eenhedenSpreiding(
+            assessment,
+            [
+              { id: "eigen", label: "", aantalScans: 1, antwoorden: eigen },
+              ...anderen.map((antwoorden, i) => ({ id: `andere-${i}`, label: "", aantalScans: 1, antwoorden })),
+            ],
+            "eigen"
+          )
+        : null,
   };
 }
 
@@ -672,7 +689,7 @@ export type LeadBenchmarkView =
  * De drempel `benchmarkMinOrganisaties` telt Organisaties en geen onderdelen. Staat er in de filters maar één Organisatie, dan
  * geldt hij niet en staan de onderdelen van de Lead naast elkaar. Per eigen onderdeel een entry, met zijn naam als `eigenNaam`.
  */
-function leadViewsOnderdelen(
+export function leadViewsOnderdelen(
   benchmark: Benchmark,
   secties: BenchmarkSectie[],
   organisatie: Organisatie,

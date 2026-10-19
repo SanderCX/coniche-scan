@@ -1,5 +1,6 @@
 import { Assessment } from "@/lib/types";
 import { RijVergelijking, Vergelijking } from "@/lib/verkennen";
+import { bouwblokWoorden } from "@/lib/visualisatie";
 import { Rij, Schaalkop, Tegels, pct, toon, vorigeGroepen } from "@/components/visualisatie/gedeeld";
 
 export type Sortering = "model" | "uitslag";
@@ -57,12 +58,12 @@ export function WeergaveGroepRest({
           { label: "Gemiddelde van de pool", waarde: toon(overall.focus.gemiddelde), sub: "Overall score" },
           { label: eenheidWoord === "onderdelen" ? "Onderdelen" : "Organisaties", waarde: String(overall.focus.n), sub: "in de pool" },
           {
-            label: `Hoogste ${assessment.bouwblokEenheidEnkelvoud}`,
+            label: `Hoogste ${bouwblokWoorden(assessment).enkelvoud}`,
             waarde: hoogste ? toon(hoogste.focus.gemiddelde) : "–",
             sub: hoogste?.rij.bouwblok.naam,
           },
           {
-            label: `Laagste ${assessment.bouwblokEenheidEnkelvoud}`,
+            label: `Laagste ${bouwblokWoorden(assessment).enkelvoud}`,
             waarde: laagste ? toon(laagste.focus.gemiddelde) : "–",
             sub: laagste?.rij.bouwblok.naam,
           },
@@ -70,12 +71,12 @@ export function WeergaveGroepRest({
           { label: `Gemiddelde van ${focusNaam}`, waarde: toon(overall.focus.gemiddelde), sub: `${overall.focus.n} ${eenheidWoord}` },
           { label: "Gemiddelde van de rest", waarde: toon(overall.rest.gemiddelde), sub: `${overall.rest.n} ${eenheidWoord}` },
           {
-            label: `Grootste plus per ${assessment.bouwblokEenheidEnkelvoud}`,
+            label: `Grootste plus per ${bouwblokWoorden(assessment).enkelvoud}`,
             waarde: vergelijking.grootstePlus ? `+${toon(vergelijking.grootstePlus.verschil)}` : "–",
             sub: vergelijking.grootstePlus?.naam,
           },
           {
-            label: `Grootste min per ${assessment.bouwblokEenheidEnkelvoud}`,
+            label: `Grootste min per ${bouwblokWoorden(assessment).enkelvoud}`,
             waarde: vergelijking.grootsteMin ? `−${toon(Math.abs(vergelijking.grootsteMin.verschil))}` : "–",
             sub: vergelijking.grootsteMin?.naam,
           },

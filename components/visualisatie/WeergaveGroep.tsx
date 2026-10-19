@@ -1,5 +1,5 @@
 import { Assessment } from "@/lib/types";
-import { TussenOrganisatiesWeergave } from "@/lib/visualisatie";
+import { TussenOrganisatiesWeergave, bouwblokWoorden } from "@/lib/visualisatie";
 import { Rij, Schaalkop, Tegels, pct, toon, vorigeGroepen } from "./gedeeld";
 
 function teken(n: number): string {
@@ -28,9 +28,9 @@ export function WeergaveGroep({
       <Tegels
         tegels={[
           { label: "Vergelijkgroep", waarde: String(weergave.grootte), sub: "andere leden" },
-          { label: "Boven het gemiddelde", waarde: String(weergave.boven), sub: `${assessment.bouwblokEenheidMeervoud}` },
-          { label: "Bovenste kwart", waarde: String(weergave.inBovensteKwart), sub: `${assessment.bouwblokEenheidMeervoud}` },
-          { label: "Onderste kwart", waarde: String(weergave.inOndersteKwart), sub: `${assessment.bouwblokEenheidMeervoud}` },
+          { label: "Boven het gemiddelde", waarde: String(weergave.boven), sub: `${bouwblokWoorden(assessment).meervoud}` },
+          { label: "Bovenste kwart", waarde: String(weergave.inBovensteKwart), sub: `${bouwblokWoorden(assessment).meervoud}` },
+          { label: "Onderste kwart", waarde: String(weergave.inOndersteKwart), sub: `${bouwblokWoorden(assessment).meervoud}` },
         ]}
       />
       <Schaalkop rechts={eigenNaam} />

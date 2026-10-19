@@ -9,8 +9,8 @@ import { magBenchmarkBeheren } from "@/lib/rechten";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { maakFilterNamen } from "@/lib/verkenning-namen";
 import { aantalOrganisatiesInLeden, filterRegels, filtersVanStand, redenNietOpslaan, voorgesteldeNaam } from "@/lib/verkenning-benchmark";
-import { Assessment, Organisatie, VerkenEenheid } from "@/lib/types";
-import { FilterStand, PoolLid } from "@/lib/verkennen";
+import { Assessment, Meetperiode, Organisatie, VerkenEenheid } from "@/lib/types";
+import { FilterStand, PoolLid, meetperiodeTekst } from "@/lib/verkennen";
 
 export const MAX_NAAM_BENCHMARK = 60;
 
@@ -23,6 +23,7 @@ export const MAX_NAAM_BENCHMARK = 60;
 export function OpslaanAlsBenchmark({
   assessment,
   eenheid,
+  meetperiode,
   stand,
   poolGrootte,
   gefilterd,
@@ -30,6 +31,8 @@ export function OpslaanAlsBenchmark({
 }: {
   assessment: Assessment;
   eenheid: VerkenEenheid;
+  /** Leeg: De meest recente Meting telt. */
+  meetperiode?: Meetperiode | null;
   stand: FilterStand;
   /** De pool zonder filters, voor de reden als de knop uit staat. */
   poolGrootte: number;
@@ -67,6 +70,7 @@ export function OpslaanAlsBenchmark({
         soort: "verkenning",
         eenheid,
         filters,
+        meetperiode,
         assessmentIds: [assessment.id],
         leden: [],
         aangemaaktDoor: gebruiker.id,
@@ -110,6 +114,7 @@ export function OpslaanAlsBenchmark({
               {regels.map((r) => (
                 <li key={r}>{r}</li>
               ))}
+              {meetperiode && <li>Meetperiode {meetperiodeTekst(meetperiode)}</li>}
             </ul>
           </div>
           <p className="text-sm text-ink-m" style={{ margin: 0 }}>

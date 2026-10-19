@@ -1,5 +1,6 @@
 "use client";
 
+import { lijnKleur } from "@/lib/colors";
 import { useEffect, useRef } from "react";
 import { useFocusVal } from "@/lib/use-focus-val";
 
@@ -47,7 +48,7 @@ export function Modal({
           ✕
         </button>
         {eyebrow && (
-          <p className="eyebrow" style={accentColor ? { color: accentColor } : undefined}>
+          <p className="eyebrow" style={accentColor ? { color: lijnKleur(accentColor) } : undefined}>
             {eyebrow}
           </p>
         )}

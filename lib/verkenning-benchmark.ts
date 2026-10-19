@@ -60,7 +60,7 @@ function alsPoolLid(lid: Omit<PoolLid, "aantalScans" | "scores" | "overall">): P
  */
 export function ledenVoorVerkenning(
   organisaties: Organisatie[],
-  benchmark: Pick<Benchmark, "assessmentIds" | "eenheid" | "filters">,
+  benchmark: Pick<Benchmark, "assessmentIds" | "eenheid" | "filters" | "meetperiode">,
   minScans: number
 ): BenchmarkLid[] {
   const assessmentId = benchmark.assessmentIds[0];
@@ -68,10 +68,37 @@ export function ledenVoorVerkenning(
   const eenheid = benchmark.eenheid ?? "organisaties";
   if (!assessmentId || filters.length === 0) return [];
   if (onbekendeKenmerken(filters, eenheid).length > 0) return [];
-  const { gekozen } = kiesPoolMetingen(organisaties, assessmentId, minScans, eenheid);
+  const { gekozen } = kiesPoolMetingen(organisaties, assessmentId, minScans, eenheid, benchmark.meetperiode);
   const velden = [...filterVelden(), ...onderdeelVelden()];
   const leden = pasFiltersToe(gekozen.map(alsPoolLid), standVanFilters(filters), velden);
   return leden.map((l) => ({ organisatieId: l.organisatie.id, assessmentId, metingId: l.meting.id }));
+}
+
+export const REDEN_GEEN_METING_IN_PERIODE = "Geen Meting in de Meetperiode";
+
+/**
+ * Waarom een Organisatie niet in een verkenning zit terwijl ze aan de filters voldoet (`benchmark.md`, Opgeslagen verkenning, Onder
+ * de drempel): "Geen Meting in de Meetperiode" als de periode haar Meting uitsluit. `null` als de Organisatie meedoet of niet aan de
+ * filters voldoet. Filters op Organisatie of Onderdeel doen hier niet mee: Die zeggen niets over de Meting. De tweede reden uit de
+ * spec, "Geen onderdelen met een eigen Meting" bij een Organisatie met alleen een samengestelde Meting, komt niet voor: Een
+ * samengestelde Meting voldoet alleen aan `benchmarkMinScans` als haar onderliggende Metingen dat doen, en die tellen dan zelf mee.
+ */
+export function redenGeenLid(
+  organisaties: Organisatie[],
+  benchmark: Pick<Benchmark, "assessmentIds" | "eenheid" | "filters" | "meetperiode">,
+  organisatieId: string,
+  minScans: number
+): string | null {
+  const assessmentId = benchmark.assessmentIds[0];
+  const filters = (benchmark.filters ?? []).filter((f) => f.kenmerk !== "__organisatie" && f.kenmerk !== "__onderdeel");
+  if (!assessmentId || filters.length === 0) return null;
+  if (onbekendeKenmerken(filters, "organisaties").length > 0) return null;
+  const doetMee = (b: typeof benchmark) => ledenVoorVerkenning(organisaties, b, minScans).some((l) => l.organisatieId === organisatieId);
+  if (doetMee(benchmark)) return null;
+  if (!benchmark.meetperiode) return null;
+  // Zonder periode zou ze meedoen? Dan ligt het aan de periode. De virtuele filters laten we weg: Die gaan over onderdeel, niet over de Meting.
+  const zonderPeriode = { ...benchmark, filters, meetperiode: undefined };
+  return doetMee(zonderPeriode) ? REDEN_GEEN_METING_IN_PERIODE : null;
 }
 
 /** De benchmark met de berekende leden bij een verkenning. Een vaste groep blijft zoals ze is. */
