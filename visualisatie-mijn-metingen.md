@@ -77,8 +77,12 @@ De teaser is een samenvatting en geen tweede resultatenpagina. Hij toont alleen 
 ### Volwassenheidsscan (en andere Assessments met categorieën)
 
 - Links "Jouw overall score" (label), het getal in 48 px vet (bijvoorbeeld "3,4"), met daarnaast een klassenpil van 32 px in de celkleur van de klasse (bijvoorbeeld "Uitbouwen" in `#fbf0b8` met tekst `#5c4800`). Kleuren en klassenamen komen uit de bestaande scorevisualisatie (`visualisatie-scores.md`), niet uit deze spec.
-- Rechts vijf rijen, één per categorie, in de vaste volgorde Overkoepelend, Organisatie, Proces & Tech, Mens, Fundament. Elke rij heeft naam (170 px), een balk van 6 px in de categoriekleur en rechts het gemiddelde met één decimaal. De balk is het gemiddelde op een schaal van 1 tot 5 (3,4 is 68%; het ontwerp rondt af).
-- Categoriekleuren: De bestaande kleuren per categorie (`stylesheet.md`).
+- Rechts vijf rijen, één per categorie, in de vaste volgorde Overkoepelend, Organisatie, Proces & Tech, Mens, Fundament. Elke rij heeft naam, een spoor en rechts het gemiddelde met één decimaal. Naam en getal hebben in het blok Jouw scan en het blok Hele meting dezelfde breedte, zodat de sporen op één lijn staan.
+- **Schaal.** Het spoor is een schaal van 1 tot 5, zoals overal in de scorevisualisaties (`visualisatie-scores.md`, Gedeelde regels). Een gemiddelde van 3,4 staat dus op 60% van het spoor. (Eerder stond hier 68%, want een schaal van 0 tot 5. Dat is vervallen.) Onder de onderste rij staan de ankers "1" en "5" in 12 px `--ink-s`.
+- **Eigen scan (links).** Een balk van 8 px in de categoriekleur op een spoor van `--bg-mid`.
+- **Hele meting (rechts, voorstel van 19 oktober 2026, ontworpen).** Een stip van 14 px in de categoriekleur op het gemiddelde, met een witte rand van 2 px, en een grijze lijn van 2 px (`#b3b0a8`) van de laagste tot de hoogste score van een afgeronde scan in die categorie, op hetzelfde spoor. Zo ziet de Lead in één blik het gemiddelde en het bereik, en kan hij zijn eigen balk ervoor houden. De lijn volgt dezelfde drempel als de rest van de Lead-weergaven: Het blok bestaat alleen bij minstens `benchmarkMinRespondenten` afgeronde scans (zie Voorwaarden), dus de lijn kan nooit bij een te kleine groep staan.
+- **Tekstalternatief.** Per rij bijvoorbeeld "Overkoepelend, gemiddelde 2,7, laagste 2,0, hoogste 3,6". De eigen balk: "Overkoepelend, jouw score 2,6".
+- Categoriekleuren: De kleuren per categorie (`stylesheet.md`, Categoriekleuren). Fundament is het merkgeel (voorstel van 19 oktober 2026). Het getal staat in `--ink`.
 
 ### Quickscan (en andere Assessments met afdelingen)
 
@@ -93,7 +97,7 @@ Voor een nieuw Assessment geldt: Heeft het categorieën, dan de eerste vorm. Hee
 Een Lead ziet op elke Meting-kaart waarvoor Resultaten is aangevinkt een blok "Hele meting". Dat geldt ook voor een Lead die geen respondent is. Het blok heeft dezelfde vorm als de teaser van een eigen scan, met drie verschillen:
 
 - Het getal is het gemiddelde van alle afgeronde scans van de Meting. De regel eronder is "Gemiddelde van <n> afgeronde scans" in plaats van punten.
-- De rijen tonen alleen het gemiddelde of percentage, zonder "x/15".
+- De rijen tonen het gemiddelde met bij de Volwassenheidsscan de stip en lijn hierboven, zonder "x/15". Bij de Quickscan blijft het een balk van het percentage (zie Open punten).
 - Rechtsboven staat een chip. "Tussenstand" (amber) zolang de Meting open is, "Eindstand" (groen) zodra hij is afgesloten.
 
 **Voorwaarden.** Het blok verschijnt alleen als aan alle drie is voldaan:
@@ -172,6 +176,8 @@ Alles volgt `stylesheet.md`. Voor deze pagina in het bijzonder:
 - De pagina is voor één rol van één Organisatie. Heeft iemand scans bij meerdere Organisaties, dan blijft dat zoals nu geregeld (`datamodel.md`, deel 2, Toegang voor respondenten) en is de naam van de Organisatie in de kop de enige scheiding.
 
 ## Open punten
+
+- Quickscan, Hele meting: Krijgt de rij per afdeling ook een stip en lijn op een schaal van 0 tot 100%, of blijft het een balk met het percentage? Het ontwerp van 19 oktober 2026 dekt alleen de Volwassenheidsscan.
 
 - **Laatst opgeslagen.** `ScanInvulling` heeft geen veld voor het laatste opslagmoment. Voorstel: `laatstOpgeslagenOp` (datum en tijd), gezet bij elk opslaan van een antwoord. Zonder dat veld vervalt de rechterhelft van de voortgangsregel.
 - **Tussenstand en eindstand.** Voorstel: Een Meting is open zolang er geen sluitingsdatum is gepasseerd en niet alle uitgenodigde scans zijn afgerond. Er is nog geen gedefinieerde "afgesloten Meting". Bevestigen of er een Admin-actie komt, of dat het automatisch uit de status volgt.

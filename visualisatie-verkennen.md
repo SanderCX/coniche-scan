@@ -28,8 +28,8 @@ De tab Verkennen onder de hoofdlink Resultaten, naast Metingen en Benchmarks, al
 
 **Voorstel van 16 oktober 2026, gebouwd op 17 oktober 2026.** Boven de kaart Kenmerken staat een pilvormige groep Eenheid met Organisaties en Onderdelen, naast een Info-icoon. Organisaties is de standaard en is wat hierboven staat.
 
-- **Organisaties.** Elke Organisatie telt één keer mee, met haar meest recente Meting (Pool).
-- **Onderdelen.** Elke Meting met een onderdeel is een eenheid (`benchmark.md`, Onderdeel en samengestelde Meting). Een Organisatie met drie onderdelen telt dus drie keer. Een Organisatie met één onderdeel heet in de lijst "Hele organisatie". Per onderdeel telt de meest recente Meting die aan `benchmarkMinScans` voldoet. De pool, de teller en de balk, de drempels, de groepen en de teksten gaan over onderdelen en gebruiken het woord "onderdelen". Een regel onder de teller noemt uit hoeveel Organisaties de pool bestaat.
+- **Organisaties.** Elke Organisatie telt één keer mee, met de Meting die telt volgens de Meetperiode (Meetperiode). Dat mag een gewone of een samengestelde Meting zijn.
+- **Onderdelen.** Elke gewone Meting met een onderdeel is een eenheid (`benchmark.md`, Welke Meting telt waar). Een samengestelde Meting telt nooit mee, want haar onderdelen zijn de onderliggende Metingen zelf. Een Organisatie met alleen een samengestelde Meting heeft dus geen onderdelen en doet niet mee. Een Organisatie met drie onderdelen telt drie keer. Een Organisatie met één Meting zonder onderdeel heet in de lijst "Hele organisatie". Per onderdeel telt de laatste Meting binnen de Meetperiode die aan `benchmarkMinScans` voldoet. De pool, de teller en de balk, de drempels, de groepen en de teksten gaan over onderdelen en gebruiken het woord "onderdelen". Een regel onder de teller noemt uit hoeveel Organisaties de pool bestaat, bijvoorbeeld "3 onderdelen van 1 Organisatie".
 - **Gelijk gewicht.** Elk onderdeel telt even zwaar, ook als een Organisatie er meer heeft dan een andere (`benchmark.md`, Gedeelde regels). Een Organisatie met vier onderdelen telt dus vier keer zwaar in het gemiddelde. De voettekst zegt dat.
 - **Drempels.** Dezelfde vijf instellingen (Drempels) gelden voor onderdelen, met de eenheid onderdelen in de tekst. Er komen geen aparte instellingen bij.
 - **Nieuwe kenmerken.** Alleen bij Onderdelen staan er twee kenmerken bij in het menu, in de groep "Organisatie en onderdeel".
@@ -39,12 +39,24 @@ De tab Verkennen onder de hoofdlink Resultaten, naast Metingen en Benchmarks, al
 - **Snel beginnen.** De pillen bij Snel beginnen volgen de eenheid. Bij Onderdelen is Organisatie er een van.
 - **Weergaven.** Ongewijzigd. De naam in de heatmap en in de lijsten is bij Onderdelen "{Organisatie}, {onderdeel}", of de naam van de Organisatie bij "Hele organisatie".
 
+## Meetperiode
+
+**Besloten op 19 oktober 2026, ontworpen in "Coniche Scan Verkennen".** Naast Assessment en Eenheid staat de keuze Meetperiode, op een eigen regel eronder, als pilvormige groep met "Meest recente" en "Periode". De volgorde bovenaan is Assessment, Eenheid, Meetperiode. De pillen zijn even hoog als de keuzelijst van het Assessment.
+
+- **Meest recente.** De standaard. Per Organisatie, bij de eenheid Onderdelen per onderdeel, telt de meest recente Meting. Onder de keuze staat "Per organisatie telt de meest recente Meting."
+- **Periode.** Twee datumvelden, "tot en met" ertussen. Per Organisatie (of onderdeel) telt de laatste Meting met een meetdatum in die periode. Zo blijft een eerdere ronde te vergelijken, ook als een nieuwe ronde al deels binnen is. Het gebruik is bijvoorbeeld half januari tot begin februari voor de eerste meting en een periode in oktober voor de volgende.
+- **Zonder Meting in de periode.** Die Organisatie of dat onderdeel doet niet mee. Onder de keuze staat hoeveel er afvallen: "Per organisatie telt de laatste Meting tussen 12-01-2026 en 10-02-2026. 6 organisaties hebben geen Meting in deze periode en doen niet mee."
+- **Pool en drempels.** De pool, de teller, de drempels en de groepen gaan over wat na de periode overblijft. Datums staan als dd-mm-jjjj.
+- **Info-icoon.** "Per Organisatie telt de laatste Meting met een meetdatum in deze periode. Zo kun je ronde 1 blijven vergelijken, ook als ronde 2 al deels binnen is. Zonder periode telt de meest recente Meting. Een Organisatie zonder Meting in de periode doet niet mee."
+- **Opslaan.** De periode wordt meegenomen bij Opslaan als benchmark (Opslaan als benchmark). Een periode die meeschuift, zoals de laatste twaalf maanden, is er niet.
+- **Bij een lege periode.** Valt alles weg, dan geldt de bestaande melding over een te kleine pool.
+
 ## Pool
 
 **Besloten.** De pool is per Assessment. Scores van verschillende Assessments worden niet door elkaar gezet.
 
 - In de pool zitten Organisaties met `benchmarkToegestaan` die een Meting van het gekozen Assessment hebben met minstens `benchmarkMinScans` afgeronde scans.
-- Per Organisatie telt de meest recente Meting die aan die eis voldoet, net als bij het samenstellen van een benchmark. Bij een samengestelde Meting (`benchmark.md`, Onderdeel en samengestelde Meting) telt die.
+- Per Organisatie telt de Meting die volgens de Meetperiode telt en aan die eis voldoet (Meetperiode). Bij de eenheid Organisaties mag dat een samengestelde Meting zijn (`benchmark.md`, Welke Meting telt waar). Bij de eenheid Onderdelen nooit.
 - De Admin ziet de namen van de Organisaties.
 - De Zorgscan en de Klantcontact Volwassenheidsscan hebben dezelfde 15 bouwblokken, maar zijn aparte Assessments en dus aparte pools. De Zorgscan weegt bouwblok 4, 10 en 11 dubbel. Binnen een pool speelt dat niet, omdat bouwblokscores ongewogen zijn en de overall scoring van het Assessment volgt (`CLAUDE.md`, sectie 1).
 
@@ -182,10 +194,10 @@ Kleuren in de grafieken: Focus oranje (`--or`), rest grijs (`rgba(136,136,132,.5
 
 - **Knop.** Onder de teller en de balk in de kaart Kenmerken staat "Opslaan als benchmark" met een Info-icoon (`info.verkennenOpslaan`). De Admin heeft hiervoor `benchmark.beheren` nodig.
 - **Uitgeschakeld.** Zonder filter, met de reden "Zet eerst een filter, anders is de groep de hele pool". En als de pool kleiner is dan `verkennenMinPool`, met de reden "Minder dan {n} {Organisaties of onderdelen} in de pool". De reden staat naast de knop.
-- **Paneel.** De knop opent onder zich een paneel met het veld Naam (maximaal 60 tekens, "zichtbaar voor de Lead"), de filters die worden opgeslagen als regels ("CRM-pakket is Salesforce", bij meerdere waarden "of", bij Ingezette kanalen "alle van"), en de zin "Nu {n} {eenheid} in de groep. De Lead ziet de eigen scores tegenover de rest van de groep. Alleen de eigen Organisatie en haar onderdelen staan met naam in beeld." Daaronder "Opslaan" en "Annuleren". Opslaan is uitgeschakeld zolang de naam leeg is.
+- **Paneel.** De knop opent onder zich een paneel met het veld Naam (maximaal 60 tekens, "zichtbaar voor de Lead"), de filters die worden opgeslagen als regels ("CRM-pakket is Salesforce", bij meerdere waarden "of", bij Ingezette kanalen "alle van"), bij een Meetperiode de regel "Meetperiode 12-01-2026 tot en met 10-02-2026", en de zin "Nu {n} {eenheid} in de groep. De Lead ziet de eigen scores tegenover de rest van de groep. Alleen de eigen Organisatie en haar onderdelen staan met naam in beeld." Daaronder "Opslaan" en "Annuleren". Opslaan is uitgeschakeld zolang de naam leeg is.
 - **Voorgestelde naam.** Is er één filter met één waarde, dan staat er "Organisaties met {waarde}" voorgevuld. In andere gevallen is het veld leeg. De Admin kiest een naam die voor een Lead logisch leest.
 - **Na Opslaan.** Een groene regel: "Opgeslagen als {naam}. Wijs hem toe in het Leads-venster van een Organisatie die erin zit." De stand in Verkennen blijft zoals hij was.
-- **Wat er wordt bewaard.** De naam, het Assessment, de eenheid en de filters. Niet de groepering, de focus, de drempel van een getalkenmerk of de uitkomst.
+- **Wat er wordt bewaard.** De naam, het Assessment, de eenheid, de Meetperiode en de filters. Niet de groepering, de focus, de drempel van een getalkenmerk of de uitkomst.
 - **Toewijzen.** Gebeurt niet hier maar in het Leads-venster van de Organisatie (`beheerpagina.md`, punt 6a). Daar staat een kolom met de badge Verkenning en het aantal Organisaties (visual design, bord "Leads-venster").
 - **Terugvinden en wijzigen.** In de tab Benchmarks (`beheerpagina.md`, punt 14). Een opgeslagen verkenning opent niet terug in Verkennen. Dat staat bij Later.
 
@@ -205,11 +217,11 @@ Kleuren in de grafieken: Focus oranje (`--or`), rest grijs (`rgba(136,136,132,.5
 - **Een opgeslagen verkenning weer openen in Verkennen.** Nu staan de filters als regels in de tab Benchmarks. Terug openen in Verkennen om verder te kijken staat nog open.
 - **Export** van de gefilterde pool als CSV (`export-csv.md`).
 - **Quickscan Ziekenhuis.** De antwoorden zijn percentages (`visualisatie-quickscan.md`), dus de schaal wordt 0 tot 100%, met de classificatiekleuren van de Quickscan.
-- **Meerdere Metingen per Organisatie.** Nu telt de meest recente. Een tijdsdimensie hoort bij niveau 2 van de benchmark.
+- **Meetperiode die meeschuift.** Nu is de periode een vaste begin- en einddatum. Een periode als de laatste twaalf maanden is er niet.
 
 ## Open punten
 
-- Eenheid Onderdelen: Welke Meting telt als een samengestelde Meting en haar onderliggende Metingen allebei voor hetzelfde onderdeel in aanmerking komen (`benchmark.md`, Open punten).
+- Of een Meetperiode die meeschuift nodig is (Later).
 - Eenheid Onderdelen: Of een Organisatie met vele onderdelen te zwaar meetelt in het gemiddelde. Nu telt elk onderdeel even zwaar, de voettekst zegt het.
 - Werken meerdere gekozen kanalen als "en" of als "of"? Het ontwerp gebruikt "en".
 - Zijn 3, 5, 6, 12 en 40% de juiste startwaarden voor de vijf drempels (zie Drempels)? Met ongeveer 10 Organisaties per branche vallen combinaties van sector en pakket snel onder 5.

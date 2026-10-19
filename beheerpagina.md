@@ -1913,7 +1913,8 @@ en is voorstel.
   "+ Benchmark aanmaken" (`.btn-or .btn-compact`).
 - **Aanmaken en wijzigen**: Eerst de Assessments, daarna de organisaties
   met het optionele sectorfilter, en per organisatie de Meting per
-  Assessment in dezelfde lijst (`benchmark.md`, Samenstellen). De Admin
+  Assessment in dezelfde lijst, met alle Metingen als keuze, gewone en
+  samengestelde, en niet stil de meest recente (`benchmark.md`, Samenstellen). De Admin
   geeft de benchmark een naam. Wijzigen van de samenstelling kan altijd.
   Organisaties met de vlag die niet in de lijst staan, komen onder de lijst
   met de reden. De knop "Benchmark aanmaken" is uitgeschakeld tot de benchmark een naam,
@@ -1922,10 +1923,14 @@ en is voorstel.
 - **Verkenning** (gebouwd op 17 oktober 2026): Een benchmark die uit
   Verkennen komt (`benchmark.md`, Opgeslagen verkenning) staat in de lijst met
   de badge Verkenning en het aantal Organisaties van dit moment. Het detail
-  toont erboven de filters als regels ("CRM-pakket is Salesforce") en de eenheid. De
-  leden zijn berekend en niet te kiezen. De Admin wijzigt de naam en de
-  filters met de knop "Wijzigen" (zie Opgeslagen verkenning, Aanpassen). Aanmaken
-  gaat alleen vanuit Verkennen. Bij het verwijderen staat in de bevestiging
+  toont erboven de filters als regels ("CRM-pakket is Salesforce"), de Meetperiode en de eenheid. De
+  leden zijn berekend en niet te kiezen. De Admin wijzigt de naam, de
+  filters en de Meetperiode met de knop "Wijzigen" (zie Opgeslagen verkenning, Aanpassen). Het
+  Assessment en de eenheid zijn vast. Aanmaken
+  gaat alleen vanuit Verkennen. De teller volgt de eenheid, bij Onderdelen
+  "3 onderdelen van 1 Organisatie" (`benchmark.md`, Teller). Het detail en het perspectief
+  van een lid staan in `benchmark.md`, Opgeslagen verkenning, Detail en perspectief.
+  Een lege pagina komt niet voor. Zonder uitkomst staat er een melding met de reden. Bij het verwijderen staat in de bevestiging
   hoeveel vinkjes van Leads vervallen, zoals bij een Vaste groep.
 - **Detail**: Kruimelpad Resultaten › Benchmarks › {naam}. Per Assessment een sectie met
   de teller "X van Y organisaties", de gemiddelden van de groep en per
@@ -1970,8 +1975,11 @@ de meetdata meer dan `benchmarkMaxDagenTussenMetingen` dagen uit elkaar liggen
 meetdatum (bij Naast elkaar op naam), met de matrix, bij twee Metingen een kolom
 Verschil of Hoogste en weergave C of H, naar de lezing (`benchmark.md`, Niveau 2). Er is geen groepsgemiddelde. Niveau 3 is een view
 op één Meting: De scan van een Respondent naast het gemiddelde van de andere
-scans in die Meting. De spreiding en de hoge en lage scores zijn nog niet
-ontworpen (`benchmark.md`, Niveau 3). De vergelijking (niveau 2) geeft
+scans in die Meting. De hoofdpagina van zo'n Meting toont boven de lijst met
+scans het Overzicht en de Spreiding, zonder de positie-ring, en pas daaronder
+de lijst (`visualisatie-scores.md`, onderdeel J). Kiest de Admin een scan, dan
+staat de samenvatting van die Respondent boven de positie ten opzichte van de
+groep (`benchmark.md`, Niveau 3). De vergelijking (niveau 2) geeft
 de Admin via het Leads-venster aan een Lead met Resultaten op de Metingen daarin. De
 spreiding binnen een Meting (niveau 3) krijgt een Lead als kolom Spreiding
 (punt 6a). De view op één scan blijft voor de Admin.

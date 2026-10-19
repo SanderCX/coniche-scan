@@ -231,7 +231,7 @@ laagste 3 de verbeterkansen.
 ## 2. Kleuren per categorie
 
 Overkoepelend oranje, Organisatie blauw, Proces & Tech paars, Mens groen,
-Fundament antraciet. De interactieve flow gebruikt deze kleuren; de
+Fundament geel (het merkgeel `#ffc043`, voorstel van 19 oktober 2026, daarvoor antraciet). Fundament is alleen een vulling, dus tekst in en bij die kleur staat in `--ink` (`stylesheet.md`, Categoriekleuren). De interactieve flow gebruikt deze kleuren; de
 PDF-export gebruikt overal oranje.
 
 Alle opmaakwaarden (hexcodes, tekstkleuren, scorekleuren, knopstaten)
@@ -534,7 +534,7 @@ geen afwijking van de spec maar een gat erin.
    scheidingslijn, dan "← Terug naar Mijn metingen".
 6. **Resultatenscherm**: Overall score met classificatiecirkel en
    voortgang, radar van alle bouwblokken, staafdiagram per categorie
-   (kleur volgt de score), top 3 sterktes en verbeterkansen, legenda.
+   (in de categoriekleuren, met de klassegrenzen als stippellijn, voorstel van 19 oktober 2026, voorheen volgde de kleur de score), top 3 sterktes en verbeterkansen, legenda.
    **Bij AI-volwassenheid** (geen categorielaag, `content-ai-scan.md`)
    vervalt het staafdiagram per categorie: In plaats daarvan "Scores per
    Domein", een horizontale balk per domein individueel, gesorteerd van
