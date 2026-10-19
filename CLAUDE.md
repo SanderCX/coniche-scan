@@ -119,6 +119,15 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   samengestelde Meting, de vergelijking, de benchmark tussen organisaties, het
   perspectief van een lid en de hoofdpagina van een Meting, met Toon als
   (Gemiddeld of Naast elkaar met zes vormen) en Spreiding tussen onderdelen.
+- **KPI's per plek en kanaal** (voorstel van 19 oktober 2026, besloten door
+  Joost, ontworpen, nog niet gebouwd): Een KPI-waarde hoort bij de hele
+  organisatie, een Onderdeel of een kanaal, en je vult alleen in wat je weet
+  (`datamodel.md`, Onderdeel en KPI's en kanalen). Het Onderdeel wordt een eigen
+  object en vervangt de tekst op de Meting. In het organisatie-detail staat een
+  eigen blok KPI's en een modal "KPI's invullen" (`beheerpagina.md`, punt 4). De
+  KPI's en kanalen zelf beheert een Admin (punt 3), en Verkennen kiest per KPI
+  een kanaal (`visualisatie-verkennen.md`, KPI's als kenmerk). Het design staat
+  in `Claude outputs/kpi-design/`: Zes borden als `.dc.html` met een PNG per bord.
 - **Opmaakronde**: Besloten door Joost en gebouwd op 15 oktober 2026
   (`stylesheet.md`). Acht lettergroottes in even px (12, 14, 16, 18,
   24, 32, 40, 48) in plaats van zo'n 17 maten, met de paginatitel op 32px.
@@ -141,7 +150,9 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
 In de interface en in alle specs: **Organisatie**, **Meting** (een
 afname van één scan-type bij één organisatie, voor één onderdeel op één meetdatum), **Respondent** (de
 persoon), **Ingevulde scan** (één invulling door één respondent binnen
-één meting). Niet "leden" of "scanuitvoering". In de code heten sommige
+één meting), **Onderdeel** (een deel van een Organisatie met een eigen naam en
+eigen KPI-waarden, voorstel van 19 oktober 2026). Niet "leden" of
+"scanuitvoering". In de code heten sommige
 typen nog anders; dat staat in het datamodel.
 
 ---

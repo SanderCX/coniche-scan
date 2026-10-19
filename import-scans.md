@@ -462,7 +462,15 @@ meetdatum (`datamodel.md`, Meting). De import leidt ze af uit wat hij al weet.
   zijn gekoppeld. In de voorbeeldweergave staat dan per bronnaam een veld
   "Onderdeel", voorgevuld met de bronnaam en aanpasbaar. Bij één bronnaam is het
   onderdeel "Hele organisatie". Bij de eigen export geldt het onderdeel uit de
-  kolom `onderdeel`, als die er is (`export-csv.md`).
+  kolom `onderdeel`, als die er is (`export-csv.md`). Voorstel van 19 oktober
+  2026: Het veld is de keuzelijst Onderdeel (`beheerpagina.md`, punt 5, Het veld
+  Onderdeel). De bronnaam staat gekozen als er een Onderdeel met die naam
+  bestaat (hoofdletterongevoelig), anders als "Nieuw onderdeel…" met de bronnaam
+  ingevuld. Het Onderdeel ontstaat bij het importeren. De KPI's uit een eigen
+  export (`organisatie_kpis`) worden teruggelezen en overschrijven bij een
+  bestaande Organisatie niets, zoals `organisatie_kenmerken`. Een oudere eigen
+  export met KPI's in `organisatie_kenmerken` wordt omgezet volgens
+  `datamodel.md`, KPI's en kanalen, Overgang.
 - **Dezelfde Respondent twee keer.** Krijgt een scan een eigen Meting omdat
   dezelfde Respondent al een scan heeft in die Meting (zie hierboven), dan hoort
   die Meting bij zijn eigen meetdatum. Het label krijgt dezelfde datumconventie,

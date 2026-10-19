@@ -105,6 +105,17 @@ Bewust nog niet opgepakt. Geen prioritering.
   `datamodel.md`, Meting en `beheerpagina.md`, punt 5 en 14. Nog niet
   ontworpen: De weergave bij drie of meer Metingen, bijvoorbeeld een lijn per
   bouwblok over de meetdata.
+- **KPI's, peildatum en ontwikkeling in de tijd** (19 oktober 2026): Een
+  KPI-waarde heeft in het voorstel geen peildatum, zodat het model niet
+  explodeert in waarden maal kanalen maal tijd (`datamodel.md`, KPI's en
+  kanalen, Geen tijd). Later komt een peildatum bij de waarde, met een
+  weergave van de ontwikkeling. Bestaande waarden krijgen dan een lege datum.
+- **KPI's, wat het voorstel van 19 oktober 2026 openlaat** (`datamodel.md`,
+  KPI's en kanalen, Open punten, en `beheerpagina.md`, punt 3): Een eigen stand
+  "niet van toepassing" bij een kanaal, het verwijderen van een KPI-definitie en
+  het hernoemen van een kanaal. Het potlood en de modal voor het wijzigen van een
+  Onderdeel, de modal "+ Onderdeel toevoegen" en de knoppen Opslaan en
+  Annuleren in de tab KPI's en kanalen staan niet in het design.
 - **Verkennen (gebouwd op 15 oktober 2026)**: Een Admin-scherm om de hele
   pool van een Assessment te filteren, te groeperen en te vergelijken
   (`visualisatie-verkennen.md`, `beheerpagina.md` punt 15). Kenmerken, Groeperen
@@ -115,9 +126,9 @@ Bewust nog niet opgepakt. Geen prioritering.
     een splitsing.
   - Filter op bereik (sliders) bij getalkenmerken, naast de drempel bij het
     groeperen.
-  - AHT per kanaal. Dit is een wijziging in het datamodel (AHT wordt een
-    subveld bij elk kanaal in plaats van één los KPI-veld, `datamodel.md`,
-    KPI's) en vraagt Sander.
+  - AHT per kanaal. Uitgewerkt in het voorstel van 19 oktober 2026 (KPI's per
+    plek en kanaal, `datamodel.md`, KPI's en kanalen, en
+    `visualisatie-verkennen.md`, KPI's als kenmerk).
   - Een filterstand bewaren als benchmark, en het resultaat zo aan een Lead
     tonen.
   - Export van de gefilterde pool als CSV.

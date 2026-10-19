@@ -166,6 +166,13 @@ Geen nieuwe contentbron: Dezelfde velden als de PDF-export
 </scanExport>
 ```
 
+**Voorstel van 19 oktober 2026 (KPI's en kanalen), nog niet uitgewerkt.** De
+elementen `contactenCall` tot en met `contactenWhatsapp` en `kpiAht` tot en met
+`kpiFtr` blijven bestaan, zodat het sjabloon blijft werken. Ze komen uit de
+`KpiWaarde`'s bij Algemeen (`datamodel.md`, KPI's en kanalen, Gevolgen voor
+andere specs). Waarden per Onderdeel en de kanalen die een Admin toevoegt,
+volgen pas als het sjabloon ze vraagt.
+
 **`kenmerken`**: Eén los, benoemd element per organisatieveld uit
 `datamodel.md` (Organisatievelden), 1-op-1 met de huidige, vaste
 lijst (Sector, Subsector, Volume en klantbasis, Digitalisering,
