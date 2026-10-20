@@ -194,6 +194,9 @@ deze afwijkingen:
 - **Score-berekening**: Eén gedeelde functie, zie `datamodel.md`,
   Scoreberekening. Deze export implementeert `overall_score`/
   `groepsScores` niet apart.
+- **Geen Contactpersonen en Nieuwsartikelen**: Ze zijn geen scandata en een
+  Contactpersoon is een persoon buiten de app (`datamodel.md`, Contactpersoon en
+  Nieuwsartikel, Privacy). Ze staan niet in de CSV (besloten op 20 oktober 2026).
 - **Bulk-export alleen binnen één organisatie**, in verband met
   datavermenging. Op het globale overzicht werkt dat ook zonder filter,
   zolang de selectie bij één organisatie hoort. Zie hierboven.

@@ -52,6 +52,14 @@ invullen):
 Organisatiekenmerken zoals klantvolumes, kanaalgebruik, techstack en
 KPI's (`datamodel.md`, Organisatievelden).
 
+**Van contactpersonen bij een organisatie** (alleen ingevuld door een
+Admin): Naam, functie, het LinkedIn-profiel en een zakelijke notitie, uit
+openbare bronnen, ter voorbereiding van gesprekken. Geen privégegevens. Zij
+zijn geen gebruiker van de app, doen niet mee aan een scan en krijgen niets
+toegestuurd. Wie niet als contactpersoon vermeld wil staan, kan Coniche
+vragen het te verwijderen (`datamodel.md`, Contactpersoon en Nieuwsartikel).
+Voorstel van 20 oktober 2026.
+
 **Van beheerders** (Coniche-medewerkers): E-mailadres en naam voor het
 beheeraccount.
 

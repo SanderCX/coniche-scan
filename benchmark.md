@@ -93,6 +93,7 @@ Valt een lid weg doordat de Meting of de Organisatie is verwijderd, of doordat d
 
 Opbouw van de view:
 
+- Bovenaan de Resultaatkop met de Totaalkaart van X, in plaats van de losse ring (voorstel van 20 oktober 2026, `stylesheet.md`, Resultaatkop, Benchmark). De schakelaar staat eronder.
 - Een radar met twee reeksen, X en de rest van de groep.
 - Het staafdiagram per categorie, met het groepsgemiddelde als tweede, neutraal gekleurde balk naast die van X. Eerder stond hier een markering. De tweede balk is gebouwd en leest beter, dus de spec volgt de code.
 - Het verschil per bouwblok (X min de rest, op één decimaal).

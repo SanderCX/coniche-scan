@@ -154,11 +154,15 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   kolommen, het staafdiagram per categorie met getal van 14px, de kaarten Toegang en Afspraken op het organisatie-detail, korte namen in de kaart
   Kenmerken en in Sector en Subsector, en `Meting.onderdeel` is vervallen (de naam komt uit het Onderdeel).
 - **Contactpersonen en Nieuws** (gebouwd op 20 oktober 2026, op verzoek van Sander):
-  Bij de Kenmerken van een Organisatie leggen een Admin en een Consultant (eigen)
-  relevante contactpersonen vast, met functie en LinkedIn-profiel, en relevante
+  Bij de Kenmerken van een Organisatie legt een Admin relevante
+  contactpersonen vast, met functie en LinkedIn-profiel, en relevante
   nieuwsartikelen met een link (`datamodel.md`, Contactpersoon en Nieuwsartikel,
   `beheerpagina.md`, punt 4). Het zijn geen Respondenten, een Lead ziet ze niet en de
-  gegevens van een contactpersoon staan niet in de audit-log.
+  gegevens van een contactpersoon staan niet in de audit-log. Alleen openbare,
+  zakelijke gegevens zijn toegestaan, geen privégegevens. Vooralsnog mag alleen een
+  Admin ze wijzigen (recht `contactpersonen.bewerken`, besloten op 20 oktober
+  2026, de bouw moet nog worden aangepast); een Consultant ziet ze bij eigen
+  Organisaties. Als de functie stabiel is, mag een Consultant ze ook wijzigen, voor eigen Organisaties.
 - **Help**: Gebouwd op 19 oktober 2026 (`help.md`). Een helppagina per rol
   (Respondent, Lead, Consultant en Admin) met 25 onderwerpen als Markdown in
   `help/`, twee films met CSS-animaties en de rij "Help" in het Accountmenu
@@ -396,6 +400,7 @@ geen afwijking van de spec maar een gat erin.
    pijlers" is in de beschrijving bovenaan een link naar `/bouwstenen` (niet ook in de kaart Volledig beeld, waar de zin nog eens staat). Deze pagina
    wordt later mogelijk een leadgenerator met "Toegang aanvragen"
    (`backlog.md`).
+   **Bovenkant (hero, voorstel van 20 oktober 2026, design `Open-B` in `Claude outputs/resultaatkop/`, gekozen door Joost omdat de hero te rommelig was)**: Gecentreerd, op een witte achtergrond (de gradient vervalt), met van boven naar beneden: Het Assessment-icoon in een witte cirkel van 64px met een lichte schaduw (icoon 28px), de eyebrow "Coniche Scan" (12px, hoofdletters, `--or`) op 24px eronder, de titel op 12px daaronder (48px, regelhoogte 56px, gewicht 800), één zin uitleg (18px, regelhoogte 28px, `--ink-m`, hoogstens 620px breed, gecentreerd) met op 20px afstand de link "15 bouwblokken in 5 pijlers" in `--or`, de drie kenmerken ("±30 minuten", "Heldere inzichten", "Direct verbeterkansen", 14px, gewicht 600, grijze lijniconen van 20px) op 28px eronder in één rij met 28px ertussen, de knop "Start assessment" (uitgeschakeld, 52px hoog) met het Info-icoon ernaast op 36px eronder, daaronder op 16px één regel toelichting (14px, `--ink-m`, hoogstens 440px) en als laatste, op 28px, "Bedoeld voor ..." (14px, `--ink-s`). De uitleg is één zin: De tweede zin ("Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken") komt niet meer in de hero voor en staat bij de feature-card Volledig beeld. De toelichting bij de knop is "Toegang loopt via een persoonlijke link van Coniche. Heb je die niet, neem dan contact op." De rest van de pagina (feature-cards, film, Praktische informatie) blijft ongewijzigd.
 3. **Voorbeeld-output**: Dezelfde resultaatcomponenten als scherm 6, met
    vaste demodata. De resultaatcomponent wordt één keer gebouwd. Voor
    elk Assessment, dus ook voor de AI-scan, de Zorgscan en de Quickscan,
@@ -608,8 +613,10 @@ geen afwijking van de spec maar een gat erin.
    het staafdiagram in de categoriekleuren, met de klassegrenzen als stippellijn, gebouwd op 19 oktober 2026, voorheen volgde de kleur de score), top 3 sterktes en verbeterkansen, legenda.
    **Bij AI-volwassenheid** (geen categorielaag, `content-ai-scan.md`)
    vervalt het staafdiagram per categorie: In plaats daarvan "Scores per
-   Domein", een horizontale balk per domein individueel, gesorteerd van
-   hoog naar laag (`Assessment.scoresPerGroepGesorteerd`).
+   domein", een staand kolomdiagram met een kolom per domein in volgorde 1 tot en met 8
+   (een eigen kleur per domein, nummercirkels onder de kolommen en een sleutel met de namen;
+   voorstel van 20 oktober 2026, `stylesheet.md`, Radar en staafdiagram op het
+   resultaatscherm, Domeinen). Het staat niet meer gesorteerd op score en scrolt niet.
 
    **Bij Ja / Nee / Weet ik niet (Quickscan)** heeft het scherm een eigen
    opbouw: Een totaalkaart (met de ring, `content-ziekenhuis-quickscan.md`,

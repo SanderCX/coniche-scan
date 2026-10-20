@@ -445,8 +445,8 @@ standaardteksten zoals ze nu in de app staan):
 | `info.verkennenMeetperiode` | Verkennen en het wijzigen van een opgeslagen verkenning, naast het label Meetperiode | Per Organisatie telt de laatste Meting met een meetdatum in deze periode. Zo kun je ronde 1 blijven vergelijken, ook als ronde 2 al deels binnen is. Zonder periode telt de meest recente Meting. Een Organisatie zonder Meting in de periode doet niet mee. |
 | `info.verkennenOpslaan` | Verkennen, naast de knop Opslaan als benchmark | Je slaat de filters op en niet de uitkomst. De groep volgt de filters: Komt er een Organisatie bij die erbij past, dan telt die mee. Daarna wijs je de benchmark toe aan een Lead van een Organisatie die erin zit, in het Leads-venster van die Organisatie. |
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
-| `info.contactpersonen` | Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen | Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Alleen Admins en Consultants met toegang tot deze organisatie zien ze. |
-| `info.nieuwsartikelen` | Organisatie-detail, bij Kenmerken, naast de kop Nieuws | Artikelen over de organisatie die relevant zijn voor het gesprek, met een link naar het artikel. Het nieuwste staat bovenaan. Alleen Admins en Consultants met toegang tot deze organisatie zien ze. |
+| `info.contactpersonen` | Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen | Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze. |
+| `info.nieuwsartikelen` | Organisatie-detail, bij Kenmerken, naast de kop Nieuws | Artikelen over de organisatie die relevant zijn voor het gesprek, met een link naar het artikel. Het nieuwste staat bovenaan. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze. |
 | `info.kpiBlok` | Organisatie-detail, blok KPI's, naast de titel | Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet. |
 | `info.kpiPlek` | Modal KPI's invullen, naast het label Plek | Kies voor welk deel van de organisatie je invult. Algemeen is de hele organisatie. |
 | `info.kpiKanalen` | Modal KPI's invullen, naast het label Kanalen uitsplitsen | Kies alleen de kanalen waarvoor je cijfers hebt. De kolom Algemeen blijft altijd staan. |
@@ -1022,9 +1022,13 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     gescheiden door een lijn van 1px `--border` en 24px ruimte, staan twee lijsten
     naast elkaar (onder 1000px onder elkaar), elk met een kop van 16px, gewicht 700,
     een Info-icoon (`info.contactpersonen` en `info.nieuwsartikelen`) en rechts een
-    knop "+ Toevoegen" (`.btn-outline .btn-compact`). Wie de Organisatie ziet,
-    mag toevoegen en bewerken (`organisaties.bewerken`: Admin alle, Consultant
-    eigen). Een Lead en een Respondent zien ze niet. Het Bewerkslot van de
+    knop "+ Toevoegen" (`.btn-outline .btn-compact`). Alleen een Admin mag
+    toevoegen, bewerken en verwijderen (`contactpersonen.bewerken`, besloten op
+    20 oktober 2026; de eerste bouw gebruikte `organisaties.bewerken` en moet
+    worden aangepast). Een Consultant met toegang tot de Organisatie ziet de
+    lijsten zonder de knoppen "+ Toevoegen" en "Bewerken". Later krijgt een
+    Consultant het recht ook, beperkt tot eigen Organisaties. Een Lead en een
+    Respondent zien ze niet. Het Bewerkslot van de
     Organisatie geldt voor de hele pagina. De velden en regels staan in
     `datamodel.md`, Contactpersoon en Nieuwsartikel.
     - **Contactpersonen**: Op alfabet. Per rij de naam (14px, gewicht 600), de
@@ -1038,6 +1042,8 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     - **Toevoegen en bewerken**: Een basismodal met "Annuleren" en "Opslaan".
       Contactpersoon: Naam (verplicht), Functie, LinkedIn-profiel (optioneel,
       een adres van linkedin.com, met `https://` als het ontbreekt) en Notitie.
+      Onder Notitie staat in 12px `--ink-s`: "Alleen zakelijke, openbaar
+      vindbare informatie. Geen privégegevens." (besloten op 20 oktober 2026).
       Nieuwsartikel: Titel (verplicht), Link (verplicht, http of https), Bron,
       Datum en Notitie. Een fout staat boven de knoppen in een `.overzicht-melding`
       (bijvoorbeeld "Dit is geen LinkedIn-adres."). Bij Bewerken staat links

@@ -37,7 +37,7 @@ Assessment {
   geschatteDuur: string             // bijv. "±30 minuten"
   categorieen: Categorie[] | null   // optioneel, zie hieronder
   bouwblokken: Bouwblok[] | null    // gebruikt als categorieen ontbreken
-  scoresPerGroepGesorteerd: boolean // AI-scan sorteert op waarde, Klantcontact-scan niet
+  scoresPerGroepGesorteerd: boolean // sorteert de lijst Scores per groep op waarde; de AI-scan toont Scores per domein in volgorde 1 tot en met 8 (stylesheet.md, Domeinen), dus voor de kaart naast de radar niet gebruikt
   schaal: SchaalLabel[5] | null     // per Assessment, zie hieronder; null bij antwoordType "ja-nee-weetniet"
   antwoordType: "schaal" | "ja-nee-weetniet" // standaard "schaal" (1–5), zie Antwoordtype
   instructieregel: string | null    // regel boven de vragen in de doorloopflow; leeg = de standaardtekst voor de 1–5-schaal
@@ -275,7 +275,7 @@ Onderdeel {
 
 ### Contactpersoon en Nieuwsartikel
 
-**Besloten en gebouwd op 20 oktober 2026, op verzoek van Sander.** Een Admin of Consultant legt bij een Organisatie vast welke mensen en welke nieuwsartikelen relevant zijn. Ze staan bij de Kenmerken op het organisatie-detail (`beheerpagina.md`, punt 4, Contactpersonen en Nieuws).
+**Besloten en gebouwd op 20 oktober 2026, op verzoek van Sander.** Een Admin legt bij een Organisatie vast welke mensen en welke nieuwsartikelen relevant zijn. Een Consultant ziet ze bij de eigen Organisaties en kan ze vooralsnog niet wijzigen (aangepast op 20 oktober 2026, zie Recht en slot). Ze staan bij de Kenmerken op het organisatie-detail (`beheerpagina.md`, punt 4, Contactpersonen en Nieuws).
 
 ```
 Contactpersoon {
@@ -304,9 +304,9 @@ Nieuwsartikel {
 - **LinkedIn-adres.** Optioneel. Wat is ingevuld, moet een adres van `linkedin.com` of een subdomein zijn (de controle is op het domein, niet op de tekst). Zonder schema wordt `https://` voorgezet. Een ander domein wordt geweigerd.
 - **Adres van een artikel.** Alleen `http` en `https`, met een punt in de domeinnaam. Een adres met een ander schema, zoals `javascript:`, wordt geweigerd. Zonder schema wordt `https://` voorgezet. Links openen in een nieuw tabblad met `rel="noopener noreferrer"`.
 - **Volgorde.** Contactpersonen op alfabet, hoofdletterongevoelig. Nieuws met het nieuwste bovenaan: Op publicatiedatum, en zonder datum op het moment van toevoegen.
-- **Recht en slot.** `organisaties.bewerken` en het Bewerkslot van de Organisatie, zoals bij de Kenmerken. Een Lead en een Respondent zien ze niet.
+- **Recht en slot.** Aanmaken, wijzigen en verwijderen vraagt het recht `contactpersonen.bewerken` en het Bewerkslot van de Organisatie, zoals bij de Kenmerken. Vooralsnog heeft alleen een Admin dat recht (alle Organisaties), besloten op 20 oktober 2026; de eerste bouw gebruikte `organisaties.bewerken` en moet worden aangepast. Een Consultant ziet de lijsten bij de eigen Organisaties, zonder de knoppen om te wijzigen. Als de functie stabiel is, krijgt een Consultant het recht ook, beperkt tot eigen Organisaties (zoals bij `organisaties.bewerken`); dan verandert alleen de rechtenmatrix. Een Lead en een Respondent zien ze niet.
 - **Verwijderen.** Een eigen verwijderactie per item, met bevestiging. Wordt de Organisatie verwijderd, dan gaan ze mee (Verwijderen en datakoppelingen).
-- **Privacy.** Een Contactpersoon is een persoon buiten de app met persoonsgegevens. Daarom staan hun gegevens niet in de audit-log (Audit) en niet in de exports. Wat er is vastgelegd, is wat Coniche uit openbare bronnen weet, en Coniche is er verantwoordelijk voor dat dat klopt.
+- **Privacy.** Een Contactpersoon is een persoon buiten de app, en een naam met functie blijft ook als die openbaar is een persoonsgegeven. Daarom staan hun gegevens niet in de audit-log (Audit) en niet in de exports (`export-csv.md`, `export-indesign.md` en `import-scans.md` noemen dat). Alleen openbaar vindbare, zakelijke gegevens zijn toegestaan: Naam, functie, het LinkedIn-profiel en een zakelijke notitie. Geen privégegevens, zoals een privé e-mailadres, telefoonnummer, woonadres of geboortedatum, en niets over de persoon als privépersoon. Onder het veld Notitie staat een korte waarschuwing met die regel, omdat een vrij tekstveld de plek is waar zoiets ongemerkt binnenkomt. Wat er is vastgelegd, is wat Coniche uit openbare bronnen weet, en Coniche is er verantwoordelijk voor dat dat klopt (besloten op 20 oktober 2026).
 
 ### Respondent (in de code: `OrganisatieLid`)
 
@@ -1491,7 +1491,8 @@ Een streepje betekent geen toegang.
 | `content.beheren` (ook de definitie van organisatievelden, KPI's en kanalen) | alle | - | - | - |
 | `organisaties.aanmaken` | alle | ja | - | - |
 | `organisaties.toewijzen` (aan een Consultant) | alle | - | - | - |
-| `organisaties.bewerken` (incl. kenmerken, KPI-waarden, Onderdelen, Contactpersonen en Nieuwsartikelen) | alle | eigen | te bevestigen | - |
+| `organisaties.bewerken` (incl. kenmerken, KPI-waarden en Onderdelen) | alle | eigen | te bevestigen | - |
+| `contactpersonen.bewerken` (Contactpersonen en Nieuwsartikelen aanmaken, wijzigen en verwijderen; een Consultant ziet ze wel; vooralsnog alleen Admin, later waarschijnlijk eigen voor een Consultant) | alle | - | - | - |
 | `organisaties.verwijderen` | alle | eigen | - | - |
 | `metingen.plannen` (ook een nieuw Onderdeel aanmaken in het formulier) | alle | eigen | - | - |
 | `respondenten.uitnodigen` | alle | eigen | aangevinkte Metingen (Uitnodigen) | - |
