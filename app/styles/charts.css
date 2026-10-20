@@ -98,8 +98,9 @@
 }
 .cat-balk:hover > .grafiek-tooltip,
 .cat-balk:focus > .grafiek-tooltip,
-.radar-knoop:hover > .grafiek-tooltip,
-.radar-knoop:focus > .grafiek-tooltip {
+.grafiek-tooltip.is-zichtbaar,
+.dk-kolom:hover > .grafiek-tooltip,
+.dk-kolom:focus > .grafiek-tooltip {
   display: block;
 }
 
@@ -324,6 +325,11 @@
 }
 
 /* Radar met genummerde knooppunten (`components/RadarChartView.tsx`). */
+.radar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .radar-vlak {
   position: relative;
   width: 100%;
@@ -332,6 +338,9 @@
 }
 .radar-vlak svg {
   display: block;
+}
+.radar-taart {
+  transition: fill-opacity 120ms;
 }
 .radar-knoop {
   position: absolute;
@@ -351,33 +360,270 @@
   font-size: var(--fs-12);
   font-weight: 700;
   cursor: pointer;
+  transition: opacity 120ms, background-color 120ms, box-shadow 120ms;
 }
-.radar-knoop:hover,
-.radar-knoop:focus {
+/* Het nummer staat precies in het midden van de cirkel (`stylesheet.md`, Getallen in een cirkel of balk). */
+.radar-knoop > span {
+  line-height: 1;
+  padding-top: 0.09em;
+}
+.radar-knoop.is-actief {
   background: var(--knoop-kleur);
   color: var(--knoop-tekst);
   box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--knoop-kleur);
   z-index: 20;
 }
-.radar-knoop .grafiek-tooltip {
-  top: 50%;
-  transform: translateY(-50%);
+.radar-knoop.is-gedimd {
+  opacity: 0.4;
 }
-.radar-knoop--rechts .grafiek-tooltip {
-  right: calc(100% + 24px);
+
+/* De tooltip van de radar staat buiten de radar (`stylesheet.md`, Tooltip van de radar). Dichtbij de verticale as boven of onder het
+   knooppunt met een pijltje, anders in de hoek van het kwadrant zonder pijltje. */
+.radar-tip {
+  max-width: 96%;
 }
-.radar-knoop--links .grafiek-tooltip {
-  left: calc(100% + 24px);
+.radar-tip--boven {
+  transform: translate(-50%, calc(-100% - 37px));
 }
-.radar-knoop--rechts .grafiek-tooltip::after {
-  left: 100%;
-  top: 50%;
-  margin-top: -6px;
-  border-left-color: var(--ink);
+.radar-tip--onder {
+  transform: translate(-50%, 37px);
 }
-.radar-knoop--links .grafiek-tooltip::after {
-  right: 100%;
-  top: 50%;
-  margin-top: -6px;
-  border-right-color: var(--ink);
+.radar-tip--boven::after {
+  top: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border-top-color: var(--ink);
+}
+.radar-tip--onder::after {
+  bottom: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border-bottom-color: var(--ink);
+}
+.radar-tip--hoek::after {
+  display: none;
+}
+.radar-tip--lt,
+.radar-tip--lb {
+  left: 1.5%;
+}
+.radar-tip--rt,
+.radar-tip--rb {
+  right: 1.5%;
+}
+.radar-tip--lt,
+.radar-tip--rt {
+  top: 1%;
+}
+.radar-tip--lb,
+.radar-tip--rb {
+  bottom: 1%;
+}
+
+/* De legenda onder de radar (`stylesheet.md`, Legenda onder de radar). */
+.radar-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2) var(--sp-6);
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-12);
+  line-height: 16px;
+  color: var(--ink-s);
+}
+.radar-legenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* Een balk van het staafdiagram per categorie die actief of gedimd is (`stylesheet.md`, Hover tussen radar en staafdiagram). */
+.cat-item .cat-balk,
+.cat-item .cat-naam {
+  transition: opacity 120ms, box-shadow 120ms;
+}
+.cat-item.is-actief .cat-balk {
+  box-shadow: 0 0 0 3px var(--balk-ring, rgba(0, 0, 0, 0.3));
+}
+.cat-item.is-gedimd .cat-balk {
+  opacity: 0.35;
+}
+.cat-item.is-gedimd .cat-naam {
+  opacity: 0.45;
+}
+
+/* Het staande kolomdiagram per domein (`components/DomeinKolommen.tsx`, `stylesheet.md`, Domeinen). */
+.dk {
+  width: 100%;
+}
+.dk-plot {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  padding-top: var(--sp-6);
+}
+.dk-as {
+  position: relative;
+  height: 300px;
+  font-size: var(--fs-12);
+  color: var(--ink-m);
+}
+.dk-as span {
+  position: absolute;
+  right: var(--sp-2);
+  line-height: 0;
+  transform: translateY(50%);
+}
+.dk-gebied {
+  position: relative;
+  height: 300px;
+  min-width: 0;
+}
+.dk-raster i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--q) * 1%);
+  border-top: 1px solid var(--border);
+}
+.dk-raster i.dk-lijn--klasse {
+  border-top: 1px dashed #9a978f;
+}
+.dk-kolommen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+.dk-kolom {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  transition: opacity 120ms;
+}
+.dk-kolom.is-gedimd {
+  opacity: 0.35;
+}
+.dk-kolom.is-actief {
+  background: rgba(28, 28, 26, 0.04);
+}
+.dk-staaf {
+  width: 26px;
+  max-width: 45%;
+  height: calc(var(--p) * 1%);
+  min-height: 2px;
+  border-radius: 4px 4px 0 0;
+}
+.dk-staaf--groep {
+  background: #b8b5ad;
+}
+.dk-kolom .grafiek-tooltip {
+  bottom: calc(var(--hoogste) * 1% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.dk-kolom--eerste .grafiek-tooltip {
+  left: 0;
+  transform: none;
+}
+.dk-kolom--laatste .grafiek-tooltip {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+.dk-nummers {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  margin-top: var(--sp-2);
+}
+.dk-nr-rij {
+  display: flex;
+}
+.dk-nr-cel {
+  flex: 1 1 0;
+  display: flex;
+  justify-content: center;
+}
+.dk-nr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--domein-kleur);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1;
+  padding-top: 0.09em;
+  flex: none;
+}
+.dk-sleutel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(4, auto);
+  grid-auto-flow: column;
+  gap: var(--sp-2) var(--sp-6);
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.dk-sleutel li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+  white-space: nowrap;
+  transition: opacity 120ms;
+  cursor: default;
+}
+.dk-sleutel li.is-gedimd {
+  opacity: 0.45;
+}
+.dk-sleutel li > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dk-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-6);
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.dk-legenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.dk-blokje {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex: none;
+}
+@container (max-width: 519px) {
+  .dk-sleutel {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-auto-flow: row;
+  }
 }

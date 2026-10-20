@@ -52,6 +52,16 @@ export function magBenchmarkBeheren(gebruiker: Gebruiker | null): boolean {
 }
 
 /**
+ * `contactpersonen.bewerken` (`datamodel.md` deel 2, Rechtenmatrix; `datamodel.md`, Contactpersoon en Nieuwsartikel, Recht en slot):
+ * Contactpersonen en Nieuwsartikelen aanmaken, wijzigen en verwijderen. Vooralsnog alleen een Admin (besloten op 20 oktober 2026): Een
+ * Consultant ziet ze bij de eigen Organisaties zonder de knoppen om te wijzigen. Later krijgt een Consultant het recht ook, beperkt
+ * tot eigen Organisaties: Dan verandert alleen deze functie.
+ */
+export function magContactpersonenBewerken(gebruiker: Gebruiker | null): boolean {
+  return isAdmin(gebruiker);
+}
+
+/**
  * `verkennen.inzien` (`datamodel.md` deel 2, Rechtenmatrix; `visualisatie-verkennen.md`, Privacy en rechten): Alleen een Admin.
  * Verkennen rekent over alle organisaties van een Assessment en toont hun namen, net als `benchmark.beheren`.
  */

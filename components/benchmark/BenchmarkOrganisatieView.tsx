@@ -5,9 +5,10 @@ import { VergelijkingsView } from "@/lib/benchmark";
 import { BenchmarkNiveau } from "@/lib/types";
 import { isVlakkeAssessment } from "@/lib/assessment-structuur";
 import { classificatie } from "@/lib/scoring";
-import { ScoreCircle } from "@/components/ScoreCircle";
-import { RadarChartView } from "@/components/RadarChartView";
-import { CategoryBarChart } from "@/components/CategoryBarChart";
+import { CLASSIFICATIE_INFO } from "@/lib/colors";
+import { ringVanScore } from "@/lib/score-ring";
+import { ResultaatKop, Totaalkaart } from "@/components/Resultaatkop";
+import { ResultaatKaarten } from "@/components/ResultaatKaarten";
 import { WeergaveGroep } from "@/components/visualisatie/WeergaveGroep";
 import { WeergaveSpreiding } from "@/components/visualisatie/WeergaveSpreiding";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
@@ -25,26 +26,37 @@ const datumFormat = new Intl.DateTimeFormat("nl-NL", { dateStyle: "long" });
  * bij een scan, de plek tussen de andere scans (weergave B). Nooit de namen van andere organisaties.
  * Dezelfde component voor de Admin (die de view eerst zelf bekijkt) en voor de Lead aan wie hij is toegewezen.
  */
-const TEKSTEN: Record<BenchmarkNiveau, { rest: string; restKort: string; voetnoot: (n: number) => string; geenAnderen: string }> = {
+const TEKSTEN: Record<
+  BenchmarkNiveau,
+  { rest: string; tegenover: string; anderen: [string, string]; voetnoot: (n: number) => string; geenAnderen: string }
+> = {
   organisaties: {
     rest: "Rest van de groep",
-    restKort: "groep zonder",
+    tegenover: "de rest van de groep",
+    anderen: ["andere organisatie", "andere organisaties"],
     voetnoot: (n) => `Vergelijkgroep van ${n} ${n === 1 ? "organisatie" : "organisaties"}, samengesteld door Coniche`,
     geenAnderen: "Er zijn nog geen andere organisaties om mee te vergelijken.",
   },
   metingen: {
     rest: "Overige Metingen",
-    restKort: "overige Metingen zonder",
+    tegenover: "de overige Metingen",
+    anderen: ["andere Meting", "andere Metingen"],
     voetnoot: (n) => `Vergelijking met ${n} andere ${n === 1 ? "Meting" : "Metingen"} van deze organisatie`,
     geenAnderen: "Er zijn geen andere Metingen om mee te vergelijken.",
   },
   scans: {
     rest: "Overige scans",
-    restKort: "overige scans zonder",
+    tegenover: "de overige scans",
+    anderen: ["andere scan", "andere scans"],
     voetnoot: (n) => `Vergelijking met ${n} andere ${n === 1 ? "scan" : "scans"} in deze Meting`,
     geenAnderen: "Er zijn geen andere scans om mee te vergelijken.",
   },
 };
+
+/** De subregel van de Resultaatkop: "{Organisatie} tegenover de rest van de groep · 5 andere organisaties". */
+function kopSubregel(naam: string, tekst: (typeof TEKSTEN)[BenchmarkNiveau], aantalAnderen: number): string {
+  return `${naam} tegenover ${tekst.tegenover} · ${aantalAnderen} ${aantalAnderen === 1 ? tekst.anderen[0] : tekst.anderen[1]}`;
+}
 
 export function BenchmarkOrganisatieView({
   view,
@@ -68,7 +80,7 @@ export function BenchmarkOrganisatieView({
   if (view.quickscan) {
     return (
       <section className="benchmark-sectie" aria-label={assessment.naam}>
-        <h2>{assessment.naam}</h2>
+        <ResultaatKop eyebrow="Benchmark" titel={assessment.naam} subregel={[kopSubregel(organisatieNaam, tekst, view.aantalAnderen)]} />
         {view.aantalAnderen === 0 ? (
           <p className="admin-notice">{tekst.geenAnderen}</p>
         ) : (
@@ -80,23 +92,15 @@ export function BenchmarkOrganisatieView({
   if (!rest) {
     return (
       <section className="benchmark-sectie" aria-label={assessment.naam}>
-        <h2>{assessment.naam}</h2>
+        <ResultaatKop eyebrow="Benchmark" titel={assessment.naam} subregel={[kopSubregel(organisatieNaam, tekst, view.aantalAnderen)]} />
         <p className="admin-notice">{tekst.geenAnderen}</p>
       </section>
     );
   }
   return (
     <section className="benchmark-sectie" aria-label={assessment.naam}>
-      <h2>{assessment.naam}</h2>
-      <div className="resultaten-header" style={{ paddingTop: "1rem" }}>
-        {organisatie.overall !== null && (
-          <ScoreCircle score={organisatie.overall} classificatie={classificatie(organisatie.overall)} />
-        )}
-        <p className="mt-4 font-semibold text-ink-m">
-          Overall score van {organisatieNaam}
-          {rest.overall !== null && <> · {tekst.restKort} {organisatieNaam}: {formatScore(rest.overall)}</>}
-        </p>
-      </div>
+      {/* Dezelfde Resultaatkop en Totaalkaart als bij een Meting (`stylesheet.md`, Resultaatkop, Benchmark): De namen van andere leden staan er niet in. */}
+      <ResultaatKop eyebrow="Benchmark" titel={assessment.naam} subregel={[kopSubregel(organisatieNaam, tekst, view.aantalAnderen)]} />
 
       {/* Bij de view van één scan staan de samenvatting van de Respondent en de positie ten opzichte van de groep onder elkaar
           (`visualisatie-scores.md`, J, Niveau 3). Bij een organisatie en een Meting wisselt de schakelaar de weergave. */}
@@ -120,23 +124,26 @@ export function BenchmarkOrganisatieView({
         </div>
       )}
 
+      {organisatie.overall !== null && (
+        <Totaalkaart
+          ring={ringVanScore(organisatie.overall, classificatie(organisatie.overall))}
+          uitleg={CLASSIFICATIE_INFO[classificatie(organisatie.overall)].omschrijving}
+          feiten={[rest.overall !== null && `${tekst.rest}: ${formatScore(rest.overall)}`]}
+        />
+      )}
+
       {(weergave === "overzicht" || niveau === "scans") && (
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <div className="chart-block">
-            <h3>Alle {woorden.meervoud}</h3>
-            <RadarChartView resultaten={organisatie.bouwblokken} vergelijking={rest.bouwblokken} naam={organisatieNaam} vergelijkingNaam={tekst.rest} />
-          </div>
-          <div className="chart-block">
-            <h3>{vlak ? `Scores per ${woorden.enkelvoud}` : "Per categorie"}</h3>
-            <CategoryBarChart
-              resultaten={organisatie.groepen}
-              vergelijking={rest.groepen}
-              horizontaal={vlak}
-              naam={organisatieNaam}
-              vergelijkingNaam={tekst.rest}
-            />
-          </div>
-        </div>
+        <ResultaatKaarten
+          bouwblokResultaten={organisatie.bouwblokken}
+          groepResultaten={organisatie.groepen}
+          vergelijkingBouwblokken={rest.bouwblokken}
+          vergelijkingGroepen={rest.groepen}
+          vlak={vlak}
+          naam={organisatieNaam}
+          vergelijkingNaam={tekst.rest}
+          radarTitel={vlak ? `Per ${woorden.enkelvoud}` : "Per bouwblok"}
+          groepTitel={vlak ? `Scores per ${woorden.enkelvoud}` : "Per categorie"}
+        />
       )}
 
       {(weergave === "bouwblok" || niveau === "scans") && (

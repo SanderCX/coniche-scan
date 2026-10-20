@@ -6,11 +6,11 @@ import { BenchmarkSectie, resultatenVan } from "@/lib/benchmark";
 import { alleBouwblokkenMetGroep, isVlakkeAssessment } from "@/lib/assessment-structuur";
 import { classificatie } from "@/lib/scoring";
 import { gewichtMarkering } from "@/lib/weging";
-import { scoreKleur } from "@/lib/colors";
+import { CLASSIFICATIE_INFO, scoreKleur } from "@/lib/colors";
 import { formatScore } from "@/lib/format";
-import { ScoreCircle } from "@/components/ScoreCircle";
-import { RadarChartView } from "@/components/RadarChartView";
-import { CategoryBarChart } from "@/components/CategoryBarChart";
+import { ringVanScore } from "@/lib/score-ring";
+import { ResultaatKop, Totaalkaart } from "@/components/Resultaatkop";
+import { ResultaatKaarten } from "@/components/ResultaatKaarten";
 import { WeergaveMatrix } from "@/components/visualisatie/WeergaveMatrix";
 import { EenheidInvoer, bouwblokWoorden, matrix } from "@/lib/visualisatie";
 import { OnderdelenWeergaven } from "@/components/visualisatie/OnderdelenWeergaven";
@@ -63,7 +63,6 @@ export function BenchmarkGroepSectie({
   const { assessment, rijen, ontbrekend, teller } = sectie;
   const resultaten = resultatenVan(assessment, sectie.groepAntwoorden);
   const vlak = isVlakkeAssessment(assessment);
-  const eenheid = bouwblokWoorden(assessment).meervoud;
   const onderDrempel = rijen.length < minOrganisaties;
   // De leden als eenheden voor de weergaven A en B: Elk lid telt even zwaar mee, ongeacht het aantal scans.
   const eenheden: EenheidInvoer[] = rijen.map((r) => ({
@@ -80,7 +79,12 @@ export function BenchmarkGroepSectie({
 
   return (
     <section className="benchmark-sectie" aria-label={assessment.naam}>
-      <h2>{assessment.naam}</h2>
+      {/* Dezelfde Resultaatkop en Totaalkaart als bij een Meting (`stylesheet.md`, Resultaatkop, Benchmark). */}
+      <ResultaatKop
+        eyebrow="Benchmark"
+        titel={assessment.naam}
+        subregel={[verkenning ? verkenningTeller(rijen, metOnderdeel) : `${rijen.length} ${rijen.length === 1 ? "organisatie" : "organisaties"} in de groep`]}
+      />
       <p className="benchmark-teller" data-onder-drempel={onderDrempel || undefined}>
         <strong>{verkenning ? verkenningTeller(rijen, metOnderdeel) : `${teller.x} van ${teller.y} organisaties`}</strong>
         {onderDrempel && (
@@ -137,17 +141,19 @@ export function BenchmarkGroepSectie({
         </table>
       ) : (
         <>
-          <div className="resultaten-header" style={{ paddingTop: "1rem" }}>
-            {resultaten.overall !== null && (
-              <ScoreCircle score={resultaten.overall} classificatie={classificatie(resultaten.overall)} />
-            )}
-            <p className="mt-4 font-semibold text-ink-m">Gemiddelde van de groep</p>
-          </div>
-
           <OnderdelenWeergaven
             assessment={assessment}
             eenheden={eenheden}
             eenheid={eenheidTekst}
+            onderSchakelaar={
+              resultaten.overall !== null && (
+                <Totaalkaart
+                  ring={ringVanScore(resultaten.overall, classificatie(resultaten.overall))}
+                  uitleg={CLASSIFICATIE_INFO[classificatie(resultaten.overall)].omschrijving}
+                  feiten={["Elke organisatie telt even zwaar mee"]}
+                />
+              )
+            }
             // Bij een opgeslagen verkenning op één Organisatie is het detail weergave I: Gemiddeld of Naast elkaar, met de onderdelen als
             // eenheid (`benchmark.md`, Opgeslagen verkenning, Detail en perspectief). Anders alleen het gemiddelde met de lijn.
             toonAlsKeuze={enkeleOrganisatie}
@@ -185,16 +191,14 @@ export function BenchmarkGroepSectie({
                   </tbody>
                 </table>
 
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                  <div className="chart-block">
-                    <h3>Alle {eenheid}</h3>
-                    <RadarChartView resultaten={resultaten.bouwblokken} naam="Groep" />
-                  </div>
-                  <div className="chart-block">
-                    <h3>{vlak ? `Scores per ${woorden.enkelvoud}` : "Per categorie"}</h3>
-                    <CategoryBarChart resultaten={resultaten.groepen} horizontaal={vlak} />
-                  </div>
-                </div>
+                <ResultaatKaarten
+                  bouwblokResultaten={resultaten.bouwblokken}
+                  groepResultaten={resultaten.groepen}
+                  vlak={vlak}
+                  naam="Groep"
+                  radarTitel={vlak ? `Per ${woorden.enkelvoud}` : "Per bouwblok"}
+                  groepTitel={vlak ? `Scores per ${woorden.enkelvoud}` : "Per categorie"}
+                />
 
 
                 <h3 style={{ marginTop: "2rem" }}>Per {woorden.enkelvoud} en per vraag</h3>

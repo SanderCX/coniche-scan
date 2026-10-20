@@ -1,4 +1,5 @@
 import { Assessment, Bouwblok } from "./types";
+import { domeinKleur } from "./colors";
 
 /**
  * Normaliseert een Assessment naar "groepen" van bouwblokken: categorieën als
@@ -54,9 +55,14 @@ export function alleBouwblokkenMetGroep(assessment: Assessment): BouwblokMetGroe
       bouwblok,
       groepId: groep.id,
       groepNaam: groep.naam,
-      groepKleur: groep.kleur,
+      groepKleur: kleurVan(groep, bouwblok),
     }))
   );
+}
+
+/** De kleur van een bouwblok: Die van zijn categorie, en zonder categorielaag de kleur van het domein (`domeinKleur`). */
+function kleurVan(groep: Groep, bouwblok: Bouwblok): string | null {
+  return groep.kleur ?? (groep.id === "_vlak" ? domeinKleur(bouwblok.volgnummer) : null);
 }
 
 export function alleVragen(assessment: Assessment) {
@@ -88,7 +94,7 @@ export function actieveBouwblokkenMetGroep(assessment: Assessment): BouwblokMetG
       bouwblok: { ...bouwblok, vragen: bouwblok.vragen.filter((v) => !v.gearchiveerd) },
       groepId: groep.id,
       groepNaam: groep.naam,
-      groepKleur: groep.kleur,
+      groepKleur: kleurVan(groep, bouwblok),
     }))
   );
 }

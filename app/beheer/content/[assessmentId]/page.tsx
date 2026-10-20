@@ -7,7 +7,7 @@ import { Categorie, ContentBron } from "@/lib/types";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { BouwblokEditor } from "@/components/beheer/BouwblokEditor";
 import { addCategorie, patchCategorie, removeCategorie, herstelCategorie, addBouwblok, herstelBouwblok, schakelCategorieLaag, patchFeatureCard, addFeatureCard, removeFeatureCard } from "@/lib/assessment-bewerken";
-import { CATEGORIE_COLORS } from "@/lib/colors";
+import { CATEGORIE_COLORS, CATEGORIE_KLEUR_KEUZES } from "@/lib/colors";
 import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { AssessmentVerwijderen } from "@/components/beheer/AssessmentVerwijderen";
@@ -415,7 +415,7 @@ export default function ContentEditorPage({
                       onClick={(e) => e.stopPropagation()}
                       className="rounded-lg border border-gray-200 p-1.5 text-sm"
                     >
-                      {Object.keys(CATEGORIE_COLORS).map((k) => (
+                      {CATEGORIE_KLEUR_KEUZES.map((k) => (
                         <option key={k} value={k}>
                           {k}
                         </option>

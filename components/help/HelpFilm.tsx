@@ -1,11 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { CATEGORIE_COLORS, DOMEIN_KLEUREN } from "@/lib/colors";
+import { FilmVariant, filmVariant, filmWeging } from "@/lib/film";
+import { Assessment } from "@/lib/types";
 
 /**
  * De films van de Help (`help.md`, Films): Korte, bewegende uitleg gebouwd met CSS-animaties in de kleuren en de balken van de app, geen
  * video. Elke film heeft stapkaarten die ook het tekstalternatief zijn, een pauzeknop, een beschrijving voor schermlezers en een
  * eindbeeld voor wie verminderde beweging aan heeft (`app/styles/help.css`). Alle cijfers zijn voorbeelddata.
+ *
+ * "Wat krijg ik" heeft een variant per Assessment-type (`lib/film.ts`, `filmVariant`): Categorieën (Klantcontact Volwassenheid en de
+ * Zorgscan, die er de weging bij toont), domeinen (de AI-scan) en percentages (de Quickscan). Zonder Assessment, zoals in Help, is het de
+ * variant met categorieën.
  */
 export type FilmNaam = "wat-krijg-ik" | "meetperiode";
 
@@ -17,45 +24,157 @@ const CATEGORIEEN = [
   { naam: "Fundament", kleur: "var(--ye)", score: 2.3, laag: 1.9, hoog: 3.0, groep: 2.5 },
 ];
 
+/** De acht domeinen van de AI-scan met voorbeelddata (`help.md`, Films, AI-scan): De score en het gemiddelde van de groep, in de volgorde 1 tot en met 8. */
+const DOMEINEN = [
+  { naam: "Strategie en governance", score: 2.8, groep: 3.9 },
+  { naam: "Data, integratie en architectuur", score: 2.4, groep: 3.8 },
+  { naam: "Use-cases en automatisering", score: 2.0, groep: 3.4 },
+  { naam: "Performance, monitoring en kwaliteit", score: 2.0, groep: 3.4 },
+  { naam: "Mensen, skills en adoptie", score: 2.4, groep: 3.8 },
+  { naam: "Security, risk en compliance", score: 3.6, groep: 4.0 },
+  { naam: "Operating model en schaalbaarheid", score: 2.2, groep: 3.7 },
+  { naam: "Klant- en kanaalervaring", score: 2.2, groep: 3.4 },
+];
+
+/** De vier afdelingen van de Quickscan met voorbeeldpercentages (`help.md`, Films, Quickscan). Het bereik is voorbeelddata van mij: De spec noemt alleen het gemiddelde. */
+const AFDELINGEN = [
+  { naam: "Poliklinieken", score: 85, laag: 51, hoog: 93, groep: 72 },
+  { naam: "Verpleegafdelingen", score: 64, laag: 44, hoog: 90, groep: 70 },
+  { naam: "Receptie / Centrale", score: 47, laag: 30, hoog: 81, groep: 58 },
+  { naam: "Patiëntenservice", score: 36, laag: 27, hoog: 77, groep: 52 },
+];
+
 const komma = (n: number) => n.toFixed(1).replace(".", ",");
 /** De plek op een spoor van 1 tot 5, in procenten. */
 const plek = (n: number) => ((n - 1) / 4) * 100;
+/** De klassekleur van een percentage bij de Quickscan: Groen vanaf 80%, oranje vanaf 50%, anders rood. */
+const klassekleur = (p: number) => (p >= 80 ? "var(--stat-green)" : p >= 50 ? "var(--stat-amber)" : "var(--stat-red)");
+const domeinHex = (i: number) => CATEGORIE_COLORS[DOMEIN_KLEUREN[i % DOMEIN_KLEUREN.length]].hex;
 
-function WatKrijgIkPodium() {
+/** De ring met de score erin: De vulling en de kleur komen mee (`--ring-vul`, `--ring-kleur`). */
+function Ring({ getal, vul, kleur, klasse, extra }: { getal: string; vul: number; kleur: string; klasse: string; extra?: string }) {
   return (
-    <>
+    <div className="film-totaal">
+      <span className="film-cirkel" style={{ ["--ring-vul" as string]: `${vul}%`, ["--ring-kleur" as string]: kleur }}>
+        {getal}
+      </span>
+      <span className="film-klasse">{klasse}</span>
+      {extra && <span className="film-weging">{extra}</span>}
+    </div>
+  );
+}
+
+function Vraag({ variant }: { variant: FilmVariant }) {
+  if (variant === "quickscan") {
+    return (
       <div className="film-vraag">
-        <p className="film-vraag-tekst">Er is een actueel overzicht van alle kanalen waarop klanten ons bereiken.</p>
+        <p className="film-vraag-tekst">Er is een actueel overzicht van alle kanalen waarop patiënten ons bereiken.</p>
         <div className="film-schaal">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <span key={n} className={`film-keuze film-keuze--${n}`}>
-              {n}
+          {["Ja", "Nee", "Weet ik niet"].map((t) => (
+            <span key={t} className={`film-keuze film-keuze--tekst ${t === "Ja" ? "film-keuze--4" : ""}`}>
+              {t}
             </span>
           ))}
         </div>
-        <p className="film-vraag-hint">1 is niet aanwezig, 5 is geoptimaliseerd en continu verbeterd</p>
+        <p className="film-vraag-hint">Weet je het niet, kies dan Weet ik niet</p>
       </div>
-      <div className="film-resultaat">
-        <div className="film-totaal">
-          <span className="film-cirkel">3,4</span>
-          <span className="film-klasse">Uitbouwen</span>
-        </div>
-        <div className="film-rijen">
-          {CATEGORIEEN.map((c, i) => (
-            <div key={c.naam} className="film-rij">
-              <span className="film-naam">{c.naam}</span>
-              <div className="film-spoor">
-                <span className={`film-balk film-balk--${i + 1}`} style={{ width: `${plek(c.score)}%`, background: c.kleur }} />
-                <span className="film-groeplijn" style={{ left: `${plek(c.laag)}%`, width: `${plek(c.hoog) - plek(c.laag)}%` }} />
-                <span className="film-stip" style={{ left: `${plek(c.groep)}%`, background: c.kleur }} />
-              </div>
-              <span className="film-getal">{komma(c.score)}</span>
+    );
+  }
+  return (
+    <div className="film-vraag">
+      <p className="film-vraag-tekst">Er is een actueel overzicht van alle kanalen waarop klanten ons bereiken.</p>
+      <div className="film-schaal">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <span key={n} className={`film-keuze film-keuze--${n}`}>
+            {n}
+          </span>
+        ))}
+      </div>
+      <p className="film-vraag-hint">1 is niet aanwezig, 5 is geoptimaliseerd en continu verbeterd</p>
+    </div>
+  );
+}
+
+function Rijen({ variant }: { variant: FilmVariant }) {
+  if (variant === "domeinen") {
+    return (
+      <div className="film-rijen film-rijen--domeinen">
+        {DOMEINEN.map((d, i) => (
+          <div key={d.naam} className="film-rij film-rij--domein">
+            <span className="film-nr" style={{ ["--domein-kleur" as string]: domeinHex(i) }} aria-hidden="true">
+              {i + 1}
+            </span>
+            <span className="film-naam">{d.naam}</span>
+            <div className="film-spoor">
+              <span className="film-grens" style={{ left: `${plek(2.5)}%` }} />
+              <span className="film-grens" style={{ left: `${plek(3.5)}%` }} />
+              <span className={`film-balk film-balk--${i + 1}`} style={{ width: `${plek(d.score)}%`, background: domeinHex(i) }} />
+              <span className="film-stip" style={{ left: `${plek(d.groep)}%`, background: domeinHex(i) }} />
             </div>
-          ))}
+            <span className="film-getal">{komma(d.score)}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (variant === "quickscan") {
+    return (
+      <div className="film-rijen film-rijen--quickscan">
+        {AFDELINGEN.map((a, i) => (
+          <div key={a.naam} className="film-rij film-rij--afdeling">
+            <span className="film-naam">{a.naam}</span>
+            <div className="film-spoor">
+              <span className="film-grens" style={{ left: "50%" }} />
+              <span className="film-grens" style={{ left: "80%" }} />
+              <span className={`film-balk film-balk--${i + 1}`} style={{ width: `${a.score}%`, background: klassekleur(a.score) }} />
+              <span className="film-groeplijn" style={{ left: `${a.laag}%`, width: `${a.hoog - a.laag}%` }} />
+              <span className="film-stip" style={{ left: `${a.groep}%`, background: klassekleur(a.score) }} />
+            </div>
+            <span className="film-getal">{a.score}%</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return (
+    <div className="film-rijen">
+      {CATEGORIEEN.map((c, i) => (
+        <div key={c.naam} className="film-rij">
+          <span className="film-naam">{c.naam}</span>
+          <div className="film-spoor">
+            <span className={`film-balk film-balk--${i + 1}`} style={{ width: `${plek(c.score)}%`, background: c.kleur }} />
+            <span className="film-groeplijn" style={{ left: `${plek(c.laag)}%`, width: `${plek(c.hoog) - plek(c.laag)}%` }} />
+            <span className="film-stip" style={{ left: `${plek(c.groep)}%`, background: c.kleur }} />
+          </div>
+          <span className="film-getal">{komma(c.score)}</span>
         </div>
+      ))}
+    </div>
+  );
+}
+
+function WatKrijgIkPodium({ variant, weging }: { variant: FilmVariant; weging: string | null }) {
+  return (
+    <>
+      <Vraag variant={variant} />
+      <div className="film-resultaat">
+        {variant === "quickscan" ? (
+          <Ring getal="58%" vul={58} kleur="var(--stat-amber)" klasse="Gemiddeld ontwikkeld" />
+        ) : variant === "domeinen" ? (
+          // 2,5 rondt af op 3 en is dus geel (`--score-3`), gevuld tot (2,5 - 1) / 4.
+          <Ring getal="2,5" vul={plek(2.5)} kleur="var(--score-3)" klasse="Uitbouwen" />
+        ) : (
+          // 3,4 rondt af op 3 en is dus geel (`--score-3`, `help.md`, Films, Ring), gevuld tot (3,4 - 1) / 4.
+          <Ring getal="3,4" vul={plek(3.4)} kleur="var(--score-3)" klasse="Uitbouwen" extra={weging ?? undefined} />
+        )}
+        <Rijen variant={variant} />
         <p className="film-legenda">
           <span className="film-legenda-teken film-legenda-stip" /> Gemiddelde van de groep
-          <span className="film-legenda-teken film-legenda-lijn" /> Laagste tot hoogste score
+          {variant !== "domeinen" && (
+            <>
+              <span className="film-legenda-teken film-legenda-lijn" /> {variant === "quickscan" ? "Laagste tot hoogste percentage" : "Laagste tot hoogste score"}
+            </>
+          )}
         </p>
       </div>
     </>
@@ -92,37 +211,86 @@ function MeetperiodePodium() {
   );
 }
 
-const FILMS: Record<FilmNaam, { titel: string; duur: number; beschrijving: string; stappen: string[]; Podium: () => React.ReactElement }> = {
-  "wat-krijg-ik": {
+interface FilmGegevens {
+  titel: string;
+  duur: number;
+  beschrijving: string;
+  stappen: string[];
+  podium: React.ReactElement;
+}
+
+const STAP_3 = "Een Lead ziet er het gemiddelde en de spreiding van de groep bij, zodra er genoeg scans zijn.";
+
+/** "Wat krijg ik" voor een variant (`help.md`, Films, Varianten van Wat krijg ik per Assessment-type). */
+function watKrijgIk(variant: FilmVariant, weging: { regel: string; zin: string } | null): FilmGegevens {
+  const podium = <WatKrijgIkPodium variant={variant} weging={weging?.regel ?? null} />;
+  if (variant === "quickscan") {
+    return {
+      titel: "Wat krijg ik?",
+      duur: 16,
+      beschrijving:
+        "Een voorbeeldvraag wordt beantwoord met Ja. Direct daarna verschijnt het resultaat met het totaalpercentage 58 en een staaf per afdeling, in de kleur van de klasse. Als laatste komen bij elke afdeling een stip met het gemiddelde van de groep en een grijze lijn van het laagste tot het hoogste percentage.",
+      stappen: ["Je beantwoordt een vraag met Ja, Nee of Weet ik niet.", "Direct daarna zie je je resultaat: het totaalpercentage en een staaf per afdeling.", STAP_3],
+      podium,
+    };
+  }
+  if (variant === "domeinen") {
+    return {
+      titel: "Wat krijg ik?",
+      duur: 16,
+      beschrijving:
+        "Een voorbeeldvraag wordt beantwoord met een score van 4 op een schaal van 1 tot 5. Direct daarna verschijnt het resultaat met de totaalscore 2,5 en een staaf per domein, in de kleur van het domein. Als laatste komt bij elk domein een stip met het gemiddelde van de groep.",
+      stappen: ["Je beantwoordt een vraag met een score van 1 tot 5.", "Direct daarna zie je je resultaat: de totaalscore en een staaf per domein.", STAP_3],
+      podium,
+    };
+  }
+  return {
     titel: "Wat krijg ik?",
     duur: 16,
     beschrijving:
-      "Een voorbeeldvraag wordt beantwoord met een score van 4 op een schaal van 1 tot 5. Direct daarna verschijnt het resultaat met de totaalscore 3,4 en een staaf per categorie. Als laatste komen bij elke categorie een stip met het gemiddelde van de groep en een grijze lijn van de laagste tot de hoogste score.",
+      "Een voorbeeldvraag wordt beantwoord met een score van 4 op een schaal van 1 tot 5. Direct daarna verschijnt het resultaat met de totaalscore 3,4 en een staaf per categorie." +
+      (weging ? ` ${weging.regel}.` : "") +
+      " Als laatste komen bij elke categorie een stip met het gemiddelde van de groep en een grijze lijn van de laagste tot de hoogste score.",
     stappen: [
       "Je beantwoordt een vraag met een score van 1 tot 5.",
-      "Direct daarna zie je je resultaat: de totaalscore en een staaf per categorie.",
-      "Een Lead ziet er het gemiddelde en de spreiding van de groep bij, zodra er genoeg scans zijn.",
+      "Direct daarna zie je je resultaat: de totaalscore en een staaf per categorie." + (weging ? ` ${weging.zin}` : ""),
+      STAP_3,
     ],
-    Podium: WatKrijgIkPodium,
-  },
-  meetperiode: {
-    titel: "De Meetperiode kiezen",
-    duur: 12,
-    beschrijving:
-      "De keuze bij Meetperiode gaat van Meest recente naar Periode. Er komen twee datums bij, en het aantal Organisaties in de pool daalt van 38 naar 32 van de 44.",
-    stappen: [
-      "Kies bij Meetperiode voor Periode in plaats van Meest recente.",
-      "Vul de twee datums in. Per Organisatie telt de laatste Meting in die periode.",
-      "De pool wordt kleiner: Organisaties zonder Meting in de periode doen niet mee.",
-    ],
-    Podium: MeetperiodePodium,
-  },
+    podium,
+  };
+}
+
+const MEETPERIODE: FilmGegevens = {
+  titel: "De Meetperiode kiezen",
+  duur: 12,
+  beschrijving:
+    "De keuze bij Meetperiode gaat van Meest recente naar Periode. Er komen twee datums bij, en het aantal Organisaties in de pool daalt van 38 naar 32 van de 44.",
+  stappen: [
+    "Kies bij Meetperiode voor Periode in plaats van Meest recente.",
+    "Vul de twee datums in. Per Organisatie telt de laatste Meting in die periode.",
+    "De pool wordt kleiner: Organisaties zonder Meting in de periode doen niet mee.",
+  ],
+  podium: <MeetperiodePodium />,
 };
 
-export function HelpFilm({ naam, knop, opmerking }: { naam: FilmNaam; knop?: React.ReactNode; opmerking?: string }) {
-  const film = FILMS[naam];
+/**
+ * `assessment`: Bij "Wat krijg ik" op de landingspagina van een Assessment bepaalt het type de variant van de film. In Help is er geen
+ * Assessment en staat de variant met categorieën.
+ */
+export function HelpFilm({
+  naam,
+  knop,
+  opmerking,
+  assessment,
+}: {
+  naam: FilmNaam;
+  knop?: React.ReactNode;
+  opmerking?: string;
+  assessment?: Assessment | null;
+}) {
+  const variant = naam === "wat-krijg-ik" ? filmVariant(assessment) : "categorieen";
+  const film = naam === "wat-krijg-ik" ? watKrijgIk(variant, variant === "categorieen" ? filmWeging(assessment) : null) : MEETPERIODE;
   const [pauze, setPauze] = useState(false);
-  const Podium = film.Podium;
   return (
     <section className="help-kaart help-film-kaart" aria-label={`Film: ${film.titel}`}>
       <div className="help-film-kop">
@@ -134,9 +302,13 @@ export function HelpFilm({ naam, knop, opmerking }: { naam: FilmNaam; knop?: Rea
           {pauze ? "Afspelen" : "Pauzeer"}
         </button>
       </div>
-      <div className={`help-film help-film--${naam}`} data-pauze={pauze ? "ja" : undefined} style={{ ["--film-duur" as string]: `${film.duur}s` }}>
+      <div
+        className={`help-film help-film--${naam} help-film--${variant}`}
+        data-pauze={pauze ? "ja" : undefined}
+        style={{ ["--film-duur" as string]: `${film.duur}s` }}
+      >
         <div className="help-film-podium" aria-hidden="true">
-          <Podium />
+          {film.podium}
         </div>
         <p className="sr-only">{film.beschrijving}</p>
         <ol className="help-film-stappen">

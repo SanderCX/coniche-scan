@@ -380,7 +380,7 @@ export const zorgscan: Assessment = {
   naam: "Klantcontact Volwassenheid – Zorg",
   subtitel: "±30 minuten. Heldere inzichten. Direct verbeterkansen.",
   beschrijving:
-    "Breng in kaart hoe volwassen het patiënt- of cliëntcontact van jouw zorg- of welzijnsorganisatie is op 15 bouwblokken, verdeeld over 5 pijlers — van strategie tot cultuur. Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken.",
+    "Breng in kaart hoe volwassen het patiënt- of cliëntcontact van jouw zorg- of welzijnsorganisatie is. Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken.",
   doelgroep: "Praktijkmanagers, zorgcoördinatoren en teamleads binnen zorg- en welzijnsorganisaties",
   // Hartje-outline, zelfde SVG-lijnstijl als "target" (Klantcontact
   // Volwassenheid) en "sparkle" (AI-volwassenheid), op verzoek van Sander

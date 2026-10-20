@@ -45,6 +45,13 @@ export default function PrivacyPage() {
           organisatiekenmerken zoals klantvolumes, kanaalgebruik, techstack en KPI&apos;s.
         </p>
         <p>
+          <strong>Van contactpersonen bij een organisatie</strong> (alleen ingevuld door een Admin):
+          naam, functie, het LinkedIn-profiel en een zakelijke notitie, uit openbare bronnen, ter
+          voorbereiding van gesprekken. Geen privégegevens. Zij zijn geen gebruiker van de app, doen
+          niet mee aan een scan en krijgen niets toegestuurd. Wie niet als contactpersoon vermeld wil
+          staan, kan Coniche vragen het te verwijderen.
+        </p>
+        <p>
           <strong>Van beheerders</strong> (Coniche-medewerkers): e-mailadres en naam voor het
           beheeraccount.
         </p>

@@ -33,7 +33,16 @@ export const KLASSE_LABEL: Record<Classificatie, string> = {
 export function bouwblokWoorden(assessment: Pick<Assessment, "bouwblokEenheidEnkelvoud" | "bouwblokEenheidMeervoud">): { enkelvoud: string; meervoud: string } {
   const enkelvoud = assessment.bouwblokEenheidEnkelvoud;
   if (enkelvoud.toLowerCase() === "bouwsteen") return { enkelvoud: "bouwblok", meervoud: "bouwblokken" };
-  return { enkelvoud: enkelvoud.toLowerCase(), meervoud: assessment.bouwblokEenheidMeervoud.toLowerCase() };
+  return { enkelvoud: kleineLetter(enkelvoud), meervoud: kleineLetter(assessment.bouwblokEenheidMeervoud) };
+}
+
+/**
+ * Midden in een zin: Alleen de eerste letter van het woord in een kleine letter, behalve als het woord met een afkorting begint ("AI-domeinen",
+ * niet "ai-domeinen", `stylesheet.md`, Schrijfwijze). Bij een woord in kleine letters verandert er niets.
+ */
+export function kleineLetter(woord: string): string {
+  if (/^[A-Z]{2,}/.test(woord)) return woord;
+  return woord.charAt(0).toLowerCase() + woord.slice(1);
 }
 
 /** Eén decimaal, met `toFixed(1)` zoals de rest van de app (`CLAUDE.md`, Afronding). */

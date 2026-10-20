@@ -3,14 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { middelAntwoorden, resultatenVan, ScanSectie } from "@/lib/benchmark";
-import { scoreKleur } from "@/lib/colors";
+import { CLASSIFICATIE_INFO, scoreKleur } from "@/lib/colors";
 import { formatScore } from "@/lib/format";
 import { classificatie } from "@/lib/scoring";
+import { ringVanScore } from "@/lib/score-ring";
 import { isVlakkeAssessment } from "@/lib/assessment-structuur";
 import { bouwblokWoorden, spreiding } from "@/lib/visualisatie";
-import { ScoreCircle } from "@/components/ScoreCircle";
-import { RadarChartView } from "@/components/RadarChartView";
-import { CategoryBarChart } from "@/components/CategoryBarChart";
+import { ResultaatKop, Totaalkaart } from "@/components/Resultaatkop";
+import { ResultaatKaarten } from "@/components/ResultaatKaarten";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
 import { WeergaveSpreiding } from "@/components/visualisatie/WeergaveSpreiding";
 
@@ -48,10 +48,7 @@ export function BenchmarkScanSectie({
 
   return (
     <section className="benchmark-sectie" aria-label={assessment.naam}>
-      <h2>{assessment.naam}</h2>
-      <p className="text-sm text-ink-m">
-        {organisatie.naam} · {meting.label}
-      </p>
+      <ResultaatKop eyebrow="Benchmark" titel={assessment.naam} subregel={[organisatie.naam, meting.label]} />
       <p className="benchmark-teller" data-onder-drempel={onderGrens || undefined}>
         <strong>
           {scans.length} {scans.length === 1 ? "afgeronde scan" : "afgeronde scans"}
@@ -71,23 +68,22 @@ export function BenchmarkScanSectie({
               onChange={setWeergave}
             />
           </div>
+          {resultaten.overall !== null && (
+            <Totaalkaart
+              ring={ringVanScore(resultaten.overall, classificatie(resultaten.overall))}
+              uitleg={CLASSIFICATIE_INFO[classificatie(resultaten.overall)].omschrijving}
+              feiten={[`Gemiddelde van ${scans.length} afgeronde ${scans.length === 1 ? "scan" : "scans"}`, "Elke scan telt even zwaar mee"]}
+            />
+          )}
           {weergave === "overzicht" && (
-            <>
-              <div className="resultaten-header" style={{ paddingTop: "1rem" }}>
-                {resultaten.overall !== null && <ScoreCircle score={resultaten.overall} classificatie={classificatie(resultaten.overall)} />}
-                <p className="mt-4 font-semibold text-ink-m">Gemiddelde van de Meting</p>
-              </div>
-              <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                <div className="chart-block">
-                  <h3>Alle {woorden.meervoud}</h3>
-                  <RadarChartView resultaten={resultaten.bouwblokken} naam="Meting" />
-                </div>
-                <div className="chart-block">
-                  <h3>{vlak ? `Scores per ${woorden.enkelvoud}` : "Per categorie"}</h3>
-                  <CategoryBarChart resultaten={resultaten.groepen} horizontaal={vlak} />
-                </div>
-              </div>
-            </>
+            <ResultaatKaarten
+              bouwblokResultaten={resultaten.bouwblokken}
+              groepResultaten={resultaten.groepen}
+              vlak={vlak}
+              naam="Meting"
+              radarTitel={vlak ? `Per ${woorden.enkelvoud}` : "Per bouwblok"}
+              groepTitel={vlak ? `Scores per ${woorden.enkelvoud}` : "Per categorie"}
+            />
           )}
           {weergave === "spreiding" && <WeergaveSpreiding assessment={assessment} weergave={spreiding(assessment, scans.map((s) => s.invulling))} />}
         </>
