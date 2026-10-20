@@ -192,6 +192,11 @@
   color: var(--ink-s);
   white-space: nowrap;
 }
+.cat-nummers {
+  display: block;
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
 .cat-uitleg {
   margin: var(--sp-4) 0 0;
   font-size: var(--fs-12);
@@ -209,7 +214,7 @@
     top: 0;
     bottom: 0;
     height: auto;
-    left: 128px;
+    left: 158px;
   }
   .cat-lijn {
     top: 0;
@@ -231,11 +236,78 @@
   }
   .cat-naam {
     order: -1;
-    width: 120px;
+    width: 150px;
     margin: 0 var(--sp-2) 0 0;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .cat-nummers {
+    display: inline;
+  }
+  .cat-nummers::before {
+    content: " · ";
+  }
+  .cat-spoor {
+    flex: 1;
+    width: auto;
+    height: 28px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .cat-balk {
+    width: calc(var(--p) * 1%);
+    height: 24px;
+    border-radius: 0 6px 6px 0;
+  }
+}
+
+/* Hetzelfde in een kaart die smaller is dan de plot (twee kaarten naast elkaar op een smal scherm). */
+@container (max-width: 499px) {
+  .cat-plot {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 0;
+  }
+  .cat-as {
+    display: none;
+  }
+  .cat-raster {
+    top: 0;
+    bottom: 0;
+    height: auto;
+    left: 158px;
+  }
+  .cat-lijn {
+    top: 0;
+    bottom: 0;
+    left: calc(var(--q) * 1%);
+    right: auto;
+    border-top: 0;
+    border-left: 1px solid var(--border);
+  }
+  .cat-lijn--klasse {
+    border-left: 1px dashed #9a978f;
+  }
+  .cat-kolommen {
+    flex-direction: column;
+    gap: var(--sp-3);
+  }
+  .cat-item {
+    flex-direction: row;
+  }
+  .cat-naam {
+    order: -1;
+    width: 150px;
+    margin: 0 var(--sp-2) 0 0;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cat-nummers {
+    display: inline;
+  }
+  .cat-nummers::before {
+    content: " · ";
   }
   .cat-spoor {
     flex: 1;
@@ -255,7 +327,7 @@
 .radar-vlak {
   position: relative;
   width: 100%;
-  max-width: 432px;
+  max-width: 372px;
   margin: 0 auto;
 }
 .radar-vlak svg {
@@ -308,23 +380,4 @@
   top: 50%;
   margin-top: -6px;
   border-right-color: var(--ink);
-}
-.radar-categorieen {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--sp-2) var(--sp-4);
-  margin: var(--sp-4) 0 0;
-  font-size: var(--fs-12);
-  color: var(--ink-m);
-}
-.radar-categorieen span {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-}
-.radar-categorieen i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
 }

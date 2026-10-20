@@ -1,5 +1,6 @@
 import { Classificatie } from "@/lib/types";
-import { KLASSE_STIJL } from "./gedeeld";
+import { ScoreRing } from "@/components/ScoreRing";
+import { KLASSE_STIJL, klasseNaam } from "./gedeeld";
 
 interface AfdelingRij {
   categorie: { id: string; naam: string };
@@ -20,7 +21,19 @@ function Kolom({ titel, afdelingen }: { titel: string; afdelingen: AfdelingRij[]
             style={a.klasse ? { background: KLASSE_STIJL[a.klasse].vulling, borderColor: KLASSE_STIJL[a.klasse].rand } : undefined}
           >
             <span>{a.categorie.naam}</span>
-            <strong style={{ color: a.klasse ? KLASSE_STIJL[a.klasse].tekst : undefined }}>{a.percentage ?? 0}%</strong>
+            <ScoreRing
+              mini
+              metChip={false}
+              ring={{
+                fractie: (a.percentage ?? 0) / 100,
+                kleur: a.klasse ? KLASSE_STIJL[a.klasse].kleur : "var(--border-d)",
+                getal: `${a.percentage ?? 0}%`,
+                klasseNaam: a.klasse ? klasseNaam(a.klasse) : "",
+                chipAchtergrond: "",
+                chipTekst: "",
+              }}
+              alt={`${a.categorie.naam}: ${a.percentage ?? 0}%${a.klasse ? `, ${klasseNaam(a.klasse)}` : ""}`}
+            />
           </div>
         ))}
       </div>

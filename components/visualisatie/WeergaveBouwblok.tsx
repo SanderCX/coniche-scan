@@ -30,9 +30,9 @@ export function WeergaveBouwblok({
     <div className="vis" data-weergave="bouwblok">
       <Tegels
         tegels={[
-          { label: "Totaalscore", waarde: toon(totaal), sub: totaalKlasse ? KLASSE_LABEL[totaalKlasse] : undefined },
-          { label: `Hoogste ${woorden.enkelvoud}`, waarde: toon(hoogsteBouwblok?.score), sub: hoogsteBouwblok?.naam },
-          { label: `Laagste ${woorden.enkelvoud}`, waarde: toon(laagsteBouwblok?.score), sub: laagsteBouwblok?.naam },
+          { label: "Totaalscore", waarde: toon(totaal), score: totaal, sub: totaalKlasse ? KLASSE_LABEL[totaalKlasse] : undefined },
+          { label: `Hoogste ${woorden.enkelvoud}`, waarde: toon(hoogsteBouwblok?.score), score: hoogsteBouwblok?.score, sub: hoogsteBouwblok?.naam },
+          { label: `Laagste ${woorden.enkelvoud}`, waarde: toon(laagsteBouwblok?.score), score: laagsteBouwblok?.score, sub: laagsteBouwblok?.naam },
           {
             label: `Verdeling van de ${woorden.meervoud}`,
             waarde: `${verdeling.rood} · ${verdeling.oranje} · ${verdeling.groen}`,

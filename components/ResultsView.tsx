@@ -17,6 +17,7 @@ import { CLASSIFICATIE_INFO } from "@/lib/colors";
 import { celStap } from "@/lib/mijn-metingen";
 import { ResultaatKop, Totaalkaart } from "./Resultaatkop";
 import { ringVanScore } from "@/lib/score-ring";
+import { ScoreRing } from "@/components/ScoreRing";
 import { RadarChartView } from "./RadarChartView";
 import { CategoryBarChart } from "./CategoryBarChart";
 
@@ -28,7 +29,7 @@ import { CategoryBarChart } from "./CategoryBarChart";
 function scoreTint(score: number | null): React.CSSProperties {
   if (score === null) return {};
   const n = celStap(score);
-  return { background: `var(--score-${n}-faint)`, borderColor: `var(--score-${n}-cel)`, ["--score-tekst" as string]: `var(--score-${n}-cel-tekst)` } as React.CSSProperties;
+  return { background: `var(--score-${n}-faint)`, borderColor: `var(--score-${n}-cel)` } as React.CSSProperties;
 }
 
 /** De stip bij een klasse: De klassekleur (`stylesheet.md`, Resultaatkop, Classificatie). */
@@ -40,7 +41,6 @@ export function ResultsView({
   antwoorden,
   relevantie,
   respondentNaam,
-  isPreview = false,
   bouwblokHref,
   toonKop = true,
   eyebrow = "Jouw resultaat",
@@ -53,7 +53,6 @@ export function ResultsView({
   /** Alleen bij een Assessment met optionele categorieën (de Quickscan): Welke afdelingen van toepassing zijn. */
   relevantie?: Record<string, boolean>;
   respondentNaam?: string | null;
-  isPreview?: boolean;
   /** Als gezet: bouwblokken in de top 3-lijsten linken hiernaartoe om het antwoord aan te passen. */
   bouwblokHref?: (bouwblokId: string) => string;
   /**
@@ -79,7 +78,6 @@ export function ResultsView({
         antwoorden={antwoorden}
         relevantie={relevantie}
         respondentNaam={respondentNaam}
-        isPreview={isPreview}
         toonKop={toonKop}
         eyebrow={eyebrow}
         subregel={subregel}
@@ -101,12 +99,6 @@ export function ResultsView({
     <div>
 
       {toonKop && <ResultaatKop eyebrow={eyebrow} titel={assessment.naam} subregel={subregel ?? [respondentNaam]} rechts={kopRechts} />}
-      {isPreview && (
-        <div className="preview-banner">
-          Dit is een voorbeeld met demo-data — zo ziet jouw resultatenscherm eruit na afronding
-          van de scan.
-        </div>
-      )}
       {overall !== null && (
         <Totaalkaart
           ring={ringVanScore(overall, classificatie(overall))}
@@ -145,7 +137,12 @@ export function ResultsView({
                     {gewichtMarkering(r.bouwblok)}
                   </span>
                 )}
-                <span className="score-pill">{formatScore(r.score)}</span>
+                <ScoreRing
+                  mini
+                  metChip={false}
+                  ring={ringVanScore(r.score, classificatie(r.score))}
+                  alt={`${r.bouwblok.naam}: ${formatScore(r.score)}`}
+                />
               </li>
             ))}
           </ol>
@@ -167,7 +164,12 @@ export function ResultsView({
                     {gewichtMarkering(r.bouwblok)}
                   </span>
                 )}
-                <span className="score-pill">{formatScore(r.score)}</span>
+                <ScoreRing
+                  mini
+                  metChip={false}
+                  ring={ringVanScore(r.score, classificatie(r.score))}
+                  alt={`${r.bouwblok.naam}: ${formatScore(r.score)}`}
+                />
               </li>
             ))}
           </ol>

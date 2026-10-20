@@ -171,6 +171,8 @@ export interface GroepResultaat {
   score: number | null;
   /** Alleen bij een platte assessment (de groep is het bouwblok): het gewicht, voor de factor bij de naam. */
   gewicht?: number;
+  /** De nummers van de bouwblokken van een categorie ("1–2" of "15"), of bij een platte assessment het nummer van het domein zelf. */
+  nummers?: string;
 }
 
 /**
@@ -180,6 +182,15 @@ export interface GroepResultaat {
  * eigen "groep", dus dit levert dezelfde granulariteit als de bouwblok-
  * resultaten. Sortering op waarde volgt `scoresPerGroepGesorteerd`.
  */
+/** De nummers van de bouwblokken van een categorie: "1–2" bij twee of meer, "15" bij één, `undefined` bij geen. */
+function nummersVan(bouwblokken: BouwblokResultaat[]): string | undefined {
+  if (bouwblokken.length === 0) return undefined;
+  const nrs = bouwblokken.map((r) => r.bouwblok.volgnummer);
+  const van = Math.min(...nrs);
+  const tot = Math.max(...nrs);
+  return van === tot ? `${van}` : `${van}–${tot}`;
+}
+
 export function alleGroepResultaten(
   assessment: Assessment,
   bouwblokResultaten: BouwblokResultaat[],
@@ -195,6 +206,7 @@ export function alleGroepResultaten(
       kleur: null,
       score: r.score,
       gewicht: r.gewicht,
+      nummers: `${r.bouwblok.volgnummer}`,
     }));
   } else {
     resultaten = assessment.categorieen!.map((categorie) => {
@@ -204,6 +216,7 @@ export function alleGroepResultaten(
         groepNaam: categorie.naam,
         kleur: categorie.kleur,
         score: categorieScore(bouwblokken, antwoorden),
+        nummers: nummersVan(bouwblokken),
       };
     });
   }

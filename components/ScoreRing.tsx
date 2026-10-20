@@ -34,6 +34,8 @@ export function ScoreRing({
   stipFractie,
   alt,
   klein = false,
+  mini = false,
+  tegel = false,
   metChip = true,
 }: {
   ring: RingGegevens;
@@ -41,6 +43,10 @@ export function ScoreRing({
   alt?: string;
   /** De ring van 128px in de Resultaatkop, met het getal in 32px. */
   klein?: boolean;
+  /** De ring van 44px in een rij van de top 3: Alleen het getal in de ring, zonder label en zonder chip. */
+  mini?: boolean;
+  /** De ring van 64px in een tegel boven een weergave: Alleen het getal in de ring (16px), zonder label en zonder chip. */
+  tegel?: boolean;
   /** De klassenchip onder de ring. In de Resultaatkop staat hij rechts ervan. */
   metChip?: boolean;
 }) {
@@ -48,7 +54,7 @@ export function ScoreRing({
   const midden = GROOTTE / 2;
   const hoek = (stipFractie ?? 0) * 2 * Math.PI;
   return (
-    <div className={`score-ring-blok ${klein ? "score-ring--klein" : ""}`}>
+    <div className={`score-ring-blok ${klein ? "score-ring--klein" : ""} ${mini ? "score-ring--mini" : ""} ${tegel ? "score-ring--tegel" : ""}`}>
       <div className="score-ring" role="img" aria-label={alt ?? `Totaalscore ${ring.getal}${ring.klasseNaam ? `, ${ring.klasseNaam}` : ""}`}>
         <svg width="100%" height="100%" viewBox={`0 0 ${GROOTTE} ${GROOTTE}`} aria-hidden="true">
           <circle cx={midden} cy={midden} r={STRAAL} fill="none" stroke="var(--bg-mid)" strokeWidth={DIKTE} />
@@ -77,11 +83,13 @@ export function ScoreRing({
           )}
         </svg>
         <div className="score-ring-tekst">
-          <span className="score-ring-getal">{ring.getal}</span>
-          <span className="score-ring-label">Totaalscore</span>
+          <span className="score-ring-getal" style={mini && ring.getal.length > 3 ? { fontSize: "var(--fs-12)" } : undefined}>
+            {ring.getal}
+          </span>
+          {!mini && !tegel && <span className="score-ring-label">Totaalscore</span>}
         </div>
       </div>
-      {metChip && ring.klasseNaam && (
+      {metChip && !mini && !tegel && ring.klasseNaam && (
         <span className="score-ring-chip" style={{ background: ring.chipAchtergrond, color: ring.chipTekst }}>
           {ring.klasseNaam}
         </span>

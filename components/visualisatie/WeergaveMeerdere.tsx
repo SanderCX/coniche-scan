@@ -33,8 +33,8 @@ export function WeergaveMeerdere({
       <Tegels
         tegels={[
           { label: eenheid.telLabel, waarde: String(weergave.eenheden.length), sub: eenheid.telSub },
-          { label: `Hoogste ${eenheid.enkelvoud}`, waarde: toon(weergave.hoogste?.totaal), sub: weergave.hoogste?.label },
-          { label: `Laagste ${eenheid.enkelvoud}`, waarde: toon(weergave.laagste?.totaal), sub: weergave.laagste?.label },
+          { label: `Hoogste ${eenheid.enkelvoud}`, waarde: toon(weergave.hoogste?.totaal), score: weergave.hoogste?.totaal, sub: weergave.hoogste?.label },
+          { label: `Laagste ${eenheid.enkelvoud}`, waarde: toon(weergave.laagste?.totaal), score: weergave.laagste?.totaal, sub: weergave.laagste?.label },
           { label: "Grootste verschil", waarde: toon(weergave.grootsteVerschil?.verschil), sub: weergave.grootsteVerschil?.naam },
         ]}
       />

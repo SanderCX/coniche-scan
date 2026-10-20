@@ -37,7 +37,6 @@ export default function VoorbeeldPage({
         antwoorden={getDemoAntwoorden(assessment.id)}
         relevantie={getDemoRelevantie(assessment.id)}
         respondentNaam={demoRespondentNaam}
-        isPreview
         // De Resultaatkop met de eyebrow "Voorbeeld-output" en rechts naast de titel de knop "← Terug" (`CLAUDE.md`, scherm 3). De kop mag
         // afbreken (`min-width: 0`), de knop niet.
         eyebrow="Voorbeeld-output"

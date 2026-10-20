@@ -1,5 +1,65 @@
 # Coniche Scan — Changelog
 
+## 2026-10-20 (14) — Laagste en hoogste vraag in Antwoorden zijn een meter
+
+Op verzoek van Sander: De tegels Laagste vraag en Hoogste vraag in de weergave Antwoorden tonen hun score in een ring van 64px, zoals de andere scoretegels (`visualisatie-scores.md`, Scores in een tegel zijn een meter).
+
+## 2026-10-20 (13) — Lege regel boven en onder de vragen in Antwoorden
+
+Op verzoek van Sander: Bij een uitgeklapt bouwblok in de weergave Antwoorden staat boven de eerste en onder de laatste vraag een lege regel ruimte (eerst 30px, op verzoek van Sander een halve regel van 15px, `.vis-antw-ruimte`, een rij zonder inhoud met `aria-hidden`). `visualisatie-scores.md`, onderdeel G, bijgewerkt. Bekeken in een Meting van Gemeente Amsterdam.
+
+## 2026-10-20 (12) — De percentages in het Quickscan-resultaat zijn een meter
+
+Op verzoek van Sander: In de rijen van Sterkste afdeling en Meeste ontwikkelruimte (Quickscan) staat het percentage in een kleine ring van 44px (`ScoreRing mini`) die tot dat percentage gevuld is in de klassekleur. Bij 100% past het getal in 12px in de ring. De rij houdt zijn tint. `.qs-uitgelicht-rij strong` is vervallen.
+
+Ook het percentage in de kaart van elke afdeling (Poliklinieken "5 / 15 33%") is een ring van 44px, naast de punten. `.qs-punten` is nu een `div` met een flexrij (een ring in een `p` is ongeldige HTML) en `.qs-percentage` is vervallen.
+
+## 2026-10-20 (11) — De duur van de film vervalt
+
+Op verzoek van Sander: Het label boven de films (Wat krijg ik, De Meetperiode kiezen) is "Voorbeeld met voorbeelddata", zonder "· 16 seconden". `HelpFilm.tsx` en `help.md` aangepast. De duur staat nog wel in `help.md` bij de beschrijving van elke film.
+
+## 2026-10-20 (10) — Scores in de tegels zijn een meter
+
+Op verzoek van Sander: In de tegels boven de weergaven (zoals Per bouwblok) staan de scores nu als ring van 64px met het getal erin (`ScoreRing` met de nieuwe variant `tegel`) in plaats van als groot getal. Het gaat om de totaalscore, het hoogste en het laagste bouwblok, de hoogste en laagste Meting of organisatie en de gemiddelden in Verkennen. Aantallen, verschillen en de standaardafwijking blijven getallen, evenals de tegels met twee scores ("2,9 → 3,1" en "2,9 | 3,1"): Daar past één ring niet. `Tegels` kreeg een optioneel veld `score`. De percentages in de tegels van de Quickscan zijn niet aangepast. `visualisatie-scores.md` bijgewerkt.
+
+## 2026-10-20 (9) — Nummers van de domeinen in Scores per Domein (AI-scan)
+
+Op verzoek van Sander: Bij de AI-scan staat het nummer van het domein nu voor de naam in het diagram "Scores per Domein" ("1 · Strategie en governance"), zodat het aansluit op de knooppunten van de radar. `GroepResultaat.nummers` is er ook bij een platte Assessment gevuld, met het nummer van het bouwblok. Bekeken in de voorbeeld-output van de AI-scan. `stylesheet.md` bijgewerkt.
+
+## 2026-10-20 (8) — De radar 1,2 keer zo groot
+
+Op verzoek van Sander: De radar is 1,2 keer zo groot getoond: 372px in plaats van de 309px die in een kaart van een derde paste. Omdat zo'n kaart niet breder dan 309px kan zijn, zijn de kolommen `2fr 3fr` geworden in plaats van `1fr 2fr` (radarkaart 429px, staafdiagram 643px bij een pagina van 1160px; het staafdiagram blijft verticaal). `.radar-vlak` heeft `max-width: 372px`. `stylesheet.md` bijgewerkt.
+
+## 2026-10-20 (7) — Radar een derde, staafdiagram twee derde
+
+Op verzoek van Sander: De kolommen op het resultaatscherm zijn `1fr 2fr` (Per bouwblok een derde, Per categorie twee derde) in plaats van 480px en de rest, en op elk scherm vanaf 1000px. Onder 1000px staan ze onder elkaar (was 800px, want in een derde van 920px wordt de radar te klein). Bij een pagina van 1160px is de radarkaart 357px en het staafdiagram 715px, waarbij het staafdiagram verticaal blijft. `stylesheet.md` bijgewerkt.
+
+## 2026-10-20 (6) — Legenda onder de radar weg, nummers bij de categorieën in het staafdiagram
+
+Op verzoek van Sander: De regel met de categorieën onder de radar ("Overkoepelend · 1–2", enzovoort) is weg. De nummers van de bouwblokken staan nu bij de categorienaam in het staafdiagram: Onder de naam in de verticale vorm, achter de naam ("Proces & Tech · 7–10") in de horizontale vorm, waarvoor het label 150px breed is geworden in plaats van 120px. Daarvoor heeft `GroepResultaat` een veld `nummers`, gevuld in `alleGroepResultaten`. Het Recharts-diagram met de vergelijking (benchmark) toont de nummers ook, als tweede regel onder de naam. De radar zelf is daarmee eenvoudiger: De groepering in de component is vervallen. Test aangepast en uitgebreid (471 tests). `stylesheet.md` bijgewerkt.
+
+## 2026-10-20 (5) — De ring in de top 3
+
+Op verzoek van Sander: Bij Top 3 Sterktes en Top 3 Verbeterkansen staat de score nu in een kleine ring (`ScoreRing` met de nieuwe variant `mini`, 44px, getal in 14px, zonder label en chip) in plaats van als los getal. De ring vult tot (score − 1) / 4 in de volle scorekleur, zoals de grote ring. De rij houdt zijn tint. De tekstkleur `--score-tekst` van de rij en de stijl `.top3-item .score-pill` zijn vervallen. De rijen Sterkste afdeling en Meeste ontwikkelruimte van de Quickscan zijn niet aangepast: Daar staan percentages, en de vraag ging over de top 3. `stylesheet.md` bijgewerkt.
+
+## 2026-10-20 (4) — De radar kleiner
+
+Op verzoek van Sander: De radar (`.radar-vlak`) is maximaal 360px breed in plaats van 432px. De knooppunten blijven 26px en staan procentueel op hun plek, dus ze schalen mee in positie maar niet in grootte. `stylesheet.md` bijgewerkt.
+
+## 2026-10-20 (3) — Radar en staafdiagram ook op een smaller scherm naast elkaar
+
+Op verzoek van Sander: Op een scherm van rond 920px stonden de twee kaarten onder elkaar (de spec liet ze onder 1200px stapelen). Nu staan ze van 800 tot 1200px als twee gelijke kaarten naast elkaar en pas onder 800px onder elkaar. Omdat het staafdiagram met 104px per categorie niet in een kaart van 416px past, springt het om naar de horizontale vorm op basis van de breedte van zijn kaart (`@container`, onder 500px) in plaats van van het scherm. Bekeken op 700, 920 en 1400px. `stylesheet.md`, Radar en staafdiagram op het resultaatscherm, is aangepast.
+
+## 2026-10-20 (2) — Banner "Dit is een voorbeeld" vervalt in de voorbeeld-output
+
+Op verzoek van Sander: De banner onder de kop van de voorbeeld-output herhaalde wat de eyebrow "Voorbeeld-output" al zegt, en is weggehaald in `ResultsView` en `QuickscanResultaten`. De prop `isPreview` en de CSS-klasse `.preview-banner` zijn opgeruimd. Specs bijgewerkt: `stylesheet.md`, Resultaatkop, Zo gebouwd.
+
+## 2026-10-20 — Iconen en link op de landingspagina van een Assessment
+
+Op verzoek van Sander (`CLAUDE.md`, scherm 2). Grijze lijniconen (`components/icons/LandingIcons.tsx`) bij de subtitel, voor de titel van de feature-cards en bij Praktische informatie, en de zin "15 bouwblokken, verdeeld over 5 pijlers" is een link naar `/bouwstenen` (`.tekst-link`).
+
+**Keuzes waar de vraag open liet**: Ook "Heldere inzichten" heeft een icoon, zodat de drie delen van de subtitel gelijk zijn. De iconen staan voor de titel van de kaarten (eerst in de cirkel boven de titel, op verzoek van Sander verplaatst), en de nummers vervallen. De link staat alleen in de beschrijving bovenaan ("Breng in kaart hoe volwassen … 15 bouwblokken, verdeeld over 5 pijlers …") en niet in de kaart Volledig beeld, waar dezelfde zin staat. Dat was eerst andersom gebouwd en is op verzoek van Sander omgedraaid. De icoon bij een deel van de subtitel volgt uit de tekst (minuten, inzicht, verbeterkansen of vervolgstappen), dus een Assessment met een andere subtitel krijgt alleen een icoon als het deel daarbij past.
+
 ## 2026-10-19 (9) — Specs van Joost, PR 141: de radar met knooppunten, het staafdiagram met tooltip en de top 3 in scorekleur
 
 Op verzoek van Sander gebouwd (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm en Staafdiagram per categorie; `content-ziekenhuis-quickscan.md`, Resultaten, 3; `CLAUDE.md`, scherm 6). Helpbestand: `help/resultaten-lezen.md`.

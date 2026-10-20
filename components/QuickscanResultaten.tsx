@@ -15,6 +15,7 @@ import { formatGewicht } from "@/lib/format";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
 import { SterksteMeeste } from "@/components/quickscan/SterksteMeeste";
 import { ResultaatKop, Totaalkaart } from "@/components/Resultaatkop";
+import { ScoreRing } from "@/components/ScoreRing";
 import { KLASSE_CHIP } from "@/lib/mijn-metingen";
 import { QuickscanOverzicht } from "@/components/quickscan/QuickscanOverzicht";
 
@@ -70,12 +71,24 @@ function AfdelingKaart({ afdeling, toonTellingen }: { afdeling: QuickscanAfdelin
           </span>
         )}
       </div>
-      <p className="qs-punten">
-        <strong>{getal(afdeling.punten)}</strong> <span>/ {getal(aantalVragen)}</span>{" "}
-        <span className="qs-percentage" style={{ color: kleur }}>
-          {afdeling.percentage ?? 0}%
+      <div className="qs-punten">
+        <span>
+          <strong>{getal(afdeling.punten)}</strong> <span>/ {getal(aantalVragen)}</span>
         </span>
-      </p>
+        <ScoreRing
+          mini
+          metChip={false}
+          ring={{
+            fractie: (afdeling.percentage ?? 0) / 100,
+            kleur,
+            getal: `${afdeling.percentage ?? 0}%`,
+            klasseNaam: klasse ? KLASSE_NAAM.afdeling[klasse] : "",
+            chipAchtergrond: "",
+            chipTekst: "",
+          }}
+          alt={`${categorie.naam}: ${afdeling.percentage ?? 0}%${klasse ? `, ${KLASSE_NAAM.afdeling[klasse]}` : ""}`}
+        />
+      </div>
       <Voortgangsbalk percentage={afdeling.percentage} kleur={kleur} />
       {toonTellingen && (
         <p className="qs-tellingen">
@@ -150,7 +163,6 @@ export interface QuickscanResultatenProps {
   /** Een kant-en-klaar resultaat, bijvoorbeeld het gemiddelde van een Meting (`metingAlsResultaat`): Gaat voor `antwoorden`. */
   resultaat?: QuickscanResultaat;
   respondentNaam?: string | null;
-  isPreview?: boolean;
   toonKop?: boolean;
   /** De Resultaatkop (`stylesheet.md`, Resultaatkop): Eyebrow, subregel en de knop rechts naast de titel. */
   eyebrow?: string;
@@ -174,7 +186,6 @@ function QuickscanResultatenInhoud({
   relevantie,
   resultaat,
   respondentNaam,
-  isPreview = false,
   toonKop = true,
   eyebrow = "Jouw resultaat",
   subregel,
@@ -203,11 +214,6 @@ function QuickscanResultatenInhoud({
   return (
     <div>
       {toonKop && <ResultaatKop eyebrow={eyebrow} titel={assessment.naam} subregel={subregel ?? [respondentNaam]} rechts={kopRechts} />}
-      {isPreview && (
-        <div className="preview-banner">
-          Dit is een voorbeeld met demo-data — zo ziet jouw resultatenscherm eruit na afronding van de scan.
-        </div>
-      )}
 
       {/* De totaalkaart van de Resultaatkop (`stylesheet.md`, Resultaatkop; `content-ziekenhuis-quickscan.md`, Resultaten, 1). */}
       {r.percentage !== null && r.klasse !== null && (

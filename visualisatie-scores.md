@@ -35,6 +35,8 @@ Deze regels gelden voor alle weergaven. G wijkt af in de kleuren en heeft geen b
 
 **Bovenaan** staat een rij met vier tegels met kerncijfers. Welke vier staat per weergave.
 
+**Scores in een tegel zijn een meter** (besloten op 20 oktober 2026, gebouwd op 20 oktober 2026). Een tegel met een score van 1 tot 5 (de totaalscore, het hoogste en het laagste bouwblok of de hoogste en laagste Meting of organisatie, de laagste en hoogste vraag in Antwoorden, het gemiddelde in Verkennen) toont die in een ring van 64px, dezelfde ring als bij de totaalscore (`stylesheet.md`, Resultaten, `.score-ring`) met het getal erin in 16px, en rechts ervan de naam of de klasse. Aantallen, verschillen en spreiding blijven een getal in 24px. De ring is `ScoreRing` met `tegel`, gekozen via `score` in `Tegels` (`components/visualisatie/gedeeld.tsx`).
+
 **Alleen desktop**, zoals de rest van de app.
 
 **Lege en onvolledige toestand.** Een bouwblok zonder afgeronde scan toont een streepje en geen stip. Een weergave zonder enige afgeronde scan toont de bestaande lege-toestand van de resultaatcomponenten.
@@ -202,6 +204,7 @@ Dit vult het onderdeel "Nog te ontwerpen" van `benchmark.md`, niveau 3.
 
 - Kolomkop met de initialen van de respondent. De volledige naam staat in een tooltip. Het voorbeeld toont R1 tot R14. Voor een Lead zonder namen (`Organisatie.antwoordenMetNamen` uit) staat er R1 tot en met Rn en is er geen tooltip met een naam.
 - Een blokrij heeft een achtergrond van `--bg-warm`, de accentrand van 4px in de categoriekleur, het volgnummer, de naam en een pijltje dat de rij open- en dichtklapt. Een vraagrij heeft de vraagtekst op één tot drie regels. Vraagrijen zijn hoger dan blokrijen (50px tegenover 30px per cel).
+- Bij een uitgeklapt bouwblok staat boven de eerste en onder de laatste vraag een halve lege regel ruimte (15px, witte achtergrond, zonder inhoud, besloten op 20 oktober 2026, eerst een hele regel van 30px), zodat de vragen zich afscheiden van de bouwblokrijen.
 - Alle bouwblokken staan standaard ingeklapt. Boven de kaart staan de knoppen "Alles uitklappen" en "Alles inklappen". De open of dichte stand wordt niet in de adresbalk bewaard.
 - De kolomkop blijft staan bij het scrollen. Bij meer dan 14 respondenten scrolt de kaart horizontaal, met de linkerkolom (bouwblok en vraag) vast.
 

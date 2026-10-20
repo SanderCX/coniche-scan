@@ -55,21 +55,23 @@ export function WeergaveGroepRest({
     <div className="vis" data-weergave={`verkennen-${modus}`}>
       <Tegels
         tegels={zonderGroepering ? [
-          { label: "Gemiddelde van de pool", waarde: toon(overall.focus.gemiddelde), sub: "Overall score" },
+          { label: "Gemiddelde van de pool", waarde: toon(overall.focus.gemiddelde), score: overall.focus.gemiddelde, sub: "Overall score" },
           { label: eenheidWoord === "onderdelen" ? "Onderdelen" : "Organisaties", waarde: String(overall.focus.n), sub: "in de pool" },
           {
             label: `Hoogste ${bouwblokWoorden(assessment).enkelvoud}`,
             waarde: hoogste ? toon(hoogste.focus.gemiddelde) : "–",
+            score: hoogste?.focus.gemiddelde,
             sub: hoogste?.rij.bouwblok.naam,
           },
           {
             label: `Laagste ${bouwblokWoorden(assessment).enkelvoud}`,
             waarde: laagste ? toon(laagste.focus.gemiddelde) : "–",
+            score: laagste?.focus.gemiddelde,
             sub: laagste?.rij.bouwblok.naam,
           },
         ] : [
-          { label: `Gemiddelde van ${focusNaam}`, waarde: toon(overall.focus.gemiddelde), sub: `${overall.focus.n} ${eenheidWoord}` },
-          { label: "Gemiddelde van de rest", waarde: toon(overall.rest.gemiddelde), sub: `${overall.rest.n} ${eenheidWoord}` },
+          { label: `Gemiddelde van ${focusNaam}`, waarde: toon(overall.focus.gemiddelde), score: overall.focus.gemiddelde, sub: `${overall.focus.n} ${eenheidWoord}` },
+          { label: "Gemiddelde van de rest", waarde: toon(overall.rest.gemiddelde), score: overall.rest.gemiddelde, sub: `${overall.rest.n} ${eenheidWoord}` },
           {
             label: `Grootste plus per ${bouwblokWoorden(assessment).enkelvoud}`,
             waarde: vergelijking.grootstePlus ? `+${toon(vergelijking.grootstePlus.verschil)}` : "–",

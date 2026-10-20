@@ -208,7 +208,10 @@ Classificatie. Van boven naar beneden:
    - Linkerrand en badge in de klassekleur van de afdeling; de badge
      toont de klassenaam.
    - De naam van de afdeling, daaronder "{punten}" groot met "/ {aantal
-     vragen}" en het percentage, en een voortgangsbalk in klassekleur.
+     vragen}" en het percentage in een kleine ring (`.score-ring--mini`, 44px,
+     gevuld tot het percentage in de klassekleur, besloten op 20 oktober 2026 en
+     gebouwd, eerder het percentage als getal in de klassekleur), en een
+     voortgangsbalk in klassekleur.
    - De tellingen "Ja: 10", "Nee: 3", "Weet niet: 2", in de kleuren
      groen, rood en grijs.
    - Het blok "Verdieping op dimensies": Per bouwblok van de afdeling de
@@ -231,8 +234,10 @@ Classificatie. Van boven naar beneden:
    `--stat-green-faint` (Goed op orde), `--stat-amber-faint` (Gemiddeld inzicht)
    of `--stat-red-faint` (Ontwikkelruimte), met `1px solid` in de randkleur van de
    chip van die klasse. Links staat de naam van de afdeling in 14px `--ink` en
-   rechts het percentage in 16px, gewicht 600, in de tekstkleur van de chip van
-   die klasse (`stylesheet.md`, Scorekleuren). Een voorstel van 19 oktober 2026
+   rechts het percentage in een kleine ring (`.score-ring--mini`, 44px, gevuld
+   tot het percentage in de klassekleur, het percentage erin in 14px en bij 100%
+   in 12px, besloten op 20 oktober 2026 en gebouwd; eerder het percentage in 16px,
+   gewicht 600, in de tekstkleur van de chip van die klasse). Een voorstel van 19 oktober 2026
    (eerder `--bg-warm` met een neutrale rand), de tint in de klasse gebouwd op 19 oktober 2026 (`KLASSE_STIJL[klasse].vulling`, `.rand` en `.tekst`). Het hoogste percentage is de sterkste
    afdeling, het laagste de meeste ontwikkelruimte. Afdelingen die niet van
    toepassing zijn doen niet mee. Bij gelijkstand staat elke gelijke afdeling als
