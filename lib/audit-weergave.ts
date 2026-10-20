@@ -24,6 +24,8 @@ const TYPE_LABEL: Record<string, string> = {
   kpi: "KPI-waarden",
   kpiDefinitie: "KPI",
   kanaal: "Kanaal",
+  contactpersoon: "Contactpersoon",
+  nieuwsartikel: "Nieuwsartikel",
 };
 
 /** Het deel van de actie vóór de punt, bijv. "organisatie" bij "organisatie.verwijderd". */
@@ -75,6 +77,8 @@ const DETAIL_LABEL: Record<string, string> = {
   oudeNaam: "Oude naam",
   nieuweNaam: "Nieuwe naam",
   onderdeelNaam: "Onderdeel",
+  metLinkedin: "Met LinkedIn-profiel",
+  titel: "Titel",
   aantalKpiWaarden: "KPI-waarden die meegingen",
   plek: "Plek",
   aantalIngevuld: "Ingevuld",

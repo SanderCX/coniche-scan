@@ -1,5 +1,17 @@
 # Coniche Scan — Changelog
 
+## 2026-10-20 (15) — Contactpersonen en nieuws bij de Kenmerken van een Organisatie
+
+Op verzoek van Sander: Een Admin en een Consultant (eigen Organisaties) kunnen bij een Organisatie relevante contactpersonen toevoegen, met functie en LinkedIn-profiel, en relevante nieuwsartikelen met een link. Specs: `datamodel.md` (Contactpersoon en Nieuwsartikel, Audit, Verwijderen, rechtenmatrix), `beheerpagina.md` (punt 4, Contactpersonen en Nieuws, en twee Info-teksten in het register), `CLAUDE.md` (Status). Help: `help/contactpersonen-en-nieuws.md` (25 onderwerpen).
+
+**Gedaan**:
+- **Opslag**: `Organisatie.contactpersonen` en `Organisatie.nieuwsartikelen` (`lib/types.ts`), geladen met lege lijsten bij oudere data. De regels staan in `lib/contacten-nieuws.ts` (naam, adressen, volgorde), het opslaan in `lib/db/contacten-nieuws.ts`.
+- **Scherm**: `components/beheer/ContactenNieuws.tsx`, onder het raster in de kaart Kenmerken: Twee lijsten naast elkaar, met "+ Toevoegen", "Bewerken" en in de bewerkmodal "Verwijderen" met bevestiging. Links openen in een nieuw tabblad. Het LinkedIn-profiel is een LinkedIn-logo (`components/icons/LinkedInIcoon.tsx`, 18px, grijs, oranje bij hover) achter de naam, in plaats van een tekstlink (op verzoek van Sander).
+- **Audit**: `contactpersoon.toegevoegd/gewijzigd/verwijderd` en `nieuwsartikel.toegevoegd/gewijzigd/verwijderd`. Bij een contactpersoon staat nooit de naam, de functie, het adres of de notitie in de log, bij een artikel wel de titel.
+- **Tests**: `lib/contacten-nieuws.test.ts` (10 tests), bekeken in de browser met een contactpersoon en een artikel, daarna weer verwijderd.
+
+**Keuzes waar de vraag open liet**: De velden (naam, functie, LinkedIn, notitie bij een persoon; titel, link, bron, datum, notitie bij een artikel) heb ik zelf gekozen, met alleen de naam of titel en bij een artikel de link verplicht. Een LinkedIn-adres moet bij linkedin.com horen. Het recht is `organisaties.bewerken`, zoals de Kenmerken, en er is geen apart recht. Er is geen e-mailadres of telefoonnummer bij een persoon, om zo weinig mogelijk persoonsgegevens vast te leggen. Een contactpersoon verwijderen kan alleen per persoon. De CSV-export, de InDesign-export en de import nemen ze niet mee.
+
 ## 2026-10-20 (14) — Laagste en hoogste vraag in Antwoorden zijn een meter
 
 Op verzoek van Sander: De tegels Laagste vraag en Hoogste vraag in de weergave Antwoorden tonen hun score in een ring van 64px, zoals de andere scoretegels (`visualisatie-scores.md`, Scores in een tegel zijn een meter).

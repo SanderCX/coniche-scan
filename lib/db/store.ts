@@ -133,6 +133,9 @@ function normaliseerOrganisatie(invoer: Organisatie): Organisatie {
     leadToegang: Array.isArray(ruw.leadToegang) ? ruw.leadToegang : [],
     antwoordenMetNamen: ruw.antwoordenMetNamen === true,
     leadOvergangMelding: ruw.leadOvergangMelding ?? null,
+    // Ontbreken bij data van vóór de contactpersonen en het nieuws: Dan zijn er geen.
+    contactpersonen: Array.isArray(ruw.contactpersonen) ? ruw.contactpersonen : [],
+    nieuwsartikelen: Array.isArray(ruw.nieuwsartikelen) ? ruw.nieuwsartikelen : [],
   };
   zetLegacyBereikOm(organisatie);
   // Overgang van de tekst op de Meting naar Onderdelen (`datamodel.md`, Onderdeel): Idempotent, en stabiel tot het is opgeslagen.

@@ -169,6 +169,18 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Kies waarover je vergelijkt. Bij Organisaties telt elke Organisatie één keer, met één Meting (zie Meetperiode). Bij Onderdelen telt elk onderdeel van een Organisatie apart, en elk onderdeel telt even zwaar mee.",
   },
   {
+    sleutel: "info.contactpersonen",
+    plek: "Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen",
+    tekst:
+      "Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Alleen Admins en Consultants met toegang tot deze organisatie zien ze.",
+  },
+  {
+    sleutel: "info.nieuwsartikelen",
+    plek: "Organisatie-detail, bij Kenmerken, naast de kop Nieuws",
+    tekst:
+      "Artikelen over de organisatie die relevant zijn voor het gesprek, met een link naar het artikel. Het nieuwste staat bovenaan. Alleen Admins en Consultants met toegang tot deze organisatie zien ze.",
+  },
+  {
     sleutel: "info.kpiBlok",
     plek: "Organisatie-detail, blok KPI's, naast de titel",
     tekst: "Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet.",

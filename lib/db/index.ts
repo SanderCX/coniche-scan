@@ -11,6 +11,7 @@ export * from "./metingen";
 export * from "./meting-plannen";
 export * from "./onderdelen";
 export * from "./kpi";
+export * from "./contacten-nieuws";
 export * from "./respondenten";
 export * from "./verplaatsen";
 export * from "./samenbrengen";

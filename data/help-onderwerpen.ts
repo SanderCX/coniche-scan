@@ -356,6 +356,26 @@ export const HELP_ONDERWERPEN: HelpOnderwerp[] = [
     "svg": null
   },
   {
+    "slug": "contactpersonen-en-nieuws",
+    "titel": "Contactpersonen en nieuws",
+    "groep": "Scans en Metingen",
+    "volgorde": 6,
+    "rollen": [
+      "Consultant",
+      "Admin"
+    ],
+    "toegang": [],
+    "afbeelding": null,
+    "film": null,
+    "bronnen": [
+      "beheerpagina.md",
+      "datamodel.md"
+    ],
+    "bijgewerkt": "2026-10-20",
+    "tekst": "Bij elke Organisatie leg je vast welke mensen en welke nieuwsartikelen relevant zijn, zodat je bij een gesprek of een Meting direct de juiste context hebt. Ze staan op het organisatie-detail, bij de Kenmerken.\n\n## In het kort\nOnder de Kenmerken staan twee lijsten naast elkaar: Contactpersonen en Nieuws. Met \"+ Toevoegen\" voeg je een persoon of een artikel toe, met \"Bewerken\" wijzig of verwijder je het.\n\n## Wat je ziet\n1. **Contactpersonen.** Per persoon de naam, de functie en een link naar het LinkedIn-profiel. De link opent in een nieuw tabblad. De lijst staat op alfabet.\n2. **Een contactpersoon toevoegen.** De naam is verplicht. De functie, het LinkedIn-profiel en een notitie (waarom de persoon relevant is) mag je leeg laten. Plak bij LinkedIn het adres van het profiel, bijvoorbeeld https://www.linkedin.com/in/naam. Een adres van een andere site wordt geweigerd.\n3. **Nieuws.** Per artikel de titel als link naar het artikel, met de bron en de datum eronder. Het nieuwste staat bovenaan.\n4. **Een artikel toevoegen.** De titel en de link zijn verplicht. De bron, de datum en een notitie mag je leeg laten.\n5. **Bewerken en verwijderen.** \"Bewerken\" opent hetzelfde venster. Links onderin staat \"Verwijderen\", dat eerst om een bevestiging vraagt.\n\n## Let op\nEen contactpersoon is geen Respondent. Er wordt niets naartoe gestuurd en de persoon doet niet mee aan een scan. Alleen een Admin en een Consultant met toegang tot de Organisatie zien deze lijsten, een Lead en een Respondent niet. De gegevens van een contactpersoon staan niet in de audit-log, wel de titel van een artikel.\n\n## Zie ook\n- [KPI's invullen](kpis-invullen)\n- [Een scan aanmaken](scan-aanmaken)",
+    "svg": null
+  },
+  {
     "slug": "verkennen",
     "titel": "Verkennen",
     "groep": "Verkennen en Benchmarks",
