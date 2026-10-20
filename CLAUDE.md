@@ -387,7 +387,9 @@ geen afwijking van de spec maar een gat erin.
    uitgeschakeld, met de uitleg dat toegang via een persoonlijke link
    loopt. Tussen de drie kaarten en "Praktische informatie" staat de film "Wat
    krijg ik" met stapkaarten (`help.md`, Films, gebouwd op 19 oktober 2026,
-   niet bij een scan met Ja / Nee / Weet ik niet), met daaronder de knop
+   met per Assessment-type een eigen variant: Klantcontact en Zorg met categorieën (Zorg met de weging),
+   de AI-scan met een rij per domein en de Quickscan met percentages per afdeling; voorstel van
+   20 oktober 2026, `help.md`, Films, Varianten van Wat krijg ik), met daaronder de knop
    "Bekijk de voorbeeld-output" naar scherm 3. Die knop vervangt de link
    "Bekijk wat je krijgt" verderop op de pagina. Alle cijfers in de film
    zijn voorbeelddata. Op de pagina staan grijze lijniconen (`--ink-s`, op het
