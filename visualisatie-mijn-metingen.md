@@ -30,7 +30,8 @@ De vier vaste content-links blijven in de header staan, zoals in `CLAUDE.md` bes
 
 - **Metingen.** Eén kaart per Meting waarvoor de Admin minstens één weergave heeft aangevinkt (`beheerpagina.md`, punt 6a), op meetdatum, de nieuwste bovenaan.
 - **Vergelijkingen.** Een kaart per benchmark die aan staat. Zie Benchmarkkaart.
-- Een Lead zonder Metingen maar met een benchmark ziet alleen de sectie Vergelijkingen.
+- **Dossier.** Eén kaart, onder Vergelijkingen (of onder Metingen als er geen Vergelijkingen zijn), als de Consultant het Dossier van de Organisatie heeft opengezet en er minstens één item zichtbaar is (voorstel van 20 oktober 2026). Zie Dossierkaart.
+- Een Lead zonder Metingen maar met een benchmark ziet alleen de sectie Vergelijkingen. Een Lead zonder Metingen en zonder benchmark, maar met een Dossier, ziet alleen de sectie Dossier.
 
 ### Lead en respondent
 
@@ -189,7 +190,7 @@ Dezelfde kaart, in percentages en met klassekleuren. Alles hierboven geldt, beha
 - Hoogte 40 px, hoekstraal 6 px, lettergrootte 14 px vet, horizontale padding 20 px.
 - **Hoofdactie** is massief oranje (`--or`) met witte tekst, over de hele pagina. Dat geldt ook voor "Bekijk jouw resultaten", op elke kaart. Hover `--or-l`.
 - **Nevenactie** is wit met oranje rand en oranje tekst. Hover `--or-faint`.
-- Staan er twee knoppen onder elkaar of naast elkaar in dezelfde kaart, dan hebben ze dezelfde breedte van 232 px. Een enkele knop is zo breed als zijn tekst. Knoppen worden nooit over de volle kaartbreedte getrokken.
+- Staan er twee knoppen onder elkaar of naast elkaar in dezelfde kaart, dan hebben ze dezelfde breedte van 232 px. Een enkele knop is zo breed als zijn tekst, met één uitzondering (voorstel van 20 oktober 2026): De knoppen "Bekijk vergelijking" op de benchmarkkaart en "Bekijk dossier" op de Dossierkaart hebben dezelfde vaste breedte (184 px in het ontwerp), zodat ze onder elkaar op één lijn staan. Knoppen worden nooit over de volle kaartbreedte getrokken.
 - Op smalle schermen mogen de knoppen onder elkaar staan en dan op 100% breedte.
 - Een Lead-kaart heeft de knoppen die aan staan: "Resultaten" (hoofdactie) en "Respondenten uitnodigen" (nevenactie). Spreiding, Antwoorden en Exporteren zitten niet op de kaart (zie `beheerpagina.md`, punt 6a). Staat alleen Uitnodigen aan, dan is dat de hoofdactie.
 - Op de kaart "Lead en respondent" heet de knop naar de hele meting "Resultaten hele meting". Op een kaart van een Lead zonder eigen scan heet die "Resultaten".
@@ -202,6 +203,17 @@ Een benchmark die voor deze Lead aan staat, is een kaart in de sectie Vergelijki
 - Daarnaast het label "Benchmark" (12 px, hoofdletters, `--bl`), de naam van de benchmark (18 px, vet) en een regel van 14 px: "Vergelijking van <n> organisaties, <Assessment>".
 - Rechts de knop "Bekijk vergelijking" (hoofdactie).
 - Het aantal organisaties staat er alleen als de benchmark ten minste `benchmarkMinOrganisaties` heeft (`benchmark.md`). Anders vervalt het aantal uit de regel. Wat de Lead in de vergelijking ziet, staat in `benchmark.md`, View voor een Lead.
+
+## Dossierkaart
+
+Voorstel van 20 oktober 2026, ontwerp "Coniche Scan Dossier", bord 6. Een Dossier dat voor deze Lead openstaat, is een kaart in de sectie Dossier, volle breedte, achtergrond `--bg-warm`. Het is één kaart: De Cases en het Nieuws staan niet los in het overzicht maar op de Dossierpagina (`dossier.md`, scherm 5), die de knop opent.
+
+- Links een rond icoon van 48px in `--or-faint` met een oranje mapje.
+- Daarnaast de eyebrow "Dossier" (12px, hoofdletters, `--or`), eventueel de tag "Nieuw" (11px, gewicht 700, `--bl` op `--bl-faint`), de titel "Dossier {Organisatie}" (18px, vet) en de regel "Gedeeld door je consultant op {datum}" (14px, `--ink-s`).
+- Onder de regel een voorproef met ten hoogste drie titels als chips (13px, gewicht 600, wit met 1px `--border`, afgerond, met een stip in oranje voor een Case en blauw voor Nieuws), eerst de Cases. Zijn er meer items, dan staat er "+ n meer". Daaronder "2 cases · 2 nieuwsberichten" in 13px `--ink-s`.
+- Rechts de knop "Bekijk dossier" (hoofdactie), even breed als "Bekijk vergelijking".
+- De tag "Nieuw" staat er zolang de Lead de Dossierpagina niet heeft geopend na de laatste wijziging (`OrganisatieLid.dossierGezienOp`, `datamodel.md`, Dossieritem).
+- Het label "Dossier" is oranje. Benchmark is blauw, en de Meting heeft het oranje van het Assessment-icoon. De sectielabels zijn grijs en tellen mee: "Dossier, 1".
 
 ## Kleur en typografie
 

@@ -35,6 +35,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `benchmark.md` | Benchmark op drie niveaus: Tussen organisaties (gebouwd, geaggregeerd en anoniem, met een view per organisatie voor een Lead), binnen een organisatie tussen Metingen, en binnen een Meting (beide voorstel) |
 | `visualisatie-scores.md` | Hoe hoge en lage scores getoond worden: één meting, spreiding binnen een Meting, tussen Metingen, tussen organisaties en de matrix over Metingen (besloten ontwerp, gebouwd op 13 oktober 2026) |
 | `visualisatie-quickscan.md` | Visualisaties van de Quickscan Ziekenhuis in percentages: eigen resultaat (twee standen), gemiddelde en spreiding, antwoorden per vraag en benchmark (besloten op 15 oktober 2026, gebouwd) |
+| `dossier.md` | Het Dossier van een Organisatie: Nieuws en Cases die een Consultant samenstelt en openzet voor de Lead, met koppeling aan bouwblokken, de radar met filter, de Afspraak "Mag als case gebruikt worden" en de rechten (voorstel van 20 oktober 2026) |
 | `visualisatie-mijn-metingen.md` | Opmaak van de landingspagina "Mijn metingen" voor Respondent en Lead: kaarten, statussen, teaser van de uitkomst, respons, benchmarkkaart (voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026) |
 | `visualisatie-verkennen.md` | Admin-scherm Verkennen onder Resultaten: filteren, groeperen en vergelijken van alle Organisaties van één Assessment, met vier weergaven (besloten en gebouwd op 15 oktober 2026) |
 | `help.md` | De helppagina in de app. Een regel Help in het menu, uitleg per rol met illustratie, als Markdown-bestanden in `help/` (gebouwd op 19 oktober 2026) |
@@ -153,18 +154,31 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   het resultaatscherm van een respondent, een Meting en de voorbeeld-output (`stylesheet.md`, Resultaatkop), de Quickscan met Sterkste en Meeste als twee
   kolommen, het staafdiagram per categorie met getal van 14px, de kaarten Toegang en Afspraken op het organisatie-detail, korte namen in de kaart
   Kenmerken en in Sector en Subsector, en `Meting.onderdeel` is vervallen (de naam komt uit het Onderdeel).
-- **Contactpersonen en Nieuws** (gebouwd op 20 oktober 2026, op verzoek van Sander):
+- **Contactpersonen** (gebouwd op 20 oktober 2026, op verzoek van Sander):
   Bij de Kenmerken van een Organisatie legt een Admin relevante
-  contactpersonen vast, met functie en LinkedIn-profiel, en relevante
-  nieuwsartikelen met een link (`datamodel.md`, Contactpersoon en Nieuwsartikel,
-  `beheerpagina.md`, punt 4). Het zijn geen Respondenten, een Lead ziet ze niet en de
-  gegevens van een contactpersoon staan niet in de audit-log. Alleen openbare,
-  zakelijke gegevens zijn toegestaan, geen privégegevens. Vooralsnog mag alleen een
-  Admin ze wijzigen (recht `contactpersonen.bewerken`, besloten op 20 oktober
-  2026, de bouw moet nog worden aangepast); een Consultant ziet ze bij eigen
-  Organisaties. Als de functie stabiel is, mag een Consultant ze ook wijzigen, voor eigen Organisaties.
+  contactpersonen vast, met functie en LinkedIn-profiel (`datamodel.md`,
+  Contactpersoon, `beheerpagina.md`, punt 4). Het zijn geen Respondenten, een
+  Lead ziet ze niet en de gegevens van een contactpersoon staan niet in de
+  audit-log. Alleen openbare, zakelijke gegevens zijn toegestaan, geen
+  privégegevens. Vooralsnog mag alleen een Admin ze wijzigen (recht
+  `contactpersonen.bewerken`, besloten op 20 oktober 2026, de bouw moet nog
+  worden aangepast); een Consultant ziet ze bij eigen Organisaties.
+- **Dossier** (voorstel van 20 oktober 2026, besloten door Joost, nog niet
+  gebouwd, `dossier.md`): Het Dossier vervangt de lijst nieuwsartikelen die
+  Sander bij de Kenmerken zette. Een Consultant (en een Admin) stelt bij een
+  Organisatie een lijst Nieuws en Cases samen, koppelt items aan bouwblokken, en
+  zet het Dossier en per item open voor de Lead. Op Mijn metingen van de Lead is
+  het één kaart "Dossier" onder Vergelijkingen die naar de Dossierpagina gaat,
+  met de radar van de bouwblokken waarop de lijst filtert. Een Case verwijst
+  naar een andere Organisatie en kan alleen open als die de Afspraak "Mag als
+  case gebruikt worden" heeft (standaard uit). De Lead ziet de branche en
+  de omvang, nooit de naam. Afwijkingen van eerdere besluiten: Een Consultant mag
+  het Dossier van eigen Organisaties wijzigen (`dossier.bewerken`), en een Lead
+  ziet de items die zijn opengezet (`dossier.inzien`). Contactpersonen blijft
+  zoals het was.
 - **Help**: Gebouwd op 19 oktober 2026 (`help.md`). Een helppagina per rol
-  (Respondent, Lead, Consultant en Admin) met 25 onderwerpen als Markdown in
+  (Respondent, Lead, Consultant en Admin) met 25 onderwerpen (het Dossier komt
+  erbij met twee, voorstel van 20 oktober 2026) als Markdown in
   `help/`, twee films met CSS-animaties en de rij "Help" in het Accountmenu
   en in "Mijn gegevens". De inhoud is door Claude Code geschreven en wacht op
   de beoordeling van Joost. Alleen twee onderwerpen hebben een illustratie.
