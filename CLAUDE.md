@@ -153,8 +153,14 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   het resultaatscherm van een respondent, een Meting en de voorbeeld-output (`stylesheet.md`, Resultaatkop), de Quickscan met Sterkste en Meeste als twee
   kolommen, het staafdiagram per categorie met getal van 14px, de kaarten Toegang en Afspraken op het organisatie-detail, korte namen in de kaart
   Kenmerken en in Sector en Subsector, en `Meting.onderdeel` is vervallen (de naam komt uit het Onderdeel).
+- **Contactpersonen en Nieuws** (gebouwd op 20 oktober 2026, op verzoek van Sander):
+  Bij de Kenmerken van een Organisatie leggen een Admin en een Consultant (eigen)
+  relevante contactpersonen vast, met functie en LinkedIn-profiel, en relevante
+  nieuwsartikelen met een link (`datamodel.md`, Contactpersoon en Nieuwsartikel,
+  `beheerpagina.md`, punt 4). Het zijn geen Respondenten, een Lead ziet ze niet en de
+  gegevens van een contactpersoon staan niet in de audit-log.
 - **Help**: Gebouwd op 19 oktober 2026 (`help.md`). Een helppagina per rol
-  (Respondent, Lead, Consultant en Admin) met 24 onderwerpen als Markdown in
+  (Respondent, Lead, Consultant en Admin) met 25 onderwerpen als Markdown in
   `help/`, twee films met CSS-animaties en de rij "Help" in het Accountmenu
   en in "Mijn gegevens". De inhoud is door Claude Code geschreven en wacht op
   de beoordeling van Joost. Alleen twee onderwerpen hebben een illustratie.

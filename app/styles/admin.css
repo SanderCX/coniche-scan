@@ -1451,6 +1451,83 @@ select.veld-compact {
   font-size: var(--fs-14);
   color: var(--ink-s);
 }
+/* Contactpersonen en Nieuws onder het raster van de Kenmerken (`beheerpagina.md`, punt 4). */
+.cn-rij {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-8);
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-6);
+  border-top: 1px solid var(--border);
+}
+.cn-kop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-3);
+}
+.cn-kop h3 {
+  margin: 0;
+  font-size: var(--fs-16);
+  font-weight: 700;
+}
+.cn-lijst {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cn-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--border);
+}
+.cn-item:first-child {
+  border-top: 0;
+}
+.cn-tekst {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+.cn-titel {
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--ink);
+}
+a.cn-titel {
+  color: var(--or);
+}
+.cn-sub {
+  font-size: var(--fs-14);
+  color: var(--ink-m);
+}
+.cn-naamrij {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.cn-linkedin {
+  display: inline-flex;
+  color: var(--ink-s);
+}
+.cn-linkedin:hover {
+  color: var(--or);
+}
+.cn-notitie {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+  line-height: 1.4;
+}
+@media (max-width: 999px) {
+  .cn-rij {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .kenmerken-modal {
   margin-top: var(--sp-4);
 }

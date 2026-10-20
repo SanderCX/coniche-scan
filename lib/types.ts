@@ -285,9 +285,41 @@ export interface Onderdeel {
   aangemaaktOp: string;
 }
 
+/** Een relevante contactpersoon bij een Organisatie, met een LinkedIn-profiel (`datamodel.md`, Contactpersoon en Nieuwsartikel). Geen Respondent en geen gebruiker. */
+export interface Contactpersoon {
+  id: string;
+  naam: string;
+  /** Functie bij de Organisatie, vrije tekst. */
+  functie: string;
+  /** Het adres van het LinkedIn-profiel, altijd met https://. Leeg als er geen is. */
+  linkedinUrl: string;
+  /** Waarom de persoon relevant is, vrije tekst. */
+  notitie: string;
+  aangemaaktOp: string;
+}
+
+/** Een relevant nieuwsartikel over een Organisatie, met een link (`datamodel.md`, Contactpersoon en Nieuwsartikel). */
+export interface Nieuwsartikel {
+  id: string;
+  titel: string;
+  /** Het adres van het artikel, altijd http of https. */
+  url: string;
+  /** De publicatie of de site, vrije tekst. */
+  bron: string;
+  /** De publicatiedatum (jjjj-mm-dd), leeg als die onbekend is. */
+  gepubliceerdOp: string;
+  /** Waarom het artikel relevant is, vrije tekst. */
+  notitie: string;
+  aangemaaktOp: string;
+}
+
 export interface Organisatie {
   id: string;
   naam: string;
+  /** Relevante contactpersonen, op alfabet getoond. Ontbreekt bij data van vóór dit veld. */
+  contactpersonen?: Contactpersoon[];
+  /** Relevante nieuwsartikelen, het nieuwste bovenaan getoond. Ontbreekt bij data van vóór dit veld. */
+  nieuwsartikelen?: Nieuwsartikel[];
   /** De Onderdelen van deze Organisatie, één keer per Organisatie. "Hele organisatie" is er geen van. Ontbreekt bij data van vóór dit veld. */
   onderdelen?: Onderdeel[];
   /** De KPI-waarden van deze Organisatie, per plek (Onderdeel), kanaal en KPI (`datamodel.md`, KPI's en kanalen). Ontbreekt bij data van vóór dit veld. */

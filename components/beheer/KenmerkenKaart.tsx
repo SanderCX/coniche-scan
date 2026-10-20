@@ -6,6 +6,7 @@ import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
 import { organisatieVelden } from "@/data/organisatie-velden";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { kenmerkenRaster } from "@/lib/kenmerken-weergave";
+import { ContactenNieuws } from "@/components/beheer/ContactenNieuws";
 import { Organisatie } from "@/lib/types";
 
 /**
@@ -44,6 +45,7 @@ export function KenmerkenKaart({
           ))}
         </dl>
       )}
+      <ContactenNieuws organisatie={organisatie} />
       {open && (
         <KenmerkenModal
           organisatie={organisatie}

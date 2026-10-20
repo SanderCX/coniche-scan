@@ -273,6 +273,41 @@ Onderdeel {
 - **Zo gebouwd (afwijking, op 19 oktober 2026 daarna teruggedraaid: `Meting.onderdeel` bleef eerst staan).** `Meting.onderdeelId` is er, maar het tekstveld `Meting.onderdeel` is niet vervallen: Het is de naam van het Onderdeel als kopie, zodat een Meting zonder de Organisatie erbij te lezen is en de vele plekken die de naam tonen niet allemaal de Organisatie hoeven op te zoeken. `zorgOnderdelenKloppend` (`lib/onderdelen.ts`) houdt de twee kloppend bij elke keer laden en bij elke schrijfactie (`slaAlles`): De naam bepaalt het Onderdeel (hoofdletterongevoelig, met de spelling van het bestaande Onderdeel), een naam die nog geen Onderdeel is maakt er een aan, en "Hele organisatie" is `null`. Hernoemen (`hernoemOnderdeel`) werkt de kopie en de naam van elke Meting bij, behalve bij `labelHandmatig`. De overgang loopt bij het laden en is stabiel: Een Onderdeel dat uit bestaande data ontstaat, krijgt een id uit een hash van de Organisatie en de naam, tot het is opgeslagen.
 - **Besluit 19 oktober 2026: `Meting.onderdeel` vervalt, gebouwd op 19 oktober 2026.** Zo gebouwd: `onderdeelVan(organisatie, meting)` zoekt de naam via `onderdeelId` (`lib/onderdelen.ts`, `onderdeelNaamVan`), het veld staat niet meer in het type, `zorgOnderdelenKloppend` leest de oude tekst alleen nog bij het laden om de Onderdelen aan te maken en verwijdert ze daarna, en het aanmaken en wijzigen van een Meting kiest of maakt het Onderdeel met `zorgVoorOnderdeel`. Het is gebouwd als kopie van de naam van het Onderdeel, naast `Meting.onderdeelId`. De spec heeft die kopie niet nodig: De naam komt uit het Onderdeel via `onderdeelId`, en een tweede veld voor dezelfde informatie kan na een hernoeming uit de pas lopen. Op te ruimen: Het veld verdwijnt uit het type, `zorgOnderdelenKloppend` en `hernoemOnderdeel` hoeven de kopie niet meer bij te houden, en de plekken die de naam tonen zoeken het Onderdeel op via `onderdeelId`. De overgang (hieronder) leest de tekst nog één keer om de Onderdelen aan te maken. Hernoemen van een Onderdeel werkt de naam van de Metingen bij, behalve bij `labelHandmatig`, zoals nu.
 
+### Contactpersoon en Nieuwsartikel
+
+**Besloten en gebouwd op 20 oktober 2026, op verzoek van Sander.** Een Admin of Consultant legt bij een Organisatie vast welke mensen en welke nieuwsartikelen relevant zijn. Ze staan bij de Kenmerken op het organisatie-detail (`beheerpagina.md`, punt 4, Contactpersonen en Nieuws).
+
+```
+Contactpersoon {
+  id: string
+  naam: string                      // verplicht, getrimd, maximaal 80 tekens
+  functie: string                   // vrije tekst, maximaal 80 tekens, mag leeg zijn
+  linkedinUrl: string               // het adres van het profiel, altijd https:// of http://, leeg als er geen is
+  notitie: string                   // waarom de persoon relevant is, maximaal 300 tekens
+  aangemaaktOp: datetime
+}
+
+Nieuwsartikel {
+  id: string
+  titel: string                     // verplicht, getrimd, maximaal 200 tekens
+  url: string                       // verplicht, altijd http of https
+  bron: string                      // de publicatie of de site, maximaal 80 tekens
+  gepubliceerdOp: date | ""         // jjjj-mm-dd, leeg als het onbekend is
+  notitie: string                   // waarom het artikel relevant is, maximaal 300 tekens
+  aangemaaktOp: datetime
+}
+```
+
+`Organisatie.contactpersonen` en `Organisatie.nieuwsartikelen` zijn lijsten die ontbreken in data van vóór deze velden (dan zijn ze leeg).
+
+- **Geen Respondent, geen gebruiker.** Een Contactpersoon heeft geen e-mailadres, geen toegangscode en geen rol. Er wordt niets naartoe gestuurd, en ze doen niet mee in een scan, een benchmark of een export.
+- **LinkedIn-adres.** Optioneel. Wat is ingevuld, moet een adres van `linkedin.com` of een subdomein zijn (de controle is op het domein, niet op de tekst). Zonder schema wordt `https://` voorgezet. Een ander domein wordt geweigerd.
+- **Adres van een artikel.** Alleen `http` en `https`, met een punt in de domeinnaam. Een adres met een ander schema, zoals `javascript:`, wordt geweigerd. Zonder schema wordt `https://` voorgezet. Links openen in een nieuw tabblad met `rel="noopener noreferrer"`.
+- **Volgorde.** Contactpersonen op alfabet, hoofdletterongevoelig. Nieuws met het nieuwste bovenaan: Op publicatiedatum, en zonder datum op het moment van toevoegen.
+- **Recht en slot.** `organisaties.bewerken` en het Bewerkslot van de Organisatie, zoals bij de Kenmerken. Een Lead en een Respondent zien ze niet.
+- **Verwijderen.** Een eigen verwijderactie per item, met bevestiging. Wordt de Organisatie verwijderd, dan gaan ze mee (Verwijderen en datakoppelingen).
+- **Privacy.** Een Contactpersoon is een persoon buiten de app met persoonsgegevens. Daarom staan hun gegevens niet in de audit-log (Audit) en niet in de exports. Wat er is vastgelegd, is wat Coniche uit openbare bronnen weet, en Coniche is er verantwoordelijk voor dat dat klopt.
+
 ### Respondent (in de code: `OrganisatieLid`)
 
 De persoon, los van hoe vaak die een scan invult.
@@ -622,7 +657,8 @@ verwijst wat niet meer bestaat.
   waarden en het aantal Organisaties.
 - **Organisatie**: Alles wat eronder hangt: Metingen, respondenten,
   toegangscodes, invullingen, antwoorden en opmerkingen, en (voorstel van
-  19 oktober 2026) Onderdelen en KPI-waarden. Het
+  19 oktober 2026) Onderdelen en KPI-waarden, en (gebouwd op 20 oktober 2026)
+  Contactpersonen en Nieuwsartikelen. Het
   assessment-type en de content blijven staan.
 - **Assessment**: Alleen als er geen enkele Meting van dit Assessment
   bestaat, bij welke organisatie dan ook (ook geen Meting zonder scans).
@@ -1415,6 +1451,16 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   de hele keer. `details` bevat de naam van de Organisatie, de plek (de naam van
   het Onderdeel of "Algemeen") en het aantal ingevulde, gewijzigde en gewiste
   waarden.
+- `contactpersoon.toegevoegd`, `contactpersoon.gewijzigd` en
+  `contactpersoon.verwijderd` (gebouwd op 20 oktober 2026). `details` bevat
+  alleen de Organisatie en bij `toegevoegd` of er een LinkedIn-profiel is, en
+  bij `gewijzigd` welke velden zijn gewijzigd (`["functie"]`), nooit de naam,
+  de functie, het adres of de notitie. `entiteitNaam` is leeg, zoals bij
+  `respondent.bewerkt`.
+- `nieuwsartikel.toegevoegd`, `nieuwsartikel.gewijzigd` en
+  `nieuwsartikel.verwijderd` (gebouwd op 20 oktober 2026). `details` bevat de
+  Organisatie en de titel van het artikel, en bij `gewijzigd` de gewijzigde
+  velden. Een artikel is openbaar en bevat geen persoonsgegevens uit scans.
 - `kpiDefinitie.aangemaakt`, `kpiDefinitie.gewijzigd`, `kpiDefinitie.verwijderd`,
   `kpiDefinitie.volgordeGewijzigd`, `kanaal.aangemaakt`, `kanaal.hernoemd`,
   `kanaal.verwijderd` en `kanaal.volgordeGewijzigd` (gebouwd op 19 oktober 2026). `details` bevat de naam en
@@ -1445,7 +1491,7 @@ Een streepje betekent geen toegang.
 | `content.beheren` (ook de definitie van organisatievelden, KPI's en kanalen) | alle | - | - | - |
 | `organisaties.aanmaken` | alle | ja | - | - |
 | `organisaties.toewijzen` (aan een Consultant) | alle | - | - | - |
-| `organisaties.bewerken` (incl. kenmerken, KPI-waarden en Onderdelen) | alle | eigen | te bevestigen | - |
+| `organisaties.bewerken` (incl. kenmerken, KPI-waarden, Onderdelen, Contactpersonen en Nieuwsartikelen) | alle | eigen | te bevestigen | - |
 | `organisaties.verwijderen` | alle | eigen | - | - |
 | `metingen.plannen` (ook een nieuw Onderdeel aanmaken in het formulier) | alle | eigen | - | - |
 | `respondenten.uitnodigen` | alle | eigen | aangevinkte Metingen (Uitnodigen) | - |
