@@ -1,5 +1,21 @@
 # Coniche Scan — Changelog
 
+## 2026-10-19 (9) — Specs van Joost, PR 141: de radar met knooppunten, het staafdiagram met tooltip en de top 3 in scorekleur
+
+Op verzoek van Sander gebouwd (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm en Staafdiagram per categorie; `content-ziekenhuis-quickscan.md`, Resultaten, 3; `CLAUDE.md`, scherm 6). Helpbestand: `help/resultaten-lezen.md`.
+
+**Gedaan**:
+- **Radar** (`components/RadarChartView.tsx`): Een eigen SVG met per bouwblok een genummerd knooppunt van 26px (wit, rand in de categoriekleur), taartpunten in de categoriekleur, de klassegrenzen 2,5 en 3,5 als stippellijnen en een regel met de
+  categorieën en hun nummers eronder. De naam staat in de tooltip (hover, Tab en een tik), met de factor bij een gewogen bouwblok. De radar met twee reeksen in de benchmark heeft dezelfde knooppunten en toont beide scores in de tooltip.
+- **Staafdiagram** (`components/CategorieStaafdiagram.tsx`): Geen getal boven de balk, een tooltip met naam, getal en klasse bij hover en toetsenbordfocus, de klassenamen in een regel eronder, geen horizontaal scrollen en onder 640px een
+  horizontaal diagram. Het diagram met een vergelijking en dat per domein (AI-scan) houdt Recharts.
+- **Resultaatscherm**: De radar ("Per bouwblok") en het staafdiagram ("Per categorie") staan in twee kaarten naast elkaar, op de pagina van een respondent en in Overzicht van een Meting. De top 3 heeft de rijen in de tint van de score,
+  de Quickscan-rijen Sterkste en Meeste in de tint van de klasse.
+- **Tests**: `lib/radar.test.tsx` (6 tests) met server-rendering van beide componenten.
+
+**Keuzes waar de spec open liet**: `BouwblokResultaat` heeft nu `groepKleur` voor de knooppunten. De tooltip werkt met CSS (`:hover` en `:focus`) in plaats van met script, zodat hij ook met het toetsenbord opent. Het diagram met twee reeksen houdt Recharts, omdat de
+spec één reeks beschrijft.
+
 ## 2026-10-19 (8) — Specs van Joost, PR 139: de Resultaatkop, Toegang en Afspraken, korte namen in Kenmerken en `Meting.onderdeel` vervalt
 
 Op verzoek van Sander gebouwd (`stylesheet.md`, Resultaatkop; `content-ziekenhuis-quickscan.md`, Resultaten; `visualisatie-quickscan.md`, 3; `beheerpagina.md`, punt 4; `datamodel.md`, Onderdeel en Korte namen). Helpbestanden: `help/resultaten-lezen.md` en `help/mijn-metingen.md`.

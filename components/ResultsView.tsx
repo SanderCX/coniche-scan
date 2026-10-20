@@ -13,11 +13,23 @@ import {
   voortgang,
 } from "@/lib/scoring";
 import { gewichtMarkering } from "@/lib/weging";
-import { CLASSIFICATIE_INFO, scoreKleur } from "@/lib/colors";
+import { CLASSIFICATIE_INFO } from "@/lib/colors";
+import { celStap } from "@/lib/mijn-metingen";
 import { ResultaatKop, Totaalkaart } from "./Resultaatkop";
 import { ringVanScore } from "@/lib/score-ring";
 import { RadarChartView } from "./RadarChartView";
 import { CategoryBarChart } from "./CategoryBarChart";
+
+/**
+ * De rij van de top 3 heeft de tint van de afgeronde score van het bouwblok (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm):
+ * Achtergrond `--score-N-faint`, rand `--score-N-cel` en het getal in `--score-N-cel-tekst`. De klasse hoort bij de score en niet bij de plek
+ * in de lijst.
+ */
+function scoreTint(score: number | null): React.CSSProperties {
+  if (score === null) return {};
+  const n = celStap(score);
+  return { background: `var(--score-${n}-faint)`, borderColor: `var(--score-${n}-cel)`, ["--score-tekst" as string]: `var(--score-${n}-cel-tekst)` } as React.CSSProperties;
+}
 
 /** De stip bij een klasse: De klassekleur (`stylesheet.md`, Resultaatkop, Classificatie). */
 const STAT_KLEUR = { rood: "var(--stat-red)", oranje: "var(--stat-amber)", groen: "var(--stat-green)" } as const;
@@ -103,15 +115,16 @@ export function ResultsView({
         />
       )}
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div className="chart-block">
-          <h3>Alle {assessment.bouwblokEenheidMeervoud}</h3>
+      {/* Twee kaarten naast elkaar (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm): De radar en het staafdiagram. */}
+      <div className="resultaat-kaarten">
+        <section className="resultaat-kaart">
+          <h3>{vlak ? `Per ${assessment.bouwblokEenheidEnkelvoud}` : "Per bouwblok"}</h3>
           <RadarChartView resultaten={bouwblokResultaten} />
-        </div>
-        <div className="chart-block">
+        </section>
+        <section className="resultaat-kaart">
           <h3>{groepHeading}</h3>
           <CategoryBarChart resultaten={groepResultaten} horizontaal={vlak} />
-        </div>
+        </section>
       </div>
 
       <div className="top3-grid" style={{ margin: "2.5rem 0" }}>
@@ -119,7 +132,7 @@ export function ResultsView({
           <h3>Top 3 Sterktes</h3>
           <ol className="top3-lijst">
             {sterktes.map((r) => (
-              <li key={r.bouwblok.id} className="top3-item">
+              <li key={r.bouwblok.id} className="top3-item" style={scoreTint(r.score)}>
                 {bouwblokHref ? (
                   <Link href={bouwblokHref(r.bouwblok.id)} className="text-sm text-ink hover:underline">
                     {r.bouwblok.naam}
@@ -132,12 +145,7 @@ export function ResultsView({
                     {gewichtMarkering(r.bouwblok)}
                   </span>
                 )}
-                <span
-                  className="score-pill"
-                  style={{ ["--kleur" as string]: scoreKleur(r.score) } as React.CSSProperties}
-                >
-                  {formatScore(r.score)}
-                </span>
+                <span className="score-pill">{formatScore(r.score)}</span>
               </li>
             ))}
           </ol>
@@ -146,7 +154,7 @@ export function ResultsView({
           <h3>Top 3 Verbeterkansen</h3>
           <ol className="top3-lijst">
             {verbeterkansen.map((r) => (
-              <li key={r.bouwblok.id} className="top3-item">
+              <li key={r.bouwblok.id} className="top3-item" style={scoreTint(r.score)}>
                 {bouwblokHref ? (
                   <Link href={bouwblokHref(r.bouwblok.id)} className="text-sm text-ink hover:underline">
                     {r.bouwblok.naam}
@@ -159,12 +167,7 @@ export function ResultsView({
                     {gewichtMarkering(r.bouwblok)}
                   </span>
                 )}
-                <span
-                  className="score-pill"
-                  style={{ ["--kleur" as string]: scoreKleur(r.score) } as React.CSSProperties}
-                >
-                  {formatScore(r.score)}
-                </span>
+                <span className="score-pill">{formatScore(r.score)}</span>
               </li>
             ))}
           </ol>
