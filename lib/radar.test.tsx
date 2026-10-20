@@ -21,9 +21,8 @@ describe("de radar met knooppunten", () => {
     expect(html).toContain("4 · Leren uit klantcontact 2×");
     expect(html).toContain("<strong>1 · Organisatiestrategie</strong>");
   });
-  it("noemt onder de radar de categorieën met hun nummers", () => {
-    expect(html).toContain("Overkoepelend · 1–2");
-    expect(html).toContain("Fundament · 15");
+  it("heeft onder de radar geen legenda met categorieën meer", () => {
+    expect(html).not.toContain("radar-categorieen");
   });
   it("toont bij een tweede reeks beide scores in de tooltip", () => {
     const m = renderToStaticMarkup(<RadarChartView resultaten={bouwblokken} vergelijking={bouwblokken} naam="Org" vergelijkingNaam="Groep" />);
@@ -43,5 +42,10 @@ describe("het staafdiagram per categorie", () => {
     for (const g of groepen) expect(html).toContain(g.groepNaam.replace("&", "&amp;"));
     expect(html).toContain("De stippellijnen bij 2,5 en 3,5");
     expect(html).not.toContain("recharts");
+  });
+  it("zet de nummers van de bouwblokken bij de categorienaam", () => {
+    expect(html).toContain('<span class="cat-nummers">1–2</span>');
+    expect(html).toContain('<span class="cat-nummers">15</span>');
+    expect(html).toContain('<span class="cat-nummers">7–10</span>');
   });
 });

@@ -46,15 +46,6 @@ export function RadarChartView({
       .map((r, i) => punt(radiaal(r.score ?? SCHAAL_MIN), hoek(i, n)).map((v) => v.toFixed(1)).join(","))
       .join(" ");
 
-  // De categorieën in volgorde met hun nummers ("Organisatie · 3–6"): Alleen bij een Assessment met een categorielaag.
-  const groepen: { id: string; naam: string; kleur: string; van: number; tot: number }[] = [];
-  for (const r of resultaten) {
-    const laatste = groepen[groepen.length - 1];
-    if (laatste && laatste.id === r.groepId) laatste.tot = r.bouwblok.volgnummer;
-    else groepen.push({ id: r.groepId, naam: r.groepNaam ?? "", kleur: kleurVan(r), van: r.bouwblok.volgnummer, tot: r.bouwblok.volgnummer });
-  }
-  const metCategorieen = groepen.length < n && groepen.every((g) => g.naam);
-
   return (
     <div className="radar">
       <div className="radar-vlak" style={{ aspectRatio: "1 / 1" }}>
@@ -140,16 +131,6 @@ export function RadarChartView({
           );
         })}
       </div>
-      {metCategorieen && (
-        <p className="radar-categorieen">
-          {groepen.map((g) => (
-            <span key={g.id}>
-              <i style={{ background: g.kleur }} aria-hidden="true" />
-              {g.naam} · {g.van === g.tot ? g.van : `${g.van}–${g.tot}`}
-            </span>
-          ))}
-        </p>
-      )}
     </div>
   );
 }

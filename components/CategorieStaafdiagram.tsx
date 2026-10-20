@@ -53,8 +53,9 @@ export function CategorieStaafdiagram({ resultaten }: { resultaten: GroepResulta
                       </span>
                     </button>
                   </div>
-                  <span className="cat-naam" title={naam}>
+                  <span className="cat-naam" title={r.nummers ? `${naam} · bouwblok ${r.nummers}` : naam}>
                     {naam}
+                    {r.nummers && <span className="cat-nummers">{r.nummers}</span>}
                   </span>
                 </div>
               );

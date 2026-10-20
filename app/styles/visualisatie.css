@@ -39,6 +39,16 @@
   line-height: 1.2;
   color: var(--ink);
 }
+.vis-tegel-meter {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+}
+.vis-tegel-meter .vis-tegel-sub {
+  margin-top: 0;
+  min-width: 0;
+}
 .vis-tegel-sub {
   margin-top: 0.1rem;
   font-size: var(--fs-14);
@@ -523,6 +533,10 @@
 }
 .vis-antw-vraag td {
   height: 50px;
+}
+.vis-antw-ruimte td {
+  height: 15px;
+  background: var(--bg);
 }
 .vis-antw-vraagtekst {
   display: -webkit-box;

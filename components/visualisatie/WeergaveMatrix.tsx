@@ -60,8 +60,8 @@ export function WeergaveMatrix({
     <div className="vis" data-weergave="matrix">
       <Tegels
         tegels={[
-          { label: `Hoogste ${soort}`, waarde: toon(weergave.hoogsteMeting?.totaal), sub: tegelSub(weergave.hoogsteMeting) },
-          { label: `Laagste ${soort}`, waarde: toon(weergave.laagsteMeting?.totaal), sub: tegelSub(weergave.laagsteMeting) },
+          { label: `Hoogste ${soort}`, waarde: toon(weergave.hoogsteMeting?.totaal), score: weergave.hoogsteMeting?.totaal, sub: tegelSub(weergave.hoogsteMeting) },
+          { label: `Laagste ${soort}`, waarde: toon(weergave.laagsteMeting?.totaal), score: weergave.laagsteMeting?.totaal, sub: tegelSub(weergave.laagsteMeting) },
           {
             label: "Grootste verschil",
             waarde: toon(weergave.grootsteVerschil?.verschil),

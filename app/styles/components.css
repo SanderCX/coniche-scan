@@ -915,6 +915,34 @@ select.veld-compact:focus {
   letter-spacing: 0.04em;
 }
 
+/* De ring in een rij van de top 3: 44px, het getal in 14px, zonder label. */
+.score-ring--mini {
+  margin: 0;
+  flex: none;
+}
+.score-ring--mini .score-ring {
+  width: 44px;
+  height: 44px;
+}
+.score-ring--mini .score-ring-getal {
+  font-size: var(--fs-14);
+  font-weight: 700;
+}
+
+/* De ring in een tegel boven een weergave: 64px, het getal in 16px, zonder label. */
+.score-ring--tegel {
+  margin: 0;
+  flex: none;
+}
+.score-ring--tegel .score-ring {
+  width: 64px;
+  height: 64px;
+}
+.score-ring--tegel .score-ring-getal {
+  font-size: var(--fs-16);
+  font-weight: 700;
+}
+
 /* ---------- Resultaatkop (`stylesheet.md`, Resultaatkop) ---------- */
 .resultaatkop {
   margin-bottom: var(--sp-6);
@@ -1107,20 +1135,16 @@ select.veld-compact:focus {
   color: var(--ink);
 }
 
-.top3-item .score-pill {
-  font-size: var(--fs-16);
-  font-weight: 600;
-  color: var(--score-tekst, var(--ink));
-}
 
 /* De radar en het staafdiagram naast elkaar (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm). */
 .resultaat-kaarten {
   display: grid;
-  grid-template-columns: 480px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
   gap: var(--sp-6);
   margin-bottom: var(--sp-8);
 }
 .resultaat-kaart {
+  container-type: inline-size;
   min-width: 0;
   padding: var(--sp-6);
   background: var(--bg);
@@ -1132,7 +1156,8 @@ select.veld-compact:focus {
   font-size: var(--fs-18);
   font-weight: 700;
 }
-@media (max-width: 1199px) {
+/* Radar een derde en staafdiagram twee derde van de breedte. Het staafdiagram springt in zijn kaart om naar horizontaal als de kaart smal is (`charts.css`). Onder 1000px onder elkaar. */
+@media (max-width: 999px) {
   .resultaat-kaarten {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1148,18 +1173,6 @@ select.veld-compact:focus {
   color: var(--ink-s);
   font-size: var(--fs-14);
   margin-top: 0.6rem;
-}
-
-.preview-banner {
-  background: var(--or-faint);
-  border: 1px solid var(--or-mid);
-  color: var(--or);
-  text-align: center;
-  padding: 0.8rem;
-  font-weight: 700;
-  font-size: var(--fs-14);
-  /* Eén regel ruimte onder de balk, voor de eerste kaart van het resultaat. */
-  margin-bottom: 1.5rem;
 }
 
 @media (max-width: 900px) {
@@ -1432,15 +1445,15 @@ select.veld-compact:focus {
   border-radius: 100px;
 }
 .qs-punten {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
   font-size: var(--fs-24);
-  margin: 0.6rem 0 0;
+  margin: 0.6rem 0 var(--sp-2);
 }
 .qs-punten span {
   font-size: var(--fs-16);
   color: var(--ink-m);
-}
-.qs-punten .qs-percentage {
-  font-weight: 800;
 }
 .qs-tellingen {
   display: flex;
@@ -1520,8 +1533,4 @@ select.veld-compact:focus {
   border-radius: 10px;
   font-size: var(--fs-14);
   color: var(--ink);
-}
-.qs-uitgelicht-rij strong {
-  font-size: var(--fs-16);
-  font-weight: 600;
 }

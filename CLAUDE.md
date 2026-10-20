@@ -380,7 +380,14 @@ geen afwijking van de spec maar een gat erin.
    niet bij een scan met Ja / Nee / Weet ik niet), met daaronder de knop
    "Bekijk de voorbeeld-output" naar scherm 3. Die knop vervangt de link
    "Bekijk wat je krijgt" verderop op de pagina. Alle cijfers in de film
-   zijn voorbeelddata. Deze pagina
+   zijn voorbeelddata. Op de pagina staan grijze lijniconen (`--ink-s`, op het
+   raster van de Assessment-iconen, `components/icons/LandingIcons.tsx`, gebouwd op
+   20 oktober 2026): Voor elk deel van de subtitel ("±30 minuten", "Heldere
+   inzichten", "Direct verbeterkansen", gekozen op de inhoud van het deel), voor de
+   titel van elke feature-card (Volledig beeld, Direct inzicht, Concreet en
+   toepasbaar, op volgorde van de kaart, zonder nummer) en voor de drie
+   koppen van Praktische informatie. De zin "15 bouwblokken, verdeeld over 5
+   pijlers" is in de beschrijving bovenaan een link naar `/bouwstenen` (niet ook in de kaart Volledig beeld, waar de zin nog eens staat). Deze pagina
    wordt later mogelijk een leadgenerator met "Toegang aanvragen"
    (`backlog.md`).
 3. **Voorbeeld-output**: Dezelfde resultaatcomponenten als scherm 6, met

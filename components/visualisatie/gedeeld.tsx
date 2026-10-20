@@ -2,6 +2,10 @@ import { Classificatie } from "@/lib/types";
 import { isVlakkeAssessment } from "@/lib/assessment-structuur";
 import { Assessment } from "@/lib/types";
 import { BouwblokRij, KLASSE_LABEL } from "@/lib/visualisatie";
+import { classificatie } from "@/lib/scoring";
+import { ringVanScore } from "@/lib/score-ring";
+import { formatScore } from "@/lib/format";
+import { ScoreRing } from "@/components/ScoreRing";
 
 /**
  * Gedeelde onderdelen van de weergaven A tot en met E (`visualisatie-scores.md`, Gedeelde regels): Schaal van 1 tot 5 met
@@ -25,16 +29,36 @@ export function pct(score: number): number {
   return Math.min(100, Math.max(0, ((score - 1) / 4) * 100));
 }
 
-export function Tegels({ tegels }: { tegels: { label: string; waarde: string; sub?: string }[] }) {
+/**
+ * De tegels boven een weergave. Een tegel met een `score` van 1 tot 5 toont die als meter: Een ring van 64px (`ScoreRing` met `tegel`,
+ * dezelfde boog als de ring van de totaalscore) met het getal erin, en rechts ervan de `sub`. Alle andere tegels (aantallen, verschillen,
+ * spreiding) tonen hun `waarde` als tekst.
+ */
+export function Tegels({ tegels }: { tegels: { label: string; waarde: string; sub?: string; score?: number | null }[] }) {
   return (
     <div className="vis-tegels">
-      {tegels.map((t) => (
-        <div key={t.label} className="vis-tegel">
-          <div className="vis-tegel-label">{t.label}</div>
-          <div className="vis-tegel-waarde">{t.waarde}</div>
-          {t.sub && <div className="vis-tegel-sub">{t.sub}</div>}
-        </div>
-      ))}
+      {tegels.map((t) =>
+        typeof t.score === "number" ? (
+          <div key={t.label} className="vis-tegel">
+            <div className="vis-tegel-label">{t.label}</div>
+            <div className="vis-tegel-meter">
+              <ScoreRing
+                tegel
+                metChip={false}
+                ring={ringVanScore(t.score, classificatie(t.score))}
+                alt={`${t.label}: ${formatScore(t.score)}${t.sub ? `, ${t.sub}` : ""}`}
+              />
+              {t.sub && <div className="vis-tegel-sub">{t.sub}</div>}
+            </div>
+          </div>
+        ) : (
+          <div key={t.label} className="vis-tegel">
+            <div className="vis-tegel-label">{t.label}</div>
+            <div className="vis-tegel-waarde">{t.waarde}</div>
+            {t.sub && <div className="vis-tegel-sub">{t.sub}</div>}
+          </div>
+        ),
+      )}
     </div>
   );
 }

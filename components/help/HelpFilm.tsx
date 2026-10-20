@@ -128,7 +128,7 @@ export function HelpFilm({ naam, knop, opmerking }: { naam: FilmNaam; knop?: Rea
       <div className="help-film-kop">
         <div>
           <h3 className="help-kaart-kop">{film.titel}</h3>
-          <span className="help-label">Voorbeeld met voorbeelddata · {film.duur} seconden</span>
+          <span className="help-label">Voorbeeld met voorbeelddata</span>
         </div>
         <button type="button" className="btn btn-outline btn-compact help-film-pauze" aria-pressed={pauze} onClick={() => setPauze(!pauze)}>
           {pauze ? "Afspelen" : "Pauzeer"}

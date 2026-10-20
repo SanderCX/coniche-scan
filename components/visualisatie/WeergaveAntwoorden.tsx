@@ -33,6 +33,7 @@ export function WeergaveAntwoorden({ assessment, weergave }: { assessment: Asses
   const percentage = weergave.mogelijk === 0 ? null : Math.round((weergave.beantwoord / weergave.mogelijk) * 100);
   const vraagTegel = (v: AntwoordenWeergave["laagsteVraag"]) => ({
     waarde: toon(v?.score),
+    score: v?.score,
     sub: v ? `${v.bouwblok}, vraag ${v.nummer}` : undefined,
   });
   const laagste = vraagTegel(weergave.laagsteVraag);
@@ -109,6 +110,7 @@ export function WeergaveAntwoorden({ assessment, weergave }: { assessment: Asses
                     <td className="vis-antw-zij">{toon(r.gemiddelde)}</td>
                     <td className="vis-antw-zij">{r.n}</td>
                   </tr>
+                  {uitgeklapt && <Ruimte kolommen={kolommen.length + 3} />}
                   {uitgeklapt &&
                     r.vragen.map((v) => (
                       <tr key={v.vraagId} className="vis-antw-vraag">
@@ -126,6 +128,7 @@ export function WeergaveAntwoorden({ assessment, weergave }: { assessment: Asses
                         <td className="vis-antw-zij">{v.n}</td>
                       </tr>
                     ))}
+                  {uitgeklapt && <Ruimte kolommen={kolommen.length + 3} />}
                 </RijGroep>
               );
             })}
@@ -147,6 +150,15 @@ export function WeergaveAntwoorden({ assessment, weergave }: { assessment: Asses
         Een bouwblokcel toont de bouwblokscore van die respondent, een lege cel is een onbeantwoorde vraag.
       </p>
     </div>
+  );
+}
+
+/** Een lege regel ruimte boven de eerste en onder de laatste vraag van een uitgeklapt bouwblok. */
+function Ruimte({ kolommen }: { kolommen: number }) {
+  return (
+    <tr className="vis-antw-ruimte" aria-hidden="true">
+      <td colSpan={kolommen} />
+    </tr>
   );
 }
 

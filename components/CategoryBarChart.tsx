@@ -30,7 +30,8 @@ export function CategoryBarChart({
   vergelijkingNaam?: string;
 }) {
   const data = resultaten.map((r, i) => ({
-    naam: r.gewicht && r.gewicht !== 1 ? `${r.groepNaam} (${formatGewicht(r.gewicht)}×)` : r.groepNaam,
+    // Per domein (horizontaal) staat het nummer van het domein voor de naam, zodat het diagram aansluit op de radar ernaast.
+    naam: `${horizontaal && r.nummers ? `${r.nummers} · ` : ""}${r.gewicht && r.gewicht !== 1 ? `${r.groepNaam} (${formatGewicht(r.gewicht)}×)` : r.groepNaam}`,
     score: r.score ?? 0,
     // Per categorie de categoriekleur (`stylesheet.md`, Categoriekleuren). Per bouwblok (horizontaal) blijft de scorekleur.
     kleur:
@@ -40,6 +41,7 @@ export function CategoryBarChart({
           ? CATEGORIE_COLORS[r.kleur].hex
           : scoreKleur(r.score),
     vergelijking: vergelijking?.[i]?.score ?? 0,
+    nummers: r.nummers,
   }));
   const hoogtePerRij = vergelijking ? 64 : 44;
 
@@ -85,7 +87,7 @@ export function CategoryBarChart({
       <div className="h-72 w-full" style={{ minWidth: minBreedte }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 24, right: 96, left: -16, bottom: 8 }}>
-            <XAxis dataKey="naam" interval={0} tick={<CategorieTick />} height={32} />
+            <XAxis dataKey="naam" interval={0} tick={<CategorieTick nummers={Object.fromEntries(data.map((d) => [d.naam, d.nummers]))} />} height={44} />
             <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 12, fill: "#4d4d49" }} allowDataOverflow />
             <Tooltip formatter={(value) => Number(value).toFixed(1).replace(".", ",")} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
@@ -108,10 +110,26 @@ export function CategoryBarChart({
 }
 
 /** Een categorienaam op één regel onder zijn balk, nooit afgebroken en nooit overgeslagen. */
-function CategorieTick({ x, y, payload }: { x?: number; y?: number; payload?: { value: string } }) {
+function CategorieTick({
+  x,
+  y,
+  payload,
+  nummers,
+}: {
+  x?: number;
+  y?: number;
+  payload?: { value: string };
+  nummers?: Record<string, string | undefined>;
+}) {
+  const nrs = payload ? nummers?.[payload.value] : undefined;
   return (
     <text x={x} y={(y ?? 0) + 14} textAnchor="middle" fontSize={12} fill="var(--ink-s)" style={{ whiteSpace: "nowrap" }}>
       {payload?.value}
+      {nrs && (
+        <tspan x={x} dy={16}>
+          {nrs}
+        </tspan>
+      )}
     </text>
   );
 }

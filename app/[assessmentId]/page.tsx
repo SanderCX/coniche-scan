@@ -8,6 +8,26 @@ import { PageWithChrome } from "@/components/PageWithChrome";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
 import { HelpFilm } from "@/components/help/HelpFilm";
+import { KAART_ICONEN, KlokIcoon, SlotIcoon, StaafIcoon, icoonVoorSubtitel } from "@/components/icons/LandingIcons";
+
+/** De zin "15 bouwblokken, verdeeld over 5 pijlers" in een tekst wordt een link naar het bouwstenenmodel. */
+const BOUWSTENEN_ZIN = /(\d+ bouwblokken, verdeeld over \d+ pijlers)/;
+
+function MetBouwstenenLink({ tekst }: { tekst: string }) {
+  return (
+    <>
+      {tekst.split(BOUWSTENEN_ZIN).map((deel, i) =>
+        i % 2 === 1 ? (
+          <Link key={i} href="/bouwstenen" className="tekst-link">
+            {deel}
+          </Link>
+        ) : (
+          deel
+        ),
+      )}
+    </>
+  );
+}
 
 export default function AssessmentLandingPage({
   params,
@@ -63,16 +83,33 @@ export default function AssessmentLandingPage({
           <h1>{assessment.naam}</h1>
           <p
             style={{
-              maxWidth: "34rem",
+              maxWidth: "44rem",
               margin: "0 auto",
               fontSize: "var(--fs-18)",
               fontWeight: 700,
               color: "var(--ink)",
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: "0.5rem 1.5rem",
             }}
           >
-            {assessment.subtitel}
+            {assessment.subtitel
+              .split(/(?<=\.)\s+/)
+              .filter(Boolean)
+              .map((deel) => {
+                const Icoon = icoonVoorSubtitel(deel);
+                return (
+                  <span key={deel} style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+                    {Icoon && <Icoon aria-hidden="true" style={{ width: "1.5rem", height: "1.5rem", flexShrink: 0, color: "var(--ink-s)" }} />}
+                    {deel}
+                  </span>
+                );
+              })}
           </p>
-          <p style={{ maxWidth: "38rem", margin: "1rem auto 0" }}>{assessment.beschrijving}</p>
+          <p style={{ maxWidth: "38rem", margin: "1rem auto 0" }}>
+            <MetBouwstenenLink tekst={assessment.beschrijving} />
+          </p>
           <p className="text-sm" style={{ color: "var(--ink-s)", marginTop: "0.6rem" }}>
             Bedoeld voor: {assessment.doelgroep}
           </p>
@@ -103,31 +140,20 @@ export default function AssessmentLandingPage({
           className="grid grid-cols-1 gap-6 sm:grid-cols-3"
           style={{ marginTop: "-2.5rem", position: "relative", zIndex: 1 }}
         >
-          {assessment.featureCards.map((card, i) => (
+          {assessment.featureCards.map((card, i) => {
+            const KaartIcoon = KAART_ICONEN[i];
+            return (
             <div key={card.titel} className="card card-accent-top" style={{ background: "var(--bg)" }}>
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "2.2rem",
-                  height: "2.2rem",
-                  borderRadius: "50%",
-                  background: "var(--or-faint)",
-                  color: "var(--or)",
-                  fontWeight: 800,
-                  fontSize: "var(--fs-14)",
-                  marginBottom: "0.9rem",
-                }}
-              >
-                {i + 1}
-              </span>
-              <h3>{card.titel}</h3>
+              <h3 style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                {KaartIcoon && <KaartIcoon aria-hidden="true" style={{ width: "1.5rem", height: "1.5rem", flexShrink: 0, color: "var(--ink-s)" }} />}
+                {card.titel}
+              </h3>
               <p className="text-sm" style={{ color: "var(--ink-m)" }}>
                 {card.tekst}
               </p>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* De film Wat krijg ik (`help.md`, Films): Tussen de kaarten en Praktische informatie, met de knop naar de Voorbeeld-output.
@@ -148,7 +174,8 @@ export default function AssessmentLandingPage({
           <h3>Praktische informatie</h3>
           <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3" style={{ marginTop: "1.2rem" }}>
             <div>
-              <dt className="eyebrow" style={{ marginBottom: "0.3rem" }}>
+              <dt className="eyebrow" style={{ marginBottom: "0.3rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <KlokIcoon aria-hidden="true" style={{ width: "1.25rem", height: "1.25rem", flexShrink: 0, color: "var(--ink-s)" }} />
                 Invultijd
               </dt>
               <dd className="text-sm" style={{ color: "var(--ink-m)" }}>
@@ -156,7 +183,8 @@ export default function AssessmentLandingPage({
               </dd>
             </div>
             <div>
-              <dt className="eyebrow" style={{ marginBottom: "0.3rem" }}>
+              <dt className="eyebrow" style={{ marginBottom: "0.3rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <StaafIcoon aria-hidden="true" style={{ width: "1.25rem", height: "1.25rem", flexShrink: 0, color: "var(--ink-s)" }} />
                 Direct resultaat
               </dt>
               <dd className="text-sm" style={{ color: "var(--ink-m)" }}>
@@ -164,7 +192,8 @@ export default function AssessmentLandingPage({
               </dd>
             </div>
             <div>
-              <dt className="eyebrow" style={{ marginBottom: "0.3rem" }}>
+              <dt className="eyebrow" style={{ marginBottom: "0.3rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <SlotIcoon aria-hidden="true" style={{ width: "1.25rem", height: "1.25rem", flexShrink: 0, color: "var(--ink-s)" }} />
                 Privacy
               </dt>
               <dd className="text-sm" style={{ color: "var(--ink-m)" }}>
