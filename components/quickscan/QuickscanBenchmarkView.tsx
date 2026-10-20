@@ -1,6 +1,9 @@
 import { BenchmarkRijQs, BenchmarkViewQs } from "@/lib/quickscan-groep";
 import { Tegels } from "@/components/visualisatie/gedeeld";
-import { Hulplijnen, getal } from "./gedeeld";
+import { Totaalkaart } from "@/components/Resultaatkop";
+import { KLASSE_CHIP } from "@/lib/mijn-metingen";
+import { KLASSE_NAAM, klasseVanPercentage } from "@/lib/quickscan";
+import { Hulplijnen, KLASSE_STIJL, getal } from "./gedeeld";
 
 const teken = (n: number) => (n > 0 ? "+" : n < 0 ? "−" : "");
 
@@ -19,8 +22,24 @@ export function QuickscanBenchmarkView({
   eigenNaam: string;
   peildatum: Date;
 }) {
+  // De Totaalkaart van de Resultaatkop met het percentage van X in de ring (`stylesheet.md`, Resultaatkop, Benchmark, Alle weergaven dezelfde kop).
+  const totaal = view.rijen.find((r) => r.soort === "totaal");
+  const totaalKlasse = totaal && totaal.eigen !== null ? klasseVanPercentage(totaal.eigen) : null;
   return (
     <div className="vis" data-weergave="quickscan-benchmark">
+      {totaal && totaal.eigen !== null && totaalKlasse && (
+        <Totaalkaart
+          ring={{
+            fractie: totaal.eigen / 100,
+            kleur: KLASSE_STIJL[totaalKlasse].kleur,
+            getal: `${totaal.eigen}%`,
+            klasseNaam: KLASSE_NAAM.totaal[totaalKlasse],
+            chipAchtergrond: KLASSE_CHIP[totaalKlasse].achtergrond,
+            chipTekst: KLASSE_CHIP[totaalKlasse].tekst,
+          }}
+          feiten={[totaal.groep && `Rest van de groep: ${Math.round(totaal.groep.gemiddelde)}%`]}
+        />
+      )}
       <Tegels
         tegels={[
           { label: "Vergelijkgroep", waarde: String(view.groepsgrootte), sub: "ziekenhuizen, X inbegrepen" },

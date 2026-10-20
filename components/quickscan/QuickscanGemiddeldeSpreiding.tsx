@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { MetingAfdeling, MetingBouwblok, QuickscanMeting, SpreidingUitkomst } from "@/lib/quickscan-groep";
-import { Tegels } from "@/components/visualisatie/gedeeld";
+import { Totaalkaart } from "@/components/Resultaatkop";
+import { KLASSE_CHIP } from "@/lib/mijn-metingen";
+import { KLASSE_NAAM } from "@/lib/quickscan";
 import { SterksteMeeste } from "./SterksteMeeste";
 import { Hulplijnen, KLASSE_STIJL, KlasseBadge, getal } from "./gedeeld";
 
@@ -42,20 +44,23 @@ export function QuickscanGemiddeldeSpreiding({
 
   return (
     <div className="vis" data-weergave="quickscan-spreiding">
-      <Tegels
-        tegels={[
-          {
-            label: "Afgeronde scans",
-            waarde: String(meting.aantalScans),
-            sub: uitgenodigd !== undefined ? `van ${uitgenodigd} uitgenodigd` : undefined,
-          },
-          {
-            label: "Totaal van de Meting",
-            waarde: meting.percentage === null ? "–" : `${meting.percentage}%`,
-            sub: meting.klasse ? (meting.klasse === "groen" ? "Sterk ontwikkeld" : meting.klasse === "oranje" ? "Gemiddeld ontwikkeld" : "Aanzienlijke ontwikkelruimte") : undefined,
-          },
-        ]}
-      />
+      {/* Dezelfde Totaalkaart als in Overzicht (`visualisatie-quickscan.md`, 3, Totaalkaart in plaats van tegels). */}
+      {meting.percentage !== null && meting.klasse !== null && (
+        <Totaalkaart
+          ring={{
+            fractie: meting.percentage / 100,
+            kleur: KLASSE_STIJL[meting.klasse].kleur,
+            getal: `${meting.percentage}%`,
+            klasseNaam: KLASSE_NAAM.totaal[meting.klasse],
+            chipAchtergrond: KLASSE_CHIP[meting.klasse].achtergrond,
+            chipTekst: KLASSE_CHIP[meting.klasse].tekst,
+          }}
+          feiten={[
+            `Gemiddelde van ${meting.aantalScans} afgeronde ${meting.aantalScans === 1 ? "scan" : "scans"}`,
+            uitgenodigd !== undefined && `${meting.aantalScans} van ${uitgenodigd} uitgenodigd`,
+          ]}
+        />
+      )}
       <div className="vis-acties">
         <button type="button" className="btn btn-outline btn-compact" onClick={() => setOpSpreiding((x) => !x)} aria-pressed={opSpreiding}>
           {opSpreiding ? "Volgorde van het model" : "Sorteer op spreiding"}

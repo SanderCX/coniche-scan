@@ -203,7 +203,7 @@ export function alleGroepResultaten(
     resultaten = bouwblokResultaten.map((r) => ({
       groepId: r.bouwblok.id,
       groepNaam: r.bouwblok.naam,
-      kleur: null,
+      kleur: r.groepKleur ?? null,
       score: r.score,
       gewicht: r.gewicht,
       nummers: `${r.bouwblok.volgnummer}`,

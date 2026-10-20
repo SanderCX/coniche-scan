@@ -389,7 +389,7 @@ geen afwijking van de spec maar een gat erin.
    krijg ik" met stapkaarten (`help.md`, Films, gebouwd op 19 oktober 2026,
    met per Assessment-type een eigen variant: Klantcontact en Zorg met categorieën (Zorg met de weging),
    de AI-scan met een rij per domein en de Quickscan met percentages per afdeling; voorstel van
-   20 oktober 2026, `help.md`, Films, Varianten van Wat krijg ik), met daaronder de knop
+   20 oktober 2026, gebouwd op 20 oktober 2026, `help.md`, Films, Varianten van Wat krijg ik), met daaronder de knop
    "Bekijk de voorbeeld-output" naar scherm 3. Die knop vervangt de link
    "Bekijk wat je krijgt" verderop op de pagina. Alle cijfers in de film
    zijn voorbeelddata. Op de pagina staan grijze lijniconen (`--ink-s`, op het
@@ -402,7 +402,7 @@ geen afwijking van de spec maar een gat erin.
    pijlers" is in de beschrijving bovenaan een link naar `/bouwstenen` (niet ook in de kaart Volledig beeld, waar de zin nog eens staat). Deze pagina
    wordt later mogelijk een leadgenerator met "Toegang aanvragen"
    (`backlog.md`).
-   **Bovenkant (hero, voorstel van 20 oktober 2026, design `Open-B` in `Claude outputs/resultaatkop/`, gekozen door Joost omdat de hero te rommelig was)**: Gecentreerd, op een witte achtergrond (de gradient vervalt), met van boven naar beneden: Het Assessment-icoon in een witte cirkel van 64px met een lichte schaduw (icoon 28px), de eyebrow "Coniche Scan" (12px, hoofdletters, `--or`) op 24px eronder, de titel op 12px daaronder (48px, regelhoogte 56px, gewicht 800), één zin uitleg (18px, regelhoogte 28px, `--ink-m`, hoogstens 620px breed, gecentreerd) met op 20px afstand de link "15 bouwblokken in 5 pijlers" in `--or`, de drie kenmerken ("±30 minuten", "Heldere inzichten", "Direct verbeterkansen", 14px, gewicht 600, grijze lijniconen van 20px) op 28px eronder in één rij met 28px ertussen, de knop "Start assessment" (uitgeschakeld, 52px hoog) met het Info-icoon ernaast op 36px eronder, daaronder op 16px één regel toelichting (14px, `--ink-m`, hoogstens 440px) en als laatste, op 28px, "Bedoeld voor ..." (14px, `--ink-s`). De uitleg is één zin: De tweede zin ("Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken") komt niet meer in de hero voor en staat bij de feature-card Volledig beeld. De toelichting bij de knop is "Toegang loopt via een persoonlijke link van Coniche. Heb je die niet, neem dan contact op." De rest van de pagina (feature-cards, film, Praktische informatie) blijft ongewijzigd.
+   **Bovenkant (hero, besloten door Joost en gebouwd op 20 oktober 2026, design `Open-B` in `Claude outputs/resultaatkop/`, gekozen door Joost omdat de hero te rommelig was)**: Gecentreerd, op een witte achtergrond (de gradient vervalt), met van boven naar beneden: Het Assessment-icoon in een witte cirkel van 64px met een lichte schaduw (icoon 28px), de eyebrow "Coniche Scan" (12px, hoofdletters, `--or`) op 24px eronder, de titel op 12px daaronder (48px, regelhoogte 56px, gewicht 800), één zin uitleg (18px, regelhoogte 28px, `--ink-m`, hoogstens 620px breed, gecentreerd) met op 20px afstand de link "15 bouwblokken in 5 pijlers" in `--or`, de drie kenmerken ("±30 minuten", "Heldere inzichten", "Direct verbeterkansen", 14px, gewicht 600, grijze lijniconen van 20px) op 28px eronder in één rij met 28px ertussen, de knop "Start assessment" (uitgeschakeld, 52px hoog) met het Info-icoon ernaast op 36px eronder, daaronder op 16px één regel toelichting (14px, `--ink-m`, hoogstens 440px) en als laatste, op 28px, "Bedoeld voor ..." (14px, `--ink-s`). De uitleg is één zin: De tweede zin ("Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken") komt niet meer in de hero voor en staat bij de feature-card Volledig beeld. De toelichting bij de knop is "Toegang loopt via een persoonlijke link van Coniche. Heb je die niet, neem dan contact op." De rest van de pagina (feature-cards, film, Praktische informatie) blijft ongewijzigd.
 3. **Voorbeeld-output**: Dezelfde resultaatcomponenten als scherm 6, met
    vaste demodata. De resultaatcomponent wordt één keer gebouwd. Voor
    elk Assessment, dus ook voor de AI-scan, de Zorgscan en de Quickscan,
@@ -617,7 +617,7 @@ geen afwijking van de spec maar een gat erin.
    vervalt het staafdiagram per categorie: In plaats daarvan "Scores per
    domein", een staand kolomdiagram met een kolom per domein in volgorde 1 tot en met 8
    (een eigen kleur per domein, nummercirkels onder de kolommen en een sleutel met de namen;
-   voorstel van 20 oktober 2026, `stylesheet.md`, Radar en staafdiagram op het
+   gebouwd op 20 oktober 2026, `stylesheet.md`, Radar en staafdiagram op het
    resultaatscherm, Domeinen). Het staat niet meer gesorteerd op score en scrolt niet.
 
    **Bij Ja / Nee / Weet ik niet (Quickscan)** heeft het scherm een eigen

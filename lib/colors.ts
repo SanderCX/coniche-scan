@@ -16,10 +16,30 @@ export const CATEGORIE_COLORS: Record<
   paars: { bg: "bg-pu", text: "text-pu", border: "border-pu", hex: "#392944" },
   groen: { bg: "bg-gr", text: "text-gr", border: "border-gr", hex: "#197f4e" },
   antraciet: { bg: "bg-fu", text: "text-fu", border: "border-fu", hex: "#ffc043" },
+  // Alleen voor de domeinen van een Assessment zonder categorielaag (`DOMEIN_KLEUREN`), geen keuze voor een categorie.
+  turkoois: { bg: "bg-gr", text: "text-gr", border: "border-gr", hex: "#1f9aa0" },
+  framboos: { bg: "bg-or", text: "text-or", border: "border-or", hex: "#d1467f" },
+  lavendel: { bg: "bg-pu", text: "text-pu", border: "border-pu", hex: "#8a7bb8" },
 };
 
-/** Het merkgeel van Fundament: Te licht voor witte tekst en voor tekst of een dunne lijn in de kleur zelf. */
-const LICHTE_CATEGORIEKLEUREN = new Set(["#ffc043"]);
+/**
+ * De kleuren van de domeinen van een Assessment zonder categorielaag, zoals de 8 domeinen van de AI-volwassenheidsscan
+ * (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm, Domeinkleuren, palet B, besloten door Joost op 20 oktober 2026):
+ * In de volgorde van de domeinen, zo dat buren op de radar zo veel mogelijk verschillen: Oranje, blauw, groen, paars, geel, turkoois,
+ * framboos en lavendel. Het domein met volgnummer 1 krijgt de eerste kleur. Bij meer dan 8 domeinen begint de rij opnieuw.
+ */
+export const DOMEIN_KLEUREN = ["oranje", "blauw", "groen", "paars", "antraciet", "turkoois", "framboos", "lavendel"] as const;
+
+/** De sleutel van de kleur van een domein op volgnummer (1 is het eerste). */
+export function domeinKleur(volgnummer: number): string {
+  return DOMEIN_KLEUREN[(((volgnummer - 1) % DOMEIN_KLEUREN.length) + DOMEIN_KLEUREN.length) % DOMEIN_KLEUREN.length];
+}
+
+/** De kleuren die een Admin voor een categorie kan kiezen: De extra domeinkleuren horen daar niet bij. */
+export const CATEGORIE_KLEUR_KEUZES = Object.keys(CATEGORIE_COLORS).filter((k) => !["turkoois", "framboos", "lavendel"].includes(k));
+
+/** Het merkgeel van Fundament, het turkoois en de lavendel van de domeinen: Te licht voor witte tekst en voor tekst of een dunne lijn in de kleur zelf. */
+const LICHTE_CATEGORIEKLEUREN = new Set(["#ffc043", "#1f9aa0", "#8a7bb8"]);
 
 /** Kleur voor tekst of een dunne lijn in de categoriekleur: Voor Fundament `--ink`. */
 export function lijnKleur(hex: string): string {

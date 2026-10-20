@@ -347,7 +347,7 @@ export const klantcontactVolwassenheid: Assessment = {
   naam: "Klantcontact Volwassenheid",
   subtitel: "±30 minuten. Heldere inzichten. Direct verbeterkansen.",
   beschrijving:
-    "Breng in kaart hoe volwassen jouw klantcontactorganisatie is op 15 bouwblokken, verdeeld over 5 pijlers — van strategie tot cultuur. Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken.",
+    "Breng in kaart hoe volwassen jouw klantcontactorganisatie is. Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken.",
   doelgroep: "MT, operations en CX-verantwoordelijken binnen klantcontactorganisaties",
   icoon: "target",
   geschatteDuur: "±30 minuten",

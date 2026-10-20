@@ -857,6 +857,9 @@
   color: #fff;
   font-size: var(--fs-12);
   font-weight: 700;
+  /* Een getal in het midden van de balk staat precies in het midden (`stylesheet.md`, Getallen in een cirkel of balk). */
+  line-height: 1;
+  padding-top: 0.09em;
 }
 .qv-vraag-rij {
   display: grid;

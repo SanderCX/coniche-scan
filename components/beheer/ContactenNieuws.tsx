@@ -22,6 +22,8 @@ import {
   contactpersonenOpAlfabet,
   nieuwsNieuwsteEerst,
 } from "@/lib/contacten-nieuws";
+import { useIngelogdeGebruiker } from "@/lib/admin-auth";
+import { magContactpersonenBewerken } from "@/lib/rechten";
 import { Contactpersoon, Nieuwsartikel, Organisatie } from "@/lib/types";
 
 /** Een datum jjjj-mm-dd als "14 okt 2026". */
@@ -32,11 +34,12 @@ function datumTekst(d: string): string {
 
 /**
  * Contactpersonen en Nieuws bij de Kenmerken op het organisatie-detail (`beheerpagina.md`, punt 4, Contactpersonen en Nieuws): Twee lijsten naast
- * elkaar onder het raster van de Kenmerken. Een Admin en een Consultant met toegang tot de Organisatie voegen toe en bewerken
- * (`organisaties.bewerken`), "Bewerken" opent een basismodal met "Verwijderen". Een LinkedIn-profiel en een artikel zijn links die
+ * elkaar onder het raster van de Kenmerken. Alleen een Admin voegt toe, bewerkt en verwijdert (`contactpersonen.bewerken`, besloten op
+ * 20 oktober 2026): Een Consultant met toegang tot de Organisatie ziet de lijsten zonder de knoppen. "Bewerken" opent een basismodal met "Verwijderen". Een LinkedIn-profiel en een artikel zijn links die
  * in een nieuw tabblad openen. Het Bewerkslot van de Organisatie geldt voor de hele pagina (`MetBewerkslot`).
  */
 export function ContactenNieuws({ organisatie }: { organisatie: Organisatie }) {
+  const kanBewerken = magContactpersonenBewerken(useIngelogdeGebruiker());
   const contacten = contactpersonenOpAlfabet(organisatie.contactpersonen);
   const nieuws = nieuwsNieuwsteEerst(organisatie.nieuwsartikelen);
   const [contactModal, setContactModal] = useState<"nieuw" | Contactpersoon | null>(null);
@@ -50,9 +53,11 @@ export function ContactenNieuws({ organisatie }: { organisatie: Organisatie }) {
             <h3>Contactpersonen</h3>
             <InfoIcoon sleutel="info.contactpersonen" />
           </div>
-          <button type="button" className="btn btn-outline btn-compact" onClick={() => setContactModal("nieuw")}>
-            + Toevoegen
-          </button>
+          {kanBewerken && (
+            <button type="button" className="btn btn-outline btn-compact" onClick={() => setContactModal("nieuw")}>
+              + Toevoegen
+            </button>
+          )}
         </div>
         {contacten.length === 0 ? (
           <p className="kenmerken-leeg">Er zijn nog geen contactpersonen toegevoegd.</p>
@@ -79,9 +84,11 @@ export function ContactenNieuws({ organisatie }: { organisatie: Organisatie }) {
                   {c.functie && <span className="cn-sub">{c.functie}</span>}
                   {c.notitie && <span className="cn-notitie">{c.notitie}</span>}
                 </div>
-                <button type="button" className="btn btn-outline btn-compact" onClick={() => setContactModal(c)}>
-                  Bewerken
-                </button>
+                {kanBewerken && (
+                  <button type="button" className="btn btn-outline btn-compact" onClick={() => setContactModal(c)}>
+                    Bewerken
+                  </button>
+                )}
               </li>
             ))}
           </ul>
@@ -94,9 +101,11 @@ export function ContactenNieuws({ organisatie }: { organisatie: Organisatie }) {
             <h3>Nieuws</h3>
             <InfoIcoon sleutel="info.nieuwsartikelen" />
           </div>
-          <button type="button" className="btn btn-outline btn-compact" onClick={() => setNieuwsModal("nieuw")}>
-            + Toevoegen
-          </button>
+          {kanBewerken && (
+            <button type="button" className="btn btn-outline btn-compact" onClick={() => setNieuwsModal("nieuw")}>
+              + Toevoegen
+            </button>
+          )}
         </div>
         {nieuws.length === 0 ? (
           <p className="kenmerken-leeg">Er zijn nog geen nieuwsartikelen toegevoegd.</p>
@@ -113,17 +122,19 @@ export function ContactenNieuws({ organisatie }: { organisatie: Organisatie }) {
                   )}
                   {n.notitie && <span className="cn-notitie">{n.notitie}</span>}
                 </div>
-                <button type="button" className="btn btn-outline btn-compact" onClick={() => setNieuwsModal(n)}>
-                  Bewerken
-                </button>
+                {kanBewerken && (
+                  <button type="button" className="btn btn-outline btn-compact" onClick={() => setNieuwsModal(n)}>
+                    Bewerken
+                  </button>
+                )}
               </li>
             ))}
           </ul>
         )}
       </section>
 
-      {contactModal && <ContactpersoonModal organisatie={organisatie} contactpersoon={contactModal === "nieuw" ? null : contactModal} onSluit={() => setContactModal(null)} />}
-      {nieuwsModal && <NieuwsartikelModal organisatie={organisatie} nieuwsartikel={nieuwsModal === "nieuw" ? null : nieuwsModal} onSluit={() => setNieuwsModal(null)} />}
+      {kanBewerken && contactModal && <ContactpersoonModal organisatie={organisatie} contactpersoon={contactModal === "nieuw" ? null : contactModal} onSluit={() => setContactModal(null)} />}
+      {kanBewerken && nieuwsModal && <NieuwsartikelModal organisatie={organisatie} nieuwsartikel={nieuwsModal === "nieuw" ? null : nieuwsModal} onSluit={() => setNieuwsModal(null)} />}
     </div>
   );
 }
@@ -180,6 +191,9 @@ function ContactpersoonModal({ organisatie, contactpersoon, onSluit }: { organis
           <div className="admin-field">
             <label htmlFor="cp-notitie">Notitie</label>
             <textarea id="cp-notitie" rows={3} maxLength={NOTITIE_MAX} value={notitie} onChange={(e) => setNotitie(e.target.value)} />
+            <span className="text-xs" style={{ color: "var(--ink-s)" }}>
+              Alleen zakelijke, openbaar vindbare informatie. Geen privégegevens.
+            </span>
           </div>
           {fout && (
             <p className="overzicht-melding fout" role="alert" style={{ marginTop: "var(--sp-3)" }}>

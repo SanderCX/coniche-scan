@@ -9,6 +9,7 @@ import {
   VORMEN,
   antwoordenPerVraag,
   bouwblokWoorden,
+  kleineLetter,
   eenMeting,
   eenhedenGemiddeld,
   eenhedenNaastElkaar,
@@ -511,5 +512,14 @@ describe("I. Eenheden: onderdelen en organisaties", () => {
       enkelvoud: "domein",
       meervoud: "domeinen",
     });
+  });
+});
+
+describe("schrijfwijze van de eenheid in een zin", () => {
+  it("zet de eerste letter in een kleine letter, behalve bij een afkorting", () => {
+    expect(kleineLetter("Domein")).toBe("domein");
+    expect(kleineLetter("domeinen")).toBe("domeinen");
+    expect(kleineLetter("AI-domeinen")).toBe("AI-domeinen");
+    expect(bouwblokWoorden({ bouwblokEenheidEnkelvoud: "Domein", bouwblokEenheidMeervoud: "AI-domeinen" }).meervoud).toBe("AI-domeinen");
   });
 });

@@ -186,10 +186,13 @@ export function OnderdelenWeergaven({
   extra = [],
   toonAlsKeuze = true,
   metAntwoorden = true,
+  onderSchakelaar,
 }: {
   assessment: Assessment;
   eenheden: EenheidInvoer[];
   eenheid: EenheidTeksten;
+  /** Onder de schakelaar, in elke weergave: De Totaalkaart van de Resultaatkop (`stylesheet.md`, Resultaatkop, Benchmark). */
+  onderSchakelaar?: React.ReactNode;
   overzicht?: React.ReactNode;
   toonKaarten?: boolean;
   standaardToonAls?: ToonAls;
@@ -220,6 +223,7 @@ export function OnderdelenWeergaven({
         />
         {toonAlsKeuze && <ToonAlsKeuze waarde={toonAls} onChange={setToonAls} aantal={eenheden.length} />}
       </div>
+      {onderSchakelaar}
       {actief === "overzicht" && (
         <>
           {overzicht}

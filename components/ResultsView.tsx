@@ -18,8 +18,8 @@ import { celStap } from "@/lib/mijn-metingen";
 import { ResultaatKop, Totaalkaart } from "./Resultaatkop";
 import { ringVanScore } from "@/lib/score-ring";
 import { ScoreRing } from "@/components/ScoreRing";
-import { RadarChartView } from "./RadarChartView";
-import { CategoryBarChart } from "./CategoryBarChart";
+import { ResultaatKaarten } from "./ResultaatKaarten";
+import { kleineLetter } from "@/lib/visualisatie";
 
 /**
  * De rij van de top 3 heeft de tint van de afgeronde score van het bouwblok (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm):
@@ -92,7 +92,7 @@ export function ResultsView({
   const { sterktes, verbeterkansen } = topSterktesEnVerbeterkansen(bouwblokResultaten);
   const vlak = isVlakkeAssessment(assessment);
   const groepHeading = vlak
-    ? `Scores per ${assessment.bouwblokEenheidEnkelvoud}`
+    ? `Scores per ${kleineLetter(assessment.bouwblokEenheidEnkelvoud)}`
     : "Per categorie";
 
   return (
@@ -108,16 +108,13 @@ export function ResultsView({
       )}
 
       {/* Twee kaarten naast elkaar (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm): De radar en het staafdiagram. */}
-      <div className="resultaat-kaarten">
-        <section className="resultaat-kaart">
-          <h3>{vlak ? `Per ${assessment.bouwblokEenheidEnkelvoud}` : "Per bouwblok"}</h3>
-          <RadarChartView resultaten={bouwblokResultaten} />
-        </section>
-        <section className="resultaat-kaart">
-          <h3>{groepHeading}</h3>
-          <CategoryBarChart resultaten={groepResultaten} horizontaal={vlak} />
-        </section>
-      </div>
+      <ResultaatKaarten
+        bouwblokResultaten={bouwblokResultaten}
+        groepResultaten={groepResultaten}
+        vlak={vlak}
+        radarTitel={vlak ? `Per ${kleineLetter(assessment.bouwblokEenheidEnkelvoud)}` : "Per bouwblok"}
+        groepTitel={groepHeading}
+      />
 
       <div className="top3-grid" style={{ margin: "2.5rem 0" }}>
         <div>

@@ -4,6 +4,7 @@ import { MetingenVergelijking } from "@/lib/benchmark";
 import { STANDAARD_ONDERDEEL, onderdeelVan, toonMeetdatum } from "@/lib/metingen";
 import { bouwblokWoorden, matrix, naastElkaarUitAntwoorden, tussenMetingenUitAntwoorden } from "@/lib/visualisatie";
 import { scoreKleur } from "@/lib/colors";
+import { ResultaatKop } from "@/components/Resultaatkop";
 import { WeergaveVergelijking } from "@/components/visualisatie/WeergaveVergelijking";
 import { WeergaveNaastElkaar } from "@/components/visualisatie/WeergaveNaastElkaar";
 import { WeergaveMatrix } from "@/components/visualisatie/WeergaveMatrix";
@@ -72,12 +73,13 @@ export function MetingenVergelijkingView({
   ) : undefined;
   return (
     <section className="benchmark-sectie" aria-label={assessment.naam}>
-      <h2>{assessment.naam}</h2>
-      <p className="benchmark-teller">
-        <strong>
-          {metingen.length} {metingen.length === 1 ? "Meting" : "Metingen"}
-        </strong>
-      </p>
+      {/* Dezelfde Resultaatkop als bij een Meting (`stylesheet.md`, Resultaatkop, Benchmark, Alle weergaven dezelfde kop). Een vergelijking heeft
+          geen eigen totaal, dus er staat geen Totaalkaart: De overall van elke Meting staat in de tabel. */}
+      <ResultaatKop
+        eyebrow="Benchmark"
+        titel={assessment.naam}
+        subregel={[`${metingen.length} ${metingen.length === 1 ? "Meting" : "Metingen"} in de vergelijking`]}
+      />
 
       {metingen.length === 0 ? (
         <p className="admin-notice">Geen Metingen in deze vergelijking voor dit Assessment.</p>

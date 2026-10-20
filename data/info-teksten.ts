@@ -172,13 +172,13 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     sleutel: "info.contactpersonen",
     plek: "Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen",
     tekst:
-      "Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Alleen Admins en Consultants met toegang tot deze organisatie zien ze.",
+      "Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze.",
   },
   {
     sleutel: "info.nieuwsartikelen",
     plek: "Organisatie-detail, bij Kenmerken, naast de kop Nieuws",
     tekst:
-      "Artikelen over de organisatie die relevant zijn voor het gesprek, met een link naar het artikel. Het nieuwste staat bovenaan. Alleen Admins en Consultants met toegang tot deze organisatie zien ze.",
+      "Artikelen over de organisatie die relevant zijn voor het gesprek, met een link naar het artikel. Het nieuwste staat bovenaan. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze.",
   },
   {
     sleutel: "info.kpiBlok",

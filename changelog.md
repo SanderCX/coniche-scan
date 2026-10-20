@@ -1,5 +1,36 @@
 # Coniche Scan — Changelog
 
+## 2026-10-20 (17) — Specs van Joost, PR 146: De film Wat krijg ik per Assessment-type
+
+Op verzoek van Sander gebouwd uit `help.md`, Films, Varianten van Wat krijg ik per Assessment-type, en `CLAUDE.md`, scherm 2.
+
+**Gedaan**:
+- **Varianten** (`lib/film.ts`, `components/help/HelpFilm.tsx`): De film kiest zijn variant op het type van het Assessment. Klantcontact Volwassenheid en de Zorgscan hebben vijf categorieën met ring 3,4, de AI-scan acht rijen met nummercirkel en domeinkleur en ring 2,5 (tot 37,5%), en de Quickscan vier afdelingen in klassekleur met ring 58% (Gemiddeld ontwikkeld), een vraag met Ja, Nee of Weet ik niet en de legenda "Laagste tot hoogste percentage". De stapkaarten volgen het type, stap 3 is overal dezelfde zin.
+- **Weging bij de Zorgscan**: "Drie bouwblokken tellen 2× mee" onder de klassenaam en de zin "Bouwblokken die zwaarder meetellen, tonen hun factor, zoals 2×." op stapkaart 2. Het aantal en de factor komen uit de gewichten (`filmWeging`), zonder namen. Zonder gewichten ongelijk aan 1 verschijnen ze niet.
+- **Landingspagina**: De film staat nu bij elk Assessment, ook bij de Quickscan, en `HelpFilm` krijgt het Assessment mee. De knop "Bekijk wat je krijgt" voor de Quickscan vervalt daarmee. In Help staat de variant met categorieën.
+- **Opmaak** (`app/styles/help.css`): `--ring-vul` en `--ring-kleur` op de ring, rijen van 36px (AI-scan) en 52px (Quickscan), stippellijnen door de rijen, en balkanimaties tot en met rij 8.
+- **Tests**: `lib/film.test.tsx` (10 tests), bekeken in de browser bij de AI-scan, de Quickscan en de Zorgscan.
+
+**Afwijkingen en keuzes**: De nummercirkel heeft een getal van 12px in plaats van 11px (de letterschaal heeft geen 11px). Het laagste en hoogste percentage bij de Quickscan (51 tot 93, 44 tot 90, 30 tot 81 en 27 tot 77) heb ik bedacht, want de spec noemt alleen de gemiddelden. De AI-scan toont alleen de stip, geen lijn. In de browser waar ik testte, staan de gewichten van de Zorgscan in de opgeslagen data op 1, dus daar staat de weging-regel niet in de film: De seed heeft 2 (`CLAUDE.md`, sectie 5, Weging), de opgeslagen data moeten daarop staan.
+
+## 2026-10-20 (16) — Specs van Joost, PR 145: AI-domeinen, hover tussen radar en diagram, Resultaatkop bij de benchmark, hero
+
+Op verzoek van Sander gebouwd uit de specs van Joost (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm, Getallen in een cirkel of balk, Resultaatkop; `CLAUDE.md`, scherm 2, 5 en 6; `visualisatie-quickscan.md`; `benchmark.md`; `datamodel.md`; `privacy-pagina.md`). Een eerdere bouw van mij met lichte tinten voor de AI-domeinen is vervangen door palet B van Joost.
+
+**Gedaan**:
+- **Contactpersonen en Nieuws alleen voor een Admin**: Nieuw recht `contactpersonen.bewerken` (`magContactpersonenBewerken` in `lib/rechten.ts`). Een Consultant ziet de lijsten zonder "+ Toevoegen" en "Bewerken". Onder het veld Notitie staat de waarschuwing "Alleen zakelijke, openbaar vindbare informatie. Geen privégegevens.", de Info-teksten zijn aangepast, de privacypagina noemt contactpersonen en het helponderwerp is bijgewerkt.
+- **Domeinkleuren, palet B**: Oranje, blauw, groen, paars, geel, turkoois `#1f9aa0`, framboos `#d1467f` en lavendel `#8a7bb8` (`DOMEIN_KLEUREN` in `lib/colors.ts`), via `groepKleur` in de radar, de taartpunten en de weergaven. Tekst op geel, turkoois en lavendel is `--ink`.
+- **Kolomdiagram per domein** (`components/DomeinKolommen.tsx`): Een staand diagram in de volgorde 1 tot en met 8, met twee balken per kolom (Organisatie in de domeinkleur, Rest van de groep in `#b8b5ad`), nummercirkels onder de kolommen, een sleutel met de namen in twee kolommen van vier, een legenda en een tooltip met drie regels. Het vervangt de liggende balken van Recharts.
+- **Hover tussen radar en diagram** (`lib/grafiek-actief.ts`, `components/ResultaatKaarten.tsx`): Hover of focus op een knooppunt, balk of kolom laat de andere lichten oplichten (taartpunt naar 50%, score-stip op de veelhoek, ring om de balk) en dimt de rest, in 120 ms.
+- **Radar**: De tooltip staat buiten de veelhoek (boven of onder het knooppunt bij de verticale as, anders in de hoek van het kwadrant), de taartpunten staan op 20%, de tweede reeks heeft een streeplijn in `--ink` en er is een legenda onder de radar. De zin onder het staafdiagram is vervallen.
+- **Classificatie** staat in een kaart over de breedte van de Top 3 met de klassen links, midden en rechts (`1fr auto 1fr`).
+- **Getallen in een cirkel of balk**: `padding-top: 0.09em` bij de ring, de gestapelde balk, de knooppunten en de nummercirkels.
+- **Resultaatkop bij de benchmark**: Eyebrow "Benchmark" en de Totaalkaart in de View per organisatie, de sectie van de groep, de scans van een Meting, de vergelijking tussen Metingen (alleen de kop) en de Quickscan. Quickscan, Gemiddelde en spreiding heeft de Totaalkaart in plaats van twee tegels.
+- **Landingspagina**: De hero (`Open-B`) op wit, met één zin uitleg, de link "15 bouwblokken in 5 pijlers" (`lib/landing.ts`), de drie kenmerken, de knop en één regel toelichting. De seedteksten van de Klantcontact- en Zorgscan zijn ingekort tot de eerste zin.
+- **Schrijfwijze**: "AI" blijft in hoofdletters in "Alle AI-domeinen" (`kleineLetter` in `lib/visualisatie.ts`). De kaarten heten "Per domein" en "Scores per domein".
+
+**Keuzes en afwijkingen**: De vergelijking tussen Metingen heeft geen Totaalkaart, want ze heeft geen eigen totaal en de spec zegt niet welke Meting de ring toont. De tweede zin van de beschrijving ("Elke vraag is gebaseerd op aantoonbaar bewijs …") staat al in de kaart "Concreet en toepasbaar", dus ik heb de kaart "Volledig beeld" niet aangepast. De seedteksten veranderen niets in opgeslagen Assessments: Bij een oude tekst haalt `heroUitleg` het stuk over de bouwblokken uit de eerste zin.
+
 ## 2026-10-20 (15) — Contactpersonen en nieuws bij de Kenmerken van een Organisatie
 
 Op verzoek van Sander: Een Admin en een Consultant (eigen Organisaties) kunnen bij een Organisatie relevante contactpersonen toevoegen, met functie en LinkedIn-profiel, en relevante nieuwsartikelen met een link. Specs: `datamodel.md` (Contactpersoon en Nieuwsartikel, Audit, Verwijderen, rechtenmatrix), `beheerpagina.md` (punt 4, Contactpersonen en Nieuws, en twee Info-teksten in het register), `CLAUDE.md` (Status). Help: `help/contactpersonen-en-nieuws.md` (25 onderwerpen).
