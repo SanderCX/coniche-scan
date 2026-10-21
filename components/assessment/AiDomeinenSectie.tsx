@@ -11,11 +11,12 @@ import { domeinKleur } from "@/lib/colors";
  * De sectie "AI in klantcontact" (`CLAUDE.md`, scherm 2, Herontwerp; `ai-domeinenmodel-visual.md`): De acht domeinen als kaarten in een raster van
  * vier kolommen, met een nummercirkel in de domeinkleur (`stylesheet.md`, Domeinkleuren) en de naam. Een klik opent de Toelichtingsmodal.
  */
-export function AiDomeinenSectie() {
+export function AiDomeinenSectie({ warm = false }: { warm?: boolean }) {
   const [gekozen, setGekozen] = useState<AiDomeinContent | null>(null);
   const hex = (nummer: number) => CATEGORIE_COLORS[domeinKleur(nummer)].hex;
   return (
     <Sectie
+      warm={warm}
       id="ai"
       kop="De AI-domeinen in Klantcontact"
       inleiding="Acht domeinen beschrijven hoe volwassen een organisatie is in het inzetten van AI binnen klantcontact. Klik op een domein voor meer uitleg."

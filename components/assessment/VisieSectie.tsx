@@ -16,7 +16,7 @@ import {
  * korte tekst en "Lees verder", dat de volledige tekst op dezelfde pagina uitklapt. De korte tekst is de eerste alinea. De kaart "Wat is goed
  * klantcontact?" uit het oorspronkelijke stuk staat eronder, omdat het ontwerp er geen plek voor heeft (open punt, `CLAUDE.md`, sectie 5).
  */
-export function VisieSectie() {
+export function VisieSectie({ warm = false }: { warm?: boolean }) {
   const [open, setOpen] = useState<Set<number>>(new Set());
   const wissel = (i: number) =>
     setOpen((huidig) => {
@@ -28,6 +28,7 @@ export function VisieSectie() {
 
   return (
     <Sectie
+      warm={warm}
       id="visie"
       kop="Onze visie op goed klantcontact"
       inleiding={visieIntro}

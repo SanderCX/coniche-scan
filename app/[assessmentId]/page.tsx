@@ -13,6 +13,7 @@ import { bouwstenenLink, contentSoort, heroUitleg, paginaSecties } from "@/lib/l
 import { MijnGegevensMenuVoorCode } from "@/components/MijnGegevensMenuVoorCode";
 import { AssessmentSubNav } from "@/components/assessment/AssessmentSubNav";
 import { Sectie } from "@/components/assessment/Sectie";
+import { PraktischSectie } from "@/components/assessment/PraktischSectie";
 import { VisieSectie } from "@/components/assessment/VisieSectie";
 import { BouwblokkenSectie } from "@/components/assessment/BouwblokkenSectie";
 import { AiDomeinenSectie } from "@/components/assessment/AiDomeinenSectie";
@@ -124,85 +125,92 @@ function AssessmentLanding({ assessmentId }: { assessmentId: string }) {
     </Link>
   );
 
+  // De secties in de volgorde van 21 oktober 2026, met een afwisselende achtergrond die met wit begint (`CLAUDE.md`, scherm 2).
+  const wat = (warm: boolean) => (
+    <Sectie
+      key="wat"
+      id="wat"
+      warm={warm}
+      kop="Zo ziet je resultaat eruit"
+      inleiding={
+        soort === "ai"
+          ? "Na afronding zie je meteen je totaalscore en je score per domein. Hieronder zie je hoe dat eruitziet, met voorbeelddata."
+          : "Na afronding zie je meteen je totaalscore en je score per categorie en per bouwblok. Hieronder zie je hoe dat eruitziet, met voorbeelddata."
+      }
+      kinderen={
+        <>
+          {featureKaarten}
+          <HelpFilm naam="wat-krijg-ik" assessment={assessment} opmerking="Alle cijfers in de film zijn voorbeelddata." knop={voorbeeldKnop} />
+          <HelpFilm naam="dossier" />
+        </>
+      }
+    />
+  );
+  const sectieNodes: ((warm: boolean) => React.ReactNode)[] = [
+    (warm) => (soort === "ai" ? <AiDomeinenSectie key="ai" warm={warm} /> : <BouwblokkenSectie key="bouwblokken" warm={warm} />),
+    (warm) => <PraktischSectie key="praktisch" assessment={assessment} aantalVragen={totaalVragen} warm={warm} />,
+    wat,
+    (warm) => (soort === "ai" ? <Content2030Sectie key="2030" warm={warm} /> : <VisieSectie key="visie" warm={warm} />),
+  ];
+
   return (
     <PageWithChrome {...chrome}>
-      {/* De hero (`CLAUDE.md`, scherm 2, Bovenkant, design Open-B, besloten door Joost op 20 oktober 2026): Gecentreerd op wit, zonder gradient. */}
-      <div className="container landing-hero">
-        <div className="landing-icoon">
-          <AssessmentIcon name={assessment.icoon} style={{ width: "28px", height: "28px", color: "var(--or)" }} />
-        </div>
-        <span className="eyebrow">Coniche Scan</span>
-        <h1>{assessment.naam}</h1>
-        <p className="landing-uitleg">{heroUitleg(assessment.beschrijving)}</p>
-        {link && (
-          <a href={link.href} className="tekst-link landing-link">
-            {link.tekst}
-          </a>
-        )}
-        <ul className="landing-kenmerken">
-          {assessment.subtitel
-            .split(/(?<=\.)\s+/)
-            .filter(Boolean)
-            .map((deel) => {
-              const Icoon = icoonVoorSubtitel(deel);
-              return (
-                <li key={deel}>
-                  {Icoon && <Icoon aria-hidden="true" style={{ width: "20px", height: "20px", flexShrink: 0, color: "var(--ink-s)" }} />}
-                  {deel}
-                </li>
-              );
-            })}
-        </ul>
-        <div className="landing-start">
-          <button type="button" disabled className="btn btn-or">
-            Start assessment
-          </button>
-          <InfoIcoon sleutel="info.startAssessment" />
-        </div>
-        <p className="landing-toelichting">Toegang loopt via een persoonlijke link van Coniche. Heb je die niet, neem dan contact op.</p>
-        <p className="landing-doelgroep">Bedoeld voor: {assessment.doelgroep}</p>
-      </div>
-
       {metContent ? (
         <>
+          {/* De kop (`CLAUDE.md`, scherm 2, Bovenkant, tweede ronde van 21 oktober 2026): Alleen het icoon en de titel op één regel, links uitgelijnd. */}
+          <div className="container ap-kop">
+            <span className="ap-kop-icoon">
+              <AssessmentIcon name={assessment.icoon} style={{ width: "28px", height: "28px", color: "var(--or)" }} strokeWidth={1.8} />
+            </span>
+            <h1>{assessment.naam}</h1>
+          </div>
           <AssessmentSubNav secties={secties} />
-          {soort === "volwassenheid" && (
-            <>
-              <VisieSectie />
-              <BouwblokkenSectie />
-            </>
-          )}
-          {soort === "ai" && (
-            <>
-              <AiDomeinenSectie />
-              <Content2030Sectie />
-            </>
-          )}
-          <Sectie
-            id="wat"
-            kop="Zo ziet je resultaat eruit"
-            inleiding={
-              soort === "ai"
-                ? "Na afronding zie je meteen je totaalscore en je score per domein. Hieronder zie je hoe dat eruitziet, met voorbeelddata."
-                : "Na afronding zie je meteen je totaalscore en je score per categorie en per bouwblok. Hieronder zie je hoe dat eruitziet, met voorbeelddata."
-            }
-            kinderen={
-              <>
-                {featureKaarten}
-                <HelpFilm naam="wat-krijg-ik" assessment={assessment} opmerking="Alle cijfers in de film zijn voorbeelddata." knop={voorbeeldKnop} />
-                <HelpFilm naam="dossier" />
-              </>
-            }
-          />
-          <Sectie id="praktisch" kop="Praktisch" kinderen={praktisch} />
+          {sectieNodes.map((maak, i) => maak(i % 2 === 1))}
         </>
       ) : (
-        <div className="container" style={{ paddingBottom: "5rem" }}>
-          {featureKaarten}
-          {/* De film Wat krijg ik (`help.md`, Films, Varianten van Wat krijg ik per Assessment-type): Met de knop naar de Voorbeeld-output. */}
-          <HelpFilm naam="wat-krijg-ik" assessment={assessment} opmerking="Alle cijfers in de film zijn voorbeelddata." knop={voorbeeldKnop} />
-          <div style={{ marginTop: "2.5rem" }}>{praktisch}</div>
-        </div>
+        <>
+          {/* Een Assessment zonder content (de Quickscan) houdt voorlopig de hero van 20 oktober 2026 (`CLAUDE.md`, scherm 2, Bovenkant, design Open-B). */}
+          <div className="container landing-hero">
+            <div className="landing-icoon">
+              <AssessmentIcon name={assessment.icoon} style={{ width: "28px", height: "28px", color: "var(--or)" }} />
+            </div>
+            <h1>{assessment.naam}</h1>
+            <p className="landing-uitleg">{heroUitleg(assessment.beschrijving)}</p>
+            {link && (
+              <a href={link.href} className="tekst-link landing-link">
+                {link.tekst}
+              </a>
+            )}
+            <ul className="landing-kenmerken">
+              {assessment.subtitel
+                .split(/(?<=\.)\s+/)
+                .filter(Boolean)
+                .map((deel) => {
+                  const Icoon = icoonVoorSubtitel(deel);
+                  return (
+                    <li key={deel}>
+                      {Icoon && <Icoon aria-hidden="true" style={{ width: "20px", height: "20px", flexShrink: 0, color: "var(--ink-s)" }} />}
+                      {deel}
+                    </li>
+                  );
+                })}
+            </ul>
+            <div className="landing-start">
+              <button type="button" disabled className="btn btn-or">
+                Start assessment
+              </button>
+              <InfoIcoon sleutel="info.startAssessment" />
+            </div>
+            <p className="landing-toelichting">Toegang loopt via een persoonlijke link van Coniche. Heb je die niet, neem dan contact op.</p>
+            <p className="landing-doelgroep">Bedoeld voor: {assessment.doelgroep}</p>
+          </div>
+          <div className="container" style={{ paddingBottom: "5rem" }}>
+            {featureKaarten}
+            {/* De film Wat krijg ik (`help.md`, Films, Varianten van Wat krijg ik per Assessment-type): Met de knop naar de Voorbeeld-output. */}
+            <HelpFilm naam="wat-krijg-ik" assessment={assessment} opmerking="Alle cijfers in de film zijn voorbeelddata." knop={voorbeeldKnop} />
+            <div style={{ marginTop: "2.5rem" }}>{praktisch}</div>
+          </div>
+        </>
       )}
     </PageWithChrome>
   );

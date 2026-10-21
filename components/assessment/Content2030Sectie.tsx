@@ -84,10 +84,11 @@ function IconLijst({ items }: { items: { titel: string; tekst: string; icoon: st
  * elkaar (nummer, titel, één zin), daaronder pillen met de overige onderdelen van het stuk en "Lees het hele stuk", dat het volledige stuk op
  * dezelfde pagina uitklapt. De zin op een kaart is de eerste zin van de tekst.
  */
-export function Content2030Sectie() {
+export function Content2030Sectie({ warm = false }: { warm?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <Sectie
+      warm={warm}
       id="2030"
       kop="Klantcontact richting 2030"
       inleiding={vijfDingenIntro}

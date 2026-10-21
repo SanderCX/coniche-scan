@@ -29,8 +29,8 @@ describe("de content op de Assessment-pagina", () => {
     expect(contentSoort(ziekenhuisQuickscan)).toBeNull();
   });
   it("heeft per type de secties van de sub-nav en bij de Quickscan geen sub-nav", () => {
-    expect(paginaSecties(klantcontactVolwassenheid).map((s) => s.label)).toEqual(["Visie", "De 15 bouwblokken", "Wat krijg ik", "Praktisch"]);
-    expect(paginaSecties(aiScan).map((s) => s.id)).toEqual(["ai", "2030", "wat", "praktisch"]);
+    expect(paginaSecties(klantcontactVolwassenheid).map((s) => s.label)).toEqual(["De 15 bouwblokken", "Praktisch", "Wat krijg ik", "Visie"]);
+    expect(paginaSecties(aiScan).map((s) => s.id)).toEqual(["ai", "praktisch", "wat", "2030"]);
     expect(paginaSecties(ziekenhuisQuickscan)).toEqual([]);
   });
   it("geeft de link Over deze scan met de tekst per type en niet bij de Quickscan", () => {

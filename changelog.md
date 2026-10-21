@@ -1,5 +1,27 @@
 # Coniche Scan — Changelog
 
+## 2026-10-21 (23) — SCAN achter het logo, geen eyebrow "Coniche Scan" meer
+
+Op verzoek van Sander: In de nav staat achter het logo het woord SCAN (`SiteHeader`, `.nav-scan`, 14px, gewicht 800, letterafstand .14em, `--or`, onderaan uitgelijnd met het logo, een link naar dezelfde bestemming als het logo, ook in beheer vóór de rolbadge). De eyebrow "Coniche Scan" boven de titel op scherm 1 en in de hero van de Quickscan is vervallen. De spec noemt dit niet: Kleur, maat en plek zijn mijn keuze, en `CLAUDE.md` en `stylesheet.md` zijn hier nog niet op aangepast.
+
+## 2026-10-21 (22) — Specs van Joost, PR 158: Kop en volgorde van de Assessment-pagina, paneel op scherm 1
+
+Op verzoek van Sander gebouwd uit `CLAUDE.md` (scherm 1 en 2) en `stylesheet.md` (Assessmenttegel, Kop van de Assessment-pagina en sectie-inleiding). De Digitale Spanningsmeter uit dezelfde PR is bewust niet gebouwd (voorstel, apart te beslissen).
+
+**Gedaan**:
+- **Kop**: Bij een Assessment met content staat bovenaan alleen het icoon in een witte cirkel van 56px en de titel (48px) op één regel, links uitgelijnd. Eyebrow, zin, ankerlink, kenmerken, knop en "Bedoeld voor ..." zijn uit de kop. De Quickscan houdt zijn eigen opbouw met de hero.
+- **Volgorde**: De inhoudssectie (De 15 bouwblokken of AI in klantcontact), Praktisch, Wat krijg ik en als laatste Visie (bij AI Klantcontact richting 2030). De sub-nav volgt die volgorde (`paginaSecties`). De secties wisselen af tussen wit en `--bg-warm`, de warme met een boven- en onderrand.
+- **Praktisch** (`PraktischSectie`): Kop "Wat je kunt verwachten" met "Bedoeld voor ..." als inleiding, de drie kaarten (bij AI "per domein"), en daaronder de uitgeschakelde knop van 52px met het Info-icoon (22px) en de toelichting (15px).
+- **Typografie**: `text-wrap: pretty` op de inleiding (hoogstens 880px) en op `.card p`, en een niet-brekende spatie na een koppelteken in een samengestelde woordgroep (`nbspNaKoppelteken`).
+- **Paneel op scherm 1**: Titel 24px, zin 16px en punten 14px (regelhoogte 20px), zoals Joost het in de spec heeft vastgezet. De lege tekst staat op 24px.
+- **Tests**: Aangepaste `lib/landing.test.ts` (volgorde van de secties). Bekeken in de browser: kop, sub-nav, afwisselende achtergronden en Praktisch.
+
+- **Labels op de cirkel**: De pil om de korte naam op scherm 1 was te smal (`max-width` 150px) waardoor de naam er 9px buiten viel bij "Klantcontact Volwassenheid", "AI-Volwassenheid" en "Volwassenheid Zorg". De pil is nu zo breed als zijn langste woord (`width: min-content`), de naam staat op twee regels en valt er nooit meer buiten.
+
+**Specs bijgewerkt**: `CLAUDE.md`, `stylesheet.md`, `help.md`.
+
+**Keuzes en afwijkingen**: De teksten van de kaarten in Praktisch (behalve de eenheid "per domein") zijn die van de vorige pagina, de spec geeft alleen de wijzigingen. De Digitale Spanningsmeter, de vijf delen van de cirkel en het `gauge`-icoon horen bij die latere ronde.
+
 ## 2026-10-21 (21) — Specs van Joost, PR 156: Kies jouw assessment als cirkel met vier kwarten, lettermaten volgens de specs
 
 Op verzoek van Sander gebouwd uit `CLAUDE.md` (scherm 1, ontwerp `Home-D`) en `stylesheet.md` (Assessmenttegel).

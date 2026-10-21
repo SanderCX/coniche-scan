@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AssessmentIcon } from "@/components/icons/AssessmentIcons";
 import { TEGEL_ICONEN } from "@/components/icons/LandingIcons";
+import { nbspNaKoppelteken } from "@/lib/format";
 import { tegelInhoud } from "@/lib/landing";
 import {
   AI_WEDGES,
@@ -172,7 +173,7 @@ export function AssessmentCirkel({ assessments }: { assessments: Assessment[] })
         {gekozenAssessment && inhoud ? (
           <div key={gekozenAssessment.id} className="ac-detail">
             <h2>{gekozenAssessment.naam}</h2>
-            <p className="ac-zin">{inhoud.zin}</p>
+            <p className="ac-zin">{nbspNaKoppelteken(inhoud.zin)}</p>
             <ul className="ac-punten">
               {inhoud.punten.map((p) => {
                 const Icoon = TEGEL_ICONEN[p.icoon];

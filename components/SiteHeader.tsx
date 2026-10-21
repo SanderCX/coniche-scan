@@ -36,6 +36,10 @@ export function SiteHeader({
           priority
         />
       </Link>
+      {/* Het woord SCAN achter het logo (21 oktober 2026): De naam van de app in de balk, dus nergens meer als kopje boven een titel. */}
+      <Link href={logoHref} className="nav-scan" aria-label="Coniche Scan, naar de beginpagina">
+        SCAN
+      </Link>
       {badge && (
         <span
           className={badgeKleur ? "nav-badge nav-badge-rol" : "nav-badge"}
