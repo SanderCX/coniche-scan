@@ -26,6 +26,8 @@ import {
 } from "@/lib/metingen";
 import { useBenchmarks } from "@/lib/benchmark-store";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { isSpanning, spanningScansVan } from "@/lib/spanning";
+import { SpanningResultaat } from "@/components/spanning/SpanningResultaat";
 import { metingAlsResultaat, quickscanMeting, quickscanScansVan } from "@/lib/quickscan-groep";
 import { QuickscanResultaten } from "@/components/QuickscanResultaten";
 import { kruimelsVoorMeting, VIA_RESULTATEN } from "@/lib/resultaten-nav";
@@ -88,6 +90,23 @@ export default function RapportagePage({
         <p className="admin-notice">
           Nog geen afgeronde scans voor {scanUitvoering.label} — {assessment.naam}.
         </p>
+      </div>
+    );
+  }
+
+  // De Digitale Spanningsmeter: Het profiel van de groep, zonder de weergaven van de schaalscans (`visualisatie-spanningsmeter.md`,
+  // Resultaat). Een Admin of Consultant ziet de groep altijd; de drempel geldt voor een Lead.
+  if (isSpanning(assessment)) {
+    return (
+      <div className="admin-main admin-main--breed">
+        <Kruimelpad delen={kruimelsVoorMeting(organisatie, scanUitvoering, via, "Resultaten van de Meting")} />
+        <SpanningResultaat
+          assessment={assessment}
+          groep={{
+            scans: spanningScansVan(scanUitvoering.invullingen),
+            subregel: [scanUitvoering.label, organisatie.naam, `Gemiddelde van ${aantalAfgerond} ${aantalAfgerond === 1 ? "afgeronde scan" : "afgeronde scans"}`],
+          }}
+        />
       </div>
     );
   }

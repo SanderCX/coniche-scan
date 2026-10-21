@@ -28,6 +28,7 @@ export default function ContentEditorPage({
 }) {
   const { assessmentId } = use(params);
   const assessment = useAssessment(assessmentId);
+  const spanning = assessment?.antwoordType === "spanning";
   const alleAssessments = useAssessments();
   const router = useRouter();
   const [categorieArchiveren, setCategorieArchiveren] = useState<Categorie | null>(null);
@@ -187,6 +188,7 @@ export default function ContentEditorPage({
               <InfoIcoon sleutel="info.contentBouwblokLabel" />
             </div>
           </label>
+          {!spanning && (
           <label className="block text-sm">
             <span className="mb-1 block text-ink">Titel wegingskaart</span>
             <input
@@ -196,6 +198,7 @@ export default function ContentEditorPage({
               className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
+          )}
           <label className="block text-sm sm:col-span-2">
             <span className="mb-1 block text-ink">Instructieregel boven de vragen</span>
             <textarea
@@ -219,6 +222,7 @@ export default function ContentEditorPage({
               className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
+          {!spanning && (
           <label className="block text-sm sm:col-span-2">
             <span className="mb-1 block text-ink">Tekst wegingskaart</span>
             <textarea
@@ -231,6 +235,39 @@ export default function ContentEditorPage({
               className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
+          )}
+          {spanning && (
+            <>
+              <label className="block text-sm sm:col-span-2">
+                <span className="mb-1 block text-ink">Open vraag onder elk spanningsveld</span>
+                <textarea
+                  value={assessment.openVraag ?? ""}
+                  onChange={(e) => updateAssessment(assessmentId, (a) => ({ ...a, openVraag: e.target.value || null }))}
+                  rows={2}
+                  placeholder="Leeg: het gewone opmerkingenveld"
+                  className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+                />
+              </label>
+              <label className="block text-sm sm:col-span-2">
+                <span className="mb-1 block text-ink">Rolgroepen in de intake (gescheiden door een komma)</span>
+                <input
+                  key={(assessment.rolgroepen ?? []).join("|")}
+                  defaultValue={(assessment.rolgroepen ?? []).join(", ")}
+                  onBlur={(e) =>
+                    updateAssessment(assessmentId, (a) => ({
+                      ...a,
+                      rolgroepen: e.target.value
+                        .split(",")
+                        .map((t) => t.trim())
+                        .filter(Boolean),
+                    }))
+                  }
+                  placeholder="Leeg: de vraag Rolgroep ontbreekt"
+                  className="w-full rounded-lg border border-gray-200 p-2 text-sm"
+                />
+              </label>
+            </>
+          )}
         </div>
 
         <label className="mt-4 flex items-center gap-2 text-sm text-ink">
@@ -566,7 +603,7 @@ export default function ContentEditorPage({
         )}
       </section>
 
-      <WegingBeheer assessment={assessment} />
+      {!spanning && <WegingBeheer assessment={assessment} />}
 
       <BevestigModal
         open={categorieArchiveren !== null}

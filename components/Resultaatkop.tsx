@@ -41,8 +41,14 @@ export function Totaalkaart({
   uitleg,
   feiten,
   extra,
+  ringLabel,
+  ringAlt,
 }: {
   ring: RingGegevens;
+  /** Het label onder het getal in de ring: Standaard "Totaalscore", bij de Spanningsmeter "Niveau". */
+  ringLabel?: string;
+  /** Het tekstalternatief van de ring. */
+  ringAlt?: string;
   uitleg?: string;
   feiten: (string | null | undefined | false)[];
   extra?: (string | null | undefined | false)[];
@@ -50,8 +56,8 @@ export function Totaalkaart({
   const f = feiten.filter(Boolean) as string[];
   const e = (extra ?? []).filter(Boolean) as string[];
   return (
-    <section className="totaalkaart" aria-label="Totaalscore">
-      <ScoreRing ring={ring} klein metChip={false} />
+    <section className="totaalkaart" aria-label={ringLabel ?? "Totaalscore"}>
+      <ScoreRing ring={ring} klein metChip={false} label={ringLabel} alt={ringAlt} />
       <div className="totaalkaart-tekst">
         {ring.klasseNaam && (
           <span className="score-ring-chip" style={{ background: ring.chipAchtergrond, color: ring.chipTekst }}>

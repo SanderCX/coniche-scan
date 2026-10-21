@@ -18,8 +18,21 @@ export const BRON_MAX = 80;
 export const OMVANG_MAX = 40;
 export const TOT_RESULTAAT_MAX = 40;
 
-/** Het Assessment waarvan de bouwblokken aan een item gekoppeld kunnen worden (`dossier.md`, Koppeling aan bouwblokken). */
+export const PLAATS_MAX = 80;
+
+/** Het Assessment waarvan de bouwblokken als eerste aan een item gekoppeld kunnen worden (`dossier.md`, Koppeling aan bouwblokken). */
 export const DOSSIER_ASSESSMENT_ID = "klantcontact-volwassenheid";
+
+/**
+ * De Assessments waarvan de bouwblokken (en de AI-domeinen) aan een item gekoppeld kunnen worden, in de volgorde van de pillen (`dossier.md`,
+ * Koppeling aan bouwblokken, besloten door Joost op 21 oktober 2026): De Klantcontact Volwassenheidsscan en de AI-scan. Een bouwblok van
+ * een ander Assessment is niet te kiezen.
+ */
+export const DOSSIER_ASSESSMENT_IDS = ["klantcontact-volwassenheid", "ai-volwassenheid"] as const;
+
+export type DossierSoort = Dossieritem["soort"];
+
+export const DOSSIER_SOORTEN: DossierSoort[] = ["case", "nieuws", "event", "blog"];
 
 export function leegDossier(): Dossier {
   return { openVoorLead: false, openSinds: null, gewijzigdOp: null, items: [] };
@@ -32,8 +45,26 @@ export function dossierVan(organisatie: Pick<Organisatie, "dossier">): Dossier {
 
 const DATUM = /^\d{4}-\d{2}-\d{2}$/;
 
+/** Een datum als jjjj-mm-dd die bestaat. */
+function geldigeDatum(d: string): boolean {
+  return DATUM.test(d) && !Number.isNaN(Date.parse(d));
+}
+
+/** Vandaag als jjjj-mm-dd, in de lokale tijd. */
+export function vandaag(nu: Date = new Date()): string {
+  const m = String(nu.getMonth() + 1).padStart(2, "0");
+  const d = String(nu.getDate()).padStart(2, "0");
+  return `${nu.getFullYear()}-${m}-${d}`;
+}
+
+/** Een Event is verlopen vanaf de dag na `einddatum`, of na `datum` als er geen einddatum is (`dossier.md`, Regels). Andere soorten verlopen niet. */
+export function isVerlopen(item: Pick<Dossieritem, "soort" | "datum" | "einddatum">, nu: Date = new Date()): boolean {
+  if (item.soort !== "event" || !item.datum) return false;
+  return (item.einddatum || item.datum) < vandaag(nu);
+}
+
 export interface DossierInvoer {
-  soort: "nieuws" | "case";
+  soort: DossierSoort;
   titel: string;
   toelichting: string;
   url: string;
@@ -41,6 +72,9 @@ export interface DossierInvoer {
   zichtbaarVoorLead: boolean;
   bron: string;
   gepubliceerdOp: string;
+  datum: string;
+  einddatum: string;
+  plaats: string;
   samenvatting: string;
   caseOrganisatieId: string | null;
   omvang: string;
@@ -48,7 +82,7 @@ export interface DossierInvoer {
 }
 
 /** Een lege invoer voor een nieuw item van dit soort. */
-export function leegDossierInvoer(soort: "nieuws" | "case"): DossierInvoer {
+export function leegDossierInvoer(soort: DossierSoort): DossierInvoer {
   return {
     soort,
     titel: "",
@@ -58,6 +92,9 @@ export function leegDossierInvoer(soort: "nieuws" | "case"): DossierInvoer {
     zichtbaarVoorLead: false,
     bron: "",
     gepubliceerdOp: "",
+    datum: "",
+    einddatum: "",
+    plaats: "",
     samenvatting: "",
     caseOrganisatieId: null,
     omvang: "",
@@ -73,9 +110,9 @@ export function invoerVanItem(item: Dossieritem): DossierInvoer {
 }
 
 /**
- * De invoer van een item controleren en schoonmaken (`dossier.md`, Regels). Een Nieuwsitem heeft een titel en een geldig adres nodig, een Case
- * een titel, een samenvatting en een Organisatie in de case (die niet de eigen Organisatie is). Velden van het andere soort worden leeg
- * bewaard. Of het item open mag staan, hangt af van de Afspraak en de Sector van de Organisatie in de case: Dat controleert
+ * De invoer van een item controleren en schoonmaken (`dossier.md`, Regels). Een Nieuws- of Blogitem heeft een titel en een geldig adres nodig, een
+ * Event een titel en een datum (met een optionele einddatum die niet voor de datum ligt), een Case een titel, een samenvatting en een
+ * Organisatie in de case (die niet de eigen Organisatie is). Velden van de andere soorten worden leeg bewaard. Of het item open mag staan, hangt af van de Afspraak en de Sector van de Organisatie in de case: Dat controleert
  * `kanOpenZetten`, omdat het van andere Organisaties afhangt.
  */
 export function controleerDossieritem(invoer: DossierInvoer, eigenOrganisatieId: string): Controle<DossierInvoer> {
@@ -93,15 +130,29 @@ export function controleerDossieritem(invoer: DossierInvoer, eigenOrganisatieId:
     url = genormaliseerd;
   } else if (invoer.soort === "nieuws") {
     return { ok: false, reden: "Vul het adres van het artikel in." };
+  } else if (invoer.soort === "blog") {
+    return { ok: false, reden: "Vul het adres van de blog in." };
   }
 
   const basis = { ...leegDossierInvoer(invoer.soort), soort: invoer.soort, titel, toelichting, url, bouwblokIds, zichtbaarVoorLead: invoer.zichtbaarVoorLead };
 
-  if (invoer.soort === "nieuws") {
+  if (invoer.soort === "event") {
+    const datum = invoer.datum.trim();
+    if (!datum) return { ok: false, reden: "Vul de datum in." };
+    if (!geldigeDatum(datum)) return { ok: false, reden: "De datum klopt niet." };
+    const einddatum = invoer.einddatum.trim();
+    if (einddatum && !geldigeDatum(einddatum)) return { ok: false, reden: "De einddatum klopt niet." };
+    if (einddatum && einddatum < datum) return { ok: false, reden: "De einddatum ligt voor de datum." };
+    const plaats = schoon(invoer.plaats);
+    if (plaats.length > PLAATS_MAX) return { ok: false, reden: `De plaats mag maximaal ${PLAATS_MAX} tekens hebben.` };
+    return { ok: true, waarde: { ...basis, datum, einddatum, plaats } };
+  }
+
+  if (invoer.soort === "nieuws" || invoer.soort === "blog") {
     const bron = schoon(invoer.bron);
     if (bron.length > BRON_MAX) return { ok: false, reden: `De bron mag maximaal ${BRON_MAX} tekens hebben.` };
     const gepubliceerdOp = invoer.gepubliceerdOp.trim();
-    if (gepubliceerdOp && (!DATUM.test(gepubliceerdOp) || Number.isNaN(Date.parse(gepubliceerdOp)))) {
+    if (gepubliceerdOp && !geldigeDatum(gepubliceerdOp)) {
       return { ok: false, reden: "De datum klopt niet." };
     }
     return { ok: true, waarde: { ...basis, bron, gepubliceerdOp } };
@@ -154,11 +205,12 @@ export function kanOpenZetten(
   return null;
 }
 
-export type DossierStatus = "zichtbaar" | "intern" | "toestemming-ontbreekt" | "kies-organisatie";
+export type DossierStatus = "zichtbaar" | "intern" | "verlopen" | "toestemming-ontbreekt" | "kies-organisatie";
 
 export const DOSSIER_STATUS_LABEL: Record<DossierStatus, string> = {
   zichtbaar: "Zichtbaar voor klant",
   intern: "Intern",
+  verlopen: "Verlopen",
   "toestemming-ontbreekt": "Toestemming ontbreekt",
   "kies-organisatie": "Kies een organisatie",
 };
@@ -166,9 +218,10 @@ export const DOSSIER_STATUS_LABEL: Record<DossierStatus, string> = {
 /**
  * De status van een item voor de Consultant (`dossier.md`, Scherm 1): "Kies een organisatie" bij een Case zonder Organisatie,
  * "Toestemming ontbreekt" bij een Case waarvan de Organisatie de Afspraak niet (meer) heeft, ook als het item op Zichtbaar voor klant
- * stond, anders "Zichtbaar voor klant" of "Intern".
+ * stond, "Verlopen" bij een Event waarvan de datum voorbij is, anders "Zichtbaar voor klant" of "Intern".
  */
-export function itemStatus(item: Dossieritem, alle: Pick<Organisatie, "id" | "caseToegestaan">[]): DossierStatus {
+export function itemStatus(item: Dossieritem, alle: Pick<Organisatie, "id" | "caseToegestaan">[], nu: Date = new Date()): DossierStatus {
+  if (isVerlopen(item, nu)) return "verlopen";
   if (item.soort === "case") {
     if (!item.caseOrganisatieId) return "kies-organisatie";
     const o = alle.find((x) => x.id === item.caseOrganisatieId);
@@ -196,20 +249,40 @@ export function nieuwsNieuwsteEerst<T extends Pick<Dossieritem, "soort" | "gepub
     .sort((a, b) => sleutel(b).localeCompare(sleutel(a)) || b.aangemaaktOp.localeCompare(a.aangemaaktOp));
 }
 
-/** Alle items voor de Consultant: Eerst de Cases, dan het Nieuws, elk in de eigen volgorde. */
-export function itemsInVolgorde<T extends Dossieritem>(lijst: T[]): T[] {
-  return [...casesNieuwsteEerst(lijst), ...nieuwsNieuwsteEerst(lijst)];
+/** Events met het eerstvolgende bovenaan, daarna de verlopen events met het meest recente eerst (`dossier.md`, Regels, Volgorde). */
+export function eventsInVolgorde<T extends Pick<Dossieritem, "soort" | "datum" | "einddatum" | "aangemaaktOp">>(lijst: T[], nu: Date = new Date()): T[] {
+  const events = lijst.filter((i) => i.soort === "event");
+  const komend = events.filter((e) => !isVerlopen(e, nu)).sort((a, b) => a.datum.localeCompare(b.datum) || a.aangemaaktOp.localeCompare(b.aangemaaktOp));
+  const verlopen = events.filter((e) => isVerlopen(e, nu)).sort((a, b) => b.datum.localeCompare(a.datum) || b.aangemaaktOp.localeCompare(a.aangemaaktOp));
+  return [...komend, ...verlopen];
 }
 
-/** Het aantal items per soort. */
-export function aantallPerSoort(lijst: Pick<Dossieritem, "soort">[]): { alles: number; cases: number; nieuws: number } {
-  const cases = lijst.filter((i) => i.soort === "case").length;
-  return { alles: lijst.length, cases, nieuws: lijst.length - cases };
+/** Blogs met het nieuwste bovenaan, zoals Nieuws: Op publicatiedatum, en zonder datum op het moment van toevoegen. */
+export function blogsNieuwsteEerst<T extends Pick<Dossieritem, "soort" | "gepubliceerdOp" | "aangemaaktOp">>(lijst: T[]): T[] {
+  const sleutel = (n: T) => n.gepubliceerdOp || n.aangemaaktOp.slice(0, 10);
+  return lijst
+    .filter((i) => i.soort === "blog")
+    .sort((a, b) => sleutel(b).localeCompare(sleutel(a)) || b.aangemaaktOp.localeCompare(a.aangemaaktOp));
+}
+
+/** Alle items voor de Consultant: Eerst de Cases, dan het Nieuws, de Events en de Blogs, elk in de eigen volgorde. */
+export function itemsInVolgorde<T extends Dossieritem>(lijst: T[], nu: Date = new Date()): T[] {
+  return [...casesNieuwsteEerst(lijst), ...nieuwsNieuwsteEerst(lijst), ...eventsInVolgorde(lijst, nu), ...blogsNieuwsteEerst(lijst)];
+}
+
+/** Het aantal items per soort. Een verlopen Event telt mee (`dossier.md`, Scherm 1, Filter). */
+export function aantallPerSoort(lijst: Pick<Dossieritem, "soort">[]): { alles: number; cases: number; nieuws: number; events: number; blogs: number } {
+  const n = (soort: DossierSoort) => lijst.filter((i) => i.soort === soort).length;
+  return { alles: lijst.length, cases: n("case"), nieuws: n("nieuws"), events: n("event"), blogs: n("blog") };
 }
 
 /** Het aantal items dat de Lead nu zou zien als het Dossier open stond (voor de bevestiging bij Open voor Lead). */
-export function aantalZichtbaarVoorLead(organisatie: Organisatie, alle: Organisatie[]): number {
-  return dossierVan(organisatie).items.filter((i) => itemStatus(i, alle) === "zichtbaar").length;
+export function aantalZichtbaarVoorLead(organisatie: Organisatie, alle: Organisatie[], nu: Date = new Date()): number {
+  // Een verlopen Event dat op Zichtbaar voor klant staat, ziet de Lead onder "Eerdere events": Het telt dus mee.
+  return dossierVan(organisatie).items.filter((i) => {
+    const status = itemStatus(i, alle, nu);
+    return status === "zichtbaar" || (status === "verlopen" && i.zichtbaarVoorLead);
+  }).length;
 }
 
 /** Het aantal Cases bij andere Organisaties dat naar deze Organisatie verwijst (voor de bevestigingen). */
@@ -266,20 +339,42 @@ export interface LeadNieuws {
   aangemaaktOp: string;
 }
 
+/** Een Blog heeft dezelfde velden als Nieuws. */
+export type LeadBlog = LeadNieuws;
+
+export interface LeadEvent {
+  id: string;
+  titel: string;
+  toelichting: string;
+  datum: string;
+  einddatum: string;
+  plaats: string;
+  /** Optioneel: De aanmeldpagina. */
+  url: string;
+  bouwblokIds: string[];
+  aangemaaktOp: string;
+  /** Volgt uit de datum (`isVerlopen`) op het moment van laden. */
+  verlopen: boolean;
+}
+
 export interface LeadDossier {
   organisatieNaam: string;
   openSinds: string | null;
   gewijzigdOp: string | null;
   cases: LeadCase[];
   nieuws: LeadNieuws[];
+  /** Eerst de komende events, daarna de verlopen (`eventsInVolgorde`). */
+  events: LeadEvent[];
+  blogs: LeadBlog[];
 }
 
 /**
  * Het Dossier zoals een Lead het ziet (`dossier.md`, Wat de Lead ziet): `null` als het Dossier niet open staat of er geen enkel item
  * zichtbaar is. Een item is zichtbaar als `openVoorLead` aan staat, het item op Zichtbaar voor klant staat en, bij een Case, de
- * Organisatie in de case de Afspraak heeft en een Sector (de branche). De Case heeft in dit resultaat geen Organisatie-id en geen naam.
+ * Organisatie in de case de Afspraak heeft en een Sector (de branche). De Case heeft in dit resultaat geen Organisatie-id en geen naam. Een
+ * Event of Blog heeft geen toestemming van een andere Organisatie nodig.
  */
-export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korteNamen?: KorteNamen): LeadDossier | null {
+export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korteNamen?: KorteNamen, nu: Date = new Date()): LeadDossier | null {
   const dossier = dossierVan(organisatie);
   if (!dossier.openVoorLead) return null;
   const zichtbaar = dossier.items.filter((i) => i.zichtbaarVoorLead);
@@ -303,7 +398,7 @@ export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korte
       },
     ];
   });
-  const nieuws: LeadNieuws[] = nieuwsNieuwsteEerst(zichtbaar).map((i) => ({
+  const artikel = (i: Dossieritem): LeadNieuws => ({
     id: i.id,
     titel: i.titel,
     toelichting: i.toelichting,
@@ -312,9 +407,23 @@ export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korte
     url: i.url,
     bouwblokIds: i.bouwblokIds,
     aangemaaktOp: i.aangemaaktOp,
+  });
+  const nieuws: LeadNieuws[] = nieuwsNieuwsteEerst(zichtbaar).map(artikel);
+  const blogs: LeadBlog[] = blogsNieuwsteEerst(zichtbaar).map(artikel);
+  const events: LeadEvent[] = eventsInVolgorde(zichtbaar, nu).map((i) => ({
+    id: i.id,
+    titel: i.titel,
+    toelichting: i.toelichting,
+    datum: i.datum,
+    einddatum: i.einddatum,
+    plaats: i.plaats,
+    url: i.url,
+    bouwblokIds: i.bouwblokIds,
+    aangemaaktOp: i.aangemaaktOp,
+    verlopen: isVerlopen(i, nu),
   }));
-  if (cases.length + nieuws.length === 0) return null;
-  return { organisatieNaam: organisatie.naam, openSinds: dossier.openSinds, gewijzigdOp: dossier.gewijzigdOp, cases, nieuws };
+  if (cases.length + nieuws.length + events.length + blogs.length === 0) return null;
+  return { organisatieNaam: organisatie.naam, openSinds: dossier.openSinds, gewijzigdOp: dossier.gewijzigdOp, cases, nieuws, events, blogs };
 }
 
 /** Of de kaart Dossier de tag "Nieuw" krijgt: Zolang de Lead de pagina niet heeft geopend na de laatste wijziging. */
@@ -324,44 +433,74 @@ export function isNieuwVoorLead(lid: Pick<OrganisatieLid, "dossierGezienOp">, do
   return !!laatste && lid.dossierGezienOp < laatste;
 }
 
-/** De voorproef op de kaart (`visualisatie-mijn-metingen.md`, Dossierkaart): Ten hoogste drie titels, eerst de Cases. */
-export function voorproef(d: Pick<LeadDossier, "cases" | "nieuws">, max = 3): { titels: { soort: "case" | "nieuws"; titel: string }[]; meer: number } {
+/** De komende events van een Lead-Dossier: Een verlopen Event staat niet op de kaart en telt daar niet mee. */
+function komendeEvents(d: Pick<LeadDossier, "events">): LeadEvent[] {
+  return d.events.filter((e) => !e.verlopen);
+}
+
+export type VoorproefSoort = "case" | "nieuws" | "event" | "blog";
+
+/** De voorproef op de kaart (`visualisatie-mijn-metingen.md`, Dossierkaart): Ten hoogste drie titels, eerst de Cases, dan Nieuws, Events en Blogs. */
+export function voorproef(d: Pick<LeadDossier, "cases" | "nieuws" | "events" | "blogs">, max = 3): { titels: { soort: VoorproefSoort; titel: string }[]; meer: number } {
   const alle = [
     ...d.cases.map((c) => ({ soort: "case" as const, titel: c.titel })),
     ...d.nieuws.map((n) => ({ soort: "nieuws" as const, titel: n.titel })),
+    ...komendeEvents(d).map((e) => ({ soort: "event" as const, titel: e.titel })),
+    ...d.blogs.map((b) => ({ soort: "blog" as const, titel: b.titel })),
   ];
   return { titels: alle.slice(0, max), meer: Math.max(0, alle.length - max) };
 }
 
-/** "2 cases · 2 nieuwsberichten", met het enkelvoud bij 1 en een soort zonder items weggelaten. */
-export function aantalTekst(d: Pick<LeadDossier, "cases" | "nieuws">): string {
+/** "2 cases · 2 nieuwsberichten · 2 events · 1 blog", met het enkelvoud bij 1 en een soort zonder items weggelaten. Een verlopen Event telt niet mee. */
+export function aantalTekst(d: Pick<LeadDossier, "cases" | "nieuws" | "events" | "blogs">): string {
   const delen: string[] = [];
-  if (d.cases.length > 0) delen.push(`${d.cases.length} ${d.cases.length === 1 ? "case" : "cases"}`);
-  if (d.nieuws.length > 0) delen.push(`${d.nieuws.length} ${d.nieuws.length === 1 ? "nieuwsbericht" : "nieuwsberichten"}`);
+  const voeg = (n: number, een: string, meer: string) => {
+    if (n > 0) delen.push(`${n} ${n === 1 ? een : meer}`);
+  };
+  voeg(d.cases.length, "case", "cases");
+  voeg(d.nieuws.length, "nieuwsbericht", "nieuwsberichten");
+  voeg(komendeEvents(d).length, "event", "events");
+  voeg(d.blogs.length, "blog", "blogs");
   return delen.join(" · ");
 }
 
-/** Het aantal zichtbare items per bouwblok (`Bouwblok.id`), voor de radar en de lijst naast de radar. */
-export function itemsPerBouwblok(d: Pick<LeadDossier, "cases" | "nieuws">): Map<string, number> {
+/** Het aantal zichtbare items per bouwblok (`Bouwblok.id`), voor de radar en de lijst naast de radar. Ook de verlopen Events tellen mee. */
+export function itemsPerBouwblok(d: Pick<LeadDossier, "cases" | "nieuws" | "events" | "blogs">): Map<string, number> {
   const kaart = new Map<string, number>();
-  for (const i of [...d.cases, ...d.nieuws]) for (const id of i.bouwblokIds) kaart.set(id, (kaart.get(id) ?? 0) + 1);
+  for (const i of [...d.cases, ...d.nieuws, ...d.events, ...d.blogs]) for (const id of i.bouwblokIds) kaart.set(id, (kaart.get(id) ?? 0) + 1);
   return kaart;
 }
 
 /** Filtert de zichtbare items op één bouwblok. Zonder bouwblok blijft alles staan. */
-export function filterOpBouwblok(d: LeadDossier, bouwblokId: string | null): { cases: LeadCase[]; nieuws: LeadNieuws[] } {
-  if (!bouwblokId) return { cases: d.cases, nieuws: d.nieuws };
+export function filterOpBouwblok(d: LeadDossier, bouwblokId: string | null): { cases: LeadCase[]; nieuws: LeadNieuws[]; events: LeadEvent[]; blogs: LeadBlog[] } {
+  if (!bouwblokId) return { cases: d.cases, nieuws: d.nieuws, events: d.events, blogs: d.blogs };
   return {
     cases: d.cases.filter((c) => c.bouwblokIds.includes(bouwblokId)),
     nieuws: d.nieuws.filter((n) => n.bouwblokIds.includes(bouwblokId)),
+    events: d.events.filter((e) => e.bouwblokIds.includes(bouwblokId)),
+    blogs: d.blogs.filter((b) => b.bouwblokIds.includes(bouwblokId)),
   };
 }
 
-/** De bouwblokken waaruit een item kiest, in de volgorde van de nummers (`dossier.md`, Koppeling aan bouwblokken). */
+/** De bouwblokken waaruit een item kiest bij de Klantcontact Volwassenheidsscan, in de volgorde van de nummers (`dossier.md`, Koppeling aan bouwblokken). */
 export function dossierBouwblokken(assessments: Assessment[]) {
-  const assessment = assessments.find((a) => a.id === DOSSIER_ASSESSMENT_ID);
-  if (!assessment) return [];
-  return alleBouwblokkenMetGroep(assessment).sort((a, b) => a.bouwblok.volgnummer - b.bouwblok.volgnummer);
+  return dossierBouwblokkenPerAssessment(assessments).find((a) => a.assessment.id === DOSSIER_ASSESSMENT_ID)?.bouwblokken ?? [];
+}
+
+/**
+ * De bouwblokken per Assessment waaraan een item gekoppeld kan worden: De 15 bouwblokken van de Klantcontact Volwassenheidsscan en de 8
+ * AI-domeinen van de AI-scan, voor zover die Assessments bestaan, elk in de volgorde van de nummers. Gearchiveerde bouwblokken zijn niet te
+ * kiezen (een bestaande koppeling blijft staan).
+ */
+export function dossierBouwblokkenPerAssessment(assessments: Assessment[]) {
+  return DOSSIER_ASSESSMENT_IDS.flatMap((id) => {
+    const assessment = assessments.find((a) => a.id === id);
+    if (!assessment) return [];
+    const bouwblokken = alleBouwblokkenMetGroep(assessment)
+      .filter((b) => !b.bouwblok.gearchiveerd)
+      .sort((a, b) => a.bouwblok.volgnummer - b.bouwblok.volgnummer);
+    return [{ assessment, bouwblokken }];
+  });
 }
 
 /**
@@ -400,7 +539,7 @@ export function zetNieuwsartikelenOm(ruw: Record<string, unknown>): Dossier {
 function vulItemAan(i: Partial<Dossieritem>): Dossieritem {
   return {
     id: i.id ?? "",
-    soort: i.soort === "case" ? "case" : "nieuws",
+    soort: i.soort === "case" || i.soort === "event" || i.soort === "blog" ? i.soort : "nieuws",
     titel: i.titel ?? "",
     toelichting: i.toelichting ?? "",
     zichtbaarVoorLead: i.zichtbaarVoorLead === true,
@@ -410,6 +549,9 @@ function vulItemAan(i: Partial<Dossieritem>): Dossieritem {
     gewijzigdOp: i.gewijzigdOp ?? i.aangemaaktOp ?? "",
     bron: i.bron ?? "",
     gepubliceerdOp: i.gepubliceerdOp ?? "",
+    datum: i.datum ?? "",
+    einddatum: i.einddatum ?? "",
+    plaats: i.plaats ?? "",
     samenvatting: i.samenvatting ?? "",
     caseOrganisatieId: i.caseOrganisatieId ?? null,
     omvang: i.omvang ?? "",

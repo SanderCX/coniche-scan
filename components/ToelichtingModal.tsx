@@ -20,6 +20,8 @@ export function ToelichtingModal({
   kleur,
   centraleVraag,
   beschrijving,
+  ijkpunten,
+  basis,
 }: {
   open: boolean;
   onClose: () => void;
@@ -31,6 +33,10 @@ export function ToelichtingModal({
   kleur: string | null;
   centraleVraag: string | null;
   beschrijving: string[];
+  /** Alleen bij een spanningsveld (`visualisatie-spanningsmeter.md`, De 6 spanningsvelden): De vijf ijkpunten, onder de beschrijving. */
+  ijkpunten?: { niveau: number; naam: string; tekst: string }[];
+  /** Alleen bij een spanningsveld: De basis (de literatuur), onder de ijkpunten. */
+  basis?: string | null;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
   useFocusVal(open, boxRef);
@@ -80,6 +86,24 @@ export function ToelichtingModal({
             ))}
           </div>
         )}
+        {ijkpunten && ijkpunten.length > 0 && (
+          <div className="tm-ijkpunten">
+            <span className="tm-label">Spanningsmeter voor dit veld</span>
+            <ol>
+              {ijkpunten.map((punt) => (
+                <li key={punt.niveau}>
+                  <span className="tm-ijk-nr" aria-hidden="true">
+                    {punt.niveau}
+                  </span>
+                  <span>
+                    <strong>{punt.naam}</strong> {punt.tekst}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+        {basis && <p className="tm-basis">{basis}</p>}
       </div>
     </div>
   );

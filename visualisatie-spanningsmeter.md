@@ -2,7 +2,7 @@
 
 Spec voor wat een gebruiker van de Digitale Spanningsmeter ziet: het beeld in de cirkel op scherm 1, de doorloopflow, Mijn metingen, het resultaat van een respondent en van een groep, en de film Wat krijg ik. De inhoud staat in `content-spanningsmeter.md`, het rekenen in `datamodel.md` (Scoreberekening, Spanningsmeter), de schermen in `CLAUDE.md` en de gedeelde opmaak in `stylesheet.md`.
 
-**Status: Voorstel van 21 oktober 2026, niet gebouwd.** Besloten door Joost in het ontwerp: De plek in de cirkel op scherm 1, het beeld, de iconen en de kleuren ("goed voor nu"), en dat de toegang gelijk is aan die van de andere scans. Besloten is ook de volgorde van de delen in de cirkel (variant E2, `CLAUDE.md`, scherm 1). Nog niet besloten zijn de punten onder Open punten, en de teksten moeten nog geverifieerd worden. De bron (het PDF van Martijn) is een bron en geen voorschrift: Waar de app een algemene wijze voor Assessments heeft (gemiddelde met spreiding, Onderdeel in plaats van afdeling), geldt die. Het ontwerp staat in het Design-artifact "Digitale Spanningsmeter: home en schermen", met de borden Main en Gekozen (de cirkel), Beeld, Vraag, Lead, Rapport, Profiel en Landing.
+**Status: Voorstel van 21 oktober 2026, gebouwd op 21 oktober 2026 (zie Zo gebouwd onderaan).** Besloten door Joost in het ontwerp: De plek in de cirkel op scherm 1, het beeld, de iconen en de kleuren ("goed voor nu"), en dat de toegang gelijk is aan die van de andere scans. Besloten is ook de volgorde van de delen in de cirkel (variant E2, `CLAUDE.md`, scherm 1). Nog niet besloten zijn de punten onder Open punten, en de teksten moeten nog geverifieerd worden. De bron (het PDF van Martijn) is een bron en geen voorschrift: Waar de app een algemene wijze voor Assessments heeft (gemiddelde met spreiding, Onderdeel in plaats van afdeling), geldt die. Het ontwerp staat in het Design-artifact "Digitale Spanningsmeter: home en schermen", met de borden Main en Gekozen (de cirkel), Beeld, Vraag, Lead, Rapport, Profiel en Landing.
 
 ## Uitgangspunten
 
@@ -153,3 +153,29 @@ Alle cijfers in de film zijn voorbeelddata (de fictieve deelnemer en groep uit `
 4. **Validatie zichtbaar.** Zolang de vragen niet getest zijn (`content-spanningsmeter.md`, Validatie), kan het resultaat een label "pilot" of een korte vermelding krijgen. Niet besloten.
 5. **Teksten.** De drie kaarten van de Visie, de omschrijvingen op de Landingspagina en de teksten van de film zijn voor nu akkoord en moeten nog geverifieerd worden.
 6. **Veldnamen.** De drie veldnamen met een ampersand ("Verhaal & leiderschap", "Governance, regie & control", "Mensen & gedrag") staan zo in de bron. In koppen en tooltips staat de volledige naam, in rijen en op de radar de korte naam of het nummer.
+
+## Zo gebouwd
+
+Gebouwd op 21 oktober 2026. De onderdelen en de plek in de code:
+
+- **Rekenen.** `lib/spanning.ts` (veldscore, niveau, spanning, grootste spanning, gemiddeld niveau, groep, rolgroepen, `groepZichtbaar`) met `lib/spanning.test.ts`, waarin het rekenvoorbeeld uit `datamodel.md` staat. `lib/spanning-radar.ts` is de meetkunde van de radar.
+- **Doorloopflow.** `components/spanning/SpanningVeldForm.tsx`, `Antwoordkeuze.tsx`, `SpanningSidebar.tsx` en `VeldToelichting.tsx` (de Toelichtingsmodal met omschrijving, ijkpunten en basis, `ToelichtingModal` heeft daarvoor `ijkpunten` en `basis`). De hoofdkolom van de flow is bij dit type breder (`.flow-main--spanning`, 1000px) omdat de antwoordkeuze zes keuzes naast elkaar heeft.
+- **Resultaat.** `components/spanning/SpanningResultaat.tsx` voor Jouw profiel en Groep, aangeroepen door `ResultsView` (één scan), de resultatenpagina van een respondent (met schakelaar voor een Lead), de Lead-pagina van een Meting, de Rapportage in beheer en de voorbeeld-output.
+- **Mijn metingen.** De bestaande Kaart met cirkel (`CirkelPaneel`) met een teaser van dit type (`spanningTeaser` in `lib/mijn-metingen.ts`).
+- **Cirkel, Assessment-pagina en film.** `lib/assessmentcirkel.ts` (vijf delen), `components/assessment/SpanningVeldenSectie.tsx`, `SpanningVisieSectie.tsx` en `components/spanning/SpanningFilm.tsx` (de film heeft een eigen opbouw met drie stapkaarten met elk een beeld, geen podium met stappen eronder).
+- **Overig.** De instelling `spanningMinPerRol` (Drempels en termijnen), `heeftEigenResultaat` (`lib/assessment-structuur.ts`) houdt dit type uit export, benchmark, Verkennen en de samengestelde Meting, en de help is bijgewerkt.
+
+**Afwijkingen en interpretaties (te beoordelen door Joost):**
+
+- **Niveaurondjes.** De tekst in het rondje van niveau 3 én 4 is `--ink` (de spec noemt alleen 3). Dat volgt de regel in `stylesheet.md`, Scorekleuren, dat tekst op geel en lichtgroen `--ink` is.
+- **Veldkleur 4 (turkoois).** Witte tekst, zoals de spec bij Veldkleuren zegt (bij de AI-domeinen is dezelfde kleur `--ink`).
+- **Rolgroep** staat niet verplicht in de intake (open punt 1), met "Kies een rolgroep" als lege keuze. Een scan zonder rolgroep telt mee in de groep maar staat in geen rol.
+- **Voorbeelden uit de groep** zijn niet gebouwd: De vrijgave is niet besloten (open punt 2), en zonder vrijgave staat de kaart er niet.
+- **Hover.** De wedges, knooppunten en rijen lichten elkaar op in beide richtingen. De tooltip van de radar is de eigen naam in een `title` (de spec noemt geen opmaak ervoor), en de knooppunten zijn met Tab bereikbaar maar geen knoppen.
+- **Namen.** In kaarten met een kop staat de volledige veldnaam, in rijen en tabellen de korte naam (open punt 6). De zin over de grootste spanning noemt beide volledige namen.
+- **Ring.** De vulling is `(gemiddeld niveau − 1) / 4`, zoals bij de andere scans, en de feiten zeggen "30 van 30 vragen beantwoord" (een 0 telt als beantwoord).
+- **Demodata.** De groep van de voorbeeld-output en de film heeft per rol verschillende scores (bijvoorbeeld Verhaal 3,0, 3,6 en 4,6), zodat de uitsplitsing per rol iets laat zien. De groepsgemiddelden, de spreiding en de spanningen zijn die van het rekenvoorbeeld.
+- **Lead.** Een Lead ziet de groep pas vanaf `benchmarkMinRespondenten` afgeronde scans (daaronder een melding, of alleen het eigen profiel). De vinkjes Spreiding, Antwoorden, Exporteren en benchmark zijn voor dit type grijs in het Leads-venster, want die weergaven bestaan er niet.
+- **Beheer.** De Rapportage van een Meting toont de weergave Groep zonder de schakelaars van de andere scans. Bij de content van het Assessment zijn de open vraag en de rolgroepen te bewerken en staat de weging niet; ijkpunten, invalshoeken, "Waar je op let" en korte namen zijn nog niet in beheer te bewerken (`backlog.md`).
+- **Testknop.** De tijdelijke testknop van de doorloopflow ("Vul alle vragen automatisch in") staat ook bij dit type en vult scores van 2 tot 4.
+- **Film.** De lus is 9 seconden, de chip is "Technologie +1,4 op Processen" uit dezelfde demodata, en de feature-kaarten (Volledig beeld, Direct inzicht, Concreet en toepasbaar) staan voor dit type niet op de pagina omdat het ontwerp er geen plek voor heeft.

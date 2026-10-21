@@ -35,6 +35,23 @@ export function domeinKleur(volgnummer: number): string {
   return DOMEIN_KLEUREN[(((volgnummer - 1) % DOMEIN_KLEUREN.length) + DOMEIN_KLEUREN.length) % DOMEIN_KLEUREN.length];
 }
 
+/**
+ * De kleuren van de zes spanningsvelden van de Digitale Spanningsmeter (`stylesheet.md`, Veldkleuren Spanningsmeter): Oranje,
+ * blauw, groen, turkoois, paars en geel. Het veld met volgnummer 1 krijgt de eerste kleur. Een veldkleur is een vulling en een
+ * accent en nooit de kleur van een score.
+ */
+export const VELD_KLEUREN = ["#ff671f", "#225ba0", "#197f4e", "#1f9aa0", "#392944", "#ffc043"] as const;
+
+/** De hex van de kleur van een spanningsveld op volgnummer (1 is het eerste). */
+export function veldKleur(volgnummer: number): string {
+  return VELD_KLEUREN[(((volgnummer - 1) % VELD_KLEUREN.length) + VELD_KLEUREN.length) % VELD_KLEUREN.length];
+}
+
+/** Tekst in of op een veldkleur: Wit, behalve op het gele veld (6), daar `--ink` (`visualisatie-spanningsmeter.md`, Veldkleuren). */
+export function tekstOpVeldKleur(volgnummer: number): string {
+  return veldKleur(volgnummer).toLowerCase() === "#ffc043" ? "var(--ink)" : "#fff";
+}
+
 /** De kleuren die een Admin voor een categorie kan kiezen: De extra domeinkleuren horen daar niet bij. */
 export const CATEGORIE_KLEUR_KEUZES = Object.keys(CATEGORIE_COLORS).filter((k) => !["turkoois", "framboos", "lavendel"].includes(k));
 

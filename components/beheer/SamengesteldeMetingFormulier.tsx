@@ -3,7 +3,7 @@
 import { OnderdeelVeld, onderdeelFout, onderdeelNaamVoorOpslaan } from "@/components/beheer/OnderdeelMeetdatumVelden";
 import { useState } from "react";
 import { useAssessments } from "@/lib/assessment-store";
-import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { heeftEigenResultaat } from "@/lib/assessment-structuur";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { maakSamengesteldeMeting, wijzigSamengesteldeMeting } from "@/lib/db";
 import {
@@ -50,7 +50,7 @@ export function SamengesteldeMetingFormulier({
   // Een gemiddelde over Metingen bestaat niet voor Ja / Nee / Weet ik niet (`backlog.md`, Quickscan Ziekenhuis).
   const assessmentIds = [...new Set(metingen.map((m) => m.assessmentId))].filter((id) => {
     const a = assessments.find((x) => x.id === id);
-    return !a || !isJaNeeWeetNiet(a);
+    return !a || !heeftEigenResultaat(a);
   });
 
   const [assessmentId, setAssessmentId] = useState(bestaande?.assessmentId ?? assessmentIds[0] ?? "");

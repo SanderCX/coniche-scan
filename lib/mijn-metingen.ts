@@ -15,6 +15,8 @@ import {
 import { KLASSE_NAAM, isJaNeeWeetNiet, quickscanResultaat, QuickscanResultaat } from "./quickscan";
 import { metingAlsResultaat, quickscanMeting, quickscanScansVan } from "./quickscan-groep";
 import { Classificatie } from "./types";
+import { isSpanning, spanningZin, spanningProfiel, groepProfiel, spanningScansVan, fmt1, niveauNaam, veldKorteNaam } from "./spanning";
+import { veldKleur, tekstOpVeldKleur } from "./colors";
 import { CATEGORIE_COLORS, CLASSIFICATIE_INFO } from "./colors";
 
 const MAANDEN_LANG = [
@@ -74,6 +76,8 @@ export interface TeaserRij {
   alt: string;
   /** De tekst rechts van de balk: "3,4" of "8/12 · 67%". Bij `nietBeantwoord` een streepje. */
   waarde: string;
+  /** Alleen bij de Spanningsmeter: Het nummer van het veld in een bolletje in de veldkleur, voor de naam. */
+  nummer?: { nr: number; achtergrond: string; tekst: string };
   /**
    * Alleen bij de Quickscan: De vragen van de afdeling zijn in deze scan niet beantwoord. De rij blijft staan, zonder balk en met een
    * streepje, en de afdeling telt niet mee in het totaal (`visualisatie-mijn-metingen.md`, Quickscan, Afdeling niet beantwoord).
@@ -108,6 +112,14 @@ export interface Teaser {
    * de volle kleur van de afgeronde score of klasse, en de kleuren van de klassenchip.
    */
   ring: { fractie: number; kleur: string; chipAchtergrond: string; chipTekst: string };
+  /** Alleen bij de Spanningsmeter: Het label onder het getal in de ring ("Niveau" in plaats van "Totaalscore"). */
+  ringLabel?: string;
+  /** Alleen bij de Spanningsmeter: Het tekstalternatief van de ring ("Gemiddeld niveau 3,1, Georganiseerd"). */
+  ringAlt?: string;
+  /** Alleen bij de Spanningsmeter: De kop boven de rijen ("Per spanningsveld"). */
+  rijenLabel?: string;
+  /** Alleen bij de Spanningsmeter: De zin over de grootste spanning onder het paneel ("Technologie loopt 1,8 voor op ..."). */
+  spanningsZin?: string | null;
 }
 
 const KLASSE_KLEUR: Record<Classificatie, string> = {
@@ -182,6 +194,61 @@ function schaalTeaser(
   };
 }
 
+const KORT = (n: number) => fmt1(n);
+
+/**
+ * De teaser van de Spanningsmeter (`visualisatie-spanningsmeter.md`, Mijn metingen): De ring toont het Gemiddeld niveau (een
+ * weergave, geen score), per spanningsveld een rij met het nummer in de veldkleur en de korte naam, en de zin over de grootste
+ * spanning. Eigen scan: Een balk per veld. Hele Meting (`scans` gezet): Het gemiddelde met de laagste tot hoogste score van een scan.
+ */
+function spanningTeaser(assessment: Assessment, antwoorden?: Record<string, Antwoord>, scans?: ScanInvulling[]): Teaser | null {
+  const groep = scans ? groepProfiel(assessment, spanningScansVan(scans), 3) : null;
+  const profiel = groep ?? (antwoorden ? spanningProfiel(assessment, antwoorden) : null);
+  if (!profiel || !profiel.gemiddeld) return null;
+  const gem = profiel.gemiddeld;
+  const stap = celStap(gem.score);
+  const niveau = niveauNaam(assessment, gem.niveau);
+  const rijen: TeaserRij[] = profiel.velden.map((v) => {
+    const g = groep ? groep.velden.find((x) => x.veld.id === v.veld.id) : null;
+    const naam = veldKorteNaam(v.veld);
+    const nummer = { nr: v.volgnummer, achtergrond: veldKleur(v.volgnummer), tekst: tekstOpVeldKleur(v.volgnummer) };
+    if (v.score === null) {
+      return { sleutel: v.veld.id, naam, nummer, kleur: veldKleur(v.volgnummer), fractie: 0, alt: `${v.veld.naam}, onvoldoende zicht`, waarde: "–", nietBeantwoord: true };
+    }
+    return {
+      sleutel: v.veld.id,
+      naam,
+      nummer,
+      kleur: veldKleur(v.volgnummer),
+      fractie: schaalFractie(v.score),
+      ...(g && g.laagste !== null && g.hoogste !== null ? { lijn: { van: schaalFractie(g.laagste), tot: schaalFractie(g.hoogste) } } : {}),
+      alt:
+        g && g.laagste !== null && g.hoogste !== null
+          ? `${v.veld.naam}, gemiddelde ${KORT(v.score)}, laagste ${KORT(g.laagste)}, hoogste ${KORT(g.hoogste)}`
+          : `${v.veld.naam}, ${KORT(v.score)}`,
+      waarde: KORT(v.score),
+    };
+  });
+  return {
+    soort: "schaal",
+    getal: KORT(gem.score),
+    klasseNaam: niveau,
+    getalKleur: null,
+    pilAchtergrond: `var(--score-${stap}-cel)`,
+    pilTekst: `var(--score-${stap}-cel-tekst)`,
+    sub: null,
+    stijl: groep ? "stip" : "balk",
+    ankers: true,
+    ...(groep ? { aantalScans: groep.scans } : {}),
+    rijen,
+    ring: { fractie: schaalFractie(gem.score), kleur: `var(--score-${stap})`, chipAchtergrond: `var(--score-${stap}-cel)`, chipTekst: `var(--score-${stap}-cel-tekst)` },
+    ringLabel: "Niveau",
+    ringAlt: `Gemiddeld niveau ${KORT(gem.score)}, ${niveau}`,
+    rijenLabel: "Per spanningsveld",
+    spanningsZin: profiel.grootste ? spanningZin(profiel.grootste) : null,
+  };
+}
+
 function quickscanTeaser(
   resultaat: QuickscanResultaat,
   metingModus: boolean,
@@ -238,7 +305,7 @@ function quickscanTeaser(
 
 /** De teaser van een gemiddelde dat al is uitgerekend, bijvoorbeeld van een samengestelde Meting (alleen voor scans met een schaal). */
 export function teaserVoorGemiddelden(assessment: Assessment, gemiddeldeAntwoorden: Record<string, number>, aantalScans: number): Teaser | null {
-  if (isJaNeeWeetNiet(assessment)) return null;
+  if (isJaNeeWeetNiet(assessment) || isSpanning(assessment)) return null;
   return schaalTeaser(assessment, gemiddeldeAntwoorden, aantalScans);
 }
 
@@ -249,6 +316,7 @@ export function teaserVoorScan(
   relevantie?: Record<string, boolean>
 ): Teaser | null {
   if (isJaNeeWeetNiet(assessment)) return quickscanTeaser(quickscanResultaat(assessment, antwoorden, relevantie), false);
+  if (isSpanning(assessment)) return spanningTeaser(assessment, antwoorden);
   return schaalTeaser(assessment, antwoorden);
 }
 
@@ -291,6 +359,7 @@ export function teaserVoorMeting(assessment: Assessment, invullingen: ScanInvull
     const resultaat = metingAlsResultaat(quickscanMeting(assessment, quickscanScansVan(afgerond)));
     return quickscanTeaser(resultaat, true, afgerond.length, spreidingPerAfdeling(assessment, afgerond));
   }
+  if (isSpanning(assessment)) return spanningTeaser(assessment, undefined, afgerond);
   const gemiddeld = gemiddeldeAntwoordenVoorMeting(assessment, afgerond);
   return schaalTeaser(assessment, gemiddeld, afgerond.length, spreidingPerGroep(assessment, afgerond));
 }

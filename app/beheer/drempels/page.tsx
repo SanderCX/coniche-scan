@@ -70,6 +70,8 @@ export default function DrempelsEnTermijnenPage() {
   const [benchmarkOpgeslagen, setBenchmarkOpgeslagen] = useState(false);
   const [verkennenInput, setVerkennenInput] = useState<Record<string, string>>({});
   const [verkennenOpgeslagen, setVerkennenOpgeslagen] = useState(false);
+  const [spanningInput, setSpanningInput] = useState<string | null>(null);
+  const [spanningOpgeslagen, setSpanningOpgeslagen] = useState(false);
 
   if (!magGebruikersBeheren(gebruiker)) {
     return (
@@ -120,6 +122,19 @@ export default function DrempelsEnTermijnenPage() {
     setVerkennenInput({});
     setVerkennenOpgeslagen(true);
     setTimeout(() => setVerkennenOpgeslagen(false), 1600);
+  }
+
+  // De Spanningsmeter (`datamodel.md`, Instellingen): Eén geheel getal van minstens 1.
+  const spanningMin = spanningInput ?? String(instellingen.spanningMinPerRol);
+  const spanningGeldig = geheelGetalVanMinstens1(spanningMin);
+
+  function handleSpanningOpslaan(e: React.FormEvent) {
+    e.preventDefault();
+    if (!spanningGeldig) return;
+    zetInstellingen({ spanningMinPerRol: Number(spanningMin) });
+    setSpanningInput(null);
+    setSpanningOpgeslagen(true);
+    setTimeout(() => setSpanningOpgeslagen(false), 1600);
   }
 
   function handleOpslaan(e: React.FormEvent) {
@@ -235,6 +250,28 @@ export default function DrempelsEnTermijnenPage() {
             </span>
           )}
           {verkennenOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
+        </span>
+      </form>
+
+      <h2 style={{ marginTop: "2rem" }}>Spanningsmeter</h2>
+      <form onSubmit={handleSpanningOpslaan} className="flex flex-wrap items-end gap-3">
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "14rem", minWidth: 0 }}>
+          <label htmlFor="spanning-min-per-rol">Scans per rol, minimum</label>
+          <input
+            id="spanning-min-per-rol"
+            type="number"
+            min={1}
+            step={1}
+            value={spanningMin}
+            onChange={(e) => setSpanningInput(e.target.value)}
+          />
+        </div>
+        <span className="knop-met-icoon">
+          <button type="submit" className="btn btn-or btn-compact" disabled={!spanningGeldig}>
+            Opslaan
+          </button>
+          <InfoIcoon naastVeld sleutel="info.spanningMinPerRol" />
+          {spanningOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
         </span>
       </form>
     </div>

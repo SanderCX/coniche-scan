@@ -12,6 +12,11 @@ import { DropdownKnop } from "@/components/DropdownKnop";
 import { langeDatum } from "@/lib/mijn-metingen";
 import { dagVan } from "@/lib/metingen";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { groepZichtbaar, isSpanning, spanningScansVan } from "@/lib/spanning";
+import { SpanningResultaat } from "@/components/spanning/SpanningResultaat";
+import { useInstellingen } from "@/lib/instellingen-store";
+import { heeftMetingToegang } from "@/lib/lead-toegang";
+import { aantalAfgerondInMeting } from "@/lib/metingen";
 import { exporteerScanIndesign, exporteerScanPdf, exporteerScansCsv } from "@/lib/scan-export";
 
 export default function ResultatenPage({
@@ -24,6 +29,7 @@ export default function ResultatenPage({
   const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
   const router = useRouter();
   const [pdfBezig, setPdfBezig] = useState(false);
+  const instellingen = useInstellingen();
 
   useEffect(() => {
     if (!gegevens) return;
@@ -49,6 +55,14 @@ export default function ResultatenPage({
   const { organisatie, scanUitvoering, lid, invulling } = gegevens;
 
   const context = { organisatie, scanUitvoering, lid, invulling, assessment };
+  const spanning = isSpanning(assessment);
+  // De Spanningsmeter: Een Lead met Resultaten voor deze Meting kan schakelen naar Groep, zodra de drempel is gehaald
+  // (`visualisatie-spanningsmeter.md`, Resultaat). Een respondent ziet alleen zijn eigen profiel.
+  const toonGroep =
+    spanning &&
+    lid.lead === true &&
+    heeftMetingToegang(organisatie, lid.id, "resultaten", scanUitvoering.id) &&
+    groepZichtbaar(aantalAfgerondInMeting(organisatie, scanUitvoering), instellingen.benchmarkMinRespondenten);
 
   async function handleExportPdf() {
     setPdfBezig(true);
@@ -67,7 +81,7 @@ export default function ResultatenPage({
           <Link href={`/scan/${respondentId}/doorloop`}>← Terug naar de scan</Link>
           {/* Voor Ja / Nee / Weet ik niet is er voorlopig geen export: PDF, CSV en InDesign gaan uit van de 1–5-schaal
               (`content-ziekenhuis-quickscan.md`, Resultaten, `backlog.md`). */}
-          {!isJaNeeWeetNiet(assessment) && (
+          {!isJaNeeWeetNiet(assessment) && !spanning && (
             <DropdownKnop
               label={pdfBezig ? "Bezig…" : "Exporteren"}
               opties={[
@@ -87,6 +101,19 @@ export default function ResultatenPage({
       identiteitMenu={<MijnGegevensMenu lid={lid} />}
     >
       <div className="container section">
+        {spanning && toonGroep ? (
+          <SpanningResultaat
+            assessment={assessment}
+            eigen={{
+              antwoorden: invulling.antwoorden,
+              subregel: [lid.naam, scanUitvoering.label, invulling.afgerondOp ? `afgerond op ${langeDatum(dagVan(invulling.afgerondOp))}` : null],
+            }}
+            groep={{
+              scans: spanningScansVan(scanUitvoering.invullingen),
+              subregel: [scanUitvoering.label, organisatie.naam, `Gemiddelde van ${aantalAfgerondInMeting(organisatie, scanUitvoering)} afgeronde scans`],
+            }}
+          />
+        ) : (
         <ResultsView
           assessment={assessment}
           antwoorden={invulling.antwoorden}
@@ -95,6 +122,7 @@ export default function ResultatenPage({
           subregel={[lid.naam, scanUitvoering.label, invulling.afgerondOp ? `afgerond op ${langeDatum(dagVan(invulling.afgerondOp))}` : null]}
           bouwblokHref={(bouwblokId) => `/scan/${respondentId}/doorloop?bouwblok=${bouwblokId}`}
         />
+        )}
       </div>
     </PageWithChrome>
   );

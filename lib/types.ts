@@ -2,6 +2,10 @@ export interface Vraag {
   id: string;
   volgnummer: number;
   tekst: string;
+  /** Alleen bij antwoordType "spanning": De korte naam van de invalshoek, boven de vraag ("Noodzaak"). Leeg: Niets tonen. */
+  invalshoek?: string | null;
+  /** Alleen bij antwoordType "spanning": De toelichting "Waar je op let" achter een Info-knop bij de vraag. Leeg: Geen Info-knop. */
+  aandachtspunt?: string | null;
   /** Zie `Bouwblok.gearchiveerd` hieronder — dezelfde reden, op vraagniveau. */
   gearchiveerd?: boolean;
 }
@@ -23,6 +27,10 @@ export interface Bouwblok {
    * afdeling is (`content-ziekenhuis-quickscan.md`). Leeg: Er staat geen zin.
    */
   aandachtZin?: string | null;
+  /** Alleen bij antwoordType "spanning": Naam voor rijen en tooltips waar de volledige naam te lang is ("Verhaal"). Leeg: De volledige naam. */
+  korteNaam?: string | null;
+  /** Alleen bij antwoordType "spanning": Vijf teksten, één per niveau 1 tot en met 5, het ijkpunt uit het boek voor dit veld. */
+  ijkpunten?: string[] | null;
   vragen: Vraag[];
   /**
    * "Verwijderen" in het contentbeheerscherm zet dit i.p.v. het record echt
@@ -56,9 +64,12 @@ export interface Categorie {
 }
 
 /** Hoe een vraag wordt beantwoord en hoe de score wordt berekend (`datamodel.md`, Antwoordtype). */
-export type AntwoordType = "schaal" | "ja-nee-weetniet";
+export type AntwoordType = "schaal" | "ja-nee-weetniet" | "spanning";
 
-/** Een antwoord op een vraag: 1 tot en met 5 bij antwoordType "schaal", Ja, Nee of Weet ik niet bij "ja-nee-weetniet". */
+/**
+ * Een antwoord op een vraag: 1 tot en met 5 bij antwoordType "schaal", Ja, Nee of Weet ik niet bij "ja-nee-weetniet", en 0 tot en
+ * met 5 bij "spanning" (0 is "Kan ik niet beoordelen": Een geldig antwoord dat niet meetelt in de score).
+ */
 export type Antwoord = number | "ja" | "nee" | "weet-niet";
 
 export interface SchaalLabel {
@@ -186,6 +197,10 @@ export interface Assessment {
   instructieregel?: string | null;
   /** Alleen als een Categorie optioneel is: De Ja/Nee-vraag bovenaan die categorie. */
   relevantieVraag?: string | null;
+  /** Alleen bij antwoordType "spanning": De tekst van de open vraag onder elk veld. Leeg: Het gewone opmerkingenveld. */
+  openVraag?: string | null;
+  /** Alleen bij antwoordType "spanning": De opties van de vraag Rolgroep in de intake. Leeg: De vraag ontbreekt. */
+  rolgroepen?: string[] | null;
   // Let op: organisatieVelden staat hier bewust niet meer — die zijn platformbreed
   // geworden, zie data/organisatie-velden.ts (datamodel-rbac-voorstel.md, keuze 4).
   /** Herkomst-template bij een sector-variant (bijv. Zorgscan). null bij een op zichzelf staand Assessment. Puur informatief, geen lopende koppeling — datamodel.md, Sector-varianten. */
@@ -299,27 +314,33 @@ export interface Contactpersoon {
 }
 
 /**
- * Een item in het Dossier van een Organisatie (`datamodel.md`, Dossieritem; `dossier.md`): Nieuws of een Case. De velden onder "alleen
- * Nieuws" en "alleen Case" zijn bij het andere soort leeg.
+ * Een item in het Dossier van een Organisatie (`datamodel.md`, Dossieritem; `dossier.md`): Nieuws, een Case, een Event of een Blog. De velden
+ * die bij een soort horen, zijn bij de andere soorten leeg.
  */
 export interface Dossieritem {
   id: string;
   /** Staat vast na het aanmaken. */
-  soort: "nieuws" | "case";
+  soort: "nieuws" | "case" | "event" | "blog";
   titel: string;
   /** Voor Nieuws de reden waarom het relevant is, voor een Case "Waarom dit voor jullie telt". De Lead leest deze tekst. */
   toelichting: string;
   zichtbaarVoorLead: boolean;
-  /** `Bouwblok.id` van de Klantcontact Volwassenheidsscan. */
+  /** `Bouwblok.id` van de Klantcontact Volwassenheidsscan en de AI-scan (de AI-domeinen). */
   bouwblokIds: string[];
-  /** Nieuws: verplicht. Case: optioneel. Altijd http of https. */
+  /** Nieuws en Blog: verplicht. Case en Event: optioneel. Altijd http of https. */
   url: string;
   aangemaaktOp: string;
   gewijzigdOp: string;
-  /** Alleen Nieuws: De publicatie of de site. */
+  /** Alleen Nieuws en Blog: De publicatie of de site. */
   bron: string;
-  /** Alleen Nieuws: jjjj-mm-dd, leeg als het onbekend is. */
+  /** Alleen Nieuws en Blog: jjjj-mm-dd, leeg als het onbekend is. */
   gepubliceerdOp: string;
+  /** Alleen Event: De startdatum, jjjj-mm-dd, verplicht. */
+  datum: string;
+  /** Alleen Event: jjjj-mm-dd, leeg bij een event van één dag, niet voor `datum`. */
+  einddatum: string;
+  /** Alleen Event: Bijvoorbeeld "Utrecht" of "Online". */
+  plaats: string;
   /** Alleen Case: Verplicht. */
   samenvatting: string;
   /** Alleen Case: De Organisatie waar de case over gaat, `null` als die is verwijderd of nog niet is gekozen. */
@@ -512,6 +533,8 @@ export interface ScanInvulling {
    */
   relevantie?: Record<string, boolean>;
   opmerkingenPerBouwblok: Record<string, string>;
+  /** Alleen bij `Assessment.rolgroepen`: De gekozen optie in de intake, voor de analyse per groep (`datamodel.md`, Scoreberekening). */
+  rolgroep?: string | null;
   /**
    * Notitie bij het starten van déze scan (`datamodel.md`, Notitie op de scan). Bij een import de `start_comment`. Hoort bij
    * de scan en niet bij de Respondent: Eén Respondent kan veel scans hebben. Ontbreekt bij data van vóór dit veld.

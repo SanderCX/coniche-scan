@@ -4,7 +4,7 @@ import { use } from "react";
 import { useRouter } from "next/navigation";
 import { useAssessments } from "@/lib/assessment-store";
 import { BenchmarkLezing } from "@/lib/types";
-import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { heeftEigenResultaat } from "@/lib/assessment-structuur";
 import { ruimBenchmarkVinkjesOp, useOrganisaties } from "@/lib/db";
 import { wijzigBenchmark } from "@/lib/benchmark-store";
 import { useBenchmarkMetLeden } from "@/lib/use-benchmarks";
@@ -29,7 +29,7 @@ export default function BenchmarkBewerkenPage({ params }: { params: Promise<{ be
   const assessments = useAssessments();
   // Tussen organisaties (niveau 1) doet ook een Assessment met Ja / Nee / Weet ik niet mee (`visualisatie-quickscan.md`, 5). Binnen
   // een organisatie en binnen een Meting rekenen de weergaven nog met de 1–5-schaal (`backlog.md`, Quickscan Ziekenhuis).
-  const voorBenchmark = assessments.filter((a) => !isJaNeeWeetNiet(a));
+  const voorBenchmark = assessments.filter((a) => !heeftEigenResultaat(a));
   const instellingen = useInstellingen();
   const router = useRouter();
 

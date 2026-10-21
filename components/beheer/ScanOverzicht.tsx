@@ -1,7 +1,7 @@
 "use client";
 
 import { formatScore } from "@/lib/format";
-import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { heeftEigenResultaat } from "@/lib/assessment-structuur";
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -59,9 +59,7 @@ export function ScanOverzicht({
   const link = typeof window === "undefined" ? "" : maakPubliekeLink(window.location.origin, lid);
   const afgerond = invulling.status === "afgerond";
   const { beantwoord, totaal, percentage } = voortgang(assessment, invulling.antwoorden, invulling.relevantie);
-  const score = afgerond
-    ? overallScore(assessment, invulling.antwoorden)
-    : null;
+  const score = afgerond && assessment.antwoordType !== "spanning" ? overallScore(assessment, invulling.antwoorden) : null;
   const rolTeam = rolTeamTekst(lid);
   const context = { organisatie, scanUitvoering, lid, invulling, assessment };
 
@@ -194,7 +192,7 @@ export function ScanOverzicht({
                     Resultaten bekijken
                   </Link>
                 )}
-                {!isJaNeeWeetNiet(assessment) && (
+                {!heeftEigenResultaat(assessment) && (
                   <DropdownKnop
                     label={pdfBezig ? "Bezig…" : "Exporteren"}
                     opties={[

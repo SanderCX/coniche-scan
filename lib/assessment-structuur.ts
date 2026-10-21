@@ -102,3 +102,12 @@ export function actieveBouwblokkenMetGroep(assessment: Assessment): BouwblokMetG
 export function actieveVragen(assessment: Assessment) {
   return actieveBouwblokkenMetGroep(assessment).flatMap((b) => b.bouwblok.vragen);
 }
+
+/**
+ * Heeft het Assessment een eigen opbouw van het resultaat, los van de 1–5-schaal met een overall score? Dat geldt voor Ja / Nee /
+ * Weet ik niet (de Quickscan) en voor de Spanningsmeter. Voor deze Assessments zijn export (PDF, CSV, InDesign), benchmark, Verkennen,
+ * een samengestelde Meting en de spreiding per bouwblok nog niet uitgewerkt (`backlog.md`).
+ */
+export function heeftEigenResultaat(assessment: Pick<Assessment, "antwoordType">): boolean {
+  return assessment.antwoordType === "ja-nee-weetniet" || assessment.antwoordType === "spanning";
+}

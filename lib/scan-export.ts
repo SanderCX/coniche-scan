@@ -7,7 +7,7 @@ import {
 } from "./csv-export";
 import { pdfBestandsnaam } from "./pdf/bestandsnaam";
 import { numeriekeAntwoorden } from "./scoring";
-import { isJaNeeWeetNiet } from "./quickscan";
+import { heeftEigenResultaat } from "./assessment-structuur";
 import type { ExportPdfPayload } from "./pdf/build-html";
 import { buildIndesignExport } from "./indesign/build-xml";
 import { downloadIndesignExport } from "./indesign/export";
@@ -16,12 +16,12 @@ import { downloadIndesignExport } from "./indesign/export";
 export function exporteerScansCsv(alleRijen: CsvRijContext[]): void {
   // De CSV kent alleen de 1–5-schaal: Een Assessment met Ja / Nee / Weet ik niet is er nog niet voor uitgewerkt (`backlog.md`,
   // Quickscan Ziekenhuis). Die scans worden overgeslagen, met een melding.
-  const rijen = alleRijen.filter((r) => !isJaNeeWeetNiet(r.assessment));
+  const rijen = alleRijen.filter((r) => !heeftEigenResultaat(r.assessment));
   if (rijen.length < alleRijen.length && typeof window !== "undefined") {
     window.alert(
       rijen.length === 0
-        ? "De CSV-export is voor dit type Assessment (Ja / Nee / Weet ik niet) nog niet beschikbaar."
-        : `${alleRijen.length - rijen.length} scan(s) van een Assessment met Ja / Nee / Weet ik niet zijn niet meegenomen: De CSV-export is daarvoor nog niet beschikbaar.`
+        ? "De CSV-export is voor dit type Assessment (Ja / Nee / Weet ik niet, of de Spanningsmeter) nog niet beschikbaar."
+        : `${alleRijen.length - rijen.length} scan(s) van een Assessment met Ja / Nee / Weet ik niet of van de Spanningsmeter zijn niet meegenomen: De CSV-export is daarvoor nog niet beschikbaar.`
     );
   }
   if (rijen.length === 0) return;

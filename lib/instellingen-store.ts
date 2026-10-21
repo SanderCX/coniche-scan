@@ -47,6 +47,11 @@ export interface Instellingen {
   /** Een kenmerk dat bij een lager percentage van de organisaties in het Assessment is ingevuld, kan niet groeperen. Startwaarde 40. */
   verkennenMinIngevuldPct: number;
   /**
+   * Digitale Spanningsmeter (`datamodel.md`, Instellingen): Het minimale aantal afgeronde scans van een rolgroep om in de
+   * uitsplitsing per rol te staan, zodat antwoorden anoniem blijven. Geheel getal van minstens 1, startwaarde 3.
+   */
+  spanningMinPerRol: number;
+  /**
    * De korte namen voor veldnamen en waarden (`datamodel.md`, Korte namen). Ze staan hier, bij de instellingen, omdat het
    * weergavenamen zijn en de organisatievelden zelf vaste data zijn.
    */
@@ -69,6 +74,7 @@ const STANDAARDWAARDEN: Instellingen = {
   verkennenMinPool: 6,
   verkennenMaxGroepen: 12,
   verkennenMinIngevuldPct: 40,
+  spanningMinPerRol: 3,
   korteNamen: { velden: {}, waarden: [] },
   kpiDefinities: STANDAARD_KPIS,
   kanalen: STANDAARD_KANALEN,

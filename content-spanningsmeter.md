@@ -2,7 +2,7 @@
 
 De vragen, de schaal en de ijkpunten van de Digitale Spanningsmeter. Dit bestand is de enige plek voor de inhoud. De regels voor rekenen staan in `datamodel.md` (Antwoordtype, Scoreberekening), de schermen in `CLAUDE.md` (scherm 1 tot en met 6) en de opmaak in `visualisatie-spanningsmeter.md`.
 
-**Status: Voorstel van 21 oktober 2026, niet gebouwd.** Bron is het document "Digitale Spanningsmeter – vragenset" van Martijn (20 oktober 2026, 13 pagina's), dat op zijn beurt op het boek "Onder Spanning" (Franssen, 2026) en de literatuur steunt. De vragen zijn nog niet getest (zie Validatie). De naam van het bronbestand zegt "15 vragen per spanningsveld", de inhoud heeft er 5 gescoord en 1 open per veld, samen 30 gescoorde vragen en 6 open vragen. Het aantal van 5 is hier aangehouden.
+**Status: Voorstel van 21 oktober 2026, gebouwd op 21 oktober 2026 (zie Zo gebouwd onderaan).** Bron is het document "Digitale Spanningsmeter – vragenset" van Martijn (20 oktober 2026, 13 pagina's), dat op zijn beurt op het boek "Onder Spanning" (Franssen, 2026) en de literatuur steunt. De vragen zijn nog niet getest (zie Validatie). De naam van het bronbestand zegt "15 vragen per spanningsveld", de inhoud heeft er 5 gescoord en 1 open per veld, samen 30 gescoorde vragen en 6 open vragen. Het aantal van 5 is hier aangehouden.
 
 ## Opzet
 
@@ -258,3 +258,7 @@ De bron levert een Excelbestand en los een CSV met dezelfde inhoud: De 30 vragen
 ## Bron
 
 Franssen, M. (2026). Onder Spanning. De literatuur per veld staat in de bron, in het document "Digitale Spanningsmeter – vragenset", onder Literatuur. Dit bestand noemt per veld alleen de basis, niet de volledige verwijzing.
+
+## Zo gebouwd
+
+Gebouwd op 21 oktober 2026 in `data/spanningsmeter-assessment.ts` (`id: "spanningsmeter"`, de zes velden als `Bouwblok` met `ijkpunten`, `korteNaam` en de basis als `toelichting`, de 30 vragen met `invalshoek` en `aandachtspunt`, `openVraag`, `rolgroepen`, `schaal`, `icoon: "gauge"`). De vraag-id's zijn de bronnen (`VL1` tot en met `TE5`), de open vragen hebben geen eigen record maar het ID `VL6` enzovoort wordt afgeleid in de doorloopflow. Het importbestand van de bron is niet ingelezen: De inhoud is overgenomen uit dit bestand. Het rekenvoorbeeld staat in `lib/spanning.test.ts` en de voorbeelddata in `data/demo-antwoorden-spanning.ts`. De validatie van de vragen is niet gedaan en het resultaat toont nog geen label "pilot" (`backlog.md`).

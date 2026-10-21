@@ -32,11 +32,12 @@ export function bouwstenenLink(assessment: Assessment): { tekst: string; href: s
 /**
  * Welke content een Assessment op zijn pagina heeft (`CLAUDE.md`, scherm 2, Secties per Assessment): "volwassenheid" (Visie en de 15 bouwblokken)
  * bij de Bouwsteen als eenheid en een categorielaag, dus de Klantcontact Volwassenheidsscan en de Zorgscan, "ai" (AI in klantcontact en 2030) bij
- * de AI-domeinen. De Quickscan en elk ander type hebben voorlopig geen extra content: `null`, en dan ook geen sub-nav.
+ * de AI-domeinen, "spanning" (De spanningsvelden, Praktisch, Wat krijg ik en Visie) bij de Digitale Spanningsmeter. De Quickscan en elk ander type hebben voorlopig geen extra content: `null`, en dan ook geen sub-nav.
  */
-export type ContentSoort = "volwassenheid" | "ai";
+export type ContentSoort = "volwassenheid" | "ai" | "spanning";
 
 export function contentSoort(assessment: Assessment): ContentSoort | null {
+  if (assessment.antwoordType === "spanning") return "spanning";
   if (assessment.bouwblokLabel === "AI-domein") return "ai";
   if (assessment.bouwblokLabel === "Bouwsteen" && (assessment.categorieen ?? []).some((c) => !c.gearchiveerd)) return "volwassenheid";
   return null;
@@ -52,7 +53,12 @@ export function paginaSecties(assessment: Assessment): PaginaSectie[] {
   const soort = contentSoort(assessment);
   if (!soort) return [];
   // De volgorde van 21 oktober 2026: De inhoudssectie, Praktisch, Wat krijg ik en als laatste de Visie (bij AI: Klantcontact richting 2030).
-  const eerste: PaginaSectie = soort === "ai" ? { id: "ai", label: "AI in klantcontact" } : { id: "bouwblokken", label: "De 15 bouwblokken" };
+  const eerste: PaginaSectie =
+    soort === "ai"
+      ? { id: "ai", label: "AI in klantcontact" }
+      : soort === "spanning"
+        ? { id: "velden", label: `De ${actieveBouwblokkenMetGroep(assessment).length} spanningsvelden` }
+        : { id: "bouwblokken", label: "De 15 bouwblokken" };
   const laatste: PaginaSectie = soort === "ai" ? { id: "2030", label: "Klantcontact richting 2030" } : { id: "visie", label: "Visie" };
   return [eerste, { id: "praktisch", label: "Praktisch" }, { id: "wat", label: "Wat krijg ik" }, laatste];
 }
@@ -63,7 +69,7 @@ export function overDezeScan(assessment: Assessment | undefined): { tekst: strin
   const soort = contentSoort(assessment);
   if (!soort) return null;
   return {
-    tekst: soort === "ai" ? "Over deze scan: AI-domeinen en 2030" : "Over deze scan: visie en bouwblokken",
+    tekst: soort === "ai" ? "Over deze scan: AI-domeinen en 2030" : soort === "spanning" ? "Over deze scan: spanningsvelden en visie" : "Over deze scan: visie en bouwblokken",
     href: `/${assessment.id}`,
   };
 }
@@ -98,6 +104,14 @@ const TEGELS: Record<string, (n: { vragen: number; duur: string; bouwblokken: nu
       { tekst: `${n.vragen} vragen, ${n.duur}`, icoon: "klok" },
       { tekst: `${n.bouwblokken} bouwblokken in ${n.categorieen} categorieën`, icoon: "lagen" },
       { tekst: "Scores gewogen voor de zorg, met concrete stappen", icoon: "vlag" },
+    ],
+  }),
+  spanningsmeter: (n) => ({
+    zin: "Zie waar de spanning zit tussen verhaal, regie, gedrag, data, processen en technologie.",
+    punten: [
+      { tekst: `${n.vragen} vragen, ${n.duur}`, icoon: "klok" },
+      { tekst: `${n.bouwblokken} spanningsvelden`, icoon: "lagen" },
+      { tekst: "Je eigen Spanningsprofiel, daarna de groep naast elkaar", icoon: "vlag" },
     ],
   }),
   "quickscan-ziekenhuis": (n) => ({

@@ -1,7 +1,14 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   aantalTekst,
+  aantallPerSoort,
+  aantalZichtbaarVoorLead,
   brancheVan,
+  dossierBouwblokkenPerAssessment,
+  eventsInVolgorde,
+  isVerlopen,
+  itemsInVolgorde,
+  vandaag,
   casesDieVerwijzenNaar,
   controleerDossieritem,
   filterOpBouwblok,
@@ -94,7 +101,7 @@ describe("openzetten van een case", () => {
 describe("status en volgorde", () => {
   const item = (extra: Partial<Dossieritem>): Dossieritem => ({
     id: "1", soort: "case", titel: "t", toelichting: "", zichtbaarVoorLead: false, bouwblokIds: [], url: "", aangemaaktOp: "2026-10-01T00:00:00Z",
-    gewijzigdOp: "x", bron: "", gepubliceerdOp: "", samenvatting: "s", caseOrganisatieId: "C", omvang: "", totResultaat: "", ...extra,
+    gewijzigdOp: "x", bron: "", gepubliceerdOp: "", datum: "", einddatum: "", plaats: "", samenvatting: "s", caseOrganisatieId: "C", omvang: "", totResultaat: "", ...extra,
   });
   it("kent vier statussen", () => {
     const alle = [org("C", { caseToegestaan: true })];
@@ -216,8 +223,8 @@ describe("wat de Lead ziet", () => {
     });
     return [o, metSector("C"), metSector("Z", false)];
   };
-  function vul(id: string, soort: "case" | "nieuws"): Dossieritem {
-    return { id, soort, titel: `Titel ${id}`, toelichting: "", zichtbaarVoorLead: false, bouwblokIds: [], url: "", aangemaaktOp: "2026-10-01T00:00:00Z", gewijzigdOp: "x", bron: "", gepubliceerdOp: "", samenvatting: "s", caseOrganisatieId: null, omvang: "", totResultaat: "" };
+  function vul(id: string, soort: Dossieritem["soort"]): Dossieritem {
+    return { id, soort, titel: `Titel ${id}`, toelichting: "", zichtbaarVoorLead: false, bouwblokIds: [], url: "", aangemaaktOp: "2026-10-01T00:00:00Z", gewijzigdOp: "x", bron: "", gepubliceerdOp: "", datum: "", einddatum: "", plaats: "", samenvatting: "s", caseOrganisatieId: null, omvang: "", totResultaat: "" };
   }
   it("toont alleen wat openstaat, zichtbaar is en bij een case toestemming heeft", () => {
     const alle = opgezet();
@@ -269,5 +276,169 @@ describe("wat de Lead ziet", () => {
     expect(eerste).toBeTruthy();
     db.markeerDossierGezien("O", "L");
     expect(laad("O").leden[0].dossierGezienOp).toBe(eerste);
+  });
+});
+
+/* ---------- Events en Blogs (`dossier.md`, 21 oktober 2026) ---------- */
+
+const NU = new Date(2026, 9, 21, 12, 0, 0); // 21 oktober 2026
+const event = (extra = {}) => ({ ...leegDossierInvoer("event"), titel: "Klantcontactdag", datum: "2026-11-12", plaats: "Utrecht", ...extra });
+const blog = (extra = {}) => ({ ...leegDossierInvoer("blog"), titel: "Waarom regie telt", url: "coniche.nl/blog/regie", ...extra });
+const basisItem = (extra: Partial<Dossieritem>): Dossieritem => ({
+  id: "i", soort: "event", titel: "t", toelichting: "", zichtbaarVoorLead: false, bouwblokIds: [], url: "", aangemaaktOp: "2026-10-01T00:00:00Z",
+  gewijzigdOp: "x", bron: "", gepubliceerdOp: "", datum: "", einddatum: "", plaats: "", samenvatting: "", caseOrganisatieId: null, omvang: "", totResultaat: "", ...extra,
+});
+
+describe("controle van een event en een blog", () => {
+  it("een event heeft een titel en een datum nodig, de einddatum, de plaats en het adres zijn optioneel", () => {
+    expect(controleerDossieritem(event({ titel: "" }), "O").ok).toBe(false);
+    expect(controleerDossieritem(event({ datum: "" }), "O")).toEqual({ ok: false, reden: "Vul de datum in." });
+    expect(controleerDossieritem(event({ datum: "31-02-2026" }), "O")).toEqual({ ok: false, reden: "De datum klopt niet." });
+    const r = controleerDossieritem(event({ url: "", einddatum: "", plaats: "" }), "O");
+    expect(r.ok && r.waarde).toMatchObject({ soort: "event", datum: "2026-11-12", einddatum: "", plaats: "", url: "" });
+    const met = controleerDossieritem(event({ url: "coniche.nl/event", einddatum: "2026-11-13" }), "O");
+    expect(met.ok && met.waarde).toMatchObject({ url: "https://coniche.nl/event", einddatum: "2026-11-13" });
+  });
+  it("een einddatum voor de datum geeft een fout, en het adres moet geldig zijn", () => {
+    expect(controleerDossieritem(event({ einddatum: "2026-11-01" }), "O")).toEqual({ ok: false, reden: "De einddatum ligt voor de datum." });
+    expect(controleerDossieritem(event({ einddatum: "geen datum" }), "O")).toEqual({ ok: false, reden: "De einddatum klopt niet." });
+    expect(controleerDossieritem(event({ url: "javascript:x" }), "O").ok).toBe(false);
+    expect(controleerDossieritem(event({ plaats: "x".repeat(81) }), "O").ok).toBe(false);
+  });
+  it("een event bewaart de velden van de andere soorten leeg", () => {
+    const r = controleerDossieritem(event({ bron: "NU.nl", samenvatting: "x", omvang: "800" }), "O");
+    expect(r.ok && r.waarde).toMatchObject({ bron: "", gepubliceerdOp: "", samenvatting: "", omvang: "" });
+  });
+  it("een blog heeft een titel en een geldig adres nodig, zoals nieuws, met bron en datum", () => {
+    expect(controleerDossieritem(blog({ url: "" }), "O")).toEqual({ ok: false, reden: "Vul het adres van de blog in." });
+    expect(controleerDossieritem(blog({ gepubliceerdOp: "31-02-2026" }), "O").ok).toBe(false);
+    const r = controleerDossieritem(blog({ bron: "Coniche", gepubliceerdOp: "2026-10-02" }), "O");
+    expect(r.ok && r.waarde).toMatchObject({ soort: "blog", url: "https://coniche.nl/blog/regie", bron: "Coniche", gepubliceerdOp: "2026-10-02", datum: "" });
+  });
+});
+
+describe("een event verlopen", () => {
+  it("is verlopen vanaf de dag na de einddatum, of na de datum zonder einddatum", () => {
+    expect(vandaag(NU)).toBe("2026-10-21");
+    expect(isVerlopen(basisItem({ datum: "2026-10-21" }), NU)).toBe(false);
+    expect(isVerlopen(basisItem({ datum: "2026-10-20" }), NU)).toBe(true);
+    expect(isVerlopen(basisItem({ datum: "2026-10-19", einddatum: "2026-10-21" }), NU)).toBe(false);
+    expect(isVerlopen(basisItem({ datum: "2026-10-19", einddatum: "2026-10-20" }), NU)).toBe(true);
+    expect(isVerlopen(basisItem({ soort: "nieuws", datum: "2020-01-01" }), NU)).toBe(false);
+  });
+  it("zet het eerstvolgende event bovenaan en daarna de verlopen events met het meest recente eerst", () => {
+    const e = (id: string, datum: string) => basisItem({ id, datum });
+    const volgorde = eventsInVolgorde([e("a", "2026-12-01"), e("oud1", "2026-09-01"), e("b", "2026-10-25"), e("oud2", "2026-10-01")], NU);
+    expect(volgorde.map((x) => x.id)).toEqual(["b", "a", "oud2", "oud1"]);
+  });
+  it("heeft de status Verlopen, ook als het op Zichtbaar voor klant stond, en telt dan nog mee voor de Lead", () => {
+    const o = org("O", {
+      dossier: {
+        openVoorLead: true, openSinds: null, gewijzigdOp: null,
+        items: [
+          basisItem({ id: "oud", datum: "2026-09-01", zichtbaarVoorLead: true }),
+          basisItem({ id: "komt", datum: "2026-12-01", zichtbaarVoorLead: true }),
+          basisItem({ id: "intern", datum: "2026-12-02" }),
+        ],
+      },
+    });
+    expect(itemStatus(o.dossier!.items[0], [o], NU)).toBe("verlopen");
+    expect(itemStatus(o.dossier!.items[1], [o], NU)).toBe("zichtbaar");
+    expect(itemStatus(o.dossier!.items[2], [o], NU)).toBe("intern");
+    expect(aantalZichtbaarVoorLead(o, [o], NU)).toBe(2);
+  });
+});
+
+describe("volgorde en aantallen met vier soorten", () => {
+  it("zet de Consultant-lijst op Cases, Nieuws, Events en Blogs en telt per soort, een verlopen event mee", () => {
+    const lijst = [
+      basisItem({ id: "bl", soort: "blog", gepubliceerdOp: "2026-10-01" }),
+      basisItem({ id: "ev", soort: "event", datum: "2026-11-01" }),
+      basisItem({ id: "ne", soort: "nieuws", gepubliceerdOp: "2026-10-01" }),
+      basisItem({ id: "ca", soort: "case" }),
+      basisItem({ id: "oud", soort: "event", datum: "2026-01-01" }),
+    ];
+    expect(itemsInVolgorde(lijst, NU).map((i) => i.id)).toEqual(["ca", "ne", "ev", "oud", "bl"]);
+    expect(aantallPerSoort(lijst)).toEqual({ alles: 5, cases: 1, nieuws: 1, events: 2, blogs: 1 });
+  });
+});
+
+describe("wat de Lead ziet bij events en blogs", () => {
+  const dossier = () =>
+    org("O", {
+      dossier: {
+        openVoorLead: true, openSinds: "2026-10-16T08:00:00Z", gewijzigdOp: null,
+        items: [
+          basisItem({ id: "e1", soort: "event", datum: "2026-11-12", plaats: "Utrecht", zichtbaarVoorLead: true, bouwblokIds: ["ai1"] }),
+          basisItem({ id: "e2", soort: "event", datum: "2026-05-01", zichtbaarVoorLead: true }),
+          basisItem({ id: "e3", soort: "event", datum: "2026-12-12" }),
+          basisItem({ id: "b1", soort: "blog", url: "https://x.nl", gepubliceerdOp: "2026-10-02", zichtbaarVoorLead: true, bouwblokIds: ["ai1", "b2"] }),
+          basisItem({ id: "n1", soort: "nieuws", url: "https://x.nl", zichtbaarVoorLead: true }),
+        ],
+      },
+    });
+  it("toont events en blogs zonder toestemming van een andere organisatie, de komende voor de verlopen", () => {
+    const o = dossier();
+    const d = leadDossier(o, [o], undefined, NU)!;
+    expect(d.events.map((e) => [e.id, e.verlopen])).toEqual([["e1", false], ["e2", true]]);
+    expect(d.blogs.map((b) => b.id)).toEqual(["b1"]);
+    expect(d.cases).toEqual([]);
+  });
+  it("telt een verlopen event niet mee in de voorproef en de aantallen, wel in het aantal per bouwblok", () => {
+    const o = dossier();
+    const d = leadDossier(o, [o], undefined, NU)!;
+    expect(voorproef(d, 5).titels.map((t) => t.soort)).toEqual(["nieuws", "event", "blog"]);
+    expect(aantalTekst(d)).toBe("1 nieuwsbericht · 1 event · 1 blog");
+    expect(Object.fromEntries(itemsPerBouwblok(d))).toEqual({ ai1: 2, b2: 1 });
+    expect(filterOpBouwblok(d, "ai1").events.map((e) => e.id)).toEqual(["e1"]);
+    expect(filterOpBouwblok(d, "ai1").blogs.map((b) => b.id)).toEqual(["b1"]);
+  });
+  it("laat een soort zonder items in de tekst weg en gebruikt het enkelvoud", () => {
+    expect(aantalTekst({ cases: [], nieuws: [], events: [], blogs: [{ id: "b" } as never] })).toBe("1 blog");
+    expect(aantalTekst({ cases: [{ id: "c" } as never, { id: "d" } as never], nieuws: [], events: [{ verlopen: true } as never], blogs: [] })).toBe("2 cases");
+  });
+  it("toont het Dossier ook als er alleen een verlopen event is", () => {
+    const o = dossier();
+    o.dossier!.items = o.dossier!.items.filter((i) => i.id === "e2");
+    expect(leadDossier(o, [o], undefined, NU)?.events).toHaveLength(1);
+  });
+});
+
+describe("koppeling aan bouwblokken van twee Assessments", () => {
+  it("biedt de bouwblokken van Klantcontact Volwassenheid en de domeinen van de AI-scan, in die volgorde en op nummer", async () => {
+    const { assessments } = await import("@/data/assessments");
+    const per = dossierBouwblokkenPerAssessment(assessments);
+    expect(per.map((p) => p.assessment.id)).toEqual(["klantcontact-volwassenheid", "ai-volwassenheid"]);
+    expect(per.map((p) => p.bouwblokken.length)).toEqual([15, 8]);
+    expect(per[1].bouwblokken.map((b) => b.bouwblok.volgnummer)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    // Een AI-domein heeft een domeinkleur en geen categorie.
+    expect(per[1].bouwblokken[0].groepKleur).toBe("oranje");
+    expect(per[1].bouwblokken[0].groepNaam).toBeNull();
+  });
+  it("laat de Zorgscan, de Quickscan en de Spanningsmeter weg", async () => {
+    const { assessments } = await import("@/data/assessments");
+    expect(dossierBouwblokkenPerAssessment(assessments).some((p) => ["zorgscan", "quickscan-ziekenhuis", "spanningsmeter"].includes(p.assessment.id))).toBe(false);
+  });
+});
+
+describe("opslaan van events en blogs", () => {
+  it("bewaart een event en een blog en logt de soort", () => {
+    zet(org("O"));
+    expect(db.voegDossieritemToe("O", event()).ok).toBe(true);
+    expect(db.voegDossieritemToe("O", blog()).ok).toBe(true);
+    const items = laad("O").dossier!.items;
+    expect(items.map((i) => i.soort)).toEqual(["event", "blog"]);
+    expect(audit().filter((a) => a.actie === "dossier.itemToegevoegd").map((a) => a.details?.soort)).toEqual(["event", "blog"]);
+  });
+  it("laat de soort bij het wijzigen vast en wijzigt de datum van een event", () => {
+    zet(org("O"));
+    const r = db.voegDossieritemToe("O", event());
+    const id = r.ok ? r.item.id : "";
+    expect(db.wijzigDossieritem("O", id, { ...event(), datum: "2026-11-20", soort: "nieuws" }).ok).toBe(true);
+    expect(laad("O").dossier!.items[0]).toMatchObject({ soort: "event", datum: "2026-11-20" });
+  });
+  it("laadt data van vóór events en blogs met lege velden", () => {
+    const d = zetNieuwsartikelenOm({ dossier: { openVoorLead: false, openSinds: null, gewijzigdOp: null, items: [{ id: "a", soort: "nieuws", titel: "t" }] } });
+    expect(d.items[0]).toMatchObject({ datum: "", einddatum: "", plaats: "" });
   });
 });
