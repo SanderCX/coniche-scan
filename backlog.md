@@ -654,7 +654,7 @@ als merkbesluit bespreken.
 
 - **Assessmentcirkel op scherm 1 uitbreiden** (besloten ontwerp van 21 oktober 2026, `CLAUDE.md`, scherm 1): Wat de cirkel doet bij minder of meer dan vier Assessments (bijvoorbeeld een kwart per Assessment met een verschillende grootte, of een tweede cirkel), of een tweede klik de keuze opheft en of de stip op de visual later het gemiddelde van de branche ten opzichte van de eigen score toont (nu een vaste markering op een hoekpunt van de voorbeeldlijn). Daarnaast de vraag of er een generieke Quickscan komt, zodat de cirkel drie vaste assen heeft (snel, uitgebreid, AI).
 
-### Digitale Spanningsmeter (antwoordType spanning, voorstel van 21 oktober 2026)
+### Spanningsmeter (antwoordType spanning, voorstel van 21 oktober 2026)
 
 Gebouwd op 21 oktober 2026 (`content-spanningsmeter.md`, `visualisatie-spanningsmeter.md`, Zo gebouwd). Bewust nog niet opgepakt:
 

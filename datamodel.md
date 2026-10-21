@@ -50,7 +50,6 @@ Assessment {
   wegingTitel: string | null        // kop van de wegingskaart, zie Bouwblok.gewicht; leeg = standaardtitel
   wegingToelichting: string | null  // tekst van de wegingskaart, per Assessment aanpasbaar; leeg = standaardtekst
   openVraag: string | null          // alleen bij antwoordType "spanning": tekst van de open vraag onder elk bouwblok, in plaats van het opmerkingenveld; leeg = het gewone opmerkingenveld, zie content-spanningsmeter.md
-  rolgroepen: string[] | null       // alleen bij antwoordType "spanning": de opties van de vraag Rolgroep in de intake; leeg = die vraag ontbreekt, zie ScanInvulling
 }
 ```
 
@@ -193,7 +192,7 @@ Een 1–5-schaal per Assessment. Voor de twee huidige scans identiek:
 
 De betekenis per niveau staat in `inhoudelijk-fundament.md` sectie 1.
 
-De Digitale Spanningsmeter heeft een eigen schaal met andere labels
+De Spanningsmeter heeft een eigen schaal met andere labels
 (Reactief, Gefragmenteerd, Georganiseerd, Geïntegreerd, Adaptief,
 `content-spanningsmeter.md`, Schaal en niveaus). De labels staan in
 `Assessment.schaal`, de waarde `0` (Kan ik niet beoordelen) niet: Die hoort bij
@@ -219,7 +218,7 @@ vragen.
   voor "Kan ik niet beoordelen". Een 0 is een geldig antwoord (de vraag telt
   als beantwoord), maar telt niet mee in de score. Er is geen totaalscore: De
   uitkomst is een score per bouwblok (hier een spanningsveld), een niveau en de
-  spanning tussen de velden (Scoreberekening). Digitale Spanningsmeter
+  spanning tussen de velden (Scoreberekening). Spanningsmeter
   (`content-spanningsmeter.md`).
 
 Een vraag is beantwoord zodra er een waarde staat, ook `"weet-niet"` en ook
@@ -504,7 +503,6 @@ ScanInvulling {
   antwoorden: { [vraagId: string]: number | string }   // 1-5, of "ja" | "nee" | "weet-niet" bij antwoordType "ja-nee-weetniet", of 0-5 bij antwoordType "spanning" (0 = kan ik niet beoordelen)
   relevantie: { [categorieId: string]: boolean }       // alleen bij optionele categorieën: true = van toepassing, false = niet van toepassing, ontbreekt = nog niet beantwoord
   opmerkingenPerBouwblok: { [bouwblokId: string]: string }   // bij antwoordType "spanning": het antwoord op de open vraag (Assessment.openVraag) per bouwblok
-  rolgroep: string | null           // alleen bij Assessment.rolgroepen: de gekozen optie in de intake; voor analyse per groep (Scoreberekening, Spanningsmeter)
   notitie: string | null            // gebouwd op 13 oktober 2026, zie hieronder
   bewaarVerlengdTot: datetime | null        // zie Bewaartermijn ingevulde scans
 }
@@ -632,7 +630,7 @@ berekening. PDF, CSV, InDesign, import, het gemiddelde over meerdere
 Respondenten, spreiding en benchmark zijn er nog niet voor uitgewerkt
 (`backlog.md`).
 
-**Antwoordtype `"spanning"` (Digitale Spanningsmeter, voorstel van 21 oktober
+**Antwoordtype `"spanning"` (Spanningsmeter, voorstel van 21 oktober
 2026, gebouwd op 21 oktober 2026, `lib/spanning.ts`).** Hier is er geen bouwblok-gemiddelde dat in een
 overall-score uitkomt. De uitkomst is een score per spanningsveld, een niveau en
 de spanning tussen de velden. Met `a` een antwoord van 1 tot en met 5, een
@@ -669,15 +667,9 @@ vraag met antwoord `0` of zonder antwoord is niet beoordeeld:
   dat veld. De spanning van de groep wordt berekend op de groepsgemiddelden, niet
   als gemiddelde van de spanningen van de personen. Het veld "Meest uiteenlopend"
   is het veld met de grootste spreiding (bij gelijke spreiding het eerste).
-- **Per rolgroep.** Hetzelfde gemiddelde per veld, gesplitst naar
-  `ScanInvulling.rolgroep`. Een rolgroep met minder afgeronde scans dan
-  `Instellingen.spanningMinPerRol` staat niet in de uitsplitsing (Instellingen).
-  Het Verschil per veld is het grootste minus het kleinste gemiddelde over de
-  rolgroepen die zichtbaar zijn. Zijn er minder dan twee zichtbare rolgroepen,
-  dan is er geen uitsplitsing.
 - **Onder de drempel.** Een groepsweergave voor een Lead volgt `benchmarkMinRespondenten`
   (Instellingen): Eronder staat er geen gemiddelde, laagste en hoogste score en
-  geen uitsplitsing per rolgroep. Wat een respondent ziet, is alleen het eigen
+  geen voorbeelden. Wat een respondent ziet, is alleen het eigen
   profiel, tenzij een Admin de groepsweergave voor hem aanzet (`beheerpagina.md`,
   punt 6a). De antwoorden en het profiel van één persoon staan nooit in een
   groepsweergave.
@@ -1853,7 +1845,6 @@ Gebouwd op 15 oktober 2026 voor Verkennen: `verkennenMinGroep` (3), `verkennenMi
 `verkennenMinPool` (6), `verkennenMaxGroepen` (12) en `verkennenMinIngevuldPct` (40),
 alle gehele getallen van minstens 1, het percentage tot en met 100 (`visualisatie-verkennen.md`, Drempels). `verkennenWaarschuwingGroep` is hernoemd naar `verkennenMinVergelijking`: Een opgeslagen waarde onder de oude naam wordt bij het lezen overgenomen. De startwaarden zijn de norm vanuit het ontwerp. Gebouwd op 15 oktober 2026: Het percentage mag 0 zijn (geen ondergrens), dus voor het percentage geldt 0 tot en met 100.
 Gebouwd op 17 oktober 2026: `benchmarkMinOrganisaties` geldt ook voor een opgeslagen verkenning en telt daar altijd Organisaties, ook bij de eenheid Onderdelen. Er komt geen nieuwe instelling bij.
-Gebouwd op 21 oktober 2026 (Digitale Spanningsmeter): `spanningMinPerRol` (startwaarde 3), het minimale aantal afgeronde scans van een rolgroep om als rolgroep in de uitsplitsing te staan, geheel getal van minstens 1 (Scoreberekening, Spanningsmeter). Een Admin past hem aan in beheer (`beheerpagina.md`, punt 10).
 Gebouwd op 14 oktober 2026: `benchmarkMaxDagenTussenMetingen` (startwaarde 90),
 het aantal dagen waarboven een vergelijking met de lezing Naast elkaar een
 waarschuwing geeft. De
