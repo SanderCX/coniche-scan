@@ -68,6 +68,23 @@ export function SlotIcoon(props: IconProps) {
   );
 }
 
+export function VlagIcoon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M5.5 21V4" />
+      <path d="M5.5 4.5h11.5l-2.2 3.8 2.2 3.7H5.5" />
+    </IconBase>
+  );
+}
+
+/** De iconen van de punten op een tegel (`lib/landing.ts`, `tegelInhoud`). */
+export const TEGEL_ICONEN: Record<"klok" | "lagen" | "vlag" | "staafjes", ComponentType<IconProps>> = {
+  klok: KlokIcoon,
+  lagen: LagenIcoon,
+  vlag: VlagIcoon,
+  staafjes: StaafIcoon,
+};
+
 /** Het icoon bij een deel van de subtitel, op de inhoud van dat deel. Geen passend icoon: `null`. */
 export function icoonVoorSubtitel(deel: string): ComponentType<IconProps> | null {
   const t = deel.toLowerCase();

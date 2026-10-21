@@ -29,7 +29,7 @@ komen uitsluitend nog terug in de modal van dit component.
 
 Binnen een persoonlijke respondent-link (via "Over deze scan" op Mijn metingen) gaat de toegangscode mee via
 `?code=`, zodat het logo en de exit-actie "← Terug naar Mijn metingen"
-naar de juiste plek blijven verwijzen. In de sectie staan de vijf categorieën als kolommen naast elkaar, in het ontwerp `Herontwerp-Volwassenheid`.
+naar de juiste plek blijven verwijzen. In de sectie staan de vijf categorieën als kolommen naast elkaar, in het ontwerp `Herontwerp-Volwassenheid`. **Zo gebouwd (21 oktober 2026)**: `components/assessment/BouwblokkenSectie.tsx`. Een kolom per categorie met een bovenrand van 4px in de categoriekleur, de bouwblokken als pillen met een nummercirkel van 26px (bij Fundament `--ink` op geel). De stippellijn om blok 1 tot en met 15 en de volle-breedte balken van de oude pagina zijn vervallen. Een klik opent dezelfde Toelichtingsmodal.
 
 ## Bron voor de inhoud
 

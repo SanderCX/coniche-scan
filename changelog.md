@@ -1,5 +1,22 @@
 # Coniche Scan — Changelog
 
+## 2026-10-21 (19) — Specs van Joost, PR 151: Herontwerp van de navigatie en de Assessment-pagina's, films over de radar
+
+Op verzoek van Sander gebouwd uit `CLAUDE.md` (sectie 3, Globale layout, scherm 1, 2 en 5), `stylesheet.md` (Assessmenttegel en sub-nav), `help.md` (Films over de radar) en de specs van de visuals.
+
+**Gedaan**:
+- **Nav**: De vier content-links zijn weg (`MetingLinksNav` verwijderd), scheidingslijnen staan alleen nog waar aan beide kanten iets staat. Op Mijn metingen staat alleen "Mijn gegevens". De tabbladtitels van de oude pagina's zijn weg.
+- **Scherm 1**: Tegels (`AssessmentCard`, `tegelInhoud` in `lib/landing.ts`) met een zin en drie punten met een lijnicoon (nieuw: `VlagIcoon`), de hele tegel klikbaar.
+- **Assessment-pagina** (`app/[assessmentId]/page.tsx`): De hero, een sticky sub-nav (`AssessmentSubNav`, actieve pil uit de scrollpositie) en de secties Visie, De 15 bouwblokken, AI in klantcontact, Klantcontact richting 2030, Wat krijg ik en Praktisch (`components/assessment/`). De hoofd-nav scrolt hier weg. De Quickscan heeft geen content en houdt zijn oude opbouw. De hero-link wordt een ankerlink (`#bouwblokken`, bij de AI-scan "8 domeinen" naar `#ai`). Tokens `--or-pil` en `--or-pil-tekst`.
+- **Routes**: `/visie`, `/bouwstenen`, `/ai-scan` en `/klantcontact-2030` zijn verwijderd en sturen door (`next.config.ts`), `?code=` blijft meegaan.
+- **Over deze scan**: Een link naast de knoppen op de Meting-kaart (`lib/landing.ts`, `overDezeScan`), niet bij de Quickscan.
+- **Films**: "Het dossier" (onder Wat krijg ik) en "De radar in je resultaten" (in "Je resultaten lezen") als CSS-animaties (`components/help/RadarFilms.tsx`), een onderwerp kan meer films hebben, en het nieuwe Help-onderwerp "Het dossier lezen". 28 onderwerpen.
+- **Tests**: `lib/landing.test.ts` (7 tests: content per type, secties, "Over deze scan", tegels), aangepaste help- en radartests. Bekeken in de browser: tegels, sub-nav met actieve pil, de secties, de redirects met code, "Over deze scan", de Quickscan en beide films.
+
+**Specs bijgewerkt**: `CLAUDE.md`, `stylesheet.md`, `help.md`, `bouwstenenmodel-visual.md`, `ai-domeinenmodel-visual.md`, `content-2030.md`, `visualisatie-mijn-metingen.md`.
+
+**Keuzes en afwijkingen**: De drie feature-cards staan bovenaan "Wat krijg ik", want het ontwerp heeft er geen plek voor (open punt 1). "Wat is goed klantcontact?" staat onder de drie visiekaarten (open punt 4). De korte tekst op een visiekaart is de eerste alinea en op een 2030-kaart de eerste zin. De ontwerpen zelf (Design-artifact) kon ik niet bekijken: Opmaak, maten en voorbeelddata van de films volgen de tekst van de spec. De pillen onder de 2030-kaarten zijn niet klikbaar. Een Lead ziet "Over deze scan" op de kaart van de hele Meting, niet op "Jouw scan".
+
 ## 2026-10-21 (18) — Specs van Joost, PR 149: Het Dossier per Organisatie, de knopbreedte en het domeindiagram
 
 Op verzoek van Sander gebouwd uit `dossier.md`, `visualisatie-mijn-metingen.md` (Dossierkaart, knopbreedte) en `stylesheet.md` (Domeinen, Filtermodus op de Dossierpagina).

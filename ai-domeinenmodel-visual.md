@@ -24,7 +24,7 @@ geen content dupliceren.
 
 ## Waar dit component een plek krijgt
 
-**Beantwoord, en gewijzigd op 21 oktober 2026.** Dit component staat als sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan (`CLAUDE.md`, sectie 3, scherm 2), met daaronder de sectie "Klantcontact richting 2030", en is bereikbaar via de sticky sub-nav. De link "AI" in de header en de route `/ai-scan` bestaan niet meer. De acht domeinen staan als kaarten in een raster van vier kolommen (`Herontwerp-AI`). Geen
+**Beantwoord, en gewijzigd op 21 oktober 2026.** Dit component staat als sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan (`CLAUDE.md`, sectie 3, scherm 2), met daaronder de sectie "Klantcontact richting 2030", en is bereikbaar via de sticky sub-nav. De link "AI" in de header en de route `/ai-scan` bestaan niet meer. De acht domeinen staan als kaarten in een raster van vier kolommen (`Herontwerp-AI`). **Zo gebouwd (21 oktober 2026)**: `components/assessment/AiDomeinenSectie.tsx`, met de nummercirkel in de domeinkleur (`domeinKleur`) en de accentkleur van de modal in dezelfde kleur (voorheen overal `--or`). Geen
 losse leespagina met alleen tekst meer ernaast: De beschrijving en
 centrale vraag per domein (`visie-ai-klantcontact.md`) komen uitsluitend
 nog terug in de modal van dit component.

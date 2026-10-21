@@ -33,7 +33,7 @@ function alineas(tekst: string | string[]): string {
 }
 
 /**
- * De Visie in dezelfde opbouw en stijl als de webpagina (app/visie/page.tsx):
+ * De Visie in dezelfde opbouw en stijl als de webpagina (de oorspronkelijke pagina /visie, nu `components/assessment/VisieSectie.tsx`):
  * tekstsecties met h2, de warme kaart met vinkjes, de verbetercyclus als
  * genummerde stappen. Past op 1 pagina; de hero staat in build-html.ts.
  */

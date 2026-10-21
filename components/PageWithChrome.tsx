@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
-import { MetingLinksNav } from "./MetingLinksNav";
 
 /**
  * Gedeelde nav + footer voor de respondent-facing schermen (CLAUDE.md
  * sectie 3, "Globale layout"). Volgorde in `.nav-right`, exact zoals daar
  * vastgelegd: eerst de scherm-specifieke acties (`navRight`, onderling
- * zonder scheidingslijn), dan een scheidingslijn (alleen als die acties
- * er zijn), dan de 4 vaste content-links, dan een scheidingslijn (alleen
- * als er een exit-actie is), dan als laatste de exit-actie.
+ * zonder scheidingslijn), dan de exit-actie, dan het identiteitsmenu, met
+ * alleen een scheidingslijn waar aan beide kanten iets staat. De 4 vaste
+ * content-links zijn vervallen (21 oktober 2026): De content staat op de
+ * Assessment-pagina.
  */
 export function PageWithChrome({
   children,
@@ -18,11 +18,12 @@ export function PageWithChrome({
   toonTerug,
   logoHref,
   identiteitMenu,
+  navNietSticky = false,
 }: {
   children: React.ReactNode;
   /** Scherm-specifieke acties, uiterst links (bijv. resultatenscherm: "← Terug naar de scan" + Exporteren, samen zonder scheidingslijn). */
   navRight?: React.ReactNode;
-  /** Toegangscode van de respondent, geeft de 4 vaste links een ?code= en maakt `toonTerug` mogelijk. */
+  /** Toegangscode van de respondent, maakt `toonTerug` mogelijk. */
   code?: string;
   /** Toont "← Terug naar Mijn metingen" na een scheidingslijn, als laatste. Vereist `code`. */
   toonTerug?: boolean;
@@ -35,6 +36,8 @@ export function PageWithChrome({
    * gegevens"-menu bestaat, hoort dat hier ook.
    */
   identiteitMenu?: React.ReactNode;
+  /** De hoofd-nav scrolt weg in plaats van te blijven staan: Op de Assessment-pagina staat de sticky sub-nav bovenaan (`CLAUDE.md`, scherm 2). */
+  navNietSticky?: boolean;
 }) {
   // Het slot is nooit leeg: Zonder herkende gebruiker (geen menu en geen code) staat er "Inloggen", de uitgelogde
   // variant van datzelfde slot (CLAUDE.md, Globale layout, punt 7).
@@ -43,23 +46,14 @@ export function PageWithChrome({
     <>
       <SiteHeader
         logoHref={logoHref}
+        nietSticky={navNietSticky}
         navRight={
           <>
             {navRight}
-            {navRight && <span className="nav-divider" />}
-            <MetingLinksNav code={code} />
-            {toonTerug && code && (
-              <>
-                <span className="nav-divider" />
-                <Link href={`/s/${code}`}>← Terug naar Mijn metingen</Link>
-              </>
-            )}
-            {identiteit && (
-              <>
-                <span className="nav-divider" />
-                {identiteit}
-              </>
-            )}
+            {navRight && (toonTerug && code ? true : !!identiteit) && <span className="nav-divider" />}
+            {toonTerug && code && <Link href={`/s/${code}`}>← Terug naar Mijn metingen</Link>}
+            {toonTerug && code && identiteit && <span className="nav-divider" />}
+            {identiteit}
           </>
         }
       />

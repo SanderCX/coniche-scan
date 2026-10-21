@@ -100,7 +100,8 @@ export function HelpPagina({
 
 function Onderwerp({ o, href, gebruiker }: { o: HelpOnderwerp; href: (slug: string) => string; gebruiker: HelpGebruiker }) {
   const artikel = artikelVan(o);
-  const film = o.film as FilmNaam | null;
+  // Een onderwerp kan meer films hebben, gescheiden door een komma (`film: wat-krijg-ik, radar`).
+  const films = (o.film ?? "").split(",").map((f) => f.trim()).filter(Boolean) as FilmNaam[];
   return (
     <>
       <div className="help-regel">
@@ -120,7 +121,9 @@ function Onderwerp({ o, href, gebruiker }: { o: HelpOnderwerp; href: (slug: stri
                 <h2 className="help-kaart-kop">{s.kop}</h2>
                 <HelpBlokken blokken={s.blokken} href={href} />
               </section>
-              {film && <HelpFilm naam={film} />}
+              {films.map((f) => (
+                <HelpFilm key={f} naam={f} />
+              ))}
               {o.svg && (
                 <section className="help-kaart">
                   <h2 className="help-kaart-kop">Zo ziet het eruit</h2>

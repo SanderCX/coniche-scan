@@ -60,7 +60,7 @@ describe("de bron van de Help", () => {
   it("de twee uitgewerkte onderwerpen hebben een afbeelding en een film", () => {
     const lezen = bron.onderwerpen.find((o) => o.slug === "resultaten-lezen");
     const verkennen = bron.onderwerpen.find((o) => o.slug === "verkennen");
-    expect(lezen).toMatchObject({ film: "wat-krijg-ik" });
+    expect(lezen).toMatchObject({ film: "wat-krijg-ik, radar" });
     expect(lezen?.svg).toContain("data-nr=\"4\"");
     expect(verkennen).toMatchObject({ film: "meetperiode" });
     expect(verkennen?.svg).toContain("data-nr=\"4\"");

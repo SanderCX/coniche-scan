@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CATEGORIE_COLORS, DOMEIN_KLEUREN } from "@/lib/colors";
 import { FilmVariant, filmVariant, filmWeging } from "@/lib/film";
 import { Assessment } from "@/lib/types";
+import { DossierFilmPodium, RadarFilmPodium } from "@/components/help/RadarFilms";
 
 /**
  * De films van de Help (`help.md`, Films): Korte, bewegende uitleg gebouwd met CSS-animaties in de kleuren en de balken van de app, geen
@@ -14,7 +15,7 @@ import { Assessment } from "@/lib/types";
  * Zorgscan, die er de weging bij toont), domeinen (de AI-scan) en percentages (de Quickscan). Zonder Assessment, zoals in Help, is het de
  * variant met categorieën.
  */
-export type FilmNaam = "wat-krijg-ik" | "meetperiode";
+export type FilmNaam = "wat-krijg-ik" | "meetperiode" | "radar" | "dossier";
 
 const CATEGORIEEN = [
   { naam: "Overkoepelend", kleur: "var(--or)", score: 2.7, laag: 2.0, hoog: 3.4, groep: 2.9 },
@@ -273,6 +274,34 @@ const MEETPERIODE: FilmGegevens = {
   podium: <MeetperiodePodium />,
 };
 
+/** "De radar in je resultaten" (`help.md`, Films over de radar): De hover tussen de radar en het staafdiagram per categorie. */
+const RADAR: FilmGegevens = {
+  titel: "De radar in je resultaten",
+  duur: 16,
+  beschrijving:
+    "Je ziet je score per bouwblok in de radar en per categorie in het staafdiagram. De cursor gaat over bouwblok 4, Leren uit klantcontact: het knooppunt, de taartpunt en de score-stip lichten op, de balk van de categorie Organisatie krijgt een ring en de andere balken dimmen, en een tooltip toont 4, Leren uit klantcontact en 2,3, Basis op Orde. Daarna gaat de cursor over de balk Mens: de bouwblokken 11 tot en met 14 lichten op in de radar en de tooltip boven de balk toont Mens en 3,7, Sterk punt.",
+  stappen: [
+    "Je ziet je score per bouwblok in de radar en per categorie in het staafdiagram.",
+    "Wijs je een bouwblok aan, dan lichten het bolletje, de taartpunt en de balk van zijn categorie op. De tooltip noemt de naam, de score en de klasse.",
+    "Wijs je een balk aan, dan lichten de bouwblokken van die categorie op in de radar.",
+  ],
+  podium: <RadarFilmPodium />,
+};
+
+/** "Het dossier lezen" (`help.md`, Films over de radar; `dossier.md`, scherm 5): De radar met alleen actieve knooppunten en het filter op een bouwblok. */
+const DOSSIER: FilmGegevens = {
+  titel: "Het dossier, de radar voor de Lead",
+  duur: 16,
+  beschrijving:
+    "De radar toont alleen actieve knooppunten voor de bouwblokken 4, 7 en 13, waar items bij staan, met rechts de lijst met bouwblokken. Een klik op bouwblok 7, Systemen en Tools, toont de filterbalk met 2 items in dit dossier en laat alleen de items bij dat bouwblok staan: een case en een nieuwsbericht. Een klik op Alle items tonen haalt het filter weg. De voorbeelditems noemen geen organisatie.",
+  stappen: [
+    "De radar toont alleen de bouwblokken waar je consultant items bij heeft gezet. Rechts staat de lijst met die bouwblokken.",
+    "Kies een bouwblok, in de radar of in de lijst: Alleen de cases en het nieuws bij dat bouwblok blijven staan.",
+    "Kies Alle items tonen om het filter weg te halen en alles weer te zien.",
+  ],
+  podium: <DossierFilmPodium />,
+};
+
 /**
  * `assessment`: Bij "Wat krijg ik" op de landingspagina van een Assessment bepaalt het type de variant van de film. In Help is er geen
  * Assessment en staat de variant met categorieën.
@@ -289,7 +318,14 @@ export function HelpFilm({
   assessment?: Assessment | null;
 }) {
   const variant = naam === "wat-krijg-ik" ? filmVariant(assessment) : "categorieen";
-  const film = naam === "wat-krijg-ik" ? watKrijgIk(variant, variant === "categorieen" ? filmWeging(assessment) : null) : MEETPERIODE;
+  const film =
+    naam === "wat-krijg-ik"
+      ? watKrijgIk(variant, variant === "categorieen" ? filmWeging(assessment) : null)
+      : naam === "radar"
+        ? RADAR
+        : naam === "dossier"
+          ? DOSSIER
+          : MEETPERIODE;
   const [pauze, setPauze] = useState(false);
   return (
     <section className="help-kaart help-film-kaart" aria-label={`Film: ${film.titel}`}>

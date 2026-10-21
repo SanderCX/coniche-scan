@@ -227,6 +227,57 @@
 .film-mp-balk { height: 8px; border-radius: 4px; background: var(--bg-mid); }
 .film-mp-vul { display: block; height: 100%; width: 72.7%; border-radius: 4px; background: var(--or); }
 
+
+/* ---- Films over de radar (`help.md`, Films over de radar): De basisstaat is het eindbeeld, de animaties staan in het blok voor beweging hieronder. ---- */
+.help-film--radar .help-film-podium, .help-film--dossier .help-film-podium { min-height: 330px; }
+.mr-radar { display: block; width: 240px; height: 240px; }
+.mr-vol, .mr-taart-op, .mr-stip, .mr-ring { opacity: 0; }
+.fr { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--sp-8); align-items: center; }
+.fr-radar { position: relative; }
+.fr-tip {
+  position: absolute; display: flex; flex-direction: column; gap: 2px; padding: var(--sp-2) var(--sp-3); border-radius: 8px;
+  background: var(--ink); color: #fff; font-size: var(--fs-12); line-height: 1.3; white-space: nowrap; z-index: 5;
+}
+.fr-tip strong { font-weight: 700; }
+.fr-tip--a { top: -8px; right: -24px; opacity: 0; }
+.fr-tip--b { left: 50%; bottom: calc(67.5% + 10px); transform: translateX(-50%); }
+.fr-staven { display: grid; gap: var(--sp-2); }
+.fr-staven-plot { position: relative; display: flex; align-items: flex-end; gap: var(--sp-4); height: 180px; }
+.fr-staaf-kolom { position: relative; flex: 1 1 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.fr-staaf { position: relative; z-index: 1; display: block; width: 100%; max-width: 40px; border-radius: 4px 4px 0 0; }
+.fr-staaf-ring { position: absolute; z-index: 2; bottom: -3px; left: 50%; width: 46px; transform: translateX(-50%); border-radius: 6px; box-shadow: 0 0 0 3px rgba(255, 103, 31, 0.3); opacity: 0; pointer-events: none; }
+.fr-grens { position: absolute; left: 0; right: 0; border-top: 1px dashed #9a978f; pointer-events: none; }
+.fr-staven-namen { display: flex; gap: var(--sp-4); }
+.fr-staven-namen span { flex: 1 1 0; text-align: center; font-size: var(--fs-12); color: var(--ink-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Eindbeeld (stap 3): Mens is aangewezen, de andere balken zijn gedimd. */
+.fr-staaf-kolom--0, .fr-staaf-kolom--1, .fr-staaf-kolom--2, .fr-staaf-kolom--4 { opacity: 0.35; }
+.fr-staaf-kolom--3 .fr-staaf-ring { opacity: 1; }
+.fr .mr-vol--11, .fr .mr-vol--12, .fr .mr-vol--13, .fr .mr-vol--14,
+.fr .mr-taart-op--11, .fr .mr-taart-op--12, .fr .mr-taart-op--13, .fr .mr-taart-op--14,
+.fr .mr-stip--11, .fr .mr-stip--12, .fr .mr-stip--13, .fr .mr-stip--14,
+.fr .mr-ring--11, .fr .mr-ring--12, .fr .mr-ring--13, .fr .mr-ring--14 { opacity: 1; }
+
+.fd { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--sp-8); align-items: start; }
+.fd-kolom { display: grid; gap: var(--sp-3); }
+.fd-lijst, .fd-items { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.fd-rij { position: relative; display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-3); border: 1px solid var(--border); border-radius: var(--r); background: #fff; }
+.fd-rij::after { content: ""; position: absolute; inset: -1px; border: 2px solid var(--or); border-radius: var(--r); opacity: 0; pointer-events: none; }
+.fd-cirkel { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 22px; height: 22px; padding-top: 0.09em; border-radius: 50%; font-size: var(--fs-12); font-weight: 700; line-height: 1; }
+.fd-cirkel--klein { margin-left: auto; }
+.fd-rij-tekst { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.fd-rij-tekst strong { font-size: var(--fs-14); color: var(--ink); }
+.fd-rij-tekst span { font-size: var(--fs-12); color: var(--ink-s); }
+.fd-aantal { padding: 2px var(--sp-2); border-radius: 999px; background: var(--bg-mid); font-size: var(--fs-12); font-weight: 600; color: var(--ink-m); white-space: nowrap; }
+.fd-filterbalk { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-3); border-radius: var(--r); background: var(--or-faint); opacity: 0; }
+.fd-wis { padding: 4px var(--sp-3); border: 2px solid var(--or); border-radius: var(--r); background: #fff; font-size: var(--fs-12); font-weight: 700; color: var(--or); white-space: nowrap; }
+.fd-item { display: flex; align-items: center; gap: var(--sp-3); max-height: 48px; padding: var(--sp-2) var(--sp-3); overflow: hidden; border: 1px solid var(--border); border-radius: var(--r); background: #fff; }
+.fd-soort { font-size: var(--fs-12); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.fd-soort--case { color: var(--or); }
+.fd-soort--nieuws { color: var(--bl); }
+.fd-item-titel { font-size: var(--fs-14); font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Eindbeeld (stap 3): Alleen de actieve knooppunten en hun score-stippen. */
+.fd .mr-stip--4, .fd .mr-stip--7, .fd .mr-stip--13 { opacity: 1; }
+
 @media (prefers-reduced-motion: no-preference) {
 
 @keyframes film-vraag { 0%, 28% { opacity: 1; } 32%, 100% { opacity: 0; } }
@@ -302,6 +353,32 @@
   67%, 100% { border-color: var(--or); color: var(--or); }
 }
 .help-film--meetperiode .help-film-stap--3 { animation: mp-stap-3 var(--film-duur) linear infinite; }
+
+/* Films over de radar: stap 2 van 34% tot 66%, stap 3 vanaf 67%. */
+@keyframes fr-s2 { 0%, 33% { opacity: 0; } 37%, 63% { opacity: 1; } 67%, 100% { opacity: 0; } }
+@keyframes fr-s3 { 0%, 66% { opacity: 0; } 70%, 96% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes fr-dim2 { 0%, 33% { opacity: 1; } 37%, 63% { opacity: 0.35; } 67%, 100% { opacity: 1; } }
+@keyframes fr-dim3 { 0%, 66% { opacity: 1; } 70%, 96% { opacity: 0.35; } 100% { opacity: 1; } }
+@keyframes fr-dim23 { 0%, 33% { opacity: 1; } 37%, 96% { opacity: 0.35; } 100% { opacity: 1; } }
+@keyframes fd-weg { 0%, 33% { max-height: 48px; opacity: 1; padding-top: var(--sp-2); padding-bottom: var(--sp-2); border-width: 1px; } 37%, 63% { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; border-width: 0; } 67%, 100% { max-height: 48px; opacity: 1; padding-top: var(--sp-2); padding-bottom: var(--sp-2); border-width: 1px; } }
+.help-film--radar .fr-tip--a, .help-film--radar .mr-vol--4, .help-film--radar .mr-taart-op--4, .help-film--radar .mr-stip--4, .help-film--radar .mr-ring--4,
+.help-film--radar .fr-staaf-kolom--1 .fr-staaf-ring { animation: fr-s2 var(--film-duur) linear infinite; }
+.help-film--radar .fr-tip--b, .help-film--radar .mr-vol--11, .help-film--radar .mr-vol--12, .help-film--radar .mr-vol--13, .help-film--radar .mr-vol--14,
+.help-film--radar .mr-taart-op--11, .help-film--radar .mr-taart-op--12, .help-film--radar .mr-taart-op--13, .help-film--radar .mr-taart-op--14,
+.help-film--radar .mr-stip--11, .help-film--radar .mr-stip--12, .help-film--radar .mr-stip--13, .help-film--radar .mr-stip--14,
+.help-film--radar .mr-ring--11, .help-film--radar .mr-ring--12, .help-film--radar .mr-ring--13, .help-film--radar .mr-ring--14,
+.help-film--radar .fr-staaf-kolom--3 .fr-staaf-ring { animation: fr-s3 var(--film-duur) linear infinite; }
+.help-film--radar .fr-staaf-kolom--1 { animation: fr-dim3 var(--film-duur) linear infinite; }
+.help-film--radar .fr-staaf-kolom--3 { animation: fr-dim2 var(--film-duur) linear infinite; }
+.help-film--radar .fr-staaf-kolom--0, .help-film--radar .fr-staaf-kolom--2, .help-film--radar .fr-staaf-kolom--4 { animation: fr-dim23 var(--film-duur) linear infinite; }
+.help-film--dossier .mr-vol--7, .help-film--dossier .mr-taart-op--7, .help-film--dossier .mr-ring--7, .help-film--dossier .fd-rij--7::after, .help-film--dossier .fd-filterbalk { animation: fr-s2 var(--film-duur) linear infinite; }
+.help-film--dossier .fd-item--4, .help-film--dossier .fd-item--13 { animation: fd-weg var(--film-duur) linear infinite; }
+@keyframes rf-stap-1 { 0%, 33.99% { border-color: var(--or); color: var(--or); } 34%, 100% { border-color: var(--border); color: var(--ink-s); } }
+@keyframes rf-stap-2 { 0%, 33.99% { border-color: var(--border); color: var(--ink-s); } 34%, 66.99% { border-color: var(--or); color: var(--or); } 67%, 100% { border-color: var(--border); color: var(--ink-s); } }
+@keyframes rf-stap-3 { 0%, 66.99% { border-color: var(--border); color: var(--ink-s); } 67%, 100% { border-color: var(--or); color: var(--or); } }
+.help-film--radar .help-film-stap--1, .help-film--dossier .help-film-stap--1 { animation: rf-stap-1 var(--film-duur) linear infinite; }
+.help-film--radar .help-film-stap--2, .help-film--dossier .help-film-stap--2 { animation: rf-stap-2 var(--film-duur) linear infinite; }
+.help-film--radar .help-film-stap--3, .help-film--dossier .help-film-stap--3 { animation: rf-stap-3 var(--film-duur) linear infinite; }
 }
 
 /* Verminderde beweging: De film staat stil op het eindbeeld en de pauzeknop blijft weg. */
@@ -311,4 +388,5 @@
 @media (max-width: 900px) {
   .help-film-stappen { grid-template-columns: minmax(0, 1fr); }
   .film-resultaat { grid-template-columns: minmax(0, 1fr); }
+  .fr, .fd { grid-template-columns: minmax(0, 1fr); }
 }

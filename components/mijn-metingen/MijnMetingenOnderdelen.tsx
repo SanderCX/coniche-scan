@@ -25,9 +25,25 @@ import {
 import { dagVan } from "@/lib/metingen";
 import { MapIcoon } from "@/components/icons/DossierIcons";
 import { LeadDossier, aantalTekst, isNieuwVoorLead, voorproef } from "@/lib/dossier";
+import { overDezeScan } from "@/lib/landing";
 import { Assessment, Organisatie, OrganisatieLid, ScanInvulling, ScanInvullingStatus, ScanUitvoering } from "@/lib/types";
 
 /* ---------- Kleine onderdelen ---------- */
+
+/**
+ * De link "Over deze scan" op een Meting-kaart (`CLAUDE.md`, scherm 5; `visualisatie-mijn-metingen.md`, Header): Naar de Assessment-pagina met de
+ * content van het Assessment (Visie en de bouwblokken, of de AI-domeinen en 2030), met de persoonlijke code in het adres. Naast de knoppen, in
+ * dezelfde stijl als een link (`--or`, 14px, gewicht 700). Er is geen link bij een Assessment zonder content (de Quickscan).
+ */
+function OverDezeScan({ assessment, code }: { assessment: Assessment | undefined; code: string | undefined }) {
+  const link = overDezeScan(assessment);
+  if (!link || !code) return null;
+  return (
+    <Link href={`${link.href}?code=${code}`} className="mm-over">
+      {link.tekst}
+    </Link>
+  );
+}
 
 const STATUS_CHIP: Record<ScanInvullingStatus, { tekst: string; klasse: string }> = {
   uitgenodigd: { tekst: "Uitgenodigd", klasse: "mm-chip--blauw" },
@@ -231,10 +247,12 @@ export function RespondentKaart({
   assessment,
   scanUitvoering,
   invulling,
+  code,
 }: {
   assessment: Assessment | undefined;
   scanUitvoering: ScanUitvoering;
   invulling: ScanInvulling;
+  code?: string;
 }) {
   const chip = STATUS_CHIP[invulling.status];
   const teaser = eigenTeaser(assessment, invulling);
@@ -255,6 +273,7 @@ export function RespondentKaart({
         <Link href={volgendeUrl(invulling.id, invulling.status)} className="btn btn-or btn-compact mm-knop">
           {HOOFDACTIE[invulling.status]}
         </Link>
+        <OverDezeScan assessment={assessment} code={code} />
       </div>
     </article>
   );
@@ -373,6 +392,7 @@ function HeleMeting({
             Respondenten uitnodigen
           </button>
         )}
+        <OverDezeScan assessment={assessment} code={code} />
       </div>
       {uitnodigen && toonUitnodigen && (
         <form onSubmit={handleUitnodigen} className="mm-uitnodigen">
