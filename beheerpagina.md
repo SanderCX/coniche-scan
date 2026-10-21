@@ -306,6 +306,7 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
   geldig blijft na een geslaagde verificatie, **default 4 uur**. Eén
   getal, geldt voor de hele omgeving, niet per organisatie of
   respondent.
+- **Minimum per rol bij de Spanningsmeter** (`spanningMinPerRol`, voorstel van 21 oktober 2026, startwaarde 3, `datamodel.md`, Instellingen): Het minimale aantal afgeronde scans van een rolgroep om in de uitsplitsing per rol te staan. Eén getal in een eigen veld met een Info-icoon (`info.spanningMinPerRol`, "Een rol met minder deelnemers staat niet in de groepsweergave, zodat antwoorden anoniem blijven.").
 - **Bewaartermijn ingevulde scans** (`bewaarTermijnDagen`,
   `datamodel.md` deel 2, Bewaartermijn ingevulde scans). **Opmaak van de
   rij**: Veld, eenheid ("dagen") en Info-icoon staan op één regel en het
