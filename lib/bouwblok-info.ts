@@ -4,6 +4,12 @@ import { CATEGORIE_COLORS } from "./colors";
 export interface ToelichtingInfo {
   eyebrow: string;
   accentColor: string;
+  /** Het volgnummer van het bouwblok, voor de cirkel in de kop van de Toelichtingsmodal. */
+  nummer: number;
+  /** De naam van de categorie, `null` zonder categorielaag. */
+  categorie: string | null;
+  /** De hex van de categoriekleur, `null` zonder categorielaag (dan geldt `--or`). */
+  kleur: string | null;
   titel: string;
   /** Leeg: het blok "CENTRALE VRAAG" ontbreekt. */
   centraleVraag: string | null;
@@ -32,6 +38,9 @@ export function toelichtingVoor(
   return {
     eyebrow,
     accentColor: (opties.groepKleur && CATEGORIE_COLORS[opties.groepKleur]?.hex) || "#ff671f",
+    nummer: bouwblok.volgnummer,
+    categorie: opties.groepNaam,
+    kleur: (opties.groepKleur && CATEGORIE_COLORS[opties.groepKleur]?.hex) || null,
     titel: bouwblok.naam,
     centraleVraag,
     beschrijving: toelichting ? toelichting.split(/\n\s*\n/).map((t) => t.trim()).filter(Boolean) : [],

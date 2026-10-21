@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Antwoord, Bouwblok, Categorie, ScanWeergave, SchaalLabel } from "@/lib/types";
-import { CATEGORIE_COLORS, accentStijl, lijnKleur } from "@/lib/colors";
+import { CATEGORIE_COLORS, accentStijl } from "@/lib/colors";
 import { toelichtingVoor } from "@/lib/bouwblok-info";
 import { gewichtMarkering } from "@/lib/weging";
 import { ScaleRadio } from "./ScaleRadio";
 import { JaNeeRadio } from "./JaNeeRadio";
 import { AfdelingKaarten } from "./AfdelingKaarten";
-import { Modal } from "./Modal";
+import { ToelichtingModal } from "./ToelichtingModal";
 
 export function BouwblokForm({
   bouwblok,
@@ -131,38 +131,18 @@ export function BouwblokForm({
         </div>
       </div>
 
-      <Modal
-        open={toelichtingOpen}
-        onClose={() => setToelichtingOpen(false)}
-        title={bouwblok.naam}
-        eyebrow={toelichtingInfo?.eyebrow}
-        accentColor={toelichtingInfo?.accentColor}
-      >
-        {toelichtingInfo?.centraleVraag && (
-          <div
-            style={{
-              borderLeft: `3px solid ${toelichtingInfo.accentColor}`,
-              paddingLeft: "0.9rem",
-              margin: "0 0 1.2rem",
-            }}
-          >
-            <p
-              className="text-xs font-bold"
-              style={{
-                color: lijnKleur(toelichtingInfo.accentColor),
-                letterSpacing: "0.08em",
-                marginBottom: "0.2rem",
-              }}
-            >
-              CENTRALE VRAAG
-            </p>
-            <p style={{ color: "var(--ink)", fontWeight: 600 }}>{toelichtingInfo.centraleVraag}</p>
-          </div>
-        )}
-        {toelichtingInfo?.beschrijving.map((tekst, i) => (
-          <p key={i}>{tekst}</p>
-        ))}
-      </Modal>
+      {toelichtingInfo && (
+        <ToelichtingModal
+          open={toelichtingOpen}
+          onClose={() => setToelichtingOpen(false)}
+          nummer={toelichtingInfo.nummer}
+          naam={bouwblok.naam}
+          categorie={toelichtingInfo.categorie}
+          kleur={toelichtingInfo.kleur}
+          centraleVraag={toelichtingInfo.centraleVraag}
+          beschrijving={toelichtingInfo.beschrijving}
+        />
+      )}
 
       <div className="instructievlak">
         {instructieregel?.trim() ||

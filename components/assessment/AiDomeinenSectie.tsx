@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Modal } from "@/components/Modal";
+import { ToelichtingModal } from "@/components/ToelichtingModal";
 import { Sectie } from "@/components/assessment/Sectie";
 import { AiDomeinContent, aiDomeinen } from "@/data/ai-domeinen-content";
 import { CATEGORIE_COLORS, tekstOpKleur } from "@/lib/colors";
@@ -31,27 +31,16 @@ export function AiDomeinenSectie() {
               </button>
             ))}
           </div>
-          <Modal
+          <ToelichtingModal
             open={gekozen !== null}
             onClose={() => setGekozen(null)}
-            title={gekozen?.naam ?? ""}
-            eyebrow={gekozen ? `AI-DOMEIN ${gekozen.nummer}` : undefined}
-            accentColor={gekozen ? hex(gekozen.nummer) : undefined}
-          >
-            {gekozen && (
-              <>
-                <div style={{ borderLeft: `3px solid ${hex(gekozen.nummer)}`, paddingLeft: "0.9rem", margin: "0 0 1.2rem" }}>
-                  <p className="text-xs font-bold" style={{ color: "var(--ink-m)", letterSpacing: "0.08em", marginBottom: "0.2rem" }}>
-                    CENTRALE VRAAG
-                  </p>
-                  <p style={{ color: "var(--ink)", fontWeight: 600 }}>{gekozen.centraleVraag}</p>
-                </div>
-                {gekozen.beschrijving.map((tekst, i) => (
-                  <p key={i}>{tekst}</p>
-                ))}
-              </>
-            )}
-          </Modal>
+            nummer={gekozen?.nummer ?? 0}
+            naam={gekozen?.naam ?? ""}
+            categorie={null}
+            kleur={null}
+            centraleVraag={gekozen?.centraleVraag ?? null}
+            beschrijving={gekozen?.beschrijving ?? []}
+          />
         </>
       }
     />

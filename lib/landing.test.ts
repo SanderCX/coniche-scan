@@ -3,6 +3,7 @@ import { klantcontactVolwassenheid } from "@/data/klantcontact-assessment";
 import { aiVolwassenheid as aiScan } from "@/data/ai-scan-assessment";
 import { zorgscan } from "@/data/zorgscan-assessment";
 import { ziekenhuisQuickscan } from "@/data/ziekenhuis-quickscan-assessment";
+import { actieveSectie } from "@/components/assessment/AssessmentSubNav";
 import { bouwstenenLink, contentSoort, heroUitleg, overDezeScan, paginaSecties, tegelInhoud } from "./landing";
 
 describe("de hero van de landingspagina", () => {
@@ -52,5 +53,16 @@ describe("de tegels op scherm 1", () => {
     expect(tegelInhoud(zorgscan).punten[2].tekst).toBe("Scores gewogen voor de zorg, met concrete stappen");
     expect(tegelInhoud(ziekenhuisQuickscan).punten.map((p) => p.icoon)).toEqual(["klok", "lagen", "staafjes"]);
     expect(tegelInhoud(ziekenhuisQuickscan).punten[1].tekst).toBe("10 dimensies");
+  });
+});
+
+describe("de actieve sectie van de sub-nav", () => {
+  const tops = (...t: number[]) => ["visie", "bouwblokken", "wat", "praktisch"].map((id, i) => ({ id, top: t[i] }));
+  it("is de laatste sectie waarvan de bovenkant minder dan 170px onder de bovenkant van het venster staat", () => {
+    expect(actieveSectie(tops(900, 1700, 2500, 3300))).toBeNull();
+    expect(actieveSectie(tops(160, 900, 1700, 2500))).toBe("visie");
+    expect(actieveSectie(tops(-800, 169, 900, 1700))).toBe("bouwblokken");
+    expect(actieveSectie(tops(-800, 170, 900, 1700))).toBe("visie");
+    expect(actieveSectie(tops(-3000, -2000, -1000, 100))).toBe("praktisch");
   });
 });
