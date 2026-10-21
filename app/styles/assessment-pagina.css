@@ -86,8 +86,8 @@
   color: var(--ink);
   transform: translate(-50%, -50%);
   white-space: normal;
-  width: max-content;
-  max-width: 150px;
+  /* De pil is zo breed als zijn langste woord, zodat de naam op twee regels staat en nooit buiten de pil valt. */
+  width: min-content;
   pointer-events: none;
 }
 .ac-midden {
@@ -117,7 +117,7 @@
 }
 .ac-leeg {
   margin: 0;
-  font-size: 26px;
+  font-size: var(--fs-24);
   line-height: 32px;
   font-weight: 800;
   color: var(--ink);
@@ -131,14 +131,14 @@
 }
 .ac-detail h2 {
   margin: 0;
-  font-size: 26px;
+  font-size: var(--fs-24);
   line-height: 32px;
   font-weight: 800;
 }
 .ac-zin {
   margin: var(--sp-3) 0 var(--sp-4);
-  font-size: var(--fs-17);
-  line-height: 27px;
+  font-size: var(--fs-16);
+  line-height: 26px;
   color: var(--ink-m);
 }
 .ac-punten {
@@ -153,8 +153,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: var(--fs-15);
-  line-height: 22px;
+  font-size: var(--fs-14);
+  line-height: 20px;
   color: var(--ink-m);
 }
 .ac-knop {
@@ -236,13 +236,15 @@
 .ap-sectie {
   scroll-margin-top: calc(var(--nav-h) + 64px);
   padding: 64px 0;
-  border-top: 1px solid var(--border);
 }
-.ap-sectie:first-of-type {
-  border-top: 0;
+/* Secties wisselen af tussen wit en warm, beginnend met wit: De warme sectie heeft een boven- en onderrand. */
+.ap-sectie--warm {
+  background: var(--bg-warm);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 .ap-sectie-kop {
-  max-width: 44rem;
+  max-width: 880px;
   margin-bottom: var(--sp-8);
 }
 .ap-sectie-kop h2 {
@@ -252,6 +254,77 @@
 .ap-inleiding {
   margin: var(--sp-3) 0 0;
   font-size: var(--fs-18);
+  line-height: 28px;
+  color: var(--ink-m);
+  max-width: 880px;
+  text-wrap: pretty;
+}
+/* De kop van de Assessment-pagina (`CLAUDE.md`, scherm 2, Bovenkant): Het icoon in een witte cirkel van 56px en op 20px ernaast de titel. */
+.ap-kop {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-top: 56px;
+  padding-bottom: 40px;
+}
+.ap-kop-icoon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(28, 28, 26, 0.08);
+}
+.ap-kop h1 {
+  margin: 0;
+  font-size: var(--fs-48);
+  line-height: 56px;
+  font-weight: 800;
+}
+/* Praktisch: Drie kaarten, en de rij met de knop, het Info-icoon en de toelichting. */
+.ap-praktisch-kaarten {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-6);
+}
+@media (max-width: 900px) {
+  .ap-praktisch-kaarten {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.ap-praktisch-titel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-18);
+}
+.ap-praktisch-kaarten .card p {
+  margin: 0;
+  font-size: var(--fs-14);
+  color: var(--ink-m);
+}
+.ap-start {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: 32px;
+}
+.ap-start-knop {
+  height: 52px;
+}
+.ap-start .info-icoon-wrap .info-icoon {
+  width: 22px;
+  height: 22px;
+}
+.ap-start p {
+  max-width: 460px;
+  margin: 0;
+  font-size: var(--fs-15);
   color: var(--ink-m);
 }
 .ap-label {

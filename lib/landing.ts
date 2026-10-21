@@ -51,17 +51,10 @@ export interface PaginaSectie {
 export function paginaSecties(assessment: Assessment): PaginaSectie[] {
   const soort = contentSoort(assessment);
   if (!soort) return [];
-  const eigen: PaginaSectie[] =
-    soort === "ai"
-      ? [
-          { id: "ai", label: "AI in klantcontact" },
-          { id: "2030", label: "Klantcontact richting 2030" },
-        ]
-      : [
-          { id: "visie", label: "Visie" },
-          { id: "bouwblokken", label: "De 15 bouwblokken" },
-        ];
-  return [...eigen, { id: "wat", label: "Wat krijg ik" }, { id: "praktisch", label: "Praktisch" }];
+  // De volgorde van 21 oktober 2026: De inhoudssectie, Praktisch, Wat krijg ik en als laatste de Visie (bij AI: Klantcontact richting 2030).
+  const eerste: PaginaSectie = soort === "ai" ? { id: "ai", label: "AI in klantcontact" } : { id: "bouwblokken", label: "De 15 bouwblokken" };
+  const laatste: PaginaSectie = soort === "ai" ? { id: "2030", label: "Klantcontact richting 2030" } : { id: "visie", label: "Visie" };
+  return [eerste, { id: "praktisch", label: "Praktisch" }, { id: "wat", label: "Wat krijg ik" }, laatste];
 }
 
 /** De link "Over deze scan" op een Meting-kaart (`CLAUDE.md`, scherm 5): Met de tekst per type, en niets bij een Assessment zonder content. */

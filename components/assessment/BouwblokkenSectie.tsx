@@ -64,7 +64,7 @@ function Groep({ naam, actief, zet, open }: { naam: string; actief: number | nul
   );
 }
 
-export function BouwblokkenSectie() {
+export function BouwblokkenSectie({ warm = false }: { warm?: boolean }) {
   const [gekozen, setGekozen] = useState<Blok | null>(null);
   const [actief, setActief] = useState<number | null>(null);
   const actiefBlok = ALLE.find((b) => b.nummer === actief);
@@ -73,6 +73,7 @@ export function BouwblokkenSectie() {
 
   return (
     <Sectie
+      warm={warm}
       id="bouwblokken"
       kop="De Bouwstenen van Klantcontact"
       inleiding="Vijftien bouwstenen, verdeeld over vijf groepen, beschrijven de voorwaarden voor goed klantcontact. Klik op een bouwsteen voor de beschrijving en de centrale vraag."

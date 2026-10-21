@@ -14,7 +14,6 @@ export default function Home() {
   return (
     <PageWithChrome>
       <div className="container ac-pagina">
-        <span className="eyebrow">Coniche Scan</span>
         <h1>Kies jouw assessment</h1>
         <p className="ac-intro">
           Coniche Scan laat zien hoe volwassen jouw klantcontact is en waar de grootste kansen liggen. Je collega&apos;s vullen een korte vragenlijst in, jij krijgt een

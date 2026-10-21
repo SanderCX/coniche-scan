@@ -32,6 +32,18 @@
   display: block;
 }
 
+.nav-scan {
+  align-self: flex-end;
+  margin-left: var(--sp-2);
+  margin-bottom: 1px;
+  font-size: var(--fs-14);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  color: var(--or);
+  text-decoration: none;
+}
+
 .nav-badge {
   background: var(--ink);
   color: #fff;
@@ -387,6 +399,9 @@
 }
 
 /* ---------- Kaarten ---------- */
+.card p {
+  text-wrap: pretty;
+}
 .card {
   background: var(--bg);
   border: 1px solid var(--border);
