@@ -189,7 +189,7 @@
 .film-nr {
   display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
   width: 22px; height: 22px; border: 2px solid var(--domein-kleur); border-radius: 50%; background: #fff;
-  font-size: var(--fs-12); font-weight: 700; color: var(--ink); line-height: 1; padding-top: 0.09em;
+  font-size: var(--fs-11); font-weight: 700; color: var(--ink); line-height: 1; padding-top: 0.09em;
 }
 /* De Quickscan: Rijen van 52px zonder nummercirkel, met stippellijnen op 50% en 80% (`help.md`, Films, Quickscan). */
 .film-rijen--quickscan { gap: 0; }
