@@ -1,5 +1,19 @@
 # Coniche Scan — Changelog
 
+## 2026-10-21 (21) — Specs van Joost, PR 156: Kies jouw assessment als cirkel met vier kwarten, lettermaten volgens de specs
+
+Op verzoek van Sander gebouwd uit `CLAUDE.md` (scherm 1, ontwerp `Home-D`) en `stylesheet.md` (Assessmenttegel).
+
+**Gedaan**:
+- **Scherm 1** (`app/page.tsx`, `components/AssessmentCirkel.tsx`, `lib/assessmentcirkel.ts`): De tegels zijn vervangen door één cirkel van 568px in vier kwarten van 280px met 8px ertussen, in de volgorde van de Assessments. De linkerhelft is één radar met vijf wedges van 36° (Fundament op de scheiding), rechtsboven staan vijf wedges van 18° in de AI-kleuren, de oranje lijn met 13 hoekpunten loopt door de drie kwarten, rechtsonder staan vier bogen in de klassekleuren van de Quickscan. In het midden staat het icoon (`public/coniche-icoon.svg`) in een cirkel van 80px, op elk kwart een pil met icoon en korte naam. Hover maakt een kwart 2,5% groter, een klik schuift het kwart naar buiten met schaduw en een pulserende stip, de andere kwarten gaan naar 38%, en rechts staat het detailpaneel met titel (26px), zin (17px), drie punten (15px) en de knop "Bekijk dit assessment". Bediening met toetsenbord en schermlezer (keuzegroep, pijltoetsen), onder 768px staat het paneel onder de cirkel.
+- **Opruimen**: `AssessmentCard` en de CSS van de tegel zijn verwijderd. `tegelInhoud` blijft, het paneel gebruikt het.
+- **Lettermaten**: De specs van de Herontwerp-onderdelen noemen 11, 13, 15 en 17px, die ik eerder naar de maten van de letterschaal had afgerond. Ze staan nu op de maten uit de specs, met de tokens `--fs-11`, `--fs-13`, `--fs-15` en `--fs-17` (`stylesheet.md`, Lettergroottes, ter bevestiging door Joost). Het gaat om de punten en het paneel, de Toelichtingsmodal, de pillen en de centrale vraag bij de bouwblokken, de chips in het Dossier, de tag Nieuw en de voorproef op de Dossierkaart, en de nummercirkel in de film van de AI-scan.
+- **Tests**: `lib/assessmentcirkel.test.ts` (9 tests). Bekeken in de browser: De cirkel, een klik, de pijltoets en het schalen onder 568px.
+
+**Specs bijgewerkt**: `CLAUDE.md`, `stylesheet.md`, `dossier.md`, `bouwstenenmodel-visual.md`, `visualisatie-mijn-metingen.md`, `help.md`.
+
+**Keuzes en afwijkingen**: De kop staat links op wit, zonder de verloopachtergrond van de oude pagina (de spec noemt die niet). Bij meer dan vier Assessments staan de overige niet in de cirkel (`backlog.md`). De pijltoets loopt in de volgorde van de Assessments. De pulse van de stip groeit tot 2,1 keer. De inleiding is het voorstel uit de spec. Ik kon het ontwerp niet bekijken.
+
 ## 2026-10-21 (20) — Specs van Joost, PR 153: Sub-nav onder de hoofd-nav, radar voor de 15 bouwblokken, Toelichtingsmodal
 
 Op verzoek van Sander gebouwd uit `CLAUDE.md` (scherm 2), `stylesheet.md` (Sub-nav, Toelichtingsmodal, opbouw) en `bouwstenenmodel-visual.md` (Herontwerp: Radar met bouwblokken).

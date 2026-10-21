@@ -5,62 +5,181 @@
   }
 }
 
-/* Scherm 1: Twee tegels per rij, de hele tegel is klikbaar. */
-.ap-tegels {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-6);
+/* Scherm 1: De Assessmentcirkel met vier kwarten en het detailpaneel (`CLAUDE.md`, scherm 1, ontwerp `Home-D`). */
+.ac-pagina {
+  padding-top: var(--sp-12);
+  padding-bottom: var(--sp-12);
 }
-@media (max-width: 900px) {
-  .ap-tegels {
+.ac-pagina h1 {
+  margin: var(--sp-2) 0 var(--sp-4);
+}
+.ac-intro {
+  max-width: 640px;
+  margin: 0;
+  font-size: var(--fs-18);
+  line-height: 28px;
+  color: var(--ink-m);
+}
+.ac {
+  display: grid;
+  grid-template-columns: minmax(0, 568px) minmax(0, 1fr);
+  gap: 56px;
+  align-items: center;
+  margin-top: 40px;
+}
+@media (max-width: 767px) {
+  .ac {
     grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-8);
   }
 }
-.card.ap-tegel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 32px;
-  text-decoration: none;
-  color: inherit;
+.ac-vlak {
+  position: relative;
+  width: 100%;
+  max-width: 568px;
 }
-.ap-tegel-kop {
+.ac-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 568px;
+  height: 568px;
+  transform-origin: 0 0;
+}
+.ac-kwart {
+  position: absolute;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
+}
+.ac-kwart svg {
+  display: block;
+  overflow: visible;
+}
+.ac-kwart:hover:not(.is-gekozen),
+.ac-kwart:focus-visible:not(.is-gekozen) {
+  transform: scale(1.025);
+}
+.ac-kwart.is-gekozen {
+  z-index: 2;
+  transform: translate(var(--ac-dx), var(--ac-dy)) scale(1.02);
+  filter: drop-shadow(0 10px 30px rgba(28, 28, 26, 0.18));
+}
+.ac-kwart.is-gedimd {
+  opacity: 0.38;
+}
+.ac-kwart:focus-visible .ac-label {
+  outline: 2px solid var(--or);
+}
+.ac-label {
+  position: absolute;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 2px 10px rgba(28, 28, 26, 0.1);
+  font-size: var(--fs-14);
+  font-weight: 700;
+  line-height: 18px;
+  color: var(--ink);
+  transform: translate(-50%, -50%);
+  white-space: normal;
+  width: max-content;
+  max-width: 150px;
+  pointer-events: none;
 }
-.ap-tegel-kop h2 {
+.ac-midden {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(28, 28, 26, 0.12);
+  pointer-events: none;
+}
+@keyframes ac-puls {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+.ac-puls {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ac-puls 1.8s ease-out infinite;
+}
+.ac-paneel {
+  min-width: 0;
+}
+.ac-leeg {
   margin: 0;
-  font-size: var(--fs-24);
-  line-height: 28px;
+  font-size: 26px;
+  line-height: 32px;
   font-weight: 800;
   color: var(--ink);
 }
-.ap-tegel-zin {
+@keyframes ac-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ac-detail {
+  animation: ac-in 0.4s ease both;
+}
+.ac-detail h2 {
   margin: 0;
-  font-size: var(--fs-16);
-  line-height: 26px;
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 800;
+}
+.ac-zin {
+  margin: var(--sp-3) 0 var(--sp-4);
+  font-size: var(--fs-17);
+  line-height: 27px;
   color: var(--ink-m);
 }
-.ap-tegel-punten {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.ac-punten {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-.ap-tegel-punten li {
+.ac-punten li {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: var(--fs-14);
+  font-size: var(--fs-15);
   line-height: 22px;
   color: var(--ink-m);
 }
-.card.ap-tegel:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(28, 28, 26, 0.08);
+.ac-knop {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  margin-top: 24px;
+  padding: 0 28px;
+  border-radius: 10px;
+  background: var(--or);
+  font-size: var(--fs-14);
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+}
+.ac-knop:hover {
+  background: var(--or-l);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ac-kwart,
+  .ac-detail,
+  .ac-puls {
+    animation: none;
+    transition: none;
+  }
 }
 
 /* Scherm 2: De sticky sub-nav, een balk van 64px direct onder de hoofd-nav, met de inhoud op de breedte van de pagina. */
@@ -292,7 +411,7 @@
 }
 .br-vraag p {
   margin: 4px 0 0;
-  font-size: var(--fs-16);
+  font-size: var(--fs-17);
   line-height: 26px;
   color: var(--ink);
 }
@@ -408,7 +527,7 @@
 }
 .br-pil-tekst {
   min-width: 0;
-  font-size: var(--fs-14);
+  font-size: var(--fs-13);
   font-weight: 600;
   line-height: 18px;
   color: var(--ink);

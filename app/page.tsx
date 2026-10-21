@@ -1,39 +1,26 @@
 "use client";
 
 import { useAssessments } from "@/lib/assessment-store";
-import { AssessmentCard } from "@/components/AssessmentCard";
+import { AssessmentCirkel } from "@/components/AssessmentCirkel";
 import { PageWithChrome } from "@/components/PageWithChrome";
 
+/**
+ * Scherm 1, Kies jouw assessment (`CLAUDE.md`, scherm 1, besloten door Joost op 21 oktober 2026, ontwerp `Home-D`): De eyebrow, de titel en een
+ * inleiding van twee zinnen op de breedte van de pagina, daaronder de Assessmentcirkel met het detailpaneel. De inleiding is een voorstel van de spec.
+ */
 export default function Home() {
   const assessments = useAssessments();
 
   return (
     <PageWithChrome>
-      <div style={{ background: "linear-gradient(180deg, var(--or-faint) 0%, var(--bg) 65%)" }}>
-        <div className="container" style={{ padding: "4.5rem 2rem 3.5rem", textAlign: "center" }}>
-          <span className="eyebrow">Coniche Scan</span>
-          <h1>Kies jouw assessment</h1>
-          <p
-            style={{
-              maxWidth: "40rem",
-              margin: "1rem auto 0",
-              fontSize: "var(--fs-18)",
-              fontWeight: 600,
-              color: "var(--ink)",
-            }}
-          >
-            Elke scan geeft direct inzicht in waar jouw organisatie staat en welke
-            verbeterkansen er liggen.
-          </p>
-        </div>
-      </div>
-
-      <div className="container flex-1" style={{ paddingBottom: "5rem", maxWidth: "64rem" }}>
-        <div className="ap-tegels">
-          {assessments.map((assessment) => (
-            <AssessmentCard key={assessment.id} assessment={assessment} />
-          ))}
-        </div>
+      <div className="container ac-pagina">
+        <span className="eyebrow">Coniche Scan</span>
+        <h1>Kies jouw assessment</h1>
+        <p className="ac-intro">
+          Coniche Scan laat zien hoe volwassen jouw klantcontact is en waar de grootste kansen liggen. Je collega&apos;s vullen een korte vragenlijst in, jij krijgt een
+          radar met concrete vervolgstappen.
+        </p>
+        <AssessmentCirkel assessments={assessments} />
       </div>
     </PageWithChrome>
   );
