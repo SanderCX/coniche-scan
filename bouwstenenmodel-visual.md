@@ -1,6 +1,6 @@
 # Coniche Scan: Bouwstenenmodel, interactief overzicht
 
-Route `/bouwstenen`. Losstaand van de andere
+Geen eigen route meer: Sinds het herontwerp van 21 oktober 2026 is dit een sectie ("De 15 bouwblokken") op de Assessment-pagina van Klantcontact Volwassenheid en Zorg (`CLAUDE.md`, sectie 3, scherm 2). Losstaand van de andere
 specs qua onderwerp, leunt inhoudelijk op `visie-coniche.md` en qua
 componenten op `stylesheet.md`. Niets hergebruiken van de meegestuurde
 schets qua stijl, die is alleen het vertrekpunt voor de indeling.
@@ -23,15 +23,13 @@ overlay bouwen, geen content dupliceren.
 
 ## Waar dit component een plek krijgt
 
-**Beantwoord.** Dit ís de bestemming van de link "Bouwstenen" in de 4
-vaste content-links in de header (CLAUDE.md sectie 3), route
-`/bouwstenen`. Geen losse leespagina met alleen tekst meer ernaast: De
+**Beantwoord, en gewijzigd op 21 oktober 2026.** Dit component staat als sectie "De 15 bouwblokken" op de Assessment-pagina van Klantcontact Volwassenheid en Zorg (`CLAUDE.md`, sectie 3, scherm 2), onder de sectie Visie en bereikbaar via de sticky sub-nav. De link "Bouwstenen" in de header en de route `/bouwstenen` bestaan niet meer. Geen losse leespagina met alleen tekst meer ernaast: De
 beschrijving en centrale vraag per bouwsteen (`visie-coniche.md` deel 2)
 komen uitsluitend nog terug in de modal van dit component.
 
-Binnen een persoonlijke respondent-link gaat de toegangscode mee via
+Binnen een persoonlijke respondent-link (via "Over deze scan" op Mijn metingen) gaat de toegangscode mee via
 `?code=`, zodat het logo en de exit-actie "← Terug naar Mijn metingen"
-naar de juiste plek blijven verwijzen.
+naar de juiste plek blijven verwijzen. In de sectie staan de vijf categorieën als kolommen naast elkaar, in het ontwerp `Herontwerp-Volwassenheid`.
 
 ## Bron voor de inhoud
 

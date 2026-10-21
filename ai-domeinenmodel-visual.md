@@ -1,6 +1,6 @@
 # Coniche Scan: AI-domeinenmodel, interactief overzicht
 
-Route `/ai-scan`. Analoog aan
+Geen eigen route meer: Sinds het herontwerp van 21 oktober 2026 is dit de sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan (`CLAUDE.md`, sectie 3, scherm 2). Analoog aan
 `bouwstenenmodel-visual.md`, met één structureel verschil: De
 AI-volwassenheidsscan heeft geen categorielaag (CLAUDE.md, Assessment).
 Waar dat verschil doorwerkt staat hieronder expliciet; de rest is
@@ -24,8 +24,7 @@ geen content dupliceren.
 
 ## Waar dit component een plek krijgt
 
-**Beantwoord.** Dit ís de bestemming van de link "AI" in de 4 vaste
-content-links in de header (CLAUDE.md sectie 3), route `/ai-scan`. Geen
+**Beantwoord, en gewijzigd op 21 oktober 2026.** Dit component staat als sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan (`CLAUDE.md`, sectie 3, scherm 2), met daaronder de sectie "Klantcontact richting 2030", en is bereikbaar via de sticky sub-nav. De link "AI" in de header en de route `/ai-scan` bestaan niet meer. De acht domeinen staan als kaarten in een raster van vier kolommen (`Herontwerp-AI`). Geen
 losse leespagina met alleen tekst meer ernaast: De beschrijving en
 centrale vraag per domein (`visie-ai-klantcontact.md`) komen uitsluitend
 nog terug in de modal van dit component.

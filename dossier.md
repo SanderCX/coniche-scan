@@ -144,6 +144,8 @@ Ontwerp: Bord 6 (de gekozen optie A). Bord 7 laat de afgewezen optie zien, met l
 
 Ontwerp: Bord 5. Een pagina van de Lead bij de persoonlijke link (voorstel voor de route: `app/s/[code]/dossier/page.tsx`). De nav is die van de Lead, met "← Terug naar Mijn metingen". Opent de Lead de pagina, dan wordt `dossierGezienOp` gezet.
 
+Een animatie van de radar met filter staat in de Help (`help.md`, Films, Het dossier lezen; ontwerp `Film-Dossier`). Dezelfde film staat sinds 21 oktober 2026 ook op de Assessment-pagina, in de sectie "Wat krijg ik" (`CLAUDE.md`, sectie 3, scherm 2).
+
 Van boven naar beneden:
 
 1. **Kop.** Achtergrond `--or-faint` met concentrische cirkels in `--or-mid` rechts. Er is geen paars in de kop (de kop lijkt anders te veel op een andere Coniche-site). Eyebrow "Dossier" (`--or`, donkerder variant `#c2570c` voor tekst), titel "Dossier {Organisatie}" (32px), een zin ("Je consultant heeft cases en nieuws verzameld die passen bij jullie situatie, met bij elk item uitleg waarom. Bij elk item staat het bouwblok waar het over gaat."), twee chips ("Gedeeld door je consultant", de datum van `openSinds`) en rechts twee tegels met het aantal Cases en het aantal Nieuwsberichten.

@@ -258,7 +258,7 @@ verandert.
 - [ ] Status van de contentbestanden nalopen. Bouwsteenbeschrijvingen
   staan volgens `CLAUDE.md` nog op concept, en de bestaande tekst blijft
   staan zolang dat zo is (`inhoudelijk-fundament.md`).
-- [ ] Contentpagina's Visie, Bouwstenen, AI en 2030 nalezen op
+- [ ] Contentsecties Visie, Bouwstenen, AI en 2030 op de Assessment-pagina's nalezen op
   actualiteit en onderling kloppen (`content-2030.md`, `visie-*.md`).
 - [ ] Focus- en foutstaten in formulieren afmaken (`CLAUDE.md` sectie 5,
   `stylesheet.md`), en foutmeldingen die een gebruiker daadwerkelijk kan

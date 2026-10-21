@@ -1,5 +1,7 @@
 # Coniche-visie op goed klantcontact
 
+**Plaats in de app (besloten door Joost op 21 oktober 2026):** Deel 1 staat als sectie "Visie" en deel 2 als sectie "De 15 bouwblokken" op de Assessment-pagina van Klantcontact Volwassenheid en Zorg (`CLAUDE.md`, sectie 3, scherm 2). Het zijn geen losse pagina's en geen links in de header meer. Voor de Zorgscan volgen later zorgspecifieke teksten (`backlog.md`).
+
 **Status: Concept.** Herschreven versie van
 `coniche-visie-goed-klantcontact.md`. Deel 1 beschrijft de visie, deel 2
 de vijftien bouwstenen. De bouwsteenbeschrijvingen zijn afgestemd op de
