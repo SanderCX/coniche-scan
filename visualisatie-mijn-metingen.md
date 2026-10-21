@@ -210,10 +210,10 @@ Een benchmark die voor deze Lead aan staat, is een kaart in de sectie Vergelijki
 
 ## Dossierkaart
 
-Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026, ontwerp "Coniche Scan Dossier", bord 6. Een Dossier dat voor deze Lead openstaat, is een kaart in de sectie Dossier, volle breedte, achtergrond `--bg-warm`. Het is één kaart: De Cases, het Nieuws, de Events en de Blogs staan niet los in het overzicht maar op de Dossierpagina (`dossier.md`, scherm 5), die de knop opent.
+Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026, ontwerp "Coniche Scan Dossier", bord 6. Een Dossier dat zichtbaar is voor deze Lead, is een kaart in de sectie Dossier, volle breedte, achtergrond `--bg-warm`. Het is één kaart: De Cases, het Nieuws, de Events en de Blogs staan niet los in het overzicht maar op de Dossierpagina (`dossier.md`, scherm 5), die de knop opent.
 
 - Links een rond icoon van 48px in `--or-faint` met een oranje mapje.
-- Daarnaast de eyebrow "Dossier" (12px, hoofdletters, `--or`), eventueel de tag "Nieuw" (12px, gewicht 700, `--bl` op `--bl-faint`), de titel "Dossier {Organisatie}" (18px, vet) en de regel "Gedeeld door je consultant op {datum}" (14px, `--ink-s`).
+- Daarnaast de eyebrow "Dossier" (12px, hoofdletters, `--or`), eventueel de tag "Nieuw" (12px, gewicht 700, `--bl` op `--bl-faint`), de titel {naam voor de Lead} (standaard "Dossier {Organisatie}", 18px, vet) en de regel "Gedeeld door je consultant op {datum}" (14px, `--ink-s`). De titel is de naam voor de Lead (nog niet gebouwd).
 - Onder de regel een voorproef met ten hoogste drie titels als chips (12px, gewicht 600, wit met 1px `--border`, afgerond, met een stip in oranje voor een Case, blauw voor Nieuws, groen voor een Event en amber voor een Blog), eerst de Cases, dan Nieuws, Events en Blogs. Een verlopen Event staat er niet bij. Zijn er meer items, dan staat er "+ n meer". Daaronder "2 cases · 2 nieuwsberichten · 2 events · 1 blog" in 12px `--ink-s`. Een soort zonder items valt weg en een verlopen Event telt niet mee. Gebouwd op 21 oktober 2026 (PR 160) voor alle vier de soorten, met chips, tag en aantallen op 12px (`--fs-12`); de stippen voor Event en Blog zijn `.mm-vp-stip--event` en `.mm-vp-stip--blog`.
 - Rechts de knop "Bekijk dossier" (hoofdactie), even breed als "Bekijk vergelijking".
 - De tag "Nieuw" staat er zolang de Lead de Dossierpagina niet heeft geopend na de laatste wijziging (`OrganisatieLid.dossierGezienOp`, `datamodel.md`, Dossieritem).

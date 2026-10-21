@@ -327,14 +327,21 @@ Contactpersoon {
 
 ### Dossieritem
 
-**Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 voor Nieuws en Cases, en op 21 oktober 2026 (PR 160) ook voor Events, Blogs en de koppeling aan AI-domeinen.** Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws, Cases, Events en Blogs, en kan het openzetten voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
+**Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 voor Nieuws en Cases, en op 21 oktober 2026 (PR 160) ook voor Events, Blogs en de koppeling aan AI-domeinen; de hernoeming naar zichtbaar, de naam voor de Lead en de scorebron van 21 oktober 2026 zijn nog niet gebouwd.** Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws, Cases, Events en Blogs, en kan het zichtbaar maken voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
 
 ```
 Organisatie.dossier {
-  openVoorLead: boolean             // standaard false
-  openSinds: datetime | null        // het moment waarop openVoorLead voor het laatst aan ging
+  zichtbaar: boolean                // standaard false (voorheen openVoorLead, hernoemd op 21 oktober 2026)
+  zichtbaarSinds: datetime | null   // het moment waarop zichtbaar voor het laatst aan ging (voorheen openSinds)
+  naamVoorLead: string              // maximaal 80 tekens, leeg = "Dossier {Organisatie.naam}"
+  radarBronnen: RadarBron[]         // hoogstens één per Assessment met een radar, leeg = overal automatisch
   gewijzigdOp: datetime | null      // laatste wijziging in wat een Lead ziet
   items: Dossieritem[]
+}
+
+RadarBron {
+  assessmentId: string              // Klantcontact Volwassenheid of AI-volwassenheid
+  metingId: string | null           // null = automatisch (meest recent), anders een vaste Meting van deze Organisatie
 }
 
 Dossieritem {
@@ -360,7 +367,8 @@ Dossieritem {
 ```
 
 - **Event verlopen** is afgeleid uit `datum` of `einddatum` (`dossier.md`, Regels), er is geen veld voor.
-- **Een Lead ziet een item** als `openVoorLead` aan staat, `zichtbaarVoorLead` aan staat en, bij een Case, `Organisatie.caseToegestaan` van `caseOrganisatieId` aan staat. De naam van de Organisatie in de Case gaat nooit naar de Lead.
+- **Een Lead ziet een item** als `Organisatie.dossier.zichtbaar` aan staat, `zichtbaarVoorLead` aan staat en, bij een Case, `Organisatie.caseToegestaan` van `caseOrganisatieId` aan staat. De naam van de Organisatie in de Case gaat nooit naar de Lead.
+- **Naam en scorebron (besloten op 21 oktober 2026).** `naamVoorLead` is de titel van het Dossier bij de Lead. `radarBronnen` bepaalt per Assessment welke Meting de scores in de radar en de verdeling levert: `metingId` leeg is automatisch (de meest recente Meting waarvan de Lead de Resultaten mag inzien), anders een vaste Meting die de Lead mag inzien. Wie `dossier.bewerken` heeft, mag beide wijzigen. De regels staan in `dossier.md` (Welke scores).
 - **Overgang.** Bestaande `nieuwsartikelen` worden bij het laden Dossieritems van soort `nieuws`, met `notitie` als `toelichting`, `zichtbaarVoorLead` op false en zonder bouwblokken (`dossier.md`, Overgang).
 - **`OrganisatieLid.dossierGezienOp`** (datetime of null) bepaalt of de kaart Dossier bij een Lead de tag "Nieuw" krijgt.
 
@@ -1595,9 +1603,14 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   Organisatie, de soort, de titel en bij `itemGewijzigd` de namen van de
   gewijzigde velden. Bij een Case staat ook de naam van de Organisatie in de
   Case erin.
-- `dossier.geopend` en `dossier.gesloten` (gebouwd op 21 oktober 2026, op de Organisatie):
-  `openVoorLead` is aan of uit gezet. `details` bevat de Organisatie en het
+- `dossier.zichtbaarGemaakt` en `dossier.verborgen` (voorheen `dossier.geopend` en
+  `dossier.gesloten`; gebouwd op 21 oktober 2026 onder de oude namen, hernoemd op 21 oktober 2026, de hernoeming is nog niet gebouwd):
+  `zichtbaar` is aan of uit gezet. `details` bevat de Organisatie en het
   aantal zichtbare items.
+- `dossier.instellingGewijzigd` (voorstel van 21 oktober 2026): `naamVoorLead` of
+  een `radarBronnen` is gewijzigd. `details` bevat de Organisatie, het veld, bij
+  een scorebron het Assessment en de Meting (of "automatisch"), en de oude en
+  nieuwe waarde.
 - `organisatie.caseVlagGewijzigd` (gebouwd op 21 oktober 2026):
   `caseToegestaan` is gewijzigd. `details` bevat de Organisatie en de nieuwe
   waarde.
@@ -1633,7 +1646,7 @@ Een streepje betekent geen toegang.
 | `organisaties.toewijzen` (aan een Consultant) | alle | - | - | - |
 | `organisaties.bewerken` (incl. kenmerken, KPI-waarden en Onderdelen) | alle | eigen | te bevestigen | - |
 | `contactpersonen.bewerken` (Contactpersonen aanmaken, wijzigen en verwijderen; een Consultant ziet ze wel; vooralsnog alleen Admin, later waarschijnlijk eigen voor een Consultant) | alle | - | - | - |
-| `dossier.bewerken` (Dossieritems aanmaken, wijzigen en verwijderen, Zichtbaar voor klant en Open voor Lead; gebouwd op 21 oktober 2026, `dossier.md`) | alle | eigen | - | - |
+| `dossier.bewerken` (Dossieritems aanmaken, wijzigen en verwijderen, Zichtbaar voor Lead, de naam en de scorebron van het Dossier; gebouwd op 21 oktober 2026, de naam en de scorebron nog niet gebouwd, `dossier.md`) | alle | eigen | - | - |
 | `dossier.inzien` (gebouwd op 21 oktober 2026) | alle | eigen | alleen openstaande items van de eigen Organisatie | - |
 | `organisaties.verwijderen` | alle | eigen | - | - |
 | `metingen.plannen` (ook een nieuw Onderdeel aanmaken in het formulier) | alle | eigen | - | - |
