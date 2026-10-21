@@ -6,6 +6,7 @@ import {
   fmt1,
   fmtVerschil,
   groepProfiel,
+  groepVoorbeelden,
   groepZichtbaar,
   isSpanning,
   niveauNaam,
@@ -127,7 +128,7 @@ describe("het profiel van een deelnemer", () => {
 describe("het profiel van een groep", () => {
   // De fictieve groep van 12 scans uit `datamodel.md` en de voorbeeld-output: Dezelfde data staat in de film en op de pagina.
   const scans = demoSpanningGroep;
-  const groep = groepProfiel(spanningsmeter, scans, 3);
+  const groep = groepProfiel(spanningsmeter, scans);
 
   it("rekent de groepsgemiddelden, de spanning daarop en de grootste spanning", () => {
     expect(groep.velden.map((v) => v.score)).toEqual([3.6, 2.9, 2.7, 3.2, 2.5, 3.9]);
@@ -149,24 +150,23 @@ describe("het profiel van een groep", () => {
     expect(niveauNaam(spanningsmeter, groep.gemiddeld!.niveau)).toBe("Georganiseerd");
   });
 
-  it("splitst per rolgroep en rekent het verschil per veld", () => {
-    expect(groep.rollen.map((r) => [r.rolgroep, r.scans])).toEqual([
-      ["Direct met klanten", 5],
-      ["Leidinggevende", 4],
-      ["MT en directie", 3],
-    ]);
-    const verhaal = groep.rollen.map((r) => rond1(r.gemiddelden[0] as number));
-    expect(verhaal).toEqual([3.0, 3.6, 4.6]);
-    expect(rond1(groep.rolVerschil[0] as number)).toBe(1.6);
-    expect(groep.grootsteRolVerschil).toBe(groep.rolVerschil[0]);
+  it("verzamelt de voorbeelden uit de groep per veld, zonder verwijzing naar een scan", () => {
+    const voorbeelden = groepVoorbeelden(spanningsmeter, scans);
+    expect(voorbeelden.length).toBe(4);
+    // In de volgorde van de velden, niet van de scans.
+    expect(voorbeelden.map((v) => v.veldNaam)).toEqual(["Verhaal & leiderschap", "Mensen & gedrag", "Mensen & gedrag", "Technologie"]);
+    expect(voorbeelden.every((v) => Object.keys(v).sort().join() === "tekst,veldId,veldNaam")).toBe(true);
   });
 
-  it("laat een rolgroep onder de drempel weg, en de hele uitsplitsing bij minder dan twee rolgroepen", () => {
-    expect(groepProfiel(spanningsmeter, scans, 4).rollen.map((r) => r.rolgroep)).toEqual(["Direct met klanten", "Leidinggevende"]);
-    const alleen = groepProfiel(spanningsmeter, scans, 5);
-    expect(alleen.rollen).toEqual([]);
-    expect(alleen.rolVerschil.every((v) => v === null)).toBe(true);
-    expect(alleen.grootsteRolVerschil).toBeNull();
+  it("laat lege en dubbele antwoorden op de open vraag weg", () => {
+    const veld = spanningsvelden(spanningsmeter)[0].id;
+    const uit = groepVoorbeelden(spanningsmeter, [
+      { antwoorden: {}, opmerkingen: { [veld]: "  Zelfde tekst " } },
+      { antwoorden: {}, opmerkingen: { [veld]: "Zelfde tekst" } },
+      { antwoorden: {}, opmerkingen: { [veld]: "   " } },
+      { antwoorden: {} },
+    ]);
+    expect(uit.map((v) => v.tekst)).toEqual(["Zelfde tekst"]);
   });
 
   it("toont de groep voor een Lead pas vanaf het minimum aantal afgeronde scans", () => {
@@ -176,6 +176,6 @@ describe("het profiel van een groep", () => {
   });
 
   it("heeft geen meest uiteenlopend veld bij één scan", () => {
-    expect(groepProfiel(spanningsmeter, [scans[0]], 3).meestUiteenlopend).toBeNull();
+    expect(groepProfiel(spanningsmeter, [scans[0]]).meestUiteenlopend).toBeNull();
   });
 });

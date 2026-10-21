@@ -54,8 +54,9 @@ function Beeld({ deel, clipId }: { deel: DeelDef; clipId: string }) {
       {deel.soort === "spanning" && (
         <g>
           <polygon points={bandVlak()} fill="#ff671f" fillOpacity={0.1} stroke="none" />
-          <polyline points={bandPuntenLijn("boven")} fill="none" stroke="#ff671f" strokeOpacity={0.6} strokeWidth={1.2} strokeDasharray="4 3" />
-          <polyline points={bandPuntenLijn("onder")} fill="none" stroke="#ff671f" strokeOpacity={0.6} strokeWidth={1.2} strokeDasharray="4 3" />
+          {/* De rand van de band is één dunne grijze lijn en geen oranje streepjes: Drie oranje lijnen naast elkaar waren te heftig (PR 164). */}
+          <polyline points={bandPuntenLijn("boven")} fill="none" stroke="#a3a19b" strokeWidth={1} />
+          <polyline points={bandPuntenLijn("onder")} fill="none" stroke="#a3a19b" strokeWidth={1} />
         </g>
       )}
       {lijn && <polygon points={lijnVulling()} fill="#ff671f" fillOpacity={0.14} stroke="none" />}
@@ -158,7 +159,9 @@ export function AssessmentCirkel({ assessments }: { assessments: Assessment[] })
                   <Beeld deel={d} clipId={clipId} />
                   {isGekozen && (
                     <g>
-                      <circle className="ac-puls" cx={stipX} cy={stipY} r={9} fill="none" stroke="#ff671f" strokeWidth={2} />
+                      {/* De gloed is oranje licht rondom de stip, ook op een gekleurde wedge, met daarbovenop de pulse (PR 164). */}
+                      <circle className="ac-gloed" cx={stipX} cy={stipY} r={12} fill="rgba(255,103,31,.55)" />
+                      <circle className="ac-puls" cx={stipX} cy={stipY} r={9} fill="none" stroke="rgba(255,103,31,.55)" strokeWidth={2} />
                       <circle cx={stipX} cy={stipY} r={9} fill="#ff671f" stroke="#fff" strokeWidth={3} />
                     </g>
                   )}

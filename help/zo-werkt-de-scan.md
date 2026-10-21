@@ -20,7 +20,7 @@ Je opent je persoonlijke link en komt op Mijn metingen. Daar start je de scan, b
 4. **Je resultaten.** Na de laatste vraag klik je op "Bekijk resultaten". Je ziet direct je scores.
 
 ## Let op
-Bij de Digitale Spanningsmeter kies je per vraag een score van 1 tot 5 op de schaal van het veld, of 0 als je de vraag niet kunt beoordelen. Zie Een scan invullen.
+Bij de Spanningsmeter kies je per vraag een score van 1 tot 5 op de schaal van het veld, of 0 als je de vraag niet kunt beoordelen. Zie Een scan invullen.
 
 Beantwoord elke vraag op basis van wat aantoonbaar geregeld is, zoals documenten, ritmes, tooling en afspraken. Een goed bedoeld plan telt niet mee.
 

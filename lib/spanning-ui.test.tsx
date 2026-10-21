@@ -10,6 +10,7 @@ import { filmVariant } from "./film";
 import { teaserVoorMeting, teaserVoorScan } from "./mijn-metingen";
 import { standaardInfoTekst } from "@/data/info-teksten";
 import { HelpFilm } from "@/components/help/HelpFilm";
+import { SpanningVeldenSectie } from "@/components/assessment/SpanningVeldenSectie";
 import { SpanningResultaat } from "@/components/spanning/SpanningResultaat";
 import { Antwoordkeuze } from "@/components/spanning/Antwoordkeuze";
 import { SpanningVeldForm } from "@/components/spanning/SpanningVeldForm";
@@ -75,7 +76,7 @@ describe("Mijn metingen bij de Spanningsmeter", () => {
   it("toont voor de hele Meting het gemiddelde met de laagste tot hoogste score", () => {
     const invullingen = demoSpanningGroep.map(
       (s, i) =>
-        ({ id: `s${i}`, status: "afgerond", antwoorden: s.antwoorden, rolgroep: s.rolgroep }) as unknown as ScanInvulling,
+        ({ id: `s${i}`, status: "afgerond", antwoorden: s.antwoorden, opmerkingen: s.opmerkingen }) as unknown as ScanInvulling,
     );
     const t = teaserVoorMeting(spanningsmeter, invullingen)!;
     expect(t.getal).toBe("3,1");
@@ -107,17 +108,25 @@ describe("het resultaat van de Spanningsmeter", () => {
     expect(html).not.toContain('role="tablist"');
   });
 
-  it("toont Groep met het meest uiteenlopende veld en de uitsplitsing per rol", () => {
+  it("toont Groep met het meest uiteenlopende veld, zonder uitsplitsing per rol", () => {
     const html = renderToStaticMarkup(
       <SpanningResultaat assessment={spanningsmeter} groep={{ scans: demoSpanningGroep, subregel: ["Meting"] }} />,
     );
     expect(html).toContain("Resultaat van de Meting");
     expect(html).toContain("Meest uiteenlopend");
     expect(html).toContain("Scores van 1,4 tot 4,0.");
-    expect(html).toContain("Gemiddelde per rol");
-    expect(html).toContain("5 deelnemers");
-    expect(html).toContain("Een rol met minder dan 3 deelnemers staat niet in de tabel");
+    expect(html).not.toContain("Gemiddelde per rol");
+    expect(html).not.toContain("Voorbeelden uit de groep");
     expect(html).not.toContain("Het groepsbeeld volgt in de sessie.");
+  });
+
+  it("toont de voorbeelden uit de groep alleen als ze voor deze lezer zijn vrijgegeven", () => {
+    const html = renderToStaticMarkup(
+      <SpanningResultaat assessment={spanningsmeter} groep={{ scans: demoSpanningGroep, voorbeelden: true, subregel: ["Meting"] }} />,
+    );
+    expect(html).toContain("Voorbeelden uit de groep");
+    expect(html).toContain("Voorbeelden zijn anoniem en staan bij het veld waar ze bij horen. Ze krijgen geen score.");
+    expect((html.match(/class="sp-voorbeeld"/g) ?? []).length).toBe(4);
   });
 
   it("toont de schakelaar Jouw profiel en Groep alleen als beide weergaven er zijn", () => {
@@ -175,9 +184,25 @@ describe("de doorloopflow van de Spanningsmeter", () => {
   });
 });
 
+describe("de velden als radar op de Assessment-pagina", () => {
+  const html = renderToStaticMarkup(<SpanningVeldenSectie assessment={spanningsmeter} />);
+
+  it("toont zes taartpunten, zes nummers en zes rijen, zonder de zes kaarten", () => {
+    expect(html).toContain("De 6 spanningsvelden");
+    expect((html.match(/class="br-nr /g) ?? []).length).toBe(6);
+    expect((html.match(/class="br-pil /g) ?? []).length).toBe(6);
+    expect(html).not.toContain("sp-veld-kaart");
+    expect(html).toContain("Beweeg over een veld of een nummer in de radar om de omschrijving te zien.");
+  });
+
+  it("heeft een aria-label met de volledige naam en de voorbeeldscore", () => {
+    expect(html).toContain('aria-label="3, Mensen &amp; gedrag, voorbeeldscore 2,2"');
+  });
+});
+
 describe("de teksten van de Spanningsmeter in het register", () => {
-  it("heeft de Info-teksten voor de instelling en de intake", () => {
-    expect(standaardInfoTekst("info.spanningMinPerRol")).toContain("anoniem");
-    expect(standaardInfoTekst("info.rolgroep")).toContain("rolgroep");
+  it("heeft geen Info-teksten meer voor de rolgroep", () => {
+    expect(standaardInfoTekst("info.spanningMinPerRol")).toBe("");
+    expect(standaardInfoTekst("info.rolgroep")).toBe("");
   });
 });

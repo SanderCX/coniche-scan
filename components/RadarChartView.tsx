@@ -139,7 +139,8 @@ export function RadarChartView({
           const vglKlasse = vgl === null ? null : CLASSIFICATIE_INFO[classificatie(vgl)].label;
           const sleutel = sleutelVan(r);
           const staat = staatVan(a, sleutel, r.bouwblok.id);
-          const zichtbaar = a?.bouwblokId === r.bouwblok.id;
+          // Alleen als de muis of de focus in de radar is: Staat hij in het diagram, dan licht de radar alleen op.
+          const zichtbaar = a?.bouwblokId === r.bouwblok.id && a.bron !== "diagram";
           const isFilter = !!filter && filter.actief.has(r.bouwblok.id);
           const isGekozen = !!filter && filter.gekozen === r.bouwblok.id;
           const knoopKlasse = filter
@@ -165,7 +166,7 @@ export function RadarChartView({
             ? `radar-tip radar-tip--${dy < 0 ? "boven" : "onder"}`
             : `radar-tip radar-tip--hoek radar-tip--${dx < 0 ? "l" : "r"}${dy < 0 ? "t" : "b"}`;
           const tipStijl = nabijAs ? { left: `${(x / MAAT) * 100}%`, top: `${(y / MAAT) * 100}%` } : undefined;
-          const zet_ = () => zet({ groepKey: sleutel, bouwblokId: r.bouwblok.id });
+          const zet_ = () => zet({ groepKey: sleutel, bouwblokId: r.bouwblok.id, bron: "radar" });
           return (
             <span key={r.bouwblok.id}>
               <button

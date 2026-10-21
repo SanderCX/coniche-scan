@@ -82,7 +82,7 @@ export default function LeadResultatenPage({
     );
   }
 
-  // De Digitale Spanningsmeter heeft geen gemiddelde antwoord per vraag en geen weergaven Spreiding en Antwoorden: Het resultaat is het
+  // De Spanningsmeter heeft geen gemiddelde antwoord per vraag en geen weergaven Spreiding en Antwoorden: Het resultaat is het
   // profiel van de groep, pas vanaf `benchmarkMinRespondenten` afgeronde scans, en bij een eigen scan de schakelaar Jouw profiel | Groep
   // (`visualisatie-spanningsmeter.md`, Resultaat en Anonimiteit).
   if (isSpanning(assessment)) {
@@ -102,6 +102,7 @@ export default function LeadResultatenPage({
                 groepOk
                   ? {
                       scans: spanningScansVan(scanUitvoering.invullingen),
+                      voorbeelden: true,
                       subregel: [scanUitvoering.label, gegevens.organisatie.naam, `Gemiddelde van ${aantalAfgerond} afgeronde ${aantalAfgerond === 1 ? "scan" : "scans"}`],
                     }
                   : null

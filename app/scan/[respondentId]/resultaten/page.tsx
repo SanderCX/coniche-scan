@@ -110,6 +110,7 @@ export default function ResultatenPage({
             }}
             groep={{
               scans: spanningScansVan(scanUitvoering.invullingen),
+              voorbeelden: true,
               subregel: [scanUitvoering.label, organisatie.naam, `Gemiddelde van ${aantalAfgerondInMeting(organisatie, scanUitvoering)} afgeronde scans`],
             }}
           />

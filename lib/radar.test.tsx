@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { zorgscan } from "@/data/zorgscan-assessment";
@@ -183,5 +184,48 @@ describe("de radar in de filtermodus (Dossier)", () => {
     expect(m).not.toContain("Organisatie Test");
     expect(m).toContain("Grenzen 2,5 en 3,5");
     expect(m).not.toMatch(/<span>–/);
+  });
+});
+
+describe("één tooltip tegelijk en het staafdiagram met twee reeksen", () => {
+  it("toont geen tooltip in de radar als de muis of focus in het diagram is", () => {
+    const b = bouwblokken[3];
+    const uitDiagram = renderToStaticMarkup(
+      <RadarChartView resultaten={bouwblokken} actief={{ groepKey: groepSleutel(b.groepId, b.bouwblok.id), bouwblokId: b.bouwblok.id, bron: "diagram" }} onActief={() => {}} />,
+    );
+    expect(uitDiagram.match(/is-zichtbaar/g)).toBeNull();
+    // De radar licht wel op.
+    expect(uitDiagram).toContain("is-actief");
+    expect(uitDiagram.match(/class="radar-stip"/g)).toHaveLength(1);
+  });
+
+  it("tekent twee balken per categorie met een tooltip met beide waarden en het verschil, en de klassenamen in de kaart", () => {
+    const html = renderToStaticMarkup(<CategorieStaafdiagram resultaten={groepen} vergelijking={groepen} naam="Org" vergelijkingNaam="Groep" />);
+    expect((html.match(/class="cat-balk cat-balk--dubbel"/g) ?? []).length).toBe(groepen.length);
+    expect((html.match(/cat-staaf--groep/g) ?? []).length).toBe(groepen.length);
+    expect(html).toMatch(/Org \d,\d · /);
+    expect(html).toMatch(/Groep \d,\d/);
+    expect(html).toContain("Verschil");
+    for (const klasse of ["Sterk punt", "Uitbouwen", "Basis op Orde"]) expect(html).toContain(`>${klasse}</span>`);
+    expect(html).toContain("Groep</li>");
+    expect(html).not.toContain("recharts");
+  });
+
+  it("heeft zonder tweede reeks geen klassenamen en geen dubbele balken", () => {
+    const html = renderToStaticMarkup(<CategorieStaafdiagram resultaten={groepen} />);
+    expect(html).not.toContain("cat-klassen");
+    expect(html).not.toContain("cat-balk--dubbel");
+  });
+
+  it("zet de as op één kleur en de namen gecentreerd", () => {
+    const css = readFileSync(new URL("../app/styles/charts.css", import.meta.url), "utf8");
+    expect(css).toMatch(/\.cat-as \{[^}]*color: var\(--ink-s\)/);
+    expect(css).toMatch(/\.cat-naam \{[^}]*text-align: center/);
+    expect(css).toMatch(/\.cat-item\.is-actief \.cat-naam,\s*\.cat-item\.is-actief \.cat-nummers \{[^}]*font-weight: 700/);
+  });
+
+  it("geeft de radar 460px en het staafdiagram de rest van de breedte", () => {
+    const css = readFileSync(new URL("../app/styles/components.css", import.meta.url), "utf8");
+    expect(css).toMatch(/\.resultaat-kaarten \{[^}]*grid-template-columns: minmax\(0, 460px\) minmax\(0, 1fr\)/);
   });
 });

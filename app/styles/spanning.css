@@ -1,4 +1,4 @@
-/* ---------- Digitale Spanningsmeter (`visualisatie-spanningsmeter.md`) ---------- */
+/* ---------- Spanningsmeter (`visualisatie-spanningsmeter.md`) ---------- */
 
 /* Doorloopflow: De hoofdkolom is breder dan bij de andere scans, want de antwoordkeuze heeft zes keuzes naast elkaar. */
 .flow-main--spanning {
@@ -471,65 +471,46 @@
   color: var(--ink-s);
 }
 
-/* Gemiddelde per rol */
-.sp-rol {
+/* Voorbeelden uit de groep */
+.sp-voorbeelden {
   margin-bottom: var(--sp-6);
 }
-.sp-rol-kop {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--sp-4);
-  margin-bottom: var(--sp-4);
-}
-.sp-rol-kop h3 {
-  margin: 0;
-}
-.sp-rol-kop p {
-  margin: 0;
-  font-size: var(--fs-12);
-  color: var(--ink-s);
-}
-.sp-rol-tabel {
+.sp-voorbeelden-raster {
   display: grid;
-  align-items: center;
-  gap: var(--sp-1) var(--sp-2);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
 }
-.sp-rol-kolom {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  padding-bottom: var(--sp-2);
+.sp-voorbeeld {
+  margin: 0;
+  padding: var(--sp-4) 20px;
+  border-radius: 8px;
+  background: var(--bg-warm);
+}
+.sp-voorbeeld-label {
+  display: block;
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.sp-voorbeeld p {
+  margin: 0;
   font-size: var(--fs-14);
+  line-height: 1.6;
+  color: var(--ink);
 }
-.sp-rol-kolom strong,
-.sp-rol-kolom small {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.sp-rol-kolom small {
+.sp-voorbeelden-uitleg {
+  margin: var(--sp-4) 0 0;
   font-size: var(--fs-12);
   color: var(--ink-s);
 }
-.sp-rol-cel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 40px;
-  border-radius: 6px;
-  background: var(--bg-mid);
-  font-size: var(--fs-14);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-.sp-rol-verschil {
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-m);
-}
-.sp-rol-verschil.is-grootste {
-  font-weight: 800;
-  color: var(--dal);
+@media (max-width: 800px) {
+  .sp-voorbeelden-raster {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* De vijf niveaus */
@@ -763,57 +744,6 @@
 }
 @media (max-width: 1000px) {
   .sf {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* De zes velden op de Assessment-pagina: Zes kaarten in drie kolommen (`visualisatie-spanningsmeter.md`, Landingspagina). */
-.sp-velden {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--sp-6);
-}
-.sp-veld-kaart {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--sp-2);
-  padding: 20px 24px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg);
-  font: inherit;
-  font-size: var(--fs-14);
-  line-height: 20px;
-  color: var(--ink-m);
-  text-align: left;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-.sp-veld-kaart:hover,
-.sp-veld-kaart:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(28, 28, 26, 0.08);
-}
-.sp-veld-kaart strong {
-  font-size: var(--fs-16);
-  font-weight: 700;
-  color: var(--ink);
-}
-.sp-veld-nr {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding-top: 0.09em;
-  border-radius: 50%;
-  font-size: var(--fs-14);
-  font-weight: 700;
-  line-height: 1;
-}
-@media (max-width: 1000px) {
-  .sp-velden {
     grid-template-columns: 1fr;
   }
 }

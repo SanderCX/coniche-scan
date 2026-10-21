@@ -32,7 +32,7 @@ export function bouwstenenLink(assessment: Assessment): { tekst: string; href: s
 /**
  * Welke content een Assessment op zijn pagina heeft (`CLAUDE.md`, scherm 2, Secties per Assessment): "volwassenheid" (Visie en de 15 bouwblokken)
  * bij de Bouwsteen als eenheid en een categorielaag, dus de Klantcontact Volwassenheidsscan en de Zorgscan, "ai" (AI in klantcontact en 2030) bij
- * de AI-domeinen, "spanning" (De spanningsvelden, Praktisch, Wat krijg ik en Visie) bij de Digitale Spanningsmeter. De Quickscan en elk ander type hebben voorlopig geen extra content: `null`, en dan ook geen sub-nav.
+ * de AI-domeinen, "spanning" (De spanningsvelden, Praktisch, Wat krijg ik en Visie) bij de Spanningsmeter. De Quickscan en elk ander type hebben voorlopig geen extra content: `null`, en dan ook geen sub-nav.
  */
 export type ContentSoort = "volwassenheid" | "ai" | "spanning";
 

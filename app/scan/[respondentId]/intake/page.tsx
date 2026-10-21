@@ -9,7 +9,6 @@ import { PageWithChrome } from "@/components/PageWithChrome";
 import { RespondentGegevensVelden } from "@/components/RespondentGegevensVelden";
 import { ScanBezet } from "@/components/ScanBezet";
 import { WegingKaart } from "@/components/WegingKaart";
-import { InfoIcoon } from "@/components/InfoIcoon";
 import { useBewerkslot } from "@/lib/bewerkslot";
 
 export default function IntakePage({
@@ -57,7 +56,6 @@ export default function IntakePage({
   }
 
   const { lid } = gegevens;
-  const rolgroepen = assessment.rolgroepen ?? [];
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -67,8 +65,6 @@ export default function IntakePage({
       functie: String(data.get("functie") ?? "").trim(),
       team: String(data.get("team") ?? "").trim(),
       notities: String(data.get("notities") ?? "").trim(),
-      // Alleen bij een Assessment met rolgroepen (de Spanningsmeter, `CLAUDE.md`, scherm 4).
-      ...(rolgroepen.length > 0 ? { rolgroep: String(data.get("rolgroep") ?? "") } : {}),
     });
     router.push(`/scan/${respondentId}/doorloop`);
   }
@@ -92,25 +88,6 @@ export default function IntakePage({
             team={lid.team}
             notities={lid.notities}
           />
-
-          {rolgroepen.length > 0 && (
-            <div className="field">
-              <label htmlFor="intake-rolgroep">
-                Rolgroep <span className="font-normal text-ink-s">(optioneel)</span>
-              </label>
-              <span className="knop-met-icoon" style={{ width: "100%" }}>
-                <select id="intake-rolgroep" name="rolgroep" className="field" defaultValue="" style={{ flex: 1 }}>
-                  <option value="">Kies een rolgroep</option>
-                  {rolgroepen.map((groep) => (
-                    <option key={groep} value={groep}>
-                      {groep}
-                    </option>
-                  ))}
-                </select>
-                <InfoIcoon naastVeld sleutel="info.rolgroep" />
-              </span>
-            </div>
-          )}
 
           <label
             className="text-sm"

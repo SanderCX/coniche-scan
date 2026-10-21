@@ -1,7 +1,7 @@
 /**
- * De Digitale Spanningsmeter (`content-spanningsmeter.md`, voorstel van 21 oktober 2026, gebouwd op 21 oktober 2026): Een vijfde
+ * De Spanningsmeter (`content-spanningsmeter.md`, voorstel van 21 oktober 2026, gebouwd op 21 oktober 2026): Een vijfde
  * Assessment met antwoordType "spanning". Zes spanningsvelden (de bouwblokken) zonder categorielaag, met per veld vijf gescoorde
- * vragen, de vijf ijkpunten uit het boek en de basis (de literatuur). Bron: "Digitale Spanningsmeter – vragenset" van Martijn en het
+ * vragen, de vijf ijkpunten uit het boek en de basis (de literatuur). Bron: "Spanningsmeter – vragenset" van Martijn en het
  * boek "Onder Spanning" (Franssen, 2026). De open voorbeeldvraag per veld heeft geen eigen record: Het antwoord staat in
  * `ScanInvulling.opmerkingenPerBouwblok` en de tekst in `Assessment.openVraag`.
  */
@@ -323,7 +323,7 @@ const velden: Bouwblok[] = [
 export const spanningsmeter: Assessment = {
   id: "spanningsmeter",
   afgeleidVanAssessmentId: null,
-  naam: "Digitale Spanningsmeter",
+  naam: "Spanningsmeter",
   kortLabel: "Spanningsmeter",
   subtitel: "±10 tot 15 minuten. Zie waar de spanning zit tussen de zes velden.",
   beschrijving:
@@ -357,5 +357,4 @@ export const spanningsmeter: Assessment = {
   instructieregel:
     "Beantwoord elke vraag vanuit wat jij zelf ziet in de organisatie. Kies een score van 1 tot 5 op de Spanningsmeter van dit veld. Kun je een vraag niet beoordelen, kies dan 0. Die vraag telt dan niet mee.",
   openVraag: "Geef een concreet voorbeeld (een klantmoment, overleg, besluit of project) dat je scores in dit veld onderbouwt.",
-  rolgroepen: ["Direct met klanten", "Leidinggevende", "MT en directie"],
 };

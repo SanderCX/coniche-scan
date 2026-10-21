@@ -36,7 +36,7 @@ export function domeinKleur(volgnummer: number): string {
 }
 
 /**
- * De kleuren van de zes spanningsvelden van de Digitale Spanningsmeter (`stylesheet.md`, Veldkleuren Spanningsmeter): Oranje,
+ * De kleuren van de zes spanningsvelden van de Spanningsmeter (`stylesheet.md`, Veldkleuren Spanningsmeter): Oranje,
  * blauw, groen, turkoois, paars en geel. Het veld met volgnummer 1 krijgt de eerste kleur. Een veldkleur is een vulling en een
  * accent en nooit de kleur van een score.
  */

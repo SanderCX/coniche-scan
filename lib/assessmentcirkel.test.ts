@@ -19,6 +19,7 @@ import {
   kompas,
   lijnPunt,
   lijnStraal,
+  stipIndex,
   stipPunt,
   volgendeKeuze,
 } from "./assessmentcirkel";
@@ -87,36 +88,55 @@ describe("de geometrie van de Assessmentcirkel met vijf delen", () => {
     expect(RINGEN).toEqual([53.75, 107.5, 161.25, 215]);
   });
 
-  it("laat de lijn van 162° tot 450° lopen met een hoekpunt op elke grens tussen twee delen en de Quickscan overslaan", () => {
+  it("laat de lijn van 162° tot 450° lopen met 13 hoekpunten op 24° van elkaar en de Quickscan overslaan", () => {
+    expect(LIJN).toHaveLength(13);
     expect(LIJN[0][0]).toBe(162);
     expect(LIJN[LIJN.length - 1][0]).toBe(450);
+    LIJN.forEach(([h], i) => expect(h).toBe(162 + i * 24));
+    expect(LIJN.map(([, sc]) => sc)).toEqual([2.6, 3.7, 2.9, 2.5, 3.3, 3.9, 2.7, 2.8, 3.6, 2.5, 3.8, 3.0, 2.6]);
     for (const grens of [234, 306, 378]) expect(LIJN.some(([h]) => h === grens)).toBe(true);
     // Geen hoekpunt in het deel van de Quickscan (90° tot 162° is 450° tot 522°).
     expect(LIJN.every(([h]) => h < 450 + 1e-9)).toBe(true);
-    expect(LIJN.every(([, s]) => s >= 1 && s <= 5)).toBe(true);
+    // Regel 1: Een dal gaat nooit onder 2,5 en een piek komt niet hoger dan bijna 4.
+    expect(LIJN.every(([, sc]) => sc >= 2.5 && sc <= 3.9)).toBe(true);
     for (let i = 1; i < LIJN.length; i++) expect(LIJN[i][0]).toBeGreaterThan(LIJN[i - 1][0]);
   });
 
-  it("rekent de straal van een hoekpunt als (score − 1) / 4 × 262 × 0,95", () => {
-    expect(dicht(lijnStraal(5), 262 * 0.95)).toBe(true);
+  it("zet op elke deelgrens een dal en de pieken binnen een deel", () => {
+    // De deelgrenzen zijn het eerste, vierde, zevende, tiende en dertiende hoekpunt.
+    const grenzen = [0, 3, 6, 9, 12];
+    for (const i of grenzen) {
+      const buren = [LIJN[i - 1], LIJN[i + 1]].filter(Boolean).map(([, sc]) => sc);
+      for (const b of buren) expect(LIJN[i][1]).toBeLessThan(b);
+    }
+    // De hoogste piek van elk deel ligt binnen het deel, niet op een grens.
+    for (let deel = 0; deel < 4; deel++) {
+      const bereik = LIJN.slice(deel * 3, deel * 3 + 4);
+      const hoogste = Math.max(...bereik.map(([, sc]) => sc));
+      expect(hoogste).toBeGreaterThan(bereik[0][1]);
+      expect(hoogste).toBeGreaterThan(bereik[3][1]);
+    }
+  });
+
+  it("rekent de straal van een hoekpunt als (score − 1) / 4 × 215 zodat 2, 3, 4 en 5 op de hulpcirkels liggen", () => {
+    RINGEN.forEach((r, i) => expect(dicht(lijnStraal(i + 2), r)).toBe(true));
     expect(lijnStraal(1)).toBe(0);
-    const [x, y] = lijnPunt(4); // 234°, score 2,3
-    expect(dicht(Math.hypot(x - CENTRUM, y - CENTRUM), lijnStraal(2.3))).toBe(true);
+    const [x, y] = lijnPunt(3); // 234°, score 2,5
+    expect(dicht(Math.hypot(x - CENTRUM, y - CENTRUM), lijnStraal(2.5))).toBe(true);
   });
 
   it("heeft een band van 0,75 punt boven en onder de lijn in het deel van de Spanningsmeter", () => {
     expect(BAND_PUNTEN).toBe(0.75);
     const boven = bandPunten("boven").split(" ");
     const onder = bandPunten("onder").split(" ");
-    // De hoekpunten van 162° tot en met 234°: Vijf.
-    expect(boven).toHaveLength(5);
-    expect(onder).toHaveLength(5);
+    // De hoekpunten van 162° tot en met 234°: Vier.
+    expect(boven).toHaveLength(4);
+    expect(onder).toHaveLength(4);
     const [bx, by] = boven[0].split(",").map(Number);
     expect(dicht(Math.hypot(bx - CENTRUM, by - CENTRUM), lijnStraal(2.6 + 0.75))).toBe(true);
-    const [ox, oy] = onder[2].split(",").map(Number); // score 1,9 min 0,75 is 1,15
-    expect(dicht(Math.hypot(ox - CENTRUM, oy - CENTRUM), lijnStraal(1.15))).toBe(true);
-    // De onderrand wordt op 1 begrensd.
-    expect(bandVlak().split(" ")).toHaveLength(10);
+    const [ox, oy] = onder[2].split(",").map(Number); // score 2,9 min 0,75 is 2,15
+    expect(dicht(Math.hypot(ox - CENTRUM, oy - CENTRUM), lijnStraal(2.15))).toBe(true);
+    expect(bandVlak().split(" ")).toHaveLength(8);
   });
 
   it("heeft vier bogen van de Quickscan in de klassekleuren en de stip op een hoekpunt of in de rode boog", () => {
@@ -124,11 +144,23 @@ describe("de geometrie van de Assessmentcirkel met vijf delen", () => {
     expect(QUICK_BOGEN.map((b) => Math.round(b.score * 100))).toEqual([84, 62, 48, 71]);
     expect(QUICK_BOGEN.map((b) => b.kleur)).toEqual(["#22a06b", "#e8871e", "#dc2626", "#e8871e"]);
     expect(stipPunt("klantcontact-volwassenheid")).toEqual(lijnPunt(5));
-    expect(stipPunt("zorgscan")).toEqual(lijnPunt(9));
-    expect(stipPunt("ai-volwassenheid")).toEqual(lijnPunt(13));
+    expect(stipPunt("zorgscan")).toEqual(lijnPunt(8));
+    expect(stipPunt("ai-volwassenheid")).toEqual(lijnPunt(10));
     expect(stipPunt("spanningsmeter")).toEqual(lijnPunt(1));
     const [x, y] = stipPunt("quickscan-ziekenhuis");
     expect(dicht(Math.hypot(x - CENTRUM, y - CENTRUM), 154)).toBe(true);
+  });
+
+  it("zet de stip op de hoogste van de twee binnenste hoekpunten van het deel, nooit op een dal", () => {
+    expect(stipIndex("spanningsmeter")).toBe(1); // 3,7 tegen 2,9
+    expect(stipIndex("klantcontact-volwassenheid")).toBe(5); // 3,9 tegen 3,3
+    expect(stipIndex("zorgscan")).toBe(8); // 3,6 tegen 2,8
+    expect(stipIndex("ai-volwassenheid")).toBe(10); // 3,8 tegen 3,0
+    expect(stipIndex("quickscan-ziekenhuis")).toBeNull();
+    for (const id of ["spanningsmeter", "klantcontact-volwassenheid", "zorgscan", "ai-volwassenheid"]) {
+      const i = stipIndex(id) as number;
+      expect(LIJN[i][1]).toBeGreaterThanOrEqual(3.6);
+    }
   });
 
   it("zet elke stip in het deel dat hoort bij zijn Assessment", () => {
@@ -148,9 +180,9 @@ describe("de geometrie van de Assessmentcirkel met vijf delen", () => {
       "Volwassenheid Zorg",
       "AI-Volwassenheid",
       "Quickscan Ziekenhuis",
-      "Digitale Spanningsmeter",
+      "Spanningsmeter",
     ].sort((a, b) => Object.values(KORTE_NAMEN).indexOf(a) - Object.values(KORTE_NAMEN).indexOf(b)));
-    expect(KORTE_NAMEN.spanningsmeter).toBe("Digitale Spanningsmeter");
+    expect(KORTE_NAMEN.spanningsmeter).toBe("Spanningsmeter");
   });
 
   it("zet een Assessment op zijn vaste plek en een onbekend type op de eerste vrije plek", () => {

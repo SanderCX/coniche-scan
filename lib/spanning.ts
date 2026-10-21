@@ -1,5 +1,5 @@
 /**
- * De score van een Assessment met antwoordType "spanning" (de Digitale Spanningsmeter, `datamodel.md`, Antwoordtype en
+ * De score van een Assessment met antwoordType "spanning" (de Spanningsmeter, `datamodel.md`, Antwoordtype en
  * Scoreberekening, Spanningsmeter; `content-spanningsmeter.md`). Pure functies zonder opslag. Alle scores worden berekend en nooit
  * opgeslagen.
  *
@@ -10,8 +10,8 @@
  * - Spanning per veld, behalve het eerste: `score(veld) − min(score van alle voorgaande velden)`, op de ongeronde scores.
  * - Grootste spanning = het veld met de grootste absolute spanning (bij gelijk het eerste).
  * - Gemiddeld niveau = gemiddelde van de veldscores: een weergave en geen score.
- * - Groep: gemiddelde, laagste, hoogste en spreiding per veld over de afgeronde scans, de spanning op de groepsgemiddelden, en per
- *   rolgroep een gemiddelde zolang de rolgroep minstens `spanningMinPerRol` scans heeft.
+ * - Groep: gemiddelde, laagste, hoogste en spreiding per veld over de afgeronde scans, en de spanning op de groepsgemiddelden. De
+ *   voorbeelden uit de groep zijn de antwoorden op de open vraag, anoniem.
  */
 import { Antwoord, Assessment, Bouwblok, ScanInvulling } from "./types";
 import { alleBouwblokkenMetGroep } from "./assessment-structuur";
@@ -191,10 +191,10 @@ export function spanningZin(v: VeldScore): string | null {
     : `${v.veld.naam} blijft ${verschil} achter bij ${v.referentie.naam}.`;
 }
 
-/** Eén scan in een groep: De antwoorden en de rolgroep. */
+/** Eén scan in een groep: De antwoorden en de antwoorden op de open vraag per veld (`ScanInvulling.opmerkingenPerBouwblok`). */
 export interface SpanningScan {
   antwoorden: Record<string, Antwoord>;
-  rolgroep?: string | null;
+  opmerkingen?: Record<string, string>;
 }
 
 export interface GroepVeld extends VeldScore {
@@ -207,32 +207,19 @@ export interface GroepVeld extends VeldScore {
   scansMetScore: number;
 }
 
-export interface RolKolom {
-  rolgroep: string;
-  scans: number;
-  /** Het gemiddelde per veld in de volgorde van de velden, `null` als niemand in de rolgroep het veld beoordeelde. */
-  gemiddelden: (number | null)[];
-}
-
 export interface GroepProfiel extends Omit<SpanningProfiel, "velden"> {
   velden: GroepVeld[];
   /** Het aantal afgeronde scans in de groep. */
   scans: number;
   /** Het veld met de grootste spreiding (bij gelijk het eerste), `null` bij minder dan twee scans. */
   meestUiteenlopend: GroepVeld | null;
-  /** De zichtbare rolgroepen, in de volgorde van `Assessment.rolgroepen`. Leeg bij minder dan twee zichtbare rolgroepen. */
-  rollen: RolKolom[];
-  /** Het verschil per veld tussen het hoogste en laagste rolgemiddelde, in de volgorde van de velden. */
-  rolVerschil: (number | null)[];
-  /** Het veld met het grootste rolverschil. */
-  grootsteRolVerschil: number | null;
 }
 
 /**
  * Het profiel van een groep afgeronde scans. De spanning wordt berekend op de groepsgemiddelden en niet als gemiddelde van de
- * spanningen van de personen. `minPerRol` is `Instellingen.spanningMinPerRol`.
+ * spanningen van de personen.
  */
-export function groepProfiel(assessment: Assessment, scans: SpanningScan[], minPerRol: number): GroepProfiel {
+export function groepProfiel(assessment: Assessment, scans: SpanningScan[]): GroepProfiel {
   const velden = spanningsvelden(assessment);
   const perScan = scans.map((s) => spanningProfiel(assessment, s.antwoorden));
   const perVeld = velden.map((_, i) => perScan.map((p) => p.velden[i].ruw).filter((r): r is number => r !== null));
@@ -263,38 +250,17 @@ export function groepProfiel(assessment: Assessment, scans: SpanningScan[], minP
     }
   }
 
-  // Per rolgroep: Alleen rolgroepen met minstens `minPerRol` scans.
-  const rolnamen = assessment.rolgroepen ?? [];
-  const zichtbaar: RolKolom[] = [];
-  for (const rolgroep of rolnamen) {
-    const indices = scans.map((s, i) => (s.rolgroep === rolgroep ? i : -1)).filter((i) => i >= 0);
-    if (indices.length === 0 || indices.length < Math.max(1, minPerRol)) continue;
-    const gemiddelden = velden.map((_, vi) => {
-      const waarden = indices.map((i) => perScan[i].velden[vi].ruw).filter((r): r is number => r !== null);
-      return waarden.length === 0 ? null : waarden.reduce((a, b) => a + b, 0) / waarden.length;
-    });
-    zichtbaar.push({ rolgroep, scans: indices.length, gemiddelden });
-  }
-  const rollen = zichtbaar.length >= 2 ? zichtbaar : [];
-  const rolVerschil = velden.map((_, vi) => {
-    const waarden = rollen.map((r) => r.gemiddelden[vi]).filter((g): g is number => g !== null);
-    return waarden.length < 2 ? null : Math.max(...waarden) - Math.min(...waarden);
-  });
-  const metVerschil = rolVerschil.filter((v): v is number => v !== null);
   return {
     ...basis,
     velden: groepVelden,
     scans: scans.length,
     meestUiteenlopend: meest,
-    rollen,
-    rolVerschil,
-    grootsteRolVerschil: metVerschil.length === 0 ? null : Math.max(...metVerschil),
   };
 }
 
 /**
- * Mag een groepsweergave voor een Lead getoond worden? Eronder staat er geen gemiddelde, laagste en hoogste score, uitsplitsing
- * per rol en voorbeelden (`visualisatie-spanningsmeter.md`, Anonimiteit). `min` is `Instellingen.benchmarkMinRespondenten`.
+ * Mag een groepsweergave voor een Lead getoond worden? Eronder staat er geen gemiddelde, laagste en hoogste score en geen
+ * voorbeelden (`visualisatie-spanningsmeter.md`, Anonimiteit). `min` is `Instellingen.benchmarkMinRespondenten`.
  */
 export function groepZichtbaar(afgerondeScans: number, min: number): boolean {
   return afgerondeScans >= min && afgerondeScans > 0;
@@ -302,5 +268,34 @@ export function groepZichtbaar(afgerondeScans: number, min: number): boolean {
 
 /** De afgeronde invullingen van een Meting als scans voor een groepsprofiel. */
 export function spanningScansVan(invullingen: ScanInvulling[]): SpanningScan[] {
-  return invullingen.filter((i) => i.status === "afgerond").map((i) => ({ antwoorden: i.antwoorden, rolgroep: i.rolgroep ?? null }));
+  return invullingen
+    .filter((i) => i.status === "afgerond")
+    .map((i) => ({ antwoorden: i.antwoorden, opmerkingen: i.opmerkingenPerBouwblok ?? {} }));
+}
+
+/** Eén voorbeeld uit de groep: Het antwoord op de open vraag bij een veld, zonder naam en zonder score. */
+export interface GroepVoorbeeld {
+  veldId: string;
+  veldNaam: string;
+  tekst: string;
+}
+
+/**
+ * De voorbeelden uit de groep (`visualisatie-spanningsmeter.md`, Voorbeelden uit de groep, besloten door Joost op 21 oktober 2026): De ingevulde
+ * antwoorden op de open vraag, per veld in de volgorde van de velden, zonder verwijzing naar de scan. Binnen een veld staan ze in een vaste volgorde
+ * die niet de volgorde van de scans is (alfabetisch op tekst), zodat de volgorde niet verraadt wie iets schreef. Dezelfde tekst telt één keer.
+ */
+export function groepVoorbeelden(assessment: Assessment, scans: SpanningScan[]): GroepVoorbeeld[] {
+  const uit: GroepVoorbeeld[] = [];
+  for (const veld of spanningsvelden(assessment)) {
+    const teksten = new Set<string>();
+    for (const scan of scans) {
+      const tekst = scan.opmerkingen?.[veld.id]?.trim();
+      if (tekst) teksten.add(tekst);
+    }
+    for (const tekst of [...teksten].sort((a, b) => a.localeCompare(b, "nl"))) {
+      uit.push({ veldId: veld.id, veldNaam: veld.naam, tekst });
+    }
+  }
+  return uit;
 }

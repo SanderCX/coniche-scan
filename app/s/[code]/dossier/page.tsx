@@ -20,15 +20,23 @@ import { BouwblokResultaat } from "@/lib/scoring";
 import { Assessment } from "@/lib/types";
 import {
   DOSSIER_ASSESSMENT_IDS,
+  DossierSectieInhoud,
+  DossierLijsten,
   LeadBlog,
   LeadCase,
   LeadDossier,
   LeadEvent,
   LeadNieuws,
+  SoortFilter,
+  VERDELING_EERST,
+  aantallenPerSoortLead,
   datumKort,
   filterOpBouwblok,
+  filterOpSoort,
   itemsPerBouwblok,
   leadDossier,
+  sorteerVerdeling,
+  verdeelOverSecties,
 } from "@/lib/dossier";
 
 /**
@@ -50,6 +58,8 @@ export default function DossierPage({ params }: { params: Promise<{ code: string
 interface RadarGegevens {
   assessment: Assessment;
   resultaten: BouwblokResultaat[];
+  /** Heeft de Lead een Meting van dit Assessment waarvan hij de Resultaten mag zien? Zonder zijn er geen scores en klassen. */
+  heeftScores: boolean;
 }
 
 /** Het woord voor een bouwblok in een tekst: Bij de AI-scan een domein. */
@@ -63,7 +73,9 @@ function DossierInhoud({ code }: { code: string }) {
   const router = useRouter();
   const zoek = useSearchParams();
   const [pilId, setPilId] = useState<string | null>(null);
-  const [eerdereOpen, setEerdereOpen] = useState(false);
+  const [eerdereOpen, setEerdereOpen] = useState<ReadonlySet<string>>(new Set());
+  const [soort, setSoort] = useState<SoortFilter>("alles");
+  const [verdelingOpen, setVerdelingOpen] = useState(false);
 
   const lid = gegevens?.lid;
   const organisatie = gegevens?.organisatie;
@@ -93,8 +105,8 @@ function DossierInhoud({ code }: { code: string }) {
   const radars: RadarGegevens[] = DOSSIER_ASSESSMENT_IDS.flatMap((id) => {
     const assessment = assessments.find((a) => a.id === id);
     if (!assessment) return [];
-    const resultaten = dossierRadar(assessment, organisatie, lid.id).resultaten;
-    return resultaten.some((r) => telling.has(r.bouwblok.id)) ? [{ assessment, resultaten }] : [];
+    const { resultaten, heeftScores } = dossierRadar(assessment, organisatie, lid.id);
+    return resultaten.some((r) => telling.has(r.bouwblok.id)) ? [{ assessment, resultaten, heeftScores }] : [];
   });
   const alleBouwblokken = radars.flatMap((r) => r.resultaten.map((res) => ({ ...res, assessment: r.assessment })));
   const gevraagd = zoek.get("bouwblok");
@@ -135,8 +147,6 @@ function DossierInhoud({ code }: { code: string }) {
     });
 
   const datum = langeDatum(dossier.openSinds);
-  const komend = gefilterd.events.filter((e) => !e.verlopen);
-  const verlopen = gefilterd.events.filter((e) => e.verlopen);
   const komendTotaal = dossier.events.filter((e) => !e.verlopen).length;
   const heeftAi = radars.some((r) => r.assessment.bouwblokLabel === "AI-domein");
   const tegels = [
@@ -145,6 +155,83 @@ function DossierInhoud({ code }: { code: string }) {
     { n: komendTotaal, een: "Event", meer: "Events" },
     { n: dossier.blogs.length, een: "Blog", meer: "Blogs" },
   ].filter((t) => t.n > 0);
+
+  // Het soortfilter telt wat er nu in de lijst past (met het filter op een bouwblok, zonder verlopen events). De lijst volgt beide filters.
+  const aantallen = aantallenPerSoortLead(gefilterd);
+  const lijsten: DossierLijsten = filterOpSoort(gefilterd, soort);
+  const totaalInLijst = lijsten.cases.length + lijsten.nieuws.length + lijsten.events.length + lijsten.blogs.length;
+
+  // De klassen bestaan alleen met een Meting waarvan de Lead de Resultaten mag zien: Anders geen verdeling, geen rail en geen secties.
+  const scores = new Map<string, number | null>(alleBouwblokken.map((r) => [r.bouwblok.id, r.score]));
+  const metScores = radars.some((r) => r.heeftScores);
+  const secties: DossierSectieInhoud[] = metScores ? verdeelOverSecties(lijsten, scores, heeftAi && radars.length === 1 ? "domein" : "bouwblok") : [];
+
+  function wisselEerdere(sleutel: string) {
+    const nieuw = new Set(eerdereOpen);
+    if (nieuw.has(sleutel)) nieuw.delete(sleutel);
+    else nieuw.add(sleutel);
+    setEerdereOpen(nieuw);
+  }
+
+  /** De vier lijsten onder elkaar, elk met een eigen kop. `sleutel` onderscheidt de uitklapknop van Eerdere events per sectie. */
+  const soorten = (l: DossierLijsten, sleutel: string) => {
+    const komend = l.events.filter((e) => !e.verlopen);
+    const verlopen = l.events.filter((e) => e.verlopen);
+    const open = eerdereOpen.has(sleutel);
+    return (
+      <>
+        {l.cases.length > 0 && (
+          <section className="dp-sectie" aria-label="Cases">
+            <SectieKop soort="case" titel="Cases" regel="Zo hebben andere organisaties het aangepakt" />
+            {l.cases.map((c) => (
+              <CaseKaart key={c.id} item={c} chips={chips(c.bouwblokIds)} />
+            ))}
+          </section>
+        )}
+
+        {l.nieuws.length > 0 && (
+          <section className="dp-sectie" aria-label="Nieuws">
+            <SectieKop soort="nieuws" titel="Nieuws" regel="Wat er speelt rond jullie organisatie" />
+            {l.nieuws.map((n) => (
+              <NieuwsRij key={n.id} item={n} chips={chips(n.bouwblokIds)} knop="Lees artikel ↗" />
+            ))}
+          </section>
+        )}
+
+        {l.events.length > 0 && (
+          <section className="dp-sectie" aria-label="Events">
+            <SectieKop soort="event" titel="Events" regel="Zien we je daar?" />
+            {komend.map((e) => (
+              <EventRij key={e.id} item={e} chips={chips(e.bouwblokIds)} />
+            ))}
+            {verlopen.length > 0 && (
+              <>
+                <button type="button" className="dp-eerdere" aria-expanded={open} aria-controls={`dp-eerdere-${sleutel}`} onClick={() => wisselEerdere(sleutel)}>
+                  Eerdere events {open ? "verbergen" : "tonen"} ({verlopen.length}) <span aria-hidden="true">{open ? "▲" : "▼"}</span>
+                </button>
+                {open && (
+                  <div id={`dp-eerdere-${sleutel}`}>
+                    {verlopen.map((e) => (
+                      <EventRij key={e.id} item={e} chips={chips(e.bouwblokIds)} />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </section>
+        )}
+
+        {l.blogs.length > 0 && (
+          <section className="dp-sectie" aria-label="Blogs">
+            <SectieKop soort="blog" titel="Blogs" regel="Om verder te lezen" />
+            {l.blogs.map((b) => (
+              <NieuwsRij key={b.id} item={b} chips={chips(b.bouwblokIds)} knop="Lees blog ↗" soort="blog" />
+            ))}
+          </section>
+        )}
+      </>
+    );
+  };
 
   return (
     <PageWithChrome logoHref={`/s/${code}`} code={code} toonTerug identiteitMenu={<MijnGegevensMenu lid={lid} />}>
@@ -193,37 +280,17 @@ function DossierInhoud({ code }: { code: string }) {
                   filter={{ actief: new Set(actief.resultaten.map((r) => r.bouwblok.id).filter((id) => telling.has(id))), gekozen, onKies: kies }}
                 />
               </div>
-              <div className="dp-radarlijst">
-                <h2>Waar dit dossier over gaat</h2>
-                <p className="dp-radarlijst-sub">
-                  Kies een {eenheid(actief.assessment)} om de cases, het nieuws, de events en de blogs daarover te zien.
-                </p>
-                <ul>
-                  {actief.resultaten
-                    .filter((r) => telling.has(r.bouwblok.id))
-                    .map((r) => {
-                      const n = telling.get(r.bouwblok.id) ?? 0;
-                      const score = r.score;
-                      const regel = [r.groepNaam, score !== null ? formatScore(score) : null, score !== null ? CLASSIFICATIE_INFO[classificatie(score)].label : null]
-                        .filter(Boolean)
-                        .join(" · ");
-                      return (
-                        <li key={r.bouwblok.id}>
-                          <button type="button" className={`dp-radarrij ${gekozen === r.bouwblok.id ? "is-gekozen" : ""}`} aria-pressed={gekozen === r.bouwblok.id} onClick={() => kies(gekozen === r.bouwblok.id ? null : r.bouwblok.id)}>
-                            <BouwblokCirkel volgnummer={r.bouwblok.volgnummer} groepKleur={r.groepKleur} />
-                            <span className="dp-radarrij-tekst">
-                              <strong>{r.bouwblok.naam}</strong>
-                              {regel && <span>{regel}</span>}
-                            </span>
-                            <span className="dp-radarrij-aantal">
-                              {n} {n === 1 ? "item" : "items"}
-                            </span>
-                          </button>
-                        </li>
-                      );
-                    })}
-                </ul>
-              </div>
+              <Verdeling
+                key={actief.assessment.id}
+                assessment={actief.assessment}
+                resultaten={actief.resultaten.filter((r) => telling.has(r.bouwblok.id))}
+                heeftScores={actief.heeftScores}
+                telling={telling}
+                gekozen={gekozen}
+                open={verdelingOpen}
+                onOpen={setVerdelingOpen}
+                onKies={(id) => kies(gekozen === id ? null : id)}
+              />
             </div>
           </section>
         )}
@@ -243,59 +310,202 @@ function DossierInhoud({ code }: { code: string }) {
           </div>
         )}
 
-        {gefilterd.cases.length > 0 && (
-          <section className="dp-sectie" aria-label="Cases">
-            <SectieKop soort="case" titel="Cases" regel="Zo hebben andere organisaties het aangepakt" />
-            {gefilterd.cases.map((c) => (
-              <CaseKaart key={c.id} item={c} chips={chips(c.bouwblokIds)} />
-            ))}
-          </section>
-        )}
+        <div className="dp-soortfilter">
+          <WeergaveWissel<SoortFilter>
+            ariaLabel="Soort item"
+            waarde={soort}
+            onChange={setSoort}
+            opties={[
+              { waarde: "alles", label: `Alles ${aantallen.alles}` },
+              { waarde: "case", label: `Cases ${aantallen.case}` },
+              { waarde: "nieuws", label: `Nieuws ${aantallen.nieuws}` },
+              { waarde: "event", label: `Events ${aantallen.event}` },
+              { waarde: "blog", label: `Blogs ${aantallen.blog}` },
+            ]}
+          />
+        </div>
 
-        {gefilterd.nieuws.length > 0 && (
-          <section className="dp-sectie" aria-label="Nieuws">
-            <SectieKop soort="nieuws" titel="Nieuws" regel="Wat er speelt rond jullie organisatie" />
-            {gefilterd.nieuws.map((n) => (
-              <NieuwsRij key={n.id} item={n} chips={chips(n.bouwblokIds)} knop="Lees artikel ↗" />
-            ))}
-          </section>
-        )}
-
-        {gefilterd.events.length > 0 && (
-          <section className="dp-sectie" aria-label="Events">
-            <SectieKop soort="event" titel="Events" regel="Zien we je daar?" />
-            {komend.map((e) => (
-              <EventRij key={e.id} item={e} chips={chips(e.bouwblokIds)} />
-            ))}
-            {verlopen.length > 0 && (
-              <>
-                <button type="button" className="dp-eerdere" aria-expanded={eerdereOpen} aria-controls="dp-eerdere-lijst" onClick={() => setEerdereOpen(!eerdereOpen)}>
-                  Eerdere events ({verlopen.length}) <span aria-hidden="true">{eerdereOpen ? "▲" : "▼"}</span>
-                </button>
-                {eerdereOpen && (
-                  <div id="dp-eerdere-lijst">
-                    {verlopen.map((e) => (
-                      <EventRij key={e.id} item={e} chips={chips(e.bouwblokIds)} />
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </section>
-        )}
-
-        {gefilterd.blogs.length > 0 && (
-          <section className="dp-sectie" aria-label="Blogs">
-            <SectieKop soort="blog" titel="Blogs" regel="Om verder te lezen" />
-            {gefilterd.blogs.map((b) => (
-              <NieuwsRij key={b.id} item={b} chips={chips(b.bouwblokIds)} knop="Lees blog ↗" soort="blog" />
-            ))}
-          </section>
+        {totaalInLijst === 0 ? (
+          <p className="dp-leeg">Voor deze keuze staat nog niets in het dossier.</p>
+        ) : secties.length > 0 ? (
+          <SectiesMetRail secties={secties} soorten={soorten} />
+        ) : (
+          soorten(lijsten, "alles")
         )}
 
         <p className="dp-slot">Vragen over dit dossier? Je consultant helpt je graag verder.</p>
       </div>
     </PageWithChrome>
+  );
+}
+
+/**
+ * De lijst met de rail "In dit dossier" (`dossier.md`, Scherm 5): Links een rail die meescrolt met per sectie het nummer in een cirkel, de naam en het
+ * aantal items, rechts de secties zelf. Een klik op de rail springt naar de sectie en de sectie waar de lezer staat is oranje gevuld.
+ */
+function SectiesMetRail({ secties, soorten }: { secties: DossierSectieInhoud[]; soorten: (l: DossierLijsten, sleutel: string) => React.ReactNode }) {
+  const [huidig, setHuidig] = useState<string>(secties[0]?.sectie ?? "");
+  const sleutel = secties.map((x) => x.sectie).join("|");
+
+  // De sectie waar de lezer staat: De laatste waarvan de bovenkant minder dan 180px onder de bovenkant van het venster staat.
+  useEffect(() => {
+    function bijScrollen() {
+      let gevonden = secties[0]?.sectie ?? "";
+      for (const sec of secties) {
+        const el = document.getElementById(`dp-sec-${sec.sectie}`);
+        if (el && el.getBoundingClientRect().top < 180) gevonden = sec.sectie;
+      }
+      setHuidig(gevonden);
+    }
+    bijScrollen();
+    window.addEventListener("scroll", bijScrollen, { passive: true });
+    return () => window.removeEventListener("scroll", bijScrollen);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sleutel]);
+
+  let nummer = 0;
+  return (
+    <div className="dp-lijst">
+      <nav className="dp-rail" aria-label="In dit dossier">
+        <span className="dp-rail-kop">In dit dossier</span>
+        <ul>
+          {secties.map((sec) => {
+            const nr = sec.sectie === "algemeen" ? null : ++nummer;
+            return (
+              <li key={sec.sectie}>
+                <a href={`#dp-sec-${sec.sectie}`} className={huidig === sec.sectie ? "is-huidig" : ""} aria-current={huidig === sec.sectie ? "location" : undefined}>
+                  <span className={`dp-rail-nr ${nr === null ? "is-algemeen" : ""}`} aria-hidden="true">
+                    {nr ?? "–"}
+                  </span>
+                  <span className="dp-rail-naam">{sec.naam}</span>
+                  <span className="dp-rail-aantal">{sec.aantal}</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+      <div className="dp-secties">
+        {(() => {
+          let n = 0;
+          return secties.map((sec) => {
+            const nr = sec.sectie === "algemeen" ? null : ++n;
+            return (
+              <section key={sec.sectie} id={`dp-sec-${sec.sectie}`} className="dp-klasse" aria-label={sec.naam}>
+                <header className="dp-klassekop">
+                  <span className={`dp-rail-nr dp-rail-nr--groot ${nr === null ? "is-algemeen" : ""}`} aria-hidden="true">
+                    {nr ?? "–"}
+                  </span>
+                  <div>
+                    <h2>{sec.naam}</h2>
+                    <p>{sec.regel}</p>
+                  </div>
+                </header>
+                {soorten(sec.lijsten, sec.sectie)}
+              </section>
+            );
+          });
+        })()}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * De verdeling rechts van de radar (`dossier.md`, Verdeling rechts van de radar): Per actief bouwblok een rij, de laagste score eerst, met de cirkel,
+ * de naam en het aantal items, een balk met de plek van de score in de drie zones en de score met de klasse. Eerst vier rijen, de rest achter "Nog {n}
+ * bouwblokken tonen". Zonder scores staat er een lijst op het nummer, zonder balk, score en klasse.
+ */
+function Verdeling({
+  assessment,
+  resultaten,
+  heeftScores,
+  telling,
+  gekozen,
+  open,
+  onOpen,
+  onKies,
+}: {
+  assessment: Assessment;
+  resultaten: BouwblokResultaat[];
+  heeftScores: boolean;
+  telling: Map<string, number>;
+  gekozen: string | null;
+  open: boolean;
+  onOpen: (open: boolean) => void;
+  onKies: (bouwblokId: string) => void;
+}) {
+  const woord = eenheid(assessment);
+  const meervoud = woord === "domein" ? "domeinen" : "bouwblokken";
+  const rijen = sorteerVerdeling(resultaten.map((r) => ({ r, score: heeftScores ? r.score : null, volgnummer: r.bouwblok.volgnummer })));
+  const zichtbaar = open ? rijen : rijen.slice(0, VERDELING_EERST);
+  const rest = rijen.length - zichtbaar.length;
+  return (
+    <div className="dp-radarlijst">
+      <h2>Waar dit dossier over gaat</h2>
+      <p className="dp-radarlijst-sub">
+        Kies een {woord} om de cases, het nieuws, de events en de blogs daarover te zien.
+        {heeftScores && ` Onder de radar staan de ${meervoud} met de laagste score bovenaan.`}
+      </p>
+      {heeftScores && (
+        <ul className="dp-klassenuitleg" aria-label="De klassen">
+          {(["rood", "oranje", "groen"] as const).map((k) => (
+            <li key={k}>
+              <i className={`dp-klassestip dp-klassestip--${k}`} aria-hidden="true" />
+              {CLASSIFICATIE_INFO[k].label}
+              <span>{k === "rood" ? "onder 2,5" : k === "oranje" ? "2,5 tot 3,5" : "vanaf 3,5"}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <ul className={`dp-verdeling ${heeftScores ? "dp-verdeling--score" : ""}`}>
+        {heeftScores && (
+          <li className="dp-zones" aria-hidden="true">
+            <span />
+            <span />
+            <span className="dp-zones-namen">
+              <span>Basis op Orde</span>
+              <span>Uitbouwen</span>
+              <span>Sterk punt</span>
+            </span>
+            <span />
+          </li>
+        )}
+        {zichtbaar.map(({ r, score }) => {
+          const n = telling.get(r.bouwblok.id) ?? 0;
+          const klasse = score === null ? null : classificatie(score);
+          return (
+            <li key={r.bouwblok.id}>
+              <button type="button" className={`dp-radarrij ${gekozen === r.bouwblok.id ? "is-gekozen" : ""}`} aria-pressed={gekozen === r.bouwblok.id} onClick={() => onKies(r.bouwblok.id)}>
+                <BouwblokCirkel volgnummer={r.bouwblok.volgnummer} groepKleur={r.groepKleur} groot />
+                <span className="dp-radarrij-tekst">
+                  <strong>{r.bouwblok.naam}</strong>
+                  <span>
+                    {n} {n === 1 ? "item" : "items"}
+                  </span>
+                </span>
+                {score !== null && klasse && (
+                  <>
+                    <span className="dp-balk" aria-hidden="true">
+                      <i style={{ left: `${(((Math.min(5, Math.max(1, score)) - 1) / 4) * 100).toFixed(1)}%` }} />
+                    </span>
+                    <span className="dp-score">
+                      <strong>{formatScore(score)}</strong>
+                      <span className={`dp-klasse-badge dp-klasse-badge--${klasse}`}>{CLASSIFICATIE_INFO[klasse].label}</span>
+                    </span>
+                  </>
+                )}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      {rijen.length > VERDELING_EERST && (
+        <button type="button" className="dp-meer" aria-expanded={open} onClick={() => onOpen(!open)}>
+          {open ? "Minder tonen ▴" : `Nog ${rest} ${rest === 1 ? woord : meervoud} tonen ▾`}
+        </button>
+      )}
+    </div>
   );
 }
 

@@ -27,12 +27,15 @@ export function PraktischSectie({ assessment, aantalVragen, warm }: { assessment
       tekst: spanning ? "Antwoorden in groepsweergaven zijn anoniem." : "Toegang verloopt via een persoonlijke, niet-herleidbare link die Coniche met je deelt.",
     },
   ];
+  // De zin over aantoonbaar bewijs stond in de feature-card Volledig beeld; die kaarten komen niet meer terug (`CLAUDE.md`, Open punten, besloten door
+  // Joost op 21 oktober 2026). Alleen een Assessment waarvan een feature-card die zin heeft, toont haar.
+  const bewijsZin = assessment.featureCards?.find((k) => k.tekst.includes("aantoonbaar bewijs"))?.tekst;
   return (
     <Sectie
       id="praktisch"
       warm={warm}
       kop="Wat je kunt verwachten"
-      inleiding={`Bedoeld voor ${assessment.doelgroep}`}
+      inleiding={`Bedoeld voor ${assessment.doelgroep}${bewijsZin ? `. ${bewijsZin}` : ""}`}
       kinderen={
         <>
           <div className="ap-praktisch-kaarten">

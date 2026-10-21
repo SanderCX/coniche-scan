@@ -199,8 +199,6 @@ export interface Assessment {
   relevantieVraag?: string | null;
   /** Alleen bij antwoordType "spanning": De tekst van de open vraag onder elk veld. Leeg: Het gewone opmerkingenveld. */
   openVraag?: string | null;
-  /** Alleen bij antwoordType "spanning": De opties van de vraag Rolgroep in de intake. Leeg: De vraag ontbreekt. */
-  rolgroepen?: string[] | null;
   // Let op: organisatieVelden staat hier bewust niet meer — die zijn platformbreed
   // geworden, zie data/organisatie-velden.ts (datamodel-rbac-voorstel.md, keuze 4).
   /** Herkomst-template bij een sector-variant (bijv. Zorgscan). null bij een op zichzelf staand Assessment. Puur informatief, geen lopende koppeling — datamodel.md, Sector-varianten. */
@@ -533,8 +531,6 @@ export interface ScanInvulling {
    */
   relevantie?: Record<string, boolean>;
   opmerkingenPerBouwblok: Record<string, string>;
-  /** Alleen bij `Assessment.rolgroepen`: De gekozen optie in de intake, voor de analyse per groep (`datamodel.md`, Scoreberekening). */
-  rolgroep?: string | null;
   /**
    * Notitie bij het starten van déze scan (`datamodel.md`, Notitie op de scan). Bij een import de `start_comment`. Hoort bij
    * de scan en niet bij de Respondent: Eén Respondent kan veel scans hebben. Ontbreekt bij data van vóór dit veld.

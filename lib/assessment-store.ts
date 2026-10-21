@@ -52,7 +52,26 @@ function voegNieuweSeedsToe(): void {
     const nieuw = seedAssessments.filter(
       (a) => !EERDERE_SEEDS.includes(a.id) && !verwijderd.includes(a.id) && !lijst.some((x) => x.id === a.id)
     );
-    if (nieuw.length > 0) {
+    // De Spanningsmeter heette tot 21 oktober 2026 "Digitale Spanningsmeter" (besloten door Joost): Een opgeslagen kopie krijgt de nieuwe naam
+    // en verliest de rolgroepen, die zijn vervallen (`CLAUDE.md`, scherm 4).
+    let gewijzigd = false;
+    for (const a of lijst) {
+      if (a.id !== "spanningsmeter") continue;
+      const oud = a as Assessment & { rolgroepen?: unknown };
+      if (a.naam === "Digitale Spanningsmeter") {
+        a.naam = "Spanningsmeter";
+        gewijzigd = true;
+      }
+      if (a.kortLabel === "Digitale Spanningsmeter") {
+        a.kortLabel = "Spanningsmeter";
+        gewijzigd = true;
+      }
+      if ("rolgroepen" in oud) {
+        delete oud.rolgroepen;
+        gewijzigd = true;
+      }
+    }
+    if (nieuw.length > 0 || gewijzigd) {
       window.localStorage.setItem(KEY, JSON.stringify([...lijst, ...structuredClone(nieuw)]));
     }
   } catch {

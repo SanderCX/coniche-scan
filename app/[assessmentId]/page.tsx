@@ -146,8 +146,8 @@ function AssessmentLanding({ assessmentId }: { assessmentId: string }) {
           // De Spanningsmeter heeft één film en geen feature-kaarten, en het Dossier is er niet voor (`visualisatie-spanningsmeter.md`).
           <HelpFilm naam="wat-krijg-ik" assessment={assessment} opmerking="Alle cijfers in de film zijn voorbeelddata." knop={voorbeeldKnop} />
         ) : (
+          // De drie feature-cards komen niet meer terug (besloten door Joost op 21 oktober 2026): De zin over aantoonbaar bewijs staat bij Praktisch.
           <>
-            {featureKaarten}
             <HelpFilm naam="wat-krijg-ik" assessment={assessment} opmerking="Alle cijfers in de film zijn voorbeelddata." knop={voorbeeldKnop} />
             <HelpFilm naam="dossier" assessment={assessment} />
           </>

@@ -1,5 +1,40 @@
 # Coniche Scan — Changelog
 
+## 2026-10-21 (29) — Specs van Joost, PR 164: Assessmentcirkel, lijn en stip van de delen, band van de Spanningsmeter
+
+Op verzoek van Sander ("pull devops", daarna "ja bouw maar").
+
+**Gedaan** (`lib/assessmentcirkel.ts`, `components/AssessmentCirkel.tsx`, `assessment-pagina.css`):
+- **De lijn** heeft 13 hoekpunten op 24° van elkaar met de scores uit de spec (2,6 – 3,7 – 2,9 – 2,5 – 3,3 – 3,9 – 2,7 – 2,8 – 3,6 – 2,5 – 3,8 – 3,0 – 2,6): Dalen op de deelgrenzen, pieken binnen een deel, nooit onder 2,5 en niet hoger dan 3,9. De straal volgt de hulpcirkels (`(score − 1) / 4 × 215px`).
+- **De stip** staat op de hoogste van de twee binnenste hoekpunten van het gekozen deel (`stipIndex`, `stipPunt`), heeft een oranje gloed en een pulse die tot 16px groeit.
+- **De band van de Spanningsmeter** heeft vier hoekpunten en één dunne grijze rand (`#a3a19b`, 1px) in plaats van oranje streepjes.
+- **Tests**: `lib/assessmentcirkel.test.ts` (13 hoekpunten, de scores, dalen en pieken, de straal op de ringen, de band, `stipIndex`).
+
+**Afwijkingen en interpretaties**: De spec noemt "50px per punt" voor de straal. Ik heb `RING_R / 4` (53,75px) genomen, zodat de scores 2 tot en met 5 precies op de hulpcirkels liggen, zoals de spec ook zegt ("volgt de hulpcirkels"). De gloed `0 0 12px 3px` van het ontwerp is voor SVG een vervaagde cirkel. De lijn dimt mee met het deel (38%), want het hele deel dimt al.
+
+## 2026-10-21 (28) — Specs van Joost, PR 163: Spanningsmeter zonder rolgroep, radar zonder scroll, één tooltip tegelijk, verdeling en rail in het Dossier
+
+Op verzoek van Sander ("pull devops", daarna "ja bouw maar"): PR 163 (alleen specs) is gebouwd, samen met de nieuwe stand van het icoon van de Spanningsmeter (entry 27).
+
+**Gedaan**:
+- **Spanningsmeter hernoemd.** "Digitale Spanningsmeter" is overal "Spanningsmeter": De naam en het kort label van het Assessment, de teksten, de commentaren, de help en het label in de cirkel (één regel). Een opgeslagen Assessment wordt bij het laden omgezet (`lib/assessment-store.ts`: naam, kort label, en de `rolgroepen` vallen weg).
+- **Rolgroep en uitsplitsing per rol weg.** `Assessment.rolgroepen`, `ScanInvulling.rolgroep`, het veld in de intake, `Instellingen.spanningMinPerRol` met zijn formulier en Info-teksten (`info.rolgroep`, `info.spanningMinPerRol`), het veld in de content-beheerpagina, `GemiddeldePerRol` en de rol-kolommen in `groepProfiel` zijn verwijderd. `groepProfiel(assessment, scans)` heeft geen drempel meer.
+- **Voorbeelden uit de groep.** `groepVoorbeelden` (`lib/spanning.ts`) en `VoorbeeldenUitDeGroep` (`SpanningResultaat`): De antwoorden op de open vraag, anoniem, bij het veld waar ze bij horen, alleen voor een Lead met een zichtbare groep en in de voorbeeld-output (niet in de Rapportage in beheer). De demodata heeft er vier.
+- **De 6 velden als radar** op de Assessment-pagina (`SpanningVeldenSectie`): Zes taartpunten van 60°, rijen links en rechts, de kaart met de omschrijving, hover en klik naar de Toelichtingsmodal. De zes kaarten en hun CSS zijn verwijderd.
+- **Radar en staafdiagram zonder scroll, één tooltip tegelijk.** `CategorieStaafdiagram` kan twee reeksen (HTML en CSS, Recharts is eruit gehaald), `.resultaat-kaarten` is 460px voor de radar en de rest voor het diagram, het diagram wordt per kaart horizontaal op de binnenbreedte, de klassenamen staan in een kolom binnen de kaart, namen en nummers staan gecentreerd en worden vet bij hover, de as heeft één kleur, en `GrafiekActief.bron` zorgt dat de radar en het diagram nooit samen een tooltip tonen.
+- **Dossier voor de Lead.** Soortfilter, verdeling rechts van de radar (de laagste score eerst, 4 rijen en "Nog n bouwblokken tonen"), de rail "In dit dossier" met de secties Basis op orde brengen, Uitbouwen, Sterk punt en Algemeen, "Eerdere events tonen ({n})" per sectie en de lege regel "Voor deze keuze staat nog niets in het dossier." (`lib/dossier.ts`, `app/s/[code]/dossier/page.tsx`, `dossier.css`).
+- **Assessment-pagina.** De feature-cards komen niet meer terug op de pagina (de Quickscan houdt ze), en de zin over aantoonbaar bewijs staat in Praktisch.
+- **Help** (`npm run help`): "Een scan invullen", "Je resultaten lezen", "Drempels en termijnen" (de regel over de Spanningsmeter vervalt) en "Het dossier lezen".
+- **Tests**: Nieuwe en aangepaste tests in `lib/spanning.test.ts`, `lib/spanning-ui.test.tsx`, `lib/dossier.test.ts` en `lib/radar.test.tsx`.
+
+**Specs bijgewerkt**: `CLAUDE.md`, `dossier.md`, `visualisatie-spanningsmeter.md`, `stylesheet.md`, `content-spanningsmeter.md`, `backlog.md`.
+
+**Afwijkingen en interpretaties**: Zie `dossier.md` (Soortfilter, rail en verdeling) en `stylesheet.md` (Radar en staafdiagram op elke plek, zonder scroll, Zo gebouwd). De belangrijkste: De test op `scrollWidth` is geen browsertest maar een controle op de opmaak plus een meting in de browser bij 1231px en 1024px, de klassenamen staan alleen bij het diagram met twee reeksen, de breedte van de balkkolom in de verdeling is 230px zodat de klassenamen niet over elkaar lopen, en items van een Assessment waarvoor de Lead geen Resultaten mag zien staan in Algemeen.
+
+## 2026-10-21 (27) — Icoon van de Spanningsmeter: een meter met een bliksemflits als wijzer
+
+Op verzoek van Sander: Het icoon `gauge` is een halve meter met een lange, dunne bliksemflits als wijzer, die vanuit het draaipunt naar rechtsboven wijst. `GaugeIcon` (`components/icons/AssessmentIcons.tsx`) tekent de boog als lijn en de flits als gevulde vorm, 38° gedraaid om het draaipunt. Nieuw in `afbeeldingen/`: `assessment-icoon-gauge.svg` en `.png`. `stylesheet.md` (Assessment-icoon) is bijgewerkt. Tussendoor zijn een versie met een band met streepjes en een versie met een band boven een omlijnde flits geprobeerd, en Sander koos deze.
+
 ## 2026-10-21 (26) — Specs van Joost, PR 160: Dossier met Events en Blogs, koppeling aan AI-domeinen, radar van de AI-domeinen
 
 Op verzoek van Sander ("pull devops", daarna "ja bouw maar"): PR 160 (alleen specs) is gebouwd.

@@ -32,14 +32,14 @@ export default function VoorbeeldPage({
 
   const demoMeting = getDemoMetingScans(assessment.id);
 
-  // De Digitale Spanningsmeter toont in de voorbeeld-output de weergave Groep met demodata (`CLAUDE.md`, scherm 3).
+  // De Spanningsmeter toont in de voorbeeld-output de weergave Groep met demodata (`CLAUDE.md`, scherm 3).
   if (isSpanning(assessment)) {
     return (
       <PageWithChrome>
         <div className="container" style={{ padding: "3.5rem 2rem 4.5rem" }}>
           <SpanningResultaat
             assessment={assessment}
-            groep={{ scans: demoSpanningGroep, subregel: ["Voorbeeld", "Gemiddelde van 12 afgeronde scans"] }}
+            groep={{ scans: demoSpanningGroep, voorbeelden: true, subregel: ["Voorbeeld", "Gemiddelde van 12 afgeronde scans"] }}
             eyebrowGroep="Voorbeeld-output"
             kopRechts={
               <Link href={`/${assessment.id}`} className="btn btn-outline btn-compact">

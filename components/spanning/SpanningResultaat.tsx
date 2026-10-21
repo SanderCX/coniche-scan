@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Antwoord, Assessment, Bouwblok } from "@/lib/types";
-import { useInstellingen } from "@/lib/instellingen-store";
+import { Antwoord, Assessment } from "@/lib/types";
 import { veldKleur, tekstOpVeldKleur } from "@/lib/colors";
 import {
   GroepProfiel,
@@ -14,8 +13,9 @@ import {
   fmt1,
   fmtVerschil,
   groepProfiel,
+  groepVoorbeelden,
+  GroepVoorbeeld,
   niveauNaam,
-  rond1,
   spanningProfiel,
   veldKorteNaam,
 } from "@/lib/spanning";
@@ -45,6 +45,8 @@ export interface SpanningEigen {
 /** De groep: De afgeronde scans van een Meting. De aanroeper beslist of de groep getoond mag worden (`groepZichtbaar`). */
 export interface SpanningGroepInvoer {
   scans: SpanningScan[];
+  /** Toon de kaart Voorbeelden uit de groep: Alleen voor een Lead met een zichtbare groep (`visualisatie-spanningsmeter.md`, Anonimiteit). */
+  voorbeelden?: boolean;
   subregel: (string | null | undefined | false)[];
 }
 
@@ -65,11 +67,11 @@ export function ringVanGemiddeld(assessment: Assessment, gemiddeld: { score: num
 }
 
 /**
- * Het resultaat van de Digitale Spanningsmeter (`visualisatie-spanningsmeter.md`, Resultaat; `CLAUDE.md`, scherm 6): Eén pagina in
+ * Het resultaat van de Spanningsmeter (`visualisatie-spanningsmeter.md`, Resultaat; `CLAUDE.md`, scherm 6): Eén pagina in
  * twee weergaven, Jouw profiel (de antwoorden van één scan) en Groep (de afgeronde scans van een Meting). De schakelaar staat er
  * alleen als beide weergaven er zijn. Onder de Resultaatkop staat de Totaalkaart met het Gemiddeld niveau (een weergave en geen
  * score), twee kaarten met de belangrijkste spanning, de radar en de tabel Score per veld die elkaar oplichten, bij een groep de
- * uitsplitsing per rol, en De vijf niveaus. De open voorbeelden uit de groep staan er niet: De vrijgave is nog niet besloten.
+ * de voorbeelden uit de groep (alleen voor een Lead met een zichtbare groep) en De vijf niveaus.
  */
 export function SpanningResultaat({
   assessment,
@@ -94,13 +96,12 @@ export function SpanningResultaat({
   /** Rechts naast de titel, alleen in de voorbeeld-output: "← Terug". */
   kopRechts?: React.ReactNode;
 }) {
-  const { spanningMinPerRol } = useInstellingen();
   const [gekozen, setGekozen] = useState<Weergave>(begin ?? (eigen ? "eigen" : "groep"));
   const weergave: Weergave = gekozen === "groep" && !groep ? "eigen" : gekozen === "eigen" && !eigen ? "groep" : gekozen;
   const [actief, setActief] = useState<number | null>(null);
 
   const profiel = weergave === "eigen" && eigen ? spanningProfiel(assessment, eigen.antwoorden) : null;
-  const groepsprofiel = weergave === "groep" && groep ? groepProfiel(assessment, groep.scans, spanningMinPerRol) : null;
+  const groepsprofiel = weergave === "groep" && groep ? groepProfiel(assessment, groep.scans) : null;
   const gedeeld = groepsprofiel ?? profiel;
   if (!gedeeld) return null;
   const velden: (VeldScore | GroepVeld)[] = gedeeld.velden;
@@ -166,7 +167,7 @@ export function SpanningResultaat({
         </section>
       </div>
 
-      {groepsprofiel && groepsprofiel.rollen.length >= 2 && <GemiddeldePerRol assessment={assessment} groep={groepsprofiel} min={spanningMinPerRol} />}
+      {groepsprofiel && groep?.voorbeelden && <VoorbeeldenUitDeGroep voorbeelden={groepVoorbeelden(assessment, groep.scans)} />}
 
       <VijfNiveaus />
     </div>
@@ -441,62 +442,25 @@ function ScoreTabel({
   );
 }
 
-function GemiddeldePerRol({ assessment, groep, min }: { assessment: Assessment; groep: GroepProfiel; min: number }) {
-  const kolommen = groep.rollen;
-  const grootste = groep.grootsteRolVerschil;
+/**
+ * De kaart Voorbeelden uit de groep (`visualisatie-spanningsmeter.md`, Voorbeelden uit de groep): De antwoorden op de open vraag, zonder naam, zonder
+ * afdeling en zonder score, met het veld waar ze bij horen. Alleen voor een Lead met een zichtbare groep. Zonder voorbeelden staat de kaart er niet.
+ */
+function VoorbeeldenUitDeGroep({ voorbeelden }: { voorbeelden: GroepVoorbeeld[] }) {
+  if (voorbeelden.length === 0) return null;
   return (
-    <section className="resultaat-kaart sp-rol" aria-label="Gemiddelde per rol">
-      <div className="sp-rol-kop">
-        <h3>Gemiddelde per rol</h3>
-        <p>Een rol met minder dan {min} deelnemers staat niet in de tabel, zodat antwoorden anoniem blijven.</p>
-      </div>
-      <div className="sp-rol-tabel" style={{ gridTemplateColumns: `220px repeat(${kolommen.length}, minmax(96px, 1fr)) 110px` }} role="table">
-        <span />
-        {kolommen.map((k) => (
-          <span key={k.rolgroep} className="sp-rol-kolom" role="columnheader" title={k.rolgroep}>
-            <strong>{k.rolgroep}</strong>
-            <small>{k.scans} deelnemers</small>
-          </span>
-        ))}
-        <span className="sp-rol-kolom sp-rechts" role="columnheader">
-          <strong>Verschil</strong>
-        </span>
-        {groep.velden.map((v, vi) => (
-          <RolRij key={v.veld.id} assessment={assessment} veld={v.veld} kolommen={kolommen.map((k) => k.gemiddelden[vi])} verschil={groep.rolVerschil[vi]} grootste={grootste} />
+    <section className="resultaat-kaart sp-voorbeelden" aria-label="Voorbeelden uit de groep">
+      <h3>Voorbeelden uit de groep</h3>
+      <div className="sp-voorbeelden-raster">
+        {voorbeelden.map((v, i) => (
+          <blockquote key={`${v.veldId}-${i}`} className="sp-voorbeeld">
+            <span className="sp-voorbeeld-label">{v.veldNaam}</span>
+            <p>{v.tekst}</p>
+          </blockquote>
         ))}
       </div>
+      <p className="sp-voorbeelden-uitleg">Voorbeelden zijn anoniem en staan bij het veld waar ze bij horen. Ze krijgen geen score.</p>
     </section>
-  );
-}
-
-function RolRij({ assessment, veld, kolommen, verschil, grootste }: { assessment: Assessment; veld: Bouwblok; kolommen: (number | null)[]; verschil: number | null; grootste: number | null }) {
-  const is = verschil !== null && grootste !== null && rond1(verschil) === rond1(grootste);
-  return (
-    <>
-      <span className="sp-tabel-naam" role="rowheader" title={veld.naam}>
-        <span className="sp-nr" style={{ background: veldKleur(veld.volgnummer), color: tekstOpVeldKleur(veld.volgnummer) }}>
-          {veld.volgnummer}
-        </span>
-        <span className="sp-tabel-tekst">{veldKorteNaam(veld)}</span>
-      </span>
-      {kolommen.map((g, i) => {
-        const stap = g === null ? null : celStap(g);
-        return (
-          <span
-            key={i}
-            role="cell"
-            className="sp-rol-cel"
-            style={stap === null ? undefined : { background: `var(--score-${stap}-cel)`, color: `var(--score-${stap}-cel-tekst)` }}
-            title={g === null ? undefined : `${fmt1(g)}, ${niveauNaam(assessment, stap as Niveau)}`}
-          >
-            {g === null ? "–" : fmt1(g)}
-          </span>
-        );
-      })}
-      <span role="cell" className={`sp-rechts sp-rol-verschil ${is ? "is-grootste" : ""}`}>
-        {verschil === null ? "–" : fmt1(verschil)}
-      </span>
-    </>
   );
 }
 

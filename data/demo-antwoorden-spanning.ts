@@ -1,5 +1,5 @@
 /**
- * Voorbeelddata van de Digitale Spanningsmeter voor de voorbeeld-output en de film (`visualisatie-spanningsmeter.md`, Wat krijg ik):
+ * Voorbeelddata van de Spanningsmeter voor de voorbeeld-output en de film (`visualisatie-spanningsmeter.md`, Wat krijg ik):
  * De fictieve deelnemer en de fictieve groep van 12 scans uit het rekenvoorbeeld (`datamodel.md`, Scoreberekening, Spanningsmeter).
  * Gesloten deterministische data: Dezelfde getallen horen overal terug te komen (Technologie als grootste spanning, Gedrag het meest
  * uiteenlopend, groepsgemiddelden 3,6, 2,9, 2,7, 3,2, 2,5 en 3,9).
@@ -33,9 +33,8 @@ function metSom(som: number): number[] {
 }
 
 /**
- * De som van de vijf antwoorden per veld, per scan (12 scans: De eerste vijf direct met klanten, dan vier leidinggevenden en drie
- * MT en directie). De sommen zijn zo gekozen dat de groepsgemiddelden 3,6, 2,9, 2,7, 3,2, 2,5 en 3,9 zijn, dat Gedrag van 1,4 tot 4,0
- * loopt en dat de rolgroepen verschillen: MT en directie scoort Verhaal en Data hoger dan wie direct met klanten werkt.
+ * De som van de vijf antwoorden per veld, per scan (12 scans). De sommen zijn zo gekozen dat de groepsgemiddelden 3,6, 2,9, 2,7, 3,2, 2,5 en 3,9 zijn, dat Gedrag van 1,4 tot 4,0
+ * loopt.
  */
 const SOMMEN: number[][] = [
   [15, 15, 15, 15, 15, 18, 18, 18, 18, 23, 23, 23],
@@ -45,23 +44,18 @@ const SOMMEN: number[][] = [
   [11, 11, 11, 11, 11, 12, 12, 12, 12, 16, 16, 15],
   [20, 20, 20, 20, 20, 19, 19, 19, 19, 19, 19, 20],
 ];
-const ROLGROEPEN = [
-  "Direct met klanten",
-  "Direct met klanten",
-  "Direct met klanten",
-  "Direct met klanten",
-  "Direct met klanten",
-  "Leidinggevende",
-  "Leidinggevende",
-  "Leidinggevende",
-  "Leidinggevende",
-  "MT en directie",
-  "MT en directie",
-  "MT en directie",
-];
+/** Vier fictieve antwoorden op de open vraag (`Assessment.openVraag`), per scan en per veld: Voorbeelddata voor de kaart Voorbeelden uit de groep. */
+const OPMERKINGEN: Record<number, Record<number, string>> = {
+  1: { 3: "In het klantoverleg van maart bleek dat drie teams dezelfde klantvraag anders beantwoordden. Niemand voelde zich verantwoordelijk om dat recht te zetten." },
+  4: { 3: "Bij de introductie van de nieuwe chatbot kregen medewerkers één uur uitleg. Daarna moesten ze het zelf uitzoeken, en dat gebeurde nauwelijks." },
+  7: { 6: "Het CRM kan klantcontacten tonen, maar kanalen zijn niet gekoppeld. Een klant die belt na een chat begint steeds opnieuw." },
+  9: { 1: "In de strategiesessie van januari is de klantbelofte vastgesteld, maar de teams kennen haar niet en gebruiken haar niet bij prioriteiten." },
+};
 
-/** Twaalf fictieve scans van één Meting, met de verdeling over de drie rolgroepen van de Spanningsmeter. */
+/** Twaalf fictieve scans van één Meting. */
 export const demoSpanningGroep: SpanningScan[] = Array.from({ length: 12 }, (_, s) => ({
   antwoorden: uitWaarden(SOMMEN.map((veldSommen) => metSom(veldSommen[s]))),
-  rolgroep: ROLGROEPEN[s],
+  opmerkingen: Object.fromEntries(
+    Object.entries(OPMERKINGEN[s] ?? {}).map(([veldnr, tekst]) => [velden[Number(veldnr) - 1].id, tekst])
+  ),
 }));
