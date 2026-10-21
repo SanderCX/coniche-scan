@@ -7,6 +7,7 @@ import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { KenmerkenKaart } from "@/components/beheer/KenmerkenKaart";
 import { KpiBlok } from "@/components/beheer/KpiBlok";
 import { AfsprakenKaart } from "@/components/beheer/AfsprakenKaart";
+import { DossierKaart } from "@/components/beheer/DossierKaart";
 import { ToegangKaart } from "@/components/beheer/ToegangKaart";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { RespondentStatusBadge } from "@/components/beheer/overzicht-helpers";
@@ -176,6 +177,8 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
           <AfsprakenKaart organisatie={organisatie} />
         </div>
       )}
+      {/* Het Dossier (`dossier.md`) staat onder Toegang en Afspraken en boven de KPI's, voor een Admin en voor een Consultant met toegang. */}
+      <DossierKaart organisatie={organisatie} />
       <KpiBlok organisatie={organisatie} />
 
       <MetingenSectie organisatie={organisatie} />

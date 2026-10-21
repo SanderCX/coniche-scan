@@ -16,6 +16,12 @@ import { GrafiekActief, ZetActief, groepSleutel, staatVan, useGrafiekActief } fr
  * taartpunt gaat naar 50%, de score-stip verschijnt op de veelhoek en wat bij een andere categorie hoort, dimt. De tooltip staat buiten de
  * radar: Boven of onder een knooppunt dichtbij de verticale as, anders in de hoek van het kwadrant.
  *
+ * `filter` (de filtermodus op de Dossierpagina, `stylesheet.md`, Filtermodus op de Dossierpagina; `dossier.md`, Radar met filter): Alleen de
+ * bouwblokken in `actief` zijn knoppen (gevuld in de categoriekleur, `aria-pressed`), de rest staat op 40% en heeft alleen de tooltip. Een klik
+ * kiest dat bouwblok, een tweede klik heft de keuze op. Het gekozen bouwblok krijgt een tweede ring en 50% dekking in de taartpunt, en de
+ * score-stip staat alleen bij de actieve bouwblokken. Zonder scores (`score: null` bij alle bouwblokken) ontbreken de veelhoek, de stippen en de
+ * reeks in de legenda.
+ *
  * `vergelijking`: Een tweede reeks, bijvoorbeeld de rest van de groep in een benchmark (`benchmark.md`, View per organisatie): Een lijn met
  * streepjes in `--ink`, en de tooltip toont beide scores.
  */
@@ -37,6 +43,15 @@ const punt = (straal: number, h: number) => [MIDDEN + straal * Math.cos(h), MIDD
 /** De dekking van een taartpunt: 20% standaard, 50% voor wat actief is en 9% voor wat bij een andere categorie hoort. */
 const TAART_DEKKING = { normaal: 0.2, actief: 0.5, groep: 0.2, gedimd: 0.09 } as const;
 
+/** De filtermodus van de radar (`dossier.md`, Radar met filter). */
+export interface RadarFilter {
+  /** `Bouwblok.id` van de bouwblokken die een filter zijn. */
+  actief: ReadonlySet<string>;
+  /** Het gekozen bouwblok, of `null`. */
+  gekozen: string | null;
+  onKies: (bouwblokId: string | null) => void;
+}
+
 export function RadarChartView({
   resultaten,
   vergelijking,
@@ -44,6 +59,7 @@ export function RadarChartView({
   vergelijkingNaam = "Rest van de groep",
   actief,
   onActief,
+  filter,
 }: {
   resultaten: BouwblokResultaat[];
   vergelijking?: BouwblokResultaat[];
@@ -52,6 +68,7 @@ export function RadarChartView({
   /** De actieve staat van de ouder, zodat de radar en het staafdiagram elkaar oplichten. Zonder: Een eigen staat. */
   actief?: GrafiekActief | null;
   onActief?: ZetActief;
+  filter?: RadarFilter;
 }) {
   const { actief: a, zet } = useGrafiekActief({ actief, onActief });
   const n = resultaten.length;
@@ -63,6 +80,8 @@ export function RadarChartView({
       .map((r, i) => punt(radiaal(r.score ?? SCHAAL_MIN), hoek(i, n)).map((v) => v.toFixed(1)).join(","))
       .join(" ");
   const sleutelVan = (r: BouwblokResultaat) => groepSleutel(r.groepId, r.bouwblok.id);
+  // In de filtermodus zonder scores (de Lead mag geen Resultaten zien) staat er geen veelhoek.
+  const toonVlak = !filter || resultaten.some((r) => r.score !== null);
 
   return (
     <div className="radar">
@@ -79,7 +98,9 @@ export function RadarChartView({
                 className="radar-taart"
                 d={`M${MIDDEN},${MIDDEN} L${x1.toFixed(1)},${y1.toFixed(1)} A${STRAAL},${STRAAL} 0 0 1 ${x2.toFixed(1)},${y2.toFixed(1)} Z`}
                 fill={kleurVan(r)}
-                fillOpacity={TAART_DEKKING[staatVan(a, sleutelVan(r), r.bouwblok.id)]}
+                fillOpacity={
+                  filter ? (filter.gekozen === r.bouwblok.id ? TAART_DEKKING.actief : TAART_DEKKING.normaal) : TAART_DEKKING[staatVan(a, sleutelVan(r), r.bouwblok.id)]
+                }
                 stroke="#fff"
                 strokeWidth={1}
               />
@@ -93,10 +114,10 @@ export function RadarChartView({
             <circle key={s} cx={MIDDEN} cy={MIDDEN} r={radiaal(s)} fill="none" stroke="#9a978f" strokeWidth={1} strokeDasharray="3 3" />
           ))}
           {vergelijking && <polygon points={polygoon(vergelijking)} fill="var(--ink)" fillOpacity={0.08} stroke="var(--ink)" strokeWidth={2} strokeDasharray="4 3" />}
-          <polygon points={polygoon(resultaten)} fill="var(--or)" fillOpacity={0.18} stroke="var(--or)" strokeWidth={2} strokeLinejoin="round" />
+          {toonVlak && <polygon points={polygoon(resultaten)} fill="var(--or)" fillOpacity={0.18} stroke="var(--or)" strokeWidth={2} strokeLinejoin="round" />}
           {/* De score-stippen van wat actief is: 10px met een witte rand van 2px, `--or` voor de reeks Organisatie en `--ink` voor de rest van de groep. */}
           {resultaten.map((r, i) => {
-            if (staatVan(a, sleutelVan(r), r.bouwblok.id) !== "actief") return null;
+            if (filter ? !filter.actief.has(r.bouwblok.id) || r.score === null : staatVan(a, sleutelVan(r), r.bouwblok.id) !== "actief") return null;
             const h = hoek(i, n);
             const [x, y] = punt(radiaal(r.score ?? SCHAAL_MIN), h);
             const vgl = vergelijking?.[i];
@@ -119,6 +140,15 @@ export function RadarChartView({
           const sleutel = sleutelVan(r);
           const staat = staatVan(a, sleutel, r.bouwblok.id);
           const zichtbaar = a?.bouwblokId === r.bouwblok.id;
+          const isFilter = !!filter && filter.actief.has(r.bouwblok.id);
+          const isGekozen = !!filter && filter.gekozen === r.bouwblok.id;
+          const knoopKlasse = filter
+            ? `${isFilter ? "is-filter" : "is-gedimd is-inactief"} ${isGekozen ? "is-gekozen" : ""}`
+            : staat === "actief"
+              ? "is-actief"
+              : staat === "gedimd"
+                ? "is-gedimd"
+                : "";
           const label = [
             `${r.bouwblok.volgnummer}, ${r.bouwblok.naam}${factor ? `, ${factor}` : ""}`,
             score === null ? "geen score" : `${formatScore(score)}${klasse ? `, ${klasse}` : ""}`,
@@ -140,7 +170,7 @@ export function RadarChartView({
             <span key={r.bouwblok.id}>
               <button
                 type="button"
-                className={`radar-knoop ${staat === "actief" ? "is-actief" : staat === "gedimd" ? "is-gedimd" : ""}`}
+                className={`radar-knoop ${knoopKlasse}`}
                 style={{
                   left: `${(x / MAAT) * 100}%`,
                   top: `${(y / MAAT) * 100}%`,
@@ -148,6 +178,9 @@ export function RadarChartView({
                   ["--knoop-tekst" as string]: tekstOpKleur(kleur),
                 }}
                 aria-label={label}
+                aria-pressed={filter && isFilter ? isGekozen : undefined}
+                aria-disabled={filter && !isFilter ? true : undefined}
+                onClick={filter && isFilter ? () => filter.onKies(isGekozen ? null : r.bouwblok.id) : undefined}
                 onMouseEnter={zet_}
                 onMouseLeave={() => zet(null)}
                 onFocus={zet_}
@@ -172,10 +205,12 @@ export function RadarChartView({
                     </span>
                   </>
                 ) : (
-                  <span>
-                    {score === null ? "–" : formatScore(score)}
-                    {klasse ? ` · ${klasse}` : ""}
-                  </span>
+                  (!filter || score !== null) && (
+                    <span>
+                      {score === null ? "–" : formatScore(score)}
+                      {klasse ? ` · ${klasse}` : ""}
+                    </span>
+                  )
                 )}
               </span>
             </span>
@@ -183,12 +218,14 @@ export function RadarChartView({
         })}
       </div>
       <ul className="radar-legenda" aria-label="Legenda">
-        <li>
-          <svg width="28" height="4" viewBox="0 0 28 4" aria-hidden="true">
-            <line x1="0" y1="2" x2="28" y2="2" stroke="var(--or)" strokeWidth="2" />
-          </svg>
-          {naam}
-        </li>
+        {toonVlak && (
+          <li>
+            <svg width="28" height="4" viewBox="0 0 28 4" aria-hidden="true">
+              <line x1="0" y1="2" x2="28" y2="2" stroke="var(--or)" strokeWidth="2" />
+            </svg>
+            {naam}
+          </li>
+        )}
         {vergelijking && (
           <li>
             <svg width="28" height="4" viewBox="0 0 28 4" aria-hidden="true">

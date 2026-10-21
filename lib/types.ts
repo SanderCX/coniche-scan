@@ -285,7 +285,7 @@ export interface Onderdeel {
   aangemaaktOp: string;
 }
 
-/** Een relevante contactpersoon bij een Organisatie, met een LinkedIn-profiel (`datamodel.md`, Contactpersoon en Nieuwsartikel). Geen Respondent en geen gebruiker. */
+/** Een relevante contactpersoon bij een Organisatie, met een LinkedIn-profiel (`datamodel.md`, Contactpersoon). Geen Respondent en geen gebruiker. */
 export interface Contactpersoon {
   id: string;
   naam: string;
@@ -298,19 +298,47 @@ export interface Contactpersoon {
   aangemaaktOp: string;
 }
 
-/** Een relevant nieuwsartikel over een Organisatie, met een link (`datamodel.md`, Contactpersoon en Nieuwsartikel). */
-export interface Nieuwsartikel {
+/**
+ * Een item in het Dossier van een Organisatie (`datamodel.md`, Dossieritem; `dossier.md`): Nieuws of een Case. De velden onder "alleen
+ * Nieuws" en "alleen Case" zijn bij het andere soort leeg.
+ */
+export interface Dossieritem {
   id: string;
+  /** Staat vast na het aanmaken. */
+  soort: "nieuws" | "case";
   titel: string;
-  /** Het adres van het artikel, altijd http of https. */
+  /** Voor Nieuws de reden waarom het relevant is, voor een Case "Waarom dit voor jullie telt". De Lead leest deze tekst. */
+  toelichting: string;
+  zichtbaarVoorLead: boolean;
+  /** `Bouwblok.id` van de Klantcontact Volwassenheidsscan. */
+  bouwblokIds: string[];
+  /** Nieuws: verplicht. Case: optioneel. Altijd http of https. */
   url: string;
-  /** De publicatie of de site, vrije tekst. */
-  bron: string;
-  /** De publicatiedatum (jjjj-mm-dd), leeg als die onbekend is. */
-  gepubliceerdOp: string;
-  /** Waarom het artikel relevant is, vrije tekst. */
-  notitie: string;
   aangemaaktOp: string;
+  gewijzigdOp: string;
+  /** Alleen Nieuws: De publicatie of de site. */
+  bron: string;
+  /** Alleen Nieuws: jjjj-mm-dd, leeg als het onbekend is. */
+  gepubliceerdOp: string;
+  /** Alleen Case: Verplicht. */
+  samenvatting: string;
+  /** Alleen Case: De Organisatie waar de case over gaat, `null` als die is verwijderd of nog niet is gekozen. */
+  caseOrganisatieId: string | null;
+  /** Alleen Case: Bijvoorbeeld "800 medewerkers". */
+  omvang: string;
+  /** Alleen Case: Bijvoorbeeld "6 weken". */
+  totResultaat: string;
+}
+
+/** Het Dossier van een Organisatie (`datamodel.md`, Dossieritem). */
+export interface Dossier {
+  /** Of de Leads van de Organisatie het Dossier zien. Standaard `false`. */
+  openVoorLead: boolean;
+  /** Het moment waarop `openVoorLead` voor het laatst aan ging. */
+  openSinds: string | null;
+  /** De laatste wijziging in wat een Lead ziet. */
+  gewijzigdOp: string | null;
+  items: Dossieritem[];
 }
 
 export interface Organisatie {
@@ -318,8 +346,13 @@ export interface Organisatie {
   naam: string;
   /** Relevante contactpersonen, op alfabet getoond. Ontbreekt bij data van vóór dit veld. */
   contactpersonen?: Contactpersoon[];
-  /** Relevante nieuwsartikelen, het nieuwste bovenaan getoond. Ontbreekt bij data van vóór dit veld. */
-  nieuwsartikelen?: Nieuwsartikel[];
+  /** Het Dossier met Nieuws en Cases (`dossier.md`). Ontbreekt bij data van vóór dit veld, dan is het leeg en dicht. */
+  dossier?: Dossier;
+  /**
+   * Of deze Organisatie als Case bij een andere Organisatie mag voorkomen (`datamodel.md` deel 3, Uitbreiding op Organisatie, de Afspraak
+   * "Mag als case gebruikt worden"). Standaard `false`.
+   */
+  caseToegestaan?: boolean;
   /** De Onderdelen van deze Organisatie, één keer per Organisatie. "Hele organisatie" is er geen van. Ontbreekt bij data van vóór dit veld. */
   onderdelen?: Onderdeel[];
   /** De KPI-waarden van deze Organisatie, per plek (Onderdeel), kanaal en KPI (`datamodel.md`, KPI's en kanalen). Ontbreekt bij data van vóór dit veld. */
@@ -404,6 +437,11 @@ export interface OrganisatieLid {
    */
   leadMetingIds?: string[];
   leadVoorOrganisatie?: boolean;
+  /**
+   * Het moment waarop de Lead de Dossierpagina voor het laatst opende (`dossier.md`, Mijn metingen: De tag "Nieuw"). `null` of
+   * ontbrekend: Nog nooit.
+   */
+  dossierGezienOp?: string | null;
   aangemaaktOp: string;
 }
 

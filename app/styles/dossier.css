@@ -1,0 +1,415 @@
+/* ---------- Dossierpagina van een Lead (`dossier.md`, Scherm 5) ---------- */
+.dp-pagina {
+  padding-top: var(--sp-8);
+  padding-bottom: var(--sp-12);
+}
+.dp-kop {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-8);
+  overflow: hidden;
+  padding: var(--sp-8);
+  border-radius: 10px;
+  background: var(--or-faint);
+}
+/* Concentrische cirkels in `--or-mid` rechts in de kop, zonder paars. */
+.dp-kop::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -120px;
+  width: 420px;
+  height: 420px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, transparent 0, transparent 38px, var(--or-mid) 38px, var(--or-mid) 40px);
+  opacity: 0.7;
+  pointer-events: none;
+}
+.dp-kop-tekst,
+.dp-tegels {
+  position: relative;
+  z-index: 1;
+}
+.dp-kop-tekst {
+  max-width: 600px;
+}
+.dp-eyebrow {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dal);
+}
+.dp-kop-tekst h1 {
+  margin: var(--sp-2) 0 var(--sp-3);
+}
+.dp-kop-tekst p {
+  margin: 0;
+  font-size: var(--fs-16);
+  color: var(--ink-m);
+}
+.dp-kop-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+.dp-kopchip {
+  padding: 4px var(--sp-3);
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: var(--fs-12);
+  font-weight: 600;
+  color: var(--ink-m);
+}
+.dp-tegels {
+  display: flex;
+  gap: var(--sp-4);
+}
+.dp-tegel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 128px;
+  padding: var(--sp-4) var(--sp-6);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.dp-tegel strong {
+  font-size: var(--fs-32);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--ink);
+}
+.dp-tegel span {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+
+.dp-radarkaart {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--sp-8);
+  align-items: center;
+  margin-top: var(--sp-8);
+  padding: var(--sp-8);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-warm);
+}
+.dp-radar {
+  max-width: 420px;
+  margin: 0 auto;
+  width: 100%;
+}
+.dp-radarlijst h2 {
+  margin: 0;
+  font-size: var(--fs-18);
+  font-weight: 700;
+}
+.dp-radarlijst-sub {
+  margin: var(--sp-1) 0 var(--sp-4);
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.dp-radarlijst ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dp-radarrij {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--bg);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.dp-radarrij:hover {
+  border-color: var(--or);
+}
+.dp-radarrij.is-gekozen {
+  border-color: var(--or);
+  background: var(--or-faint);
+}
+.dp-radarrij-tekst {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.dp-radarrij-tekst strong {
+  font-size: var(--fs-14);
+  font-weight: 700;
+  color: var(--ink);
+}
+.dp-radarrij-tekst span {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.dp-radarrij-aantal {
+  flex: none;
+  padding: 2px var(--sp-2);
+  border-radius: 999px;
+  background: var(--bg-mid);
+  font-size: var(--fs-12);
+  font-weight: 600;
+  color: var(--ink-m);
+}
+
+.dp-filterbalk {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r);
+  background: var(--or-faint);
+}
+.dp-filterbalk-tekst {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+.dp-filterbalk-tekst strong {
+  font-size: var(--fs-14);
+  color: var(--ink);
+}
+.dp-filterbalk-tekst span {
+  font-size: var(--fs-12);
+  color: var(--ink-m);
+}
+
+.dp-sectie {
+  margin-top: var(--sp-12);
+}
+.dp-sectiekop {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-6);
+}
+.dp-sectiekop h2 {
+  margin: 0;
+  font-size: var(--fs-24);
+  font-weight: 800;
+}
+.dp-sectiekop p {
+  margin: 0;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.dp-sectie-icoon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+.dp-sectie-icoon--case {
+  background: var(--or-faint);
+  color: var(--or);
+}
+.dp-sectie-icoon--nieuws {
+  background: var(--bl-faint);
+  color: var(--bl);
+}
+
+.dp-case {
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr);
+  margin-bottom: var(--sp-6);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.dp-case-blok {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-6);
+  background: var(--or);
+  color: #fff;
+}
+.dp-case-blok strong {
+  font-size: var(--fs-32);
+  font-weight: 800;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+/* Een lange branche (de korte naam van een Sector) past niet op 32px in een blok van 168px. */
+.dp-case-blok--lang strong {
+  font-size: var(--fs-24);
+}
+.dp-case-blok span {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.dp-case-inhoud {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-6) var(--sp-8);
+}
+.dp-case-inhoud h3 {
+  margin: 0;
+  font-size: var(--fs-24);
+  font-weight: 800;
+}
+.dp-case-samenvatting {
+  margin: 0;
+  font-size: var(--fs-16);
+  color: var(--ink-m);
+}
+.dp-badge {
+  padding: 2px var(--sp-2);
+  border-radius: 3px;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.dp-badge--case {
+  background: var(--or-faint);
+  color: var(--dal);
+}
+.dp-case-tegels {
+  display: flex;
+  gap: var(--sp-4);
+}
+.dp-case-tegel {
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--bg-warm);
+}
+.dp-case-tegel span {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.dp-case-tegel strong {
+  font-size: var(--fs-16);
+  font-weight: 700;
+  color: var(--ink);
+}
+.dp-waarom {
+  width: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--or-mid);
+  border-radius: var(--r);
+  background: var(--or-faint);
+}
+.dp-waarom span {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dal);
+}
+.dp-waarom p {
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-14);
+  color: var(--ink);
+}
+.dp-case-voet {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  width: 100%;
+}
+.dp-gaatover {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.dp-gaatover > span {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+
+.dp-nieuws {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-6);
+  margin-bottom: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.dp-datumtegel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--r);
+  background: var(--bl-faint);
+  color: var(--bl);
+}
+.dp-datumtegel span {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.dp-datumtegel strong {
+  font-size: var(--fs-24);
+  font-weight: 800;
+  line-height: 1.1;
+}
+.dp-nieuws-tekst {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+.dp-nieuws-titel {
+  font-size: var(--fs-18);
+  font-weight: 700;
+  color: var(--ink);
+}
+.dp-nieuws-titel:hover {
+  color: var(--or);
+}
+.dp-nieuws-bron {
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.dp-nieuws-tekst p {
+  margin: var(--sp-1) 0;
+  font-size: var(--fs-14);
+  color: var(--ink-m);
+}
+.dp-slot {
+  margin-top: var(--sp-12);
+  text-align: center;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}

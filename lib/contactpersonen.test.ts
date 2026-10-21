@@ -1,13 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  contactpersonenOpAlfabet,
-  controleerContactpersoon,
-  controleerNieuwsartikel,
-  isLinkedinAdres,
-  nieuwsNieuwsteEerst,
-  normaliseerUrl,
-} from "./contacten-nieuws";
-import type { Nieuwsartikel, Organisatie } from "./types";
+import { contactpersonenOpAlfabet, controleerContactpersoon, isLinkedinAdres, normaliseerUrl } from "./contactpersonen";
+import type { Organisatie } from "./types";
 
 const opslag = new Map<string, string>();
 const KEY = "coniche-scan:organisaties";
@@ -62,24 +55,15 @@ describe("controle van de invoer", () => {
     expect(controleerContactpersoon({ naam: "A", functie: "", linkedinUrl: "https://twitter.com/a", notitie: "" }).ok).toBe(false);
     expect(controleerContactpersoon({ naam: "A", functie: "", linkedinUrl: "", notitie: "" }).ok).toBe(true);
   });
-  it("een nieuwsartikel heeft een titel en een geldig adres nodig, de datum is optioneel", () => {
-    expect(controleerNieuwsartikel({ titel: "", url: "https://nu.nl/a", bron: "", gepubliceerdOp: "", notitie: "" }).ok).toBe(false);
-    expect(controleerNieuwsartikel({ titel: "T", url: "", bron: "", gepubliceerdOp: "", notitie: "" }).ok).toBe(false);
-    expect(controleerNieuwsartikel({ titel: "T", url: "javascript:x", bron: "", gepubliceerdOp: "", notitie: "" }).ok).toBe(false);
-    expect(controleerNieuwsartikel({ titel: "T", url: "https://nu.nl/a", bron: "", gepubliceerdOp: "31-02-2026", notitie: "" }).ok).toBe(false);
-    expect(controleerNieuwsartikel({ titel: "T", url: "https://nu.nl/a", bron: "NU.nl", gepubliceerdOp: "2026-10-14", notitie: "" }).ok).toBe(true);
-  });
 });
 
 describe("volgorde", () => {
-  it("contactpersonen staan op alfabet, nieuws met het nieuwste bovenaan", () => {
+  it("contactpersonen staan op alfabet", () => {
     const c = contactpersonenOpAlfabet([
       { id: "1", naam: "Zoë", functie: "", linkedinUrl: "", notitie: "", aangemaaktOp: "x" },
       { id: "2", naam: "anna", functie: "", linkedinUrl: "", notitie: "", aangemaaktOp: "x" },
     ]);
     expect(c.map((p) => p.naam)).toEqual(["anna", "Zoë"]);
-    const n = (id: string, gepubliceerdOp: string, aangemaaktOp: string): Nieuwsartikel => ({ id, titel: id, url: "https://x.nl", bron: "", gepubliceerdOp, notitie: "", aangemaaktOp });
-    expect(nieuwsNieuwsteEerst([n("oud", "2026-01-01", "2026-10-01T00:00:00Z"), n("nieuw", "2026-09-01", "2026-09-02T00:00:00Z"), n("zonderDatum", "", "2026-10-19T08:00:00Z")]).map((x) => x.id)).toEqual(["zonderDatum", "nieuw", "oud"]);
   });
 });
 
@@ -102,36 +86,20 @@ describe("opslaan, wijzigen en verwijderen", () => {
     zet();
     expect(db.voegContactpersoonToe("O", { naam: "", functie: "", linkedinUrl: "", notitie: "" }).ok).toBe(false);
     expect(laad().contactpersonen ?? []).toHaveLength(0);
-    db.voegNieuwsartikelToe("O", { titel: "Groei", url: "https://nu.nl/a", bron: "", gepubliceerdOp: "", notitie: "" });
-    const id = laad().nieuwsartikelen![0].id;
+    const anna = (db.voegContactpersoonToe("O", { naam: "Anna", functie: "CX", linkedinUrl: "", notitie: "" }) as { ok: true; contactpersoon: { id: string } }).contactpersoon.id;
     const voor = audit().length;
-    expect(db.wijzigNieuwsartikel("O", id, { titel: "Groei", url: "https://nu.nl/a", bron: "", gepubliceerdOp: "", notitie: "" }).ok).toBe(true);
+    expect(db.wijzigContactpersoon("O", anna, { naam: "Anna", functie: "CX", linkedinUrl: "", notitie: "" }).ok).toBe(true);
     expect(audit()).toHaveLength(voor);
-  });
-  it("een nieuwsartikel wordt toegevoegd, gewijzigd en verwijderd, en de titel staat in de audit-log", () => {
-    zet();
-    db.voegNieuwsartikelToe("O", { titel: "Overname aangekondigd", url: "nu.nl/overname", bron: "NU.nl", gepubliceerdOp: "2026-10-14", notitie: "" });
-    expect(laad().nieuwsartikelen![0].url).toBe("https://nu.nl/overname");
-    const id = laad().nieuwsartikelen![0].id;
-    db.wijzigNieuwsartikel("O", id, { titel: "Overname bevestigd", url: "https://nu.nl/overname", bron: "NU.nl", gepubliceerdOp: "2026-10-14", notitie: "" });
-    db.verwijderNieuwsartikel("O", id);
-    expect(laad().nieuwsartikelen).toHaveLength(0);
-    expect(audit().filter((e) => e.actie.startsWith("nieuwsartikel.")).map((e) => e.actie)).toEqual([
-      "nieuwsartikel.toegevoegd", "nieuwsartikel.gewijzigd", "nieuwsartikel.verwijderd",
-    ]);
-    expect(audit().find((e) => e.actie === "nieuwsartikel.toegevoegd")?.entiteitNaam).toBe("Overname aangekondigd");
   });
   it("een onbekende Organisatie of id geeft een fout", () => {
     zet();
     expect(db.voegContactpersoonToe("X", { naam: "A", functie: "", linkedinUrl: "", notitie: "" }).ok).toBe(false);
     expect(db.verwijderContactpersoon("O", "nope").ok).toBe(false);
-    expect(db.verwijderNieuwsartikel("O", "nope").ok).toBe(false);
   });
-  it("een organisatie van vóór deze velden laadt met lege lijsten", () => {
-    const { contactpersonen, nieuwsartikelen, ...oud } = { ...org(), contactpersonen: [], nieuwsartikelen: [] };
-    void contactpersonen; void nieuwsartikelen;
+  it("een organisatie van vóór deze velden laadt met een lege lijst", () => {
+    const { contactpersonen, ...oud } = { ...org(), contactpersonen: [] };
+    void contactpersonen;
     opslag.set(KEY, JSON.stringify([oud]));
     expect(db.laadAlles()[0].contactpersonen).toEqual([]);
-    expect(db.laadAlles()[0].nieuwsartikelen).toEqual([]);
   });
 });

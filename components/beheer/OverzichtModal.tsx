@@ -18,12 +18,15 @@ export function OverzichtModal({
   onSluit,
   escUitgeschakeld = false,
   vol = false,
+  className = "",
   children,
 }: {
   label: string;
   onSluit: () => void;
   escUitgeschakeld?: boolean;
   vol?: boolean;
+  /** Een extra klasse op de modal, bijvoorbeeld `modal-box--dossier` voor een smallere modal. */
+  className?: string;
   children: React.ReactNode;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
@@ -40,7 +43,7 @@ export function OverzichtModal({
 
   return (
     <div className="modal-overlay" onClick={onSluit} role="dialog" aria-modal="true" aria-label={label}>
-      <div className={`modal-box ${vol ? "modal-box--vol" : "modal-box--breed"}`} ref={boxRef} tabIndex={-1} onClick={(e) => e.stopPropagation()}>
+      <div className={`modal-box ${vol ? "modal-box--vol" : "modal-box--breed"} ${className}`.trim()} ref={boxRef} tabIndex={-1} onClick={(e) => e.stopPropagation()}>
         <button type="button" onClick={onSluit} aria-label="Sluiten" className="modal-close">
           ✕
         </button>

@@ -53,11 +53,28 @@ export function magBenchmarkBeheren(gebruiker: Gebruiker | null): boolean {
 
 /**
  * `contactpersonen.bewerken` (`datamodel.md` deel 2, Rechtenmatrix; `datamodel.md`, Contactpersoon en Nieuwsartikel, Recht en slot):
- * Contactpersonen en Nieuwsartikelen aanmaken, wijzigen en verwijderen. Vooralsnog alleen een Admin (besloten op 20 oktober 2026): Een
+ * Contactpersonen aanmaken, wijzigen en verwijderen. Vooralsnog alleen een Admin (besloten op 20 oktober 2026): Een
  * Consultant ziet ze bij de eigen Organisaties zonder de knoppen om te wijzigen. Later krijgt een Consultant het recht ook, beperkt
  * tot eigen Organisaties: Dan verandert alleen deze functie.
  */
 export function magContactpersonenBewerken(gebruiker: Gebruiker | null): boolean {
+  return isAdmin(gebruiker);
+}
+
+/**
+ * `dossier.bewerken` (`dossier.md`, Rechten): Items van het Dossier aanmaken, wijzigen en verwijderen, Zichtbaar voor klant en Open voor Lead.
+ * Alle Organisaties voor een Admin, de eigen Organisaties voor een Consultant (hetzelfde bereik als `organisaties.bewerken`). Ook
+ * `dossier.inzien` voor de beheerkant gebruikt dit bereik. Een Lead leest het Dossier via `leadDossier` (`lib/dossier.ts`).
+ */
+export function magDossierBewerken(
+  gebruiker: Gebruiker | null,
+  organisatie: Pick<Organisatie, "aangemaaktDoor" | "toegewezenAan">
+): boolean {
+  return magOrganisatieToegang(gebruiker, organisatie);
+}
+
+/** De Afspraak "Mag als case gebruikt worden" (`dossier.md`, Rechten): Blijft bij een Admin, net als de andere twee Afspraken. */
+export function magCaseVlagZetten(gebruiker: Gebruiker | null): boolean {
   return isAdmin(gebruiker);
 }
 

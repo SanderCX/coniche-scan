@@ -293,13 +293,13 @@ Contactpersoon {
 - **Geen Respondent, geen gebruiker.** Een Contactpersoon heeft geen e-mailadres, geen toegangscode en geen rol. Er wordt niets naartoe gestuurd, en ze doen niet mee in een scan, een benchmark of een export.
 - **LinkedIn-adres.** Optioneel. Wat is ingevuld, moet een adres van `linkedin.com` of een subdomein zijn (de controle is op het domein, niet op de tekst). Zonder schema wordt `https://` voorgezet. Een ander domein wordt geweigerd.
 - **Volgorde.** Op alfabet, hoofdletterongevoelig.
-- **Recht en slot.** Aanmaken, wijzigen en verwijderen vraagt het recht `contactpersonen.bewerken` en het Bewerkslot van de Organisatie, zoals bij de Kenmerken. Vooralsnog heeft alleen een Admin dat recht (alle Organisaties), besloten op 20 oktober 2026; de eerste bouw gebruikte `organisaties.bewerken` en moet worden aangepast. Een Consultant ziet de lijst bij de eigen Organisaties, zonder de knoppen om te wijzigen. Als de functie stabiel is, krijgt een Consultant het recht ook, beperkt tot eigen Organisaties (zoals bij `organisaties.bewerken`); dan verandert alleen de rechtenmatrix. Een Lead en een Respondent zien ze niet.
+- **Recht en slot.** Aanmaken, wijzigen en verwijderen vraagt het recht `contactpersonen.bewerken` en het Bewerkslot van de Organisatie, zoals bij de Kenmerken. Vooralsnog heeft alleen een Admin dat recht (alle Organisaties), besloten op 20 oktober 2026 en gebouwd (`magContactpersonenBewerken`, `lib/rechten.ts`). Een Consultant ziet de lijst bij de eigen Organisaties, zonder de knoppen om te wijzigen. Als de functie stabiel is, krijgt een Consultant het recht ook, beperkt tot eigen Organisaties (zoals bij `organisaties.bewerken`); dan verandert alleen de rechtenmatrix. Een Lead en een Respondent zien ze niet.
 - **Verwijderen.** Een eigen verwijderactie per item, met bevestiging. Wordt de Organisatie verwijderd, dan gaan ze mee (Verwijderen en datakoppelingen).
 - **Privacy.** Een Contactpersoon is een persoon buiten de app, en een naam met functie blijft ook als die openbaar is een persoonsgegeven. Daarom staan hun gegevens niet in de audit-log (Audit) en niet in de exports (`export-csv.md`, `export-indesign.md` en `import-scans.md` noemen dat). Alleen openbaar vindbare, zakelijke gegevens zijn toegestaan: Naam, functie, het LinkedIn-profiel en een zakelijke notitie. Geen privégegevens, zoals een privé e-mailadres, telefoonnummer, woonadres of geboortedatum, en niets over de persoon als privépersoon. Onder het veld Notitie staat een korte waarschuwing met die regel, omdat een vrij tekstveld de plek is waar zoiets ongemerkt binnenkomt. Wat er is vastgelegd, is wat Coniche uit openbare bronnen weet, en Coniche is er verantwoordelijk voor dat dat klopt (besloten op 20 oktober 2026).
 
 ### Dossieritem
 
-**Voorstel van 20 oktober 2026, nog niet gebouwd.** Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws en Cases, en kan het openzetten voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
+**Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026.** Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws en Cases, en kan het openzetten voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
 
 ```
 Organisatie.dossier {
@@ -685,10 +685,13 @@ verwijst wat niet meer bestaat.
   19 oktober 2026) Onderdelen en KPI-waarden, en (gebouwd op 20 oktober 2026)
   Contactpersonen en het Dossier. Het
   assessment-type en de content blijven staan.
-- **Organisatie die in een Case voorkomt** (voorstel van 20 oktober 2026):
+- **Organisatie die in een Case voorkomt** (gebouwd op 21 oktober 2026):
   De Cases bij andere Organisaties die naar haar verwijzen krijgen
-  `caseOrganisatieId: null` en worden onzichtbaar voor de Lead. De
-  bevestiging noemt het aantal (`dossier.md`, Verwijderen en datakoppelingen).
+  `caseOrganisatieId: null`, `zichtbaarVoorLead: false` en de status "Kies een
+  organisatie". De bevestiging noemt het aantal (`dossier.md`, Verwijderen en
+  datakoppelingen). Eén plek doet dat voor elke schrijfactie (`ruimDossierOp` in
+  `slaAlles`), de audit-regel `organisatie.verwijderd` noemt het aantal als
+  `aantalCasesLosgemaakt`.
 - **Assessment**: Alleen als er geen enkele Meting van dit Assessment
   bestaat, bij welke organisatie dan ook (ook geen Meting zonder scans).
   Bestaat er wel een Meting, dan kan het Assessment niet worden verwijderd,
@@ -1488,17 +1491,17 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   `respondent.bewerkt`.
 - `nieuwsartikel.toegevoegd`, `nieuwsartikel.gewijzigd` en
   `nieuwsartikel.verwijderd` (gebouwd op 20 oktober 2026, vervallen voor nieuwe
-  gebeurtenissen zodra het Dossier is gebouwd; bestaande regels blijven
-  leesbaar).
+  gebeurtenissen sinds het Dossier is gebouwd op 21 oktober 2026; bestaande
+  regels blijven leesbaar).
 - `dossier.itemToegevoegd`, `dossier.itemGewijzigd` en
-  `dossier.itemVerwijderd` (voorstel van 20 oktober 2026). `details` bevat de
+  `dossier.itemVerwijderd` (gebouwd op 21 oktober 2026, `entiteitType` is `dossieritem`). `details` bevat de
   Organisatie, de soort, de titel en bij `itemGewijzigd` de namen van de
   gewijzigde velden. Bij een Case staat ook de naam van de Organisatie in de
   Case erin.
-- `dossier.geopend` en `dossier.gesloten` (voorstel van 20 oktober 2026):
+- `dossier.geopend` en `dossier.gesloten` (gebouwd op 21 oktober 2026, op de Organisatie):
   `openVoorLead` is aan of uit gezet. `details` bevat de Organisatie en het
   aantal zichtbare items.
-- `organisatie.caseVlagGewijzigd` (voorstel van 20 oktober 2026):
+- `organisatie.caseVlagGewijzigd` (gebouwd op 21 oktober 2026):
   `caseToegestaan` is gewijzigd. `details` bevat de Organisatie en de nieuwe
   waarde.
 - `kpiDefinitie.aangemaakt`, `kpiDefinitie.gewijzigd`, `kpiDefinitie.verwijderd`,
@@ -1533,8 +1536,8 @@ Een streepje betekent geen toegang.
 | `organisaties.toewijzen` (aan een Consultant) | alle | - | - | - |
 | `organisaties.bewerken` (incl. kenmerken, KPI-waarden en Onderdelen) | alle | eigen | te bevestigen | - |
 | `contactpersonen.bewerken` (Contactpersonen aanmaken, wijzigen en verwijderen; een Consultant ziet ze wel; vooralsnog alleen Admin, later waarschijnlijk eigen voor een Consultant) | alle | - | - | - |
-| `dossier.bewerken` (Dossieritems aanmaken, wijzigen en verwijderen, Zichtbaar voor klant en Open voor Lead; voorstel van 20 oktober 2026, `dossier.md`) | alle | eigen | - | - |
-| `dossier.inzien` (voorstel van 20 oktober 2026) | alle | eigen | alleen openstaande items van de eigen Organisatie | - |
+| `dossier.bewerken` (Dossieritems aanmaken, wijzigen en verwijderen, Zichtbaar voor klant en Open voor Lead; gebouwd op 21 oktober 2026, `dossier.md`) | alle | eigen | - | - |
+| `dossier.inzien` (gebouwd op 21 oktober 2026) | alle | eigen | alleen openstaande items van de eigen Organisatie | - |
 | `organisaties.verwijderen` | alle | eigen | - | - |
 | `metingen.plannen` (ook een nieuw Onderdeel aanmaken in het formulier) | alle | eigen | - | - |
 | `respondenten.uitnodigen` | alle | eigen | aangevinkte Metingen (Uitnodigen) | - |
@@ -1727,7 +1730,7 @@ organisaties met de vlag kunnen in een benchmark worden opgenomen. Zie
 `benchmark.md`, Toestemming en privacy.
 
 `Organisatie` krijgt ook `caseToegestaan` (boolean, standaard false, voorstel van
-20 oktober 2026): De Afspraak "Mag als case gebruikt worden". Een Admin zet de
+20 oktober 2026, gebouwd op 21 oktober 2026): De Afspraak "Mag als case gebruikt worden". Een Admin zet de
 vlag nadat dit met de organisatie is afgesproken. Alleen met de vlag kan een
 Case bij een andere Organisatie naar haar verwijzen en voor een Lead zichtbaar
 zijn. Bestaande Organisaties beginnen met false. Zie `dossier.md`.

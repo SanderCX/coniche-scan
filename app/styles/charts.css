@@ -376,6 +376,18 @@
 .radar-knoop.is-gedimd {
   opacity: 0.4;
 }
+/* Filtermodus (`stylesheet.md`, Filtermodus op de Dossierpagina): Een actief knooppunt is altijd gevuld, het gekozen bouwblok krijgt de tweede ring. */
+.radar-knoop.is-filter {
+  background: var(--knoop-kleur);
+  color: var(--knoop-tekst);
+}
+.radar-knoop.is-gekozen {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--knoop-kleur);
+  z-index: 20;
+}
+.radar-knoop.is-inactief {
+  cursor: default;
+}
 
 /* De tooltip van de radar staat buiten de radar (`stylesheet.md`, Tooltip van de radar). Dichtbij de verticale as boven of onder het
    knooppunt met een pijltje, anders in de hoek van het kwadrant zonder pijltje. */
@@ -457,6 +469,16 @@
 /* Het staande kolomdiagram per domein (`components/DomeinKolommen.tsx`, `stylesheet.md`, Domeinen). */
 .dk {
   width: 100%;
+}
+.dk-plot,
+.dk-nummers,
+.dk-legenda {
+  max-width: 736px;
+}
+.dk-plot,
+.dk-nummers {
+  margin-left: auto;
+  margin-right: auto;
 }
 .dk-plot {
   display: grid;
@@ -571,39 +593,12 @@
   padding-top: 0.09em;
   flex: none;
 }
-.dk-sleutel {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(4, auto);
-  grid-auto-flow: column;
-  gap: var(--sp-2) var(--sp-6);
-  margin: var(--sp-4) 0 0;
-  padding: 0;
-  list-style: none;
-}
-.dk-sleutel li {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  min-width: 0;
-  font-size: var(--fs-14);
-  color: var(--ink-s);
-  white-space: nowrap;
-  transition: opacity 120ms;
-  cursor: default;
-}
-.dk-sleutel li.is-gedimd {
-  opacity: 0.45;
-}
-.dk-sleutel li > span:last-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 .dk-legenda {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: var(--sp-2) var(--sp-6);
-  margin: var(--sp-4) 0 0;
+  margin: var(--sp-4) auto 0;
   padding: 0;
   list-style: none;
   font-size: var(--fs-12);
@@ -619,11 +614,4 @@
   height: 10px;
   border-radius: 2px;
   flex: none;
-}
-@container (max-width: 519px) {
-  .dk-sleutel {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: none;
-    grid-auto-flow: row;
-  }
 }

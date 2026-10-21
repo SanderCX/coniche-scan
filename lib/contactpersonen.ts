@@ -1,17 +1,15 @@
 /**
- * Contactpersonen en nieuwsartikelen bij een Organisatie (`datamodel.md`, Contactpersoon en Nieuwsartikel): De regels voor de velden,
- * de adressen en de volgorde. Pure functies zonder opslag.
+ * Contactpersonen bij een Organisatie (`datamodel.md`, Contactpersoon): De regels voor de velden, de adressen en de volgorde. Pure
+ * functies zonder opslag. De regels voor het adres (`normaliseerUrl`) gelden ook voor het Dossier (`lib/dossier.ts`).
  */
-import { Contactpersoon, Nieuwsartikel } from "./types";
+import { Contactpersoon } from "./types";
 
 export const NAAM_MAX = 80;
 export const FUNCTIE_MAX = 80;
-export const TITEL_MAX = 200;
-export const BRON_MAX = 80;
 export const NOTITIE_MAX = 300;
 
 /** Spaties getrimd en samengevoegd. */
-const schoon = (s: string) => s.trim().replace(/\s+/g, " ");
+export const schoon = (s: string) => s.trim().replace(/\s+/g, " ");
 
 /** Een adres met http of https, zonder voor- en achterspaties. Zonder schema wordt het https://. Geeft `null` bij een ongeldig adres. */
 export function normaliseerUrl(invoer: string): string | null {
@@ -65,42 +63,7 @@ export function controleerContactpersoon(invoer: ContactpersoonInvoer): Controle
   return { ok: true, waarde: { naam, functie, linkedinUrl, notitie } };
 }
 
-export interface NieuwsartikelInvoer {
-  titel: string;
-  url: string;
-  bron: string;
-  gepubliceerdOp: string;
-  notitie: string;
-}
-
-const DATUM = /^\d{4}-\d{2}-\d{2}$/;
-
-/** De invoer van een nieuwsartikel controleren: De titel en een geldig adres zijn verplicht, de datum is optioneel. */
-export function controleerNieuwsartikel(invoer: NieuwsartikelInvoer): Controle<NieuwsartikelInvoer> {
-  const titel = schoon(invoer.titel);
-  if (!titel) return { ok: false, reden: "Vul een titel in." };
-  if (titel.length > TITEL_MAX) return { ok: false, reden: `De titel mag maximaal ${TITEL_MAX} tekens hebben.` };
-  if (!invoer.url.trim()) return { ok: false, reden: "Vul het adres van het artikel in." };
-  const url = normaliseerUrl(invoer.url);
-  if (!url) return { ok: false, reden: "Dit is geen geldig adres. Gebruik een adres dat met http of https begint." };
-  const bron = schoon(invoer.bron);
-  if (bron.length > BRON_MAX) return { ok: false, reden: `De bron mag maximaal ${BRON_MAX} tekens hebben.` };
-  const gepubliceerdOp = invoer.gepubliceerdOp.trim();
-  if (gepubliceerdOp && (!DATUM.test(gepubliceerdOp) || Number.isNaN(Date.parse(gepubliceerdOp)))) {
-    return { ok: false, reden: "De datum klopt niet." };
-  }
-  const notitie = invoer.notitie.trim();
-  if (notitie.length > NOTITIE_MAX) return { ok: false, reden: `De notitie mag maximaal ${NOTITIE_MAX} tekens hebben.` };
-  return { ok: true, waarde: { titel, url, bron, gepubliceerdOp, notitie } };
-}
-
 /** De contactpersonen op alfabet, hoofdletterongevoelig. */
 export function contactpersonenOpAlfabet(lijst: Contactpersoon[] | undefined): Contactpersoon[] {
   return [...(lijst ?? [])].sort((a, b) => a.naam.localeCompare(b.naam, "nl", { sensitivity: "base" }));
-}
-
-/** De nieuwsartikelen met het nieuwste bovenaan: Op publicatiedatum, en zonder datum op het moment van toevoegen. */
-export function nieuwsNieuwsteEerst(lijst: Nieuwsartikel[] | undefined): Nieuwsartikel[] {
-  const sleutel = (n: Nieuwsartikel) => n.gepubliceerdOp || n.aangemaaktOp.slice(0, 10);
-  return [...(lijst ?? [])].sort((a, b) => sleutel(b).localeCompare(sleutel(a)) || b.aangemaaktOp.localeCompare(a.aangemaaktOp));
 }

@@ -2,7 +2,7 @@
 
 Spec voor het Dossier van een Organisatie: Een lijst Nieuws en Cases die een Consultant samenstelt, en die hij open kan zetten voor de Lead van de Organisatie. Het Dossier vervangt de lijst Nieuws bij de Kenmerken.
 
-**Status: Voorstel van 20 oktober 2026, nog niet gebouwd.** Joost heeft de richting en het ontwerp goedgekeurd (Claude Design, "Coniche Scan Dossier", versie 15, borden 1, 3, 5 en 6). Het ontwerp is dus de bron voor de opmaak, deze spec voor het gedrag. Wat in een ander document staat en hier wordt aangepast, staat onder Aanpassingen in andere documenten.
+**Status: Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 (zie Zo gebouwd).** Joost heeft de richting en het ontwerp goedgekeurd (Claude Design, "Coniche Scan Dossier", versie 15, borden 1, 3, 5 en 6). Het ontwerp is dus de bron voor de opmaak, deze spec voor het gedrag. Wat in een ander document staat en hier wordt aangepast, staat onder Aanpassingen in andere documenten.
 
 ## Doel
 
@@ -194,6 +194,24 @@ Nieuw (`beheerpagina.md`, Info-iconen):
 - `info.caseVlag`: "Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads."
 
 `info.nieuwsartikelen` vervalt.
+
+## Zo gebouwd (21 oktober 2026)
+
+- **Bestanden.** De regels en de pure functies staan in `lib/dossier.ts` (controle van de invoer, status, volgorde, `leadDossier`, `isNieuwVoorLead`, de overgang van de nieuwsartikelen en `ruimDossierOp`), de opslag in `lib/db/dossier.ts` (items, Open voor Lead, de Afspraak en `markeerDossierGezien`), de radar-gegevens van de Lead in `lib/dossier-radar.ts`. De kaart en het formulier zijn `components/beheer/DossierKaart.tsx`, de Afspraak is `components/beheer/CaseVlag.tsx`, de kaart op Mijn metingen is `DossierKaart` in `components/mijn-metingen/MijnMetingenOnderdelen.tsx` en de Dossierpagina is `app/s/[code]/dossier/page.tsx`. De opmaak staat in `app/styles/dossier.css` (de pagina van de Lead) en `admin.css` (`.dos-*`, de beheerkant). Rechten: `magDossierBewerken` (de eigen Organisaties voor een Consultant) en `magCaseVlagZetten` (alleen een Admin). Tests: `lib/dossier.test.ts` en de filtermodus in `lib/radar.test.tsx`.
+- **De lijst Nieuws bij de Kenmerken is weg.** `Organisatie.nieuwsartikelen` bestaat niet meer: Bij het laden wordt elk artikel een Dossieritem (Overgang), en het oude veld valt weg. De bestanden `contacten-nieuws` heten nu `contactpersonen`, het helponderwerp `contactpersonen-en-nieuws` is `contactpersonen`.
+- **Wat een Lead ziet, wordt in het prototype in de browser bepaald.** `leadDossier` geeft een eigen vorm terug zonder `caseOrganisatieId` en zonder naam, zodat de schermen van de Lead die gegevens niet kunnen tonen. De data zelf staat in de browser, dus echt afschermen kan pas met de database ("aan de serverkant").
+- **Een Case zonder branche is voor een Lead onzichtbaar.** Heeft de Organisatie in de case geen Sector meer (bijvoorbeeld na een wijziging nadat het item openstond), dan laat `leadDossier` de Case weg. De spec zegt alleen dat zo'n Case niet open kan.
+- **De status "Toestemming ontbreekt"** staat bij elke Case waarvan de Organisatie de Afspraak niet heeft, ook als het item op Intern staat. De spec noemt dit expliciet bij een item dat op Zichtbaar voor klant stond.
+- **Het item bewerken met een verlopen toestemming.** Een Case die al open stond, kan bewerkt worden zonder dat de toestemming klopt en houdt zijn stand. Nieuw openzetten kan alleen met toestemming en een Sector.
+- **De tag "Nieuw"** staat er zolang `dossierGezienOp` leeg is of vóór de laatste van `openSinds` en `gewijzigdOp` ligt. `gewijzigdOp` verandert alleen bij een wijziging in wat een Lead kan zien (een item dat zichtbaar was of wordt), bij het openzetten, en als de Afspraak van een Organisatie in een zichtbare Case verandert.
+- **Schakelaars zijn vinkjes.** "Open voor Lead" en "Zichtbaar voor klant" zijn, zoals de andere schakelaars in beheer (`BenchmarkVlag`), een vinkje met een label en geen schuifknop.
+- **Letterschaal.** De chips (13px in het ontwerp), de tag "Nieuw" en de regel met aantallen (11 en 13px) staan op 12px, want de letterschaal kent geen andere maten (`stylesheet.md`, Lettergroottes).
+- **De waarschuwing "Noem de organisatie niet bij naam."** staat één keer, onder Samenvatting, in plaats van bij elk veld.
+- **"Naar Afspraken".** Voor een Admin sluit de knop het formulier en scrolt naar de kaart Afspraken. Een Consultant ziet de tekst "Vraag een Admin om 'Mag als case gebruikt worden' aan te zetten".
+- **De kop van de Dossierpagina** heeft de concentrische cirkels als `repeating-radial-gradient` in `--or-mid` en geen paars. Een lange branche (meer dan 14 tekens, de korte naam van een Sector) staat in het oranje blok op 24px in plaats van 32px, anders past ze niet in 168px.
+- **Zonder toegang.** Een Lead zonder open Dossier, of een Respondent zonder Lead-rol, ziet op de Dossierpagina "Geen dossier".
+- **De filter in de URL** (`?bouwblok=`) gebruikt `router.push`, zodat de terugknop van de browser de vorige stand terugzet. Een bouwblok dat niet actief is, wordt genegeerd.
+- **Nog niet gebouwd.** De ontwerpen voor de latere versie (bibliotheek, systeemvoorstel) en bord 7 (de afgewezen optie, dat uit het ontwerp vervalt) hebben geen code nodig.
 
 ## Open punten
 

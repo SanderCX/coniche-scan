@@ -175,10 +175,16 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze.",
   },
   {
-    sleutel: "info.nieuwsartikelen",
-    plek: "Organisatie-detail, bij Kenmerken, naast de kop Nieuws",
+    sleutel: "info.dossier",
+    plek: "Organisatie-detail, kaart Dossier, naast de titel",
     tekst:
-      "Artikelen over de organisatie die relevant zijn voor het gesprek, met een link naar het artikel. Het nieuwste staat bovenaan. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze.",
+      "Cases en nieuws die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier open staat én het item op Zichtbaar voor klant staat. Een case kan alleen open als de organisatie in de case dat heeft toegestaan.",
+  },
+  {
+    sleutel: "info.caseVlag",
+    plek: "Organisatie-detail, bij de schakelaar \"Mag als case gebruikt worden\"",
+    tekst:
+      "Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads.",
   },
   {
     sleutel: "info.kpiBlok",

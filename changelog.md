@@ -1,5 +1,24 @@
 # Coniche Scan — Changelog
 
+## 2026-10-21 (18) — Specs van Joost, PR 149: Het Dossier per Organisatie, de knopbreedte en het domeindiagram
+
+Op verzoek van Sander gebouwd uit `dossier.md`, `visualisatie-mijn-metingen.md` (Dossierkaart, knopbreedte) en `stylesheet.md` (Domeinen, Filtermodus op de Dossierpagina).
+
+**Gedaan**:
+- **Dossier op de Organisatie** (`lib/dossier.ts`, `lib/db/dossier.ts`, `components/beheer/DossierKaart.tsx`): Een kaart onder Toegang en Afspraken en boven de KPI's, met "Open voor Lead" (bevestiging met het aantal items), het filter Alles, Cases en Nieuws, de rijen met statusbadge en het formulier voor Nieuws en Case met de chips "Gaat over bouwblokken" en "Zichtbaar voor klant". `Organisatie.dossier`, `Organisatie.caseToegestaan` en `OrganisatieLid.dossierGezienOp` staan in `lib/types.ts`.
+- **Overgang**: De lijst Nieuws bij de Kenmerken is weg. Bij het laden wordt elk `nieuwsartikel` een Dossieritem van soort Nieuws, zonder dat iets open of zichtbaar is. `contacten-nieuws` heet nu `contactpersonen` (code, test, component en helponderwerp).
+- **De Afspraak "Mag als case gebruikt worden"** (`components/beheer/CaseVlag.tsx`): Een derde vinkje in de kaart Afspraken, alleen een Admin, met een bevestiging bij uitzetten die de zichtbare Cases bij andere Organisaties telt. De bevestiging bij het verwijderen van een Organisatie noemt de Cases die naar haar verwijzen, en `slaAlles` maakt ze los (`ruimDossierOp`).
+- **Rechten, audit, info**: `magDossierBewerken` en `magCaseVlagZetten` (`lib/rechten.ts`), `dossier.itemToegevoegd/itemGewijzigd/itemVerwijderd`, `dossier.geopend/gesloten` en `organisatie.caseVlagGewijzigd`, `info.dossier` en `info.caseVlag` (`info.nieuwsartikelen` vervalt).
+- **Mijn metingen**: De sectie "Dossier, 1" met een kaart (voorproef, aantallen, tag "Nieuw") onder Vergelijkingen, en de knop "Bekijk dossier" even breed als "Bekijk vergelijking" (`.mm-knop--vast`, 184px).
+- **Dossierpagina** (`app/s/[code]/dossier/page.tsx`): De kop met tegels, de kaart "Waar dit dossier over gaat" met de radar in een filtermodus (`RadarChartView` met `filter`, het gekozen bouwblok in de URL), de filterbalk, de Cases en het Nieuws. Een Lead ziet nooit de naam van de Organisatie in een Case (`leadDossier`). Scores in de radar komen alleen uit een Meting waarvoor de Lead Resultaten heeft (`lib/dossier-radar.ts`).
+- **Domeindiagram**: De sleutel met namen onder de plot is weg, de namen staan in de tooltip (drie regels met een groepsreeks), de plot is hoogstens 736px breed en gecentreerd, en de legenda staat er alleen met een groepsreeks.
+- **Help**: Twee onderwerpen (Het Dossier van een Organisatie, Het Dossier van je consultant), `contactpersonen` zonder nieuws, en `mijn-metingen` noemt de kaart. 27 onderwerpen.
+- **Tests**: `lib/dossier.test.ts` (20 tests), de filtermodus in `lib/radar.test.tsx`, bijgewerkte `lib/contactpersonen.test.ts`. Bekeken in de browser met een Lead, een Organisatie met Sector en Afspraak en een zonder, op een lokale server zonder database.
+
+**Specs bijgewerkt**: `dossier.md` (Zo gebouwd), `CLAUDE.md`, `datamodel.md`, `beheerpagina.md`, `stylesheet.md`, `visualisatie-mijn-metingen.md`, `help.md`, `export-csv.md`, `export-indesign.md`, `import-scans.md`, `privacy-pagina.md`.
+
+**Afwijkingen en keuzes**: De chips, de tag "Nieuw" en de aantalregel staan op 12px (de spec noemt 11 en 13px, de letterschaal kent die niet). "Open voor Lead" en "Zichtbaar voor klant" zijn vinkjes, zoals de andere schakelaars in beheer. Wat een Lead ziet, wordt in het prototype in de browser bepaald (`leadDossier`), niet aan de serverkant. Een Case zonder Sector bij de Organisatie in de case is voor de Lead onzichtbaar. De waarschuwing "Noem de organisatie niet bij naam." staat één keer. Een lange branche staat op 24px in het oranje blok. De volledige lijst staat in `dossier.md`, Zo gebouwd.
+
 ## 2026-10-20 (17) — Specs van Joost, PR 146: De film Wat krijg ik per Assessment-type
 
 Op verzoek van Sander gebouwd uit `help.md`, Films, Varianten van Wat krijg ik per Assessment-type, en `CLAUDE.md`, scherm 2.
