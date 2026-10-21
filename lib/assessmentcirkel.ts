@@ -13,9 +13,6 @@ export const RAND = MAAT / 2;
 export const DEEL_HOEK = 72;
 /** De straal van de wedges (het vlak van de radar). */
 export const WEDGE_R = 262;
-/** De hulpcirkels lopen tot 215px (0,82 van de straal van 262px), op 25, 50, 75 en 100%. */
-export const RING_R = 215;
-export const RINGEN = [0.25, 0.5, 0.75, 1].map((f) => f * RING_R);
 
 /** Het punt op afstand `r` van het midden bij kompashoek `graden`. */
 export function kompas(r: number, graden: number, cx = CENTRUM, cy = CENTRUM): [number, number] {
@@ -90,52 +87,75 @@ export const DELEN: DeelDef[] = [
   deel("spanningsmeter", "spanning", 522),
 ];
 
-/** Het label staat op de middenlijn van het deel, ongeveer 200px van het middelpunt: Zo valt het links niet buiten het vlak. */
-export const LABEL_R = 200;
-
 /**
- * De wedges van de Volwassenheid-delen: Eén doorlopende radar over Klantcontact Volwassenheid en Zorg (234° tot 378°), vijf wedges van 28,8°
- * met Fundament op de scheiding tussen de twee delen (306°). Elk deel tekent de hele radar en knipt zijn eigen stuk.
+ * De drie kleurwedges van elk deel met een radar (`CLAUDE.md`, scherm 1, De cirkel, Kleuren per deel, besloten door Joost op 21 oktober 2026, PR 166):
+ * Precies drie wedges van 24° tot straal 262px, met 30% dekking en een witte rand van 1,2px, met de klok mee binnen het deel. Het is een selectie
+ * van de kleuren van het Assessment en niet alle categorieën of alle domeinen. De doorlopende radar over Klantcontact Volwassenheid en Zorg met
+ * Fundament op de scheiding en de vijf wedges van AI zijn vervallen.
  */
-export const VOLWASSENHEID_WEDGES: { naam: string; kleur: string; van: number; tot: number }[] = [
-  { naam: "Mens", kleur: "#197f4e", van: 234, tot: 262.8 },
-  { naam: "Proces & Tech", kleur: "#392944", van: 262.8, tot: 291.6 },
-  { naam: "Fundament", kleur: "#ffc043", van: 291.6, tot: 320.4 },
-  { naam: "Organisatie", kleur: "#225ba0", van: 320.4, tot: 349.2 },
-  { naam: "Overkoepelend", kleur: "#ff671f", van: 349.2, tot: 378 },
-];
+export const DEEL_KLEUREN: Record<string, string[]> = {
+  "klantcontact-volwassenheid": ["#ff671f", "#225ba0", "#197f4e"],
+  zorgscan: ["#ff671f", "#225ba0", "#197f4e"],
+  "ai-volwassenheid": ["#ff671f", "#1f9aa0", "#d1467f"],
+  spanningsmeter: ["#225ba0", "#1f9aa0", "#ffc043"],
+};
 
-/** AI: Vijf wedges van 14,4° vanaf het begin van het deel (378°) met de klok mee in de kleuren van de AI-domeinen. */
-export const AI_WEDGES: { kleur: string; van: number; tot: number }[] = ["#ff671f", "#225ba0", "#1f9aa0", "#d1467f", "#8a7bb8"].map((kleur, i) => ({
-  kleur,
-  van: 378 + i * 14.4,
-  tot: 378 + (i + 1) * 14.4,
-}));
+/** De wedges van een deel: Drie van 24°, vanaf het begin van het deel met de klok mee, met hun kleur (leeg bij de Quickscan). */
+export function deelWedges(d: DeelDef): { kleur: string; van: number; tot: number }[] {
+  return (DEEL_KLEUREN[d.assessmentId] ?? []).map((kleur, i) => ({ kleur, van: d.van + i * WEDGE_HOEK, tot: d.van + (i + 1) * WEDGE_HOEK }));
+}
 
-/** De Spanningsmeter: Drie wedges van 24° vanaf het begin van het deel (162°) in een selectie van de veldkleuren. */
-export const SPANNING_WEDGES: { kleur: string; van: number; tot: number }[] = ["#225ba0", "#1f9aa0", "#ffc043"].map((kleur, i) => ({
-  kleur,
-  van: 162 + i * 24,
-  tot: 162 + (i + 1) * 24,
-}));
-
+export const WEDGE_HOEK = 24;
 export const WEDGE_DEKKING = 0.3;
 
+/** Het label op de middenlijn van het deel, op 235px van het middelpunt (Zorg 240px, de Quickscan 200px). */
+export const LABEL_R: Record<string, number> = {
+  "klantcontact-volwassenheid": 235,
+  zorgscan: 240,
+  "ai-volwassenheid": 235,
+  "quickscan-ziekenhuis": 200,
+  spanningsmeter: 235,
+};
+/** Klantcontact Volwassenheid staat 16px lager, zodat de pil de stip niet raakt. */
+const LABEL_DY: Record<string, number> = { "klantcontact-volwassenheid": 16 };
+
+/** Het middelpunt van de label-pil van een Assessment. */
+export function labelPunt(assessmentId: string): [number, number] {
+  const d = DELEN.find((x) => x.assessmentId === assessmentId);
+  if (!d) return [CENTRUM, CENTRUM];
+  const [x, y] = kompas(LABEL_R[assessmentId] ?? 235, d.midden);
+  return [x, y + (LABEL_DY[assessmentId] ?? 0)];
+}
+
+/** De pil is ongeveer 210 × 56px (`CLAUDE.md`, De stip): Het midden van de stip ligt minstens 8px buiten die pil. */
+export const PIL_B = 210;
+export const PIL_H = 56;
+export const STIP_R = 9;
+export const STIP_AFSTAND = 8;
+
 /**
- * De hoekpunten van de lijn (aangepast op 21 oktober 2026, besloten door Joost, PR 164): (hoek, score van 1 tot 5). De lijn loopt van 162° (het
- * begin van de Spanningsmeter) met de klok mee tot 450° (het einde van AI, dus 90°, rechts) en slaat de Quickscan over. Hij heeft drie regels, zodat
- * hij op een echte meting lijkt: (1) De score van een hoekpunt ligt tussen 2,5 en 3,9, dus een dal gaat nooit onder 2,5 en een piek komt niet
- * hoger dan bijna 4. (2) De straal volgt de hulpcirkels van het deel (`lijnStraal`). (3) Op elke grens tussen twee delen zit een dal en de pieken
- * liggen binnen een deel: De lijn zakt bij elke deelgrens in. Dat zijn 13 hoekpunten op 24° van elkaar. De deelgrenzen zijn het eerste, vierde,
- * zevende, tiende en dertiende hoekpunt. Elk deel tekent de hele lijn en knipt zijn eigen stuk, dus de lijn sluit precies aan.
+ * De schaal van de cirkel (`CLAUDE.md`, scherm 1, De cirkel, Hulpcirkels en schaal, PR 166): Straal = 48 + (score − 1) × 50 px. Score 2 is 98px,
+ * 3 is 148px, 4 is 198px en 5 is 248px. Het midden (score 1, 48px) blijft vrij.
+ */
+export const schaalStraal = (score: number) => 48 + (score - 1) * 50;
+
+/** De hulpcirkels: Vier witte bogen op de scores 2, 3, 4 en 5 (75% dekking, 1,2px), over de 72° van een deel. */
+export const RINGEN = [2, 3, 4, 5].map(schaalStraal);
+
+/**
+ * De hoekpunten van de lijn (PR 163 en PR 166, besloten door Joost): (hoek, score van 1 tot 5). De lijn loopt van 162° (het begin van de
+ * Spanningsmeter) met de klok mee tot 450° (het einde van AI, dus 90°, rechts) en slaat de Quickscan over. Een echte meting heeft pieken en dalen:
+ * Alle hoekpunten liggen tussen score 2,5 (123px) en 3,9 (193px), dus nooit op of tegen de hulpcirkels van 4 en 5. Er zijn 13 hoekpunten op 24° van
+ * elkaar. Dalen liggen op de grenzen tussen de delen (het eerste, vierde, zevende, tiende en dertiende hoekpunt) en pieken binnen een deel. Een deel
+ * tekent zijn eigen vier hoekpunten, waarvan de eerste en de laatste gedeeld zijn met het buurdeel, zodat de lijn precies aansluit.
  */
 export const LIJN: [number, number][] = [
   [162, 2.6], [186, 3.7], [210, 2.9], [234, 2.5], [258, 3.3], [282, 3.9], [306, 2.7],
   [330, 2.8], [354, 3.6], [378, 2.5], [402, 3.8], [426, 3.0], [450, 2.6],
 ];
 
-/** De straal van een hoekpunt: (score − 1) / 4 × 215px, zodat de scores 2, 3, 4 en 5 op de hulpcirkels liggen (`RINGEN`). */
-export const lijnStraal = (score: number) => ((score - 1) / 4) * RING_R;
+/** De straal van een hoekpunt volgens de schaal van de cirkel. */
+export const lijnStraal = schaalStraal;
 
 export function lijnPunt(index: number): [number, number] {
   const [hoek, score] = LIJN[index];
@@ -158,8 +178,8 @@ export const BAND_PUNTEN = 0.75;
 /** De hoekpunten van de rand van de band: De score plus of min 0,75, begrensd op 1 tot 5. Alleen de hoekpunten van het deel van de Spanningsmeter (162° tot 234°). */
 export function bandPunten(kant: "boven" | "onder"): string {
   const punten = LIJN.filter(([hoek]) => hoek <= 234 + 1e-9).map(([hoek, score]) => {
-    const s = kant === "boven" ? Math.min(5, score + BAND_PUNTEN) : Math.max(1, score - BAND_PUNTEN);
-    return kompas(lijnStraal(s), hoek).map(f).join(",");
+    const sc = kant === "boven" ? Math.min(5, score + BAND_PUNTEN) : Math.max(1, score - BAND_PUNTEN);
+    return kompas(lijnStraal(sc), hoek).map(f).join(",");
   });
   return punten.join(" ");
 }
@@ -170,27 +190,40 @@ export function bandVlak(): string {
   return `${bandPunten("boven")} ${onder}`;
 }
 
-/** De bogen van de Quickscan: Vier concentrische bogen over het deel, van 90° (rechts) over `DEEL_HOEK` graden, met de score als vulling. */
+/**
+ * De bogen van de Quickscan (PR 166): Vier concentrische bogen over 56° (de middenlijn plus en min 28°), met straal 56, 90, 124 en 158px, 14px dik
+ * en ronde uiteinden. De baan is `#e9e6df`, het gekleurde deel is 84%, 62%, 48% en 71% van de 56°.
+ */
 export const QUICK_BOGEN: { r: number; score: number; kleur: string }[] = [
-  { r: 70, score: 0.84, kleur: "#22a06b" },
-  { r: 112, score: 0.62, kleur: "#e8871e" },
-  { r: 154, score: 0.48, kleur: "#dc2626" },
-  { r: 196, score: 0.71, kleur: "#e8871e" },
+  { r: 56, score: 0.84, kleur: "#22a06b" },
+  { r: 90, score: 0.62, kleur: "#e8871e" },
+  { r: 124, score: 0.48, kleur: "#dc2626" },
+  { r: 158, score: 0.71, kleur: "#e8871e" },
 ];
-export const BOOG_DIKTE = 20;
-const QUICK_VAN = 90;
+export const BOOG_DIKTE = 14;
+export const BOOG_HOEK = 56;
+/** De bogen beginnen op de middenlijn van de Quickscan (126°) min 28°. */
+const QUICK_VAN = 126 - BOOG_HOEK / 2;
 
-/** Het pad van een boog van 90° tot 90° + `fractie` × 72° (met de klok mee). */
+/** Het pad van een boog van 98° tot 98° + `fractie` × 56° (met de klok mee). */
 export function boogPad(r: number, fractie: number): string {
   const [x1, y1] = kompas(r, QUICK_VAN);
-  const [x2, y2] = kompas(r, QUICK_VAN + DEEL_HOEK * fractie);
+  const [x2, y2] = kompas(r, QUICK_VAN + BOOG_HOEK * fractie);
   return `M${f(x1)},${f(y1)} A${r},${r} 0 0 1 ${f(x2)},${f(y2)}`;
 }
 
+/** De afstand van een punt tot de rechthoek van de label-pil: 0 als het erin ligt. */
+function afstandTotPil(assessmentId: string, x: number, y: number): number {
+  const [lx, ly] = labelPunt(assessmentId);
+  const dx = Math.max(Math.abs(x - lx) - PIL_B / 2, 0);
+  const dy = Math.max(Math.abs(y - ly) - PIL_H / 2, 0);
+  return Math.hypot(dx, dy);
+}
+
 /**
- * Het hoekpunt van de lijn waar de stip staat (aangepast op 21 oktober 2026, PR 164): De hoogste van de binnenste hoekpunten van het deel, dus nooit
- * een dal en nooit naast de lijn. Een deel heeft vier hoekpunten, de twee op de grenzen zijn dalen en worden gedeeld met het buurdeel. De Quickscan
- * heeft geen lijn en geeft `null`.
+ * Het hoekpunt van de lijn waar de stip staat (PR 166): De hoogste van de twee binnenste hoekpunten van het deel, dus nooit een dal en nooit naast de
+ * lijn. De stip staat nooit in of tegen een label: Hij ligt minstens 8px buiten de pil. Valt de hoogste piek onder de pil, dan neemt de stip het
+ * andere binnenste hoekpunt (bij AI-Volwassenheid hoekpunt 12 in plaats van 11). De Quickscan heeft geen lijn en geeft `null`.
  */
 export function stipIndex(assessmentId: string): number | null {
   const d = DELEN.find((x) => x.assessmentId === assessmentId);
@@ -198,26 +231,39 @@ export function stipIndex(assessmentId: string): number | null {
   // De Spanningsmeter ligt op 522° tot 594°, de lijn begint op 162° (522 − 360).
   const van = d.van >= 450 ? d.van - 360 : d.van;
   const tot = van + DEEL_HOEK;
-  let beste: number | null = null;
-  LIJN.forEach(([hoek, score], i) => {
-    if (hoek <= van + 1e-9 || hoek >= tot - 1e-9) return;
-    if (beste === null || score > LIJN[beste][1]) beste = i;
+  const kandidaten: number[] = [];
+  LIJN.forEach(([hoek], i) => {
+    if (hoek > van + 1e-9 && hoek < tot - 1e-9) kandidaten.push(i);
   });
-  return beste;
+  kandidaten.sort((a, b) => LIJN[b][1] - LIJN[a][1]);
+  const vrij = kandidaten.find((i) => {
+    const [x, y] = lijnPunt(i);
+    return afstandTotPil(assessmentId, x, y) >= STIP_AFSTAND;
+  });
+  return vrij ?? kandidaten[0] ?? null;
 }
 
-/** De plek van de stip: Op het hoekpunt van `stipIndex`, en bij de Quickscan in het midden van de rode boog. */
+/** De plek van de stip: Op het hoekpunt van `stipIndex`, en bij de Quickscan in het midden van de rode boog (straal 124px, halverwege het gekleurde deel). */
 export function stipPunt(assessmentId: string): [number, number] {
   const i = stipIndex(assessmentId);
   if (i !== null) return lijnPunt(i);
   const rood = QUICK_BOGEN[2];
-  return kompas(rood.r, QUICK_VAN + DEEL_HOEK * (rood.score / 2));
+  return kompas(rood.r, QUICK_VAN + (BOOG_HOEK * rood.score) / 2);
 }
+
+/** De regels van het label op de cirkel (PR 166): Twee regels, behalve de Spanningsmeter op één regel. */
+export const LABEL_REGELS: Record<string, string[]> = {
+  "klantcontact-volwassenheid": ["Klantcontact", "Volwassenheid"],
+  zorgscan: ["Volwassenheid", "Zorg"],
+  "ai-volwassenheid": ["AI-Volwassenheid", "in Klantcontact"],
+  "quickscan-ziekenhuis": ["Quickscan", "Ziekenhuis"],
+  spanningsmeter: ["Spanningsmeter"],
+};
 
 /** Het label van een Assessment op de cirkel (de korte naam, op twee regels) en de volledige naam voor het paneel. */
 export const KORTE_NAMEN: Record<string, string> = {
   "klantcontact-volwassenheid": "Klantcontact Volwassenheid",
-  "ai-volwassenheid": "AI-Volwassenheid",
+  "ai-volwassenheid": "AI-Volwassenheid in Klantcontact",
   zorgscan: "Volwassenheid Zorg",
   "quickscan-ziekenhuis": "Quickscan Ziekenhuis",
   spanningsmeter: "Spanningsmeter",

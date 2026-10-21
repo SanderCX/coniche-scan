@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  AI_WEDGES,
+  DEEL_KLEUREN,
   BAND_PUNTEN,
   CENTRUM,
   DEEL_HOEK,
@@ -10,15 +10,20 @@ import {
   MAAT,
   QUICK_BOGEN,
   RINGEN,
-  SPANNING_WEDGES,
-  VOLWASSENHEID_WEDGES,
+  STIP_AFSTAND,
+  PIL_B,
+  PIL_H,
+  BOOG_DIKTE,
+  BOOG_HOEK,
+  schaalStraal,
+  deelWedges,
+  labelPunt,
   bandPunten,
   bandVlak,
   delenMetAssessments,
   deelPad,
   kompas,
   lijnPunt,
-  lijnStraal,
   stipIndex,
   stipPunt,
   volgendeKeuze,
@@ -65,27 +70,25 @@ describe("de geometrie van de Assessmentcirkel met vijf delen", () => {
     expect(dicht(CENTRUM - ax, 4 / Math.sin((36 * Math.PI) / 180))).toBe(true);
   });
 
-  it("heeft vijf wedges van 28,8° voor de twee Volwassenheid-delen met Fundament op de scheiding (306°)", () => {
-    expect(VOLWASSENHEID_WEDGES.map((w) => Math.round((w.tot - w.van) * 10) / 10)).toEqual([28.8, 28.8, 28.8, 28.8, 28.8]);
-    const fundament = VOLWASSENHEID_WEDGES.find((w) => w.naam === "Fundament")!;
-    expect((fundament.van + fundament.tot) / 2).toBeCloseTo(306);
-    expect(VOLWASSENHEID_WEDGES[0].van).toBe(234);
-    expect(VOLWASSENHEID_WEDGES[4].tot).toBe(378);
+  it("heeft per deel met een radar precies drie wedges van 24° in een selectie van de kleuren", () => {
+    const wedges = (id: string) => deelWedges(DELEN.find((d) => d.assessmentId === id)!);
+    for (const id of ["klantcontact-volwassenheid", "zorgscan", "ai-volwassenheid", "spanningsmeter"]) {
+      const w = wedges(id);
+      expect(w.map((x) => x.tot - x.van)).toEqual([24, 24, 24]);
+      const d = DELEN.find((x) => x.assessmentId === id)!;
+      expect(w[0].van).toBe(d.van);
+      expect(w[2].tot).toBe(d.tot);
+    }
+    expect(DEEL_KLEUREN["klantcontact-volwassenheid"]).toEqual(["#ff671f", "#225ba0", "#197f4e"]);
+    expect(DEEL_KLEUREN.zorgscan).toEqual(["#ff671f", "#225ba0", "#197f4e"]);
+    expect(DEEL_KLEUREN["ai-volwassenheid"]).toEqual(["#ff671f", "#1f9aa0", "#d1467f"]);
+    expect(DEEL_KLEUREN.spanningsmeter).toEqual(["#225ba0", "#1f9aa0", "#ffc043"]);
+    expect(wedges("quickscan-ziekenhuis")).toEqual([]);
   });
 
-  it("heeft vijf wedges van 14,4° bij AI en drie van 24° bij de Spanningsmeter", () => {
-    expect(AI_WEDGES.map((w) => Math.round((w.tot - w.van) * 10) / 10)).toEqual([14.4, 14.4, 14.4, 14.4, 14.4]);
-    expect(AI_WEDGES[0].van).toBe(378);
-    expect(AI_WEDGES[4].tot).toBeCloseTo(450);
-    expect(AI_WEDGES.map((w) => w.kleur).slice(2)).toEqual(["#1f9aa0", "#d1467f", "#8a7bb8"]);
-    expect(SPANNING_WEDGES.map((w) => w.tot - w.van)).toEqual([24, 24, 24]);
-    expect(SPANNING_WEDGES.map((w) => w.kleur)).toEqual(["#225ba0", "#1f9aa0", "#ffc043"]);
-    expect(SPANNING_WEDGES[0].van).toBe(162);
-    expect(SPANNING_WEDGES[2].tot).toBe(234);
-  });
-
-  it("heeft vier hulpcirkels op 25, 50, 75 en 100% van 215px", () => {
-    expect(RINGEN).toEqual([53.75, 107.5, 161.25, 215]);
+  it("rekent de straal volgens één schaal: 48 + (score − 1) × 50 px, met de hulpcirkels op 2, 3, 4 en 5", () => {
+    expect(RINGEN).toEqual([98, 148, 198, 248]);
+    expect([schaalStraal(2.5), schaalStraal(3.5), schaalStraal(3.9), schaalStraal(5)]).toEqual([123, 173, 193, 248]);
   });
 
   it("laat de lijn van 162° tot 450° lopen met 13 hoekpunten op 24° van elkaar en de Quickscan overslaan", () => {
@@ -118,11 +121,12 @@ describe("de geometrie van de Assessmentcirkel met vijf delen", () => {
     }
   });
 
-  it("rekent de straal van een hoekpunt als (score − 1) / 4 × 215 zodat 2, 3, 4 en 5 op de hulpcirkels liggen", () => {
-    RINGEN.forEach((r, i) => expect(dicht(lijnStraal(i + 2), r)).toBe(true));
-    expect(lijnStraal(1)).toBe(0);
-    const [x, y] = lijnPunt(3); // 234°, score 2,5
-    expect(dicht(Math.hypot(x - CENTRUM, y - CENTRUM), lijnStraal(2.5))).toBe(true);
+  it("zet de hoekpunten van de lijn op de straal van de schaal: Een dal op 123px en een piek niet boven 193px", () => {
+    const stralen = LIJN.map((_, i) => {
+      const [x, y] = lijnPunt(i);
+      return Math.round(Math.hypot(x - CENTRUM, y - CENTRUM));
+    });
+    expect(stralen).toEqual([128, 183, 143, 123, 163, 193, 133, 138, 178, 123, 188, 148, 128]);
   });
 
   it("heeft een band van 0,75 punt boven en onder de lijn in het deel van de Spanningsmeter", () => {
@@ -133,33 +137,60 @@ describe("de geometrie van de Assessmentcirkel met vijf delen", () => {
     expect(boven).toHaveLength(4);
     expect(onder).toHaveLength(4);
     const [bx, by] = boven[0].split(",").map(Number);
-    expect(dicht(Math.hypot(bx - CENTRUM, by - CENTRUM), lijnStraal(2.6 + 0.75))).toBe(true);
+    expect(dicht(Math.hypot(bx - CENTRUM, by - CENTRUM), schaalStraal(2.6 + 0.75))).toBe(true);
     const [ox, oy] = onder[2].split(",").map(Number); // score 2,9 min 0,75 is 2,15
-    expect(dicht(Math.hypot(ox - CENTRUM, oy - CENTRUM), lijnStraal(2.15))).toBe(true);
+    expect(dicht(Math.hypot(ox - CENTRUM, oy - CENTRUM), schaalStraal(2.15))).toBe(true);
     expect(bandVlak().split(" ")).toHaveLength(8);
   });
 
   it("heeft vier bogen van de Quickscan in de klassekleuren en de stip op een hoekpunt of in de rode boog", () => {
-    expect(QUICK_BOGEN.map((b) => b.r)).toEqual([70, 112, 154, 196]);
+    expect(QUICK_BOGEN.map((b) => b.r)).toEqual([56, 90, 124, 158]);
+    expect([BOOG_DIKTE, BOOG_HOEK]).toEqual([14, 56]);
     expect(QUICK_BOGEN.map((b) => Math.round(b.score * 100))).toEqual([84, 62, 48, 71]);
     expect(QUICK_BOGEN.map((b) => b.kleur)).toEqual(["#22a06b", "#e8871e", "#dc2626", "#e8871e"]);
     expect(stipPunt("klantcontact-volwassenheid")).toEqual(lijnPunt(5));
     expect(stipPunt("zorgscan")).toEqual(lijnPunt(8));
-    expect(stipPunt("ai-volwassenheid")).toEqual(lijnPunt(10));
+    expect(stipPunt("ai-volwassenheid")).toEqual(lijnPunt(11));
     expect(stipPunt("spanningsmeter")).toEqual(lijnPunt(1));
     const [x, y] = stipPunt("quickscan-ziekenhuis");
-    expect(dicht(Math.hypot(x - CENTRUM, y - CENTRUM), 154)).toBe(true);
+    expect(dicht(Math.hypot(x - CENTRUM, y - CENTRUM), 124)).toBe(true);
   });
 
   it("zet de stip op de hoogste van de twee binnenste hoekpunten van het deel, nooit op een dal", () => {
     expect(stipIndex("spanningsmeter")).toBe(1); // 3,7 tegen 2,9
     expect(stipIndex("klantcontact-volwassenheid")).toBe(5); // 3,9 tegen 3,3
     expect(stipIndex("zorgscan")).toBe(8); // 3,6 tegen 2,8
-    expect(stipIndex("ai-volwassenheid")).toBe(10); // 3,8 tegen 3,0
+    // De hoogste piek van AI (hoekpunt 11, 3,8) ligt onder de pil: De stip neemt hoekpunt 12 (3,0).
+    expect(stipIndex("ai-volwassenheid")).toBe(11);
     expect(stipIndex("quickscan-ziekenhuis")).toBeNull();
+    // Nooit een dal: De grenzen van de delen zijn nooit een stip.
     for (const id of ["spanningsmeter", "klantcontact-volwassenheid", "zorgscan", "ai-volwassenheid"]) {
-      const i = stipIndex(id) as number;
-      expect(LIJN[i][1]).toBeGreaterThanOrEqual(3.6);
+      expect([0, 3, 6, 9, 12]).not.toContain(stipIndex(id));
+    }
+  });
+
+  it("zet de label-pillen op 235px van het midden (Zorg 240px, Quickscan 200px, Klantcontact Volwassenheid 16px lager)", () => {
+    const afstand = (id: string) => {
+      const [x, y] = labelPunt(id);
+      return Math.hypot(x - CENTRUM, y - CENTRUM);
+    };
+    expect(dicht(afstand("spanningsmeter"), 235)).toBe(true);
+    expect(dicht(afstand("ai-volwassenheid"), 235)).toBe(true);
+    expect(dicht(afstand("zorgscan"), 240)).toBe(true);
+    expect(dicht(afstand("quickscan-ziekenhuis"), 200)).toBe(true);
+    // Klantcontact Volwassenheid: Op 270° staat de pil 16px lager dan op 235px.
+    const [, ky] = labelPunt("klantcontact-volwassenheid");
+    expect(dicht(ky, CENTRUM + 16)).toBe(true);
+  });
+
+  it("laat de stip nooit in of tegen een label staan: Het midden minstens 8px buiten de pil", () => {
+    for (const d of DELEN) {
+      if (d.soort === "quick") continue;
+      const [x, y] = stipPunt(d.assessmentId);
+      const [lx, ly] = labelPunt(d.assessmentId);
+      const dx = Math.max(Math.abs(x - lx) - PIL_B / 2, 0);
+      const dy = Math.max(Math.abs(y - ly) - PIL_H / 2, 0);
+      expect(Math.hypot(dx, dy)).toBeGreaterThanOrEqual(STIP_AFSTAND);
     }
   });
 
@@ -178,7 +209,7 @@ describe("de geometrie van de Assessmentcirkel met vijf delen", () => {
     expect(Object.values(KORTE_NAMEN)).toEqual([
       "Klantcontact Volwassenheid",
       "Volwassenheid Zorg",
-      "AI-Volwassenheid",
+      "AI-Volwassenheid in Klantcontact",
       "Quickscan Ziekenhuis",
       "Spanningsmeter",
     ].sort((a, b) => Object.values(KORTE_NAMEN).indexOf(a) - Object.values(KORTE_NAMEN).indexOf(b)));

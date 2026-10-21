@@ -3,8 +3,11 @@
 import { useEffect, useState } from "react";
 import { PaginaSectie } from "@/lib/landing";
 
-/** De sectie waar je staat (`CLAUDE.md`, scherm 2, Sticky sub-nav): De laatste sectie waarvan de bovenkant minder dan 170px onder de bovenkant van het venster staat. */
-export function actieveSectie(tops: { id: string; top: number }[], grens = 170): string | null {
+/**
+ * De sectie waar je staat (`CLAUDE.md`, scherm 2, Sticky sub-nav, aangepast door Joost op 21 oktober 2026, PR 166): De laatste sectie waarvan de
+ * bovenkant minder dan 90px onder de balk staat. `grens` is die grens als afstand tot de bovenkant van het venster (de onderkant van de sub-nav plus 90px).
+ */
+export function actieveSectie(tops: { id: string; top: number }[], grens = 136 + 90): string | null {
   let actief: string | null = null;
   for (const t of tops) if (t.top < grens) actief = t.id;
   return actief;
@@ -25,7 +28,8 @@ export function AssessmentSubNav({ secties }: { secties: PaginaSectie[] }) {
         const el = document.getElementById(s.id);
         return el ? [{ id: s.id, top: el.getBoundingClientRect().top }] : [];
       });
-      setActief(actieveSectie(tops));
+      const balkOnder = document.querySelector(".ap-subnav")?.getBoundingClientRect().bottom ?? 136;
+      setActief(actieveSectie(tops, balkOnder + 90));
     }
     meet();
     window.addEventListener("scroll", meet, { passive: true });

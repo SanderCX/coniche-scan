@@ -1,5 +1,22 @@
 # Coniche Scan — Changelog
 
+## 2026-10-21 (30) — Specs van Joost, PR 166: De cirkel volledig beschreven, Quickscan-pagina, Dossier-rail en bron van de scores
+
+Op verzoek van Sander ("pull devops", daarna "ja bouw maar").
+
+**Gedaan**:
+- **Assessmentcirkel** (`lib/assessmentcirkel.ts`, `AssessmentCirkel`, `assessment-pagina.css`): Drie wedges van 24° per deel in een selectie van de kleuren, de schaal `48 + (score − 1) × 50` (hulpcirkels op 98, 148, 198 en 248px), de lijn en de band op die schaal, de Quickscan-bogen over 56° (14px dik), labels op 235px (Zorg 240, Quickscan 200, Klantcontact Volwassenheid 16px lager) met vaste regels, de stip met een gloed en een pulse tot 16px, een tweede klik of Escape heft de keuze op, en het paneel op 26px, 17px en 15px (`--fs-26` is nieuw).
+- **Quickscan-pagina**: Dezelfde kop en sub-nav als de andere, met "De 4 afdelingen" (`AfdelingenSectie`, vier kaarten met de definitie zonder "X =" en de vragen per dimensie), Praktisch met "per afdeling", alleen de film Wat krijg ik en Visie. De link Over deze scan blijft er niet staan.
+- **Dossier**: De rail markeert subtiel, de rijen zijn ruimer, de stip in de balk is 14px met gloed, de klassenamen boven de balk zijn vervangen door de ankers 1, 2,5, 3,5 en 5, en onder de verdeling staat "Scores uit de meting … van …" met de link "Bekijk de meting" en de tooltip "Groepsscore …".
+- **Film Het dossier** toont dezelfde regel met de bron van de scores.
+- **Spanningsmeter-landing**: Alle zes de velden links onder elkaar (320px) en de radar rechts (536px).
+- **Sub-nav**: De actieve sectie is die waarvan de bovenkant minder dan 90px onder de balk staat (onderkant van de sub-nav plus 90px).
+- **Tests**: `lib/assessmentcirkel.test.ts` (wedges, schaal, hoekpunten, labels, stip), `lib/landing.test.ts` (Quickscan, definitie van een afdeling, actieve sectie).
+
+**Specs bijgewerkt**: `CLAUDE.md` (Zo gebouwd, de cirkel), `dossier.md`, `visualisatie-spanningsmeter.md`, `content-ziekenhuis-quickscan.md`, `help.md`, `stylesheet.md`.
+
+**Afwijkingen en interpretaties**: De stip kiest een hoekpunt waarvan het midden minstens 8px buiten de pil ligt: Dat geeft de hoekpunten uit de spec (2, 6, 9 en 12). "90px onder de balk" is gemeten vanaf de onderkant van de sub-nav. De titel van 26px heeft een nieuw token (`--fs-26`, ter bevestiging door Joost).
+
 ## 2026-10-21 (29) — Specs van Joost, PR 164: Assessmentcirkel, lijn en stip van de delen, band van de Spanningsmeter
 
 Op verzoek van Sander ("pull devops", daarna "ja bouw maar").

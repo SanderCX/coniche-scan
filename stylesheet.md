@@ -267,6 +267,7 @@ onder (zie boven).
 | `--fs-17` | 17px | Toegevoegd op 21 oktober 2026: De centrale vraag in de kaart boven de radar van de bouwblokken. Ter bevestiging door Joost |
 | `--fs-18` | 18px | Inleidende regel op publieke pagina's, h3, titel van modals en beheerblokken, koppen in de privacypagina en de overzichtsmodal, `.admin-main h2` |
 | `--fs-24` | 24px | Kop van een bouwblok en van een Assessment-kaart |
+| `--fs-26` | 26px | Toegevoegd op 21 oktober 2026 (PR 166): De titel in het detailpaneel van de Assessmentcirkel en de tekst zonder keuze. Ter bevestiging door Joost |
 | `--fs-32` | 32px | Paginatitel (beheer, resultaten, voorbeeld-output), h2 op publieke pagina's |
 | `--fs-36` | 36px | Getal in de `.score-ring` |
 | `--fs-40` | 40px | Vervallen voor de ring. Alleen nog in gebruik als een ander onderdeel dit token noemt |

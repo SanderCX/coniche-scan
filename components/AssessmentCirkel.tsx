@@ -8,23 +8,21 @@ import { TEGEL_ICONEN } from "@/components/icons/LandingIcons";
 import { nbspNaKoppelteken } from "@/lib/format";
 import { tegelInhoud } from "@/lib/landing";
 import {
-  AI_WEDGES,
   BOOG_DIKTE,
   CENTRUM,
   DELEN,
   DeelDef,
   KORTE_NAMEN,
-  LABEL_R,
+  LABEL_REGELS,
   MAAT,
   QUICK_BOGEN,
   RINGEN,
-  SPANNING_WEDGES,
-  VOLWASSENHEID_WEDGES,
   WEDGE_DEKKING,
   bandVlak,
   boogPad,
+  deelWedges,
   delenMetAssessments,
-  kompas,
+  labelPunt,
   lijnPunten,
   lijnVulling,
   stipPunt,
@@ -40,9 +38,9 @@ function Beeld({ deel, clipId }: { deel: DeelDef; clipId: string }) {
   const wedge = { fillOpacity: WEDGE_DEKKING, stroke: "#fff", strokeWidth: 1.2 };
   return (
     <g clipPath={`url(#${clipId})`}>
-      {deel.soort === "volwassenheid" && VOLWASSENHEID_WEDGES.map((w) => <path key={w.naam} d={wedgePad(w.van, w.tot)} fill={w.kleur} {...wedge} />)}
-      {deel.soort === "ai" && AI_WEDGES.map((w, i) => <path key={i} d={wedgePad(w.van, w.tot)} fill={w.kleur} {...wedge} />)}
-      {deel.soort === "spanning" && SPANNING_WEDGES.map((w, i) => <path key={i} d={wedgePad(w.van, w.tot)} fill={w.kleur} {...wedge} />)}
+      {deelWedges(deel).map((w, i) => (
+        <path key={i} d={wedgePad(w.van, w.tot)} fill={w.kleur} {...wedge} />
+      ))}
       {lijn && RINGEN.map((r) => <circle key={r} cx={CENTRUM} cy={CENTRUM} r={r} fill="none" stroke="#fff" strokeOpacity={0.75} strokeWidth={1.2} />)}
       {deel.soort === "quick" &&
         QUICK_BOGEN.map((b) => (
@@ -93,6 +91,21 @@ export function AssessmentCirkel({ assessments }: { assessments: Assessment[] })
     return () => ro.disconnect();
   }, []);
 
+  // Escape heft de keuze op (`CLAUDE.md`, scherm 1, Gedrag, PR 166).
+  useEffect(() => {
+    if (gekozen === null) return;
+    const bijToets = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setGekozen(null);
+    };
+    window.addEventListener("keydown", bijToets);
+    return () => window.removeEventListener("keydown", bijToets);
+  }, [gekozen]);
+
+  /** Een klik op het gekozen deel heft de keuze op, een klik op een ander deel wisselt de keuze direct. */
+  function wissel(plek: number) {
+    kies(gekozen === plek ? null : plek);
+  }
+
   function kies(plek: number | null) {
     setGekozen(plek);
     // Onder 768px staat het paneel onder de cirkel: Scrol ernaartoe.
@@ -104,7 +117,11 @@ export function AssessmentCirkel({ assessments }: { assessments: Assessment[] })
   function onToets(e: React.KeyboardEvent, plek: number) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      kies(plek);
+      wissel(plek);
+      return;
+    }
+    if (e.key === "Escape") {
+      kies(null);
       return;
     }
     const volgende = volgendeKeuze(volgorde.indexOf(plek), volgorde.length, e.key);
@@ -129,8 +146,8 @@ export function AssessmentCirkel({ assessments }: { assessments: Assessment[] })
             const gedimd = gekozen !== null && !isGekozen;
             const clipId = `ac-${uid}-${plek}`;
             const [stipX, stipY] = stipPunt(d.assessmentId);
-            const [lx, ly] = kompas(LABEL_R, d.midden);
-            const label = KORTE_NAMEN[a.id] ?? a.kortLabel ?? a.naam;
+            const [lx, ly] = labelPunt(d.assessmentId);
+            const regels = LABEL_REGELS[a.id] ?? [KORTE_NAMEN[a.id] ?? a.kortLabel ?? a.naam];
             return (
               <div
                 key={a.id}
@@ -146,7 +163,7 @@ export function AssessmentCirkel({ assessments }: { assessments: Assessment[] })
                   ["--ac-dx" as string]: `${d.richting[0] * 10}px`,
                   ["--ac-dy" as string]: `${d.richting[1] * 10}px`,
                 }}
-                onClick={() => kies(plek)}
+                onClick={() => wissel(plek)}
                 onKeyDown={(e) => onToets(e, plek)}
               >
                 <svg width={MAAT} height={MAAT} viewBox={`0 0 ${MAAT} ${MAAT}`} aria-hidden="true">
@@ -168,7 +185,11 @@ export function AssessmentCirkel({ assessments }: { assessments: Assessment[] })
                 </svg>
                 <span className="ac-label" style={{ left: lx, top: ly }}>
                   <AssessmentIcon name={a.icoon} style={{ width: "30px", height: "30px", color: "var(--or)", flex: "none" }} />
-                  <span>{label}</span>
+                  <span className="ac-label-tekst">
+                    {regels.map((r) => (
+                      <span key={r}>{r}</span>
+                    ))}
+                  </span>
                 </span>
               </div>
             );
