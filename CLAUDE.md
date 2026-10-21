@@ -20,9 +20,9 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `content-zorgscan.md` | Vragen van de Zorgscan, sector-variant van de Klantcontact Volwassenheidsscan |
 | `content-ziekenhuis-quickscan.md` | Afdelingen (categorieën), dimensies (bouwblokken), vragen en resultaatopbouw van de Klantcontact Quickscan – Ziekenhuis (Ja / Nee / Weet ik niet) |
 | `visie-ai-klantcontact.md` | Visie op AI in klantcontact, per domein van de AI-volwassenheidsscan |
-| `content-2030.md` | Duidingsstuk "Klantcontact richting 2030", los van de scanresultaten |
-| `bouwstenenmodel-visual.md` | Spec voor het interactieve overzicht van de 15 bouwstenen |
-| `ai-domeinenmodel-visual.md` | Spec voor het interactieve overzicht van de 8 AI-domeinen |
+| `content-2030.md` | Duidingsstuk "Klantcontact richting 2030", los van de scanresultaten; staat als sectie op de Assessment-pagina van de AI-scan |
+| `bouwstenenmodel-visual.md` | Spec voor het interactieve overzicht van de 15 bouwstenen, een sectie op de Assessment-pagina van Klantcontact Volwassenheid en Zorg |
+| `ai-domeinenmodel-visual.md` | Spec voor het interactieve overzicht van de 8 AI-domeinen, een sectie op de Assessment-pagina van de AI-scan |
 | `privacy-pagina.md` | De privacypagina |
 | `export-pdf-visual-volwassenheidsscan.md` | PDF-export van één ingevulde scan: gedeelde regels (bron, slotsectie, bulk-export) plus de visuele opbouw voor de Klantcontact Volwassenheidsscan |
 | `export-pdf-visual-ai-scan.md` | PDF-export: visuele opbouw voor de AI-volwassenheidsscan, verschillen t.o.v. hierboven |
@@ -337,18 +337,14 @@ De nav heeft een vast deel links (logo) en een contextueel deel rechts
    apart concept meer voor een terug- versus een vooruit-actie binnen
    hetzelfde scherm: Beide staan hier, uiterst links, ongeacht de
    richting.
-2. Een verticale scheidingslijn, **alleen als punt 1 iets bevat**.
-3. **De 4 vaste content-links** (Visie, Bouwstenen, AI, 2030, zie
-   verderop in deze sectie). Aanwezig op elk scherm, inclusief de 3
-   publieke schermen (Kies jouw assessment, Assessment-landingspagina,
-   Voorbeeld-output) en het intake-scherm.
-4. Een verticale scheidingslijn, **alleen als punt 5 iets bevat**.
+2. Een verticale scheidingslijn, **alleen als punt 1 iets bevat** en er rechts ervan nog iets staat (punt 5 of 7).
+3. **Vervallen (besloten door Joost op 21 oktober 2026, ontwerp `Herontwerp-Navigatie`).** De 4 vaste content-links (Visie, Bouwstenen, AI, 2030) staan niet meer in de nav. De content staat op de Assessment-pagina (scherm 2), bij het Assessment waar hij bij hoort. Een gebruiker met een persoonlijke link komt daar via "Over deze scan" op de Meting-kaart op Mijn metingen. De nummering van deze punten blijft zoals ze was, omdat andere specs ernaar verwijzen.
+4. Vervallen, zie punt 3.
 5. Uiterst rechts de link om de sectie te verlaten, met een `←` ervoor
    (bijv. "← Terug naar Mijn metingen" op de doorloopflow, de
-   resultatenpagina en de 4 content-pagina's). Op de 4 content-pagina's
-   staat deze link alleen bij een herkende gebruiker; zonder sessie
-   ontbreekt hij, met de scheidingslijn ervoor (punt 4), en eindigt de
-   nav op de 4 links en "Inloggen". Terug gaat dan via het logo.
+   resultatenpagina en de Assessment-pagina met een persoonlijke link). Op de
+   Assessment-pagina staat deze link alleen bij een herkende gebruiker; zonder
+   sessie ontbreekt hij en staat er alleen "Inloggen". Terug gaat dan via het logo.
    **Beheer heeft geen
    exit-actie**: Geen "← Terug naar site" — voegde niets toe en
    verwarde met "Uitloggen" in het Accountmenu ernaast (twee manieren
@@ -359,7 +355,7 @@ De nav heeft een vast deel links (logo) en een contextueel deel rechts
    Het Accountmenu (`beheerpagina.md`) aan de beheerkant, het
    "Mijn gegevens"-menu (verderop in deze sectie) aan de respondentkant.
    Op elk scherm zonder ingelogde/herkende gebruiker (scherm 1, Kies jouw
-   assessment, de andere publieke schermen en de 4 content-pagina's
+   assessment, de andere publieke schermen en de Assessment-pagina
    zonder sessie) staat hier in plaats daarvan **"Inloggen"** —
    zelfde plek, uitgelogde variant van datzelfde slot, geen dropdown en
    geen pijltje ervoor of erachter. Het slot is dus nooit leeg: Met een
@@ -370,10 +366,9 @@ De nav heeft een vast deel links (logo) en een contextueel deel rechts
    Accountmenu links van de exit-actie plaatste.
 
 **Geen scheidingslijn zonder inhoud aan beide kanten.** Op "Mijn
-metingen" bijvoorbeeld staan de 4 links en het "Mijn gegevens"-menu,
-met precies één scheidingslijn ertussen: Geen scherm-specifieke actie
-(punt 1) en geen exit-actie (punt 5) op dat scherm, dus geen
-scheidingslijn dáár.
+metingen" bijvoorbeeld staat alleen het "Mijn gegevens"-menu, zonder
+scheidingslijn: Geen scherm-specifieke actie (punt 1) en geen exit-actie
+(punt 5) op dat scherm.
 
 **"Terug naar" is niet automatisch de exit-actie.** Op de
 resultatenpagina is "Terug naar de scan" een scherm-specifieke actie
@@ -387,22 +382,29 @@ zodra de visuele uitwerking verder is.
 **Logo, contextafhankelijk**: Op de publieke schermen (Kies jouw
 assessment, Assessment-landingspagina, Voorbeeld-output) gaat het logo
 naar `#/`, zoals nu. Zodra een respondent binnen zijn persoonlijke link
-zit (intake, doorloopflow, resultaten, Mijn metingen, en de 4
-content-pagina's), gaat het logo naar "Mijn metingen" in plaats van naar
+zit (intake, doorloopflow, resultaten, Mijn metingen en de
+Assessment-pagina met een persoonlijke link), gaat het logo naar "Mijn metingen" in plaats van naar
 de publieke homepage. Dit stond nergens vastgelegd, dus `#/` overal was
 geen afwijking van de spec maar een gat erin.
 
 ### Schermen
 
 1. **Kies jouw assessment**: Kaarten per Assessment-type, generiek over
-   `Assessment[]`. **`.nav-right`**: De 4 vaste content-links, dan
+   `Assessment[]`. **`.nav-right`**:
    "Inloggen" in het identiteitsmenu-slot (Globale layout hierboven,
    punt 7) — gaat naar scherm 4a, Toegang (e-mail + verificatiecode),
    voor een respondent/Lead die al een account heeft maar zijn
    persoonlijke link niet bij de hand heeft. Nu de enige weg naar
    scherm 4a buiten "Uitloggen" om. Geen scherm-specifieke actie op dit
    scherm (punt 1 leeg), dus geen scheidingslijn daarvóór.
-2. **Assessment-landingspagina**: Titel, hero, 3 feature-cards en een
+
+   **Tegels (besloten door Joost op 21 oktober 2026, ontwerp `Herontwerp-Home` in het Design-artifact)**: Twee tegels per rij, de hele tegel is klikbaar en gaat naar scherm 2 (er staat geen aparte link "Bekijk dit assessment" in). Van boven naar beneden staat in elke tegel het Assessment-icoon (48px, `--or`) links van de titel (24px, gewicht 800), daaronder één samenvattende zin (16px, `--ink-m`) en daaronder drie punten onder elkaar (15px), elk met een grijs lijnicoon (`--ink-s`, 20px, zelfde stijl als de iconen op scherm 2) ervoor. De drie punten zijn per Assessment concreet en komen niet in elke tegel hetzelfde terug: Het eerste noemt het aantal vragen en de invultijd, het tweede de opbouw van het Assessment en het derde wat je in het resultaat terugziet. Er staat verder geen regel met kenmerken onder de tegel, omdat de invultijd al in het eerste punt staat. Voorstel voor de teksten:
+   - **Klantcontact Volwassenheid**: "Breng in kaart hoe volwassen jouw klantcontactorganisatie is." Punten: "60 vragen, ±30 minuten" (klok), "15 bouwblokken in 5 categorieën" (lagen), "Concrete stappen op basis van je scores" (vlag).
+   - **AI-Volwassenheid in Klantcontact**: "Zie hoe ver jouw organisatie is met AI in klantcontact." Punten: "40 vragen, ±20 minuten", "8 AI-domeinen", "Concrete stappen per domein".
+   - **Klantcontact Volwassenheid – Zorg**: "Breng in kaart hoe volwassen het patiënt- of cliëntcontact van jouw zorg- of welzijnsorganisatie is." Punten: "60 vragen, ±30 minuten", "15 bouwblokken in 5 categorieën", "Scores gewogen voor de zorg, met concrete stappen".
+   - **Klantcontact Quickscan – Ziekenhuis**: "Zie snel waar jouw ziekenhuis staat in klantcontact." Punten: "60 vragen, ±15 minuten", "10 dimensies", "Gemiddelde en spreiding per afdeling" (staafjes).
+   De aantallen komen waar het kan uit het Assessment. Of de zin en de punten beheerbaar zijn of in de code staan, is nog niet besloten (Open punten).
+2. **Assessment-landingspagina** (herontwerp van 21 oktober 2026, zie het blok **Herontwerp** hieronder; waar de tekst ervan afwijkt, geldt het herontwerp): Titel, hero, 3 feature-cards en een
    blok "Praktische informatie" met invultijd, direct resultaat en
    privacy. "Start assessment" staat direct onder de hero maar is
    uitgeschakeld, met de uitleg dat toegang via een persoonlijke link
@@ -420,10 +422,25 @@ geen afwijking van de spec maar een gat erin.
    titel van elke feature-card (Volledig beeld, Direct inzicht, Concreet en
    toepasbaar, op volgorde van de kaart, zonder nummer) en voor de drie
    koppen van Praktische informatie. De zin "15 bouwblokken, verdeeld over 5
-   pijlers" is in de beschrijving bovenaan een link naar `/bouwstenen` (niet ook in de kaart Volledig beeld, waar de zin nog eens staat). Deze pagina
+   pijlers" is in de beschrijving bovenaan een ankerlink naar de sectie "De 15 bouwblokken" op dezelfde pagina (niet ook in de kaart Volledig beeld, waar de zin nog eens staat). Bij de AI-scan is "8 domeinen" een ankerlink naar de sectie "AI in klantcontact". Deze pagina
    wordt later mogelijk een leadgenerator met "Toegang aanvragen"
    (`backlog.md`).
-   **Bovenkant (hero, besloten door Joost en gebouwd op 20 oktober 2026, design `Open-B` in `Claude outputs/resultaatkop/`, gekozen door Joost omdat de hero te rommelig was)**: Gecentreerd, op een witte achtergrond (de gradient vervalt), met van boven naar beneden: Het Assessment-icoon in een witte cirkel van 64px met een lichte schaduw (icoon 28px), de eyebrow "Coniche Scan" (12px, hoofdletters, `--or`) op 24px eronder, de titel op 12px daaronder (48px, regelhoogte 56px, gewicht 800), één zin uitleg (18px, regelhoogte 28px, `--ink-m`, hoogstens 620px breed, gecentreerd) met op 20px afstand de link "15 bouwblokken in 5 pijlers" in `--or`, de drie kenmerken ("±30 minuten", "Heldere inzichten", "Direct verbeterkansen", 14px, gewicht 600, grijze lijniconen van 20px) op 28px eronder in één rij met 28px ertussen, de knop "Start assessment" (uitgeschakeld, 52px hoog) met het Info-icoon ernaast op 36px eronder, daaronder op 16px één regel toelichting (14px, `--ink-m`, hoogstens 440px) en als laatste, op 28px, "Bedoeld voor ..." (14px, `--ink-s`). De uitleg is één zin: De tweede zin ("Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken") komt niet meer in de hero voor en staat bij de feature-card Volledig beeld. De toelichting bij de knop is "Toegang loopt via een persoonlijke link van Coniche. Heb je die niet, neem dan contact op." De rest van de pagina (feature-cards, film, Praktische informatie) blijft ongewijzigd.
+   **Bovenkant (hero, besloten door Joost en gebouwd op 20 oktober 2026, design `Open-B` in `Claude outputs/resultaatkop/`, gekozen door Joost omdat de hero te rommelig was)**: Gecentreerd, op een witte achtergrond (de gradient vervalt), met van boven naar beneden: Het Assessment-icoon in een witte cirkel van 64px met een lichte schaduw (icoon 28px), de eyebrow "Coniche Scan" (12px, hoofdletters, `--or`) op 24px eronder, de titel op 12px daaronder (48px, regelhoogte 56px, gewicht 800), één zin uitleg (18px, regelhoogte 28px, `--ink-m`, hoogstens 620px breed, gecentreerd) met op 20px afstand de link "15 bouwblokken in 5 pijlers" in `--or`, de drie kenmerken ("±30 minuten", "Heldere inzichten", "Direct verbeterkansen", 14px, gewicht 600, grijze lijniconen van 20px) op 28px eronder in één rij met 28px ertussen, de knop "Start assessment" (uitgeschakeld, 52px hoog) met het Info-icoon ernaast op 36px eronder, daaronder op 16px één regel toelichting (14px, `--ink-m`, hoogstens 440px) en als laatste, op 28px, "Bedoeld voor ..." (14px, `--ink-s`). De uitleg is één zin: De tweede zin ("Elke vraag is gebaseerd op aantoonbaar bewijs: documenten, ritmes, tooling en afspraken") komt niet meer in de hero voor en staat bij de feature-card Volledig beeld. De toelichting bij de knop is "Toegang loopt via een persoonlijke link van Coniche. Heb je die niet, neem dan contact op." De rest van de pagina volgt het herontwerp hieronder.
+   **Herontwerp (besloten door Joost op 21 oktober 2026, ontwerp `Herontwerp-Volwassenheid`, `Herontwerp-AI`, `Herontwerp-Home` en `Herontwerp-Navigatie` in het Design-artifact; een klikbaar voorbeeld van het scrollen staat in `Proef-Sticky`)**: De content die eerder achter de vier links bovenin stond (Visie, Bouwstenen, AI, 2030) staat nu op de Assessment-pagina zelf, bij het Assessment waar hij bij hoort. De pagina is één lange pagina met een sticky sub-nav (geen tabs).
+   - **Opbouw van boven naar beneden**: De hero (zie hierboven), de sticky sub-nav, de secties van dit Assessment, de sectie "Wat krijg ik", de sectie "Praktische informatie" en de footer. De hoofd-nav is niet sticky en scrolt weg.
+   - **Sticky sub-nav**: Een balk van 60px hoog met een boven- en onderrand, links één pil per sectie (36px hoog, 14px, gewicht 600, volledig rond), rechts de knop "Start assessment" (uitgeschakeld, zoals in de hero). De balk blijft bovenaan het venster staan (`position: sticky; top: 0`). Een klik op een pil scrolt zacht naar de sectie, met 60px ruimte erboven voor de balk (`scroll-margin-top`). De pil van de sectie waar je staat is actief (lichtoranje achtergrond `#fff1e8`, tekst `#c2570c`; tokens nog toe te voegen aan `stylesheet.md`). Als sectie geldt de laatste sectie waarvan de bovenkant minder dan 90px onder de balk staat. De pillen werken ook als gewone ankerlinks (`#visie`, `#bouwblokken`, `#ai`, `#2030`, `#wat`, `#praktisch`). Staat in het systeem verminderde beweging aan, dan scrolt de pagina niet zacht.
+   - **Secties per Assessment**:
+     - Klantcontact Volwassenheid en Zorg: "Visie", "De 15 bouwblokken", "Wat krijg ik", "Praktisch". De Zorgscan gebruikt voorlopig dezelfde teksten; zorgspecifieke teksten volgen later (`backlog.md`).
+     - AI-volwassenheid: "AI in klantcontact", "Klantcontact richting 2030", "Wat krijg ik", "Praktisch".
+     - Quickscan Ziekenhuis: Voorlopig geen extra content en geen sub-nav, de pagina houdt de opbouw van vóór het herontwerp.
+   - **Visie** (bron `visie-coniche.md`, deel 1): Een sectiekop met een korte inleiding en drie kaarten naast elkaar (Beloften waarmaken, Kwaliteit zit in het geheel, Van meten naar verbeteren), elk met een korte tekst en "Lees verder". "Lees verder" klapt de volledige tekst op dezelfde pagina uit; er is geen aparte pagina.
+   - **De 15 bouwblokken** (bron `visie-coniche.md`, deel 2, component `bouwstenenmodel-visual.md`): De interactieve visual staat hier als sectie, vijf kolommen (de categorieën) met de bouwblokken als pillen met een nummercirkel in de categoriekleur. Een klik opent de Toelichtingsmodal zoals nu.
+   - **AI in klantcontact** (bron `visie-ai-klantcontact.md`, component `ai-domeinenmodel-visual.md`): De acht domeinen als kaarten in een raster van vier kolommen, met een nummercirkel in de domeinkleur (`stylesheet.md`, Domeinkleuren) en de naam. Een klik opent de Toelichtingsmodal.
+   - **Klantcontact richting 2030** (bron `content-2030.md`): De vijf ontwerpkeuzes als vijf kaarten naast elkaar (nummer, titel, één zin), daaronder pillen met de overige onderdelen van het stuk en "Lees het hele stuk", dat het volledige stuk op dezelfde pagina uitklapt.
+   - **Wat krijg ik**: Kop "Zo ziet je resultaat eruit" met een inleidende zin die bij het type past. Daaronder de film Wat krijg ik van het type (`help.md`, Films, met de knop "Bekijk de voorbeeld-output") en daaronder de film "Het dossier, de radar voor de Lead" (`help.md`, Films, ontwerp `Film-Dossier`), zonder knop. Beide staan in een kaart met drie stapkaarten.
+   - **Praktisch**: De sectie "Praktische informatie", ongewijzigd.
+   - **Routes**: De losse pagina's `/visie`, `/bouwstenen`, `/ai-scan` en de 2030-pagina vervallen. Een oud adres stuurt door naar de Assessment-pagina waar de content nu staat (Visie en Bouwstenen naar Klantcontact Volwassenheid, AI en 2030 naar de AI-scan).
+   - **Bereikbaarheid**: Een bezoeker zonder sessie komt hier via scherm 1, met alleen "Inloggen" in de nav. Een gebruiker met een persoonlijke link komt hier via "Over deze scan" op de Meting-kaart (zie scherm 5); de nav toont dan "← Terug naar Mijn metingen" en "Mijn gegevens" en het logo gaat naar Mijn metingen.
 3. **Voorbeeld-output**: Dezelfde resultaatcomponenten als scherm 6, met
    vaste demodata. De resultaatcomponent wordt één keer gebouwd. Voor
    elk Assessment, dus ook voor de AI-scan, de Zorgscan en de Quickscan,
@@ -439,8 +456,8 @@ geen afwijking van de spec maar een gat erin.
      `--control-h`.
    - De kop is één component voor alle Assessments. Een afwijking per
      Assessment (andere kleur, andere knop) is een fout.
-   - De nav toont hier de 4 vaste content-links en "Inloggen" (Globale
-     layout, punt 3 en 7). "← Terug" staat in de kop en niet ook in de nav.
+   - De nav toont hier alleen "Inloggen" (Globale
+     layout, punt 7). "← Terug" staat in de kop en niet ook in de nav.
    Onder die kop staat bij de Klantcontact Volwassenheidsscan, de
    AI-volwassenheidsscan en de Zorgscan de weergave Per bouwblok
    van een Meting met zes demo-respondenten (`visualisatie-scores.md`, A), met
@@ -498,46 +515,14 @@ geen afwijking van de spec maar een gat erin.
    een Lead niets aan staan en geen scans, dan staat er een korte melding dat
    er nog niets voor hem klaarstaat (`beheerpagina.md`, punt 6a).
 
-   **In de header van "Mijn metingen" staan de 4 vaste content-links**
-   (zie de Globale layout hierboven, punt 1 van `.nav-right`), elk naar
-   een gewone leespagina (geen modal, geen visual, alleen tekst):
-   - **Visie** → `visie-coniche.md` deel 1
-   - **Bouwstenen** → de interactieve bouwstenenmodel-visual, route
-     `/bouwstenen` (`bouwstenenmodel-visual.md`). Geen aparte leespagina
-     meer: De beschrijving en centrale vraag per bouwsteen
-     (`visie-coniche.md` deel 2) komen uitsluitend nog terug in de
-     modal die opent bij het klikken op een bouwsteen binnen dit
-     component.
-   - **AI** → de interactieve ai-domeinenmodel-visual, route `/ai-scan`
-     (`ai-domeinenmodel-visual.md`). Zelfde patroon: `visie-ai-
-     klantcontact.md` levert de modal-content per domein, geen losse
-     leespagina.
-   - **2030** → `content-2030.md`, gewone leespagina (geen modal, geen
-     visual, alleen tekst)
-
-   **Deze 4 links staan op elk scherm van de app**, zie de Globale
-   layout hierboven. Sta je al op "Visie", dan zie
-   je in `.nav-right` nog steeds ook Bouwstenen/AI/2030, zodat je
-   rechtstreeks naar een andere kunt springen zonder eerst terug te
-   gaan. Op de 4 content-pagina's, de doorloopflow en de
-   resultatenpagina komt daarna, na de scheidingslijn, de losse
-   exit-actie "← Terug naar Mijn metingen" (zie de nav-volgorderegel
-   hierboven). Die 4 links plus de terugknop staan dus naast elkaar, de
-   een vervangt de ander niet. Op Mijn metingen zelf is die terugknop er
-   niet, dat is al de hub.
-
-   Voor nu staan alle vier er altijd, ongeacht welke scan-type(s) de
-   respondent heeft. **Open, te bespreken met Sander**: Of Bouwstenen en
-   AI straks conditioneel worden (alleen tonen bij het bijbehorende
-   scan-type), zoals eerder overwogen. Nog geen besluit, bewust als
-   vraag laten staan in plaats van stilzwijgend een van beide te kiezen.
+   **De content (Visie, Bouwstenen, AI en 2030) staat niet meer in de header** (besloten door Joost op 21 oktober 2026, zie de Globale layout, punt 3, en scherm 2). Op elke Meting-kaart van een Respondent staat een link "Over deze scan" naar de Assessment-pagina (scherm 2) van het Assessment van die Meting, met de persoonlijke code (`?code=`). De linktekst hangt af van het type: "Over deze scan: visie en bouwblokken" bij Klantcontact Volwassenheid en Zorg, "Over deze scan: AI-domeinen en 2030" bij de AI-scan. Bij de Quickscan staat de link er niet zolang daar geen extra content is. De link staat naast "Bekijk resultaten" (zelfde stijl, `--or`, 14px, gewicht 700). Een Lead die geen Respondent is en alleen een benchmark heeft, ziet de link niet. De vraag of Bouwstenen en AI conditioneel moeten worden is hiermee vervallen: De content hangt nu aan het Assessment zelf.
 
    **"Mijn gegevens"-menu.** Niet te verwarren met het Accountmenu uit
    `beheerpagina.md` (dat is voor beheerders, dit is voor
    respondenten): Een dropdown-knop, zelfde patroon als de Dropdown-knop
    uit `stylesheet.md`. Zichtbaar op elk scherm waar een respondent-
    identiteit bestaat: "Mijn metingen", de doorloopflow, de
-   resultatenpagina en de 4 content-pagina's, wanneer bereikt via een
+   resultatenpagina en de Assessment-pagina, wanneer bereikt via een
    persoonlijke link. Niet op de 3 publieke schermen en niet op de
    intake zelf (daar is nog geen opgeslagen identiteit om te tonen).
 
@@ -622,10 +607,9 @@ geen afwijking van de spec maar een gat erin.
    voorwaartse actie, geen terug-actie. Alleen zichtbaar zodra deze
    ScanInvulling `"afgerond"` is, gaat rechtstreeks naar scherm 6 zonder
    opnieuw door de bouwblokken te hoeven klikken). Is deze actie
-   zichtbaar, dan volgt een scheidingslijn; is de invulling nog niet
-   afgerond, dan begint `.nav-right` direct met de 4 vaste links, geen
-   losse scheidingslijn. Dan de 4 vaste content-links, dan de
-   scheidingslijn, dan "← Terug naar Mijn metingen".
+   zichtbaar, dan volgt een scheidingslijn, dan "← Terug naar Mijn metingen";
+   is de invulling nog niet afgerond, dan staat er alleen "← Terug naar Mijn
+   metingen", zonder scheidingslijn.
 6. **Resultatenscherm**: Bovenaan de Resultaatkop met eyebrow, titel, subregel
    en totaalkaart (voorstel van 19 oktober 2026, `stylesheet.md`,
    Resultaatkop, voor elke scan dezelfde). De overall score staat daarin in de
@@ -674,8 +658,7 @@ geen afwijking van de spec maar een gat erin.
    "Exporteren" met een dropdown (opties "Als PDF", "Als CSV" en "Voor
    InDesign (XML)", zie `stylesheet.md`, niet losse knoppen), als
    scherm-specifieke acties, uiterst links, geen scheidingslijn tussen
-   die twee onderling. Dan de scheidingslijn, dan de 4 vaste
-   content-links (zie Globale layout hierboven). Dan de scheidingslijn,
+   die twee onderling. Dan de scheidingslijn,
    dan "← Terug naar Mijn metingen". Eén gedeelde exportfunctie, zie
    `beheerpagina.md` en `export-indesign.md`.
 
@@ -710,6 +693,9 @@ bouwblokken met naam, omschrijving, tags en vragen.
 ---
 
 ## 5. Open punten
+
+- Herontwerp van de Assessment-pagina's (21 oktober 2026, scherm 1 en 2): Nog te beslissen. (1) De drie feature-cards (Volledig beeld, Direct inzicht, Concreet en toepasbaar) komen in het ontwerp niet meer terug, en de zin "Elke vraag is gebaseerd op aantoonbaar bewijs" stond in de kaart Volledig beeld: Waar die tekst blijft is open. (2) Of "Start assessment" voor een herkende Respondent met een open scan actief wordt op de Assessment-pagina. (3) Of de zin en de drie punten op de tegels beheerbaar zijn of in de code staan, en of "Concrete stappen" klopt met wat het resultaat toont (`stylesheet.md`, Vervolgstappen). (4) De tekst "Wat is goed klantcontact?" uit `visie-coniche.md` deel 1 staat in het ontwerp niet apart in de sectie Visie. (5) Welke tekst bij de Zorgscan komt en wat de Quickscan als content krijgt. (6) De film "De radar in je resultaten" staat niet op de Assessment-pagina's, alleen Wat krijg ik en Het dossier. (7) Of de teksten van Visie, Bouwstenen, AI en 2030 beheerbaar blijven zoals in `beheerpagina.md`, punt 11.
+
 
 - Aggregatie over meerdere respondenten: Het gemiddelde per Meting is
   gebouwd (`beheerpagina.md`, Organisatie-resultaten). Afwijking en

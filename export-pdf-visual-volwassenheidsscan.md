@@ -164,7 +164,7 @@ Per bouwsteen, van boven naar beneden:
 - **Opmerking** (alleen als ingevuld, `ScanInvulling.opmerkingenPerBouwblok`):
   Vlak `#faf9f7`, rand, radius 8px.
 
-## Pagina 10: Slotsectie — Visie (stijl van `/visie`)
+## Pagina 10: Slotsectie — Visie (stijl van de sectie Visie op de Assessment-pagina)
 
 Eén pagina zonder bovenmarge, zodat de gloed vanaf de paginarand loopt.
 Tekst iets verdicht (8,5pt, regelhoogte 1,42) zodat alles past.

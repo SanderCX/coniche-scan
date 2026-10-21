@@ -1,5 +1,7 @@
 # Klantcontact richting 2030
 
+**Plaats in de app (besloten door Joost op 21 oktober 2026):** Dit stuk staat als sectie "Klantcontact richting 2030" op de Assessment-pagina van de AI-scan (`CLAUDE.md`, sectie 3, scherm 2), met de vijf ontwerpkeuzes als kaarten en "Lees het hele stuk" voor de rest. Het is geen losse pagina en geen link in de header meer.
+
 Waar klantcontact naartoe gaat richting 2030 ligt niet vast. Organisaties
 bewegen niet dezelfde kant op: De ene zet vooral in op verdere
 digitalisering, de andere kiest bewust voor meer menselijk contact. Dat

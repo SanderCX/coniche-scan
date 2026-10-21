@@ -68,6 +68,13 @@ Bewust nog niet opgepakt. Geen prioritering.
 
 ## Functioneel
 
+- **Zorgspecifieke teksten voor Visie en Bouwstenen** (21 oktober 2026): De
+  Zorgscan gebruikt op de Assessment-pagina voorlopig dezelfde secties als
+  Klantcontact Volwassenheid (`CLAUDE.md`, sectie 3, scherm 2). Later krijgen
+  Visie en Bouwstenen voor Zorg eigen teksten.
+- **Content voor de Quickscan Ziekenhuis op de Assessment-pagina** (21 oktober
+  2026): Nu geen sub-nav en geen extra content. Nog te bepalen wat er komt.
+
 - **Conflict oplossen bij omhangen naar een andere Meting**
   (`beheerpagina.md`, punt 6b): Heeft de Respondent in de doel-Meting al een
   scan, dan komt er naast de waarschuwing een modal met beide scans naast
@@ -199,7 +206,7 @@ Bewust nog niet opgepakt. Geen prioritering.
   tonen (`inhoudelijk-fundament.md` sectie 1).
 - **Planning bij een meting**: Open vanaf, sluit op, status.
 - **Content presenteerbaar maken (toggle Lezen/Presenteren)**: Elke
-  contentpagina (Visie, Bouwstenen, AI-scan, 2030, dus
+  contentsectie op de Assessment-pagina (Visie, Bouwstenen, AI-scan, 2030, dus
   `visie-coniche.md`, `visie-ai-klantcontact.md`, `content-2030.md`)
   krijgt naast de leesweergave een presenteerweergave: Schermvullend,
   stap voor stap, bedoeld voor sales en consultants om het
@@ -217,7 +224,7 @@ Bewust nog niet opgepakt. Geen prioritering.
   Eerste stap: Een proof-of-concept op één of twee onderwerpen, niet in
   één keer alle vier.
 - **Kleine calls to action bij de bouwstenen-content**: Op de
-  leespagina's Bouwstenen/AI-scan en/of in de modal van de
+  secties Bouwstenen en AI op de Assessment-pagina en/of in de modal van de
   bouwstenenmodel-visual/ai-domeinenmodel-visual (nog te bepalen welke,
   zie ook de open plek-vraag in die bestanden). Drie soorten links, per
   bouwsteen of domein:
@@ -552,7 +559,7 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   centrale vraag bewerkbaar, de visual zelf vast. Open: Is er één bron met de
   velden `Bouwblok.toelichting` en `Bouwblok.centraleVraag` van het Assessment
   (een aanpassing in Content wijzigt dan ook de publieke pagina), of mogen ze
-  uit elkaar lopen. Nu gebruiken `/bouwstenen` en `/ai-scan` nog hun eigen
+  uit elkaar lopen. Nu gebruiken de secties Bouwstenen en AI op de Assessment-pagina nog hun eigen
   statische content.
 - **Content-pagina's, opslag**: Voorstel is zoals bij Algemene teksten: Een
   gewijzigde tekst gaat voor op de standaardtekst, met "Standaardtekst

@@ -447,7 +447,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
 | `info.contactpersonen` | Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen | Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze. |
 | `info.dossier` (gebouwd op 21 oktober 2026, vervangt `info.nieuwsartikelen`) | Organisatie-detail, kaart Dossier, naast de titel | Cases en nieuws die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier open staat én het item op Zichtbaar voor klant staat. Een case kan alleen open als de organisatie in de case dat heeft toegestaan. |
-| `info.caseVlag` (gebouwd op 21 oktober 2026) | Organisatie-detail, bij de schakelaar "Mag als case gebruikt worden" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads. |
+| `info.caseVlag` (gebouwd op 21 oktober 2026) | Organisatie-detail, bij het vinkje "Mag als case gebruikt worden" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads. |
 | `info.kpiBlok` | Organisatie-detail, blok KPI's, naast de titel | Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet. |
 | `info.kpiPlek` | Modal KPI's invullen, naast het label Plek | Kies voor welk deel van de organisatie je invult. Algemeen is de hele organisatie. |
 | `info.kpiKanalen` | Modal KPI's invullen, naast het label Kanalen uitsplitsen | Kies alleen de kanalen waarvoor je cijfers hebt. De kolom Algemeen blijft altijd staan. |
@@ -461,13 +461,14 @@ document of andere bouwerstekst.
 
 #### 11. Content-pagina's (Visie, Bouwstenen, AI, 2030)
 
-**Nieuw, nog niet gebouwd.** De 4 vaste content-links (CLAUDE.md,
-Globale layout, punt 3 van de nav-volgorderegel) komen nu uit losse
-bronbestanden en zijn nergens beheerbaar. Dit onderdeel maakt ze
+**Nieuw, nog niet gebouwd.** De content van Visie, Bouwstenen, AI en 2030
+staat sinds 21 oktober 2026 als secties op de Assessment-pagina (CLAUDE.md,
+sectie 3, scherm 2) en niet meer achter links in de nav. Ze komt nu uit losse
+bronbestanden en is nergens beheerbaar. Dit onderdeel maakt ze
 bewerkbaar vanuit beheer, net als Algemene teksten hierboven:
 
 - **Visie** (`visie-coniche.md` deel 1) en **2030**
-  (`content-2030.md`): Gewone leespagina's, alleen tekst. Eén
+  (`content-2030.md`): Secties met tekst (de Visie met drie kaarten, de 2030 met vijf kaarten en een uitklapbaar stuk). Eén
   tekstveld per pagina, zelfde soort component als Algemene teksten.
 - **Bouwstenen**: De 15 bouwstenen uit `visie-coniche.md` /
   `bouwstenenmodel-visual.md`. Titel en omschrijving per bouwsteen
@@ -939,17 +940,17 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   uitzetten kan zonder bevestiging. Wijzigen wordt gelogd
   (`organisatie.antwoordenNamenGewijzigd`). Zie punt 6a, Namen bij Antwoorden.
 - **Case-vlag** (Admin-only, voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 in `components/beheer/CaseVlag.tsx`): In de kaart Afspraken,
-  rechts van de schakelaar "Namen tonen bij Antwoorden", een schakelaar
+  rechts van de schakelaar "Namen tonen bij Antwoorden", een vinkje
   "Mag als case gebruikt worden" (`Organisatie.caseToegestaan`, `datamodel.md`
   deel 3) met een Info-icoon (`info.caseVlag`). Hij staat uit bij een nieuwe
   organisatie en bij alle bestaande. Een Admin zet hem aan nadat dit met de
   organisatie is afgesproken. Aanzetten kan zonder bevestiging. Uitzetten gaat na
   een bevestiging die zegt in hoeveel Cases bij andere organisaties deze
   organisatie voorkomt en dat die voor de Leads verdwijnen. Wijzigen wordt
-  gelogd (`organisatie.caseVlagGewijzigd`). Het ontwerp (`dossier.md`) tekent
-  een vinkje; de kaart heeft schakelaars, en de nieuwe vlag volgt dezelfde
-  vorm. Past de derde schakelaar niet in de rij, dan staat hij eronder (zo
-  gebouwd, de kaart is een rij die afbreekt). De bevestiging bij uitzetten telt
+  gelogd (`organisatie.caseVlagGewijzigd`). De Afspraken zijn in de bouw
+  vinkjes, ook deze (de beschrijving van de andere twee als schakelaar hierboven
+  is achterhaald). Past het derde vinkje niet in de rij, dan staat het eronder
+  (zo gebouwd, de kaart is een rij die afbreekt). De bevestiging bij uitzetten telt
   alleen de Cases die voor een Lead zichtbaar zijn (`zichtbaarVoorLead`), en een
   Case waarvan de vlag uitgaat blijft bij de Consultant staan met de status
   "Toestemming ontbreekt". Zie `dossier.md`.

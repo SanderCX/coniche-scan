@@ -581,7 +581,7 @@ link", "Openen", "Vragenlijst sturen", "Standaardtekst herstellen" en
 .btn-compact`.
 
 **Een link is alleen voor navigatie.** Dat zijn het kruimelpad, de links in
-de header en de footer (inclusief de vaste content-links en de exit-actie
+de header en de footer (inclusief de exit-actie
 "← Terug naar ...") en een verwijzing binnen lopende tekst naar een andere
 pagina, zoals de privacypagina in de toestemmingstekst. Een link is oranje
 (`var(--or)`) zonder onderstreping, met onderstreping bij hover.
@@ -632,6 +632,14 @@ bestand `assessment-icoon-<sleutel>.svg`. De code bewaart ze onder
   SVG in dezelfde stijl en kleuren, en een regel in de tabel hierboven.
   Zonder SVG bij de sleutel valt de app terug op een letterlijke emoji
   (`datamodel.md`).
+
+### Assessmenttegel en sub-nav (besloten door Joost op 21 oktober 2026)
+
+Ontwerp in het Design-artifact: `Herontwerp-Home`, `Herontwerp-Volwassenheid`, `Herontwerp-AI` en `Proef-Sticky`. Gedrag en inhoud staan in `CLAUDE.md`, sectie 3, scherm 1 en 2.
+
+- **Assessmenttegel.** Een kaart (`.card`) met 32px padding en 20px tussenruimte. Bovenaan het Assessment-icoon (48px, `--or`) en de titel (24px, regelhoogte 28px, gewicht 800) naast elkaar met 20px ertussen, daaronder één zin (16px, regelhoogte 26px, `--ink-m`) en daaronder drie regels van 15px (regelhoogte 22px, `--ink-m`) met 12px ertussen. Voor elke regel staat een grijs lijnicoon van 20px (`--ink-s`, lijndikte 1,7, ronde uiteinden). De hele tegel is klikbaar en heeft geen eigen link of knop.
+- **Sub-nav.** Een balk van 60px hoog, wit, met een boven- en een onderrand (`--line`), 48px padding links en rechts, `position: sticky; top: 0`. Links een rij pillen met 8px ertussen (36px hoog, 16px padding, 14px, gewicht 600, volledig rond, tekst `--ink-m`); de actieve pil heeft een lichtoranje achtergrond (`#fff1e8`) en tekst `#c2570c`, bij hover een lichtgrijze achtergrond. Rechts de uitgeschakelde knop "Start assessment". De hoofd-nav erboven scrolt weg.
+- **Tokens.** De twee oranjetinten van de actieve pil zijn nog geen token; ze worden toegevoegd bij het bouwen.
 
 ### Kaarten
 
@@ -794,7 +802,7 @@ Voorstel van 19 oktober 2026, gebouwd op 19 oktober 2026 (zie Zo gebouwd), desig
 
 **Opbouw van de hele pagina** (voorstel van 19 oktober 2026; de designs `01-resultaatkop-schaalscan` en `02-quickscan-meting` tonen de volledige pagina, met de nav). Van boven naar beneden:
 
-- **Respondent (scherm 6)**: De nav van de respondentkant (Visie, Bouwstenen, AI, 2030, een scheidingslijn, "← Terug naar Mijn metingen", een scheidingslijn en "Mijn gegevens"), geen kruimelpad en geen schakelaar. Daaronder de Resultaatkop, de kaart Per categorie met het staafdiagram, Top 3 sterktes en Top 3 verbeterkansen, en de Classificatie.
+- **Respondent (scherm 6)**: De nav van de respondentkant ("← Terug naar Mijn metingen" en "Mijn gegevens", sinds 21 oktober 2026 zonder de vier content-links), geen kruimelpad en geen schakelaar. Daaronder de Resultaatkop, de kaart Per categorie met het staafdiagram, Top 3 sterktes en Top 3 verbeterkansen, en de Classificatie.
 - **Meting in beheer (schaalscan en Quickscan)**: De beheer-nav (Assessments, Organisaties, Resultaten, Accountmenu) en het kruimelpad, bijvoorbeeld Resultaten › Bedrijf A › Meting oktober 2026 › Resultaten van de Meting (`beheerpagina.md`, Navigatie in beheer). Daaronder de Resultaatkop met de eyebrow "Resultaat van de Meting", dan de weergave-schakelaar met rechts ervan de knop "Vergelijking" en het Info-icoon (`visualisatie-scores.md`, Navigatie), dan de totaalkaart en de inhoud van de gekozen weergave. Bij de Quickscan zijn dat Scores per afdeling en Sterkste afdeling en Meeste ontwikkelruimte (`content-ziekenhuis-quickscan.md`, Resultaten). De Classificatie staat altijd onderaan.
 - **Classificatie** (`.legenda`): Kop in 18px, gewicht 700, zoals de andere koppen van een sectie. Daaronder de klassen in drie kolommen, in een kaart (10px radius, 1px `--border`, padding 24px 32px, zoals de Totaalkaart) die over dezelfde breedte loopt als de twee kolommen van de Top 3 erboven, van de linkerrand van de eerste tot de rechterrand van de tweede. De drie klassen staan over die breedte verdeeld: Basis op Orde links tegen de binnenrand, Uitbouwen in het midden van de kaart en Sterk punt rechts, met zijn rechterkant tegen de binnenrand. Dat is een grid met `1fr auto 1fr` en `justify-self: start`, `center` en `end`, zodat het midden ook echt het midden is als de teksten niet even breed zijn. De tekst binnen elke klasse blijft links uitgelijnd. Onder 640px staan ze onder elkaar, links uitgelijnd. Zonder kaart eindigt de legenda op ruim twee derde van de breedte, terwijl de kaarten erboven doorlopen, en dat oogt afgebroken (voorstel van 20 oktober 2026, gebouwd op 20 oktober 2026). Per klasse een stip van 10px in de klassekleur, de naam in 14px, gewicht 700, `--ink`, en de grenzen in 14px `--ink-s`. De naam staat dus niet in kleur. Bij de Quickscan staan de punten per afdeling erbij, bij de schaalscans de scoregrenzen ("Vanaf 3,5").
 - **Zo gebouwd (19 oktober 2026)**: `components/Resultaatkop.tsx` heeft twee delen, `ResultaatKop` (eyebrow, titel, subregel) en `Totaalkaart` (ring van 128px via `ScoreRing klein`, chip, uitleg, feiten en extra regels), omdat de resultatenpagina van een Meting er de schakelaar tussen zet. `ResultsView` en `QuickscanResultaten` renderen ze; op een Meting staat `ResultaatKop` op de pagina zelf ("Resultaat van de Meting", met de Meting, de Organisatie en het aantal afgeronde scans in de subregel) en `ResultsView` toont met `toonKop={false}` alleen de totaalkaart. In de voorbeeld-output staat de knop "← Terug" rechts in de kop. De banner "Dit is een voorbeeld met demo-data" is op 20 oktober 2026 vervallen, want de eyebrow "Voorbeeld-output" zegt dat al. De Classificatie heeft een kop van 18px en per klasse een stip van 10px (`.classificatie-legenda`), de grenzen als "Onder 2,5", "2,5 tot en met 3,49" en "Vanaf 3,5". De benchmarkviews houden tot 20 oktober 2026 de ring van 156px zonder Resultaatkop (voorstel hieronder, Benchmark).
