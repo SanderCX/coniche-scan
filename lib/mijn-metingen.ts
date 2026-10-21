@@ -202,7 +202,7 @@ const KORT = (n: number) => fmt1(n);
  * spanning. Eigen scan: Een balk per veld. Hele Meting (`scans` gezet): Het gemiddelde met de laagste tot hoogste score van een scan.
  */
 function spanningTeaser(assessment: Assessment, antwoorden?: Record<string, Antwoord>, scans?: ScanInvulling[]): Teaser | null {
-  const groep = scans ? groepProfiel(assessment, spanningScansVan(scans), 3) : null;
+  const groep = scans ? groepProfiel(assessment, spanningScansVan(scans)) : null;
   const profiel = groep ?? (antwoorden ? spanningProfiel(assessment, antwoorden) : null);
   if (!profiel || !profiel.gemiddeld) return null;
   const gem = profiel.gemiddeld;

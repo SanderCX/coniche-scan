@@ -1168,7 +1168,7 @@ select.veld-compact:focus {
 /* De radar en het staafdiagram naast elkaar (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm). */
 .resultaat-kaarten {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
   gap: var(--sp-6);
   margin-bottom: var(--sp-8);
 }
@@ -1185,7 +1185,7 @@ select.veld-compact:focus {
   font-size: var(--fs-18);
   font-weight: 700;
 }
-/* Radar een derde en staafdiagram twee derde van de breedte. Het staafdiagram springt in zijn kaart om naar horizontaal als de kaart smal is (`charts.css`). Onder 1000px onder elkaar. */
+/* De radarkaart is 460px en het staafdiagram krijgt de rest van de breedte (`stylesheet.md`, Radar en staafdiagram op elke plek, zonder scroll). Het staafdiagram springt in zijn kaart om naar horizontaal als de kaart smal is (`charts.css`). Onder 1000px onder elkaar. */
 @media (max-width: 999px) {
   .resultaat-kaarten {
     grid-template-columns: minmax(0, 1fr);

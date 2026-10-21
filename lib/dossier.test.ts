@@ -1,6 +1,13 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   aantalTekst,
+  aantallenPerSoortLead,
+  filterOpSoort,
+  sectieVanItem,
+  sectieVanScore,
+  sorteerVerdeling,
+  verdeelOverSecties,
+  VERDELING_EERST,
   aantallPerSoort,
   aantalZichtbaarVoorLead,
   brancheVan,
@@ -440,5 +447,78 @@ describe("opslaan van events en blogs", () => {
   it("laadt data van vóór events en blogs met lege velden", () => {
     const d = zetNieuwsartikelenOm({ dossier: { openVoorLead: false, openSinds: null, gewijzigdOp: null, items: [{ id: "a", soort: "nieuws", titel: "t" }] } });
     expect(d.items[0]).toMatchObject({ datum: "", einddatum: "", plaats: "" });
+  });
+});
+
+describe("de verdeling over secties in de lijst van de Lead", () => {
+  const scores = new Map<string, number | null>([
+    ["b1", 1.8],
+    ["b2", 3.0],
+    ["b3", 4.2],
+    ["b4", null],
+  ]);
+  const item = (id: string, bouwblokIds: string[], extra: object = {}) => ({ id, bouwblokIds, ...extra });
+
+  it("deelt een score in op dezelfde grenzen als de klassen", () => {
+    expect(sectieVanScore(2.49)).toBe("basis");
+    expect(sectieVanScore(2.5)).toBe("uitbouwen");
+    expect(sectieVanScore(3.49)).toBe("uitbouwen");
+    expect(sectieVanScore(3.5)).toBe("sterk");
+  });
+
+  it("zet een item in de sectie van zijn laagst scorende bouwblok, over beide Assessments heen", () => {
+    expect(sectieVanItem(["b3", "b2"], scores)).toBe("uitbouwen");
+    expect(sectieVanItem(["b3", "b1", "b2"], scores)).toBe("basis");
+    expect(sectieVanItem(["b3"], scores)).toBe("sterk");
+  });
+
+  it("zet een item zonder bouwblok of zonder score in Algemeen", () => {
+    expect(sectieVanItem([], scores)).toBe("algemeen");
+    expect(sectieVanItem(["b4"], scores)).toBe("algemeen");
+    expect(sectieVanItem(["onbekend"], scores)).toBe("algemeen");
+  });
+
+  it("verdeelt de lijsten, laat lege secties weg en houdt de volgorde van de secties vast", () => {
+    const l = {
+      cases: [item("c1", ["b3"]), item("c2", ["b1"])],
+      nieuws: [item("n1", [])],
+      events: [item("e1", ["b2"], { verlopen: false }), item("e2", ["b2"], { verlopen: true })],
+      blogs: [],
+    } as unknown as Parameters<typeof verdeelOverSecties>[0];
+    const secties = verdeelOverSecties(l, scores, "bouwblok");
+    expect(secties.map((x) => x.sectie)).toEqual(["basis", "uitbouwen", "sterk", "algemeen"]);
+    expect(secties.map((x) => x.aantal)).toEqual([1, 1, 1, 1]);
+    expect(secties[3].regel).toBe("Niet aan één bouwblok gekoppeld");
+    expect(secties[1].lijsten.events.map((e) => e.id)).toEqual(["e1", "e2"]);
+    expect(verdeelOverSecties({ cases: [], nieuws: [], events: [], blogs: [] }, scores, "domein")).toEqual([]);
+  });
+
+  it("telt per soort zonder verlopen events en filtert op soort", () => {
+    const l = {
+      cases: [item("c1", [])],
+      nieuws: [item("n1", []), item("n2", [])],
+      events: [item("e1", [], { verlopen: false }), item("e2", [], { verlopen: true })],
+      blogs: [item("b1", [])],
+    } as unknown as Parameters<typeof filterOpSoort>[0];
+    expect(aantallenPerSoortLead(l)).toEqual({ alles: 5, case: 1, nieuws: 2, event: 1, blog: 1 });
+    expect(filterOpSoort(l, "alles")).toBe(l);
+    const alleenNieuws = filterOpSoort(l, "nieuws");
+    expect([alleenNieuws.cases.length, alleenNieuws.nieuws.length, alleenNieuws.events.length, alleenNieuws.blogs.length]).toEqual([0, 2, 0, 0]);
+  });
+
+  it("sorteert de verdeling op de laagste score, en zonder scores op het nummer", () => {
+    const met = sorteerVerdeling([
+      { naam: "c", score: 3.4, volgnummer: 3 },
+      { naam: "a", score: 1.9, volgnummer: 9 },
+      { naam: "b", score: 1.9, volgnummer: 4 },
+      { naam: "z", score: null, volgnummer: 1 },
+    ]);
+    expect(met.map((r) => r.naam)).toEqual(["b", "a", "c", "z"]);
+    const zonder = sorteerVerdeling([
+      { naam: "x", score: null, volgnummer: 7 },
+      { naam: "y", score: null, volgnummer: 2 },
+    ]);
+    expect(zonder.map((r) => r.naam)).toEqual(["y", "x"]);
+    expect(VERDELING_EERST).toBe(4);
   });
 });

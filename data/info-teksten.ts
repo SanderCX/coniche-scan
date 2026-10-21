@@ -151,17 +151,6 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Grenzen voor Verkennen. Een groep onder het minimum is gestreept en krijgt geen cijfers. Bij een kleinere focus of rest staat een waarschuwing. In een kleinere pool kun je niet groeperen. Een kenmerk met meer waarden dan het maximum of een lagere invulling dan het minimum kan niet groeperen.",
   },
   {
-    sleutel: "info.rolgroep",
-    plek: "Intake van de Spanningsmeter, naast het veld Rolgroep",
-    tekst:
-      "We gebruiken je rolgroep alleen om de antwoorden per groep naast elkaar te leggen. In een groepsweergave staan nooit jouw antwoorden of jouw profiel, en een groep met te weinig deelnemers is niet te zien.",
-  },
-  {
-    sleutel: "info.spanningMinPerRol",
-    plek: "Instellingen, Drempels en termijnen, formulier Spanningsmeter",
-    tekst: "Een rol met minder deelnemers staat niet in de groepsweergave, zodat antwoorden anoniem blijven.",
-  },
-  {
     sleutel: "info.korteNaamOrganisatie",
     plek: "Organisatie aanmaken en bewerken, naast het veld Korte naam",
     tekst:

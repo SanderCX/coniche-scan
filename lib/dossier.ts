@@ -10,6 +10,7 @@ import type { Assessment, Dossier, Dossieritem, Organisatie, OrganisatieLid } fr
 import { KorteNamen, SECTOR_VELD_ID, korteNaamWaarde } from "./korte-namen";
 import { Controle, normaliseerUrl, schoon } from "./contactpersonen";
 import { alleBouwblokkenMetGroep } from "./assessment-structuur";
+import { classificatie } from "./scoring";
 
 export const TITEL_MAX = 200;
 export const TOELICHTING_MAX = 400;
@@ -580,3 +581,98 @@ export function ruimDossierOp(alles: Organisatie[]): number {
   }
   return aantal;
 }
+
+/** De vier lijsten van het Dossier zoals de Lead ze ziet, of een gefilterd deel ervan. */
+export interface DossierLijsten {
+  cases: LeadCase[];
+  nieuws: LeadNieuws[];
+  events: LeadEvent[];
+  blogs: LeadBlog[];
+}
+
+/** De soort waarop het soortfilter van de Lead filtert, `alles` voor geen filter (`dossier.md`, Scherm 5, Soortfilter). */
+export type SoortFilter = "alles" | DossierSoort;
+
+/** Filtert de lijsten op één soort. Bij `alles` blijft alles staan. */
+export function filterOpSoort(l: DossierLijsten, soort: SoortFilter): DossierLijsten {
+  if (soort === "alles") return l;
+  return {
+    cases: soort === "case" ? l.cases : [],
+    nieuws: soort === "nieuws" ? l.nieuws : [],
+    events: soort === "event" ? l.events : [],
+    blogs: soort === "blog" ? l.blogs : [],
+  };
+}
+
+/** Het aantal items per soort voor de pillen van het soortfilter: Een verlopen Event telt niet mee. */
+export function aantallenPerSoortLead(l: DossierLijsten): { alles: number; case: number; nieuws: number; event: number; blog: number } {
+  const event = l.events.filter((e) => !e.verlopen).length;
+  return { alles: l.cases.length + l.nieuws.length + event + l.blogs.length, case: l.cases.length, nieuws: l.nieuws.length, event, blog: l.blogs.length };
+}
+
+/**
+ * De sectie van een item in de lijst van de Lead (`dossier.md`, Scherm 5, Lijst met rail "In dit dossier"): De klasse van het laagst scorende
+ * bouwblok van het item, over beide Assessments heen. Een item zonder bouwblok of zonder score staat in Algemeen.
+ */
+export type DossierSectie = "basis" | "uitbouwen" | "sterk" | "algemeen";
+
+/** De secties in vaste volgorde, met de tekst onder de kop. `{eenheid}` is "bouwblok" of "domein". */
+export const DOSSIER_SECTIES: { sectie: DossierSectie; naam: string; regel: string }[] = [
+  { sectie: "basis", naam: "Basis op orde brengen", regel: "Hier ligt de meeste winst" },
+  { sectie: "uitbouwen", naam: "Uitbouwen", regel: "Dit werkt al en kan verder groeien" },
+  { sectie: "sterk", naam: "Sterk punt", regel: "Hier zijn jullie goed in, houd dat vast" },
+  { sectie: "algemeen", naam: "Algemeen", regel: "Niet aan één {eenheid} gekoppeld" },
+];
+
+/** De sectie bij een score: Onder 2,5 Basis op orde brengen, van 2,5 tot 3,5 Uitbouwen en vanaf 3,5 Sterk punt (dezelfde grenzen als overal). */
+export function sectieVanScore(score: number): Exclude<DossierSectie, "algemeen"> {
+  const klasse = classificatie(score);
+  return klasse === "rood" ? "basis" : klasse === "oranje" ? "uitbouwen" : "sterk";
+}
+
+/** De sectie van een item uit de scores per bouwblok (`Bouwblok.id`). Een bouwblok zonder score telt niet mee. */
+export function sectieVanItem(bouwblokIds: string[], scores: ReadonlyMap<string, number | null>): DossierSectie {
+  let laagste: number | null = null;
+  for (const id of bouwblokIds) {
+    const score = scores.get(id);
+    if (score === null || score === undefined) continue;
+    if (laagste === null || score < laagste) laagste = score;
+  }
+  return laagste === null ? "algemeen" : sectieVanScore(laagste);
+}
+
+export interface DossierSectieInhoud {
+  sectie: DossierSectie;
+  naam: string;
+  regel: string;
+  lijsten: DossierLijsten;
+  /** Het aantal items in de sectie, zonder verlopen Events. */
+  aantal: number;
+}
+
+/** Verdeelt de lijsten over de secties. Een sectie zonder items valt weg. De volgorde in een sectie blijft die van de lijsten. */
+export function verdeelOverSecties(l: DossierLijsten, scores: ReadonlyMap<string, number | null>, eenheid: string): DossierSectieInhoud[] {
+  return DOSSIER_SECTIES.flatMap((definitie) => {
+    const in_ = <T extends { bouwblokIds: string[] }>(lijst: T[]) => lijst.filter((i) => sectieVanItem(i.bouwblokIds, scores) === definitie.sectie);
+    const lijsten: DossierLijsten = { cases: in_(l.cases), nieuws: in_(l.nieuws), events: in_(l.events), blogs: in_(l.blogs) };
+    const totaal = lijsten.cases.length + lijsten.nieuws.length + lijsten.events.length + lijsten.blogs.length;
+    if (totaal === 0) return [];
+    return [{ ...definitie, regel: definitie.regel.replace("{eenheid}", eenheid), lijsten, aantal: aantallenPerSoortLead(lijsten).alles }];
+  });
+}
+
+/** De rijen van de verdeling rechts van de radar: Per actief bouwblok, de laagste score eerst, zonder score op het nummer van het bouwblok. */
+export function sorteerVerdeling<T extends { score: number | null; volgnummer: number }>(rijen: T[]): T[] {
+  const metScores = rijen.some((r) => r.score !== null);
+  return [...rijen].sort((a, b) => {
+    if (metScores) {
+      if (a.score === null && b.score !== null) return 1;
+      if (b.score === null && a.score !== null) return -1;
+      if (a.score !== null && b.score !== null && a.score !== b.score) return a.score - b.score;
+    }
+    return a.volgnummer - b.volgnummer;
+  });
+}
+
+/** Het aantal rijen van de verdeling dat eerst zichtbaar is, daaronder staat "Nog {n} bouwblokken tonen". */
+export const VERDELING_EERST = 4;

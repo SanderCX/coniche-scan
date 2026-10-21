@@ -115,7 +115,11 @@
 }
 @keyframes ac-puls {
   0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(2.1); opacity: 0; }
+  100% { transform: scale(1.78); opacity: 0; }
+}
+/* De ring van de pulse groeit van de stip (straal 9px) tot 16px. De gloed (`0 0 12px 3px rgba(255, 103, 31, 0.55)` in het ontwerp) is een vervaagde cirkel. */
+.ac-gloed {
+  filter: blur(6px);
 }
 .ac-puls {
   transform-box: fill-box;

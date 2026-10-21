@@ -39,7 +39,7 @@ export function DomeinKolommen({
   const kleurVan = (r: GroepResultaat) => (r.kleur && CATEGORIE_COLORS[r.kleur]?.hex) || "#ff671f";
   const groepScore = (r: GroepResultaat) => vergelijking?.find((v) => v.groepId === r.groepId)?.score ?? null;
   const metGroep = !!vergelijking;
-  const zetRij = (r: GroepResultaat) => () => zet({ groepKey: r.groepId, bouwblokId: r.groepId });
+  const zetRij = (r: GroepResultaat) => () => zet({ groepKey: r.groepId, bouwblokId: r.groepId, bron: "diagram" });
   const wis = () => zet(null);
   const staat = (r: GroepResultaat) => staatVan(a, r.groepId, r.groepId);
 

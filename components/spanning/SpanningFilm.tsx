@@ -5,13 +5,13 @@ import { fmt1, fmtVerschil, groepProfiel, spanningProfiel, veldKorteNaam } from 
 import { RADAR, hoekVoorAs, puntOp, puntVoorScore, straalVoorScore, veelhoekPad, wedgePad } from "@/lib/spanning-radar";
 
 /**
- * De film "Wat krijg ik" van de Digitale Spanningsmeter (`visualisatie-spanningsmeter.md`, Landingspagina en film Wat krijg ik, variant
+ * De film "Wat krijg ik" van de Spanningsmeter (`visualisatie-spanningsmeter.md`, Landingspagina en film Wat krijg ik, variant
  * Spanningsmeter): Drie stapkaarten naast elkaar op een vlak in `--bg-warm`, elk met een nummerbolletje, een titel, een beeld van 200px en een
  * regel. Het geheel loopt in een lus van 9 seconden met CSS (`@keyframes` in `spanning.css`), zonder script. Bij verminderde beweging staan de beelden
  * stil in hun eindstand. Alle cijfers zijn voorbeelddata: De fictieve deelnemer en groep uit `datamodel.md`, Scoreberekening.
  */
 const eigen = spanningProfiel(spanningsmeter, demoAntwoordenSpanning);
-const groep = groepProfiel(spanningsmeter, demoSpanningGroep, 3);
+const groep = groepProfiel(spanningsmeter, demoSpanningGroep);
 const plek = (score: number) => ((score - 1) / 4) * 100;
 
 /** De zes rijen van stap 1: Een nummerbolletje in de veldkleur en een balk met stip die vult tot de score. */

@@ -89,7 +89,7 @@ export function updateScanInvulling(
  */
 export function voltooiIntake(
   scanInvullingId: string,
-  input: { naam: string; functie: string; team: string; notities: string; rolgroep?: string }
+  input: { naam: string; functie: string; team: string; notities: string }
 ): void {
   const alles = laadAlles();
   const gevonden = zoekScanInvulling(alles, scanInvullingId);
@@ -108,8 +108,6 @@ export function voltooiIntake(
     ...invulling,
     status: "bezig",
     gestartOp: new Date().toISOString(),
-    // Alleen bij een Assessment met `rolgroepen` (de Spanningsmeter): De gekozen rolgroep hoort bij deze scan.
-    ...(input.rolgroep !== undefined ? { rolgroep: input.rolgroep || null } : {}),
   };
   slaAlles(alles);
   logAudit({

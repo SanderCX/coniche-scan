@@ -87,7 +87,7 @@ export function ResultsView({
       />
     );
   }
-  // De Digitale Spanningsmeter heeft geen overall score en een eigen opbouw (`visualisatie-spanningsmeter.md`, Resultaat): Hier staat
+  // De Spanningsmeter heeft geen overall score en een eigen opbouw (`visualisatie-spanningsmeter.md`, Resultaat): Hier staat
   // het profiel van één scan.
   if (isSpanning(assessment)) {
     return (

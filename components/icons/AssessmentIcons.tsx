@@ -68,10 +68,9 @@ function CrossIcon(props: IconProps) {
 function GaugeIcon(props: IconProps) {
   return (
     <IconBase {...props}>
-      {/* Een halve meter met een wijzer (`stylesheet.md`, Assessment-icoon): De boog en de wijzer zijn lijnen, het draaipunt een gevuld punt. */}
+      {/* Een halve meter met een bliksemflits als wijzer (`stylesheet.md`, Assessment-icoon): De boog is een lijn, de flits een gevulde vorm die vanuit het draaipunt naar rechtsboven wijst. */}
       <path d="M6 19a8.5 8.5 0 1 1 12 0" />
-      <path d="M12 13l3.6-3.6" />
-      <path d="M12 11.75a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Z" fill="currentColor" />
+      <path d="M12.7 6 10.2 10.8H12.1L11.3 16l2.8-6.6h-1.9Z" transform="rotate(38 12 13)" fill="currentColor" stroke="none" />
     </IconBase>
   );
 }

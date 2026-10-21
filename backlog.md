@@ -665,8 +665,7 @@ Gebouwd op 21 oktober 2026 (`content-spanningsmeter.md`, `visualisatie-spannings
 - **Benchmark, Verkennen en vergelijking tussen Metingen**: Nog niet voor dit type (`benchmark.md`, `visualisatie-verkennen.md`).
 - **Dossier en film**: Het Dossier en de film "Het dossier" voor dit type.
 - **Zorg-variant** en andere sector-varianten van de Spanningsmeter.
-- **Voorbeelden uit de groep**: De open voorbeelden tonen in de groepsweergave, met een vrijgave door de Consultant of Admin (`visualisatie-spanningsmeter.md`, Open punten 2).
-- **Beheer van de inhoud**: Ijkpunten, invalshoeken, "Waar je op let" en korte namen van de velden zijn nog niet in beheer te bewerken, alleen de vraagtekst, de open vraag en de rolgroepen.
+- **Beheer van de inhoud**: Ijkpunten, invalshoeken, "Waar je op let" en korte namen van de velden zijn nog niet in beheer te bewerken, alleen de vraagtekst en de open vraag.
 - **Weergaven voor een Lead**: Spreiding en Antwoorden bestaan voor dit type niet, en de samengestelde Meting ook niet.
 - **Cirkel bij meer dan vijf Assessments** en bij minder dan vijf (`CLAUDE.md`, scherm 1, Open punten).
 

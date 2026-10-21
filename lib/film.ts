@@ -10,7 +10,7 @@ import { actieveBouwblokkenMetGroep, isVlakkeAssessment } from "./assessment-str
  * - `categorieen`: Klantcontact Volwassenheid en de Zorgscan, vijf categorieën in hun eigen kleur en een ring met een score van 1 tot 5.
  * - `domeinen`: Een Assessment zonder categorielaag (de AI-scan), acht rijen met een nummercirkel en de domeinkleur.
  * - `quickscan`: Ja / Nee / Weet ik niet, met percentages en de klassekleuren.
- * - `spanning`: De Digitale Spanningsmeter, met zes velden, het profiel en de spanning (`visualisatie-spanningsmeter.md`, Film Wat krijg ik).
+ * - `spanning`: De Spanningsmeter, met zes velden, het profiel en de spanning (`visualisatie-spanningsmeter.md`, Film Wat krijg ik).
  */
 export type FilmVariant = "categorieen" | "domeinen" | "quickscan" | "spanning";
 

@@ -248,24 +248,6 @@ export default function ContentEditorPage({
                   className="w-full rounded-lg border border-gray-200 p-2 text-sm"
                 />
               </label>
-              <label className="block text-sm sm:col-span-2">
-                <span className="mb-1 block text-ink">Rolgroepen in de intake (gescheiden door een komma)</span>
-                <input
-                  key={(assessment.rolgroepen ?? []).join("|")}
-                  defaultValue={(assessment.rolgroepen ?? []).join(", ")}
-                  onBlur={(e) =>
-                    updateAssessment(assessmentId, (a) => ({
-                      ...a,
-                      rolgroepen: e.target.value
-                        .split(",")
-                        .map((t) => t.trim())
-                        .filter(Boolean),
-                    }))
-                  }
-                  placeholder="Leeg: de vraag Rolgroep ontbreekt"
-                  className="w-full rounded-lg border border-gray-200 p-2 text-sm"
-                />
-              </label>
             </>
           )}
         </div>

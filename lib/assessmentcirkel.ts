@@ -1,6 +1,6 @@
 /**
  * De geometrie van de Assessmentcirkel op scherm 1 (`CLAUDE.md`, scherm 1, Kies jouw assessment als cirkel, ontwerp `Home-D`, met vijf delen
- * van 72° na de Digitale Spanningsmeter, variant E2): Vijf delen met 8px ertussen in een vlak van 568px, de wedges van de radars, de lijn met
+ * van 72° na de Spanningsmeter, variant E2): Vijf delen met 8px ertussen in een vlak van 568px, de wedges van de radars, de lijn met
  * voorbeelddata, de band van de Spanningsmeter, de bogen van de Quickscan en de plek van de stip. Pure functies, zonder React, zodat de maten
  * testbaar zijn. Hoeken zijn kompashoeken in graden: 0 is 12 uur en ze lopen met de klok mee, dus 90 is rechts, 180 onderaan en 270 links.
  */
@@ -122,18 +122,20 @@ export const SPANNING_WEDGES: { kleur: string; van: number; tot: number }[] = ["
 export const WEDGE_DEKKING = 0.3;
 
 /**
- * De hoekpunten van de lijn: (hoek, score van 1 tot 5). De lijn loopt van 162° (het begin van de Spanningsmeter) met de klok mee tot 450° (het
- * einde van AI, dus 90°, rechts) en slaat de Quickscan over. Er ligt een hoekpunt op elke grens tussen twee delen (234°, 306° en 378°), zodat de
- * lijn precies aansluit: Elk deel tekent de hele lijn en knipt zijn eigen stuk. 15 hoekpunten op wisselende afstanden, met grote uitslagen naar
- * buiten en diepe dalen naar het midden, zodat hij op een echte meting lijkt.
+ * De hoekpunten van de lijn (aangepast op 21 oktober 2026, besloten door Joost, PR 164): (hoek, score van 1 tot 5). De lijn loopt van 162° (het
+ * begin van de Spanningsmeter) met de klok mee tot 450° (het einde van AI, dus 90°, rechts) en slaat de Quickscan over. Hij heeft drie regels, zodat
+ * hij op een echte meting lijkt: (1) De score van een hoekpunt ligt tussen 2,5 en 3,9, dus een dal gaat nooit onder 2,5 en een piek komt niet
+ * hoger dan bijna 4. (2) De straal volgt de hulpcirkels van het deel (`lijnStraal`). (3) Op elke grens tussen twee delen zit een dal en de pieken
+ * liggen binnen een deel: De lijn zakt bij elke deelgrens in. Dat zijn 13 hoekpunten op 24° van elkaar. De deelgrenzen zijn het eerste, vierde,
+ * zevende, tiende en dertiende hoekpunt. Elk deel tekent de hele lijn en knipt zijn eigen stuk, dus de lijn sluit precies aan.
  */
 export const LIJN: [number, number][] = [
-  [162, 2.6], [181, 3.8], [200, 1.9], [217, 3.5], [234, 2.3], [256, 4.1], [281, 2.0], [298, 3.3],
-  [306, 2.8], [332, 4.2], [356, 1.8], [378, 3.2], [404, 1.9], [428, 3.6], [450, 2.4],
+  [162, 2.6], [186, 3.7], [210, 2.9], [234, 2.5], [258, 3.3], [282, 3.9], [306, 2.7],
+  [330, 2.8], [354, 3.6], [378, 2.5], [402, 3.8], [426, 3.0], [450, 2.6],
 ];
 
-/** De straal van een hoekpunt: (score − 1) / 4 × 262px × 0,95. */
-export const lijnStraal = (score: number) => ((score - 1) / 4) * WEDGE_R * 0.95;
+/** De straal van een hoekpunt: (score − 1) / 4 × 215px, zodat de scores 2, 3, 4 en 5 op de hulpcirkels liggen (`RINGEN`). */
+export const lijnStraal = (score: number) => ((score - 1) / 4) * RING_R;
 
 export function lijnPunt(index: number): [number, number] {
   const [hoek, score] = LIJN[index];
@@ -185,22 +187,31 @@ export function boogPad(r: number, fractie: number): string {
   return `M${f(x1)},${f(y1)} A${r},${r} 0 0 1 ${f(x2)},${f(y2)}`;
 }
 
-/** De plek van de stip: Op een hoekpunt van de lijn (het verst van de pil af), en bij de Quickscan in het midden van de rode boog. */
+/**
+ * Het hoekpunt van de lijn waar de stip staat (aangepast op 21 oktober 2026, PR 164): De hoogste van de binnenste hoekpunten van het deel, dus nooit
+ * een dal en nooit naast de lijn. Een deel heeft vier hoekpunten, de twee op de grenzen zijn dalen en worden gedeeld met het buurdeel. De Quickscan
+ * heeft geen lijn en geeft `null`.
+ */
+export function stipIndex(assessmentId: string): number | null {
+  const d = DELEN.find((x) => x.assessmentId === assessmentId);
+  if (!d || d.soort === "quick") return null;
+  // De Spanningsmeter ligt op 522° tot 594°, de lijn begint op 162° (522 − 360).
+  const van = d.van >= 450 ? d.van - 360 : d.van;
+  const tot = van + DEEL_HOEK;
+  let beste: number | null = null;
+  LIJN.forEach(([hoek, score], i) => {
+    if (hoek <= van + 1e-9 || hoek >= tot - 1e-9) return;
+    if (beste === null || score > LIJN[beste][1]) beste = i;
+  });
+  return beste;
+}
+
+/** De plek van de stip: Op het hoekpunt van `stipIndex`, en bij de Quickscan in het midden van de rode boog. */
 export function stipPunt(assessmentId: string): [number, number] {
-  switch (assessmentId) {
-    case "klantcontact-volwassenheid":
-      return lijnPunt(5);
-    case "zorgscan":
-      return lijnPunt(9);
-    case "ai-volwassenheid":
-      return lijnPunt(13);
-    case "spanningsmeter":
-      return lijnPunt(1);
-    default: {
-      const rood = QUICK_BOGEN[2];
-      return kompas(rood.r, QUICK_VAN + DEEL_HOEK * (rood.score / 2));
-    }
-  }
+  const i = stipIndex(assessmentId);
+  if (i !== null) return lijnPunt(i);
+  const rood = QUICK_BOGEN[2];
+  return kompas(rood.r, QUICK_VAN + DEEL_HOEK * (rood.score / 2));
 }
 
 /** Het label van een Assessment op de cirkel (de korte naam, op twee regels) en de volledige naam voor het paneel. */
@@ -209,7 +220,7 @@ export const KORTE_NAMEN: Record<string, string> = {
   "ai-volwassenheid": "AI-Volwassenheid",
   zorgscan: "Volwassenheid Zorg",
   "quickscan-ziekenhuis": "Quickscan Ziekenhuis",
-  spanningsmeter: "Digitale Spanningsmeter",
+  spanningsmeter: "Spanningsmeter",
 };
 
 /**

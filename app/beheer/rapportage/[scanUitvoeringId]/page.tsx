@@ -94,7 +94,7 @@ export default function RapportagePage({
     );
   }
 
-  // De Digitale Spanningsmeter: Het profiel van de groep, zonder de weergaven van de schaalscans (`visualisatie-spanningsmeter.md`,
+  // De Spanningsmeter: Het profiel van de groep, zonder de weergaven van de schaalscans (`visualisatie-spanningsmeter.md`,
   // Resultaat). Een Admin of Consultant ziet de groep altijd; de drempel geldt voor een Lead.
   if (isSpanning(assessment)) {
     return (

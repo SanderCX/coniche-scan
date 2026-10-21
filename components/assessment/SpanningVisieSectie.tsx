@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Sectie } from "@/components/assessment/Sectie";
 
 /**
- * De sectie Visie van de Digitale Spanningsmeter (`visualisatie-spanningsmeter.md`, Landingspagina en film): Een korte inleiding en drie kaarten met
+ * De sectie Visie van de Spanningsmeter (`visualisatie-spanningsmeter.md`, Landingspagina en film): Een korte inleiding en drie kaarten met
  * "Lees verder", dat de volledige tekst op dezelfde pagina uitklapt. De teksten zijn een voorstel en komen niet uit de bron: De definitieve tekst volgt
  * uit het boek (open punt 5).
  */

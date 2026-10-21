@@ -9,6 +9,11 @@ import { useState } from "react";
 export interface GrafiekActief {
   groepKey: string;
   bouwblokId?: string;
+  /**
+   * Waar de muis of de focus is: In de radar of in het diagram. Alleen die grafiek toont een tooltip, de andere licht alleen op
+   * (`stylesheet.md`, Hover tussen radar en staafdiagram, één tooltip tegelijk). Zonder bron geldt de radar.
+   */
+  bron?: "radar" | "diagram";
 }
 
 export type ZetActief = (actief: GrafiekActief | null) => void;
