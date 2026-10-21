@@ -29,7 +29,7 @@ De tags per bouwblok (in het contentbestand) komen uit de kernwoorden
 van het oorspronkelijke Bouwstenenmodel. Voor beschrijvingen en centrale
 vragen is `visie-coniche.md` de enige bron.
 
-## Digitale Spanningsmeter
+## Spanningsmeter
 
 De Spanningsmeter heeft geen eigen laag van visie en bouwstenen in dit fundament. Haar inhoud komt uit het boek "Onder Spanning" (Franssen, 2026) en de opzet van Martijn van 20 oktober 2026 (`content-spanningsmeter.md`). Status per onderdeel: De zes spanningsvelden en de ijkpunten zijn opgesteld (concept), de vragen zijn nog niet gevalideerd (`content-spanningsmeter.md`, Validatie), en de visietekst op de Assessment-pagina is een voorstel. De scan meet verschillen tussen velden en kent geen totaalscore.
 

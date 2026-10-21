@@ -1,12 +1,12 @@
-# Coniche Scan: Content Digitale Spanningsmeter
+# Coniche Scan: Content Spanningsmeter
 
-De vragen, de schaal en de ijkpunten van de Digitale Spanningsmeter. Dit bestand is de enige plek voor de inhoud. De regels voor rekenen staan in `datamodel.md` (Antwoordtype, Scoreberekening), de schermen in `CLAUDE.md` (scherm 1 tot en met 6) en de opmaak in `visualisatie-spanningsmeter.md`.
+De vragen, de schaal en de ijkpunten van de Spanningsmeter. Dit bestand is de enige plek voor de inhoud. De regels voor rekenen staan in `datamodel.md` (Antwoordtype, Scoreberekening), de schermen in `CLAUDE.md` (scherm 1 tot en met 6) en de opmaak in `visualisatie-spanningsmeter.md`.
 
 **Status: Voorstel van 21 oktober 2026, gebouwd op 21 oktober 2026 (zie Zo gebouwd onderaan).** Bron is het document "Digitale Spanningsmeter – vragenset" van Martijn (20 oktober 2026, 13 pagina's), dat op zijn beurt op het boek "Onder Spanning" (Franssen, 2026) en de literatuur steunt. De vragen zijn nog niet getest (zie Validatie). De naam van het bronbestand zegt "15 vragen per spanningsveld", de inhoud heeft er 5 gescoord en 1 open per veld, samen 30 gescoorde vragen en 6 open vragen. Het aantal van 5 is hier aangehouden.
 
 ## Opzet
 
-- **Assessment**: Digitale Spanningsmeter, standalone Assessment zonder `afgeleidVanAssessmentId`. Er is geen categorielaag, de 6 spanningsvelden zijn de `Bouwblok`ken en hangen direct aan het Assessment (`datamodel.md`, Assessment).
+- **Assessment**: Spanningsmeter, standalone Assessment zonder `afgeleidVanAssessmentId`. Er is geen categorielaag, de 6 spanningsvelden zijn de `Bouwblok`ken en hangen direct aan het Assessment (`datamodel.md`, Assessment).
 - **Eenheid**: Een bouwblok heet hier een **spanningsveld** (`bouwblokLabel` "Spanningsveld", enkelvoud "spanningsveld", meervoud "spanningsvelden"). In de interface en in alle specs voor dit Assessment staat "veld" of "spanningsveld", niet "bouwblok" en niet "domein".
 - **Icoon**: Sleutel `gauge`, een halve meter met een wijzer (`stylesheet.md`, Assessment-icoon).
 - **Antwoordtype**: `"spanning"` (nieuw, `datamodel.md`, Antwoordtype): Een schaal van 1 tot en met 5 met als extra antwoord 0, "Kan ik niet beoordelen".
@@ -48,13 +48,9 @@ Na de vijf vragen van elk veld vraagt de tool om één concreet voorbeeld dat de
 
 ## Achtergrondvragen
 
-Voor de analyse per groep vraagt de tool bij de intake één ding (`CLAUDE.md`, scherm 4):
+De tool vraagt bij de intake niets extra voor de Spanningsmeter. De bron noemt drie achtergrondvragen (sessiecode, rol en afdeling), maar we nemen ze niet over. De sessiecode is de Meting zelf. Een rol- of afdelingsvraag is er niet, omdat de app geen afdeling als eigen object kent: Een deel van een Organisatie is een Onderdeel (`datamodel.md`, Onderdeel), met een eigen Meting en eigen KPI-waarden, en zo wordt een deel van de organisatie gemeten.
 
-**Rolgroep**: Direct met klanten, Leidinggevende, MT en directie. De bron noemt als voorbeelden "direct met klanten, leidinggevende, MT, directie of bestuur"; MT, directie en bestuur zijn hier één groep. De lijst staat in `Assessment.rolgroepen` en is dus aan te passen. Dit is een grovere indeling dan de lijst in `content-respondentrol.md` (29 functies) en staat los van `Respondent.functie`.
-
-De bron vraagt ook om een afdeling. Die nemen we niet over: De app kent geen afdeling als eigen object. Een deel van een Organisatie is een Onderdeel (`datamodel.md`, Onderdeel), met een eigen Meting en eigen KPI-waarden, en zo wordt een deel van de organisatie gemeten.
-
-De antwoorden blijven anoniem: Een groepsweergave toont nooit een antwoord of profiel van één persoon (`visualisatie-spanningsmeter.md`, Anonimiteit). De sessiecode uit de bron is de Meting zelf en komt niet als aparte vraag terug.
+De antwoorden blijven anoniem: Een groepsweergave toont nooit een antwoord of profiel van één persoon (`visualisatie-spanningsmeter.md`, Anonimiteit).
 
 ## De zes velden
 
@@ -249,11 +245,11 @@ De vragen zijn gebaseerd op het boek en de literatuur, maar nog niet getest. De 
 3. **Pilot**: Minimaal 100 deelnemers, liefst uit meerdere organisaties. Hangen de vijf vragen per veld samen (betrouwbaarheid), welke vragen krijgen vaak "kan ik niet beoordelen", en zijn verschillen tussen rollen herkenbaar?
 4. **Herhaalmeting**: Een deel van de groep scoort na 2 tot 3 weken opnieuw. Een vraag die sterk verschuift terwijl er niets is veranderd, is te vaag.
 
-Zolang dit niet gedaan is, mag een resultaat niet als gevalideerde meting worden gepresenteerd. Hoe dat in de app staat (een vermelding, een label "pilot"), is een open punt (`backlog.md`, Digitale Spanningsmeter).
+Zolang dit niet gedaan is, mag een resultaat niet als gevalideerde meting worden gepresenteerd. Hoe dat in de app staat (een vermelding, een label "pilot"), is een open punt (`backlog.md`, Spanningsmeter).
 
 ## Importbestand
 
-De bron levert een Excelbestand en los een CSV met dezelfde inhoud: De 30 vragen met toelichting, de gedeelde schaal, het ijkpunt per veld, de 6 open vragen apart van de gescoorde vragen, drie achtergrondvragen (sessiecode, rol en afdeling; de afdeling nemen we niet over), de rekenregels en een rekenvoorbeeld met een fictieve deelnemer waarmee Coniche de berekening van de tool kan controleren. Dat rekenvoorbeeld hoort in de test van de scorefunctie (`datamodel.md`, Scoreberekening, Spanningsmeter). Hoe de app dit bestand inleest, is nog niet besloten (`backlog.md`).
+De bron levert een Excelbestand en los een CSV met dezelfde inhoud: De 30 vragen met toelichting, de gedeelde schaal, het ijkpunt per veld, de 6 open vragen apart van de gescoorde vragen, drie achtergrondvragen (sessiecode, rol en afdeling; die nemen we niet over), de rekenregels en een rekenvoorbeeld met een fictieve deelnemer waarmee Coniche de berekening van de tool kan controleren. Dat rekenvoorbeeld hoort in de test van de scorefunctie (`datamodel.md`, Scoreberekening, Spanningsmeter). Hoe de app dit bestand inleest, is nog niet besloten (`backlog.md`).
 
 ## Bron
 

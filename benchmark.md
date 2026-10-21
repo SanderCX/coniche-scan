@@ -96,6 +96,7 @@ Opbouw van de view:
 - Bovenaan de Resultaatkop met de Totaalkaart van X, in plaats van de losse ring (gebouwd op 20 oktober 2026, `stylesheet.md`, Resultaatkop, Benchmark). De schakelaar staat eronder.
 - Een radar met twee reeksen, X en de rest van de groep.
 - Het staafdiagram per categorie, met het groepsgemiddelde als tweede, neutraal gekleurde balk naast die van X. Eerder stond hier een markering. De tweede balk is gebouwd en leest beter, dus de spec volgt de code.
+- De radar en het staafdiagram naast elkaar lichten elkaar op, in beide richtingen en met beide reeksen, en scrollen niet (`stylesheet.md`, Radar en staafdiagram op elke plek, zonder scroll). Dat geldt ook voor de view van een lid bij niveau 1 en voor het detail van een benchmark.
 - Het verschil per bouwblok (X min de rest, op één decimaal).
 - Onder de view de tekst "Vergelijkgroep van n organisaties, samengesteld door Coniche", met de peildatum.
 

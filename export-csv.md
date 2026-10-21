@@ -189,9 +189,9 @@ deze afwijkingen:
   interne aanhalingstekens verdubbeld (standaard CSV-escaping), niet
   als los, ongeëscaped blok tekst.
 
-## Digitale Spanningsmeter (nog niet gespecificeerd)
+## Spanningsmeter (nog niet gespecificeerd)
 
-Voor de Digitale Spanningsmeter (antwoordType `spanning`) is er nog geen CSV. De export heeft geen overall score en geen groepsscores per bouwblok, maar per veld een score en een spanning, de rolgroep. Zie `backlog.md`, Digitale Spanningsmeter. Tot dat besloten is, staat "Als CSV" niet in de Exporteren-dropdown voor dit type.
+Voor de Spanningsmeter (antwoordType `spanning`) is er nog geen CSV. De export heeft geen overall score en geen groepsscores per bouwblok, maar per veld een score en een spanning. Zie `backlog.md`, Spanningsmeter. Tot dat besloten is, staat "Als CSV" niet in de Exporteren-dropdown voor dit type.
 
 ## Beslist
 

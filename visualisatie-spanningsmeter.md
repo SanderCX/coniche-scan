@@ -1,8 +1,8 @@
-# Coniche Scan: Visualisaties Digitale Spanningsmeter
+# Coniche Scan: Visualisaties Spanningsmeter
 
-Spec voor wat een gebruiker van de Digitale Spanningsmeter ziet: het beeld in de cirkel op scherm 1, de doorloopflow, Mijn metingen, het resultaat van een respondent en van een groep, en de film Wat krijg ik. De inhoud staat in `content-spanningsmeter.md`, het rekenen in `datamodel.md` (Scoreberekening, Spanningsmeter), de schermen in `CLAUDE.md` en de gedeelde opmaak in `stylesheet.md`.
+Spec voor wat een gebruiker van de Spanningsmeter ziet: het beeld in de cirkel op scherm 1, de doorloopflow, Mijn metingen, het resultaat van een respondent en van een groep, en de film Wat krijg ik. De inhoud staat in `content-spanningsmeter.md`, het rekenen in `datamodel.md` (Scoreberekening, Spanningsmeter), de schermen in `CLAUDE.md` en de gedeelde opmaak in `stylesheet.md`.
 
-**Status: Voorstel van 21 oktober 2026, gebouwd op 21 oktober 2026 (zie Zo gebouwd onderaan).** Besloten door Joost in het ontwerp: De plek in de cirkel op scherm 1, het beeld, de iconen en de kleuren ("goed voor nu"), en dat de toegang gelijk is aan die van de andere scans. Besloten is ook de volgorde van de delen in de cirkel (variant E2, `CLAUDE.md`, scherm 1). Nog niet besloten zijn de punten onder Open punten, en de teksten moeten nog geverifieerd worden. De bron (het PDF van Martijn) is een bron en geen voorschrift: Waar de app een algemene wijze voor Assessments heeft (gemiddelde met spreiding, Onderdeel in plaats van afdeling), geldt die. Het ontwerp staat in het Design-artifact "Digitale Spanningsmeter: home en schermen", met de borden Main en Gekozen (de cirkel), Beeld, Vraag, Lead, Rapport, Profiel en Landing.
+**Status: Voorstel van 21 oktober 2026, gebouwd op 21 oktober 2026 (zie Zo gebouwd onderaan).** Besloten door Joost in het ontwerp: De plek in de cirkel op scherm 1, het beeld, de iconen en de kleuren ("goed voor nu"), en dat de toegang gelijk is aan die van de andere scans. Besloten is ook de volgorde van de delen in de cirkel (variant E2, `CLAUDE.md`, scherm 1). Nog niet besloten zijn de punten onder Open punten, en de teksten moeten nog geverifieerd worden. De bron (het PDF van Martijn) is een bron en geen voorschrift: Waar de app een algemene wijze voor Assessments heeft (gemiddelde met spreiding, Onderdeel in plaats van afdeling), geldt die. Het ontwerp staat in het Design-artifact "Spanningsmeter: home en schermen", met de borden Main en Gekozen (de cirkel), Beeld, Vraag, Lead, Rapport, Profiel en Landing.
 
 ## Uitgangspunten
 
@@ -49,13 +49,13 @@ Ontwerp: Bord Vraag, het veld Verhaal & leiderschap. De doorloopflow is die van 
 - **Antwoordkeuze.** Vijf ronde knoppen met het cijfer 1 tot en met 5, elk met de niveaunaam eronder (100px breed, 12px ertussen). Een scheidingslijn van 1px en daarachter een aparte pilknop "0 · Kan ik niet beoordelen". Gekozen is massief oranje (`stylesheet.md`, Keuzepil en pilvormige groep). Onder de keuze staat een regel (14px, `--ink-m`) met de gekozen score en het ijkpunt van het veld, bijvoorbeeld "3 · Georganiseerd: Het verhaal is helder, maar blijft vooral communicatie." Bij 0 staat er "0 · Kan ik niet beoordelen: Deze vraag telt niet mee."
 - **Open vraag.** Onder de vijf vragen een kaart met de ID (VL6), het label "VOORBEELD · NIET VERPLICHT", de vraag (18px, gewicht 600), een tekstvak (4 regels, `.field`) met als placeholder "Typ hier je voorbeeld", en een regel (14px, `--ink-s`): "Dit voorbeeld krijgt geen score. In de sessie bespreken we ook tegenvoorbeelden." Een veld is afgerond als de vijf vragen een antwoord hebben, ook als dat 0 is. De open vraag is nooit verplicht.
 - **Onderaan.** "← Vorig veld" en "Volgend veld →" (48px hoog, 10px radius). Op het laatste veld wordt "Volgend veld →" de knop "Bekijk resultaten".
-- **Intake.** De intake heeft één extra veld als `Assessment.rolgroepen` gevuld is: Rolgroep (keuzelijst, `content-spanningsmeter.md`, Achtergrondvragen), met in een Info-icoon de uitleg dat antwoorden in groepsweergaven anoniem blijven. Er is geen vraag naar een afdeling. Dit scherm is nog niet ontworpen.
+- **Intake.** De intake heeft voor dit Assessment geen extra velden (geen rolgroep, geen afdeling).
 
 ## Mijn metingen
 
 Ontwerp: Bord Lead (Lead die ook respondent is). De kaart volgt "Kaart met cirkel" in `visualisatie-mijn-metingen.md`, met deze afwijkingen.
 
-- **Icoon en titel.** De Meting-kaart heeft het icoon `gauge` en de titel "Digitale Spanningsmeter". De regel eronder is "Meting oktober 2026, afgerond op 20 oktober 2026". Rolchips "Respondent" en "Lead" staan rechtsboven.
+- **Icoon en titel.** De Meting-kaart heeft het icoon `gauge` en de titel "Spanningsmeter". De regel eronder is "Meting oktober 2026, afgerond op 20 oktober 2026". Rolchips "Respondent" en "Lead" staan rechtsboven.
 - **Cirkel.** De `.score-ring` van 156px toont het Gemiddeld niveau (`datamodel.md`, Scoreberekening). De vulling is `(niveau − 1) / 4`, de kleur de volle kleur van het afgeronde niveau, het getal staat erin in 36px, gewicht 800, met "NIVEAU" in 12px hoofdletters eronder (in plaats van "Totaalscore"). Daaronder de chip met de niveaunaam in de celkleur (24px hoog, "Georganiseerd").
 - **Stip op de cirkel (Lead met eigen scan en zichtbare groep).** Het groepsgemiddelde staat ook op de ring, als stip van 14px met een witte rand van 2px (`--ink-m`), op de hoek `(gemiddelde − 1) / 4 × 360°` vanaf boven met de klok mee, zoals in `visualisatie-mijn-metingen.md`, Stip op de cirkel. De stip heeft geen eigen uitleg links: De legenda rechts ("Gemiddelde van de groep") geldt ook voor hem. Onder de drempel, bij een Respondent zonder Resultaten en bij een Lead zonder eigen scan is er geen stip.
 - **Groep (alleen Lead met Resultaten aan).** Onder een lijn van 1px "GROEP, 12 SCANS" (12px, hoofdletters) en daaronder "3,1 Georganiseerd" (14px, het getal vet). Met de stip van het groepsgemiddelde op de cirkel (volgende punt).
@@ -71,7 +71,7 @@ Ontwerp: Bord Rapport (groep) en bord Profiel (respondent). Eén pagina in twee 
 
 ### Kop en schakelaar
 
-De Resultaatkop is die van `stylesheet.md`, Resultaatkop: Eyebrow ("JOUW RESULTAAT" bij een respondent, "RESULTAAT VAN DE METING" bij een groep), `.page-title` "Digitale Spanningsmeter" en de subregel (14px, `--ink-s`). Bij een respondent "Joost · Meting oktober 2026 · afgerond op 20 oktober 2026", bij een groep "Meting oktober 2026 · Bedrijf A · Gemiddelde van 12 afgeronde scans". De navigatie is die van de respondentkant (scherm 6) of van een Meting in beheer (`beheerpagina.md`).
+De Resultaatkop is die van `stylesheet.md`, Resultaatkop: Eyebrow ("JOUW RESULTAAT" bij een respondent, "RESULTAAT VAN DE METING" bij een groep), `.page-title` "Spanningsmeter" en de subregel (14px, `--ink-s`). Bij een respondent "Joost · Meting oktober 2026 · afgerond op 20 oktober 2026", bij een groep "Meting oktober 2026 · Bedrijf A · Gemiddelde van 12 afgeronde scans". De navigatie is die van de respondentkant (scherm 6) of van een Meting in beheer (`beheerpagina.md`).
 
 Onder de kop staat de schakelaar Jouw profiel | Groep als pilvormige groep (`stylesheet.md`, Keuzepil en pilvormige groep: 34px, gekozen massief `--or`). Hij staat alleen waar beide weergaven er zijn: Bij een Lead met eigen scan en zichtbare groep. Een respondent zonder groepsweergave ziet geen schakelaar en alleen Jouw profiel. Een Lead zonder eigen scan ziet alleen Groep.
 
@@ -102,13 +102,9 @@ Twee kaarten naast elkaar op één rij (24px ertussen): Links "Spanningsprofiel"
 
 **Hover en focus tussen radar en tabel (voorstel, naar het patroon van `stylesheet.md`, Radar en staafdiagram op het resultaatscherm).** De radar en de tabel lichten elkaar op, in beide richtingen. Hover of focus op een wedge of een knooppunt: De wedge gaat naar 34% dekking (de andere naar 6%), het knooppunt wordt 4px groter en krijgt een donkere rand (2px, `--ink`), en de rij van het veld krijgt de achtergrond `--or-faint` (overgang 200 ms). Hover op een rij: Dezelfde wedge en hetzelfde knooppunt lichten op. Wedges en knooppunten zijn met Tab bereikbaar en hebben een `aria-label` zoals "3, Mensen en gedrag, 2,2, Gefragmenteerd".
 
-### Gemiddelde per rol (alleen groep)
-
-Een kaart met de kop "Gemiddelde per rol" en rechts de regel "Een rol met minder dan 3 deelnemers staat niet in de tabel, zodat antwoorden anoniem blijven." (12px, `--ink-s`; het getal is `Instellingen.spanningMinPerRol`). Een matrix met links de velden (220px, nummerbolletje en naam), per zichtbare rolgroep een kolom met de naam en "n deelnemers" erboven, en rechts een kolom Verschil (110px). Een cel is 40px hoog, 6px radius, met het gemiddelde in de celkleur van het niveau (`stylesheet.md`, Drie niveaus van scorekleur). Het grootste Verschil staat in `#c2570c`, gewicht 800. De kolomkoppen volgen `stylesheet.md`, Kolomkop en rijkop. Bij minder dan twee zichtbare rolgroepen staat de kaart er niet.
-
 ### Voorbeelden uit de groep (alleen groep)
 
-Een kaart "Voorbeelden uit de groep" met twee kaartjes naast elkaar (achtergrond `--bg-warm`, 8px radius, padding 16px 20px): Een label (12px, hoofdletters, `--ink-s`) zoals "Direct met klanten · Mensen & gedrag" en de tekst (14px, `--ink`). Het zijn antwoorden op de open vraag (`ScanInvulling.opmerkingenPerBouwblok`), zonder naam, zonder afdeling en zonder score, bij het veld waar ze bij horen. Onder de kaarten staat "Voorbeelden zijn anoniem en staan bij het veld waar ze bij horen. Ze krijgen geen score." Een voorbeeld verschijnt alleen als de rolgroep boven de drempel zit en de tekst door de Consultant of Admin is vrijgegeven (Open punten).
+Een kaart "Voorbeelden uit de groep" met twee kaartjes naast elkaar (achtergrond `--bg-warm`, 8px radius, padding 16px 20px): Een label (12px, hoofdletters, `--ink-s`) met het veld, zoals "Mensen & gedrag", en de tekst (14px, `--ink`). Het zijn antwoorden op de open vraag (`ScanInvulling.opmerkingenPerBouwblok`), zonder naam, zonder afdeling en zonder score, bij het veld waar ze bij horen. Onder de kaarten staat "Voorbeelden zijn anoniem en staan bij het veld waar ze bij horen. Ze krijgen geen score." Voorbeelden zijn alleen zichtbaar voor een Lead met een zichtbare groep (boven `benchmarkMinRespondenten`), anoniem (besloten door Joost op 21 oktober 2026).
 
 ### De vijf niveaus
 
@@ -116,15 +112,20 @@ Een kaart met de kop "De vijf niveaus" en vijf kolommen: Een rondje van 22px in 
 
 ## Anonimiteit
 
-- Een groepsweergave toont nooit het antwoord, de score of het profiel van één persoon. Een rol met minder afgeronde scans dan `spanningMinPerRol` is niet te zien, ook niet in de gemiddelden of in "n deelnemers".
-- De groepsweergave voor een Lead volgt `benchmarkMinRespondenten` (`datamodel.md`, Instellingen). Eronder toont het scherm geen gemiddelde, geen laagste en hoogste score, geen uitsplitsing per rol en geen voorbeelden.
-- De open voorbeelden kunnen een persoon verraden. Daarom worden ze alleen getoond na vrijgave (Open punten).
+- Een groepsweergave toont nooit het antwoord, de score of het profiel van één persoon.
+- De groepsweergave voor een Lead volgt `benchmarkMinRespondenten` (`datamodel.md`, Instellingen). Eronder toont het scherm geen gemiddelde, geen laagste en hoogste score en geen voorbeelden.
+- De open voorbeelden kunnen een persoon verraden. Daarom zijn ze alleen zichtbaar voor Leads, anoniem en boven de drempel.
 
 ## Landingspagina en film Wat krijg ik
 
 Ontwerp: Bord Landing. De pagina volgt `CLAUDE.md`, scherm 2: De kop (icoon `gauge` in een witte cirkel van 56px en de titel in 48px), de sticky sub-nav en de secties, in deze volgorde: "De 6 spanningsvelden", "Praktisch", "Wat krijg ik" en "Visie", met achtergronden die wisselen beginnend met wit.
 
-- **De 6 spanningsvelden.** Kop "De 6 spanningsvelden", een inleiding ("Elk veld heeft vijf vragen met een eigen schaal van 1 tot 5. Klik op een veld voor de uitleg.") en zes kaarten in drie kolommen (10px radius, padding 20px 24px, 24px ertussen). Elke kaart is een knop met het nummer in een bolletje in de veldkleur (28px), de naam (16px, gewicht 700) en de `omschrijving` (14px, `--ink-m`). Een klik opent de Toelichtingsmodal van het veld (de `omschrijving`, de ijkpunten en de basis). Er is geen interactief overzicht met een radar (anders dan bij `bouwstenenmodel-visual.md`).
+- **De 6 spanningsvelden.** Kop "De 6 spanningsvelden", een inleiding ("Elk veld heeft vijf vragen met een eigen schaal van 1 tot 5. Klik op een veld voor de uitleg.") en daaronder een interactieve radar met zes taartpunten, analoog aan de radar van de AI-scan (`ai-domeinenmodel-visual.md`) en van Volwassenheid (`bouwstenenmodel-visual.md`). Voorstel van 21 oktober 2026, naar het ontwerp van de AI-scan. De zes kaarten in drie kolommen vervallen: De velden staan als rijen naast de radar. Nog te bouwen: De radar vervangt de zes kaarten, die nu zo gebouwd zijn.
+  - **Structuur.** Drie kolommen van 280px, 536px en 280px, met boven de radar de kaart voor de omschrijving (96px hoog). Midden: De radar van 536px met 6 taartpunten van 60° die bij −30° beginnen, zodat veld 1 boven staat en de rest met de klok mee loopt. Straal van de taartpunten 190px, nummercirkels van 26px op straal 226px, ringen bij 2, 3, 4 en 5 (37,5px per stap), taartpunten op 22% vulling met een witte rand van 1,5px. Rechts: Veld 1 tot en met 3 als rijen. Links: Veld 4 tot en met 6. Geen groepskoppen, want er is geen categorielaag.
+  - **Kleur.** Elk veld in zijn eigen veldkleur (`content-spanningsmeter.md`). Tekst op een veldkleur is wit, behalve waar de kleur te licht is (geel): Daar `--ink`.
+  - **Voorbeeldpolygoon.** De scores uit het tekstalternatief (3,8 / 2,6 / 2,2 / 3,4 / 2,4 / 4,0), als voorbeelddata en zonder claim.
+  - **Interactie.** Hover op een taartpunt, nummer of rij: De taartpunt gaat naar 62% vulling, de andere naar 10%, de nummercirkel schaalt naar 125%, de rij krijgt een rand in de veldkleur en de kaart toont de `omschrijving` van dat veld. Een klik op een taartpunt, nummer of rij opent de Toelichtingsmodal van het veld (de `omschrijving`, de ijkpunten en de basis), dezelfde modal als bij het i-icoontje in de doorloopflow. Geen tweede modalfunctie en geen content dupliceren.
+  - **Toegankelijkheid.** Taartpunten en nummers zijn met Tab bereikbaar en hebben een `aria-label` ("3, Mensen en gedrag, voorbeeldscore 2,2"). De rijen zijn dezelfde informatie in tekst.
 - **Praktisch.** Kop "Wat je kunt verwachten", als inleiding "Bedoeld voor ..." (de doelgroep van het Assessment), drie kaarten (invultijd "±10 tot 15 minuten voor 30 vragen", direct resultaat "je eigen profiel, het groepsbeeld volgt als de resultaten zijn opengezet", privacy "antwoorden in groepsweergaven zijn anoniem") en de rij met de uitgeschakelde knop "Start assessment", het Info-icoon en de toelichting over de persoonlijke link, zoals bij de andere Assessments.
 - **Visie.** Een korte inleiding en drie kaarten met "Lees verder" dat de volledige tekst op dezelfde pagina uitklapt. De teksten zijn voorstel en komen niet uit de bron: "Zes velden naast elkaar" (verhaal, regie, gedrag, data, processen en technologie krijgen elk een score op dezelfde schaal), "Spanning is een verschil" (loopt het ene veld ver voor op het andere, dan ontstaat wrijving en dat verschil wordt gemeten) en "Eerst jij, dan de groep" (eerst het eigen profiel, daarna het beeld van de groep, met ruimte voor verschillen in kijk). De definitieve tekst volgt uit het boek (Open punten).
 - **Wat krijg ik.** Kop "Zo ziet je resultaat eruit", een inleiding ("Je krijgt direct je eigen Spanningsprofiel. Daarna leggen we de profielen van de groep naast elkaar. Alle cijfers hieronder zijn voorbeelddata.") en de film in een kaart met drie stapkaarten en daaronder de knop "Bekijk de voorbeeld-output" (naar scherm 3, de weergave Groep van het resultaat met demodata). Een tweede film "Het dossier, de radar voor de Lead" ontbreekt: Het Dossier is er niet voor dit Assessment (`backlog.md`).
@@ -147,12 +148,10 @@ Alle cijfers in de film zijn voorbeelddata (de fictieve deelnemer en groep uit `
 
 ## Open punten
 
-1. **Intake.** De intake met Rolgroep is niet ontworpen. Vraag: Verplicht of niet.
-2. **Vrijgave van open voorbeelden.** Wie geeft voorbeelden vrij voor de groepsweergave, en hoe? Zonder vrijgave staat de kaart er niet.
-3. **Gemiddeld niveau in de ring.** De ring en de rij "Groep" tonen een gemiddelde van de zes veldscores. Dat is een nieuw getal dat de bron niet kent. Alternatief: De ring toont de grootste spanning, of de kaart heeft geen ring. De ring is gekozen voor uniformiteit met de andere scans.
-4. **Validatie zichtbaar.** Zolang de vragen niet getest zijn (`content-spanningsmeter.md`, Validatie), kan het resultaat een label "pilot" of een korte vermelding krijgen. Niet besloten.
-5. **Teksten.** De drie kaarten van de Visie, de omschrijvingen op de Landingspagina en de teksten van de film zijn voor nu akkoord en moeten nog geverifieerd worden.
-6. **Veldnamen.** De drie veldnamen met een ampersand ("Verhaal & leiderschap", "Governance, regie & control", "Mensen & gedrag") staan zo in de bron. In koppen en tooltips staat de volledige naam, in rijen en op de radar de korte naam of het nummer.
+1. **Gemiddeld niveau in de ring.** Besloten: Het blijft als weergave staan (geen score). De drempelwaarden waarbij het gemiddelde op een niveau uitkomt worden nog vastgelegd (Joost levert een screenshot).
+2. **Validatie zichtbaar.** Zolang de vragen niet getest zijn (`content-spanningsmeter.md`, Validatie), kan het resultaat een label "pilot" of een korte vermelding krijgen. Niet besloten.
+3. **Teksten.** De drie kaarten van de Visie, de omschrijvingen op de Landingspagina en de teksten van de film zijn voor nu akkoord en moeten nog geverifieerd worden.
+4. **Veldnamen.** De drie veldnamen met een ampersand ("Verhaal & leiderschap", "Governance, regie & control", "Mensen & gedrag") staan zo in de bron. In koppen en tooltips staat de volledige naam, in rijen en op de radar de korte naam of het nummer.
 
 ## Zo gebouwd
 
@@ -164,6 +163,8 @@ Gebouwd op 21 oktober 2026. De onderdelen en de plek in de code:
 - **Mijn metingen.** De bestaande Kaart met cirkel (`CirkelPaneel`) met een teaser van dit type (`spanningTeaser` in `lib/mijn-metingen.ts`).
 - **Cirkel, Assessment-pagina en film.** `lib/assessmentcirkel.ts` (vijf delen), `components/assessment/SpanningVeldenSectie.tsx`, `SpanningVisieSectie.tsx` en `components/spanning/SpanningFilm.tsx` (de film heeft een eigen opbouw met drie stapkaarten met elk een beeld, geen podium met stappen eronder).
 - **Overig.** De instelling `spanningMinPerRol` (Drempels en termijnen), `heeftEigenResultaat` (`lib/assessment-structuur.ts`) houdt dit type uit export, benchmark, Verkennen en de samengestelde Meting, en de help is bijgewerkt.
+
+**Daarna besloten, nog niet gebouwd (Joost, 21 oktober 2026):** De rolgroep in de intake, de afdeling, de uitsplitsing per rol (met de instelling `spanningMinPerRol`) en het Gemiddelde per rol vervallen. De kaart Voorbeelden uit de groep komt er wel, alleen zichtbaar voor Leads, anoniem en pas vanaf `benchmarkMinRespondenten`. De bouw hieronder heeft de rolgroep, de uitsplitsing per rol en `spanningMinPerRol` nog en moet daarop aangepast worden.
 
 **Afwijkingen en interpretaties (te beoordelen door Joost):**
 
