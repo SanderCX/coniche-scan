@@ -5,6 +5,7 @@ import { CATEGORIE_COLORS, DOMEIN_KLEUREN } from "@/lib/colors";
 import { FilmVariant, filmVariant, filmWeging } from "@/lib/film";
 import { Assessment } from "@/lib/types";
 import { DossierFilmPodium, RadarFilmPodium } from "@/components/help/RadarFilms";
+import { SPANNING_FILM_BESCHRIJVING, SPANNING_FILM_STAPPEN, SpanningFilmStappen } from "@/components/spanning/SpanningFilm";
 
 /**
  * De films van de Help (`help.md`, Films): Korte, bewegende uitleg gebouwd met CSS-animaties in de kleuren en de balken van de app, geen
@@ -302,6 +303,20 @@ const DOSSIER: FilmGegevens = {
   podium: <DossierFilmPodium />,
 };
 
+/** De AI-variant van "Het dossier lezen" (`Film-Dossier-AI`): Een radar met 8 taartpunten in de domeinkleuren, de tekst spreekt van "domein". */
+const DOSSIER_AI: FilmGegevens = {
+  titel: "Het dossier, de radar voor de Lead",
+  duur: 16,
+  beschrijving:
+    "De radar toont alleen actieve knooppunten voor de AI-domeinen 2, 4 en 7, waar items bij staan, met rechts de lijst met domeinen. Een klik op domein 7, Operating model en schaalbaarheid, toont de filterbalk met 2 items in dit dossier en laat alleen de items bij dat domein staan: een case en een nieuwsbericht. Een klik op Alle items tonen haalt het filter weg. De voorbeelditems noemen geen organisatie.",
+  stappen: [
+    "De radar toont alleen de domeinen waar je consultant items bij heeft gezet. Rechts staat de lijst met die domeinen.",
+    "Kies een domein, in de radar of in de lijst: Alleen de cases en het nieuws bij dat domein blijven staan.",
+    "Kies Alle items tonen om het filter weg te halen en alles weer te zien.",
+  ],
+  podium: <DossierFilmPodium ai />,
+};
+
 /**
  * `assessment`: Bij "Wat krijg ik" op de landingspagina van een Assessment bepaalt het type de variant van de film. In Help is er geen
  * Assessment en staat de variant met categorieën.
@@ -318,13 +333,25 @@ export function HelpFilm({
   assessment?: Assessment | null;
 }) {
   const variant = naam === "wat-krijg-ik" ? filmVariant(assessment) : "categorieen";
+  // De Spanningsmeter heeft een eigen film van drie stapkaarten met elk een beeld (`visualisatie-spanningsmeter.md`), geen podium met stappen eronder.
+  const spanning = naam === "wat-krijg-ik" && variant === "spanning";
   const film =
-    naam === "wat-krijg-ik"
+    spanning
+      ? {
+          titel: "Wat krijg ik?",
+          duur: 9,
+          beschrijving: SPANNING_FILM_BESCHRIJVING,
+          stappen: SPANNING_FILM_STAPPEN.map((st) => `${st.titel} ${st.regel}`),
+          podium: <></>,
+        }
+      : naam === "wat-krijg-ik"
       ? watKrijgIk(variant, variant === "categorieen" ? filmWeging(assessment) : null)
       : naam === "radar"
         ? RADAR
         : naam === "dossier"
-          ? DOSSIER
+          ? assessment && filmVariant(assessment) === "domeinen"
+            ? DOSSIER_AI
+            : DOSSIER
           : MEETPERIODE;
   const [pauze, setPauze] = useState(false);
   return (
@@ -343,18 +370,29 @@ export function HelpFilm({
         data-pauze={pauze ? "ja" : undefined}
         style={{ ["--film-duur" as string]: `${film.duur}s` }}
       >
-        <div className="help-film-podium" aria-hidden="true">
-          {film.podium}
-        </div>
-        <p className="sr-only">{film.beschrijving}</p>
-        <ol className="help-film-stappen">
-          {film.stappen.map((tekst, i) => (
-            <li key={i} className={`help-film-stap help-film-stap--${i + 1}`}>
-              <span className="help-film-nr">{i + 1}</span>
-              <span className="help-film-tekst">{tekst}</span>
-            </li>
-          ))}
-        </ol>
+        {spanning ? (
+          <>
+            <div className="sf-vlak" aria-hidden="true">
+              <SpanningFilmStappen />
+            </div>
+            <p className="sr-only">{film.beschrijving}</p>
+          </>
+        ) : (
+          <>
+            <div className="help-film-podium" aria-hidden="true">
+              {film.podium}
+            </div>
+            <p className="sr-only">{film.beschrijving}</p>
+            <ol className="help-film-stappen">
+              {film.stappen.map((tekst, i) => (
+                <li key={i} className={`help-film-stap help-film-stap--${i + 1}`}>
+                  <span className="help-film-nr">{i + 1}</span>
+                  <span className="help-film-tekst">{tekst}</span>
+                </li>
+              ))}
+            </ol>
+          </>
+        )}
       </div>
       {opmerking && <p className="help-film-opmerking">{opmerking}</p>}
       {knop}

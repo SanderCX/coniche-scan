@@ -372,7 +372,7 @@
 .help-film--radar .fr-staaf-kolom--3 { animation: fr-dim2 var(--film-duur) linear infinite; }
 .help-film--radar .fr-staaf-kolom--0, .help-film--radar .fr-staaf-kolom--2, .help-film--radar .fr-staaf-kolom--4 { animation: fr-dim23 var(--film-duur) linear infinite; }
 .help-film--dossier .mr-vol--7, .help-film--dossier .mr-taart-op--7, .help-film--dossier .mr-ring--7, .help-film--dossier .fd-rij--7::after, .help-film--dossier .fd-filterbalk { animation: fr-s2 var(--film-duur) linear infinite; }
-.help-film--dossier .fd-item--4, .help-film--dossier .fd-item--13 { animation: fd-weg var(--film-duur) linear infinite; }
+.help-film--dossier .fd-item--4, .help-film--dossier .fd-item--13, .help-film--dossier .fd-item--2 { animation: fd-weg var(--film-duur) linear infinite; }
 @keyframes rf-stap-1 { 0%, 33.99% { border-color: var(--or); color: var(--or); } 34%, 100% { border-color: var(--border); color: var(--ink-s); } }
 @keyframes rf-stap-2 { 0%, 33.99% { border-color: var(--border); color: var(--ink-s); } 34%, 66.99% { border-color: var(--or); color: var(--or); } 67%, 100% { border-color: var(--border); color: var(--ink-s); } }
 @keyframes rf-stap-3 { 0%, 66.99% { border-color: var(--border); color: var(--ink-s); } 67%, 100% { border-color: var(--or); color: var(--or); } }

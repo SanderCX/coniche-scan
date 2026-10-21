@@ -11,45 +11,53 @@ import {
   AI_WEDGES,
   BOOG_DIKTE,
   CENTRUM,
+  DELEN,
+  DeelDef,
   KORTE_NAMEN,
-  KWART,
-  KWARTEN,
   LABEL_R,
-  LINKS_WEDGES,
   MAAT,
   QUICK_BOGEN,
   RINGEN,
+  SPANNING_WEDGES,
+  VOLWASSENHEID_WEDGES,
   WEDGE_DEKKING,
+  bandVlak,
   boogPad,
+  delenMetAssessments,
   kompas,
   lijnPunten,
   lijnVulling,
   stipPunt,
   volgendeKeuze,
   wedgePad,
-  Positie,
 } from "@/lib/assessmentcirkel";
 import { Assessment } from "@/lib/types";
+import { bandPunten as bandPuntenLijn } from "@/lib/assessmentcirkel";
 
-/** De beelden in een kwart zijn vaste illustraties met voorbeelddata: Ze rekenen niets uit. */
-function Beeld({ positie, clipId }: { positie: Positie; clipId: string }) {
-  const lijn = positie !== "br";
+/** De beelden in een deel zijn vaste illustraties met voorbeelddata: Ze rekenen niets uit. */
+function Beeld({ deel, clipId }: { deel: DeelDef; clipId: string }) {
+  const lijn = deel.soort !== "quick";
+  const wedge = { fillOpacity: WEDGE_DEKKING, stroke: "#fff", strokeWidth: 1.2 };
   return (
     <g clipPath={`url(#${clipId})`}>
-      {positie === "tl" || positie === "bl"
-        ? LINKS_WEDGES.map((w) => <path key={w.naam} d={wedgePad(w.van, w.tot)} fill={w.kleur} fillOpacity={WEDGE_DEKKING} stroke="#fff" strokeWidth={1.2} />)
-        : positie === "tr"
-          ? AI_WEDGES.map((w, i) => <path key={i} d={wedgePad(w.van, w.tot)} fill={w.kleur} fillOpacity={WEDGE_DEKKING} stroke="#fff" strokeWidth={1.2} />)
-          : null}
-      {positie !== "br" &&
-        RINGEN.map((r) => <circle key={r} cx={CENTRUM} cy={CENTRUM} r={r} fill="none" stroke="#fff" strokeOpacity={0.75} strokeWidth={1.2} />)}
-      {positie === "br" &&
+      {deel.soort === "volwassenheid" && VOLWASSENHEID_WEDGES.map((w) => <path key={w.naam} d={wedgePad(w.van, w.tot)} fill={w.kleur} {...wedge} />)}
+      {deel.soort === "ai" && AI_WEDGES.map((w, i) => <path key={i} d={wedgePad(w.van, w.tot)} fill={w.kleur} {...wedge} />)}
+      {deel.soort === "spanning" && SPANNING_WEDGES.map((w, i) => <path key={i} d={wedgePad(w.van, w.tot)} fill={w.kleur} {...wedge} />)}
+      {lijn && RINGEN.map((r) => <circle key={r} cx={CENTRUM} cy={CENTRUM} r={r} fill="none" stroke="#fff" strokeOpacity={0.75} strokeWidth={1.2} />)}
+      {deel.soort === "quick" &&
         QUICK_BOGEN.map((b) => (
           <g key={b.r}>
             <path d={boogPad(b.r, 1)} fill="none" stroke="#e9e6df" strokeWidth={BOOG_DIKTE} strokeLinecap="round" />
             <path d={boogPad(b.r, b.score)} fill="none" stroke={b.kleur} strokeWidth={BOOG_DIKTE} strokeLinecap="round" />
           </g>
         ))}
+      {deel.soort === "spanning" && (
+        <g>
+          <polygon points={bandVlak()} fill="#ff671f" fillOpacity={0.1} stroke="none" />
+          <polyline points={bandPuntenLijn("boven")} fill="none" stroke="#ff671f" strokeOpacity={0.6} strokeWidth={1.2} strokeDasharray="4 3" />
+          <polyline points={bandPuntenLijn("onder")} fill="none" stroke="#ff671f" strokeOpacity={0.6} strokeWidth={1.2} strokeDasharray="4 3" />
+        </g>
+      )}
       {lijn && <polygon points={lijnVulling()} fill="#ff671f" fillOpacity={0.14} stroke="none" />}
       {lijn && <polyline points={lijnPunten()} fill="none" stroke="#ff671f" strokeWidth={2.5} strokeLinejoin="miter" strokeLinecap="butt" />}
     </g>
@@ -57,18 +65,21 @@ function Beeld({ positie, clipId }: { positie: Positie; clipId: string }) {
 }
 
 /**
- * Kies jouw assessment als cirkel met vier kwarten (`CLAUDE.md`, scherm 1, besloten door Joost op 21 oktober 2026, ontwerp `Home-D`): Eén cirkel van
- * 568px in vier kwarten, elk kwart is een Assessment (in de volgorde van de lijst: linksboven, rechtsboven, linksonder, rechtsonder), met rechts
- * het detailpaneel van het gekozen kwart. Een keuzegroep met vier opties: Pijltoetsen wisselen, de naam van het Assessment is het label. Er is
- * steeds één kwart gekozen of geen. Bij meer dan vier Assessments staan de overige niet in de cirkel (open punt, `backlog.md`).
+ * Kies jouw assessment als cirkel met vijf delen (`CLAUDE.md`, scherm 1, besloten door Joost op 21 oktober 2026, ontwerp `Home-D`, met de Digitale
+ * Spanningsmeter als vijfde deel, variant E2): Eén cirkel van 568px in vijf delen van 72°, elk deel is een Assessment op een vaste plek (met de klok
+ * mee vanaf links: Klantcontact Volwassenheid, Zorg, AI, Quickscan, Spanningsmeter), met rechts het detailpaneel van het gekozen deel. Een
+ * keuzegroep met vijf opties: Pijltoetsen wisselen in die volgorde, de naam van het Assessment is het label. Er is steeds één deel gekozen of geen.
+ * Een gekozen deel schuift 10px naar buiten langs zijn middenlijn, de andere vier gaan naar 38% dekking.
  */
 export function AssessmentCirkel({ assessments }: { assessments: Assessment[] }) {
-  const lijst = assessments.slice(0, 4);
+  // Per plek het Assessment of `null`; `volgorde` zijn de plekken die er zijn, in de volgorde van de pijltoetsen.
+  const perPlek = delenMetAssessments(assessments);
+  const volgorde = perPlek.map((a, plek) => (a ? plek : -1)).filter((plek) => plek >= 0);
   const [gekozen, setGekozen] = useState<number | null>(null);
   const [schaal, setSchaal] = useState(1);
   const wrapRef = useRef<HTMLDivElement>(null);
   const paneelRef = useRef<HTMLDivElement>(null);
-  const kwartRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const deelRefs = useRef<(HTMLDivElement | null)[]>([]);
   const uid = useId().replace(/:/g, "");
 
   useEffect(() => {
@@ -81,74 +92,70 @@ export function AssessmentCirkel({ assessments }: { assessments: Assessment[] })
     return () => ro.disconnect();
   }, []);
 
-  function kies(i: number | null) {
-    setGekozen(i);
+  function kies(plek: number | null) {
+    setGekozen(plek);
     // Onder 768px staat het paneel onder de cirkel: Scrol ernaartoe.
-    if (i !== null && typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
+    if (plek !== null && typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
       setTimeout(() => paneelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     }
   }
 
-  function onToets(e: React.KeyboardEvent, i: number) {
+  function onToets(e: React.KeyboardEvent, plek: number) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      kies(i);
+      kies(plek);
       return;
     }
-    const volgende = volgendeKeuze(i, lijst.length, e.key);
+    const volgende = volgendeKeuze(volgorde.indexOf(plek), volgorde.length, e.key);
     if (volgende === null) return;
     e.preventDefault();
-    kies(volgende);
-    kwartRefs.current[volgende]?.focus();
+    kies(volgorde[volgende]);
+    deelRefs.current[volgorde[volgende]]?.focus();
   }
 
-  const gekozenAssessment = gekozen !== null ? lijst[gekozen] : null;
+  const gekozenAssessment = gekozen !== null ? perPlek[gekozen] : null;
   const inhoud = gekozenAssessment ? tegelInhoud(gekozenAssessment) : null;
+  const aantalWoord = ["Nul", "Eén", "Twee", "Drie", "Vier", "Vijf"][volgorde.length] ?? String(volgorde.length);
 
   return (
     <div className="ac">
       <div ref={wrapRef} className="ac-vlak" style={{ height: MAAT * schaal }}>
         <div className="ac-stage" role="radiogroup" aria-label="Kies jouw assessment" style={{ transform: `scale(${schaal})` }}>
-          {KWARTEN.map((k, i) => {
-            const a = lijst[i];
+          {DELEN.map((d, plek) => {
+            const a = perPlek[plek];
             if (!a) return null;
-            const isGekozen = gekozen === i;
+            const isGekozen = gekozen === plek;
             const gedimd = gekozen !== null && !isGekozen;
-            const clipId = `ac-${uid}-${k.positie}`;
-            const [stipX, stipY] = stipPunt(k.positie);
-            const [lx, ly] = kompas(LABEL_R, k.midden);
+            const clipId = `ac-${uid}-${plek}`;
+            const [stipX, stipY] = stipPunt(d.assessmentId);
+            const [lx, ly] = kompas(LABEL_R, d.midden);
             const label = KORTE_NAMEN[a.id] ?? a.kortLabel ?? a.naam;
             return (
               <div
                 key={a.id}
                 ref={(el) => {
-                  kwartRefs.current[i] = el;
+                  deelRefs.current[plek] = el;
                 }}
                 role="radio"
                 aria-checked={isGekozen}
                 aria-label={a.naam}
-                tabIndex={isGekozen || (gekozen === null && i === 0) ? 0 : -1}
-                className={`ac-kwart ${isGekozen ? "is-gekozen" : ""} ${gedimd ? "is-gedimd" : ""}`}
+                tabIndex={isGekozen || (gekozen === null && plek === volgorde[0]) ? 0 : -1}
+                className={`ac-deel ${isGekozen ? "is-gekozen" : ""} ${gedimd ? "is-gedimd" : ""}`}
                 style={{
-                  left: k.x0,
-                  top: k.y0,
-                  width: KWART,
-                  height: KWART,
-                  transformOrigin: `${k.richting[0] < 0 ? KWART : 0}px ${k.richting[1] < 0 ? KWART : 0}px`,
-                  ["--ac-dx" as string]: `${k.richting[0] * 7}px`,
-                  ["--ac-dy" as string]: `${k.richting[1] * 7}px`,
+                  ["--ac-dx" as string]: `${d.richting[0] * 10}px`,
+                  ["--ac-dy" as string]: `${d.richting[1] * 10}px`,
                 }}
-                onClick={() => kies(i)}
-                onKeyDown={(e) => onToets(e, i)}
+                onClick={() => kies(plek)}
+                onKeyDown={(e) => onToets(e, plek)}
               >
-                <svg width={KWART} height={KWART} viewBox={`${k.x0} ${k.y0} ${KWART} ${KWART}`} aria-hidden="true">
+                <svg width={MAAT} height={MAAT} viewBox={`0 0 ${MAAT} ${MAAT}`} aria-hidden="true">
                   <defs>
                     <clipPath id={clipId}>
-                      <path d={k.pad} />
+                      <path d={d.pad} />
                     </clipPath>
                   </defs>
-                  <path d={k.pad} fill="#faf8f5" />
-                  <Beeld positie={k.positie} clipId={clipId} />
+                  <path className="ac-deel-vorm" d={d.pad} fill="#faf8f5" />
+                  <Beeld deel={d} clipId={clipId} />
                   {isGekozen && (
                     <g>
                       <circle className="ac-puls" cx={stipX} cy={stipY} r={9} fill="none" stroke="#ff671f" strokeWidth={2} />
@@ -156,7 +163,7 @@ export function AssessmentCirkel({ assessments }: { assessments: Assessment[] })
                     </g>
                   )}
                 </svg>
-                <span className="ac-label" style={{ left: lx - k.x0, top: ly - k.y0 }}>
+                <span className="ac-label" style={{ left: lx, top: ly }}>
                   <AssessmentIcon name={a.icoon} style={{ width: "30px", height: "30px", color: "var(--or)", flex: "none" }} />
                   <span>{label}</span>
                 </span>
@@ -190,7 +197,7 @@ export function AssessmentCirkel({ assessments }: { assessments: Assessment[] })
             </Link>
           </div>
         ) : (
-          <h2 className="ac-leeg">Vier assessments in één cirkel. Klik op een kwart voor de details.</h2>
+          <h2 className="ac-leeg">{aantalWoord} assessments in één cirkel. Klik op een deel voor de details.</h2>
         )}
       </div>
     </div>

@@ -8,6 +8,7 @@ import { useAssessment } from "@/lib/assessment-store";
 import { actieveBouwblokkenMetGroep, actieveVragen } from "@/lib/assessment-structuur";
 import { categorieVanToepassing, isVolledigIngevuld } from "@/lib/scoring";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { isSpanning } from "@/lib/spanning";
 import { Antwoord } from "@/lib/types";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
@@ -15,6 +16,8 @@ import { Sidebar } from "@/components/Sidebar";
 import { MobielVoortgang } from "@/components/MobielVoortgang";
 import { BouwblokForm } from "@/components/BouwblokForm";
 import { ScanBezet } from "@/components/ScanBezet";
+import { SpanningSidebar } from "@/components/spanning/SpanningSidebar";
+import { SpanningVeldForm } from "@/components/spanning/SpanningVeldForm";
 import { useBewerkslot } from "@/lib/bewerkslot";
 
 export default function DoorloopPage({
@@ -99,6 +102,7 @@ export default function DoorloopPage({
   const huidig = alleBouwblokken[huidigeIndex];
   const isLaatsteBouwblok = huidigeIndex === alleBouwblokken.length - 1;
   const jaNee = isJaNeeWeetNiet(assessment);
+  const spanning = isSpanning(assessment);
   // Een optionele categorie begint met haar kaarten bij het eerste bouwblok.
   const categorie = (assessment.categorieen ?? []).find((c) => c.id === huidig.groepId);
   const eersteVanOptioneleCategorie =
@@ -226,39 +230,64 @@ export default function DoorloopPage({
 
       <MobielVoortgang assessment={assessment} respondent={respondent} />
       <div className="flow-layout flex-1">
-        <Sidebar
-          assessment={assessment}
-          respondent={respondent}
-          actieveBouwblokId={actieveBouwblokId}
-          onSelecteer={setHandmatigGekozenId}
-        />
-        <main className="flow-main">
-          <BouwblokForm
-            bouwblok={huidig.bouwblok}
-            categorieKleur={huidig.groepKleur}
-            categorieNaam={huidig.groepNaam}
-            bouwblokLabel={assessment.bouwblokLabel}
-            eenheid={assessment.bouwblokEenheidEnkelvoud}
-            schaal={assessment.schaal}
+        {spanning ? (
+          <SpanningSidebar
+            assessment={assessment}
             respondent={respondent}
-            isLaatsteBouwblok={isLaatsteBouwblok}
-            jaNee={jaNee}
-            instructieregel={assessment.instructieregel}
-            afdeling={
-              eersteVanOptioneleCategorie && categorie
-                ? {
-                    categorie,
-                    relevantieVraag: assessment.relevantieVraag?.trim() || "Is dit onderdeel relevant voor uw situatie?",
-                    relevantie: invulling.relevantie?.[categorie.id],
-                    onRelevantie: (relevant) => handleRelevantie(categorie.id, relevant),
-                  }
-                : undefined
-            }
-            kanAfronden={kanAfronden}
-            onAntwoord={handleAntwoord}
-            onOpmerking={handleOpmerking}
-            onVolgende={handleVolgende}
+            actieveBouwblokId={actieveBouwblokId}
+            onSelecteer={setHandmatigGekozenId}
           />
+        ) : (
+          <Sidebar
+            assessment={assessment}
+            respondent={respondent}
+            actieveBouwblokId={actieveBouwblokId}
+            onSelecteer={setHandmatigGekozenId}
+          />
+        )}
+        <main className={spanning ? "flow-main flow-main--spanning" : "flow-main"}>
+          {spanning ? (
+            <SpanningVeldForm
+              key={huidig.bouwblok.id}
+              assessment={assessment}
+              veld={huidig.bouwblok}
+              respondent={respondent}
+              eerste={huidigeIndex === 0}
+              laatste={isLaatsteBouwblok}
+              kanAfronden={kanAfronden}
+              onAntwoord={handleAntwoord}
+              onVoorbeeld={handleOpmerking}
+              onVorige={() => setHandmatigGekozenId(alleBouwblokken[huidigeIndex - 1].bouwblok.id)}
+              onVolgende={handleVolgende}
+            />
+          ) : (
+            <BouwblokForm
+              bouwblok={huidig.bouwblok}
+              categorieKleur={huidig.groepKleur}
+              categorieNaam={huidig.groepNaam}
+              bouwblokLabel={assessment.bouwblokLabel}
+              eenheid={assessment.bouwblokEenheidEnkelvoud}
+              schaal={assessment.schaal}
+              respondent={respondent}
+              isLaatsteBouwblok={isLaatsteBouwblok}
+              jaNee={jaNee}
+              instructieregel={assessment.instructieregel}
+              afdeling={
+                eersteVanOptioneleCategorie && categorie
+                  ? {
+                      categorie,
+                      relevantieVraag: assessment.relevantieVraag?.trim() || "Is dit onderdeel relevant voor uw situatie?",
+                      relevantie: invulling.relevantie?.[categorie.id],
+                      onRelevantie: (relevant) => handleRelevantie(categorie.id, relevant),
+                    }
+                  : undefined
+              }
+              kanAfronden={kanAfronden}
+              onAntwoord={handleAntwoord}
+              onOpmerking={handleOpmerking}
+              onVolgende={handleVolgende}
+            />
+          )}
         </main>
       </div>
     </PageWithChrome>

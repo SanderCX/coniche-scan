@@ -32,18 +32,6 @@
   display: block;
 }
 
-.nav-scan {
-  align-self: flex-end;
-  margin-left: var(--sp-2);
-  margin-bottom: 1px;
-  font-size: var(--fs-14);
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  line-height: 1;
-  color: var(--or);
-  text-decoration: none;
-}
-
 .nav-badge {
   background: var(--ink);
   color: #fff;
@@ -1742,4 +1730,56 @@ select.veld-compact:focus {
 }
 .tm-beschrijving p:last-child {
   margin-bottom: 0;
+}
+
+/* Spanningsveld in de Toelichtingsmodal: De ijkpunten en de basis (`visualisatie-spanningsmeter.md`). */
+.tm-ijkpunten {
+  margin-top: 20px;
+}
+.tm-label {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.tm-ijkpunten ol {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tm-ijkpunten li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  font-size: var(--fs-15);
+  line-height: 24px;
+  color: var(--ink-m);
+}
+.tm-ijkpunten li strong {
+  color: var(--ink);
+}
+.tm-ijk-nr {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  padding-top: 0.09em;
+  border-radius: 50%;
+  background: var(--or-faint);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--dal);
+}
+.tm-basis {
+  margin: 16px 0 0;
+  font-size: var(--fs-12);
+  line-height: 18px;
+  color: var(--ink-s);
 }

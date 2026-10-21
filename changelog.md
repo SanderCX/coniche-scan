@@ -1,5 +1,48 @@
 # Coniche Scan — Changelog
 
+## 2026-10-21 (26) — Specs van Joost, PR 160: Dossier met Events en Blogs, koppeling aan AI-domeinen, radar van de AI-domeinen
+
+Op verzoek van Sander ("pull devops", daarna "ja bouw maar"): PR 160 (alleen specs) is gebouwd.
+
+**Gedaan**:
+- **Dossier, vier soorten** (`lib/types.ts`, `lib/dossier.ts`): `Dossieritem.soort` is nu `nieuws`, `case`, `event` of `blog`, met `datum`, `einddatum` en `plaats`. Controle per soort, `isVerlopen` en de status "Verlopen" (een Event is verlopen vanaf de dag na zijn einddatum of datum), volgorde (Events op datum, Blogs en Nieuws nieuwste eerst), `aantallPerSoort`, `LeadEvent`, `LeadBlog`, `LeadDossier` met vier lijsten, `voorproef` en `aantalTekst` ("2 cases · 2 nieuwsberichten · 2 events · 1 blog"). Een verlopen Event telt niet mee voor de Lead en niet in de bevestiging bij Open voor Lead.
+- **Koppeling per Assessment**: `DOSSIER_ASSESSMENT_IDS`, `dossierBouwblokkenPerAssessment`, `dossierRadarMeting`. In het formulier staat bij "Gaat over" een pil-groep per Assessment.
+- **Kaart bij de Organisatie** (`DossierKaart`): Filter Alles, Cases, Nieuws, Events en Blogs met aantallen, een formulier met vier soorten (Event: datum, einddatum, plaats; Blog: link), regel "{datum} tot {einddatum}, {plaats}", icoon, kleur en statusbadge per soort (`EventIcoon`, `BlogIcoon`, `SoortIcoon`).
+- **Dossierpagina** (`app/s/[code]/dossier/page.tsx`): Pil per Assessment boven de radar, één radar per Assessment (ook de AI-domeinen), het filter in `?bouwblok=`, secties Cases, Nieuws, Events (komend eerst, "Eerdere events (n)" klapt uit) en Blogs, en een kopregel met een tegel per soort.
+- **Mijn metingen**: Stippen voor Event (groen) en Blog (amber), tellerregel met alle soorten, chips en tag op 12px.
+- **AI-domeinen als radar** (`components/assessment/AiDomeinenSectie.tsx`): Vervangt het raster van kaarten op de Assessment-pagina van de AI-scan (spec `ai-domeinenmodel-visual.md`), met de kaart met de centrale vraag, rijen links en rechts en de Toelichtingsmodal.
+- **Film Het dossier lezen, AI-variant** (`DossierFilmPodium ai`, `MiniRadar` voor beide soorten): Op de Assessment-pagina van de AI-scan en in Help.
+- **Help** (`npm run help`): "Het dossier lezen", "Het Dossier van je consultant" en "Het Dossier van een Organisatie"; de Info-tekst `info.dossier` noemt events en blogs.
+- **Tests**: `lib/dossier.test.ts` uitgebreid, `lib/dossier-ai-ui.test.tsx` nieuw (radar, film, Assessments). Alle 607 tests slagen, tsc, lint en build zijn schoon.
+
+**Specs bijgewerkt** (voorstel naar gebouwd, met "Zo gebouwd"): `dossier.md`, `datamodel.md`, `stylesheet.md` (Soortkleuren), `visualisatie-mijn-metingen.md`, `ai-domeinenmodel-visual.md`, `CLAUDE.md`, `help.md`, `beheerpagina.md` (Info-tekst).
+
+**Afwijkingen en interpretaties**: Zie `dossier.md`, Zo gebouwd (Events, Blogs en de koppeling aan AI-domeinen). De belangrijkste: "Vandaag" is de lokale datum van de browser, de chips en de tag staan weer op 12px (de tokens `--fs-11` en `--fs-13` blijven voor andere onderdelen), de pil-groep per Assessment verschijnt alleen bij meer dan één radar, en een item zonder koppeling verschijnt alleen zonder filter. De beheerkaart (formulier voor Event en Blog) is niet in de browser bekeken, omdat daar een Admin-login voor nodig is; hij is wel door tsc, lint en tests gedekt.
+
+## 2026-10-21 (25) — De Digitale Spanningsmeter gebouwd
+
+Op verzoek van Sander ("Nu de Spanningsmeter bouwen", daarna "ja bouw maar"): Het hele voorstel van 21 oktober 2026 (`content-spanningsmeter.md`, `visualisatie-spanningsmeter.md`, `datamodel.md`, antwoordType `spanning`) is gebouwd als vijfde Assessment. Een tussentijdse `pull devops` haalde PR 160 (Dossier met Events en Blogs) binnen, alleen specs, niet gebouwd.
+
+**Gedaan**:
+- **Rekenen** (`lib/spanning.ts`, `lib/spanning-radar.ts`): Veldscore (een 0 telt niet mee, minder dan drie beoordeeld is "Onvoldoende zicht"), niveau, spanning ten opzichte van het laagste voorgaande veld, grootste spanning, gemiddeld niveau, groep (gemiddelde, laagste, hoogste, spreiding, meest uiteenlopend), uitsplitsing per rolgroep met `spanningMinPerRol`, en `groepZichtbaar`. Tests (`lib/spanning.test.ts`, `lib/spanning-radar.test.ts`) met het rekenvoorbeeld uit het datamodel (deelnemer en groep van 12).
+- **Data en types**: `AntwoordType` `spanning`, `Bouwblok.korteNaam` en `ijkpunten`, `Vraag.invalshoek` en `aandachtspunt`, `Assessment.openVraag` en `rolgroepen`, `ScanInvulling.rolgroep`, `Instellingen.spanningMinPerRol`. `data/spanningsmeter-assessment.ts` (6 velden, 30 vragen, schaal, open vraag, rolgroepen), `data/demo-antwoorden-spanning.ts`, icoon `gauge`, veldkleuren (`lib/colors.ts`).
+- **Doorloopflow**: Intake met Rolgroep (niet verplicht), sidebar met de zes velden, veldkop met Info-icoon en Toelichtingsmodal (omschrijving, ijkpunten, basis), instructievlak met de vijf ijkpunten, vraagkaarten met invalshoek, "Waar je op let" achter een Info-knop, antwoordkeuze 1 tot 5 met niveaunaam en de pil "0 · Kan ik niet beoordelen", open vraag, Vorig veld en Volgend veld.
+- **Resultaat** (`components/spanning/SpanningResultaat.tsx`): Jouw profiel en Groep met schakelaar, Totaalkaart met het Gemiddeld niveau (de ring heeft nu een `label`), twee kaarten met de belangrijkste spanning, radar en tabel Score per veld die elkaar oplichten, Gemiddelde per rol en De vijf niveaus. Op de resultatenpagina van een respondent (een Lead met Resultaten kan naar Groep), de Lead-pagina van een Meting, de Rapportage in beheer en de voorbeeld-output.
+- **Mijn metingen**: Teaser van dit type in de Kaart met cirkel (ring met "Niveau", rij per veld met nummer, de zin over de grootste spanning).
+- **Scherm 1**: `lib/assessmentcirkel.ts` en `AssessmentCirkel` herschreven voor vijf delen van 72° (variant E2), met de band van de Spanningsmeter en een vaste plek per Assessment. Test opnieuw geschreven.
+- **Scherm 2**: Secties De 6 spanningsvelden, Praktisch, Wat krijg ik en Visie (`SpanningVeldenSectie`, `SpanningVisieSectie`), de film Wat krijg ik met drie stapkaarten van 9 seconden (`SpanningFilm`), "Over deze scan: spanningsvelden en visie", de tegel op scherm 1.
+- **Beheer**: Het formulier Spanningsmeter onder Drempels en termijnen (`info.spanningMinPerRol`), bij de content de open vraag en de rolgroepen (de weging is er niet), en `heeftEigenResultaat` houdt dit type uit export, benchmark, Verkennen en de samengestelde Meting. De score staat niet in de lijst met Organisaties, het Scan-overzicht en het Conflict.
+- **Help** (`npm run help`): Alinea's bij "Een scan invullen", "Je resultaten lezen", "Mijn metingen", "Zo werkt de scan" en "Drempels en termijnen".
+- **Tests**: `lib/spanning-ui.test.tsx` (landing, film, Mijn metingen, resultaat, doorloopflow), alle 587 tests slagen.
+
+**Specs bijgewerkt** (voorstel naar gebouwd, met "Zo gebouwd" en de afwijkingen): `CLAUDE.md`, `content-spanningsmeter.md`, `visualisatie-spanningsmeter.md` (met de lijst afwijkingen en interpretaties voor Joost), `datamodel.md`, `stylesheet.md`, `beheerpagina.md` (twee Info-teksten), `help.md`, `backlog.md`.
+
+**Afwijkingen en interpretaties**: Zie `visualisatie-spanningsmeter.md`, Zo gebouwd. De belangrijkste: Niveaurondje 4 heeft `--ink`, Rolgroep is niet verplicht, de voorbeelden uit de groep ontbreken (vrijgave niet besloten), de cirkel heeft 15 hoekpunten en het label staat op 200px, en het bewerken van ijkpunten en toelichtingen in beheer is nog niet gebouwd.
+
+## 2026-10-21 (24) — SCAN weer uit de nav
+
+Op verzoek van Sander: Het woord SCAN achter het logo (entry 23) is weer weg (`SiteHeader`, `.nav-scan`). De nav heeft weer alleen het logo, met daarachter de rolbadge in beheer. De eyebrow "Coniche Scan" boven de titel op scherm 1 en in de hero van de Quickscan blijft vervallen.
+
 ## 2026-10-21 (23) — SCAN achter het logo, geen eyebrow "Coniche Scan" meer
 
 Op verzoek van Sander: In de nav staat achter het logo het woord SCAN (`SiteHeader`, `.nav-scan`, 14px, gewicht 800, letterafstand .14em, `--or`, onderaan uitgelijnd met het logo, een link naar dezelfde bestemming als het logo, ook in beheer vóór de rolbadge). De eyebrow "Coniche Scan" boven de titel op scherm 1 en in de hero van de Quickscan is vervallen. De spec noemt dit niet: Kleur, maat en plek zijn mijn keuze, en `CLAUDE.md` en `stylesheet.md` zijn hier nog niet op aangepast.

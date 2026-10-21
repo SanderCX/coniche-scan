@@ -15,6 +15,7 @@ import { isAdmin, isConsultant, zichtbareOrganisaties } from "@/lib/rechten";
 import { useGebruikers } from "@/lib/gebruikers-store";
 import { Assessment, Organisatie, ScanUitvoering } from "@/lib/types";
 import { gemiddeldeAntwoordenVoorMeting, overallScore } from "@/lib/scoring";
+import { heeftEigenResultaat } from "@/lib/assessment-structuur";
 import { scoreKleur } from "@/lib/colors";
 import { isOuderDanBewaartermijn, useInstellingen } from "@/lib/instellingen-store";
 import { aantalBenchmarksMetOrganisatie } from "@/lib/benchmark-store";
@@ -34,7 +35,8 @@ function meestRecenteMetingMetAfgerond(organisatie: Organisatie): ScanUitvoering
 
 function ScoreEnVoortgang({ meting, assessment }: { meting: ScanUitvoering; assessment: Assessment }) {
   const gemiddeldeAntwoorden = gemiddeldeAntwoordenVoorMeting(assessment, meting.invullingen);
-  const score = overallScore(assessment, gemiddeldeAntwoorden);
+  // De Spanningsmeter heeft geen overall score (`datamodel.md`, Scoreberekening, Spanningsmeter).
+  const score = heeftEigenResultaat(assessment) ? null : overallScore(assessment, gemiddeldeAntwoorden);
   const afgerond = meting.invullingen.filter((i) => i.status === "afgerond").length;
   const totaal = meting.invullingen.length;
   const volledigAfgerond = afgerond === totaal;

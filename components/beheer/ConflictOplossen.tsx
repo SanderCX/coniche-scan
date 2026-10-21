@@ -172,7 +172,7 @@ function KolomKaart({
   const [form, setForm] = useState({ naam: "", email: "", functie: "", team: "", notities: "" });
 
   const voortgangTekst = assessment ? `${voortgang(assessment, scan.antwoorden, scan.relevantie).percentage}%` : "";
-  const score = assessment ? overallScore(assessment, scan.antwoorden) : null;
+  const score = assessment && assessment.antwoordType !== "spanning" ? overallScore(assessment, scan.antwoorden) : null;
   const kandidaten = organisatie.leden.filter(
     (l) => l.id !== lid.id && !meting.invullingen.some((i) => i.id !== scan.id && i.organisatieLidId === l.id)
   );

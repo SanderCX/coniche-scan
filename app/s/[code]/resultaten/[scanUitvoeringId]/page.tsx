@@ -23,6 +23,9 @@ import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { metingAlsResultaat, quickscanMeting, quickscanScansVan } from "@/lib/quickscan-groep";
 import { QuickscanResultaten } from "@/components/QuickscanResultaten";
 import { benchmarkGeldigVoorOrganisatie, heeftBenchmarkToegang } from "@/lib/lead-toegang";
+import { groepZichtbaar, isSpanning, spanningScansVan } from "@/lib/spanning";
+import { SpanningResultaat } from "@/components/spanning/SpanningResultaat";
+import { useInstellingen } from "@/lib/instellingen-store";
 
 /**
  * Resultaten van één Meting, voor een Lead die het vinkje Resultaten voor deze Meting heeft (beheerpagina.md punt 6a,
@@ -46,6 +49,7 @@ export default function LeadResultatenPage({
   const assessment = useAssessment(scanUitvoering?.assessmentId ?? "");
   const [pdfBezig, setPdfBezig] = useState(false);
   const benchmarks = useBenchmarks();
+  const instellingen = useInstellingen();
 
   if (!gegevens || !scanUitvoering || !assessment) {
     return (
@@ -73,6 +77,46 @@ export default function LeadResultatenPage({
           <span className="eyebrow">{scanUitvoering.label}</span>
           <h1>Nog geen resultaten</h1>
           <p>Nog geen afgeronde scans voor {scanUitvoering.label} — {assessment.naam}.</p>
+        </div>
+      </PageWithChrome>
+    );
+  }
+
+  // De Digitale Spanningsmeter heeft geen gemiddelde antwoord per vraag en geen weergaven Spreiding en Antwoorden: Het resultaat is het
+  // profiel van de groep, pas vanaf `benchmarkMinRespondenten` afgeronde scans, en bij een eigen scan de schakelaar Jouw profiel | Groep
+  // (`visualisatie-spanningsmeter.md`, Resultaat en Anonimiteit).
+  if (isSpanning(assessment)) {
+    const eigenScan = scanUitvoering.invullingen.find((i) => i.organisatieLidId === gegevens.lid.id && i.status === "afgerond");
+    const groepOk = groepZichtbaar(aantalAfgerond, instellingen.benchmarkMinRespondenten);
+    const eigen = eigenScan
+      ? { antwoorden: eigenScan.antwoorden, subregel: [gegevens.lid.naam, scanUitvoering.label] }
+      : null;
+    return (
+      <PageWithChrome logoHref={`/s/${code}`} code={code} toonTerug identiteitMenu={<MijnGegevensMenu lid={gegevens.lid} />}>
+        <div className="container section">
+          {groepOk || eigen ? (
+            <SpanningResultaat
+              assessment={assessment}
+              eigen={eigen}
+              groep={
+                groepOk
+                  ? {
+                      scans: spanningScansVan(scanUitvoering.invullingen),
+                      subregel: [scanUitvoering.label, gegevens.organisatie.naam, `Gemiddelde van ${aantalAfgerond} afgeronde ${aantalAfgerond === 1 ? "scan" : "scans"}`],
+                    }
+                  : null
+              }
+              begin={groepOk ? "groep" : "eigen"}
+            />
+          ) : (
+            <>
+              <ResultaatKop eyebrow="Resultaat van de Meting" titel={assessment.naam} subregel={[scanUitvoering.label, gegevens.organisatie.naam]} />
+              <p className="admin-notice">
+                Het groepsbeeld verschijnt zodra er minstens {instellingen.benchmarkMinRespondenten} afgeronde scans zijn, zodat antwoorden anoniem blijven.
+                Nu zijn het er {aantalAfgerond}.
+              </p>
+            </>
+          )}
         </div>
       </PageWithChrome>
     );

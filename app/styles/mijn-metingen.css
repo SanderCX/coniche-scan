@@ -135,7 +135,7 @@
   border-radius: 3px;
   background: var(--bl-faint);
   color: var(--bl);
-  font-size: var(--fs-11);
+  font-size: var(--fs-12);
   font-weight: 700;
   line-height: 1.5;
 }
@@ -156,7 +156,7 @@
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--bg);
-  font-size: var(--fs-13);
+  font-size: var(--fs-12);
   font-weight: 600;
   color: var(--ink);
   line-height: 1.4;
@@ -173,6 +173,12 @@
 .mm-vp-stip--nieuws {
   background: var(--bl);
 }
+.mm-vp-stip--event {
+  background: var(--gr);
+}
+.mm-vp-stip--blog {
+  background: var(--stat-amber);
+}
 .mm-vp-meer {
   font-size: var(--fs-12);
   font-weight: 600;
@@ -180,7 +186,7 @@
 }
 .mm-kop-tekst .mm-vp-aantal {
   margin-top: var(--sp-2);
-  font-size: var(--fs-13);
+  font-size: var(--fs-12);
 }
 /* Eén vaste breedte voor de hoofdknop op de kaarten Benchmark en Dossier, zodat ze onder elkaar op één lijn staan (184px in het ontwerp). */
 .mm-knop--vast {

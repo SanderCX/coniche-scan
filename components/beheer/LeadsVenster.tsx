@@ -20,7 +20,7 @@ import {
 import { aantalAfgerondInMeting, isSamengesteld, nieuwsteEerst, toonMeetdatum } from "@/lib/metingen";
 import { LeadToegang, LeadWeergave, Organisatie } from "@/lib/types";
 import { useBeheerOverzicht } from "@/lib/beheer-url";
-import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { heeftEigenResultaat } from "@/lib/assessment-structuur";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { maakPubliekeLink } from "@/lib/uitnodiging-link";
 import { InfoIcoon } from "@/components/InfoIcoon";
@@ -258,7 +258,7 @@ export function LeadsVenster({
                             afgerondeScans: aantalAfgerondInMeting(organisatie, m),
                             antwoordenMetNamen: organisatie.antwoordenMetNamen === true,
                             drempels,
-                            ondersteund: !isJaNeeWeetNiet(assessments.find((a) => a.id === m.assessmentId) ?? { antwoordType: "schaal" }),
+                            ondersteund: !heeftEigenResultaat(assessments.find((a) => a.id === m.assessmentId) ?? { antwoordType: "schaal" }),
                           });
                           const aan = heeft(lead.id, w, m.id);
                           return (

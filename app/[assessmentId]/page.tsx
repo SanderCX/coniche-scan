@@ -18,6 +18,8 @@ import { VisieSectie } from "@/components/assessment/VisieSectie";
 import { BouwblokkenSectie } from "@/components/assessment/BouwblokkenSectie";
 import { AiDomeinenSectie } from "@/components/assessment/AiDomeinenSectie";
 import { Content2030Sectie } from "@/components/assessment/Content2030Sectie";
+import { SpanningVeldenSectie } from "@/components/assessment/SpanningVeldenSectie";
+import { SpanningVisieSectie } from "@/components/assessment/SpanningVisieSectie";
 import { KAART_ICONEN, KlokIcoon, SlotIcoon, StaafIcoon, icoonVoorSubtitel } from "@/components/icons/LandingIcons";
 
 export default function AssessmentLandingPage({
@@ -133,24 +135,45 @@ function AssessmentLanding({ assessmentId }: { assessmentId: string }) {
       warm={warm}
       kop="Zo ziet je resultaat eruit"
       inleiding={
-        soort === "ai"
+        soort === "spanning"
+          ? "Je krijgt direct je eigen Spanningsprofiel. Daarna leggen we de profielen van de groep naast elkaar. Alle cijfers hieronder zijn voorbeelddata."
+          : soort === "ai"
           ? "Na afronding zie je meteen je totaalscore en je score per domein. Hieronder zie je hoe dat eruitziet, met voorbeelddata."
           : "Na afronding zie je meteen je totaalscore en je score per categorie en per bouwblok. Hieronder zie je hoe dat eruitziet, met voorbeelddata."
       }
       kinderen={
-        <>
-          {featureKaarten}
+        soort === "spanning" ? (
+          // De Spanningsmeter heeft één film en geen feature-kaarten, en het Dossier is er niet voor (`visualisatie-spanningsmeter.md`).
           <HelpFilm naam="wat-krijg-ik" assessment={assessment} opmerking="Alle cijfers in de film zijn voorbeelddata." knop={voorbeeldKnop} />
-          <HelpFilm naam="dossier" />
-        </>
+        ) : (
+          <>
+            {featureKaarten}
+            <HelpFilm naam="wat-krijg-ik" assessment={assessment} opmerking="Alle cijfers in de film zijn voorbeelddata." knop={voorbeeldKnop} />
+            <HelpFilm naam="dossier" assessment={assessment} />
+          </>
+        )
       }
     />
   );
   const sectieNodes: ((warm: boolean) => React.ReactNode)[] = [
-    (warm) => (soort === "ai" ? <AiDomeinenSectie key="ai" warm={warm} /> : <BouwblokkenSectie key="bouwblokken" warm={warm} />),
+    (warm) =>
+      soort === "spanning" ? (
+        <SpanningVeldenSectie key="velden" assessment={assessment} warm={warm} />
+      ) : soort === "ai" ? (
+        <AiDomeinenSectie key="ai" warm={warm} />
+      ) : (
+        <BouwblokkenSectie key="bouwblokken" warm={warm} />
+      ),
     (warm) => <PraktischSectie key="praktisch" assessment={assessment} aantalVragen={totaalVragen} warm={warm} />,
     wat,
-    (warm) => (soort === "ai" ? <Content2030Sectie key="2030" warm={warm} /> : <VisieSectie key="visie" warm={warm} />),
+    (warm) =>
+      soort === "spanning" ? (
+        <SpanningVisieSectie key="visie" warm={warm} />
+      ) : soort === "ai" ? (
+        <Content2030Sectie key="2030" warm={warm} />
+      ) : (
+        <VisieSectie key="visie" warm={warm} />
+      ),
   ];
 
   return (

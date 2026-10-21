@@ -6,7 +6,7 @@ import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
 import { BouwblokChip } from "@/components/dossier/BouwblokChip";
-import { CaseIcoon, NieuwsIcoon } from "@/components/icons/DossierIcons";
+import { SoortIcoon } from "@/components/icons/DossierIcons";
 import { useAssessments } from "@/lib/assessment-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { useInstellingen } from "@/lib/instellingen-store";
@@ -16,7 +16,9 @@ import {
   BRON_MAX,
   DOSSIER_STATUS_LABEL,
   DossierInvoer,
+  DossierSoort,
   OMVANG_MAX,
+  PLAATS_MAX,
   SAMENVATTING_MAX,
   TITEL_MAX,
   TOELICHTING_MAX,
@@ -25,8 +27,9 @@ import {
   aantallPerSoort,
   brancheVan,
   datumKort,
-  dossierBouwblokken,
+  dossierBouwblokkenPerAssessment,
   dossierVan,
+  isVerlopen,
   invoerVanItem,
   itemStatus,
   itemsInVolgorde,
@@ -36,11 +39,11 @@ import {
 import { kopNaam } from "@/lib/korte-namen";
 import { Dossieritem, Organisatie } from "@/lib/types";
 
-type Filter = "alles" | "case" | "nieuw";
+type Filter = "alles" | DossierSoort;
 
 /**
  * De kaart Dossier op het organisatie-detail (`dossier.md`, Scherm 1; `beheerpagina.md`, punt 4, Dossier): Onder de Kenmerken en de rij
- * Toegang en Afspraken, boven de KPI's. Met de schakelaar "Open voor Lead", een filter Alles, Cases en Nieuws, en per item een rij met een
+ * Toegang en Afspraken, boven de KPI's. Met het vinkje "Open voor Lead", een filter Alles, Cases, Nieuws, Events en Blogs, en per item een rij met een
  * statusbadge en de knop "Bewerken". Voor een Admin en voor een Consultant met toegang tot de Organisatie (`dossier.bewerken`). Het Bewerkslot
  * van de Organisatie geldt voor de hele pagina (`MetBewerkslot`).
  */
@@ -56,7 +59,7 @@ export function DossierKaart({ organisatie }: { organisatie: Organisatie }) {
 
   const telling = aantallPerSoort(dossier.items);
   const zichtbaar = aantalZichtbaarVoorLead(organisatie, alle);
-  const gefilterd = itemsInVolgorde(dossier.items).filter((i) => filter === "alles" || (filter === "case" ? i.soort === "case" : i.soort === "nieuws"));
+  const gefilterd = itemsInVolgorde(dossier.items).filter((i) => filter === "alles" || i.soort === filter);
 
   function wissel(aan: boolean) {
     if (aan) setBevestigOpen(true);
@@ -97,7 +100,9 @@ export function DossierKaart({ organisatie }: { organisatie: Organisatie }) {
           opties={[
             { waarde: "alles", label: `Alles ${telling.alles}` },
             { waarde: "case", label: `Cases ${telling.cases}` },
-            { waarde: "nieuw", label: `Nieuws ${telling.nieuws}` },
+            { waarde: "nieuws", label: `Nieuws ${telling.nieuws}` },
+            { waarde: "event", label: `Events ${telling.events}` },
+            { waarde: "blog", label: `Blogs ${telling.blogs}` },
           ]}
         />
       </div>
@@ -151,23 +156,30 @@ function ItemRij({
   const isCase = item.soort === "case";
   const status = itemStatus(item, alle);
   const caseOrg = isCase ? alle.find((o) => o.id === item.caseOrganisatieId) : undefined;
-  const regel = isCase
-    ? [
-        caseOrg ? kopNaam(caseOrg) : "",
-        brancheVan(caseOrg, korteNamen).toLowerCase(),
-        item.omvang ? `ongeveer ${item.omvang}` : "",
-        item.totResultaat ? `resultaat in ${item.totResultaat}` : "",
-      ]
-        .filter(Boolean)
-        .join(", ")
-    : [item.bron, item.gepubliceerdOp ? datumKort(item.gepubliceerdOp) : ""].filter(Boolean).join(", ");
+  let regel: string;
+  if (isCase) {
+    regel = [
+      caseOrg ? kopNaam(caseOrg) : "",
+      brancheVan(caseOrg, korteNamen).toLowerCase(),
+      item.omvang ? `ongeveer ${item.omvang}` : "",
+      item.totResultaat ? `resultaat in ${item.totResultaat}` : "",
+    ]
+      .filter(Boolean)
+      .join(", ");
+  } else if (item.soort === "event") {
+    // "{datum}, {plaats}", bij een meerdaags event "{datum} tot {einddatum}, {plaats}". Een lege plaats valt weg.
+    const wanneer = item.einddatum && item.einddatum !== item.datum ? `${datumKort(item.datum)} tot ${datumKort(item.einddatum)}` : datumKort(item.datum);
+    regel = [wanneer, item.plaats].filter(Boolean).join(", ");
+  } else {
+    regel = [item.bron, item.gepubliceerdOp ? datumKort(item.gepubliceerdOp) : ""].filter(Boolean).join(", ");
+  }
   return (
     <li className="dos-rij">
-      <span className={`dos-icoon ${isCase ? "dos-icoon--case" : "dos-icoon--nieuws"}`} aria-hidden="true">
-        {isCase ? <CaseIcoon width={26} height={26} /> : <NieuwsIcoon width={26} height={26} />}
+      <span className={`dos-icoon dos-icoon--${item.soort} ${isVerlopen(item) ? "is-verlopen" : ""}`} aria-hidden="true">
+        <SoortIcoon soort={item.soort} />
       </span>
       <div className="dos-tekst">
-        <span className={`dos-eyebrow ${isCase ? "dos-eyebrow--case" : "dos-eyebrow--nieuws"}`}>{isCase ? "Case" : "Nieuws"}</span>
+        <span className={`dos-eyebrow dos-eyebrow--${item.soort}`}>{SOORT_LABEL[item.soort]}</span>
         <h3 className="dos-titel">{item.titel}</h3>
         {regel && <span className="dos-regel">{regel}</span>}
         {item.toelichting && <span className="dos-toelichting">{item.toelichting}</span>}
@@ -184,6 +196,11 @@ function ItemRij({
   );
 }
 
+/** De namen op de pillen van de koppeling: De volledige naam is te lang voor een pil. */
+const KOPPEL_NAAM: Record<string, string> = { "klantcontact-volwassenheid": "Klantcontact Volwassenheid", "ai-volwassenheid": "AI-volwassenheid" };
+
+const SOORT_LABEL: Record<DossierSoort, string> = { case: "Case", nieuws: "Nieuws", event: "Event", blog: "Blog" };
+
 /**
  * Item toevoegen of bewerken (`dossier.md`, Scherm 3): Een modal van 640px met de soort (bij Bewerken vast), de velden van dat soort, de
  * chips "Gaat over bouwblokken" en de schakelaar Zichtbaar voor klant. Bij Bewerken staat links "Verwijderen" met een bevestiging.
@@ -196,8 +213,14 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
   const [invoer, setInvoer] = useState<DossierInvoer>(item ? invoerVanItem(item) : leegDossierInvoer("nieuws"));
   const [fout, setFout] = useState<string | null>(null);
   const [bevestig, setBevestig] = useState(false);
-  const bouwblokken = dossierBouwblokken(assessments);
+  const perAssessment = dossierBouwblokkenPerAssessment(assessments);
+  // De pil-groep Gaat over: Het Assessment waarvan de chips staan. Een bestaande koppeling bepaalt waarmee het begint.
+  const [koppelAssessmentId, setKoppelAssessmentId] = useState<string>(
+    () => perAssessment.find((a) => a.bouwblokken.some((b) => (item?.bouwblokIds ?? []).includes(b.bouwblok.id)))?.assessment.id ?? perAssessment[0]?.assessment.id ?? ""
+  );
+  const koppel = perAssessment.find((a) => a.assessment.id === koppelAssessmentId) ?? perAssessment[0];
   const isCase = invoer.soort === "case";
+  const isEvent = invoer.soort === "event";
 
   const zet = (patch: Partial<DossierInvoer>) => {
     setInvoer((v) => ({ ...v, ...patch }));
@@ -248,14 +271,15 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
 
           <div className="admin-field">
             <span className="dos-label">Soort</span>
-            <WeergaveWissel<"nieuws" | "case">
+            <WeergaveWissel<DossierSoort>
               ariaLabel="Soort"
               waarde={invoer.soort}
               onChange={(soort) => zet({ soort })}
-              opties={[
-                { waarde: "nieuws", label: "Nieuws", disabled: !!item && item.soort !== "nieuws" },
-                { waarde: "case", label: "Case", disabled: !!item && item.soort !== "case" },
-              ]}
+              opties={(["nieuws", "case", "event", "blog"] as DossierSoort[]).map((soort) => ({
+                waarde: soort,
+                label: SOORT_LABEL[soort],
+                disabled: !!item && item.soort !== soort,
+              }))}
             />
           </div>
 
@@ -318,6 +342,31 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
                 <input id="dos-url" type="text" inputMode="url" placeholder="https://" value={invoer.url} onChange={(e) => zet({ url: e.target.value })} />
               </div>
             </>
+          ) : isEvent ? (
+            <>
+              <div className="dos-twee">
+                <div className="admin-field">
+                  <label htmlFor="dos-datum">Datum</label>
+                  <input id="dos-datum" type="date" value={invoer.datum} onChange={(e) => zet({ datum: e.target.value })} />
+                </div>
+                <div className="admin-field">
+                  <label htmlFor="dos-einddatum">
+                    Einddatum <span className="font-normal text-ink-s">(optioneel)</span>
+                  </label>
+                  <input id="dos-einddatum" type="date" value={invoer.einddatum} onChange={(e) => zet({ einddatum: e.target.value })} />
+                </div>
+              </div>
+              <div className="admin-field">
+                <label htmlFor="dos-plaats">Plaats</label>
+                <input id="dos-plaats" type="text" maxLength={PLAATS_MAX} placeholder="Utrecht of Online" value={invoer.plaats} onChange={(e) => zet({ plaats: e.target.value })} />
+              </div>
+              <div className="admin-field">
+                <label htmlFor="dos-url">
+                  Link <span className="font-normal text-ink-s">(optioneel, de aanmeldpagina)</span>
+                </label>
+                <input id="dos-url" type="text" inputMode="url" placeholder="https://" value={invoer.url} onChange={(e) => zet({ url: e.target.value })} />
+              </div>
+            </>
           ) : (
             <>
               <div className="admin-field">
@@ -345,8 +394,21 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
 
           <div className="admin-field">
             <span className="dos-label">Gaat over bouwblokken (optioneel)</span>
+            {perAssessment.length > 1 && (
+              <div className="dos-koppel">
+                <WeergaveWissel<string>
+                  ariaLabel="Assessment van de bouwblokken"
+                  waarde={koppel?.assessment.id ?? ""}
+                  onChange={setKoppelAssessmentId}
+                  opties={perAssessment.map((a) => ({
+                    waarde: a.assessment.id,
+                    label: `${KOPPEL_NAAM[a.assessment.id] ?? a.assessment.kortLabel} ${a.bouwblokken.filter((b) => invoer.bouwblokIds.includes(b.bouwblok.id)).length}`,
+                  }))}
+                />
+              </div>
+            )}
             <div className="dos-chips">
-              {bouwblokken.map(({ bouwblok, groepKleur }) => (
+              {(koppel?.bouwblokken ?? []).map(({ bouwblok, groepKleur }) => (
                 <BouwblokChip
                   key={bouwblok.id}
                   volgnummer={bouwblok.volgnummer}

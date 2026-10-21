@@ -5,8 +5,8 @@ volgorde: 3
 rollen: [Respondent, Lead, Consultant, Admin]
 afbeelding: 
 film: 
-bronnen: [CLAUDE.md, visualisatie-mijn-metingen.md]
-bijgewerkt: 2026-10-19
+bronnen: [CLAUDE.md, visualisatie-mijn-metingen.md, content-spanningsmeter.md]
+bijgewerkt: 2026-10-21
 ---
 Een scan is een vragenlijst over hoe je Organisatie het klantcontact heeft ingericht. Je ontvangt een persoonlijke link en vult de scan in je eigen tempo in.
 
@@ -20,6 +20,8 @@ Je opent je persoonlijke link en komt op Mijn metingen. Daar start je de scan, b
 4. **Je resultaten.** Na de laatste vraag klik je op "Bekijk resultaten". Je ziet direct je scores.
 
 ## Let op
+Bij de Digitale Spanningsmeter kies je per vraag een score van 1 tot 5 op de schaal van het veld, of 0 als je de vraag niet kunt beoordelen. Zie Een scan invullen.
+
 Beantwoord elke vraag op basis van wat aantoonbaar geregeld is, zoals documenten, ritmes, tooling en afspraken. Een goed bedoeld plan telt niet mee.
 
 ## Zie ook

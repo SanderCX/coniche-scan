@@ -2,6 +2,8 @@ import { formatScore } from "@/lib/format";
 import Link from "next/link";
 import { Antwoord, Assessment } from "@/lib/types";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { isSpanning } from "@/lib/spanning";
+import { SpanningResultaat } from "./spanning/SpanningResultaat";
 import { QuickscanResultaten } from "./QuickscanResultaten";
 import { isVlakkeAssessment } from "@/lib/assessment-structuur";
 import {
@@ -81,6 +83,19 @@ export function ResultsView({
         toonKop={toonKop}
         eyebrow={eyebrow}
         subregel={subregel}
+        kopRechts={kopRechts}
+      />
+    );
+  }
+  // De Digitale Spanningsmeter heeft geen overall score en een eigen opbouw (`visualisatie-spanningsmeter.md`, Resultaat): Hier staat
+  // het profiel van één scan.
+  if (isSpanning(assessment)) {
+    return (
+      <SpanningResultaat
+        assessment={assessment}
+        eigen={{ antwoorden, subregel: subregel ?? [respondentNaam] }}
+        toonKop={toonKop}
+        eyebrowEigen={eyebrow}
         kopRechts={kopRechts}
       />
     );

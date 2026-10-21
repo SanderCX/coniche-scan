@@ -11,10 +11,21 @@ import { Assessment } from "@/lib/types";
  */
 export function PraktischSectie({ assessment, aantalVragen, warm }: { assessment: Assessment; aantalVragen: number; warm: boolean }) {
   const eenheid = assessment.bouwblokLabel === "AI-domein" ? "domein" : "bouwblok";
+  const spanning = assessment.antwoordType === "spanning";
   const kaarten = [
-    { Icoon: KlokIcoon, titel: "Invultijd", tekst: `${assessment.geschatteDuur}, verdeeld over ${aantalVragen} vragen.` },
-    { Icoon: StaafIcoon, titel: "Direct resultaat", tekst: `Na afronding zie je meteen je scores en classificaties per ${eenheid}.` },
-    { Icoon: SlotIcoon, titel: "Privacy", tekst: "Toegang verloopt via een persoonlijke, niet-herleidbare link die Coniche met je deelt." },
+    { Icoon: KlokIcoon, titel: "Invultijd", tekst: `${assessment.geschatteDuur}${spanning ? " voor" : ", verdeeld over"} ${aantalVragen} vragen.` },
+    {
+      Icoon: StaafIcoon,
+      titel: "Direct resultaat",
+      tekst: spanning
+        ? "Je eigen profiel. Het groepsbeeld volgt als de resultaten zijn opengezet."
+        : `Na afronding zie je meteen je scores en classificaties per ${eenheid}.`,
+    },
+    {
+      Icoon: SlotIcoon,
+      titel: "Privacy",
+      tekst: spanning ? "Antwoorden in groepsweergaven zijn anoniem." : "Toegang verloopt via een persoonlijke, niet-herleidbare link die Coniche met je deelt.",
+    },
   ];
   return (
     <Sectie

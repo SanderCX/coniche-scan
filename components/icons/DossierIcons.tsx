@@ -35,3 +35,32 @@ export function NieuwsIcoon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+/** Een kalender voor een Event. */
+export function EventIcoon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...basis} aria-hidden="true" {...props}>
+      <rect x="3.5" y="5" width="17" height="15" rx="2" />
+      <path d="M3.5 10h17M8 3v4M16 3v4" />
+    </svg>
+  );
+}
+
+/** Een pen op een blad voor een Blog. */
+export function BlogIcoon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...basis} aria-hidden="true" {...props}>
+      <path d="M5 4h9a1 1 0 0 1 1 1v3M5 4a1 1 0 0 0-1 1v13a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-4" />
+      <path d="M8 9h4M8 13h3M14.5 14.5 20 9l-2-2-5.5 5.5-.5 2.5 2.5-.5Z" />
+    </svg>
+  );
+}
+
+/** De icoon per soort, met de maat. */
+export function SoortIcoon({ soort, size = 26 }: { soort: "case" | "nieuws" | "event" | "blog"; size?: number }) {
+  const props = { width: size, height: size };
+  if (soort === "case") return <CaseIcoon {...props} />;
+  if (soort === "nieuws") return <NieuwsIcoon {...props} />;
+  if (soort === "event") return <EventIcoon {...props} />;
+  return <BlogIcoon {...props} />;
+}

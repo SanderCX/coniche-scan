@@ -12,7 +12,7 @@ De Toelichtingsmodal (`stylesheet.md`, "Modal en Toelichtingsmodal"), dezelfde a
 
 ## Waar dit component een plek krijgt
 
-Sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan, met daaronder de sectie "Klantcontact richting 2030", bereikbaar via de sticky sub-nav. De link "AI" in de header en de route `/ai-scan` bestaan niet meer. De beschrijving en centrale vraag per domein komen uitsluitend nog terug in de modal van dit component. **Gebouwd (21 oktober 2026)** als raster van vier kolommen kaarten in `components/assessment/AiDomeinenSectie.tsx`, met de nummercirkel in de domeinkleur (`domeinKleur`) en de accentkleur van de modal in dezelfde kleur (voorheen overal `--or`). **Nog te bouwen**: De radar hieronder vervangt dat raster.
+Sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan, met daaronder de sectie "Klantcontact richting 2030", bereikbaar via de sticky sub-nav. De link "AI" in de header en de route `/ai-scan` bestaan niet meer. De beschrijving en centrale vraag per domein komen uitsluitend nog terug in de modal van dit component. **Gebouwd (21 oktober 2026)** als raster van vier kolommen kaarten in `components/assessment/AiDomeinenSectie.tsx`, met de nummercirkel in de domeinkleur (`domeinKleur`) en de accentkleur van de modal in dezelfde kleur (voorheen overal `--or`). **Radar gebouwd (21 oktober 2026, PR 160)**: De radar hieronder vervangt dat raster, zie Zo gebouwd onderaan.
 
 ## Bron voor de inhoud
 
@@ -55,3 +55,7 @@ Besloten door Joost op 21 oktober 2026: Een Dossieritem mag aan AI-domeinen geko
 ## Open punten
 
 - Precieze bewoording van het kleine label (nu "AI-domein" in `bouwblokLabel`, aanpasbaar in beheer).
+
+## Zo gebouwd (21 oktober 2026)
+
+`components/assessment/AiDomeinenSectie.tsx` is de radar van deze spec: Een SVG van 536px met 8 taartpunten van 45° (straal 190px, domein 1 boven, met de klok mee), nummercirkels van 26px op straal 226px, ringen bij score 2 tot en met 5, en links en rechts vier rijen (domein 1 tot en met 4 rechts, 5 tot en met 8 links) in de klassen `br-*` van de bouwstenenradar. Boven de radar staat de kaart met de centrale vraag. Hover of focus op een knooppunt, een rij of een taartpunt licht het domein op; een klik opent de Toelichtingsmodal met de categorie "AI-domein" en de domeinkleur. De voorbeeldpolygoon is vaste demodata. Het oude raster van kaarten en zijn CSS (`.ap-domeinen`, `.ap-domein`) is verwijderd.

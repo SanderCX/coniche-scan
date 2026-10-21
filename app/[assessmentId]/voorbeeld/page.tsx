@@ -8,6 +8,9 @@ import { ResultsView } from "@/components/ResultsView";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { WeergaveBouwblok } from "@/components/visualisatie/WeergaveBouwblok";
 import { eenMeting } from "@/lib/visualisatie";
+import { isSpanning } from "@/lib/spanning";
+import { SpanningResultaat } from "@/components/spanning/SpanningResultaat";
+import { demoSpanningGroep } from "@/data/demo-antwoorden-spanning";
 
 export default function VoorbeeldPage({
   params,
@@ -28,6 +31,26 @@ export default function VoorbeeldPage({
   }
 
   const demoMeting = getDemoMetingScans(assessment.id);
+
+  // De Digitale Spanningsmeter toont in de voorbeeld-output de weergave Groep met demodata (`CLAUDE.md`, scherm 3).
+  if (isSpanning(assessment)) {
+    return (
+      <PageWithChrome>
+        <div className="container" style={{ padding: "3.5rem 2rem 4.5rem" }}>
+          <SpanningResultaat
+            assessment={assessment}
+            groep={{ scans: demoSpanningGroep, subregel: ["Voorbeeld", "Gemiddelde van 12 afgeronde scans"] }}
+            eyebrowGroep="Voorbeeld-output"
+            kopRechts={
+              <Link href={`/${assessment.id}`} className="btn btn-outline btn-compact">
+                ← Terug
+              </Link>
+            }
+          />
+        </div>
+      </PageWithChrome>
+    );
+  }
 
   return (
     <PageWithChrome>

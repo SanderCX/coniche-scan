@@ -8,6 +8,7 @@ import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magOrganisatieToegang } from "@/lib/rechten";
 import { ResultsView } from "@/components/ResultsView";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { isSpanning } from "@/lib/spanning";
 import { langeDatum } from "@/lib/mijn-metingen";
 import { dagVan } from "@/lib/metingen";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
@@ -102,7 +103,8 @@ function ScanWeergaven({
   // "Positie in de Meting" is de spreiding op de schaal van 1 tot 5. Een Assessment met Ja / Nee / Weet ik niet heeft eigen
   // weergaven op de resultatenpagina van de Meting (`visualisatie-quickscan.md`, 3), en het scherm van de scan heeft zelf de
   // schakelaar Per afdeling en Overzicht.
-  if (isJaNeeWeetNiet(assessment)) {
+  // De Spanningsmeter heeft geen positie op de schaal van 1 tot 5: Alleen het profiel van de scan.
+  if (isJaNeeWeetNiet(assessment) || isSpanning(assessment)) {
     return <ResultsView assessment={assessment} antwoorden={invulling.antwoorden} relevantie={invulling.relevantie} respondentNaam={lid.naam} eyebrow="Resultaat van de scan" subregel={subregel} />;
   }
 

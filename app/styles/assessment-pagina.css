@@ -5,7 +5,7 @@
   }
 }
 
-/* Scherm 1: De Assessmentcirkel met vier kwarten en het detailpaneel (`CLAUDE.md`, scherm 1, ontwerp `Home-D`). */
+/* Scherm 1: De Assessmentcirkel met vijf delen en het detailpaneel (`CLAUDE.md`, scherm 1, ontwerp `Home-D`). */
 .ac-pagina {
   padding-top: var(--sp-12);
   padding-bottom: var(--sp-12);
@@ -46,29 +46,40 @@
   height: 568px;
   transform-origin: 0 0;
 }
-.ac-kwart {
+.ac-deel {
   position: absolute;
+  inset: 0;
+  /* Het deel beslaat het hele vlak maar reageert alleen op zijn eigen vorm en label. */
+  pointer-events: none;
   cursor: pointer;
   outline: none;
+  transform-origin: 284px 284px;
   transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
 }
-.ac-kwart svg {
+.ac-deel svg {
   display: block;
   overflow: visible;
 }
-.ac-kwart:hover:not(.is-gekozen),
-.ac-kwart:focus-visible:not(.is-gekozen) {
+.ac-deel-vorm,
+.ac-label {
+  pointer-events: auto;
+}
+.ac-deel:hover:not(.is-gekozen),
+.ac-deel:focus-visible:not(.is-gekozen) {
   transform: scale(1.025);
 }
-.ac-kwart.is-gekozen {
+.ac-deel.is-gekozen {
   z-index: 2;
   transform: translate(var(--ac-dx), var(--ac-dy)) scale(1.02);
   filter: drop-shadow(0 10px 30px rgba(28, 28, 26, 0.18));
 }
-.ac-kwart.is-gedimd {
+.ac-deel.is-gedimd {
   opacity: 0.38;
 }
-.ac-kwart:focus-visible .ac-label {
+.ac-deel:focus-visible .ac-label {
+  outline: 2px solid var(--or);
+}
+.ac-label {
   outline: 2px solid var(--or);
 }
 .ac-label {
@@ -88,7 +99,6 @@
   white-space: normal;
   /* De pil is zo breed als zijn langste woord, zodat de naam op twee regels staat en nooit buiten de pil valt. */
   width: min-content;
-  pointer-events: none;
 }
 .ac-midden {
   position: absolute;
@@ -174,7 +184,7 @@
   background: var(--or-l);
 }
 @media (prefers-reduced-motion: reduce) {
-  .ac-kwart,
+  .ac-deel,
   .ac-detail,
   .ac-puls {
     animation: none;
@@ -638,41 +648,6 @@
   height: 32px;
 }
 
-/* AI in klantcontact: De acht domeinen als kaarten in vier kolommen. */
-.ap-domeinen {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--sp-3);
-}
-@media (max-width: 1000px) {
-  .ap-domeinen {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-.ap-domein {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  min-height: 76px;
-  padding: var(--sp-3) var(--sp-4);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg);
-  font-family: inherit;
-  font-size: var(--fs-14);
-  font-weight: 600;
-  color: var(--ink);
-  text-align: left;
-  cursor: pointer;
-}
-.ap-domein:hover {
-  border-color: var(--or);
-}
-.ap-domein.is-gekozen {
-  border-color: var(--or);
-  background: var(--or-faint);
-}
-
 /* Klantcontact richting 2030: Vijf kaarten naast elkaar, pillen en het uitklapbare stuk. */
 .ap-2030-kaarten {
   display: grid;
@@ -741,4 +716,14 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--sp-4);
   margin: var(--sp-4) 0;
+}
+
+/* AI in klantcontact: De rijen links en rechts van de radar zijn een lijst zonder groepskop (`ai-domeinenmodel-visual.md`, Structuur). */
+.br-rijen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }

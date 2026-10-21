@@ -37,6 +37,7 @@ export function ScoreRing({
   mini = false,
   tegel = false,
   metChip = true,
+  label = "Totaalscore",
 }: {
   ring: RingGegevens;
   stipFractie?: number;
@@ -49,13 +50,15 @@ export function ScoreRing({
   tegel?: boolean;
   /** De klassenchip onder de ring. In de Resultaatkop staat hij rechts ervan. */
   metChip?: boolean;
+  /** Het label onder het getal. Bij de Spanningsmeter "Niveau": Daar is het getal het gemiddeld niveau en geen totaalscore. */
+  label?: string;
 }) {
   const fractie = Math.min(1, Math.max(0, ring.fractie));
   const midden = GROOTTE / 2;
   const hoek = (stipFractie ?? 0) * 2 * Math.PI;
   return (
     <div className={`score-ring-blok ${klein ? "score-ring--klein" : ""} ${mini ? "score-ring--mini" : ""} ${tegel ? "score-ring--tegel" : ""}`}>
-      <div className="score-ring" role="img" aria-label={alt ?? `Totaalscore ${ring.getal}${ring.klasseNaam ? `, ${ring.klasseNaam}` : ""}`}>
+      <div className="score-ring" role="img" aria-label={alt ?? `${label} ${ring.getal}${ring.klasseNaam ? `, ${ring.klasseNaam}` : ""}`}>
         <svg width="100%" height="100%" viewBox={`0 0 ${GROOTTE} ${GROOTTE}`} aria-hidden="true">
           <circle cx={midden} cy={midden} r={STRAAL} fill="none" stroke="var(--bg-mid)" strokeWidth={DIKTE} />
           {fractie > 0 && (
@@ -86,7 +89,7 @@ export function ScoreRing({
           <span className="score-ring-getal" style={mini && ring.getal.length > 3 ? { fontSize: "var(--fs-12)" } : undefined}>
             {ring.getal}
           </span>
-          {!mini && !tegel && <span className="score-ring-label">Totaalscore</span>}
+          {!mini && !tegel && <span className="score-ring-label">{label}</span>}
         </div>
       </div>
       {metChip && !mini && !tegel && ring.klasseNaam && (

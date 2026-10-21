@@ -1776,6 +1776,19 @@ a.cn-titel {
   background: var(--bl-faint);
   color: var(--bl);
 }
+/* Soortkleuren van Events en Blogs (`stylesheet.md`, Soortkleuren van Dossieritems): Event groen op `#e7f6ef`, Blog `#7a5600` op `#fff6e0`, een verlopen Event grijs. */
+.dos-icoon--event {
+  background: #e7f6ef;
+  color: var(--gr);
+}
+.dos-icoon--blog {
+  background: #fff6e0;
+  color: #7a5600;
+}
+.dos-icoon.is-verlopen {
+  background: var(--bg-warm);
+  color: var(--ink-s);
+}
 .dos-tekst {
   display: flex;
   flex-direction: column;
@@ -1793,6 +1806,12 @@ a.cn-titel {
 }
 .dos-eyebrow--nieuws {
   color: var(--bl);
+}
+.dos-eyebrow--event {
+  color: var(--gr);
+}
+.dos-eyebrow--blog {
+  color: #7a5600;
 }
 .dos-titel {
   margin: 0;
@@ -1829,6 +1848,13 @@ a.cn-titel {
 .dos-status--intern {
   background: var(--bg-mid);
   color: var(--ink-m);
+}
+.dos-status--verlopen {
+  background: var(--bg-mid);
+  color: var(--ink-s);
+}
+.dos-koppel {
+  margin-bottom: var(--sp-2);
 }
 .dos-status--toestemming-ontbreekt,
 .dos-status--kies-organisatie {
@@ -1915,7 +1941,7 @@ a.cn-titel {
   border-radius: 999px;
   background: var(--bg);
   font-family: inherit;
-  font-size: var(--fs-13);
+  font-size: var(--fs-12);
   font-weight: 600;
   color: var(--ink);
   line-height: 1.2;

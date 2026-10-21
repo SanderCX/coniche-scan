@@ -6,7 +6,7 @@ import { useOrganisaties } from "@/lib/db";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magVerkennen } from "@/lib/rechten";
-import { isJaNeeWeetNiet } from "@/lib/quickscan";
+import { heeftEigenResultaat } from "@/lib/assessment-structuur";
 import { korteNaamVeld, korteNaamWaarde } from "@/lib/korte-namen";
 import { Meetperiode, VerkenEenheid } from "@/lib/types";
 import {
@@ -62,7 +62,7 @@ const VERBAND_X = [
  */
 export default function VerkennenPage() {
   const gebruiker = useIngelogdeGebruiker();
-  const assessments = useAssessments().filter((a) => !isJaNeeWeetNiet(a));
+  const assessments = useAssessments().filter((a) => !heeftEigenResultaat(a));
   const organisaties = useOrganisaties();
   const instellingen = useInstellingen();
 

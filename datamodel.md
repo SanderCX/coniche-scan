@@ -214,7 +214,7 @@ vragen.
   resultaat per antwoord kan tellen. De score is een aantal punten en een
   percentage (Scoreberekening). Klantcontact Quickscan – Ziekenhuis
   (`content-ziekenhuis-quickscan.md`).
-- `"spanning"` (voorstel van 21 oktober 2026, niet gebouwd): Een antwoord
+- `"spanning"` (voorstel van 21 oktober 2026, gebouwd op 21 oktober 2026): Een antwoord
   van 1 tot en met 5 volgens `Assessment.schaal`, met als extra waarde `0`
   voor "Kan ik niet beoordelen". Een 0 is een geldig antwoord (de vraag telt
   als beantwoord), maar telt niet mee in de score. Er is geen totaalscore: De
@@ -328,7 +328,7 @@ Contactpersoon {
 
 ### Dossieritem
 
-**Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 voor Nieuws en Cases; Events, Blogs en de koppeling aan AI-domeinen zijn nog niet gebouwd.** Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws, Cases, Events en Blogs, en kan het openzetten voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
+**Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 voor Nieuws en Cases, en op 21 oktober 2026 (PR 160) ook voor Events, Blogs en de koppeling aan AI-domeinen.** Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws, Cases, Events en Blogs, en kan het openzetten voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
 
 ```
 Organisatie.dossier {
@@ -633,7 +633,7 @@ Respondenten, spreiding en benchmark zijn er nog niet voor uitgewerkt
 (`backlog.md`).
 
 **Antwoordtype `"spanning"` (Digitale Spanningsmeter, voorstel van 21 oktober
-2026, niet gebouwd).** Hier is er geen bouwblok-gemiddelde dat in een
+2026, gebouwd op 21 oktober 2026, `lib/spanning.ts`).** Hier is er geen bouwblok-gemiddelde dat in een
 overall-score uitkomt. De uitkomst is een score per spanningsveld, een niveau en
 de spanning tussen de velden. Met `a` een antwoord van 1 tot en met 5, een
 vraag met antwoord `0` of zonder antwoord is niet beoordeeld:
@@ -1853,7 +1853,7 @@ Gebouwd op 15 oktober 2026 voor Verkennen: `verkennenMinGroep` (3), `verkennenMi
 `verkennenMinPool` (6), `verkennenMaxGroepen` (12) en `verkennenMinIngevuldPct` (40),
 alle gehele getallen van minstens 1, het percentage tot en met 100 (`visualisatie-verkennen.md`, Drempels). `verkennenWaarschuwingGroep` is hernoemd naar `verkennenMinVergelijking`: Een opgeslagen waarde onder de oude naam wordt bij het lezen overgenomen. De startwaarden zijn de norm vanuit het ontwerp. Gebouwd op 15 oktober 2026: Het percentage mag 0 zijn (geen ondergrens), dus voor het percentage geldt 0 tot en met 100.
 Gebouwd op 17 oktober 2026: `benchmarkMinOrganisaties` geldt ook voor een opgeslagen verkenning en telt daar altijd Organisaties, ook bij de eenheid Onderdelen. Er komt geen nieuwe instelling bij.
-Voorstel van 21 oktober 2026 (Digitale Spanningsmeter): `spanningMinPerRol` (startwaarde 3), het minimale aantal afgeronde scans van een rolgroep om als rolgroep in de uitsplitsing te staan, geheel getal van minstens 1 (Scoreberekening, Spanningsmeter). Een Admin past hem aan in beheer (`beheerpagina.md`, punt 10).
+Gebouwd op 21 oktober 2026 (Digitale Spanningsmeter): `spanningMinPerRol` (startwaarde 3), het minimale aantal afgeronde scans van een rolgroep om als rolgroep in de uitsplitsing te staan, geheel getal van minstens 1 (Scoreberekening, Spanningsmeter). Een Admin past hem aan in beheer (`beheerpagina.md`, punt 10).
 Gebouwd op 14 oktober 2026: `benchmarkMaxDagenTussenMetingen` (startwaarde 90),
 het aantal dagen waarboven een vergelijking met de lezing Naast elkaar een
 waarschuwing geeft. De

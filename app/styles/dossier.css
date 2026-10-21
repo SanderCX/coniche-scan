@@ -226,6 +226,26 @@
   background: var(--bl-faint);
   color: var(--bl);
 }
+/* Soortkleuren (`stylesheet.md`, Soortkleuren van Dossieritems): Event groen, Blog amber, een verlopen Event grijs. */
+.dp-sectie-icoon--event {
+  background: #e7f6ef;
+  color: var(--gr);
+}
+.dp-sectie-icoon--blog {
+  background: #fff6e0;
+  color: #7a5600;
+}
+.dp-pil {
+  margin-bottom: var(--sp-4);
+}
+.dp-radarkaart-wrap {
+  margin-top: var(--sp-8);
+  margin-bottom: var(--sp-6);
+}
+.dp-radarkaart-wrap .dp-radarkaart {
+  margin-top: 0;
+  margin-bottom: 0;
+}
 
 .dp-case {
   display: grid;
@@ -373,6 +393,43 @@
   border-radius: var(--r);
   background: var(--bl-faint);
   color: var(--bl);
+}
+.dp-datumtegel--event {
+  background: #e7f6ef;
+  color: var(--gr);
+}
+.dp-datumtegel--blog {
+  background: #fff6e0;
+  color: #7a5600;
+}
+.dp-datumtegel--verlopen {
+  background: var(--bg-warm);
+  color: var(--ink-s);
+}
+.dp-nieuws.is-verlopen {
+  background: var(--bg-warm);
+}
+.dp-nieuws-titel--tekst {
+  font-size: var(--fs-18);
+  font-weight: 700;
+  color: var(--ink-m);
+}
+.dp-eerdere {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0 var(--sp-4);
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--fs-14);
+  font-weight: 700;
+  color: var(--ink-m);
+  cursor: pointer;
+}
+.dp-eerdere:hover {
+  color: var(--or);
 }
 .dp-datumtegel span {
   font-size: var(--fs-12);

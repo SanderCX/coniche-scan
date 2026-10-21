@@ -1,5 +1,6 @@
 import { Assessment } from "./types";
 import { isJaNeeWeetNiet } from "./quickscan";
+import { isSpanning } from "./spanning";
 import { actieveBouwblokkenMetGroep, isVlakkeAssessment } from "./assessment-structuur";
 
 /**
@@ -9,12 +10,14 @@ import { actieveBouwblokkenMetGroep, isVlakkeAssessment } from "./assessment-str
  * - `categorieen`: Klantcontact Volwassenheid en de Zorgscan, vijf categorieën in hun eigen kleur en een ring met een score van 1 tot 5.
  * - `domeinen`: Een Assessment zonder categorielaag (de AI-scan), acht rijen met een nummercirkel en de domeinkleur.
  * - `quickscan`: Ja / Nee / Weet ik niet, met percentages en de klassekleuren.
+ * - `spanning`: De Digitale Spanningsmeter, met zes velden, het profiel en de spanning (`visualisatie-spanningsmeter.md`, Film Wat krijg ik).
  */
-export type FilmVariant = "categorieen" | "domeinen" | "quickscan";
+export type FilmVariant = "categorieen" | "domeinen" | "quickscan" | "spanning";
 
 export function filmVariant(assessment: Pick<Assessment, "antwoordType" | "categorieen" | "bouwblokken"> | null | undefined): FilmVariant {
   if (!assessment) return "categorieen";
   if (isJaNeeWeetNiet(assessment as Assessment)) return "quickscan";
+  if (isSpanning(assessment)) return "spanning";
   if (isVlakkeAssessment(assessment as Assessment)) return "domeinen";
   return "categorieen";
 }
@@ -27,7 +30,7 @@ const GETALWOORD = ["nul", "één", "twee", "drie", "vier", "vijf", "zes", "zeve
  * (`null`). Hebben de zwaardere bouwblokken niet dezelfde factor, dan staat er "zwaarder" in plaats van de factor.
  */
 export function filmWeging(assessment: Assessment | null | undefined): { regel: string; zin: string } | null {
-  if (!assessment || isJaNeeWeetNiet(assessment)) return null;
+  if (!assessment || isJaNeeWeetNiet(assessment) || isSpanning(assessment)) return null;
   const gewichten = actieveBouwblokkenMetGroep(assessment)
     .map((b) => b.bouwblok.gewicht ?? 1)
     .filter((g) => g !== 1);

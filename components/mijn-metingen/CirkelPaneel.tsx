@@ -40,12 +40,13 @@ export function CirkelPaneel({
   const groepAantal = groep?.aantalScans;
 
   return (
-    <div className={`mm-paneel ${quick ? "mm-paneel--quick" : ""}`}>
+    <div className={`mm-paneel ${quick ? "mm-paneel--quick" : ""} ${hoofd.rijenLabel ? "mm-paneel--spanning" : ""}`}>
       <div className="mm-zij">
         <ScoreRing
           ring={ringVanTeaser(hoofd)}
           stipFractie={metJij && groep ? groep.ring.fractie : undefined}
-          alt={`Totaalscore ${hoofd.getal}${klasse ? `, ${klasse}` : ""}`}
+          alt={hoofd.ringAlt ?? `Totaalscore ${hoofd.getal}${klasse ? `, ${klasse}` : ""}`}
+          label={hoofd.ringLabel}
         />
         {metJij && groep && (
           <div className="mm-zij-groep">
@@ -69,7 +70,7 @@ export function CirkelPaneel({
 
       <div className="mm-paneel-rijen" style={{ ["--mm-kolommen" as string]: (metJij ? 1 : 0) + (metGroep ? 1 : 0) }}>
         <div className="mm-paneel-rij mm-paneel-kop">
-          <span className="mm-label-klein">{quick ? "Per afdeling" : "Per categorie"}</span>
+          <span className="mm-label-klein">{hoofd.rijenLabel ?? (quick ? "Per afdeling" : "Per categorie")}</span>
           <span />
           {metJij && <span className="mm-kolomkop">Jij</span>}
           {metGroep && <span className="mm-kolomkop">Groep</span>}
@@ -83,6 +84,11 @@ export function CirkelPaneel({
           return (
             <div key={r.sleutel} className="mm-paneel-rij" role="img" aria-label={alt} title={titel}>
               <span className={`mm-paneel-naam ${jijLeeg && metJij ? "mm-paneel-naam--leeg" : ""}`} title={r.naam}>
+                {r.nummer && (
+                  <span className="sp-nr sp-nr--rij" style={{ background: r.nummer.achtergrond, color: r.nummer.tekst }}>
+                    {r.nummer.nr}
+                  </span>
+                )}
                 {r.naam}
               </span>
               <span className="mm-paneel-spoor" aria-hidden="true">
@@ -138,6 +144,11 @@ export function CirkelPaneel({
                 {(groep?.aantalScans ?? 0) > 1 && <span><i className="mm-legenda-lijn" /> Laagste tot hoogste score</span>}
               </>
             )}
+          </p>
+        )}
+        {hoofd.spanningsZin && (
+          <p className="mm-spanning">
+            <strong>Grootste spanning:</strong> {hoofd.spanningsZin}
           </p>
         )}
         {quick && hoofd.rijen.some((r) => r.nietBeantwoord) && (

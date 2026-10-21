@@ -1,0 +1,819 @@
+/* ---------- Digitale Spanningsmeter (`visualisatie-spanningsmeter.md`) ---------- */
+
+/* Doorloopflow: De hoofdkolom is breder dan bij de andere scans, want de antwoordkeuze heeft zes keuzes naast elkaar. */
+.flow-main--spanning {
+  max-width: 1000px;
+}
+
+.sp-kop {
+  margin-bottom: var(--sp-6);
+  padding-left: 20px;
+  border-left: 4px solid var(--or);
+}
+.sp-kop-titelrij {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.sp-kop h2 {
+  margin: 0;
+  font-size: var(--fs-24);
+  font-weight: 800;
+}
+.sp-kop p {
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-16);
+  color: var(--ink-m);
+}
+
+.sp-instructie {
+  margin-bottom: var(--sp-6);
+  padding: 20px 24px;
+  border-radius: 10px;
+  background: var(--bg-mid);
+}
+.sp-instructie > p {
+  margin: 0 0 var(--sp-4);
+  font-size: var(--fs-14);
+  line-height: 22px;
+  color: var(--ink-m);
+}
+.sp-instructie h3 {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-16);
+  font-weight: 700;
+}
+.sp-ijkpunten {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sp-ijkpunten li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-1);
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: var(--fs-14);
+  line-height: 20px;
+  color: var(--ink-m);
+  overflow-wrap: break-word;
+}
+.sp-ijkpunten li strong {
+  color: var(--ink);
+}
+.sp-ijk-nr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  margin-bottom: var(--sp-1);
+  padding-top: 0.09em;
+  border-radius: 50%;
+  background: var(--or-faint);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--dal);
+}
+
+/* Een vraag en de open vraag staan in een kaart. */
+.sp-kaart {
+  margin-bottom: var(--sp-4);
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  scroll-margin-top: calc(var(--nav-h) + 1rem);
+}
+.sp-kaart-kop {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+.sp-id {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--bg-mid);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  color: var(--ink-m);
+}
+.sp-invalshoek {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.sp-info {
+  margin-left: auto;
+}
+.sp-vraag {
+  max-width: 640px;
+  margin: 0 0 var(--sp-4);
+  font-size: var(--fs-18);
+  font-weight: 600;
+  line-height: 28px;
+  color: var(--ink);
+}
+.sp-aandacht {
+  max-width: 640px;
+  margin: 0 0 var(--sp-4);
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--bg-mid);
+}
+.sp-aandacht span {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.sp-aandacht p {
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-14);
+  line-height: 22px;
+  color: var(--ink-m);
+}
+.sp-noot {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+
+/* Antwoordkeuze: Vijf ronde knoppen met de niveaunaam eronder, een lijn en de pilknop 0. */
+.sp-keuze {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--sp-3);
+}
+.sp-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  width: 100px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+.sp-score-rond {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  padding-top: 0.09em;
+  border: 1px solid var(--border-d);
+  border-radius: 50%;
+  background: var(--bg);
+  font-size: var(--fs-18);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink-m);
+}
+.sp-score:hover .sp-score-rond {
+  border-color: var(--or);
+  color: var(--ink);
+}
+.sp-score[aria-pressed="true"] .sp-score-rond {
+  border-color: var(--or);
+  background: var(--or);
+  color: #fff;
+}
+.sp-score:hover[aria-pressed="true"] .sp-score-rond {
+  background: var(--or-l);
+}
+.sp-score-naam {
+  font-size: var(--fs-12);
+  line-height: 16px;
+  color: var(--ink-m);
+  text-align: center;
+}
+.sp-score[aria-pressed="true"] .sp-score-naam {
+  font-weight: 700;
+  color: var(--ink);
+}
+.sp-keuze-lijn {
+  align-self: stretch;
+  width: 1px;
+  margin: 0 var(--sp-2);
+  background: var(--border);
+}
+.sp-nul {
+  align-self: flex-start;
+  margin-top: 6px;
+}
+.sp-gekozen {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-14);
+  line-height: 22px;
+  color: var(--ink-m);
+}
+.sp-gekozen strong {
+  color: var(--ink);
+}
+
+.sp-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--sp-6);
+}
+.btn.sp-nav-knop {
+  height: 48px;
+  padding: 0 var(--sp-6);
+  border-radius: 10px;
+}
+
+/* Sidebar */
+.sp-side-rij {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 6px;
+  border-radius: var(--r);
+  font-size: var(--fs-14);
+  line-height: 1.25;
+  color: var(--ink-m);
+  cursor: pointer;
+  text-align: left;
+}
+.sp-side-rij:hover,
+.sp-side-rij.actief {
+  background: var(--bg-mid);
+}
+.sp-side-rij.actief {
+  font-weight: 700;
+  color: var(--ink);
+}
+.sp-nr {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  padding-top: 0.09em;
+  border-radius: 50%;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1;
+}
+.sp-side-klaar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--stat-green);
+  color: #fff;
+}
+
+/* ---------- Resultaat (`visualisatie-spanningsmeter.md`, Resultaat) ---------- */
+.sp-schakelaar {
+  margin: 0 0 var(--sp-6);
+}
+
+.sp-label {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+
+/* Twee kaarten naast elkaar met de belangrijkste spanning. */
+.sp-kaarten {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-6);
+  margin: var(--sp-6) 0;
+}
+.sp-spanningkaart {
+  padding: var(--sp-6);
+}
+.sp-spanningkaart h3 {
+  margin: var(--sp-1) 0 var(--sp-1);
+  font-size: var(--fs-18);
+  font-weight: 700;
+}
+.sp-spanningkaart p {
+  margin: 0;
+  font-size: var(--fs-14);
+  line-height: 22px;
+  color: var(--ink-m);
+}
+
+/* De radar en de tabel Score per veld op één rij. */
+.sp-radar-rij {
+  display: grid;
+  grid-template-columns: 460px minmax(0, 1fr);
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-6);
+}
+.sp-radar {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.sp-knooppunt {
+  outline: none;
+  cursor: default;
+}
+.sp-knooppunt:focus-visible circle {
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+.sp-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-12);
+  color: var(--ink-m);
+}
+.sp-legenda li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.sp-tabel {
+  font-size: var(--fs-14);
+}
+.sp-tabel-kop,
+.sp-tabel-rij {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr) 170px 64px;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.sp-tabel-kop {
+  padding: 0 var(--sp-2) var(--sp-2);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.sp-tabel-rij {
+  padding: var(--sp-2);
+  border-radius: var(--sp-2);
+  outline: none;
+  transition: background 200ms;
+}
+.sp-tabel-rij.is-actief,
+.sp-tabel-rij:focus-visible {
+  background: var(--or-faint);
+}
+.sp-rechts {
+  text-align: right;
+}
+.sp-tabel-naam {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+.sp-tabel-tekst {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink);
+}
+.sp-tabel-tekst small {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.sp-spoor {
+  position: relative;
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg-mid);
+}
+.sp-balk {
+  display: block;
+  height: 100%;
+  min-width: 4px;
+  border-radius: 4px;
+}
+.sp-spoor--groep {
+  overflow: visible;
+}
+.sp-bereik {
+  position: absolute;
+  top: 3px;
+  height: 2px;
+  background: #b3b0a8;
+}
+.sp-stip {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.sp-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.sp-geen {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.sp-spanning {
+  display: inline-block;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.sp-spanning--grootste {
+  padding: 1px 8px;
+  border: 2px solid var(--dal);
+  border-radius: 12px;
+}
+.sp-tabel-uitleg {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+
+/* Gemiddelde per rol */
+.sp-rol {
+  margin-bottom: var(--sp-6);
+}
+.sp-rol-kop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+.sp-rol-kop h3 {
+  margin: 0;
+}
+.sp-rol-kop p {
+  margin: 0;
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.sp-rol-tabel {
+  display: grid;
+  align-items: center;
+  gap: var(--sp-1) var(--sp-2);
+}
+.sp-rol-kolom {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-bottom: var(--sp-2);
+  font-size: var(--fs-14);
+}
+.sp-rol-kolom strong,
+.sp-rol-kolom small {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.sp-rol-kolom small {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.sp-rol-cel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border-radius: 6px;
+  background: var(--bg-mid);
+  font-size: var(--fs-14);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.sp-rol-verschil {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-m);
+}
+.sp-rol-verschil.is-grootste {
+  font-weight: 800;
+  color: var(--dal);
+}
+
+/* De vijf niveaus */
+.sp-niveaus {
+  margin-bottom: var(--sp-6);
+}
+.sp-niveaus ol {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--sp-4);
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.sp-niveaus li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-1);
+  font-size: var(--fs-14);
+  line-height: 20px;
+  color: var(--ink-m);
+}
+.sp-niveaus li strong {
+  color: var(--ink);
+}
+.sp-niveaus li small {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.sp-niveau-rond {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  padding-top: 0.09em;
+  border-radius: 50%;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (max-width: 1000px) {
+  .sp-radar-rij,
+  .sp-kaarten {
+    grid-template-columns: 1fr;
+  }
+  .sp-ijkpunten,
+  .sp-niveaus ol {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mijn metingen: De zin over de grootste spanning en het nummer voor de naam van het veld (`visualisatie-spanningsmeter.md`, Mijn metingen). */
+.mm-spanning {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-14);
+  line-height: 22px;
+  color: var(--ink-m);
+}
+.mm-spanning strong {
+  color: #6b3a00;
+}
+.sp-nr--rij {
+  margin-right: var(--sp-2);
+  vertical-align: middle;
+}
+/* De kolom met de veldnaam is 190px breed en de kop staat op één regel. */
+.mm-paneel--spanning .mm-paneel-rij {
+  grid-template-columns: 190px minmax(0, 1fr) repeat(var(--mm-kolommen, 1), 44px);
+}
+.mm-paneel--spanning .mm-paneel-kop .mm-label-klein {
+  white-space: nowrap;
+}
+
+/* ---------- Film Wat krijg ik, variant Spanningsmeter (`visualisatie-spanningsmeter.md`) ---------- */
+.sf-vlak {
+  padding: var(--sp-6);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-warm);
+}
+.sf {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sf-stap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-6);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.sf-stap-nr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding-top: 0.09em;
+  border-radius: 50%;
+  background: var(--or);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+.sf-stap h4 {
+  margin: 0;
+  font-size: var(--fs-16);
+  font-weight: 700;
+  color: var(--ink);
+}
+.sf-stap p {
+  margin: 0;
+  font-size: var(--fs-14);
+  line-height: 20px;
+  color: var(--ink-m);
+}
+.sf-beeld {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  border-radius: var(--r);
+  background: var(--bg-warm);
+  overflow: hidden;
+}
+.sf-radar {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+}
+.sf-rijen {
+  display: grid;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: 0 var(--sp-4);
+}
+.sf-rij {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sp-3);
+}
+.sf-nr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding-top: 0.09em;
+  border-radius: 50%;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1;
+}
+.sf-spoor {
+  position: relative;
+  height: 8px;
+  margin-right: 7px;
+  border-radius: 4px;
+  background: var(--bg-mid);
+}
+.sf-vul {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--p);
+  border-radius: 4px;
+  background: var(--k);
+}
+.sf-vul::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -7px;
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--k);
+  transform: translateY(-50%);
+}
+.sf-chip {
+  position: absolute;
+  left: var(--sp-2);
+  bottom: var(--sp-2);
+  padding: 4px 10px;
+  border: 2px solid var(--dal);
+  border-radius: 12px;
+  background: #fff;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  color: var(--dal);
+}
+.sf-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* De lus van 9 seconden: Stap 1 vult de balken, stap 2 laat het profiel uitgroeien, stap 3 toont band, lijn en de ring om de grootste spanning. */
+@keyframes sf-vul { 0% { width: 0; } 14% { width: var(--p); } 90% { width: var(--p); } 100% { width: 0; } }
+@keyframes sf-profiel { 0%, 33% { transform: scale(0); opacity: 0; } 45% { transform: scale(1); opacity: 1; } 90% { transform: scale(1); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+@keyframes sf-groep { 0%, 66% { opacity: 0; } 72% { opacity: 1; } 96% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes sf-ring { 0%, 74% { transform: scale(2.4); opacity: 0; } 80% { transform: scale(1); opacity: 1; } 88% { transform: scale(1.35); } 94% { transform: scale(1); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+@keyframes sf-chip { 0%, 78% { opacity: 0; transform: translateY(6px); } 84% { opacity: 1; transform: translateY(0); } 96% { opacity: 1; } 100% { opacity: 0; } }
+.help-film .sf-vul { animation: var(--film-duur) ease-out infinite sf-vul; animation-fill-mode: backwards; }
+.help-film .sf-profiel { animation: var(--film-duur) ease-out infinite sf-profiel; transform-box: view-box; transform-origin: 50% 50%; }
+.help-film .sf-groep { animation: var(--film-duur) linear infinite sf-groep; }
+.help-film .sf-ring { animation: var(--film-duur) ease-out infinite sf-ring; }
+.help-film .sf-chip { animation: var(--film-duur) ease-out infinite sf-chip; }
+@media (prefers-reduced-motion: reduce) {
+  .help-film .sf-vul,
+  .help-film .sf-profiel,
+  .help-film .sf-groep,
+  .help-film .sf-ring,
+  .help-film .sf-chip {
+    animation: none;
+  }
+}
+@media (max-width: 1000px) {
+  .sf {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* De zes velden op de Assessment-pagina: Zes kaarten in drie kolommen (`visualisatie-spanningsmeter.md`, Landingspagina). */
+.sp-velden {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-6);
+}
+.sp-veld-kaart {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: 20px 24px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  font: inherit;
+  font-size: var(--fs-14);
+  line-height: 20px;
+  color: var(--ink-m);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.sp-veld-kaart:hover,
+.sp-veld-kaart:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(28, 28, 26, 0.08);
+}
+.sp-veld-kaart strong {
+  font-size: var(--fs-16);
+  font-weight: 700;
+  color: var(--ink);
+}
+.sp-veld-nr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding-top: 0.09em;
+  border-radius: 50%;
+  font-size: var(--fs-14);
+  font-weight: 700;
+  line-height: 1;
+}
+@media (max-width: 1000px) {
+  .sp-velden {
+    grid-template-columns: 1fr;
+  }
+}
