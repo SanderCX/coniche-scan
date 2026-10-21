@@ -654,6 +654,19 @@ als merkbesluit bespreken.
 
 - **Assessmentcirkel op scherm 1 uitbreiden** (besloten ontwerp van 21 oktober 2026, `CLAUDE.md`, scherm 1): Wat de cirkel doet bij minder of meer dan vier Assessments (bijvoorbeeld een kwart per Assessment met een verschillende grootte, of een tweede cirkel), of een tweede klik de keuze opheft en of de stip op de visual later het gemiddelde van de branche ten opzichte van de eigen score toont (nu een vaste markering op een hoekpunt van de voorbeeldlijn). Daarnaast de vraag of er een generieke Quickscan komt, zodat de cirkel drie vaste assen heeft (snel, uitgebreid, AI).
 
+### Digitale Spanningsmeter (antwoordType spanning, voorstel van 21 oktober 2026)
+
+Ontworpen en gespecificeerd (`content-spanningsmeter.md`, `visualisatie-spanningsmeter.md`), nog niet gebouwd. Bewust nog niet opgepakt:
+
+- **Validatie van de vragen**: De vier stappen uit `content-spanningsmeter.md`, Validatie. Zolang die niet gedaan zijn, kan het resultaat een label "pilot" krijgen.
+- **Import**: Het importbestand van de opzet (Excel of CSV) inlezen (`import-scans.md`).
+- **PDF, CSV en InDesign**: Eigen exportspecs. De CSV heeft voor dit type per veld een score en een spanning in plaats van groepsscores per bouwblok (`export-csv.md`).
+- **Verdeling per veld**: Het aantal scans per niveau, zoals de bron vraagt, naast laagste en hoogste score.
+- **Benchmark, Verkennen en vergelijking tussen Metingen**: Nog niet voor dit type (`benchmark.md`, `visualisatie-verkennen.md`).
+- **Dossier en film**: Het Dossier en de film "Het dossier" voor dit type.
+- **Zorg-variant** en andere sector-varianten van de Spanningsmeter.
+- **Help**: De helpbestanden en de film Wat krijg ik krijgen een variant voor dit type (`help.md`, Films).
+
 ## Content-onderhoud
 
 - **Periodieke check op `content-2030.md`**: Elke 2 maanden een seintje

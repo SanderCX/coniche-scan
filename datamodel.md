@@ -33,13 +33,13 @@ Assessment {
   subtitel: string
   beschrijving: string
   doelgroep: string
-  icoon: string                     // sleutel in ASSESSMENT_ICONS (eigen SVG's, nu target, sparkle en heart, zie stylesheet.md, Assessment-icoon); valt terug op een letterlijke emoji als er geen SVG bij de sleutel is
+  icoon: string                     // sleutel in ASSESSMENT_ICONS (eigen SVG's, nu target, sparkle, heart, cross en gauge, zie stylesheet.md, Assessment-icoon); valt terug op een letterlijke emoji als er geen SVG bij de sleutel is
   geschatteDuur: string             // bijv. "±30 minuten"
   categorieen: Categorie[] | null   // optioneel, zie hieronder
   bouwblokken: Bouwblok[] | null    // gebruikt als categorieen ontbreken
   scoresPerGroepGesorteerd: boolean // sorteert de lijst Scores per groep op waarde; de AI-scan toont Scores per domein in volgorde 1 tot en met 8 (stylesheet.md, Domeinen), dus voor de kaart naast de radar niet gebruikt
   schaal: SchaalLabel[5] | null     // per Assessment, zie hieronder; null bij antwoordType "ja-nee-weetniet"
-  antwoordType: "schaal" | "ja-nee-weetniet" // standaard "schaal" (1–5), zie Antwoordtype
+  antwoordType: "schaal" | "ja-nee-weetniet" | "spanning" // standaard "schaal" (1–5), zie Antwoordtype
   instructieregel: string | null    // regel boven de vragen in de doorloopflow; leeg = de standaardtekst voor de 1–5-schaal
   relevantieVraag: string | null    // alleen als een Categorie optioneel is: de Ja/Nee-vraag bovenaan die categorie, zie Optionele categorieën
   pdfContentSecties: { titel: string, bron: ContentBron } | null // zie export-pdf-visual-volwassenheidsscan.md
@@ -49,6 +49,8 @@ Assessment {
   bouwblokEenheidMeervoud: string   // meervoud, bijv. "bouwstenen" of "domeinen"
   wegingTitel: string | null        // kop van de wegingskaart, zie Bouwblok.gewicht; leeg = standaardtitel
   wegingToelichting: string | null  // tekst van de wegingskaart, per Assessment aanpasbaar; leeg = standaardtekst
+  openVraag: string | null          // alleen bij antwoordType "spanning": tekst van de open vraag onder elk bouwblok, in plaats van het opmerkingenveld; leeg = het gewone opmerkingenveld, zie content-spanningsmeter.md
+  rolgroepen: string[] | null       // alleen bij antwoordType "spanning": de opties van de vraag Rolgroep in de intake; leeg = die vraag ontbreekt, zie ScanInvulling
 }
 ```
 
@@ -125,10 +127,12 @@ Bouwblok {
   toelichting: string | null        // lopende tekst in de Toelichtingsmodal, zie stylesheet.md; leeg = dat onderdeel ontbreekt
   centraleVraag: string | null      // blok "CENTRALE VRAAG" in dezelfde modal, bron: visie-coniche.md deel 2 / visie-ai-klantcontact.md; leeg = het blok ontbreekt
   tags: string[]                    // variabel aantal
+  korteNaam: string | null          // alleen bij antwoordType "spanning": naam voor rijen en tooltips waar de volledige naam te lang is ("Verhaal", "Regie", ...); leeg = de volledige naam
+  ijkpunten: string[] | null        // alleen bij antwoordType "spanning": vijf teksten, één per niveau 1 tot en met 5, het ijkpunt uit het boek voor dit veld; leeg = geen ijkpunt
   gewicht: number                   // standaard 1, zie toelichting hieronder
   gearchiveerd: boolean             // standaard false, zie Content bewerken
   aandachtZin: string | null        // alleen bij antwoordType "ja-nee-weetniet": zin onder de categoriekaart als dit bouwblok het grootste aandachtspunt is, zie content-ziekenhuis-quickscan.md
-  vragen: Vraag[]                   // nu steeds 4 (AI-scan: 5, Quickscan: 1 tot en met 12), niet hardcoded aannemen
+  vragen: Vraag[]                   // nu steeds 4 (AI-scan: 5, Spanningsmeter: 5, Quickscan: 1 tot en met 12), niet hardcoded aannemen
 }
 ```
 
@@ -169,6 +173,8 @@ Vraag {
   id: string
   volgnummer: number                // binnen het bouwblok
   tekst: string
+  invalshoek: string | null         // alleen bij antwoordType "spanning": korte naam van de invalshoek, boven de vraag ("Noodzaak", "Prioriteren & stoppen"); leeg = niets tonen
+  aandachtspunt: string | null      // alleen bij antwoordType "spanning": de toelichting "Waar je op let" achter een Info-knop bij de vraag; leeg = geen Info-knop
   gearchiveerd: boolean             // standaard false, zie Content bewerken
 }
 ```
@@ -187,6 +193,12 @@ Een 1–5-schaal per Assessment. Voor de twee huidige scans identiek:
 
 De betekenis per niveau staat in `inhoudelijk-fundament.md` sectie 1.
 
+De Digitale Spanningsmeter heeft een eigen schaal met andere labels
+(Reactief, Gefragmenteerd, Georganiseerd, Geïntegreerd, Adaptief,
+`content-spanningsmeter.md`, Schaal en niveaus). De labels staan in
+`Assessment.schaal`, de waarde `0` (Kan ik niet beoordelen) niet: Die hoort bij
+het antwoordType en heeft in de interface altijd dezelfde tekst.
+
 ### Antwoordtype
 
 `Assessment.antwoordType` bepaalt hoe een vraag wordt beantwoord en hoe de
@@ -202,9 +214,26 @@ vragen.
   resultaat per antwoord kan tellen. De score is een aantal punten en een
   percentage (Scoreberekening). Klantcontact Quickscan – Ziekenhuis
   (`content-ziekenhuis-quickscan.md`).
+- `"spanning"` (voorstel van 21 oktober 2026, niet gebouwd): Een antwoord
+  van 1 tot en met 5 volgens `Assessment.schaal`, met als extra waarde `0`
+  voor "Kan ik niet beoordelen". Een 0 is een geldig antwoord (de vraag telt
+  als beantwoord), maar telt niet mee in de score. Er is geen totaalscore: De
+  uitkomst is een score per bouwblok (hier een spanningsveld), een niveau en de
+  spanning tussen de velden (Scoreberekening). Digitale Spanningsmeter
+  (`content-spanningsmeter.md`).
 
-Een vraag is beantwoord zodra er een waarde staat, ook `"weet-niet"`. De
-voortgang telt dus ook Weet ik niet mee.
+Een vraag is beantwoord zodra er een waarde staat, ook `"weet-niet"` en ook
+`0` bij `"spanning"`. De voortgang telt dus ook Weet ik niet en Kan ik niet
+beoordelen mee.
+
+**Structuur van de Spanningsmeter.** Dit Assessment gebruikt de bestaande
+lagen en voegt er geen toe. Er is geen categorielaag (`categorieen` is leeg),
+de 6 spanningsvelden zijn `Bouwblok`ken direct onder het Assessment, en de 5
+gescoorde vragen per veld zijn `Vraag`en. De volgorde van de bouwblokken is de
+bouwlogica en telt mee in de berekening (Scoreberekening, Spanning). Wat per
+bouwblok en per vraag extra is (ijkpunten, invalshoek, "Waar je op let", de
+open vraag) staat in de velden hieronder en bij Bouwblok en Vraag. `gewicht`
+is bij dit antwoordType niet in gebruik en de wegingskaart verschijnt niet.
 
 **Structuur van de Quickscan.** Dit Assessment gebruikt de bestaande
 lagen en voegt er geen toe. De 4 afdelingen zijn `Categorie`s, de
@@ -468,9 +497,10 @@ ScanInvulling {
   gestartOp: datetime | null        // gezet bij het verzenden van de intake
   afgerondOp: datetime | null
   laatstOpgeslagenOp: datetime | null  // gebouwd op 15 oktober 2026, voor "Laatst opgeslagen" op Mijn metingen (`visualisatie-mijn-metingen.md`); gezet bij elk opslaan van een antwoord
-  antwoorden: { [vraagId: string]: number | string }   // 1-5, of "ja" | "nee" | "weet-niet" bij antwoordType "ja-nee-weetniet"
+  antwoorden: { [vraagId: string]: number | string }   // 1-5, of "ja" | "nee" | "weet-niet" bij antwoordType "ja-nee-weetniet", of 0-5 bij antwoordType "spanning" (0 = kan ik niet beoordelen)
   relevantie: { [categorieId: string]: boolean }       // alleen bij optionele categorieën: true = van toepassing, false = niet van toepassing, ontbreekt = nog niet beantwoord
-  opmerkingenPerBouwblok: { [bouwblokId: string]: string }
+  opmerkingenPerBouwblok: { [bouwblokId: string]: string }   // bij antwoordType "spanning": het antwoord op de open vraag (Assessment.openVraag) per bouwblok
+  rolgroep: string | null           // alleen bij Assessment.rolgroepen: de gekozen optie in de intake; voor analyse per groep (Scoreberekening, Spanningsmeter)
   notitie: string | null            // gebouwd op 13 oktober 2026, zie hieronder
   bewaarVerlengdTot: datetime | null        // zie Bewaartermijn ingevulde scans
 }
@@ -596,6 +626,77 @@ afdelingen scoren 5, 3, 5 en 4 punten van 15, samen 17 van 60, dus 28%
 Voor dit antwoordType gebruikt voorlopig alleen de resultatenpagina deze
 berekening. PDF, CSV, InDesign, import, het gemiddelde over meerdere
 Respondenten, spreiding en benchmark zijn er nog niet voor uitgewerkt
+(`backlog.md`).
+
+**Antwoordtype `"spanning"` (Digitale Spanningsmeter, voorstel van 21 oktober
+2026, niet gebouwd).** Hier is er geen bouwblok-gemiddelde dat in een
+overall-score uitkomt. De uitkomst is een score per spanningsveld, een niveau en
+de spanning tussen de velden. Met `a` een antwoord van 1 tot en met 5, een
+vraag met antwoord `0` of zonder antwoord is niet beoordeeld:
+
+- **Veldscore** = gemiddelde van de beoordeelde antwoorden in het veld (de
+  antwoorden 1 tot en met 5), met één decimaal getoond. Een 0 telt niet mee in
+  teller en noemer. Zijn er minder dan drie beoordeeld, dan heeft het veld geen
+  score en toont de interface "Onvoldoende zicht" in plaats van een getal. Zo'n
+  veld doet niet mee in niveau, spanning en gemiddeld niveau.
+- **Niveau** = de getoonde veldscore afgerond op een heel getal (half-away-from-
+  zero), met de naam uit `Assessment.schaal`: Onder 1,5 Reactief, 1,5 tot en met
+  2,49 Gefragmenteerd, 2,5 tot en met 3,49 Georganiseerd, 3,5 tot en met 4,49
+  Geïntegreerd, vanaf 4,5 Adaptief. Kleur en chip volgen het niveau
+  (`stylesheet.md`, Scorekleuren).
+- **Spanning** per veld, behalve het eerste: `score(veld) − min(score van alle
+  voorgaande velden)`, over de voorgaande velden die een score hebben. De
+  volgorde is die van `Bouwblok.volgnummer`: Verhaal, Regie, Gedrag, Data,
+  Processen, Technologie. Positief betekent dat het veld voorloopt op zijn
+  fundament, negatief dat het achterblijft bij het laagste veld daarvoor. Het
+  eerste veld heeft geen spanning, evenmin een veld zonder voorgaand veld met
+  een score. De berekening gebruikt de ongeronde veldscores en toont één
+  decimaal met een min-teken (`−`) of plusteken, dus het getoonde verschil kan
+  0,1 afwijken van het verschil van twee getoonde scores.
+- **Grootste spanning** = het veld met de grootste absolute spanning. Bij gelijke
+  waarden het veld dat het eerst komt. Het profiel markeert dat veld.
+- **Gemiddeld niveau** = gemiddelde van de veldscores van de velden met een score,
+  ongewogen, met één decimaal en het bijbehorende niveau. Dit is een weergave en
+  geen score van de meter (`visualisatie-spanningsmeter.md`, Ring).
+- **Groep.** Per veld telt elke afgeronde scan met een veldscore één keer. Het
+  gemiddelde van de groep is het gemiddelde van die veldscores, de laagste en
+  hoogste score zijn het minimum en maximum ervan, en de spreiding is hoogste
+  minus laagste. Het aantal "beoordeeld" is het aantal scans met een veldscore in
+  dat veld. De spanning van de groep wordt berekend op de groepsgemiddelden, niet
+  als gemiddelde van de spanningen van de personen. Het veld "Meest uiteenlopend"
+  is het veld met de grootste spreiding (bij gelijke spreiding het eerste).
+- **Per rolgroep.** Hetzelfde gemiddelde per veld, gesplitst naar
+  `ScanInvulling.rolgroep`. Een rolgroep met minder afgeronde scans dan
+  `Instellingen.spanningMinPerRol` staat niet in de uitsplitsing (Instellingen).
+  Het Verschil per veld is het grootste minus het kleinste gemiddelde over de
+  rolgroepen die zichtbaar zijn. Zijn er minder dan twee zichtbare rolgroepen,
+  dan is er geen uitsplitsing.
+- **Onder de drempel.** Een groepsweergave voor een Lead volgt `benchmarkMinRespondenten`
+  (Instellingen): Eronder staat er geen gemiddelde, laagste en hoogste score en
+  geen uitsplitsing per rolgroep. Wat een respondent ziet, is alleen het eigen
+  profiel, tenzij een Admin de groepsweergave voor hem aanzet (`beheerpagina.md`,
+  punt 6a). De antwoorden en het profiel van één persoon staan nooit in een
+  groepsweergave.
+- **Afronding**: Alleen op getoonde waarden, half-away-from-zero, één decimaal.
+
+Rekenvoorbeeld (de fictieve deelnemer uit de designs). Antwoorden per veld:
+Verhaal 4, 4, 4, 4, 3 (3,8), Regie 3, 3, 2, 3, 2 (2,6), Gedrag 2, 2, 3, 2, 2
+(2,2), Data 3, 4, 3, 3, 4 (3,4), Processen 2, 3, 2, 3, 2 (2,4) en Technologie 4,
+4, 4, 4, 4 (4,0). Niveaus: Geïntegreerd, Georganiseerd, Gefragmenteerd,
+Georganiseerd, Gefragmenteerd en Geïntegreerd. Spanning: Regie −1,2 (2,6 min
+3,8), Gedrag −0,4 (2,2 min 2,6), Data +1,2 (3,4 min 2,2), Processen +0,2 (2,4 min
+2,2) en Technologie +1,8 (4,0 min 2,2). De grootste spanning is Technologie. Het
+gemiddeld niveau is 3,1 (18,4 gedeeld door 6), Georganiseerd. Geeft de deelnemer
+bij Verhaal als laatste een 0 (4, 4, 4, 4, 0), dan is de veldscore 4,0 over vier
+antwoorden. Groep (12 scans): Gemiddelden 3,6, 2,9, 2,7, 3,2, 2,5 en 3,9 geven
+spanningen van −0,7, −0,2, +0,5, −0,2 en +1,4, met Technologie als grootste (op
+Processen, 2,5). De spreiding is het grootst bij Gedrag (1,4 tot 4,0, dus 2,6).
+Deze voorbeelden horen in de test van de scorefunctie, naast het rekenvoorbeeld in
+het importbestand van de bron (`content-spanningsmeter.md`, Importbestand).
+
+Voor dit antwoordType gebruikt voorlopig alleen de resultatenpagina deze
+berekening, met Mijn metingen. PDF, CSV, InDesign, import, de vergelijking tussen
+Metingen, benchmark en Verkennen zijn er nog niet voor uitgewerkt
 (`backlog.md`).
 
 Vier plekken gebruiken dezelfde uitkomst, geen van alle een eigen
@@ -1748,6 +1849,7 @@ Gebouwd op 15 oktober 2026 voor Verkennen: `verkennenMinGroep` (3), `verkennenMi
 `verkennenMinPool` (6), `verkennenMaxGroepen` (12) en `verkennenMinIngevuldPct` (40),
 alle gehele getallen van minstens 1, het percentage tot en met 100 (`visualisatie-verkennen.md`, Drempels). `verkennenWaarschuwingGroep` is hernoemd naar `verkennenMinVergelijking`: Een opgeslagen waarde onder de oude naam wordt bij het lezen overgenomen. De startwaarden zijn de norm vanuit het ontwerp. Gebouwd op 15 oktober 2026: Het percentage mag 0 zijn (geen ondergrens), dus voor het percentage geldt 0 tot en met 100.
 Gebouwd op 17 oktober 2026: `benchmarkMinOrganisaties` geldt ook voor een opgeslagen verkenning en telt daar altijd Organisaties, ook bij de eenheid Onderdelen. Er komt geen nieuwe instelling bij.
+Voorstel van 21 oktober 2026 (Digitale Spanningsmeter): `spanningMinPerRol` (startwaarde 3), het minimale aantal afgeronde scans van een rolgroep om als rolgroep in de uitsplitsing te staan, geheel getal van minstens 1 (Scoreberekening, Spanningsmeter). Een Admin past hem aan in beheer (`beheerpagina.md`, punt 10).
 Gebouwd op 14 oktober 2026: `benchmarkMaxDagenTussenMetingen` (startwaarde 90),
 het aantal dagen waarboven een vergelijking met de lezing Naast elkaar een
 waarschuwing geeft. De
