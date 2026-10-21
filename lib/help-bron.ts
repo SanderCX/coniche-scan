@@ -21,7 +21,7 @@ export const HELP_GROEPEN: { naam: string; rollen: HelpRol[] }[] = [
 export const HELP_TOEGANG = ["resultaten", "spreiding", "antwoorden", "uitnodigen", "exporteren", "benchmark"];
 
 /** De films die bestaan (`help.md`, Films). */
-export const HELP_FILMS = ["wat-krijg-ik", "meetperiode"];
+export const HELP_FILMS = ["wat-krijg-ik", "meetperiode", "radar", "dossier"];
 
 export interface HelpOnderwerp {
   /** Bestandsnaam zonder `.md`, ook het deel van de route. */
@@ -241,7 +241,8 @@ export function controleerHelp(onderwerpen: HelpOnderwerp[], ctx: HelpControleCo
         if (!groep.rollen.includes(r)) fouten.push(`${bestand}: De rol ${r} mag de groep "${o.groep}" niet zien.`);
     if (o.toegang.length && !o.rollen.includes("Lead")) fouten.push(`${bestand}: "toegang" hoort alleen bij de rol Lead.`);
     for (const t of o.toegang) if (!HELP_TOEGANG.includes(t)) fouten.push(`${bestand}: Onbekende toegang "${t}".`);
-    if (o.film && !HELP_FILMS.includes(o.film)) fouten.push(`${bestand}: Onbekende film "${o.film}".`);
+    for (const f of (o.film ?? "").split(",").map((x) => x.trim()).filter(Boolean))
+      if (!HELP_FILMS.includes(f)) fouten.push(`${bestand}: Onbekende film "${f}".`);
     if (!o.bronnen.length) fouten.push(`${bestand}: Kopgegeven "bronnen" ontbreekt.`);
     for (const b of o.bronnen) {
       if (!ctx.bronBestaat(b)) fouten.push(`${bestand}: De bron ${b} bestaat niet.`);

@@ -5,7 +5,7 @@ import { HelpVoorCode } from "@/components/help/HelpVoorCode";
 
 /**
  * De Help voor een Respondent of Lead (`help.md`, Plek in de app): Via "Mijn gegevens", binnen de persoonlijke link. De code staat
- * in de adresbalk zoals bij de vier content-pagina's (`/visie?code=`). Wat de gebruiker ziet, volgt uit zijn rol en de vinkjes van
+ * in de adresbalk zoals bij de Assessment-pagina (`/{assessment}?code=`). Wat de gebruiker ziet, volgt uit zijn rol en de vinkjes van
  * een Admin (`HelpVoorCode`). Zonder herkende gebruiker is er geen Help (`help.md`, Open punten).
  */
 export default async function HelpPage({

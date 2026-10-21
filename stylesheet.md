@@ -639,7 +639,8 @@ Ontwerp in het Design-artifact: `Herontwerp-Home`, `Herontwerp-Volwassenheid`, `
 
 - **Assessmenttegel.** Een kaart (`.card`) met 32px padding en 20px tussenruimte. Bovenaan het Assessment-icoon (48px, `--or`) en de titel (24px, regelhoogte 28px, gewicht 800) naast elkaar met 20px ertussen, daaronder één zin (16px, regelhoogte 26px, `--ink-m`) en daaronder drie regels van 15px (regelhoogte 22px, `--ink-m`) met 12px ertussen. Voor elke regel staat een grijs lijnicoon van 20px (`--ink-s`, lijndikte 1,7, ronde uiteinden). De hele tegel is klikbaar en heeft geen eigen link of knop.
 - **Sub-nav.** Een balk van 60px hoog, wit, met een boven- en een onderrand (`--line`), 48px padding links en rechts, `position: sticky; top: 0`. Links een rij pillen met 8px ertussen (36px hoog, 16px padding, 14px, gewicht 600, volledig rond, tekst `--ink-m`); de actieve pil heeft een lichtoranje achtergrond (`#fff1e8`) en tekst `#c2570c`, bij hover een lichtgrijze achtergrond. Rechts de uitgeschakelde knop "Start assessment". De hoofd-nav erboven scrolt weg.
-- **Tokens.** De twee oranjetinten van de actieve pil zijn nog geen token; ze worden toegevoegd bij het bouwen.
+- **Tokens.** De twee oranjetinten van de actieve pil zijn `--or-pil` (`#fff1e8`) en `--or-pil-tekst` (`#c2570c`, gelijk aan `--dal`), toegevoegd aan `tokens.css` op 21 oktober 2026.
+- **Zo gebouwd (21 oktober 2026).** De tegel is `.card.ap-tegel` en de sub-nav `.ap-subnav` (`app/styles/assessment-pagina.css`), met `AssessmentCard` en `AssessmentSubNav`. De secties hebben `scroll-margin-top: 60px`, en `scroll-behavior: smooth` staat alleen aan bij `prefers-reduced-motion: no-preference`. De pillen zijn gewone ankerlinks. Het icoon in de tegel is 48px en de punten hebben een icoon van 20px.
 
 ### Kaarten
 

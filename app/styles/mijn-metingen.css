@@ -387,6 +387,21 @@
   width: 232px;
   justify-content: center;
 }
+.mm-over {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--fs-14);
+  font-weight: 700;
+  color: var(--or);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.mm-over:hover {
+  text-decoration: underline;
+}
+.mm-knoppen .mm-over {
+  align-self: center;
+}
 .mm-uitnodigen {
   display: flex;
   gap: var(--sp-2);

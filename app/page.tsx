@@ -29,7 +29,7 @@ export default function Home() {
       </div>
 
       <div className="container flex-1" style={{ paddingBottom: "5rem", maxWidth: "64rem" }}>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="ap-tegels">
           {assessments.map((assessment) => (
             <AssessmentCard key={assessment.id} assessment={assessment} />
           ))}

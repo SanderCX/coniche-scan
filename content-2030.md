@@ -1,6 +1,6 @@
 # Klantcontact richting 2030
 
-**Plaats in de app (besloten door Joost op 21 oktober 2026):** Dit stuk staat als sectie "Klantcontact richting 2030" op de Assessment-pagina van de AI-scan (`CLAUDE.md`, sectie 3, scherm 2), met de vijf ontwerpkeuzes als kaarten en "Lees het hele stuk" voor de rest. Het is geen losse pagina en geen link in de header meer.
+**Plaats in de app (besloten door Joost op 21 oktober 2026):** Dit stuk staat als sectie "Klantcontact richting 2030" op de Assessment-pagina van de AI-scan (`CLAUDE.md`, sectie 3, scherm 2), met de vijf ontwerpkeuzes als kaarten en "Lees het hele stuk" voor de rest. Het is geen losse pagina en geen link in de header meer. **Zo gebouwd (21 oktober 2026)**: `components/assessment/Content2030Sectie.tsx`. De korte zin op een kaart is de eerste zin van de tekst, de pillen zijn de overige onderdelen van het stuk (alleen ter oriëntatie) en "Lees het hele stuk" klapt het volledige stuk uit, zoals het op de oude pagina stond.
 
 Waar klantcontact naartoe gaat richting 2030 ligt niet vast. Organisaties
 bewegen niet dezelfde kant op: De ene zet vooral in op verdere

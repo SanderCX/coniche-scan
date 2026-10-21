@@ -1,0 +1,450 @@
+/* ---------- Assessment-pagina en tegels (`CLAUDE.md`, scherm 1 en 2; `stylesheet.md`, Assessmenttegel en sub-nav) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Scherm 1: Twee tegels per rij, de hele tegel is klikbaar. */
+.ap-tegels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-6);
+}
+@media (max-width: 900px) {
+  .ap-tegels {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.card.ap-tegel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 32px;
+  text-decoration: none;
+  color: inherit;
+}
+.ap-tegel-kop {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.ap-tegel-kop h2 {
+  margin: 0;
+  font-size: var(--fs-24);
+  line-height: 28px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.ap-tegel-zin {
+  margin: 0;
+  font-size: var(--fs-16);
+  line-height: 26px;
+  color: var(--ink-m);
+}
+.ap-tegel-punten {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ap-tegel-punten li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--fs-14);
+  line-height: 22px;
+  color: var(--ink-m);
+}
+.card.ap-tegel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(28, 28, 26, 0.08);
+}
+
+/* Scherm 2: De sticky sub-nav, een balk van 60px met een boven- en onderrand. */
+.ap-subnav {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  height: 60px;
+  padding: 0 48px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.ap-subnav-pillen {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+  overflow-x: auto;
+}
+.ap-subnav-pil {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  height: 36px;
+  padding: 0 var(--sp-4);
+  border-radius: 999px;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--ink-m);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.ap-subnav-pil:hover {
+  background: var(--bg-mid);
+}
+.ap-subnav-pil.is-actief {
+  background: var(--or-pil);
+  color: var(--or-pil-tekst);
+}
+
+/* De secties: 60px ruimte erboven voor de sub-nav bij het scrollen naar een anker. */
+.ap-sectie {
+  scroll-margin-top: 60px;
+  padding: 64px 0;
+  border-top: 1px solid var(--border);
+}
+.ap-sectie:first-of-type {
+  border-top: 0;
+}
+.ap-sectie-kop {
+  max-width: 44rem;
+  margin-bottom: var(--sp-8);
+}
+.ap-sectie-kop h2 {
+  margin: 0;
+  font-size: var(--fs-32);
+}
+.ap-inleiding {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-18);
+  color: var(--ink-m);
+}
+.ap-label {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+
+/* Visie: Drie kaarten naast elkaar met "Lees verder". */
+.ap-visie-rij {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-6);
+  align-items: stretch;
+}
+@media (max-width: 1000px) {
+  .ap-visie-rij {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.ap-visie-kaart {
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-6);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.ap-visie-kaart h3 {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-18);
+  font-weight: 800;
+}
+.ap-visie-kaart p {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-14);
+  line-height: 1.6;
+  color: var(--ink-m);
+}
+.ap-visie-meer {
+  margin-top: var(--sp-3);
+}
+.ap-meer {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: var(--fs-14);
+  font-weight: 700;
+  color: var(--or);
+  cursor: pointer;
+}
+.ap-meer:hover {
+  text-decoration: underline;
+}
+.ap-cyclus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0;
+  padding: 0;
+  list-style: none;
+}
+.ap-cyclus li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--ink);
+}
+.ap-cyclus li span,
+.ap-cirkel--licht {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  padding-top: 0.09em;
+  border-radius: 50%;
+  background: var(--or-faint);
+  color: var(--or);
+  font-size: var(--fs-12);
+  font-weight: 800;
+  line-height: 1;
+}
+.ap-goed {
+  margin-top: var(--sp-8);
+  padding: var(--sp-6);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-warm);
+}
+.ap-goed h3 {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-18);
+}
+.ap-goed p {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-14);
+  color: var(--ink-m);
+}
+.ap-goed ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0;
+  padding: 0;
+  list-style: none;
+}
+.ap-goed li {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: flex-start;
+  font-size: var(--fs-14);
+  color: var(--ink);
+}
+.ap-goed li span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--or);
+  color: #fff;
+  font-size: var(--fs-12);
+  font-weight: 800;
+}
+
+/* De 15 bouwblokken: Vijf kolommen, de pillen met een nummercirkel in de categoriekleur. */
+.ap-kolommen {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--sp-4);
+  align-items: start;
+}
+@media (max-width: 1000px) {
+  .ap-kolommen {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.ap-kolom {
+  padding: var(--sp-4);
+  border-top: 4px solid var(--kolom-kleur);
+  border-radius: 0 0 10px 10px;
+  background: var(--bg-warm);
+}
+.ap-kolom h3 {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-14);
+  font-weight: 800;
+}
+.ap-kolom ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ap-pil {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+  min-height: 40px;
+  padding: 6px var(--sp-3) 6px 6px;
+  border: 1px solid var(--border-d);
+  border-radius: 20px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.ap-pil:hover {
+  border-color: var(--or);
+}
+.ap-pil.is-gekozen {
+  border-color: var(--or);
+  background: var(--or-faint);
+}
+.ap-cirkel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  padding-top: 0.09em;
+  border-radius: 50%;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1;
+}
+.ap-cirkel--groot {
+  width: 32px;
+  height: 32px;
+  font-size: var(--fs-14);
+}
+.ap-cirkel--licht {
+  width: 32px;
+  height: 32px;
+}
+.ap-cirkel--icoon {
+  width: 32px;
+  height: 32px;
+}
+
+/* AI in klantcontact: De acht domeinen als kaarten in vier kolommen. */
+.ap-domeinen {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+@media (max-width: 1000px) {
+  .ap-domeinen {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.ap-domein {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 76px;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.ap-domein:hover {
+  border-color: var(--or);
+}
+.ap-domein.is-gekozen {
+  border-color: var(--or);
+  background: var(--or-faint);
+}
+
+/* Klantcontact richting 2030: Vijf kaarten naast elkaar, pillen en het uitklapbare stuk. */
+.ap-2030-kaarten {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (max-width: 1100px) {
+  .ap-2030-kaarten {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.ap-2030-kaart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.ap-2030-kaart h3 {
+  margin: 0;
+  font-size: var(--fs-14);
+  font-weight: 800;
+}
+.ap-2030-kaart p {
+  margin: 0;
+  font-size: var(--fs-14);
+  line-height: 1.5;
+  color: var(--ink-m);
+}
+.ap-2030-onderdelen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-6) 0 var(--sp-4);
+}
+.ap-onderdeel {
+  padding: 4px var(--sp-3);
+  border: 1px solid var(--border-d);
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: var(--fs-12);
+  font-weight: 600;
+  color: var(--ink-m);
+}
+.ap-2030-stuk {
+  max-width: 42rem;
+  margin-top: var(--sp-8);
+}
+.ap-2030-stuk h3 {
+  margin: var(--sp-8) 0 var(--sp-3);
+  font-size: var(--fs-24);
+}
+.ap-2030-lijst {
+  display: grid;
+  gap: var(--sp-4);
+  margin: var(--sp-4) 0;
+}
+.ap-2030-kenmerken {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4);
+  margin: var(--sp-4) 0;
+}

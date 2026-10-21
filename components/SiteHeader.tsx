@@ -12,6 +12,7 @@ export function SiteHeader({
   badgeKleur,
   navRight,
   logoHref = "/",
+  nietSticky = false,
 }: {
   /** bijv. "Beheer" — zonder `badgeKleur` de vaste zwarte pil naast het logo. */
   badge?: string;
@@ -23,9 +24,11 @@ export function SiteHeader({
   navRight?: React.ReactNode;
   /** Binnen een persoonlijke respondent-link gaat het logo naar "Mijn metingen" i.p.v. de publieke homepage (CLAUDE.md sectie 3). */
   logoHref?: string;
+  /** Scrolt weg met de pagina (Assessment-pagina met een sticky sub-nav). */
+  nietSticky?: boolean;
 }) {
   return (
-    <header className="nav">
+    <header className={nietSticky ? "nav nav--los" : "nav"}>
       <Link href={logoHref} className="nav-logo">
         <Image
           src="/LOGO/Coniche_MMW_standard.svg"

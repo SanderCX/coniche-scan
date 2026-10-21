@@ -14,6 +14,7 @@
 @import "./styles/visualisatie.css";
 @import "./styles/mijn-metingen.css";
 @import "./styles/dossier.css";
+@import "./styles/assessment-pagina.css";
 @import "./styles/help.css";
 
 @theme inline {

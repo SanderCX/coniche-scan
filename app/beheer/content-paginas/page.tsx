@@ -22,7 +22,7 @@ export default function ContentPaginasPage() {
     <div className="admin-main">
       <h1>Content-pagina&apos;s</h1>
       <p className="admin-notice" style={{ marginTop: "1rem" }}>
-        Nog niet gebouwd. De pagina&apos;s Visie, Bouwstenen, AI en 2030 staan voorlopig in de code, tot de uitwerking
+        Nog niet gebouwd. De secties Visie, Bouwstenen, AI en 2030 op de Assessment-pagina staan voorlopig in de code, tot de uitwerking
         van het beheer is afgestemd.
       </p>
     </div>

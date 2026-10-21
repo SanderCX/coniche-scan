@@ -28,8 +28,8 @@ import {
 
 /**
  * De publieke respondent-link (v1-aanpassingen.md punt 2): alleen een toegangscode, geen gegevens. Gaat altijd eerst naar "Mijn
- * metingen" (CLAUDE.md sectie 3, scherm 4), ook bij precies één invulling. De 4 vaste links (Visie/Bouwstenen/AI/2030) staan in
- * de nav. Dit is de hub, dus zonder terugknop. De opmaak staat in `visualisatie-mijn-metingen.md`.
+ * metingen" (CLAUDE.md sectie 3, scherm 4), ook bij precies één invulling. De nav heeft alleen "Mijn gegevens" (de vaste content-links
+ * zijn vervallen, de content staat op de Assessment-pagina, via "Over deze scan" op een Meting-kaart). Dit is de hub, dus zonder terugknop. De opmaak staat in `visualisatie-mijn-metingen.md`.
  *
  * Secties per rol: Een respondent heeft Nog te doen en Afgerond. Een Lead heeft Metingen en Vergelijkingen. Een Lead die ook
  * respondent is, ziet een eigen scan die samenvalt met een Meting op zijn pagina als één kaart met twee blokken, en de overige
@@ -151,6 +151,7 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
                   assessment={assessmentVan(scanUitvoering.assessmentId)}
                   scanUitvoering={scanUitvoering}
                   invulling={invulling}
+                  code={code}
                 />
               ))}
             </div>
@@ -167,6 +168,7 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
                   assessment={assessmentVan(scanUitvoering.assessmentId)}
                   scanUitvoering={scanUitvoering}
                   invulling={invulling}
+                  code={code}
                 />
               ))}
             </div>

@@ -183,9 +183,15 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   staan en verdwijnt bij de Lead. In het prototype bepaalt `leadDossier`
   (`lib/dossier.ts`) wat een Lead ziet, zonder naam of id van de Organisatie in
   een Case, tot dat aan de serverkant kan.
+- **Herontwerp van navigatie en Assessment-pagina's** (besloten door Joost op 21
+  oktober 2026, gebouwd op 21 oktober 2026, PR 151): De vier content-links zijn uit
+  de nav, de content staat als secties op de Assessment-pagina met een sticky
+  sub-nav, scherm 1 heeft tegels met drie punten, en Mijn metingen heeft "Over
+  deze scan" op de Meting-kaart. Zie scherm 1, 2 en 5 hieronder, onder "Zo
+  gebouwd".
 - **Help**: Gebouwd op 19 oktober 2026 (`help.md`). Een helppagina per rol
-  (Respondent, Lead, Consultant en Admin) met 27 onderwerpen (het Dossier
-  heeft er twee, gebouwd op 21 oktober 2026) als Markdown in
+  (Respondent, Lead, Consultant en Admin) met 28 onderwerpen (het Dossier
+  heeft er drie, gebouwd op 21 oktober 2026) als Markdown in
   `help/`, twee films met CSS-animaties en de rij "Help" in het Accountmenu
   en in "Mijn gegevens". De inhoud is door Claude Code geschreven en wacht op
   de beoordeling van Joost. Alleen twee onderwerpen hebben een illustratie.
@@ -403,7 +409,7 @@ geen afwijking van de spec maar een gat erin.
    - **AI-Volwassenheid in Klantcontact**: "Zie hoe ver jouw organisatie is met AI in klantcontact." Punten: "40 vragen, ±20 minuten", "8 AI-domeinen", "Concrete stappen per domein".
    - **Klantcontact Volwassenheid – Zorg**: "Breng in kaart hoe volwassen het patiënt- of cliëntcontact van jouw zorg- of welzijnsorganisatie is." Punten: "60 vragen, ±30 minuten", "15 bouwblokken in 5 categorieën", "Scores gewogen voor de zorg, met concrete stappen".
    - **Klantcontact Quickscan – Ziekenhuis**: "Zie snel waar jouw ziekenhuis staat in klantcontact." Punten: "60 vragen, ±15 minuten", "10 dimensies", "Gemiddelde en spreiding per afdeling" (staafjes).
-   De aantallen komen waar het kan uit het Assessment. Of de zin en de punten beheerbaar zijn of in de code staan, is nog niet besloten (Open punten).
+   De aantallen komen waar het kan uit het Assessment. Of de zin en de punten beheerbaar zijn of in de code staan, is nog niet besloten (Open punten). **Zo gebouwd (21 oktober 2026)**: `AssessmentCard` met `tegelInhoud` (`lib/landing.ts`): De teksten staan per Assessment-id in de code, de aantallen komen uit het Assessment (60 vragen, 15 bouwblokken, 5 categorieën, 10 dimensies), en een Assessment zonder eigen tekst valt terug op de eerste zin van de beschrijving. De iconen zijn klok, lagen, vlag (nieuw, `VlagIcoon`) en staafjes (`TEGEL_ICONEN`). De pagina `app/page.tsx` heeft `.ap-tegels` (twee kolommen, een kolom onder 900px).
 2. **Assessment-landingspagina** (herontwerp van 21 oktober 2026, zie het blok **Herontwerp** hieronder; waar de tekst ervan afwijkt, geldt het herontwerp): Titel, hero, 3 feature-cards en een
    blok "Praktische informatie" met invultijd, direct resultaat en
    privacy. "Start assessment" staat direct onder de hero maar is
@@ -440,6 +446,7 @@ geen afwijking van de spec maar een gat erin.
    - **Wat krijg ik**: Kop "Zo ziet je resultaat eruit" met een inleidende zin die bij het type past. Daaronder de film Wat krijg ik van het type (`help.md`, Films, met de knop "Bekijk de voorbeeld-output") en daaronder de film "Het dossier, de radar voor de Lead" (`help.md`, Films, ontwerp `Film-Dossier`), zonder knop. Beide staan in een kaart met drie stapkaarten.
    - **Praktisch**: De sectie "Praktische informatie", ongewijzigd.
    - **Routes**: De losse pagina's `/visie`, `/bouwstenen`, `/ai-scan` en de 2030-pagina vervallen. Een oud adres stuurt door naar de Assessment-pagina waar de content nu staat (Visie en Bouwstenen naar Klantcontact Volwassenheid, AI en 2030 naar de AI-scan).
+   - **Zo gebouwd (21 oktober 2026)**: `app/[assessmentId]/page.tsx` heeft de hero, `AssessmentSubNav` (`components/assessment/`) en de secties `VisieSectie`, `BouwblokkenSectie`, `AiDomeinenSectie` en `Content2030Sectie` (de inhoud komt uit dezelfde `data/*-content.ts` als de oude pagina's). Welk type content een Assessment heeft, bepaalt `contentSoort` (`lib/landing.ts`): De Bouwsteen als eenheid met categorieën is Volwassenheid (Klantcontact en Zorg), AI-domeinen is AI, en alles anders (de Quickscan) geen content en dus geen sub-nav. De hoofd-nav scrolt weg (`navNietSticky` op `PageWithChrome`), de sub-nav is `position: sticky` en bepaalt de actieve pil uit de scrollpositie (`actieveSectie`, de laatste sectie die minder dan 90px onder de balk begint). De drie feature-cards staan bovenaan de sectie "Wat krijg ik", boven de films, omdat het ontwerp er geen plek voor heeft (open punt 1). De film "Het dossier" staat onder "Wat krijg ik" van het type, zonder knop. De Visie toont de eerste alinea op de kaart en de rest met "Lees verder", de kaart "Wat is goed klantcontact?" staat onder de drie kaarten (open punt 4), de bouwblokken zijn vijf kolommen met pillen, en de 2030-kaarten tonen de eerste zin van elke ontwerpkeuze. De oude routes sturen door (`next.config.ts`, `?code=` blijft meegaan). Zonder `?code=` heeft de nav alleen "Inloggen", met een code "← Terug naar Mijn metingen" en "Mijn gegevens".
    - **Bereikbaarheid**: Een bezoeker zonder sessie komt hier via scherm 1, met alleen "Inloggen" in de nav. Een gebruiker met een persoonlijke link komt hier via "Over deze scan" op de Meting-kaart (zie scherm 5); de nav toont dan "← Terug naar Mijn metingen" en "Mijn gegevens" en het logo gaat naar Mijn metingen.
 3. **Voorbeeld-output**: Dezelfde resultaatcomponenten als scherm 6, met
    vaste demodata. De resultaatcomponent wordt één keer gebouwd. Voor
@@ -500,7 +507,7 @@ geen afwijking van de spec maar een gat erin.
    uitkomst. Een Lead ziet ook een teaser van de hele meting (alleen met
    Resultaten aan en minstens `benchmarkMinRespondenten` afgeronde scans).
    Volledig in `visualisatie-mijn-metingen.md`, gebouwd op 15 oktober 2026.
-   Knoppen: "Start de scan", "Ga verder", "Bekijk jouw resultaten".
+   Knoppen: "Start de scan", "Ga verder", "Bekijk jouw resultaten". Naast de knoppen staat "Over deze scan" (gebouwd op 21 oktober 2026, `OverDezeScan`, `lib/landing.ts`, `overDezeScan`): Op de kaart van een eigen scan en op de kaart van de hele Meting bij een Lead, niet bij de Quickscan, de benchmarkkaart of de Dossierkaart.
 
    **Bij een Lead-rol** (`datamodel.md` deel 2) toont de pagina alleen wat een
    Admin voor deze Lead heeft aangevinkt (`beheerpagina.md`, punt 6a).

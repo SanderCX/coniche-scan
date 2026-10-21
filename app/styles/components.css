@@ -47,6 +47,9 @@
 /* Rolbadge (stylesheet.md): zelfde plek als .nav-badge, maar de vorm van
    .hero-tag (border-radius 3px i.p.v. een pil) en een rolkleur i.p.v. zwart,
    gezet via inline style (zie SiteHeader.tsx, badgeKleur). */
+.nav--los {
+  position: static;
+}
 .nav-badge-rol {
   border-radius: 3px;
 }

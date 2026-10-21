@@ -4,9 +4,9 @@ groep: Je resultaten
 volgorde: 2
 rollen: [Respondent, Lead, Consultant, Admin]
 afbeelding: resultaten-lezen.svg
-film: wat-krijg-ik
+film: wat-krijg-ik, radar
 bronnen: [visualisatie-scores.md, visualisatie-mijn-metingen.md, stylesheet.md, CLAUDE.md]
-bijgewerkt: 2026-10-19
+bijgewerkt: 2026-10-21
 ---
 Na afloop zie je bovenaan je totaalscore in een ring, met de klasse en een korte uitleg ervan. Daaronder staan de radar en je scores per categorie. Dit onderwerp legt uit wat elk teken in de grafiek Per categorie betekent. In de radar kies je een genummerd bolletje om de naam en de score van dat bouwblok te zien, en in het staafdiagram doe je dat met een balk. De radar en het diagram lichten elkaar op: Wijs je een bolletje aan, dan licht de balk van die categorie op, en andersom. Bij de AI-scan staat naast de radar een kolomdiagram per domein, met onder de kolommen het nummer en eronder de namen.
 
