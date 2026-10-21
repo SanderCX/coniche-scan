@@ -107,10 +107,6 @@
   --score-5-cel: #c3e6d2;
   --score-5-cel-tekst: #0e4d30;
 
-  /* De actieve pil van de sub-nav op de Assessment-pagina (`stylesheet.md`, Assessmenttegel en sub-nav): Achtergrond en tekst. */
-  --or-pil: #fff1e8;
-  --or-pil-tekst: #c2570c;
-
   /* Verschil: boven is --bl, onder is --dal (stylesheet.md, Verschil en afwijking) */
   --dal: #c2570c;
 }

@@ -63,37 +63,44 @@
   box-shadow: 0 8px 24px rgba(28, 28, 26, 0.08);
 }
 
-/* Scherm 2: De sticky sub-nav, een balk van 60px met een boven- en onderrand. */
+/* Scherm 2: De sticky sub-nav, een balk van 64px direct onder de hoofd-nav, met de inhoud op de breedte van de pagina. */
 .ap-subnav {
   position: sticky;
-  top: 0;
+  top: var(--nav-h);
   z-index: 90;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-4);
-  height: 60px;
-  padding: 0 48px;
+  height: 64px;
   background: var(--bg);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
-.ap-subnav-pillen {
+.ap-subnav-binnen {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
+  justify-content: space-between;
+  gap: var(--sp-4);
+  height: 100%;
+}
+/* De capsule met de pillen is de pilvormige groep (`stylesheet.md`, Keuzepil en pilvormige groep): De actieve pil is massief oranje. */
+.ap-subnav-pillen {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   min-width: 0;
+  padding: 4px;
+  border: 1px solid var(--border-d);
+  border-radius: 999px;
+  background: var(--bg);
   overflow-x: auto;
 }
 .ap-subnav-pil {
   display: inline-flex;
   align-items: center;
   flex: none;
-  height: 36px;
-  padding: 0 var(--sp-4);
+  height: 34px;
+  padding: 0 18px;
   border-radius: 999px;
   font-size: var(--fs-14);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ink-m);
   text-decoration: none;
   white-space: nowrap;
@@ -102,13 +109,13 @@
   background: var(--bg-mid);
 }
 .ap-subnav-pil.is-actief {
-  background: var(--or-pil);
-  color: var(--or-pil-tekst);
+  background: var(--or);
+  color: #fff;
 }
 
 /* De secties: 60px ruimte erboven voor de sub-nav bij het scrollen naar een anker. */
 .ap-sectie {
-  scroll-margin-top: 60px;
+  scroll-margin-top: calc(var(--nav-h) + 64px);
   padding: 64px 0;
   border-top: 1px solid var(--border);
 }
@@ -262,30 +269,94 @@
   font-weight: 800;
 }
 
-/* De 15 bouwblokken: Vijf kolommen, de pillen met een nummercirkel in de categoriekleur. */
-.ap-kolommen {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--sp-4);
-  align-items: start;
+/* De 15 bouwblokken: Een radar met de groepen eromheen (`bouwstenenmodel-visual.md`, Herontwerp van 21 oktober 2026). */
+.br-vraag {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: 720px;
+  height: 96px;
+  margin: 0 auto var(--sp-6);
+  padding: 16px 24px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-mid);
 }
-@media (max-width: 1000px) {
-  .ap-kolommen {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.br-vraag span {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
 }
-.ap-kolom {
-  padding: var(--sp-4);
-  border-top: 4px solid var(--kolom-kleur);
-  border-radius: 0 0 10px 10px;
-  background: var(--bg-warm);
+.br-vraag p {
+  margin: 4px 0 0;
+  font-size: var(--fs-16);
+  line-height: 26px;
+  color: var(--ink);
 }
-.ap-kolom h3 {
-  margin: 0 0 var(--sp-3);
+.br-vraag p.br-vraag-hint {
   font-size: var(--fs-14);
-  font-weight: 800;
+  line-height: 22px;
+  color: var(--ink-m);
 }
-.ap-kolom ul {
+.br-stage {
+  display: grid;
+  grid-template-columns: minmax(200px, 280px) minmax(0, 536px) minmax(200px, 280px);
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-4);
+}
+.br-links,
+.br-rechts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+.br-midden {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+.br-radar {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+.br-nr {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  padding: 0.09em 0 0;
+  border: 0;
+  border-radius: 50%;
+  font-family: inherit;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 120ms;
+}
+.br-nr.is-actief,
+.br-nr:focus-visible {
+  transform: scale(1.25);
+}
+.br-groep h3 {
+  margin: 0 0 var(--sp-3);
+  padding-top: 12px;
+  border-top: 4px solid var(--groep-kleur);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-m);
+}
+.br-groep ul {
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
@@ -293,29 +364,60 @@
   padding: 0;
   list-style: none;
 }
-.ap-pil {
+.br-midden .br-groep ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.br-pil {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
+  gap: 10px;
+  box-sizing: border-box;
   width: 100%;
-  min-height: 40px;
-  padding: 6px var(--sp-3) 6px 6px;
+  min-width: 0;
+  padding: 8px 10px;
   border: 1px solid var(--border-d);
-  border-radius: 20px;
+  border-radius: 10px;
   background: var(--bg);
   font-family: inherit;
-  font-size: var(--fs-14);
-  font-weight: 600;
-  color: var(--ink);
   text-align: left;
   cursor: pointer;
+  transition: border-color 120ms, box-shadow 120ms;
 }
-.ap-pil:hover {
-  border-color: var(--or);
+.br-pil.is-actief,
+.br-pil:focus-visible {
+  border-color: var(--groep-kleur);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--groep-kleur) 20%, transparent);
 }
-.ap-pil.is-gekozen {
-  border-color: var(--or);
-  background: var(--or-faint);
+.br-pil-nr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  padding-top: 0.09em;
+  border: 2px solid;
+  border-radius: 50%;
+  background: var(--bg);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+}
+.br-pil-tekst {
+  min-width: 0;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1000px) {
+  .br-stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .ap-cirkel {
   display: inline-flex;

@@ -125,7 +125,7 @@ function AssessmentLanding({ assessmentId }: { assessmentId: string }) {
   );
 
   return (
-    <PageWithChrome {...chrome} navNietSticky={metContent}>
+    <PageWithChrome {...chrome}>
       {/* De hero (`CLAUDE.md`, scherm 2, Bovenkant, design Open-B, besloten door Joost op 20 oktober 2026): Gecentreerd op wit, zonder gradient. */}
       <div className="container landing-hero">
         <div className="landing-icoon">

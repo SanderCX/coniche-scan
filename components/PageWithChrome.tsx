@@ -18,7 +18,6 @@ export function PageWithChrome({
   toonTerug,
   logoHref,
   identiteitMenu,
-  navNietSticky = false,
 }: {
   children: React.ReactNode;
   /** Scherm-specifieke acties, uiterst links (bijv. resultatenscherm: "← Terug naar de scan" + Exporteren, samen zonder scheidingslijn). */
@@ -36,8 +35,6 @@ export function PageWithChrome({
    * gegevens"-menu bestaat, hoort dat hier ook.
    */
   identiteitMenu?: React.ReactNode;
-  /** De hoofd-nav scrolt weg in plaats van te blijven staan: Op de Assessment-pagina staat de sticky sub-nav bovenaan (`CLAUDE.md`, scherm 2). */
-  navNietSticky?: boolean;
 }) {
   // Het slot is nooit leeg: Zonder herkende gebruiker (geen menu en geen code) staat er "Inloggen", de uitgelogde
   // variant van datzelfde slot (CLAUDE.md, Globale layout, punt 7).
@@ -46,7 +43,6 @@ export function PageWithChrome({
     <>
       <SiteHeader
         logoHref={logoHref}
-        nietSticky={navNietSticky}
         navRight={
           <>
             {navRight}

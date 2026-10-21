@@ -1,5 +1,20 @@
 # Coniche Scan — Changelog
 
+## 2026-10-21 (20) — Specs van Joost, PR 153: Sub-nav onder de hoofd-nav, radar voor de 15 bouwblokken, Toelichtingsmodal
+
+Op verzoek van Sander gebouwd uit `CLAUDE.md` (scherm 2), `stylesheet.md` (Sub-nav, Toelichtingsmodal, opbouw) en `bouwstenenmodel-visual.md` (Herontwerp: Radar met bouwblokken).
+
+**Gedaan**:
+- **Sub-nav** (`AssessmentSubNav`): De hoofd-nav blijft sticky (de prop `navNietSticky` is vervallen), de sub-nav zit eronder (`top: var(--nav-h)`, 64px) met de inhoud op de breedte van de pagina. De pillen staan in een omlijnde capsule en de actieve pil is massief oranje. De actieve sectie is de laatste die minder dan 170px onder de bovenkant van het venster begint (`actieveSectie`, getest), de scroll-marge is nav plus sub-nav. De tokens `--or-pil` en `--or-pil-tekst` zijn weer weg.
+- **Radar voor de 15 bouwblokken** (`BouwblokkenSectie`): Drie kolommen (Mens en Fundament links, de radar met Proces & Tech eronder in het midden, Overkoepelend en Organisatie rechts), 15 taartpunten op 22% met ringen bij score 2 tot en met 5 en een veelhoek met voorbeeldscores, nummers op straal 226px. Hover of focus op een pil of nummer zet de taartpunt op 62% en de rest op 10%, geeft de pil een gekleurde rand en laat het nummer 1,25 keer zo groot worden. De kaart boven de radar toont de centrale vraag.
+- **Toelichtingsmodal** (`components/ToelichtingModal.tsx`): De nieuwe opbouw (nummer in een cirkel, naam, categorie in hoofdletters, ronde sluitknop, centrale vraag, beschrijving) in de doorloopflow, bij de bouwblokken en bij de AI-domeinen. `toelichtingVoor` levert nummer, categorie en kleur mee.
+- **Ring en chip**: Stonden al midden onder elkaar en op één regel (`.score-ring-blok`, `.score-ring-chip`), niets aangepast.
+- **Gevonden onderweg**: Een hydratiefout door afgeronde percentages in de radar (server en browser rekenen de cosinus iets anders), opgelost met twee decimalen.
+
+**Specs bijgewerkt**: `CLAUDE.md`, `stylesheet.md`, `bouwstenenmodel-visual.md`.
+
+**Keuzes en afwijkingen**: Teksten op 14px waar de spec 13 of 15px noemt (de letterschaal kent die niet), de centrale vraag in de kaart op 16px in plaats van 17px. De schaal van de veelhoek in de radar en de voorbeeldscores zijn mijn keuze. Ik kon het ontwerp niet bekijken.
+
 ## 2026-10-21 (19) — Specs van Joost, PR 151: Herontwerp van de navigatie en de Assessment-pagina's, films over de radar
 
 Op verzoek van Sander gebouwd uit `CLAUDE.md` (sectie 3, Globale layout, scherm 1, 2 en 5), `stylesheet.md` (Assessmenttegel en sub-nav), `help.md` (Films over de radar) en de specs van de visuals.

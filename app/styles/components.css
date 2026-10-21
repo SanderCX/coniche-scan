@@ -47,9 +47,6 @@
 /* Rolbadge (stylesheet.md): zelfde plek als .nav-badge, maar de vorm van
    .hero-tag (border-radius 3px i.p.v. een pil) en een rolkleur i.p.v. zwart,
    gezet via inline style (zie SiteHeader.tsx, badgeKleur). */
-.nav--los {
-  position: static;
-}
 .nav-badge-rol {
   border-radius: 3px;
 }
@@ -1642,4 +1639,92 @@ select.veld-compact:focus {
   margin: 28px 0 0;
   font-size: var(--fs-14);
   color: var(--ink-s);
+}
+
+/* ---------- Toelichtingsmodal (`stylesheet.md`, Toelichtingsmodal, opbouw) ---------- */
+.tm-box {
+  padding: 24px;
+}
+.tm-kop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.tm-nummer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  padding-top: 0.09em;
+  border: 2px solid var(--or);
+  border-radius: 50%;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+}
+.tm-titel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.tm-titel h2 {
+  margin: 0;
+  font-size: var(--fs-18);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.tm-categorie {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.tm-sluit {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bg-mid);
+  font-size: var(--fs-16);
+  color: var(--ink-m);
+  cursor: pointer;
+}
+.tm-vraag {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  border-left: 4px solid var(--or);
+  border-radius: 0 var(--r) var(--r) 0;
+  background: var(--bg-mid);
+}
+.tm-vraag span {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.tm-vraag p {
+  margin: 4px 0 0;
+  font-size: var(--fs-14);
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.tm-beschrijving p {
+  margin: 0 0 12px;
+  font-size: var(--fs-14);
+  line-height: 24px;
+  color: var(--ink-m);
+}
+.tm-beschrijving p:last-child {
+  margin-bottom: 0;
 }
