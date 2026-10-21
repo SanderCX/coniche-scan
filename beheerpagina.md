@@ -446,7 +446,8 @@ standaardteksten zoals ze nu in de app staan):
 | `info.verkennenOpslaan` | Verkennen, naast de knop Opslaan als benchmark | Je slaat de filters op en niet de uitkomst. De groep volgt de filters: Komt er een Organisatie bij die erbij past, dan telt die mee. Daarna wijs je de benchmark toe aan een Lead van een Organisatie die erin zit, in het Leads-venster van die Organisatie. |
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
 | `info.contactpersonen` | Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen | Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze. |
-| `info.nieuwsartikelen` | Organisatie-detail, bij Kenmerken, naast de kop Nieuws | Artikelen over de organisatie die relevant zijn voor het gesprek, met een link naar het artikel. Het nieuwste staat bovenaan. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze. |
+| `info.dossier` (voorstel van 20 oktober 2026, vervangt `info.nieuwsartikelen`) | Organisatie-detail, kaart Dossier, naast de titel | Cases en nieuws die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier open staat én het item op Zichtbaar voor klant staat. Een case kan alleen open als de organisatie in de case dat heeft toegestaan. |
+| `info.caseVlag` (voorstel van 20 oktober 2026) | Organisatie-detail, bij de schakelaar "Mag als case gebruikt worden" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads. |
 | `info.kpiBlok` | Organisatie-detail, blok KPI's, naast de titel | Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet. |
 | `info.kpiPlek` | Modal KPI's invullen, naast het label Plek | Kies voor welk deel van de organisatie je invult. Algemeen is de hele organisatie. |
 | `info.kpiKanalen` | Modal KPI's invullen, naast het label Kanalen uitsplitsen | Kies alleen de kanalen waarvoor je cijfers hebt. De kolom Algemeen blijft altijd staan. |
@@ -937,6 +938,18 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   bevestiging die zegt dat de Leads van deze organisatie dan namen zien,
   uitzetten kan zonder bevestiging. Wijzigen wordt gelogd
   (`organisatie.antwoordenNamenGewijzigd`). Zie punt 6a, Namen bij Antwoorden.
+- **Case-vlag** (Admin-only, voorstel van 20 oktober 2026): In de kaart Afspraken,
+  rechts van de schakelaar "Namen tonen bij Antwoorden", een schakelaar
+  "Mag als case gebruikt worden" (`Organisatie.caseToegestaan`, `datamodel.md`
+  deel 3) met een Info-icoon (`info.caseVlag`). Hij staat uit bij een nieuwe
+  organisatie en bij alle bestaande. Een Admin zet hem aan nadat dit met de
+  organisatie is afgesproken. Aanzetten kan zonder bevestiging. Uitzetten gaat na
+  een bevestiging die zegt in hoeveel Cases bij andere organisaties deze
+  organisatie voorkomt en dat die voor de Leads verdwijnen. Wijzigen wordt
+  gelogd (`organisatie.caseVlagGewijzigd`). Het ontwerp (`dossier.md`) tekent
+  een vinkje; de kaart heeft schakelaars, en de nieuwe vlag volgt dezelfde
+  vorm. Past de derde schakelaar niet in de rij, dan staat hij eronder.
+  Zie `dossier.md`.
 - **Naam wijzigen** (`organisaties.bewerken`, dus Admin voor alle
   organisaties en Consultant voor zijn eigen): Op het organisatie-detail
   staat de naam in de kop met een potlood ernaast. Een klik opent een modal
@@ -1017,43 +1030,46 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   - **Wat de kaart niet bevat**: De KPI's en de contacten per kanaal staan in de
     kaart eronder (hieronder). De Meting, het benchmarkvinkje en de Leads hebben
     eigen blokken.
-  - **Contactpersonen en Nieuws** (besloten en gebouwd op 20 oktober 2026, op
-    verzoek van Sander): Onder het raster van de Kenmerken, in dezelfde kaart,
-    gescheiden door een lijn van 1px `--border` en 24px ruimte, staan twee lijsten
-    naast elkaar (onder 1000px onder elkaar), elk met een kop van 16px, gewicht 700,
-    een Info-icoon (`info.contactpersonen` en `info.nieuwsartikelen`) en rechts een
-    knop "+ Toevoegen" (`.btn-outline .btn-compact`). Alleen een Admin mag
-    toevoegen, bewerken en verwijderen (`contactpersonen.bewerken`, besloten op
-    20 oktober 2026; de eerste bouw gebruikte `organisaties.bewerken` en moet
-    worden aangepast). Een Consultant met toegang tot de Organisatie ziet de
-    lijsten zonder de knoppen "+ Toevoegen" en "Bewerken". Later krijgt een
-    Consultant het recht ook, beperkt tot eigen Organisaties. Een Lead en een
-    Respondent zien ze niet. Het Bewerkslot van de
-    Organisatie geldt voor de hele pagina. De velden en regels staan in
-    `datamodel.md`, Contactpersoon en Nieuwsartikel.
+  - **Contactpersonen** (besloten en gebouwd op 20 oktober 2026, op
+    verzoek van Sander; Nieuws is op 20 oktober 2026 verhuisd naar de kaart
+    Dossier, zie hieronder): Onder het raster van de Kenmerken, in dezelfde kaart,
+    gescheiden door een lijn van 1px `--border` en 24px ruimte, staat de lijst
+    Contactpersonen met een kop van 16px, gewicht 700, een Info-icoon
+    (`info.contactpersonen`) en rechts een knop "+ Toevoegen"
+    (`.btn-outline .btn-compact`). Alleen een Admin mag toevoegen, bewerken en
+    verwijderen (`contactpersonen.bewerken`, besloten op 20 oktober 2026; de
+    eerste bouw gebruikte `organisaties.bewerken` en moet worden aangepast). Een
+    Consultant met toegang tot de Organisatie ziet de lijst zonder de knoppen
+    "+ Toevoegen" en "Bewerken". Later krijgt een Consultant het recht ook,
+    beperkt tot eigen Organisaties. Een Lead en een Respondent zien ze niet. Het
+    Bewerkslot van de Organisatie geldt voor de hele pagina. De velden en regels
+    staan in `datamodel.md`, Contactpersoon.
     - **Contactpersonen**: Op alfabet. Per rij de naam (14px, gewicht 600), de
       functie, het LinkedIn-logo (18px, `--ink-s`, bij hover `--or`) achter de naam als link naar het profiel in een nieuw tabblad, met "LinkedIn-profiel" als tooltip en "LinkedIn-profiel van {naam}" als label
       (alleen met een adres) en de notitie (12px, `--ink-s`), met rechts de knop
       "Bewerken". Leeg: "Er zijn nog geen contactpersonen toegevoegd."
-    - **Nieuws**: Het nieuwste bovenaan. Per rij de titel als link naar het artikel
-      in een nieuw tabblad (oranje, 14px, gewicht 600), daaronder de bron en de
-      datum ("NU.nl · 14 okt 2026") en de notitie, met rechts de knop "Bewerken".
-      Leeg: "Er zijn nog geen nieuwsartikelen toegevoegd."
-    - **Toevoegen en bewerken**: Een basismodal met "Annuleren" en "Opslaan".
-      Contactpersoon: Naam (verplicht), Functie, LinkedIn-profiel (optioneel,
+    - **Toevoegen en bewerken**: Een basismodal met "Annuleren" en "Opslaan":
+      Naam (verplicht), Functie, LinkedIn-profiel (optioneel,
       een adres van linkedin.com, met `https://` als het ontbreekt) en Notitie.
       Onder Notitie staat in 12px `--ink-s`: "Alleen zakelijke, openbaar
       vindbare informatie. Geen privégegevens." (besloten op 20 oktober 2026).
-      Nieuwsartikel: Titel (verplicht), Link (verplicht, http of https), Bron,
-      Datum en Notitie. Een fout staat boven de knoppen in een `.overzicht-melding`
+      Een fout staat boven de knoppen in een `.overzicht-melding`
       (bijvoorbeeld "Dit is geen LinkedIn-adres."). Bij Bewerken staat links
       "Verwijderen" (`.btn-danger`), dat om een bevestiging vraagt
       (`BevestigModal`), zoals bij een Onderdeel.
     - **Zo gebouwd (20 oktober 2026)**: `components/beheer/ContactenNieuws.tsx`,
       in `KenmerkenKaart` onder het raster. De regels staan in
       `lib/contacten-nieuws.ts`, de opslag in `lib/db/contacten-nieuws.ts` en de
-      test in `lib/contacten-nieuws.test.ts`. Een adres met een ander schema dan
-      http of https (zoals `javascript:`) wordt geweigerd.
+      test in `lib/contacten-nieuws.test.ts`. Het deel voor nieuwsartikelen
+      verhuist naar het Dossier (`dossier.md`, Overgang); de naam van het
+      bestand mag meeverhuizen.
+  - **Dossier** (voorstel van 20 oktober 2026, `dossier.md`): Een eigen kaart
+    onder de Kenmerken en onder de rij Toegang en Afspraken, boven de kaart
+    KPI's, met de lijst Cases en Nieuws, de schakelaar "Open voor Lead" en de
+    knop "+ Toevoegen". Voor een Admin en voor een Consultant met toegang tot de
+    Organisatie. De opmaak, het formulier en de regels staan in `dossier.md`,
+    scherm 1 en scherm 3. Het Dossier vervangt de lijst Nieuws in de kaart
+    Kenmerken.
   - **Zo gebouwd (19 oktober 2026)**: `KenmerkenKaart` (`components/beheer/KenmerkenKaart.tsx`) en de opmaak in `lib/kenmerken-weergave.ts`, met een test. De kaart staat bovenaan het organisatie-detail, daaronder de kaart KPI's en dan Metingen. Het raster volgt de volgorde van de lijst in `organisatie-velden.ts`, dus Digitalisering staat na Volume en klantbasis. Een veld dat de spec niet noemt, valt terug op zijn label en waarde. De modal gebruikt het bestaande formulier (`KenmerkenForm`) in twee kolommen, met een groep van groepen (Volume en klantbasis, Techstack, FTE) over de volle breedte. Het label voor FTE van de klantcontactmedewerkers is "Klantcontactmedewerkers, inhouse" met "140, 70% inhouse", en het aandeel BPO staat niet in de kaart (alleen in het formulier). Voor IT DevOps staat "12, 25% digital". De blokken Benchmark en Namen tonen (Admin) staan onder het blok Leads, zonder eigen kop, omdat de kop Organisatiekenmerken vervalt. Het Bewerkslot geldt al zolang het organisatie-detail open is.
   - **Volgorde**: De spec bepaalt de volgorde, niet de code. De velden staan in
     de volgorde van `datamodel.md`, Organisatievelden: Sector, Subsector, Totaal

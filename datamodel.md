@@ -273,9 +273,9 @@ Onderdeel {
 - **Zo gebouwd (afwijking, op 19 oktober 2026 daarna teruggedraaid: `Meting.onderdeel` bleef eerst staan).** `Meting.onderdeelId` is er, maar het tekstveld `Meting.onderdeel` is niet vervallen: Het is de naam van het Onderdeel als kopie, zodat een Meting zonder de Organisatie erbij te lezen is en de vele plekken die de naam tonen niet allemaal de Organisatie hoeven op te zoeken. `zorgOnderdelenKloppend` (`lib/onderdelen.ts`) houdt de twee kloppend bij elke keer laden en bij elke schrijfactie (`slaAlles`): De naam bepaalt het Onderdeel (hoofdletterongevoelig, met de spelling van het bestaande Onderdeel), een naam die nog geen Onderdeel is maakt er een aan, en "Hele organisatie" is `null`. Hernoemen (`hernoemOnderdeel`) werkt de kopie en de naam van elke Meting bij, behalve bij `labelHandmatig`. De overgang loopt bij het laden en is stabiel: Een Onderdeel dat uit bestaande data ontstaat, krijgt een id uit een hash van de Organisatie en de naam, tot het is opgeslagen.
 - **Besluit 19 oktober 2026: `Meting.onderdeel` vervalt, gebouwd op 19 oktober 2026.** Zo gebouwd: `onderdeelVan(organisatie, meting)` zoekt de naam via `onderdeelId` (`lib/onderdelen.ts`, `onderdeelNaamVan`), het veld staat niet meer in het type, `zorgOnderdelenKloppend` leest de oude tekst alleen nog bij het laden om de Onderdelen aan te maken en verwijdert ze daarna, en het aanmaken en wijzigen van een Meting kiest of maakt het Onderdeel met `zorgVoorOnderdeel`. Het is gebouwd als kopie van de naam van het Onderdeel, naast `Meting.onderdeelId`. De spec heeft die kopie niet nodig: De naam komt uit het Onderdeel via `onderdeelId`, en een tweede veld voor dezelfde informatie kan na een hernoeming uit de pas lopen. Op te ruimen: Het veld verdwijnt uit het type, `zorgOnderdelenKloppend` en `hernoemOnderdeel` hoeven de kopie niet meer bij te houden, en de plekken die de naam tonen zoeken het Onderdeel op via `onderdeelId`. De overgang (hieronder) leest de tekst nog één keer om de Onderdelen aan te maken. Hernoemen van een Onderdeel werkt de naam van de Metingen bij, behalve bij `labelHandmatig`, zoals nu.
 
-### Contactpersoon en Nieuwsartikel
+### Contactpersoon
 
-**Besloten en gebouwd op 20 oktober 2026, op verzoek van Sander.** Een Admin legt bij een Organisatie vast welke mensen en welke nieuwsartikelen relevant zijn. Een Consultant ziet ze bij de eigen Organisaties en kan ze vooralsnog niet wijzigen (aangepast op 20 oktober 2026, zie Recht en slot). Ze staan bij de Kenmerken op het organisatie-detail (`beheerpagina.md`, punt 4, Contactpersonen en Nieuws).
+**Besloten en gebouwd op 20 oktober 2026, op verzoek van Sander.** Een Admin legt bij een Organisatie vast welke mensen relevant zijn. Een Consultant ziet ze bij de eigen Organisaties en kan ze vooralsnog niet wijzigen (aangepast op 20 oktober 2026, zie Recht en slot). Ze staan bij de Kenmerken op het organisatie-detail (`beheerpagina.md`, punt 4, Contactpersonen). De nieuwsartikelen die er in de eerste bouw naast stonden, zijn op 20 oktober 2026 opgegaan in het Dossier (zie Dossieritem).
 
 ```
 Contactpersoon {
@@ -286,27 +286,52 @@ Contactpersoon {
   notitie: string                   // waarom de persoon relevant is, maximaal 300 tekens
   aangemaaktOp: datetime
 }
-
-Nieuwsartikel {
-  id: string
-  titel: string                     // verplicht, getrimd, maximaal 200 tekens
-  url: string                       // verplicht, altijd http of https
-  bron: string                      // de publicatie of de site, maximaal 80 tekens
-  gepubliceerdOp: date | ""         // jjjj-mm-dd, leeg als het onbekend is
-  notitie: string                   // waarom het artikel relevant is, maximaal 300 tekens
-  aangemaaktOp: datetime
-}
 ```
 
-`Organisatie.contactpersonen` en `Organisatie.nieuwsartikelen` zijn lijsten die ontbreken in data van vóór deze velden (dan zijn ze leeg).
+`Organisatie.contactpersonen` is een lijst die ontbreekt in data van vóór dit veld (dan is ze leeg).
 
 - **Geen Respondent, geen gebruiker.** Een Contactpersoon heeft geen e-mailadres, geen toegangscode en geen rol. Er wordt niets naartoe gestuurd, en ze doen niet mee in een scan, een benchmark of een export.
 - **LinkedIn-adres.** Optioneel. Wat is ingevuld, moet een adres van `linkedin.com` of een subdomein zijn (de controle is op het domein, niet op de tekst). Zonder schema wordt `https://` voorgezet. Een ander domein wordt geweigerd.
-- **Adres van een artikel.** Alleen `http` en `https`, met een punt in de domeinnaam. Een adres met een ander schema, zoals `javascript:`, wordt geweigerd. Zonder schema wordt `https://` voorgezet. Links openen in een nieuw tabblad met `rel="noopener noreferrer"`.
-- **Volgorde.** Contactpersonen op alfabet, hoofdletterongevoelig. Nieuws met het nieuwste bovenaan: Op publicatiedatum, en zonder datum op het moment van toevoegen.
-- **Recht en slot.** Aanmaken, wijzigen en verwijderen vraagt het recht `contactpersonen.bewerken` en het Bewerkslot van de Organisatie, zoals bij de Kenmerken. Vooralsnog heeft alleen een Admin dat recht (alle Organisaties), besloten op 20 oktober 2026; de eerste bouw gebruikte `organisaties.bewerken` en moet worden aangepast. Een Consultant ziet de lijsten bij de eigen Organisaties, zonder de knoppen om te wijzigen. Als de functie stabiel is, krijgt een Consultant het recht ook, beperkt tot eigen Organisaties (zoals bij `organisaties.bewerken`); dan verandert alleen de rechtenmatrix. Een Lead en een Respondent zien ze niet.
+- **Volgorde.** Op alfabet, hoofdletterongevoelig.
+- **Recht en slot.** Aanmaken, wijzigen en verwijderen vraagt het recht `contactpersonen.bewerken` en het Bewerkslot van de Organisatie, zoals bij de Kenmerken. Vooralsnog heeft alleen een Admin dat recht (alle Organisaties), besloten op 20 oktober 2026; de eerste bouw gebruikte `organisaties.bewerken` en moet worden aangepast. Een Consultant ziet de lijst bij de eigen Organisaties, zonder de knoppen om te wijzigen. Als de functie stabiel is, krijgt een Consultant het recht ook, beperkt tot eigen Organisaties (zoals bij `organisaties.bewerken`); dan verandert alleen de rechtenmatrix. Een Lead en een Respondent zien ze niet.
 - **Verwijderen.** Een eigen verwijderactie per item, met bevestiging. Wordt de Organisatie verwijderd, dan gaan ze mee (Verwijderen en datakoppelingen).
 - **Privacy.** Een Contactpersoon is een persoon buiten de app, en een naam met functie blijft ook als die openbaar is een persoonsgegeven. Daarom staan hun gegevens niet in de audit-log (Audit) en niet in de exports (`export-csv.md`, `export-indesign.md` en `import-scans.md` noemen dat). Alleen openbaar vindbare, zakelijke gegevens zijn toegestaan: Naam, functie, het LinkedIn-profiel en een zakelijke notitie. Geen privégegevens, zoals een privé e-mailadres, telefoonnummer, woonadres of geboortedatum, en niets over de persoon als privépersoon. Onder het veld Notitie staat een korte waarschuwing met die regel, omdat een vrij tekstveld de plek is waar zoiets ongemerkt binnenkomt. Wat er is vastgelegd, is wat Coniche uit openbare bronnen weet, en Coniche is er verantwoordelijk voor dat dat klopt (besloten op 20 oktober 2026).
+
+### Dossieritem
+
+**Voorstel van 20 oktober 2026, nog niet gebouwd.** Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws en Cases, en kan het openzetten voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
+
+```
+Organisatie.dossier {
+  openVoorLead: boolean             // standaard false
+  openSinds: datetime | null        // het moment waarop openVoorLead voor het laatst aan ging
+  gewijzigdOp: datetime | null      // laatste wijziging in wat een Lead ziet
+  items: Dossieritem[]
+}
+
+Dossieritem {
+  id: string
+  soort: "nieuws" | "case"          // staat vast na het aanmaken
+  titel: string                     // verplicht, getrimd, maximaal 200 tekens
+  toelichting: string               // maximaal 400 tekens, mag leeg zijn
+  zichtbaarVoorLead: boolean        // standaard false
+  bouwblokIds: string[]             // Bouwblok.id van de Klantcontact Volwassenheidsscan, mag leeg zijn
+  url: string                       // Nieuws: verplicht. Case: optioneel. Altijd http of https
+  aangemaaktOp: datetime
+  gewijzigdOp: datetime
+  bron: string                      // alleen Nieuws, maximaal 80 tekens
+  gepubliceerdOp: date | ""         // alleen Nieuws, jjjj-mm-dd
+  samenvatting: string              // alleen Case, verplicht, maximaal 600 tekens
+  caseOrganisatieId: string | null  // alleen Case: de Organisatie waar de case over gaat
+  omvang: string                    // alleen Case, maximaal 40 tekens
+  totResultaat: string              // alleen Case, maximaal 40 tekens
+}
+```
+
+- **Een Lead ziet een item** als `openVoorLead` aan staat, `zichtbaarVoorLead` aan staat en, bij een Case, `Organisatie.caseToegestaan` van `caseOrganisatieId` aan staat. De naam van de Organisatie in de Case gaat nooit naar de Lead.
+- **Overgang.** Bestaande `nieuwsartikelen` worden bij het laden Dossieritems van soort `nieuws`, met `notitie` als `toelichting`, `zichtbaarVoorLead` op false en zonder bouwblokken (`dossier.md`, Overgang).
+- **`OrganisatieLid.dossierGezienOp`** (datetime of null) bepaalt of de kaart Dossier bij een Lead de tag "Nieuw" krijgt.
+
 
 ### Respondent (in de code: `OrganisatieLid`)
 
@@ -658,8 +683,12 @@ verwijst wat niet meer bestaat.
 - **Organisatie**: Alles wat eronder hangt: Metingen, respondenten,
   toegangscodes, invullingen, antwoorden en opmerkingen, en (voorstel van
   19 oktober 2026) Onderdelen en KPI-waarden, en (gebouwd op 20 oktober 2026)
-  Contactpersonen en Nieuwsartikelen. Het
+  Contactpersonen en het Dossier. Het
   assessment-type en de content blijven staan.
+- **Organisatie die in een Case voorkomt** (voorstel van 20 oktober 2026):
+  De Cases bij andere Organisaties die naar haar verwijzen krijgen
+  `caseOrganisatieId: null` en worden onzichtbaar voor de Lead. De
+  bevestiging noemt het aantal (`dossier.md`, Verwijderen en datakoppelingen).
 - **Assessment**: Alleen als er geen enkele Meting van dit Assessment
   bestaat, bij welke organisatie dan ook (ook geen Meting zonder scans).
   Bestaat er wel een Meting, dan kan het Assessment niet worden verwijderd,
@@ -1458,9 +1487,20 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   de functie, het adres of de notitie. `entiteitNaam` is leeg, zoals bij
   `respondent.bewerkt`.
 - `nieuwsartikel.toegevoegd`, `nieuwsartikel.gewijzigd` en
-  `nieuwsartikel.verwijderd` (gebouwd op 20 oktober 2026). `details` bevat de
-  Organisatie en de titel van het artikel, en bij `gewijzigd` de gewijzigde
-  velden. Een artikel is openbaar en bevat geen persoonsgegevens uit scans.
+  `nieuwsartikel.verwijderd` (gebouwd op 20 oktober 2026, vervallen voor nieuwe
+  gebeurtenissen zodra het Dossier is gebouwd; bestaande regels blijven
+  leesbaar).
+- `dossier.itemToegevoegd`, `dossier.itemGewijzigd` en
+  `dossier.itemVerwijderd` (voorstel van 20 oktober 2026). `details` bevat de
+  Organisatie, de soort, de titel en bij `itemGewijzigd` de namen van de
+  gewijzigde velden. Bij een Case staat ook de naam van de Organisatie in de
+  Case erin.
+- `dossier.geopend` en `dossier.gesloten` (voorstel van 20 oktober 2026):
+  `openVoorLead` is aan of uit gezet. `details` bevat de Organisatie en het
+  aantal zichtbare items.
+- `organisatie.caseVlagGewijzigd` (voorstel van 20 oktober 2026):
+  `caseToegestaan` is gewijzigd. `details` bevat de Organisatie en de nieuwe
+  waarde.
 - `kpiDefinitie.aangemaakt`, `kpiDefinitie.gewijzigd`, `kpiDefinitie.verwijderd`,
   `kpiDefinitie.volgordeGewijzigd`, `kanaal.aangemaakt`, `kanaal.hernoemd`,
   `kanaal.verwijderd` en `kanaal.volgordeGewijzigd` (gebouwd op 19 oktober 2026). `details` bevat de naam en
@@ -1492,7 +1532,9 @@ Een streepje betekent geen toegang.
 | `organisaties.aanmaken` | alle | ja | - | - |
 | `organisaties.toewijzen` (aan een Consultant) | alle | - | - | - |
 | `organisaties.bewerken` (incl. kenmerken, KPI-waarden en Onderdelen) | alle | eigen | te bevestigen | - |
-| `contactpersonen.bewerken` (Contactpersonen en Nieuwsartikelen aanmaken, wijzigen en verwijderen; een Consultant ziet ze wel; vooralsnog alleen Admin, later waarschijnlijk eigen voor een Consultant) | alle | - | - | - |
+| `contactpersonen.bewerken` (Contactpersonen aanmaken, wijzigen en verwijderen; een Consultant ziet ze wel; vooralsnog alleen Admin, later waarschijnlijk eigen voor een Consultant) | alle | - | - | - |
+| `dossier.bewerken` (Dossieritems aanmaken, wijzigen en verwijderen, Zichtbaar voor klant en Open voor Lead; voorstel van 20 oktober 2026, `dossier.md`) | alle | eigen | - | - |
+| `dossier.inzien` (voorstel van 20 oktober 2026) | alle | eigen | alleen openstaande items van de eigen Organisatie | - |
 | `organisaties.verwijderen` | alle | eigen | - | - |
 | `metingen.plannen` (ook een nieuw Onderdeel aanmaken in het formulier) | alle | eigen | - | - |
 | `respondenten.uitnodigen` | alle | eigen | aangevinkte Metingen (Uitnodigen) | - |
@@ -1683,6 +1725,12 @@ toestemmingsvakje veranderen er niet door.
 Admin zet de vlag nadat dit met de organisatie is afgesproken. Alleen
 organisaties met de vlag kunnen in een benchmark worden opgenomen. Zie
 `benchmark.md`, Toestemming en privacy.
+
+`Organisatie` krijgt ook `caseToegestaan` (boolean, standaard false, voorstel van
+20 oktober 2026): De Afspraak "Mag als case gebruikt worden". Een Admin zet de
+vlag nadat dit met de organisatie is afgesproken. Alleen met de vlag kan een
+Case bij een andere Organisatie naar haar verwijzen en voor een Lead zichtbaar
+zijn. Bestaande Organisaties beginnen met false. Zie `dossier.md`.
 
 ### Instellingen
 
