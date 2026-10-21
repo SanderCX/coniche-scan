@@ -652,6 +652,8 @@ Voorgestelde volgorde als het wordt opgepakt: Foutstaten, de contrastwijzigingen
 (`--ink-s`, scoretekst) en de display-schaal. Het oranje knopcontrast eerst
 als merkbesluit bespreken.
 
+- **Assessmentcirkel op scherm 1 uitbreiden** (besloten ontwerp van 21 oktober 2026, `CLAUDE.md`, scherm 1): Wat de cirkel doet bij minder of meer dan vier Assessments (bijvoorbeeld een kwart per Assessment met een verschillende grootte, of een tweede cirkel), of een tweede klik de keuze opheft en of de stip op de visual later het gemiddelde van de branche ten opzichte van de eigen score toont (nu een vaste markering op een hoekpunt van de voorbeeldlijn). Daarnaast de vraag of er een generieke Quickscan komt, zodat de cirkel drie vaste assen heeft (snel, uitgebreid, AI).
+
 ## Content-onderhoud
 
 - **Periodieke check op `content-2030.md`**: Elke 2 maanden een seintje
