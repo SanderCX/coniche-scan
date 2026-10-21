@@ -23,6 +23,8 @@ import {
   teaserVoorScan,
 } from "@/lib/mijn-metingen";
 import { dagVan } from "@/lib/metingen";
+import { MapIcoon } from "@/components/icons/DossierIcons";
+import { LeadDossier, aantalTekst, isNieuwVoorLead, voorproef } from "@/lib/dossier";
 import { Assessment, Organisatie, OrganisatieLid, ScanInvulling, ScanInvullingStatus, ScanUitvoering } from "@/lib/types";
 
 /* ---------- Kleine onderdelen ---------- */
@@ -538,8 +540,52 @@ export function BenchmarkKaart({
           <h2>{naam}</h2>
           {regel && <p>{regel}</p>}
         </div>
-        <Link href={`/s/${code}/benchmark/${id}`} className="btn btn-or btn-compact mm-knop">
+        <Link href={`/s/${code}/benchmark/${id}`} className="btn btn-or btn-compact mm-knop mm-knop--vast">
           Bekijk vergelijking
+        </Link>
+      </div>
+    </article>
+  );
+}
+
+/* ---------- Dossier ---------- */
+
+/**
+ * De kaart Dossier van een Lead (`visualisatie-mijn-metingen.md`, Dossierkaart; `dossier.md`, Scherm 4): Eén kaart in de sectie Dossier, volle
+ * breedte, met de eyebrow "Dossier", de tag "Nieuw" zolang de Lead de Dossierpagina niet opende na de laatste wijziging, de titel, wie het
+ * deelde en wanneer, een voorproef van ten hoogste drie titels (eerst de Cases) en het aantal. De knop heeft dezelfde breedte als die op de
+ * benchmarkkaart.
+ */
+export function DossierKaart({ code, lid, dossier, openSinds, gewijzigdOp }: { code: string; lid: OrganisatieLid; dossier: LeadDossier; openSinds: string | null; gewijzigdOp: string | null }) {
+  const nieuw = isNieuwVoorLead(lid, { openSinds, gewijzigdOp });
+  const proef = voorproef(dossier);
+  const datum = langeDatum(openSinds);
+  return (
+    <article className="mm-kaart mm-kaart--vol mm-kaart--benchmark">
+      <div className="mm-benchmark">
+        <span className="mm-icoon" aria-hidden="true">
+          <MapIcoon width={26} height={26} />
+        </span>
+        <div className="mm-kop-tekst">
+          <div className="mm-label-rij">
+            <span className="mm-label-klein mm-label-klein--oranje">Dossier</span>
+            {nieuw && <span className="mm-tag-nieuw">Nieuw</span>}
+          </div>
+          <h2>Dossier {dossier.organisatieNaam}</h2>
+          <p>Gedeeld door je consultant{datum ? ` op ${datum}` : ""}</p>
+          <div className="mm-voorproef" aria-label="Voorproef">
+            {proef.titels.map((t) => (
+              <span key={`${t.soort}-${t.titel}`} className="mm-vp-chip">
+                <span className={`mm-vp-stip mm-vp-stip--${t.soort}`} aria-hidden="true" />
+                {t.titel}
+              </span>
+            ))}
+            {proef.meer > 0 && <span className="mm-vp-meer">+ {proef.meer} meer</span>}
+          </div>
+          <p className="mm-vp-aantal">{aantalTekst(dossier)}</p>
+        </div>
+        <Link href={`/s/${code}/dossier`} className="btn btn-or btn-compact mm-knop mm-knop--vast">
+          Bekijk dossier
         </Link>
       </div>
     </article>

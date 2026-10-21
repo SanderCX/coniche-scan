@@ -1451,11 +1451,8 @@ select.veld-compact {
   font-size: var(--fs-14);
   color: var(--ink-s);
 }
-/* Contactpersonen en Nieuws onder het raster van de Kenmerken (`beheerpagina.md`, punt 4). */
+/* Contactpersonen onder het raster van de Kenmerken (`beheerpagina.md`, punt 4). */
 .cn-rij {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-8);
   margin-top: var(--sp-6);
   padding-top: var(--sp-6);
   border-top: 1px solid var(--border);
@@ -1522,11 +1519,6 @@ a.cn-titel {
   font-size: var(--fs-12);
   color: var(--ink-s);
   line-height: 1.4;
-}
-@media (max-width: 999px) {
-  .cn-rij {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 .kenmerken-modal {
   margin-top: var(--sp-4);
@@ -1718,4 +1710,224 @@ a.cn-titel {
 }
 .afspraken-rij > div {
   margin-bottom: 0 !important;
+}
+
+/* ---------- Dossier van een Organisatie (`dossier.md`, Scherm 1 en 3) ---------- */
+.dos-kaart {
+  margin: var(--sp-6) 0;
+}
+.dos-kop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+.dos-kop-rechts {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+}
+.dos-open {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+.dos-open-stand {
+  font-weight: 400;
+  color: var(--ink-s);
+}
+.dos-filter {
+  margin-bottom: var(--sp-4);
+}
+.dos-lijst {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.dos-rij {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--border);
+}
+.dos-rij:first-child {
+  border-top: 0;
+}
+.dos-icoon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+.dos-icoon--case {
+  background: var(--or-faint);
+  color: var(--or);
+}
+.dos-icoon--nieuws {
+  background: var(--bl-faint);
+  color: var(--bl);
+}
+.dos-tekst {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+.dos-eyebrow {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.dos-eyebrow--case {
+  color: var(--or);
+}
+.dos-eyebrow--nieuws {
+  color: var(--bl);
+}
+.dos-titel {
+  margin: 0;
+  font-size: var(--fs-18);
+  font-weight: 800;
+  color: var(--ink);
+}
+.dos-regel {
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.dos-toelichting {
+  font-size: var(--fs-14);
+  color: var(--ink-m);
+}
+.dos-acties {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+.dos-status {
+  display: inline-block;
+  padding: 2px var(--sp-2);
+  border-radius: 3px;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.dos-status--zichtbaar {
+  background: var(--stat-green-faint);
+  color: var(--stat-green);
+}
+.dos-status--intern {
+  background: var(--bg-mid);
+  color: var(--ink-m);
+}
+.dos-status--toestemming-ontbreekt,
+.dos-status--kies-organisatie {
+  background: var(--stat-amber-faint);
+  color: var(--dal);
+}
+.modal-box--dossier {
+  max-width: 640px;
+}
+.dos-label {
+  display: block;
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-m);
+}
+.dos-hint {
+  display: block;
+  margin-top: var(--sp-1);
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.dos-twee {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+.dos-paneel {
+  margin: var(--sp-2) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r);
+  font-size: var(--fs-14);
+  line-height: 1.5;
+}
+.dos-paneel--groen {
+  background: var(--stat-green-faint);
+  color: var(--ink);
+}
+.dos-paneel--oranje {
+  background: var(--stat-amber-faint);
+  color: var(--ink);
+}
+.dos-paneel-knop {
+  margin-top: var(--sp-2);
+}
+.dos-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.dos-zichtbaar {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+.dos-zichtbaar.is-uit {
+  opacity: 0.5;
+}
+.dos-cirkel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding-top: 0.09em;
+  border-radius: 50%;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1;
+}
+.dos-cirkel--groot {
+  width: 26px;
+  height: 26px;
+}
+.dos-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 4px var(--sp-3) 4px 4px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: var(--fs-12);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.2;
+  text-align: left;
+}
+button.dos-chip {
+  cursor: pointer;
+}
+button.dos-chip:hover {
+  border-color: var(--or);
+}
+.dos-chip.is-gekozen {
+  border-color: var(--or);
+  background: var(--or-faint);
 }

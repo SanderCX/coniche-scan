@@ -122,6 +122,71 @@
 .mm-label-klein--blauw {
   color: var(--bl);
 }
+.mm-label-klein--oranje {
+  color: var(--or);
+}
+.mm-label-rij {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.mm-tag-nieuw {
+  padding: 0 var(--sp-2);
+  border-radius: 3px;
+  background: var(--bl-faint);
+  color: var(--bl);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  line-height: 1.5;
+}
+/* Voorproef op de Dossierkaart (`visualisatie-mijn-metingen.md`, Dossierkaart): Ten hoogste drie titels als chips, met een stip in oranje (Case) of blauw (Nieuws). */
+.mm-voorproef {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+.mm-vp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  max-width: 100%;
+  padding: 4px var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: var(--fs-12);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.mm-vp-stip {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.mm-vp-stip--case {
+  background: var(--or);
+}
+.mm-vp-stip--nieuws {
+  background: var(--bl);
+}
+.mm-vp-meer {
+  font-size: var(--fs-12);
+  font-weight: 600;
+  color: var(--ink-s);
+}
+.mm-kop-tekst .mm-vp-aantal {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-12);
+}
+/* Eén vaste breedte voor de hoofdknop op de kaarten Benchmark en Dossier, zodat ze onder elkaar op één lijn staan (184px in het ontwerp). */
+.mm-knop--vast {
+  width: 184px;
+  justify-content: center;
+}
 .mm-tekst {
   margin: 0;
   font-size: var(--fs-14);

@@ -174,9 +174,10 @@ item, uit de daadwerkelijke CSV's:
   betekenis in het nieuwe model.
 - `respondent_phone`: `Respondent` heeft geen telefoonveld en krijgt er
   voor deze import ook geen.
-- **Contactpersonen en Nieuwsartikelen**: Ze staan niet in de oude tool en
+- **Contactpersonen en het Dossier**: Ze staan niet in de oude tool en
   niet in de eigen export, dus ook niet in de import (`datamodel.md`,
-  Contactpersoon en Nieuwsartikel, Privacy; besloten op 20 oktober 2026).
+  Contactpersoon, Privacy; besloten op 20 oktober 2026, het Dossier sinds
+  `dossier.md`, Exports).
 
 ## Wie de Respondent wordt
 

@@ -4,6 +4,7 @@ import { formatScore } from "@/lib/format";
 import { useState } from "react";
 import Link from "next/link";
 import { useAssessments } from "@/lib/assessment-store";
+import { casesDieVerwijzenNaar } from "@/lib/dossier";
 import { useOrganisaties, verwijderOrganisaties, verlengBewaartermijn, verwijderScanInvullingen } from "@/lib/db";
 import { useBulkSelect } from "@/lib/useBulkSelect";
 import { IndeterminateCheckbox } from "@/components/beheer/IndeterminateCheckbox";
@@ -269,7 +270,8 @@ export default function OrganisatiesPage() {
   // Bereik "eigen" (datamodel.md deel 2, Rechtenmatrix): een Consultant ziet
   // alleen organisaties die hij zelf aanmaakte of waaraan een Admin hem
   // toewees, een Admin ziet alles.
-  const organisaties = zichtbareOrganisaties(gebruiker, useOrganisaties());
+  const alleOrganisaties = useOrganisaties();
+  const organisaties = zichtbareOrganisaties(gebruiker, alleOrganisaties);
   const bulk = useBulkSelect(organisaties.map((o) => o.id));
   const [verwijderenOpen, setVerwijderenOpen] = useState(false);
 
@@ -284,10 +286,16 @@ export default function OrganisatiesPage() {
     benchmarkAantal > 0
       ? ` ${benchmarkAantal === 1 ? "Een van deze organisaties zit" : `${benchmarkAantal} van deze organisaties zitten`} in een benchmark en valt daar bij verwijderen uit, met de toewijzingen aan Leads.`
       : "";
+  // Cases bij andere Organisaties die naar een van deze verwijzen, moeten daar opnieuw een Organisatie kiezen (`dossier.md`, Verwijderen en datakoppelingen).
+  const casesVerwijzen = casesDieVerwijzenNaar([...bulk.selected], alleOrganisaties).aantal;
+  const caseZin =
+    casesVerwijzen > 0
+      ? ` ${casesVerwijzen === 1 ? "Een case" : `${casesVerwijzen} cases`} bij andere organisaties ${casesVerwijzen === 1 ? "verwijst" : "verwijzen"} naar ${bulk.selected.size === 1 ? "deze organisatie" : "een of meer van deze organisaties"} en ${casesVerwijzen === 1 ? "verdwijnt" : "verdwijnen"} voor de Leads tot daar een andere organisatie is gekozen.`
+      : "";
   const verwijderMelding =
     ledenAantal > 0
-      ? `${bulk.selected.size} organisatie(s) verwijderen? Dit verwijdert ook ${ledenAantal} respondent(en) en hun ingevulde antwoorden.${benchmarkZin} Dit kan niet ongedaan gemaakt worden.`
-      : `${bulk.selected.size} organisatie(s) verwijderen?${benchmarkZin} Dit kan niet ongedaan gemaakt worden.`;
+      ? `${bulk.selected.size} organisatie(s) verwijderen? Dit verwijdert ook ${ledenAantal} respondent(en) en hun ingevulde antwoorden.${benchmarkZin}${caseZin} Dit kan niet ongedaan gemaakt worden.`
+      : `${bulk.selected.size} organisatie(s) verwijderen?${benchmarkZin}${caseZin} Dit kan niet ongedaan gemaakt worden.`;
 
   function handleVerwijderenBevestigd() {
     verwijderOrganisaties([...bulk.selected]);

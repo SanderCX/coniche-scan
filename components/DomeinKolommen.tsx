@@ -9,9 +9,10 @@ import { GrafiekActief, ZetActief, staatVan, useGrafiekActief } from "@/lib/graf
  * Het staande kolomdiagram per domein (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm, Domeinen, besloten door Joost op 20 oktober
  * 2026): Voor een Assessment zonder categorielaag, zoals de AI-scan. Een kolom per domein in de volgorde 1 tot en met 8 (niet op score
  * gesorteerd) met twee balken van 26px: Links de Organisatie in de domeinkleur, rechts de rest van de groep in `#b8b5ad` (alleen met een
- * vergelijking). De plot is 300px hoog en nooit breder dan de kaart. Onder elke kolom staat een cirkel van 24px met het nummer van het domein, de
- * namen staan in een sleutel eronder (twee kolommen van vier, op één regel) en daaronder staat een legenda. Hover of focus op een kolom, cirkel
- * of sleutelregel laat de radar ernaast en deze kolom oplichten, en dimt de rest (`lib/grafiek-actief.ts`).
+ * vergelijking). De plot is 300px hoog, hoogstens 736px breed (88px per kolom en de as) en gecentreerd in de kaart. Onder elke kolom staat een
+ * cirkel van 24px met het nummer van het domein; de namen staan in de tooltip, niet onder de plot (gewijzigd op 21 oktober 2026, eerder een sleutel).
+ * De legenda staat er alleen met een groepsreeks. Hover of focus op een kolom of cirkel laat de radar ernaast en deze kolom oplichten, en dimt de rest
+ * (`lib/grafiek-actief.ts`).
  */
 const SCHAAL_MIN = 1;
 const SCHAAL_MAX = 5;
@@ -115,32 +116,23 @@ export function DomeinKolommen({
           ))}
         </div>
       </div>
-      <ul className="dk-sleutel" aria-label="Domeinen">
-        {rijen.map((r) => (
-          <li key={r.groepId} className={staat(r) === "gedimd" ? "is-gedimd" : ""} onMouseEnter={zetRij(r)} onMouseLeave={wis}>
-            <span className="dk-nr" style={{ ["--domein-kleur" as string]: kleurVan(r) }} aria-hidden="true">
-              {r.nummers}
-            </span>
-            <span>{r.groepNaam}</span>
+      {/* De legenda staat er alleen met een groepsreeks (`stylesheet.md`, Domeinen): Zonder groep vervalt ze, want de namen staan in de tooltip. */}
+      {metGroep && (
+        <ul className="dk-legenda" aria-label="Legenda">
+          <li>
+            <span
+              className="dk-blokje"
+              style={{ background: `linear-gradient(90deg, ${DOMEIN_KLEUREN.map((k) => CATEGORIE_COLORS[k].hex).join(", ")})` }}
+              aria-hidden="true"
+            />
+            {naam}, de kleur van het domein
           </li>
-        ))}
-      </ul>
-      <ul className="dk-legenda" aria-label="Legenda">
-        <li>
-          <span
-            className="dk-blokje"
-            style={{ background: `linear-gradient(90deg, ${DOMEIN_KLEUREN.map((k) => CATEGORIE_COLORS[k].hex).join(", ")})` }}
-            aria-hidden="true"
-          />
-          {naam}, de kleur van het domein
-        </li>
-        {metGroep && (
           <li>
             <span className="dk-blokje" style={{ background: "#b8b5ad" }} aria-hidden="true" />
             {vergelijkingNaam}
           </li>
-        )}
-      </ul>
+        </ul>
+      )}
     </div>
   );
 }

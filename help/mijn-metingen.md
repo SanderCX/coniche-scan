@@ -6,12 +6,12 @@ rollen: [Respondent, Lead, Consultant, Admin]
 afbeelding: 
 film: 
 bronnen: [visualisatie-mijn-metingen.md, CLAUDE.md]
-bijgewerkt: 2026-10-19
+bijgewerkt: 2026-10-21
 ---
 Mijn metingen is de pagina waar je persoonlijke link altijd op uitkomt. Je ziet er al je scans en wat je kunt doen.
 
 ## In het kort
-Elke Meting waaraan je meedoet is een kaart met de naam van de scan, een status en een knop. Een Lead ziet daarnaast kaarten voor de Metingen en benchmarks waarvoor een Admin hem toegang gaf.
+Elke Meting waaraan je meedoet is een kaart met de naam van de scan, een status en een knop. Een Lead ziet daarnaast kaarten voor de Metingen en benchmarks waarvoor een Admin hem toegang gaf, en een kaart Dossier als zijn consultant dat heeft opengezet.
 
 ## Wat je ziet
 1. **Het icoon en de titel.** Ze zeggen welke scan het is en bij welke Meting hij hoort.

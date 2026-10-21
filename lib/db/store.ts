@@ -12,6 +12,7 @@ import { getBenchmarksMetLeden } from "@/lib/benchmark-leden";
 import { ruimLeadToegangOp, toegangSleutel, zetLegacyBereikOm } from "@/lib/lead-toegang";
 import { techstackCategorieIdsMetLijst } from "@/data/organisatie-velden";
 import { migreerFteManagementSupport } from "@/lib/fte";
+import { ruimDossierOp, zetNieuwsartikelenOm } from "@/lib/dossier";
 
 const KEY = "coniche-scan:organisaties";
 const SERVER_SLEUTEL = "organisaties";
@@ -133,10 +134,14 @@ function normaliseerOrganisatie(invoer: Organisatie): Organisatie {
     leadToegang: Array.isArray(ruw.leadToegang) ? ruw.leadToegang : [],
     antwoordenMetNamen: ruw.antwoordenMetNamen === true,
     leadOvergangMelding: ruw.leadOvergangMelding ?? null,
-    // Ontbreken bij data van vóór de contactpersonen en het nieuws: Dan zijn er geen.
+    // Ontbreekt bij data van vóór de contactpersonen: Dan zijn er geen.
     contactpersonen: Array.isArray(ruw.contactpersonen) ? ruw.contactpersonen : [],
-    nieuwsartikelen: Array.isArray(ruw.nieuwsartikelen) ? ruw.nieuwsartikelen : [],
+    // De nieuwsartikelen van vóór het Dossier worden Dossieritems, zonder dat er iets open of zichtbaar voor een Lead is (`dossier.md`, Overgang).
+    dossier: zetNieuwsartikelenOm(ruw as unknown as Record<string, unknown>),
+    // Ontbreekt bij data van vóór de Afspraak: Geen toestemming vastgelegd, dus niet toegestaan.
+    caseToegestaan: ruw.caseToegestaan === true,
   };
+  delete (organisatie as { nieuwsartikelen?: unknown }).nieuwsartikelen;
   zetLegacyBereikOm(organisatie);
   // Overgang van de tekst op de Meting naar Onderdelen (`datamodel.md`, Onderdeel): Idempotent, en stabiel tot het is opgeslagen.
   zorgOnderdelenKloppend(organisatie);
@@ -179,6 +184,8 @@ export function slaAlles(alles: Organisatie[]): void {
   // Bij een opgeslagen verkenning volgen de leden uit de filters: Voldoet een organisatie niet meer, dan vervalt het vinkje van haar Leads.
   const benchmarks = getBenchmarksMetLeden(alles);
   for (const organisatie of alles) ruimLeadToegangOp(organisatie, benchmarks);
+  // Een Case bij een andere Organisatie die naar een verwijderde Organisatie verwees, vraagt om een nieuwe keuze (`dossier.md`, Verwijderen en datakoppelingen).
+  ruimDossierOp(alles);
   const json = JSON.stringify(alles);
   window.localStorage.setItem(KEY, json);
   emitChange();

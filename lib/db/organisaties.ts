@@ -4,6 +4,7 @@ import { laadAlles, slaAlles, useOrganisaties } from "./store";
 import { logAudit, nieuweGroepId } from "../audit-store";
 import { organisatieContext } from "../audit-context";
 import { haalOrganisatiesUitBenchmarks } from "../benchmark-store";
+import { casesDieVerwijzenNaar } from "../dossier";
 
 /** Organisaties: aanmaken, bijwerken, verwijderen en overzetten naar een andere eigenaar. */
 
@@ -80,6 +81,8 @@ export function verwijderOrganisaties(organisatieIds: string[]): void {
   const alles = laadAlles();
   const weg = alles.filter((o) => ids.has(o.id));
   const groepId = nieuweGroepId();
+  // Cases bij andere Organisaties die naar deze verwijzen, worden door `slaAlles` losgemaakt (`dossier.md`, Verwijderen en datakoppelingen).
+  const casesPerOrganisatie = new Map(weg.map((o) => [o.id, casesDieVerwijzenNaar([o.id], alles).aantal]));
   slaAlles(alles.filter((o) => !ids.has(o.id)));
   // Een organisatie weg haalt haar leden en toewijzingen uit de benchmarks (`datamodel.md`).
   haalOrganisatiesUitBenchmarks(
@@ -98,6 +101,7 @@ export function verwijderOrganisaties(organisatieIds: string[]): void {
         aantalRespondenten: o.leden.length,
         aantalMetingen: o.scanUitvoeringen.length,
         aantalScans: o.scanUitvoeringen.reduce((n, m) => n + m.invullingen.length, 0),
+        aantalCasesLosgemaakt: casesPerOrganisatie.get(o.id) ?? 0,
       },
     }))
   );

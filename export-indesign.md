@@ -297,9 +297,10 @@ voor het taggen, niet andersom.
 
 - **Nadruk binnen `contentSectie`**: Gaat mee als inline-markup
   (`<b>`/`<i>`), geen platte tekst. Zie hierboven.
-- **Geen Contactpersonen en Nieuwsartikelen**: Ze zijn geen scandata en een
-  Contactpersoon is een persoon buiten de app (`datamodel.md`, Contactpersoon en
-  Nieuwsartikel, Privacy). Ze gaan niet mee in de XML (besloten op 20 oktober 2026).
+- **Geen Contactpersonen en geen Dossier**: Ze zijn geen scandata en een
+  Contactpersoon is een persoon buiten de app (`datamodel.md`, Contactpersoon,
+  Privacy). Ze gaan niet mee in de XML (besloten op 20 oktober 2026, het Dossier
+  sinds `dossier.md`, Exports).
 - **Eigenaarschap van de tagnamen**: Joost tagt en beheert het
   InDesign-sjabloon zelf, deze spec is en blijft daarbij de bron van
   waarheid voor de tagnamen (geen apart afstemmingsrisico tussen twee

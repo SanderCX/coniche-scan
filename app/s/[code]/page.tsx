@@ -15,10 +15,12 @@ import {
   metingIdsMetWeergave,
   metingenMetToegang,
 } from "@/lib/lead-toegang";
+import { leadDossier } from "@/lib/dossier";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import {
   BenchmarkKaart,
+  DossierKaart,
   LeadEnRespondentKaart,
   LeadKaart,
   RespondentKaart,
@@ -97,8 +99,11 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
       })
     : [];
 
+  // Het Dossier (`dossier.md`, Scherm 4): Eén kaart onder Vergelijkingen, alleen als het open staat en er minstens één item zichtbaar is.
+  const dossier = isLeadLid ? leadDossier(organisatie, organisaties, instellingen.korteNamen) : null;
+
   const heeftEigen = invullingen.length > 0;
-  const leeg = !heeftEigen && leadMetingen.length === 0 && benchmarkKaarten.length === 0;
+  const leeg = !heeftEigen && leadMetingen.length === 0 && benchmarkKaarten.length === 0 && !dossier;
   const leadInvoer = (scanUitvoering: (typeof leadMetingen)[number]) => ({
     code,
     assessment: assessmentVan(scanUitvoering.assessmentId),
@@ -130,7 +135,7 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
         )}
 
         {/* Een Lead ziet dat hij Lead is, ook als er (nog) geen Metingen of vergelijkingen voor hem aanstaan. */}
-        {isLeadLid && leadMetingen.length === 0 && benchmarkKaarten.length === 0 && (
+        {isLeadLid && leadMetingen.length === 0 && benchmarkKaarten.length === 0 && !dossier && (
           <p className="mm-leadmelding">
             Je bent Lead van {organisatie.naam}. Een beheerder bepaalt welke resultaten je hier ziet. Er staat nu nog niets voor je klaar.
           </p>
@@ -191,6 +196,15 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
               {benchmarkKaarten.map((k) => (
                 <BenchmarkKaart key={k.id} code={code} id={k.id} naam={k.naam} regel={k.regel} />
               ))}
+            </div>
+          </>
+        )}
+
+        {dossier && (
+          <>
+            <span className="mm-label">Dossier, 1</span>
+            <div className="mm-grid">
+              <DossierKaart code={code} lid={lid} dossier={dossier} openSinds={dossier.openSinds} gewijzigdOp={dossier.gewijzigdOp} />
             </div>
           </>
         )}

@@ -35,7 +35,7 @@ Waar het ambigu of onvolledig is, wordt dat hier opgelost.
 | `benchmark.md` | Benchmark op drie niveaus: Tussen organisaties (gebouwd, geaggregeerd en anoniem, met een view per organisatie voor een Lead), binnen een organisatie tussen Metingen, en binnen een Meting (beide voorstel) |
 | `visualisatie-scores.md` | Hoe hoge en lage scores getoond worden: één meting, spreiding binnen een Meting, tussen Metingen, tussen organisaties en de matrix over Metingen (besloten ontwerp, gebouwd op 13 oktober 2026) |
 | `visualisatie-quickscan.md` | Visualisaties van de Quickscan Ziekenhuis in percentages: eigen resultaat (twee standen), gemiddelde en spreiding, antwoorden per vraag en benchmark (besloten op 15 oktober 2026, gebouwd) |
-| `dossier.md` | Het Dossier van een Organisatie: Nieuws en Cases die een Consultant samenstelt en openzet voor de Lead, met koppeling aan bouwblokken, de radar met filter, de Afspraak "Mag als case gebruikt worden" en de rechten (voorstel van 20 oktober 2026) |
+| `dossier.md` | Het Dossier van een Organisatie: Nieuws en Cases die een Consultant samenstelt en openzet voor de Lead, met koppeling aan bouwblokken, de radar met filter, de Afspraak "Mag als case gebruikt worden" en de rechten (voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026) |
 | `visualisatie-mijn-metingen.md` | Opmaak van de landingspagina "Mijn metingen" voor Respondent en Lead: kaarten, statussen, teaser van de uitkomst, respons, benchmarkkaart (voorstel van 15 oktober 2026, gebouwd op 15 oktober 2026) |
 | `visualisatie-verkennen.md` | Admin-scherm Verkennen onder Resultaten: filteren, groeperen en vergelijken van alle Organisaties van één Assessment, met vier weergaven (besloten en gebouwd op 15 oktober 2026) |
 | `help.md` | De helppagina in de app. Een regel Help in het menu, uitleg per rol met illustratie, als Markdown-bestanden in `help/` (gebouwd op 19 oktober 2026) |
@@ -161,10 +161,9 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   Lead ziet ze niet en de gegevens van een contactpersoon staan niet in de
   audit-log. Alleen openbare, zakelijke gegevens zijn toegestaan, geen
   privégegevens. Vooralsnog mag alleen een Admin ze wijzigen (recht
-  `contactpersonen.bewerken`, besloten op 20 oktober 2026, de bouw moet nog
-  worden aangepast); een Consultant ziet ze bij eigen Organisaties.
-- **Dossier** (voorstel van 20 oktober 2026, besloten door Joost, nog niet
-  gebouwd, `dossier.md`): Het Dossier vervangt de lijst nieuwsartikelen die
+  `contactpersonen.bewerken`, besloten op 20 oktober 2026, gebouwd); een Consultant ziet ze bij eigen Organisaties.
+- **Dossier** (besloten door Joost op 20 oktober 2026, gebouwd op 21 oktober
+  2026, `dossier.md`): Het Dossier vervangt de lijst nieuwsartikelen die
   Sander bij de Kenmerken zette. Een Consultant (en een Admin) stelt bij een
   Organisatie een lijst Nieuws en Cases samen, koppelt items aan bouwblokken, en
   zet het Dossier en per item open voor de Lead. Op Mijn metingen van de Lead is
@@ -175,10 +174,18 @@ van de Klantcontact Volwassenheidsscan, `content-zorgscan.md`).
   de omvang, nooit de naam. Afwijkingen van eerdere besluiten: Een Consultant mag
   het Dossier van eigen Organisaties wijzigen (`dossier.bewerken`), en een Lead
   ziet de items die zijn opengezet (`dossier.inzien`). Contactpersonen blijft
-  zoals het was.
+  zoals het was. Gebouwd: De kaart Dossier op het organisatie-detail met het
+  formulier voor Nieuws en Case, de Afspraak "Mag als case gebruikt worden" in de
+  kaart Afspraken, de kaart Dossier op Mijn metingen en de Dossierpagina
+  `/s/[code]/dossier` met de radar in een filtermodus. Een nieuwsartikel uit de
+  eerste bouw is bij het laden een Dossieritem geworden. Het Dossier staat niet
+  in exports en import. Een Case zonder toestemming blijft bij de Consultant
+  staan en verdwijnt bij de Lead. In het prototype bepaalt `leadDossier`
+  (`lib/dossier.ts`) wat een Lead ziet, zonder naam of id van de Organisatie in
+  een Case, tot dat aan de serverkant kan.
 - **Help**: Gebouwd op 19 oktober 2026 (`help.md`). Een helppagina per rol
-  (Respondent, Lead, Consultant en Admin) met 25 onderwerpen (het Dossier komt
-  erbij met twee, voorstel van 20 oktober 2026) als Markdown in
+  (Respondent, Lead, Consultant en Admin) met 27 onderwerpen (het Dossier
+  heeft er twee, gebouwd op 21 oktober 2026) als Markdown in
   `help/`, twee films met CSS-animaties en de rij "Help" in het Accountmenu
   en in "Mijn gegevens". De inhoud is door Claude Code geschreven en wacht op
   de beoordeling van Joost. Alleen twee onderwerpen hebben een illustratie.
@@ -630,7 +637,7 @@ geen afwijking van de spec maar een gat erin.
    **Bij AI-volwassenheid** (geen categorielaag, `content-ai-scan.md`)
    vervalt het staafdiagram per categorie: In plaats daarvan "Scores per
    domein", een staand kolomdiagram met een kolom per domein in volgorde 1 tot en met 8
-   (een eigen kleur per domein, nummercirkels onder de kolommen en een sleutel met de namen;
+   (een eigen kleur per domein, nummercirkels onder de kolommen en de namen in de tooltip;
    gebouwd op 20 oktober 2026, `stylesheet.md`, Radar en staafdiagram op het
    resultaatscherm, Domeinen). Het staat niet meer gesorteerd op score en scrolt niet.
 

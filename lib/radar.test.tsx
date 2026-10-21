@@ -130,14 +130,15 @@ describe("het kolomdiagram per domein", () => {
     const nummers = [...html.matchAll(/class="dk-nr-cel"[^>]*><span class="dk-nr"[^>]*>(\d)</g)].map((m) => Number(m[1]));
     expect(nummers).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
-  it("toont onder de kolommen een cirkel met het nummer en een sleutel met de namen", () => {
-    expect(html).toContain('class="dk-sleutel"');
-    for (const g of aiGroepen) expect(html).toContain(g.groepNaam.replace("&", "&amp;"));
+  it("toont onder de kolommen een cirkel met het nummer, zonder sleutel, en de namen in de tooltip", () => {
+    expect(html).not.toContain("dk-sleutel");
+    expect(html.match(/class="dk-nr-cel"/g)).toHaveLength(8);
+    for (const g of aiGroepen) expect(html).toContain(`${g.nummers} · ${g.groepNaam.replace("&", "&amp;")}`);
   });
   it("kleurt elk domein met de eigen domeinkleur en heeft zonder groep één balk per kolom", () => {
     expect(html).toContain("--domein-kleur:#1f9aa0");
     expect(html.match(/dk-staaf dk-staaf--groep/g)).toBeNull();
-    expect(html).toContain("Score, de kleur van het domein");
+    expect(html).not.toContain("dk-legenda");
   });
   it("heeft met een vergelijking twee balken per kolom, een tooltip met drie regels en de rest van de groep in de legenda", () => {
     const m = renderToStaticMarkup(<DomeinKolommen resultaten={aiGroepen} vergelijking={aiGroepen} naam="Organisatie" />);
@@ -151,5 +152,36 @@ describe("het kolomdiagram per domein", () => {
     const m = renderToStaticMarkup(<DomeinKolommen resultaten={aiGroepen} actief={{ groepKey: g.groepId, bouwblokId: g.groepId }} onActief={() => {}} />);
     expect(m.match(/is-actief/g)).toHaveLength(1);
     expect(m.match(/dk-kolom [^"]*is-gedimd/g)).toHaveLength(7);
+  });
+});
+
+describe("de radar in de filtermodus (Dossier)", () => {
+  const actief = new Set([bouwblokken[0].bouwblok.id, bouwblokken[3].bouwblok.id]);
+  it("maakt alleen de actieve bouwblokken tot knoppen met aria-pressed en dimt de rest", () => {
+    const m = renderToStaticMarkup(<RadarChartView resultaten={bouwblokken} filter={{ actief, gekozen: bouwblokken[3].bouwblok.id, onKies: () => {} }} />);
+    expect(m.match(/aria-pressed="/g)).toHaveLength(2);
+    expect(m.match(/aria-pressed="true"/g)).toHaveLength(1);
+    expect(m.match(/is-filter/g)).toHaveLength(2);
+    expect(m.match(/is-inactief/g)).toHaveLength(13);
+    expect(m.match(/is-gekozen/g)).toHaveLength(1);
+    expect(m.match(/aria-disabled="true"/g)).toHaveLength(13);
+  });
+  it("zet de taartpunt van het gekozen bouwblok op 50% en de rest op 20%", () => {
+    const m = renderToStaticMarkup(<RadarChartView resultaten={bouwblokken} filter={{ actief, gekozen: bouwblokken[3].bouwblok.id, onKies: () => {} }} />);
+    expect(m.match(/fill-opacity="0\.5"/g)).toHaveLength(1);
+    expect(m.match(/class="radar-taart"[^>]*fill-opacity="0\.2"/g)).toHaveLength(14);
+  });
+  it("toont score-stippen alleen bij de actieve bouwblokken", () => {
+    const m = renderToStaticMarkup(<RadarChartView resultaten={bouwblokken} filter={{ actief, gekozen: null, onKies: () => {} }} />);
+    expect(m.match(/class="radar-stip"/g)).toHaveLength(2);
+  });
+  it("heeft zonder scores geen veelhoek, geen stippen, geen score in de tooltip en geen reeks in de legenda", () => {
+    const zonder = bouwblokken.map((r) => ({ ...r, score: null }));
+    const m = renderToStaticMarkup(<RadarChartView resultaten={zonder} naam="Organisatie Test" filter={{ actief, gekozen: null, onKies: () => {} }} />);
+    expect(m).not.toContain("<polygon");
+    expect(m).not.toContain("radar-stip");
+    expect(m).not.toContain("Organisatie Test");
+    expect(m).toContain("Grenzen 2,5 en 3,5");
+    expect(m).not.toMatch(/<span>–/);
   });
 });

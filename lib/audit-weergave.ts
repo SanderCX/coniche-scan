@@ -26,6 +26,7 @@ const TYPE_LABEL: Record<string, string> = {
   kanaal: "Kanaal",
   contactpersoon: "Contactpersoon",
   nieuwsartikel: "Nieuwsartikel",
+  dossieritem: "Dossieritem",
 };
 
 /** Het deel van de actie vóór de punt, bijv. "organisatie" bij "organisatie.verwijderd". */
@@ -78,6 +79,10 @@ const DETAIL_LABEL: Record<string, string> = {
   nieuweNaam: "Nieuwe naam",
   onderdeelNaam: "Onderdeel",
   metLinkedin: "Met LinkedIn-profiel",
+  caseOrganisatieNaam: "Organisatie in de case",
+  aantalZichtbaar: "Zichtbare items",
+  aantalCasesLosgemaakt: "Cases bij anderen losgemaakt",
+  caseToegestaan: "Mag als case gebruikt worden",
   titel: "Titel",
   aantalKpiWaarden: "KPI-waarden die meegingen",
   plek: "Plek",

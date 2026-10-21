@@ -166,8 +166,8 @@ export const HELP_ONDERWERPEN: HelpOnderwerp[] = [
       "visualisatie-mijn-metingen.md",
       "CLAUDE.md"
     ],
-    "bijgewerkt": "2026-10-19",
-    "tekst": "Mijn metingen is de pagina waar je persoonlijke link altijd op uitkomt. Je ziet er al je scans en wat je kunt doen.\n\n## In het kort\nElke Meting waaraan je meedoet is een kaart met de naam van de scan, een status en een knop. Een Lead ziet daarnaast kaarten voor de Metingen en benchmarks waarvoor een Admin hem toegang gaf.\n\n## Wat je ziet\n1. **Het icoon en de titel.** Ze zeggen welke scan het is en bij welke Meting hij hoort.\n2. **De status.** Uitgenodigd betekent dat je nog niet begon, Bezig dat je al antwoorden gaf en Afgerond dat je klaar bent.\n3. **De voortgang of de uitkomst.** Bezig toont hoeveel vragen je beantwoordde. Bij een afgeronde scan staat er een samenvatting van je score: een ring met je totaalscore en de klasse, en de score per categorie.\n4. **De knop.** \"Start de scan\", \"Ga verder\" of \"Bekijk jouw resultaten\", afhankelijk van de status.\n\n## Let op\nEen Lead die zelf ook invult, ziet bij dezelfde Meting één kaart met twee delen: Jouw scan en Hele meting. Het deel Hele meting is er pas als er genoeg scans zijn afgerond. Zie Resultaten van je Organisatie voor de grens.\n\n## Zie ook\n- [Je resultaten lezen](resultaten-lezen)\n- [Verder waar je was gebleven](verder-waar-je-was)",
+    "bijgewerkt": "2026-10-21",
+    "tekst": "Mijn metingen is de pagina waar je persoonlijke link altijd op uitkomt. Je ziet er al je scans en wat je kunt doen.\n\n## In het kort\nElke Meting waaraan je meedoet is een kaart met de naam van de scan, een status en een knop. Een Lead ziet daarnaast kaarten voor de Metingen en benchmarks waarvoor een Admin hem toegang gaf, en een kaart Dossier als zijn consultant dat heeft opengezet.\n\n## Wat je ziet\n1. **Het icoon en de titel.** Ze zeggen welke scan het is en bij welke Meting hij hoort.\n2. **De status.** Uitgenodigd betekent dat je nog niet begon, Bezig dat je al antwoorden gaf en Afgerond dat je klaar bent.\n3. **De voortgang of de uitkomst.** Bezig toont hoeveel vragen je beantwoordde. Bij een afgeronde scan staat er een samenvatting van je score: een ring met je totaalscore en de klasse, en de score per categorie.\n4. **De knop.** \"Start de scan\", \"Ga verder\" of \"Bekijk jouw resultaten\", afhankelijk van de status.\n\n## Let op\nEen Lead die zelf ook invult, ziet bij dezelfde Meting één kaart met twee delen: Jouw scan en Hele meting. Het deel Hele meting is er pas als er genoeg scans zijn afgerond. Zie Resultaten van je Organisatie voor de grens.\n\n## Zie ook\n- [Je resultaten lezen](resultaten-lezen)\n- [Verder waar je was gebleven](verder-waar-je-was)",
     "svg": null
   },
   {
@@ -356,8 +356,8 @@ export const HELP_ONDERWERPEN: HelpOnderwerp[] = [
     "svg": null
   },
   {
-    "slug": "contactpersonen-en-nieuws",
-    "titel": "Contactpersonen en nieuws",
+    "slug": "contactpersonen",
+    "titel": "Contactpersonen",
     "groep": "Scans en Metingen",
     "volgorde": 6,
     "rollen": [
@@ -371,8 +371,29 @@ export const HELP_ONDERWERPEN: HelpOnderwerp[] = [
       "beheerpagina.md",
       "datamodel.md"
     ],
-    "bijgewerkt": "2026-10-20",
-    "tekst": "Bij elke Organisatie staat vast welke mensen en welke nieuwsartikelen relevant zijn, zodat je bij een gesprek of een Meting direct de juiste context hebt. Ze staan op het organisatie-detail, bij de Kenmerken. Een Admin beheert ze. Als Consultant zie je ze bij je eigen Organisaties.\n\n## In het kort\nOnder de Kenmerken staan twee lijsten naast elkaar: Contactpersonen en Nieuws. Een Admin voegt met \"+ Toevoegen\" een persoon of een artikel toe, en wijzigt of verwijdert het met \"Bewerken\". Een Consultant ziet de lijsten zonder die knoppen.\n\n## Wat je ziet\n1. **Contactpersonen.** Per persoon de naam, de functie en een link naar het LinkedIn-profiel. De link opent in een nieuw tabblad. De lijst staat op alfabet.\n2. **Een contactpersoon toevoegen (Admin).** De naam is verplicht. De functie, het LinkedIn-profiel en een notitie (waarom de persoon relevant is) mag je leeg laten. Gebruik alleen zakelijke, openbaar vindbare informatie en geen privégegevens. Plak bij LinkedIn het adres van het profiel, bijvoorbeeld https://www.linkedin.com/in/naam. Een adres van een andere site wordt geweigerd.\n3. **Nieuws.** Per artikel de titel als link naar het artikel, met de bron en de datum eronder. Het nieuwste staat bovenaan.\n4. **Een artikel toevoegen (Admin).** De titel en de link zijn verplicht. De bron, de datum en een notitie mag je leeg laten.\n5. **Bewerken en verwijderen (Admin).** \"Bewerken\" opent hetzelfde venster. Links onderin staat \"Verwijderen\", dat eerst om een bevestiging vraagt.\n\n## Let op\nEen contactpersoon is geen Respondent. Er wordt niets naartoe gestuurd en de persoon doet niet mee aan een scan. Een Admin en een Consultant met toegang tot de Organisatie zien deze lijsten, een Lead en een Respondent niet. De gegevens van een contactpersoon staan niet in de audit-log, wel de titel van een artikel.\n\n## Zie ook\n- [KPI's invullen](kpis-invullen)\n- [Een scan aanmaken](scan-aanmaken)",
+    "bijgewerkt": "2026-10-21",
+    "tekst": "Bij elke Organisatie staat vast welke mensen relevant zijn, zodat je bij een gesprek of een Meting direct de juiste context hebt. Ze staan op het organisatie-detail, bij de Kenmerken. Een Admin beheert ze. Als Consultant zie je ze bij je eigen Organisaties.\n\n## In het kort\nOnder het raster van de Kenmerken staat de lijst Contactpersonen. Een Admin voegt met \"+ Toevoegen\" een persoon toe en wijzigt of verwijdert hem met \"Bewerken\". Een Consultant ziet de lijst zonder die knoppen. Nieuwsartikelen horen sinds 21 oktober 2026 bij het Dossier van de Organisatie.\n\n## Wat je ziet\n1. **Contactpersonen.** Per persoon de naam, de functie en een link naar het LinkedIn-profiel. De link opent in een nieuw tabblad. De lijst staat op alfabet.\n2. **Een contactpersoon toevoegen (Admin).** De naam is verplicht. De functie, het LinkedIn-profiel en een notitie (waarom de persoon relevant is) mag je leeg laten. Gebruik alleen zakelijke, openbaar vindbare informatie en geen privégegevens. Plak bij LinkedIn het adres van het profiel, bijvoorbeeld https://www.linkedin.com/in/naam. Een adres van een andere site wordt geweigerd.\n3. **Bewerken en verwijderen (Admin).** \"Bewerken\" opent hetzelfde venster. Links onderin staat \"Verwijderen\", dat eerst om een bevestiging vraagt.\n\n## Let op\nEen contactpersoon is geen Respondent. Er wordt niets naartoe gestuurd en de persoon doet niet mee aan een scan. Een Admin en een Consultant met toegang tot de Organisatie zien deze lijst, een Lead en een Respondent niet. De gegevens van een contactpersoon staan niet in de audit-log.\n\n## Zie ook\n- [KPI's invullen](kpis-invullen)\n- [Het Dossier van een Organisatie](het-dossier-van-een-organisatie)",
+    "svg": null
+  },
+  {
+    "slug": "het-dossier-van-een-organisatie",
+    "titel": "Het Dossier van een Organisatie",
+    "groep": "Scans en Metingen",
+    "volgorde": 7,
+    "rollen": [
+      "Consultant",
+      "Admin"
+    ],
+    "toegang": [],
+    "afbeelding": null,
+    "film": null,
+    "bronnen": [
+      "dossier.md",
+      "beheerpagina.md",
+      "datamodel.md"
+    ],
+    "bijgewerkt": "2026-10-21",
+    "tekst": "In het Dossier bewaar je bij een Organisatie wat je tijdens een traject tegenkomt: nieuws over de Organisatie en cases uit andere trajecten. Een deel daarvan kun je laten zien aan de Lead, met uitleg waarom het bij de Organisatie past.\n\n## In het kort\nHet Dossier staat op het organisatie-detail, onder Toegang en Afspraken en boven de KPI's. Je voegt items toe met \"+ Toevoegen\". Een item is alleen voor jezelf en je collega-consultants, tot je het Dossier opent voor de Lead én het item op \"Zichtbaar voor klant\" zet.\n\n## Wat je ziet\n1. **De kaart Dossier.** Met de schakelaar \"Open voor Lead\", het filter Alles, Cases en Nieuws, en per item een rij met de soort, de titel, een regel met de gegevens, je toelichting, een statusbadge en de knop \"Bewerken\".\n2. **Een item toevoegen.** Kies Nieuws of Case. Bij Nieuws vul je de titel en de link in, bij een Case de titel, een samenvatting en de Organisatie in de case. Bij \"Gaat over bouwblokken\" kies je de bouwblokken van de Klantcontact Volwassenheidsscan waar het item over gaat. De Lead kan daarop filteren.\n3. **Zichtbaar voor klant.** Een schakelaar per item. Uit betekent dat alleen jij en je collega-consultants het item zien.\n4. **Open voor Lead.** De schakelaar bovenaan de kaart. Aanzetten vraagt een bevestiging en zegt hoeveel items de Lead dan ziet. De Lead ziet een item pas als het Dossier open staat én het item op Zichtbaar voor klant staat.\n5. **De status.** \"Zichtbaar voor klant\", \"Intern\", \"Toestemming ontbreekt\" (de Organisatie in de case heeft de Afspraak niet) en \"Kies een organisatie\" (bij een Case zonder Organisatie).\n6. **Een Case en de Afspraak.** Een Case kan alleen open voor een Lead als de Organisatie in de case de Afspraak \"Mag als case gebruikt worden\" heeft. Die zet een Admin in de kaart Afspraken. De Lead ziet de branche van de Organisatie en nooit haar naam.\n\n## Let op\nNoem de Organisatie in de case niet bij naam in de titel, de samenvatting of de toelichting. De Lead leest die teksten. Een Case waarvan de Organisatie geen Sector heeft, kan niet open: Vul eerst de Sector in bij haar Kenmerken. Het Dossier staat niet in exports of in de import.\n\n## Zie ook\n- [Contactpersonen](contactpersonen)\n- [Metingen en onderdelen](metingen-en-onderdelen)",
     "svg": null
   },
   {
@@ -517,6 +538,25 @@ export const HELP_ONDERWERPEN: HelpOnderwerp[] = [
     ],
     "bijgewerkt": "2026-10-19",
     "tekst": "Een benchmark zet de scores van je Organisatie naast die van een groep. Een vergelijking zet twee Metingen van je eigen Organisatie naast elkaar.\n\n## In het kort\nHeeft een Admin een benchmark voor je aangezet, dan staat er op Mijn metingen een kaart voor. Daarin zie je hoe je Organisatie scoort tegenover het gemiddelde van de andere deelnemers, zonder hun namen.\n\n## Wat je ziet\n1. **De kaart.** Met de naam van de benchmark en het aantal deelnemende Organisaties. Dat aantal staat er alleen als er genoeg deelnemers zijn.\n2. **Jouw Organisatie tegenover de groep.** Een radar en een staafdiagram met twee reeksen: Jouw Organisatie en de rest van de groep.\n3. **De positie per bouwblok.** Per bouwblok zie je het bereik van de groep, het middelste deel en jouw score, met een label voor je positie.\n4. **Een vergelijking tussen Metingen.** Heb je Resultaten op twee Metingen van de vergelijking, dan zie je hoe de scores zich ontwikkelen of naast elkaar liggen.\n\n## Let op\nJe ziet nooit de naam van een andere deelnemer, ook niet van een andere Meting in een vergelijking.\n\n## Zie ook\n- [Resultaten van je Organisatie](resultaten-organisatie)",
+    "svg": null
+  },
+  {
+    "slug": "het-dossier-van-je-consultant",
+    "titel": "Het Dossier van je consultant",
+    "groep": "Voor Leads",
+    "volgorde": 6,
+    "rollen": [
+      "Lead"
+    ],
+    "toegang": [],
+    "afbeelding": null,
+    "film": null,
+    "bronnen": [
+      "dossier.md",
+      "visualisatie-mijn-metingen.md"
+    ],
+    "bijgewerkt": "2026-10-21",
+    "tekst": "Je consultant kan een Dossier voor je openzetten: cases van andere organisaties en nieuws dat past bij jullie situatie, met bij elk item uitleg waarom.\n\n## In het kort\nZodra het Dossier voor je openstaat, zie je op Mijn metingen een kaart Dossier. Met \"Bekijk dossier\" lees je alles op een eigen pagina. Je kunt niets wijzigen: Het is een leesstuk.\n\n## Wat je ziet\n1. **De kaart Dossier.** Onder Vergelijkingen, met de tag \"Nieuw\" zolang je niet hebt gekeken na de laatste wijziging, een voorproef van de titels en het aantal cases en nieuwsberichten.\n2. **De kop.** Wie het deelde en sinds wanneer, en hoeveel cases en nieuwsberichten er zijn.\n3. **De radar.** Hij toont de bouwblokken waar het Dossier over gaat. Kies een bouwblok, in de radar of in de lijst ernaast, om alleen de cases en het nieuws daarover te zien. Kies hetzelfde bouwblok nog eens, of \"Alle items tonen\", om het filter weg te halen. Heb je resultaten van een Meting te zien, dan staat jullie score er ook in.\n4. **Cases.** Zo hebben andere organisaties het aangepakt: Met de branche, een samenvatting, de omvang, hoe snel het resultaat er was, waarom het voor jullie telt en een link naar de volledige case. De naam van de organisatie staat er nooit bij.\n5. **Nieuws.** Wat er speelt rond jullie organisatie, met de bron en de datum en een link naar het artikel.\n\n## Let op\nDe kaart staat er alleen als je consultant het Dossier heeft opengezet en er minstens één item zichtbaar is voor jou. Vragen over het Dossier? Je consultant helpt je graag verder.\n\n## Zie ook\n- [Mijn metingen](mijn-metingen)",
     "svg": null
   }
 ];
