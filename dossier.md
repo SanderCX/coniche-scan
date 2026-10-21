@@ -1,22 +1,22 @@
 # Coniche Scan: Dossier
 
-Spec voor het Dossier van een Organisatie: Een lijst Nieuws en Cases die een Consultant samenstelt, en die hij open kan zetten voor de Lead van de Organisatie. Het Dossier vervangt de lijst Nieuws bij de Kenmerken.
+Spec voor het Dossier van een Organisatie: Een lijst Cases, Nieuws, Events en Blogs die een Consultant samenstelt, en die hij open kan zetten voor de Lead van de Organisatie. Het Dossier vervangt de lijst Nieuws bij de Kenmerken.
 
-**Status: Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 (zie Zo gebouwd).** Joost heeft de richting en het ontwerp goedgekeurd (Claude Design, "Coniche Scan Dossier", versie 15, borden 1, 3, 5 en 6). Het ontwerp is dus de bron voor de opmaak, deze spec voor het gedrag. Wat in een ander document staat en hier wordt aangepast, staat onder Aanpassingen in andere documenten.
+**Status: Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 voor Nieuws en Cases (zie Zo gebouwd). De Events, de Blogs en de koppeling aan AI-domeinen (besloten door Joost op 21 oktober 2026) zijn nog niet gebouwd.** Joost heeft de richting en het ontwerp goedgekeurd (Claude Design, "Coniche Scan Dossier", versie 15, borden 1, 3, 5 en 6). Het ontwerp is dus de bron voor de opmaak, deze spec voor het gedrag. Wat in een ander document staat en hier wordt aangepast, staat onder Aanpassingen in andere documenten.
 
 ## Doel
 
-Een Consultant wil bij een Organisatie bewaren wat hij tijdens een traject tegenkomt: Nieuws over de Organisatie en cases uit andere trajecten. Een deel daarvan wil hij laten zien aan de Lead, met uitleg waarom het bij de Organisatie past. Het Dossier is primair een hulpmiddel voor de Consultant. De Lead ziet alleen wat de Consultant bewust openzet.
+Een Consultant wil bij een Organisatie bewaren wat hij tijdens een traject tegenkomt: Nieuws over de Organisatie, cases uit andere trajecten, events (vooral van Coniche of gelieerde partijen) en blogs. Een deel daarvan wil hij laten zien aan de Lead, met uitleg waarom het bij de Organisatie past. Het Dossier is primair een hulpmiddel voor de Consultant. De Lead ziet alleen wat de Consultant bewust openzet.
 
 ## Wat in versie 1 zit
 
-- Twee soorten items: Nieuws en Case.
+- Vier soorten items: Nieuws, Case, Event en Blog. Event en Blog zijn op 21 oktober 2026 toegevoegd, met dezelfde opzet als de andere soorten (zelfde koppeling aan bouwblokken, zelfde vinkje Zichtbaar voor klant, zelfde rechten).
 - Het Dossier hangt aan de Organisatie. Een Dossier per Meting of per Onderdeel komt later.
-- Een item kan gekoppeld worden aan bouwblokken van de Klantcontact Volwassenheidsscan. Op de pagina van de Lead filtert de radar op die koppeling.
-- Eén schakelaar op de Organisatie ("Open voor Lead") en per item een schakelaar "Zichtbaar voor klant". Beide staan standaard uit.
+- Een item kan gekoppeld worden aan bouwblokken van de Klantcontact Volwassenheidsscan en aan de AI-domeinen van de AI-scan (besloten door Joost op 21 oktober 2026). Op de pagina van de Lead filtert de radar op die koppeling, met een eigen radar per Assessment.
+- Eén vinkje op de Organisatie ("Open voor Lead") en per item een vinkje "Zichtbaar voor klant". Beide staan standaard uit. Het zijn vinkjes, zoals de andere Afspraken, geen schuifknoppen.
 - Een nieuwe Afspraak "Mag als case gebruikt worden" bij de Organisatie die in een Case voorkomt.
 
-Wat er niet in zit, met een reden: Een gedeelde bibliotheek van items die over Organisaties heen wordt hergebruikt, een systeemvoorstel op basis van scores, koppeling aan één bepaald bouwblok vanuit de resultaatpagina, andere soorten items (whitepaper, werkwijze, tool) en andere Assessments dan de Klantcontact Volwassenheidsscan. De eerste versie moet eenvoudig zijn, en de bibliotheek vraagt om herbruikbare items waar nog geen beheerscherm voor is. De ontwerpen daarvoor staan als v2 in hetzelfde ontwerpbestand.
+Wat er niet in zit, met een reden: Een gedeelde bibliotheek van items die over Organisaties heen wordt hergebruikt, een systeemvoorstel op basis van scores, koppeling aan één bepaald bouwblok vanuit de resultaatpagina, andere soorten items (whitepaper, werkwijze, tool, webinar-opname) en koppeling aan andere Assessments dan de Klantcontact Volwassenheidsscan en de AI-scan. De eerste versie moet eenvoudig zijn, en de bibliotheek vraagt om herbruikbare items waar nog geen beheerscherm voor is. De ontwerpen daarvoor staan als v2 in hetzelfde ontwerpbestand.
 
 ## Datamodel
 
@@ -32,18 +32,23 @@ Organisatie.dossier {
 
 Dossieritem {
   id: string
-  soort: "nieuws" | "case"          // staat vast na het aanmaken
+  soort: "nieuws" | "case" | "event" | "blog"   // staat vast na het aanmaken
   titel: string                     // verplicht, getrimd, maximaal 200 tekens
   toelichting: string               // maximaal 400 tekens, mag leeg zijn, zie Toelichting
   zichtbaarVoorLead: boolean        // standaard false
-  bouwblokIds: string[]             // Bouwblok.id, zie Koppeling aan bouwblokken, mag leeg zijn
+  bouwblokIds: string[]             // Bouwblok.id, van de Klantcontact Volwassenheidsscan en de AI-scan, zie Koppeling aan bouwblokken, mag leeg zijn
   url: string                       // Nieuws: verplicht. Case: optioneel. Altijd http of https
   aangemaaktOp: datetime
   gewijzigdOp: datetime
 
-  // alleen bij soort "nieuws"
+  // alleen bij soort "nieuws" en "blog"
   bron: string                      // de publicatie of de site, maximaal 80 tekens
   gepubliceerdOp: date | ""         // jjjj-mm-dd, leeg als het onbekend is
+
+  // alleen bij soort "event"
+  datum: date                       // jjjj-mm-dd, verplicht (de startdatum)
+  einddatum: date | ""              // jjjj-mm-dd, leeg bij een event van één dag, niet voor `datum`
+  plaats: string                    // maximaal 80 tekens, bijvoorbeeld "Utrecht" of "Online", mag leeg zijn
 
   // alleen bij soort "case"
   samenvatting: string              // verplicht, maximaal 600 tekens
@@ -53,6 +58,8 @@ Dossieritem {
 }
 ```
 
+Bij een Event is `url` optioneel (de aanmeldpagina). Bij een Blog is `url` verplicht, zoals bij Nieuws.
+
 `Organisatie.caseToegestaan` (boolean, standaard false) is de Afspraak "Mag als case gebruikt worden". Hij staat naast `benchmarkToegestaan` en `antwoordenMetNamen` (`datamodel.md`, deel 3).
 
 `OrganisatieLid` krijgt `dossierGezienOp: datetime | null`, gezet op het moment dat de Lead de Dossierpagina opent. De tag "Nieuw" op de kaart volgt daaruit (zie Mijn metingen).
@@ -60,23 +67,26 @@ Dossieritem {
 ### Regels
 
 - **Toelichting.** Voor een Nieuwsitem de reden waarom het artikel relevant is. Voor een Case het blok "Waarom dit voor jullie telt". De Lead leest deze tekst, dus onder het veld staat een korte hint ("De Lead leest deze tekst als je het item openzet.").
-- **Titel, samenvatting en toelichting van een Case bevatten geen naam van de Organisatie in de case.** De Lead ziet die naam nergens, en een naam in een vrij tekstveld lekt dat. Onder de velden staat de waarschuwing "Noem de organisatie niet bij naam."
+- **Titel, samenvatting en toelichting van een Case bevatten geen naam van de Organisatie in de case.** De Lead ziet die naam nergens, en een naam in een vrij tekstveld lekt dat. In het formulier staat de waarschuwing "Noem de organisatie niet bij naam." één keer, bij Samenvatting. Ze geldt ook voor de titel en de toelichting.
 - **Adres.** Alleen `http` en `https`, met een punt in de domeinnaam. Een adres met een ander schema, zoals `javascript:`, wordt geweigerd. Zonder schema wordt `https://` voorgezet. Links openen in een nieuw tabblad met `rel="noopener noreferrer"`. Dit zijn de regels die voor nieuwsartikelen al golden.
-- **Branche van een Case.** Is niet te bewerken. Het is de korte naam van de Sector uit de Kenmerken van `caseOrganisatieId` (`sbi-indeling.md`). Heeft die Organisatie geen Sector, dan kan de Case niet op Zichtbaar voor klant, en staat in het formulier "Vul de Sector in bij de Kenmerken van {Organisatie}."
+- **Branche van een Case.** Is niet te bewerken. Het is de korte naam van de Sector uit de Kenmerken van `caseOrganisatieId` (`sbi-indeling.md`). Heeft die Organisatie geen Sector, dan kan de Case niet op Zichtbaar voor klant, ziet de Lead de Case niet (ook niet als hij al op Zichtbaar voor klant stond) en staat in het formulier "Vul de Sector in bij de Kenmerken van {Organisatie}."
 - **Omvang en Tot resultaat.** Beide optioneel. Een leeg veld laat zijn tegel op de pagina van de Lead weg.
 - **Een Case verwijst niet naar de eigen Organisatie.** `caseOrganisatieId` mag niet gelijk zijn aan de Organisatie van het Dossier.
 - **Welke Organisaties je kunt kiezen.** In het veld "Organisatie in de case" staan de Organisaties met `caseToegestaan` aan, en de Organisaties waar de Consultant toegang toe heeft (die zonder toestemming met de aanduiding "Geen toestemming"). Een Consultant ziet zo geen namen van Organisaties waar hij niets mee te maken heeft en die niets hebben afgesproken.
-- **Volgorde.** Cases met de nieuwste bovenaan op `aangemaaktOp`. Nieuws met het nieuwste bovenaan op publicatiedatum, en zonder datum op `aangemaaktOp`, zoals nu.
+- **Volgorde.** Cases met de nieuwste bovenaan op `aangemaaktOp`. Nieuws en Blogs met het nieuwste bovenaan op publicatiedatum, en zonder datum op `aangemaaktOp`, zoals nu. Events met het eerstvolgende bovenaan op `datum`, daarna de verlopen events met het meest recente eerst.
+- **Event verlopen.** Een Event is verlopen vanaf de dag na `einddatum`, of na `datum` als er geen einddatum is. Dat volgt uit de datum, er is geen veld voor. Een verlopen Event verdwijnt niet vanzelf: De Consultant ziet de status "Verlopen" en kan het verwijderen of laten staan, en de Lead vindt het onder "Eerdere events" (zie Dossier lezen).
+- **Event en Blog zonder toestemming.** Een Event of Blog heeft geen toestemming van een andere Organisatie nodig. Het gaat om eigen of gelieerde events en om blogs, en ze noemen geen Organisatie.
 
 ### Wat de Lead ziet
 
-Een Lead ziet een item alleen als alle drie gelden:
+Een Lead ziet een item alleen als alle voorwaarden gelden:
 
 1. `Organisatie.dossier.openVoorLead` staat aan.
 2. `Dossieritem.zichtbaarVoorLead` staat aan.
 3. Bij een Case: `caseToegestaan` van `caseOrganisatieId` staat aan.
+4. Bij een Case: de Organisatie in de Case heeft een Sector (de branche is dan bekend).
 
-Dit wordt aan de serverkant bepaald, bij elke keer laden. De Lead krijgt `caseOrganisatieId` en de naam van die Organisatie nooit in de gegevens die naar de browser gaan, alleen de branche. Wordt de Afspraak later uitgezet, dan verdwijnt de Case bij de eerstvolgende keer laden voor de Lead, en blijft hij bij de Consultant staan met de status "Toestemming ontbreekt". Het Dossier is voor een Lead geen cijfer uit een andere Organisatie: Er staan geen scores van de Organisatie in de Case.
+Dit wordt aan de serverkant bepaald, bij elke keer laden. Het prototype bepaalt het in de browser (`leadDossier`). Dat is alleen toelaatbaar met demodata, want de browser van de Lead krijgt dan ook wat hij niet mag zien. Zodra er echte Organisaties en Cases in staan, moet de server het bepalen (`go-live-plan.md`). De regels over toestemming en branche gelden alleen voor Cases. De Lead krijgt `caseOrganisatieId` en de naam van die Organisatie nooit in de gegevens die naar de browser gaan, alleen de branche. Wordt de Afspraak later uitgezet, dan verdwijnt de Case bij de eerstvolgende keer laden voor de Lead, en blijft hij bij de Consultant staan met de status "Toestemming ontbreekt". Het Dossier is voor een Lead geen cijfer uit een andere Organisatie: Er staan geen scores van de Organisatie in de Case.
 
 ### Verwijderen en datakoppelingen
 
@@ -91,7 +101,7 @@ Bij het laden van data van vóór deze spec worden de bestaande `nieuwsartikelen
 
 ### Koppeling aan bouwblokken
 
-Een item verwijst naar bouwblokken met `Bouwblok.id`. In versie 1 zijn dat de 15 bouwblokken van de Klantcontact Volwassenheidsscan (`content-klantcontact-volwassenheid.md`). Bouwblokken van andere Assessments zijn niet te kiezen. Het veld is optioneel. Een item zonder bouwblokken staat in de lijst op de pagina van de Lead, krijgt geen chip en komt alleen bij "Alle items" in beeld.
+Een item verwijst naar bouwblokken met `Bouwblok.id`. Dat zijn de 15 bouwblokken van de Klantcontact Volwassenheidsscan (`content-klantcontact-volwassenheid.md`) en de 8 AI-domeinen van de AI-scan (`content-ai-scan.md`), die in het datamodel ook `Bouwblok` zijn. Een item mag aan beide soorten tegelijk gekoppeld zijn. Bouwblokken van andere Assessments zijn niet te kiezen. Het veld is optioneel. In de rest van deze spec betekent "bouwblok" ook een AI-domein, en op een scherm van de AI-scan staat het woord uit `Assessment.bouwblokLabel` ("AI-domein"). Een item zonder bouwblokken staat in de lijst op de pagina van de Lead, krijgt geen chip en komt alleen bij "Alle items" in beeld.
 
 ## Rechten
 
@@ -109,25 +119,28 @@ Een item verwijst naar bouwblokken met `Bouwblok.id`. In versie 1 zijn dat de 15
 
 Ontwerp: Bord 1. De kaart staat onder de Kenmerken en onder de rij Toegang en Afspraken (als die er is), en boven de kaart KPI's. Contactpersonen blijft in de kaart Kenmerken staan, ongewijzigd. De lijst Nieuws in die kaart vervalt.
 
-- **Kop.** De titel "Dossier" (16px, gewicht 700) met een Info-icoon (`info.dossier`). Rechts de schakelaar "Open voor Lead" (met label "Niet gedeeld" als hij uit staat) en de knop "+ Toevoegen" (`.btn-or`, `.btn-compact`).
+- **Kop.** De titel "Dossier" (16px, gewicht 700) met een Info-icoon (`info.dossier`). Rechts het vinkje "Open voor Lead" en de knop "+ Toevoegen" (`.btn-or`, `.btn-compact`).
 - **Open voor Lead aanzetten.** Vraagt een bevestiging: "Het Dossier wordt zichtbaar voor de Leads van {Organisatie}. Ze zien {n} items." Bij n gelijk aan 0 staat daar "Er staan nog geen items op Zichtbaar voor klant." Uitzetten kan zonder bevestiging.
-- **Filter.** Een pil-groep `.pil-groep` met Alles, Cases en Nieuws, elk met het aantal erachter. De gekozen pil is massief oranje.
-- **Rijen.** Zoals de kaart van een Lead (`visualisatie-mijn-metingen.md`): Een cirkel van 48px (Case in `--or-faint` met oranje icoon, Nieuws in `--bl-faint` met blauw icoon), de eyebrow CASE (`--or`) of NIEUWS (`--bl`) in 12px hoofdletters, de titel in 18px gewicht 800, een regel in 14px `--ink-s`, de toelichting in 14px `--ink-m`, rechts een statusbadge en de knop "Bewerken" (`.btn-outline`).
+- **Filter.** Een pil-groep `.pil-groep` met Alles, Cases, Nieuws, Events en Blogs, elk met het aantal erachter (verlopen Events tellen mee). De gekozen pil is massief oranje.
+- **Rijen.** Zoals de kaart van een Lead (`visualisatie-mijn-metingen.md`): Een cirkel van 48px (Case in `--or-faint` met oranje icoon, Nieuws in `--bl-faint` met blauw icoon, Event in `#e7f6ef` met een groen icoon (`--gr`), Blog in `#fff6e0` met een amberkleurig icoon), de eyebrow CASE (`--or`), NIEUWS (`--bl`), EVENT (`--gr`) of BLOG (`#7a5600`) in 12px hoofdletters, de titel in 18px gewicht 800, een regel in 14px `--ink-s`, de toelichting in 14px `--ink-m`, rechts een statusbadge en de knop "Bewerken" (`.btn-outline`).
   - Regel bij een Case: "{Organisatie in de case}, {branche in kleine letters}, ongeveer {omvang}, resultaat in {tot resultaat}". Een leeg veld valt weg. De Consultant ziet hier de naam van de Organisatie, de Lead niet.
-  - Regel bij Nieuws: "{bron}, {datum}", zoals nu.
-- **Statusbadge.** Eén van drie, in de kleuren van de bestaande statuschips: "Zichtbaar voor klant" (groen), "Intern" (grijs) en "Toestemming ontbreekt" (oranje, voor een Case waarvan de Organisatie `caseToegestaan` uit heeft, ook als het item op Zichtbaar voor klant stond). "Kies een organisatie" (oranje) bij een Case zonder `caseOrganisatieId`.
+  - Regel bij Nieuws en Blog: "{bron}, {datum}", zoals nu.
+  - Regel bij een Event: "{datum}, {plaats}", bij een meerdaags event "{datum} tot {einddatum}, {plaats}". Een lege plaats valt weg.
+- **Statusbadge.** Eén van vier, in de kleuren van de bestaande statuschips: "Zichtbaar voor klant" (groen), "Intern" (grijs), "Verlopen" (grijs, alleen bij een Event waarvan de datum voorbij is) en "Toestemming ontbreekt" (oranje, voor elke Case waarvan de Organisatie `caseToegestaan` uit heeft, ook als het item op Intern staat). "Kies een organisatie" (oranje) bij een Case zonder `caseOrganisatieId`.
 - **Leeg.** "Er staan nog geen items in het Dossier."
 
 ## Scherm 3: Item toevoegen of bewerken
 
 Ontwerp: Bord 3. Een modal van 640px breed, over een gedimde pagina. Titel "Item toevoegen aan het Dossier" (bij Bewerken "Item bewerken"). Onderin "Annuleren" en "Opslaan"; bij Bewerken staat links "Verwijderen" (`.btn-danger`) dat om een bevestiging vraagt (`BevestigModal`).
 
-- **Soort.** Een pil-groep met Nieuws en Case. Bij Bewerken staat de soort vast (de pil-groep is dan alleen-lezen).
+- **Soort.** Een pil-groep met Nieuws, Case, Event en Blog. Bij Bewerken staat de soort vast (de pil-groep is dan alleen-lezen).
 - **Nieuws.** Titel (verplicht), Link (verplicht), Bron, Datum en Toelichting. In de toelichting staat de hint voor de Lead.
+- **Event.** Titel (verplicht), Datum (verplicht), Einddatum (optioneel), Plaats, Link (optioneel) en Toelichting. Een einddatum voor de datum geeft de fout "De einddatum ligt voor de datum."
+- **Blog.** Titel (verplicht), Link (verplicht), Bron, Datum en Toelichting, zoals Nieuws.
 - **Case.** Titel (verplicht), Samenvatting (verplicht), Organisatie in de case (verplicht), Branche (alleen-lezen, met de hint "Uit de kenmerken van de organisatie."), Omvang, Tot resultaat, Link naar de volledige case (optioneel) en Toelichting.
   - Onder het veld Organisatie staat een groen paneel "Toestemming staat vastgelegd bij de Afspraken van {Organisatie}." of een oranje paneel met de uitleg en de knop of tekst uit Rechten.
-- **Gaat over bouwblokken.** Optioneel, onder de soortvelden. Alle 15 bouwblokken staan als chips in de volgorde van de nummers: Een cirkel van 22px met het nummer in de categoriekleur (bij Fundament `--ink` op geel) en de naam. Een gekozen chip heeft een oranje rand en de achtergrond `--or-faint`. Meerdere keuzes mogelijk. Onder de chips: "De Lead ziet de gekozen bouwblokken bij het item en kan in de radar op deze bouwblokken filteren."
-- **Zichtbaar voor klant.** Een schakelaar onder een scheidingslijn, uit bij een nieuw item. Label "Alleen intern" of "Zichtbaar voor klant" met eronder een regel: "Alleen jij en je collega-consultants zien dit item." of "De Lead ziet dit item zodra het Dossier open staat." Bij een Case zonder toestemming is de schakelaar uitgeschakeld (opacity 50%) met de regel "Zonder toestemming van de organisatie in de case kan een case niet open."
+- **Gaat over bouwblokken.** Optioneel, onder de soortvelden. Bij twee Assessments staat boven de chips een pil-groep met "Klantcontact Volwassenheid" en "AI-volwassenheid", met bij elke pil het aantal gekozen bouwblokken. De bouwblokken van het gekozen Assessment (15 of 8) staan als chips in de volgorde van de nummers; een AI-domein heeft zijn domeinkleur (`stylesheet.md`, Domeinkleuren) en geen categoriekleur: Een cirkel van 22px met het nummer in de categoriekleur (bij Fundament `--ink` op geel) en de naam. Een gekozen chip heeft een oranje rand en de achtergrond `--or-faint`. Meerdere keuzes mogelijk. Onder de chips: "De Lead ziet de gekozen bouwblokken bij het item en kan in de radar op deze bouwblokken filteren."
+- **Zichtbaar voor klant.** Een vinkje onder een scheidingslijn, uit bij een nieuw item. Het label is "Zichtbaar voor klant", met eronder een regel: "Alleen jij en je collega-consultants zien dit item." of "De Lead ziet dit item zodra het Dossier open staat." Bij een Case zonder toestemming is het vinkje uitgeschakeld (opacity 50%) met de regel "Zonder toestemming van de organisatie in de case kan een case niet open."
 - **Opslaan.** Een fout staat boven de knoppen in een `.overzicht-melding`, bijvoorbeeld "Dit is geen geldig webadres." of "Kies de organisatie in de case." Het Bewerkslot geldt zolang de modal open staat.
 
 ## Scherm 4: Mijn metingen, kaart Dossier (Lead)
@@ -136,7 +149,7 @@ Ontwerp: Bord 6 (de gekozen optie A). Bord 7 laat de afgewezen optie zien, met l
 
 - **Plek.** Een eigen sectie "Dossier, 1" onder Vergelijkingen. Is er geen sectie Vergelijkingen, dan onder Metingen. De sectie staat er alleen als `openVoorLead` aan staat en er minstens één item zichtbaar is. Het Dossier is dus één kaart in het overzicht, en de losse Cases en Nieuwsberichten staan er niet.
 - **Kaart.** Zoals de benchmarkkaart (`visualisatie-mijn-metingen.md`, Benchmarkkaart): Volle breedte, achtergrond `--bg-warm`, links een rond icoon van 48px in `--or-faint` met een oranje mapje. Daarnaast de eyebrow "Dossier" (12px, hoofdletters, `--or`), eventueel de tag "Nieuw" (blauw), de titel "Dossier {Organisatie}" (18px, gewicht 800) en de regel "Gedeeld door je consultant op {openSinds}" (14px, `--ink-s`).
-- **Voorproef.** Onder de regel maximaal drie chips met de titels van items: Eerst de Cases, daarna het Nieuws, een stip in oranje of blauw ervoor. Zijn er meer, dan staat er "+ n meer" achter. Daaronder in 13px: "2 cases · 2 nieuwsberichten".
+- **Voorproef.** Onder de regel maximaal drie chips met de titels van items: Eerst de Cases, daarna het Nieuws, de Events en de Blogs, een stip in oranje, blauw, groen of amber ervoor. Een verlopen Event staat er niet bij. Zijn er meer, dan staat er "+ n meer" achter. Daaronder in 12px: "2 cases · 2 nieuwsberichten · 2 events · 1 blog". Een soort zonder items valt weg, en een verlopen Event telt niet mee.
 - **Knop.** "Bekijk dossier" (hoofdactie), even breed als "Bekijk vergelijking" op de benchmarkkaart. Dat is 184px in het ontwerp; zie Open punten voor de regel over knopbreedte.
 - **Tag "Nieuw".** Staat er zolang `OrganisatieLid.dossierGezienOp` leeg is of vóór `dossier.gewijzigdOp` ligt.
 
@@ -148,21 +161,23 @@ Een animatie van de radar met filter staat in de Help (`help.md`, Films, Het dos
 
 Van boven naar beneden:
 
-1. **Kop.** Achtergrond `--or-faint` met concentrische cirkels in `--or-mid` rechts. Er is geen paars in de kop (de kop lijkt anders te veel op een andere Coniche-site). Eyebrow "Dossier" (`--or`, donkerder variant `#c2570c` voor tekst), titel "Dossier {Organisatie}" (32px), een zin ("Je consultant heeft cases en nieuws verzameld die passen bij jullie situatie, met bij elk item uitleg waarom. Bij elk item staat het bouwblok waar het over gaat."), twee chips ("Gedeeld door je consultant", de datum van `openSinds`) en rechts twee tegels met het aantal Cases en het aantal Nieuwsberichten.
-2. **Waar dit dossier over gaat.** Een kaart (10px radius, `--bg-warm`, padding 32px) met links de radar en rechts een lijst met bouwblokken. Alleen aanwezig als minstens één zichtbaar item bouwblokken heeft. Zie Radar met filter.
+1. **Kop.** Achtergrond `--or-faint` met concentrische cirkels in `--or-mid` rechts. Er is geen paars in de kop (de kop lijkt anders te veel op een andere Coniche-site). Eyebrow "Dossier" (`--or`, donkerder variant `#c2570c` voor tekst), titel "Dossier {Organisatie}" (32px), een zin ("Je consultant heeft cases en nieuws verzameld die passen bij jullie situatie, met bij elk item uitleg waarom. Bij elk item staat het bouwblok waar het over gaat."), twee chips ("Gedeeld door je consultant", de datum van `openSinds`) en rechts een tegel per soort dat items heeft, met het aantal (Cases, Nieuwsberichten, Events, Blogs). Een verlopen Event telt niet mee.
+2. **Waar dit dossier over gaat.** Een kaart (10px radius, `--bg-warm`, padding 32px) met links de radar en rechts een lijst met bouwblokken. Alleen aanwezig als minstens één zichtbaar item bouwblokken heeft. Hebben items bouwblokken in twee Assessments, dan staat boven de radar een pil-groep met de namen van die Assessments en toont de kaart er één tegelijk, met bij elke pil het aantal items. Bij maar één Assessment staat die pil-groep er niet. De eerste keer staat het Assessment met de meeste zichtbare items open. Een filter op een bouwblok van het andere Assessment zet de pil om. Eerdere events tellen hier mee, ook als ze nog dichtgeklapt zijn. Zie Radar met filter.
 3. **Filterbalk.** Alleen als er een filter staat: Een balk in `--or-faint` met het bouwblok (cirkel met nummer, naam, "n items in dit dossier") en rechts de knop "Alle items tonen ×" (`.btn-outline`, 32px hoog).
-4. **Cases.** Een kop met oranje icoon, "Cases" (24px, gewicht 800) en de regel "Zo hebben andere organisaties het aangepakt". Per Case een kaart (`.case`): Links een oranje blok van 168px met de branche (32px, gewicht 800) en het label "Branche". Rechts de badge "Case", de titel (24px), de samenvatting (16px, `--ink-m`), de tegels Omvang en Tot resultaat, het blok "Waarom dit voor jullie telt" (alleen met toelichting, achtergrond `--or-faint`, rand `--or-mid`), en onderaan "Gaat over" met de chips en de knop "Lees de case" (alleen met link). De naam van de Organisatie in de case staat er nergens.
+4. **Cases.** Een kop met oranje icoon, "Cases" (24px, gewicht 800) en de regel "Zo hebben andere organisaties het aangepakt". Per Case een kaart (`.case`): Links een oranje blok van 168px met de branche (32px, gewicht 800; een branche van meer dan 14 tekens staat op 24px, anders past ze niet in de 168px) en het label "Branche". Rechts de badge "Case", de titel (24px), de samenvatting (16px, `--ink-m`), de tegels Omvang en Tot resultaat, het blok "Waarom dit voor jullie telt" (alleen met toelichting, achtergrond `--or-faint`, rand `--or-mid`), en onderaan "Gaat over" met de chips en de knop "Lees de case" (alleen met link). De naam van de Organisatie in de case staat er nergens.
 5. **Nieuws.** Een kop met blauw icoon, "Nieuws" en de regel "Wat er speelt rond jullie organisatie". Per item een rij (`.nieuws`): Links een datumtegel van 64px in `--bl-faint` (maand en dag; zonder datum een nieuwsicoon), de titel als link, de bron, de toelichting, de chips "Gaat over", rechts de knop "Lees artikel ↗" (`.btn-outline`, 36px).
-6. **Slotregel.** "Vragen over dit dossier? Je consultant helpt je graag verder."
+6. **Events.** Een kop met groen icoon, "Events" en de regel "Zien we je daar?". Per Event een rij zoals bij Nieuws, met links een datumtegel van 64px in `#e7f6ef` (maand en dag, in `--gr`), de titel, "{datum}, {plaats}", de toelichting, de chips "Gaat over" en rechts de knop "Meer informatie ↗" (alleen met link). Verlopen Events staan niet in de lijst maar achter een regel "Eerdere events ({n})" onder de lijst, die bij een klik uitklapt. Die zijn dan grijs (datumtegel in `--bg-warm`) en hebben geen knop. Een filter op een bouwblok klapt de eerdere events van dat bouwblok niet vanzelf uit.
+7. **Blogs.** Een kop met amberkleurig icoon, "Blogs" en de regel "Om verder te lezen". Opmaak zoals Nieuws, met een datumtegel van `#fff6e0` en de knop "Lees blog ↗".
+8. **Slotregel.** "Vragen over dit dossier? Je consultant helpt je graag verder."
 
 Een sectie zonder items (door het filter of omdat er geen zijn) valt weg, met de kop.
 
 ### Radar met filter
 
-De radar is dezelfde component als op het resultaatscherm (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm), in een filtermodus. Alles uit die spec geldt (knooppunten van 26px met alleen het nummer, taartpunten per categorie, ringen op 2,5 en 3,5), met deze verschillen:
+De radar is dezelfde component als op het resultaatscherm (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm), in een filtermodus. Bij de AI-scan zijn dat 8 taartpunten van 45° in de domeinkleuren, zonder categorielaag (`ai-domeinenmodel-visual.md`), en heet de lijst naast de radar "domeinen". De film voor de Lead en de Help is `Film-Dossier-AI` (ontwerp `radar`). Alles uit die spec geldt (knooppunten van 26px met alleen het nummer, taartpunten per categorie, ringen op 2,5 en 3,5), met deze verschillen:
 
 - **Actieve knooppunten.** Alleen bouwblokken met minstens één zichtbaar item zijn actief. Een actief knooppunt is gevuld in de categoriekleur (nummer wit, bij Fundament `--ink`) en is een knop. De andere knooppunten staan op 40% dekking, zijn niet klikbaar en hebben alleen de tooltip.
-- **Klik.** Een klik op een actief knooppunt filtert de lijsten Cases en Nieuws op dat bouwblok. Een tweede klik op hetzelfde knooppunt heft het filter op. Er is één bouwblok tegelijk te kiezen.
+- **Klik.** Een klik op een actief knooppunt filtert de lijsten Cases, Nieuws, Events en Blogs op dat bouwblok. Een tweede klik op hetzelfde knooppunt heft het filter op. Er is één bouwblok tegelijk te kiezen, over beide Assessments heen.
 - **Gekozen bouwblok.** Het knooppunt krijgt een witte ring en daaromheen een ring van 2px in de categoriekleur. De taartpunt van het bouwblok krijgt 50% dekking (de andere punten houden hun dekking).
 - **Dezelfde klik elders.** Een rij in de lijst rechts van de radar, en een chip bij een item, doen hetzelfde als het knooppunt. Er is maar één filter, bewaard in de URL (`?bouwblok=…`) zodat de terugknop van de browser werkt.
 - **Score.** De polygoon en de score-stippen volgen de Meting waarvan de Lead de Resultaten mag zien (zie hieronder). Een stip van 10px met een witte rand van 2px in `--or` komt alleen bij de actieve bouwblokken.
@@ -170,17 +185,17 @@ De radar is dezelfde component als op het resultaatscherm (`stylesheet.md`, Rada
 - **Tooltip.** Zoals de tooltip van de radar: Eerste regel nummer en naam, tweede regel getal en klasse.
 - **Toetsenbord.** Tab loopt langs de actieve knooppunten. Enter of spatie filtert. `aria-pressed` staat op het gekozen knooppunt.
 
-**Welke scores.** De radar toont de groepsscore per bouwblok van de meest recente Meting (op meetdatum) van de Klantcontact Volwassenheidsscan van deze Organisatie waarvan de Lead de Resultaten mag inzien (`resultaten.inzien`, de aangevinkte weergave Resultaten). Is er zo'n Meting niet, dan staat de radar zonder polygoon, zonder stippen en zonder scores en klassen in de tooltip en de lijst. Het Dossier lekt dus geen scores die de Lead niet mag zien.
+**Welke scores.** De radar toont de groepsscore per bouwblok van de meest recente Meting (op meetdatum) van het Assessment van die radar (Klantcontact Volwassenheid of AI-volwassenheid) bij deze Organisatie waarvan de Lead de Resultaten mag inzien (`resultaten.inzien`, de aangevinkte weergave Resultaten). Is er zo'n Meting niet, dan staat de radar zonder polygoon, zonder stippen en zonder scores en klassen in de tooltip en de lijst, en zonder reeks in de legenda. Het Dossier lekt dus geen scores die de Lead niet mag zien.
 
 **Lijst rechts van de radar.** Per actief bouwblok een knop: De cirkel met het nummer (22px, categoriekleur), de naam in 14px gewicht 700, daaronder "{categorie} · {score} · {klasse}" in 12px `--ink-s`, en rechts "{n} item" of "{n} items" in een grijs label. De gekozen rij heeft een oranje rand en de achtergrond `--or-faint`.
 
-**Chips.** Bij een item staan achter "Gaat over" (12px, hoofdletters, `--ink-s`) de bouwblokken als chips: De cirkel met het nummer en de naam, 13px gewicht 600, rand 1px `--border`, afgerond. Een klik filtert.
+**Chips.** Bij een item staan achter "Gaat over" (12px, hoofdletters, `--ink-s`) de bouwblokken als chips: De cirkel met het nummer en de naam, 12px gewicht 600, rand 1px `--border`, afgerond. Een klik filtert.
 
 ## Audit
 
 Nieuwe gebeurtenissen (`datamodel.md`, Audit), in plaats van `nieuwsartikel.*`:
 
-- `dossier.itemToegevoegd`, `dossier.itemGewijzigd` en `dossier.itemVerwijderd`. `details` bevat de Organisatie, de soort, de titel, en bij `itemGewijzigd` de namen van de gewijzigde velden. Bij een Case staat ook de naam van de Organisatie in de case erin (de log is alleen voor een Admin).
+- `dossier.itemToegevoegd`, `dossier.itemGewijzigd` en `dossier.itemVerwijderd`. `details` bevat de Organisatie, de soort (nieuws, case, event of blog), de titel, en bij `itemGewijzigd` de namen van de gewijzigde velden. Bij een Case staat ook de naam van de Organisatie in de case erin (de log is alleen voor een Admin).
 - `dossier.geopend` en `dossier.gesloten`: `openVoorLead` is aan of uit gezet, met de Organisatie en het aantal zichtbare items.
 - `organisatie.caseVlagGewijzigd`: `caseToegestaan` is gewijzigd, met de Organisatie en de nieuwe waarde.
 
@@ -192,7 +207,7 @@ Het Dossier staat niet in de exports (`export-csv.md`, `export-indesign.md`, `ex
 
 Nieuw (`beheerpagina.md`, Info-iconen):
 
-- `info.dossier`: "Cases en nieuws die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier open staat én het item op Zichtbaar voor klant staat. Een case kan alleen open als de organisatie in de case dat heeft toegestaan."
+- `info.dossier`: "Cases, nieuws, events en blogs die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier open staat én het item op Zichtbaar voor klant staat. Een case kan alleen open als de organisatie in de case dat heeft toegestaan."
 - `info.caseVlag`: "Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads."
 
 `info.nieuwsartikelen` vervalt.
@@ -218,7 +233,9 @@ Nieuw (`beheerpagina.md`, Info-iconen):
 ## Open punten
 
 - **Knopbreedte.** `visualisatie-mijn-metingen.md` zegt dat een enkele knop zo breed is als zijn tekst, en 232px bij twee knoppen. Joost wil dat "Bekijk dossier" even breed is als "Bekijk vergelijking". Voorstel: Eén vaste breedte voor de knop op de kaarten Benchmark en Dossier (184px in het ontwerp) en de regel in `visualisatie-mijn-metingen.md` daarop aanpassen. De Meting-kaart houdt zijn eigen regel.
+- **Koppeling aan andere Assessments.** Quickscan, Zorgscan en Spanningsmeter hebben nog geen koppeling. Komen ze erbij, dan krijgen ze een eigen pil naast de radar.
 - **Dossier per Meting of Onderdeel.** Bij een grote Organisatie met meerdere Onderdelen en Metingen is één Dossier op de Organisatie misschien te grof. Dat komt pas aan bod na gebruik.
 - **Volgorde door de Consultant.** In versie 1 is de volgorde vast (nieuwste bovenaan). Handmatig ordenen is een latere vraag.
 - **Branche ontbreekt.** Een Case-Organisatie zonder Sector blokkeert openzetten. Misschien is een handmatig veld Branche in de Case beter. Eerst zien hoe vaak het voorkomt.
+- **Eerdere events.** Verlopen Events blijven bij de Lead staan achter een uitklapregel. Is dat te veel ruis, dan kan een Consultant ze verwijderen. Een automatische opruiming na een aantal maanden is een latere vraag.
 - **Toestemming vastleggen.** De Afspraak legt vast dát er is afgesproken, niet wanneer of met wie. Een tekstveld daarvoor is niet nodig zolang contract of mail de bron blijft.

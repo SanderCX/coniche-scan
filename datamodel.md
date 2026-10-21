@@ -328,7 +328,7 @@ Contactpersoon {
 
 ### Dossieritem
 
-**Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026.** Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws en Cases, en kan het openzetten voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
+**Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 voor Nieuws en Cases; Events, Blogs en de koppeling aan AI-domeinen zijn nog niet gebouwd.** Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws, Cases, Events en Blogs, en kan het openzetten voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
 
 ```
 Organisatie.dossier {
@@ -340,16 +340,19 @@ Organisatie.dossier {
 
 Dossieritem {
   id: string
-  soort: "nieuws" | "case"          // staat vast na het aanmaken
+  soort: "nieuws" | "case" | "event" | "blog"   // staat vast na het aanmaken
   titel: string                     // verplicht, getrimd, maximaal 200 tekens
   toelichting: string               // maximaal 400 tekens, mag leeg zijn
   zichtbaarVoorLead: boolean        // standaard false
-  bouwblokIds: string[]             // Bouwblok.id van de Klantcontact Volwassenheidsscan, mag leeg zijn
-  url: string                       // Nieuws: verplicht. Case: optioneel. Altijd http of https
+  bouwblokIds: string[]             // Bouwblok.id van de Klantcontact Volwassenheidsscan en de AI-scan (21 oktober 2026), mag leeg zijn
+  url: string                       // Nieuws en Blog: verplicht. Case en Event: optioneel. Altijd http of https
   aangemaaktOp: datetime
   gewijzigdOp: datetime
-  bron: string                      // alleen Nieuws, maximaal 80 tekens
-  gepubliceerdOp: date | ""         // alleen Nieuws, jjjj-mm-dd
+  bron: string                      // alleen Nieuws en Blog, maximaal 80 tekens
+  gepubliceerdOp: date | ""         // alleen Nieuws en Blog, jjjj-mm-dd
+  datum: date                       // alleen Event, verplicht, jjjj-mm-dd
+  einddatum: date | ""              // alleen Event, niet voor datum
+  plaats: string                    // alleen Event, maximaal 80 tekens
   samenvatting: string              // alleen Case, verplicht, maximaal 600 tekens
   caseOrganisatieId: string | null  // alleen Case: de Organisatie waar de case over gaat
   omvang: string                    // alleen Case, maximaal 40 tekens
@@ -357,6 +360,7 @@ Dossieritem {
 }
 ```
 
+- **Event verlopen** is afgeleid uit `datum` of `einddatum` (`dossier.md`, Regels), er is geen veld voor.
 - **Een Lead ziet een item** als `openVoorLead` aan staat, `zichtbaarVoorLead` aan staat en, bij een Case, `Organisatie.caseToegestaan` van `caseOrganisatieId` aan staat. De naam van de Organisatie in de Case gaat nooit naar de Lead.
 - **Overgang.** Bestaande `nieuwsartikelen` worden bij het laden Dossieritems van soort `nieuws`, met `notitie` als `toelichting`, `zichtbaarVoorLead` op false en zonder bouwblokken (`dossier.md`, Overgang).
 - **`OrganisatieLid.dossierGezienOp`** (datetime of null) bepaalt of de kaart Dossier bij een Lead de tag "Nieuw" krijgt.

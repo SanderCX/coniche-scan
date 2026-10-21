@@ -1,100 +1,57 @@
 # Coniche Scan: AI-domeinenmodel, interactief overzicht
 
-Geen eigen route meer: Sinds het herontwerp van 21 oktober 2026 is dit de sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan (`CLAUDE.md`, sectie 3, scherm 2). Analoog aan
-`bouwstenenmodel-visual.md`, met één structureel verschil: De
-AI-volwassenheidsscan heeft geen categorielaag (CLAUDE.md, Assessment).
-Waar dat verschil doorwerkt staat hieronder expliciet; de rest is
-hetzelfde patroon, niet opnieuw uitgelegd.
+Geen eigen route: Dit is de sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan (`CLAUDE.md`, sectie 3, scherm 2). Het overzicht is sinds 21 oktober 2026 een radar met acht taartpunten, analoog aan de radar op de Assessment-pagina van Volwassenheid (`bouwstenenmodel-visual.md`). Eén structureel verschil: De AI-volwassenheidsscan heeft geen categorielaag (`CLAUDE.md`, Assessment). Waar dat verschil doorwerkt staat hieronder expliciet, de rest is hetzelfde patroon en niet opnieuw uitgelegd. Design: `Claude outputs/radar/`, bord Herontwerp-AI.
 
 ## Doel
 
-Eén visuele component, een overzicht van de 8 AI-domeinen. Klikken op
-een domein toont de beschrijving en de centrale vraag.
+Eén visuele component, een overzicht van de 8 AI-domeinen. Beweeg je over een domein, dan zie je de centrale vraag. Klikken op een domein opent de beschrijving en de centrale vraag.
 
 ## Hergebruik van bestaande content, geen nieuwe
 
-De Toelichtingsmodal (`stylesheet.md`, "Modal en Toelichtingsmodal"),
-dezelfde als bij de toelichting-icoontjes ("i") per bouwblok in de
-doorloopflow en als in `bouwstenenmodel-visual.md`. Het i-icoontje in de
-doorloopflow en een klik op een domein in dit overzicht openen dezelfde
-modal met dezelfde content (`Bouwblok.toelichting` en
-`Bouwblok.centraleVraag`, hier gevuld vanuit `visie-ai-klantcontact.md`).
-Eén functie en één opmaak: Geen tweede modalfunctie, geen eigen stijlen,
-geen content dupliceren.
+De Toelichtingsmodal (`stylesheet.md`, "Modal en Toelichtingsmodal"), dezelfde als bij het i-icoontje per bouwblok in de doorloopflow en als in `bouwstenenmodel-visual.md`. Een klik op een domein in dit overzicht en het i-icoontje in de doorloopflow openen dezelfde modal met dezelfde content (`Bouwblok.toelichting` en `Bouwblok.centraleVraag`, gevuld vanuit `visie-ai-klantcontact.md`). Eén functie en één opmaak: Geen tweede modalfunctie, geen eigen stijlen, geen content dupliceren.
 
 ## Waar dit component een plek krijgt
 
-**Beantwoord, en gewijzigd op 21 oktober 2026.** Dit component staat als sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan (`CLAUDE.md`, sectie 3, scherm 2), met daaronder de sectie "Klantcontact richting 2030", en is bereikbaar via de sticky sub-nav. De link "AI" in de header en de route `/ai-scan` bestaan niet meer. De acht domeinen staan als kaarten in een raster van vier kolommen (`Herontwerp-AI`). **Zo gebouwd (21 oktober 2026)**: `components/assessment/AiDomeinenSectie.tsx`, met de nummercirkel in de domeinkleur (`domeinKleur`) en de accentkleur van de modal in dezelfde kleur (voorheen overal `--or`). Geen
-losse leespagina met alleen tekst meer ernaast: De beschrijving en
-centrale vraag per domein (`visie-ai-klantcontact.md`) komen uitsluitend
-nog terug in de modal van dit component.
+Sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan, met daaronder de sectie "Klantcontact richting 2030", bereikbaar via de sticky sub-nav. De link "AI" in de header en de route `/ai-scan` bestaan niet meer. De beschrijving en centrale vraag per domein komen uitsluitend nog terug in de modal van dit component. **Gebouwd (21 oktober 2026)** als raster van vier kolommen kaarten in `components/assessment/AiDomeinenSectie.tsx`, met de nummercirkel in de domeinkleur (`domeinKleur`) en de accentkleur van de modal in dezelfde kleur (voorheen overal `--or`). **Nog te bouwen**: De radar hieronder vervangt dat raster.
 
 ## Bron voor de inhoud
 
-Naam en volgnummer: `content-ai-scan.md`. Beschrijving en centrale vraag:
-`visie-ai-klantcontact.md`. In het datamodel dezelfde velden als bij de
-Klantcontact-scan, geen nieuwe: `Bouwblok.toelichting` en
-`Bouwblok.centraleVraag` (`datamodel.md`), nu ook gevuld voor deze 8
-bouwblokken.
+Naam en volgnummer: `content-ai-scan.md`. Beschrijving en centrale vraag: `visie-ai-klantcontact.md`. In het datamodel dezelfde velden als bij de Klantcontact-scan: `Bouwblok.toelichting` en `Bouwblok.centraleVraag` (`datamodel.md`).
 
 ---
 
 ## Structuur
 
-Eén grid, 4 kolommen × 2 rijen, geen overkoepelende of fundamentele
-balken (die bestonden bij de bouwstenen omdat 2 en 1 bouwsteen buiten de
-hoofdgroepen vielen; hier vallen alle 8 domeinen binnen dezelfde,
-enkele laag):
+Drie kolommen van 280px, 536px en 280px, zoals bij Volwassenheid, met boven de radar de kaart voor de centrale vraag.
 
-| Kolom 1 | Kolom 2 | Kolom 3 | Kolom 4 |
-|---|---|---|---|
-| 1. Strategie en governance | 2. Data, integratie en architectuur | 3. Use-cases en automatisering | 4. Performance, monitoring en kwaliteit |
-| 5. Mensen, skills en adoptie | 6. Security, risk en compliance | 7. Operating model en schaalbaarheid | 8. Klant- en kanaalervaring |
+- **Midden**: De radar van 536px, met 8 taartpunten van 45° die bij −22,5° beginnen, zodat domein 1 boven staat en de rest met de klok mee loopt. Straal van de taartpunten 190px, nummercirkels van 26px op straal 226px, ringen bij score 2, 3, 4 en 5 (37,5px per stap), taartpunten op 22% vulling met een witte rand van 1,5px. Voorbeeldpolygoon zoals bij Volwassenheid.
+- **Rechts**: Domein 1 tot en met 4 als rijen (`.pl`).
+- **Links**: Domein 5 tot en met 8 als rijen.
+- Er zijn geen groepskoppen boven de rijen, want er is geen categorielaag.
+- De kaart voor de centrale vraag (96px hoog) staat boven de radar en toont standaard "Beweeg over een domein of een nummer in de radar om de centrale vraag te zien."
 
 ## Kleur
 
-**Geen kleur per domein.** Er is geen categorie om een kleur aan op te
-hangen, en 8 losse, verzonnen kleuren zouden een indeling suggereren die
-er niet is. Alle 8 blokken gebruiken dezelfde accentkleur: `--or`. Dat is
-geen nieuwe keuze, het is de bestaande fallback uit `components.css`
-(`var(--accent, var(--or))`), nu voor het eerst met tekst geëxpliciteerd
-in `stylesheet.md`.
-
-## Visuele specificatie
-
-Zelfde drie staten als `bouwstenenmodel-visual.md`, met `--or` overal
-waar daar `--accent` (de categorietoken) staat:
-
-- **Standaard**: Witte kaart (`.card`), `border-left: 4px solid var(--or)`
-  (`.card-accent-left`), donkere tekst, klein gedempt volgnummer
-  rechtsboven, geen schaduw. **Omtrek `1.5px solid var(--border)`**, niet
-  de gewone `1px` van `.card` — zelfde afwijking en zelfde reden als
-  `bouwstenenmodel-visual.md`: kleinere kaarten, dicht op elkaar in een
-  grid, dus iets meer gewicht in de rand om ze los van elkaar te houden.
-- **Hover**: Lift en zachte schaduw (`a.card:hover`), `cursor: pointer`.
-- **Actief** (het geopende domein): `background: var(--or)`, witte
-  tekst, wit/gedempt-wit volgnummer.
-
-Gelijke celgrootte binnen de grid, vaste 4 kolommen, geen wrap-logica
-(de app is niet responsive, CLAUDE.md, Uitgangspunten).
+Elk domein heeft zijn eigen kleur, palet B uit `stylesheet.md` ("Domeinkleuren (AI-scan)"). De eerdere keuze voor één kleur voor alle domeinen is vervallen. Tekst in of op een domeinkleur is wit, behalve bij 5, 6 en 8 waar het `--ink` is. Het label "AI-domein 5", "AI-domein 6" en "AI-domein 8" in de modal staat in `--ink-m` in plaats van in de domeinkleur, anders is het contrast te laag. De accentbalk van de centrale vraag in de modal blijft wel in de domeinkleur.
 
 ## Interactie
 
-De Toelichtingsmodal, identiek aan die van `bouwstenenmodel-visual.md` en
-aan het i-icoon in de doorloopflow (`stylesheet.md`, "Modal en
-Toelichtingsmodal"). Inhoud:
+- **Hover** op een taartpunt, nummer of rij: De taartpunt gaat naar 62% vulling, de andere naar 10%, de nummercirkel schaalt naar 125%, de rij krijgt een rand in de domeinkleur en de kaart toont de centrale vraag van dat domein.
+- **Klik** op een taartpunt, nummer of rij opent de Toelichtingsmodal met:
+  1. Het kleine label `Assessment.bouwblokLabel` ("AI-domein") met het volgnummer, stijl zoals `.eyebrow`.
+  2. De naam van het domein als kop.
+  3. De centrale vraag met een linker accentbalk en het label "CENTRALE VRAAG" erboven.
+  4. De beschrijving als lopende tekst.
 
-1. Klein label: `Assessment.bouwblokLabel` ("AI-domein") met het
-   volgnummer, bijv. "AI-DOMEIN 1" (geen categorie te noemen, die is er
-   niet), stijl zoals `.eyebrow`, kleur `--or`.
-2. Naam van het domein (kop).
-3. Centrale vraag, linker accentbalk in `--or`, label "CENTRALE VRAAG"
-   erboven.
-4. Beschrijving (`visie-ai-klantcontact.md`) als body-tekst.
+## Film en Dossier
 
----
+- De sectie "Wat krijg ik" op de AI-pagina toont dezelfde twee films als bij Volwassenheid, met acht domeinen. De tweede film is de AI-variant van de Dossier-film (`Film-Dossier-AI`): Een radar met 8 taartpunten, waarin alleen de domeinen met items in het Dossier gevuld en klikbaar zijn. Een klik filtert de lijst op dat domein. De tekst spreekt van "domein", niet van "bouwblok".
+- De eerste film noemt "een staaf per domein" in plaats van "per categorie".
+
+## Koppeling met het Dossier
+
+Besloten door Joost op 21 oktober 2026: Een Dossieritem mag aan AI-domeinen gekoppeld worden, en de Dossier-pagina toont per Assessment een eigen radar (`dossier.md`, Koppeling aan bouwblokken en Radar met filter).
 
 ## Open punten
 
-- Precieze bewoording van het kleine label (nu "AI-domein" in
-  `bouwblokLabel`, geen definitieve tekst; aanpasbaar in beheer).
+- Precieze bewoording van het kleine label (nu "AI-domein" in `bouwblokLabel`, aanpasbaar in beheer).
