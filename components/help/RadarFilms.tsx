@@ -211,6 +211,10 @@ export function DossierFilmPodium({ ai = false }: { ai?: boolean }) {
             </li>
           ))}
         </ul>
+        {/* De bron van de scores (`dossier.md`, Bron van de scores): De Lead ziet dat de cijfers uit een meting komen. Voorbeelddata. */}
+        <p className="fd-bron">
+          Scores uit de meting {ai ? "AI-Volwassenheid in Klantcontact" : "Klantcontact Volwassenheid"} van oktober 2026. <span>Bekijk de meting</span>
+        </p>
       </div>
     </div>
   );

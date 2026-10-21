@@ -41,6 +41,7 @@
   --fs-17: 17px;   /* de centrale vraag in de kaart boven de radar van de bouwblokken (spec van 21 oktober 2026) */
   --fs-18: 18px;   /* inleidende regel, h3, titel van modals en beheerblokken, h2 in beheer */
   --fs-24: 24px;   /* kop van een bouwblok en van een Assessment-kaart */
+  --fs-26: 26px;   /* de titel in het detailpaneel van de Assessmentcirkel (spec van 21 oktober 2026, PR 166, ter bevestiging door Joost) */
   --fs-32: 32px;   /* paginatitel, h2 op publieke pagina's */
   --fs-36: 36px;   /* getal in de .score-ring */
   --fs-40: 40px;   /* vervallen voor de ring, nog niet meer in gebruik */

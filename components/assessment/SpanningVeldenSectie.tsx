@@ -11,7 +11,8 @@ import { fmt1, veldKorteNaam } from "@/lib/spanning";
 /**
  * De sectie "De 6 spanningsvelden" op de Assessment-pagina van de Spanningsmeter (`visualisatie-spanningsmeter.md`, Landingspagina en film, besloten
  * door Joost op 21 oktober 2026): Een interactieve radar met zes taartpunten van 60°, analoog aan de radar van de AI-scan (`ai-domeinenmodel-visual.md`)
- * en van Volwassenheid. Veld 1 staat bovenaan en de rest loopt met de klok mee, rechts veld 1 tot en met 3 en links veld 4 tot en met 6 als rijen.
+ * en van Volwassenheid. Veld 1 staat bovenaan en de rest loopt met de klok mee. Links staan alle zes de velden onder elkaar als rijen (320px) en rechts de
+ * radar (536px), met 40px ertussen en gecentreerd (PR 166: Drie links en drie rechts oogde te ielig).
  * Boven de radar staat de kaart met de omschrijving van het veld waar de muis of de focus op staat. Een klik opent de Toelichtingsmodal van het veld
  * (de omschrijving, de ijkpunten en de basis), dezelfde modal als bij het Info-icoon in de doorloopflow. De veelhoek heeft voorbeeldscores en is geen
  * echte score. De klassen `br-*` zijn die van de radars van Volwassenheid en de AI-scan.
@@ -61,7 +62,6 @@ export function SpanningVeldenSectie({ assessment, warm = false }: { assessment:
   const [gekozen, setGekozen] = useState<Bouwblok | null>(null);
   const [actief, setActief] = useState<number | null>(null);
   const actiefVeld = velden.find((v) => v.volgnummer === actief);
-  const helft = Math.ceil(velden.length / 2);
   const veelhoek = velden
     .map((v) => punt(scoreR(VOORBEELD_SCORES[v.volgnummer - 1] ?? 2.5), hoekVan(v.volgnummer)).map((x) => x.toFixed(1)).join(","))
     .join(" ");
@@ -90,9 +90,9 @@ export function SpanningVeldenSectie({ assessment, warm = false }: { assessment:
               </>
             )}
           </div>
-          <div className="br-stage">
-            <ul className="br-links br-rijen" aria-label={`Spanningsveld ${helft + 1} tot en met ${velden.length}`}>
-              {velden.filter((v) => v.volgnummer > helft).map((v) => (
+          <div className="br-stage br-stage--twee">
+            <ul className="br-links br-rijen" aria-label={`Spanningsveld 1 tot en met ${velden.length}`}>
+              {velden.map((v) => (
                 <Rij key={v.id} veld={v} actief={actief} zet={setActief} open={setGekozen} />
               ))}
             </ul>
@@ -142,11 +142,6 @@ export function SpanningVeldenSectie({ assessment, warm = false }: { assessment:
                 })}
               </div>
             </div>
-            <ul className="br-rechts br-rijen" aria-label={`Spanningsveld 1 tot en met ${helft}`}>
-              {velden.filter((v) => v.volgnummer <= helft).map((v) => (
-                <Rij key={v.id} veld={v} actief={actief} zet={setActief} open={setGekozen} />
-              ))}
-            </ul>
           </div>
           {gekozen && <VeldToelichtingModal assessment={assessment} veld={gekozen} open onClose={() => setGekozen(null)} />}
         </>

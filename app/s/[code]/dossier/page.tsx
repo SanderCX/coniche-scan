@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, use, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useOrganisaties, useRespondentPerToegangscode, markeerDossierGezien } from "@/lib/db";
 import { useAssessments } from "@/lib/assessment-store";
@@ -14,10 +15,11 @@ import { SoortIcoon } from "@/components/icons/DossierIcons";
 import { CLASSIFICATIE_INFO } from "@/lib/colors";
 import { classificatie } from "@/lib/scoring";
 import { formatScore } from "@/lib/format";
-import { langeDatum } from "@/lib/mijn-metingen";
+import { langeDatum, maandJaarLang } from "@/lib/mijn-metingen";
+import { aantalAfgerondInMeting } from "@/lib/metingen";
 import { dossierRadar } from "@/lib/dossier-radar";
 import { BouwblokResultaat } from "@/lib/scoring";
-import { Assessment } from "@/lib/types";
+import { Assessment, ScanUitvoering } from "@/lib/types";
 import {
   DOSSIER_ASSESSMENT_IDS,
   DossierSectieInhoud,
@@ -58,6 +60,8 @@ export default function DossierPage({ params }: { params: Promise<{ code: string
 interface RadarGegevens {
   assessment: Assessment;
   resultaten: BouwblokResultaat[];
+  /** De Meting waarvan de scores komen (`dossier.md`, Bron van de scores), `null` zonder scores. */
+  meting: ScanUitvoering | null;
   /** Heeft de Lead een Meting van dit Assessment waarvan hij de Resultaten mag zien? Zonder zijn er geen scores en klassen. */
   heeftScores: boolean;
 }
@@ -105,8 +109,8 @@ function DossierInhoud({ code }: { code: string }) {
   const radars: RadarGegevens[] = DOSSIER_ASSESSMENT_IDS.flatMap((id) => {
     const assessment = assessments.find((a) => a.id === id);
     if (!assessment) return [];
-    const { resultaten, heeftScores } = dossierRadar(assessment, organisatie, lid.id);
-    return resultaten.some((r) => telling.has(r.bouwblok.id)) ? [{ assessment, resultaten, heeftScores }] : [];
+    const { resultaten, heeftScores, meting } = dossierRadar(assessment, organisatie, lid.id);
+    return resultaten.some((r) => telling.has(r.bouwblok.id)) ? [{ assessment, resultaten, heeftScores, meting }] : [];
   });
   const alleBouwblokken = radars.flatMap((r) => r.resultaten.map((res) => ({ ...res, assessment: r.assessment })));
   const gevraagd = zoek.get("bouwblok");
@@ -285,6 +289,16 @@ function DossierInhoud({ code }: { code: string }) {
                 assessment={actief.assessment}
                 resultaten={actief.resultaten.filter((r) => telling.has(r.bouwblok.id))}
                 heeftScores={actief.heeftScores}
+                bron={
+                  actief.heeftScores && actief.meting
+                    ? {
+                        assessment: actief.assessment.naam,
+                        wanneer: maandJaarLang(actief.meting.meetdatum) || actief.meting.label,
+                        aantal: aantalAfgerondInMeting(organisatie, actief.meting),
+                        href: `/s/${code}/resultaten/${actief.meting.id}`,
+                      }
+                    : null
+                }
                 telling={telling}
                 gekozen={gekozen}
                 open={verdelingOpen}
@@ -420,6 +434,7 @@ function Verdeling({
   assessment,
   resultaten,
   heeftScores,
+  bron,
   telling,
   gekozen,
   open,
@@ -429,6 +444,8 @@ function Verdeling({
   assessment: Assessment;
   resultaten: BouwblokResultaat[];
   heeftScores: boolean;
+  /** Waar de scores vandaan komen (`dossier.md`, Bron van de scores): De Meting, haar maand, het aantal afgeronde scans en de link naar haar Resultaten. */
+  bron: { assessment: string; wanneer: string; aantal: number; href: string } | null;
   telling: Map<string, number>;
   gekozen: string | null;
   open: boolean;
@@ -459,24 +476,18 @@ function Verdeling({
         </ul>
       )}
       <ul className={`dp-verdeling ${heeftScores ? "dp-verdeling--score" : ""}`}>
-        {heeftScores && (
-          <li className="dp-zones" aria-hidden="true">
-            <span />
-            <span />
-            <span className="dp-zones-namen">
-              <span>Basis op Orde</span>
-              <span>Uitbouwen</span>
-              <span>Sterk punt</span>
-            </span>
-            <span />
-          </li>
-        )}
         {zichtbaar.map(({ r, score }) => {
           const n = telling.get(r.bouwblok.id) ?? 0;
           const klasse = score === null ? null : classificatie(score);
           return (
             <li key={r.bouwblok.id}>
-              <button type="button" className={`dp-radarrij ${gekozen === r.bouwblok.id ? "is-gekozen" : ""}`} aria-pressed={gekozen === r.bouwblok.id} onClick={() => onKies(r.bouwblok.id)}>
+              <button
+                type="button"
+                className={`dp-radarrij ${gekozen === r.bouwblok.id ? "is-gekozen" : ""}`}
+                aria-pressed={gekozen === r.bouwblok.id}
+                title={score !== null && bron ? `Groepsscore ${formatScore(score)}, meting ${bron.wanneer}` : undefined}
+                onClick={() => onKies(r.bouwblok.id)}
+              >
                 <BouwblokCirkel volgnummer={r.bouwblok.volgnummer} groepKleur={r.groepKleur} groot />
                 <span className="dp-radarrij-tekst">
                   <strong>{r.bouwblok.naam}</strong>
@@ -499,11 +510,30 @@ function Verdeling({
             </li>
           );
         })}
+        {heeftScores && (
+          <li className="dp-ankers" aria-hidden="true">
+            <span />
+            <span />
+            <span className="dp-ankers-rij">
+              <span style={{ left: "0%" }}>1</span>
+              <span style={{ left: "37.5%" }}>2,5</span>
+              <span style={{ left: "62.5%" }}>3,5</span>
+              <span style={{ left: "100%" }}>5</span>
+            </span>
+            <span />
+          </li>
+        )}
       </ul>
       {rijen.length > VERDELING_EERST && (
         <button type="button" className="dp-meer" aria-expanded={open} onClick={() => onOpen(!open)}>
           {open ? "Minder tonen ▴" : `Nog ${rest} ${rest === 1 ? woord : meervoud} tonen ▾`}
         </button>
+      )}
+      {bron && (
+        <p className="dp-bron">
+          Scores uit de meting {bron.assessment} van {bron.wanneer}, groepsscore van {bron.aantal} afgeronde {bron.aantal === 1 ? "scan" : "scans"}.{" "}
+          <Link href={bron.href}>Bekijk de meting</Link>
+        </p>
       )}
     </div>
   );

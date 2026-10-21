@@ -96,9 +96,12 @@
   line-height: 18px;
   color: var(--ink);
   transform: translate(-50%, -50%);
-  white-space: normal;
-  /* De pil is zo breed als zijn langste woord, zodat de naam op twee regels staat en nooit buiten de pil valt. */
-  width: min-content;
+  white-space: nowrap;
+}
+/* De naam staat op vaste regels (`lib/assessmentcirkel.ts`, `LABEL_REGELS`), zodat een afbreking bij een koppelteken niet kan. */
+.ac-label-tekst {
+  display: flex;
+  flex-direction: column;
 }
 .ac-midden {
   position: absolute;
@@ -131,7 +134,7 @@
 }
 .ac-leeg {
   margin: 0;
-  font-size: var(--fs-24);
+  font-size: var(--fs-26);
   line-height: 32px;
   font-weight: 800;
   color: var(--ink);
@@ -145,14 +148,14 @@
 }
 .ac-detail h2 {
   margin: 0;
-  font-size: var(--fs-24);
+  font-size: var(--fs-26);
   line-height: 32px;
   font-weight: 800;
 }
 .ac-zin {
   margin: var(--sp-3) 0 var(--sp-4);
-  font-size: var(--fs-16);
-  line-height: 26px;
+  font-size: var(--fs-17);
+  line-height: 27px;
   color: var(--ink-m);
 }
 .ac-punten {
@@ -167,7 +170,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: var(--fs-14);
+  font-size: var(--fs-15);
   line-height: 20px;
   color: var(--ink-m);
 }
@@ -730,4 +733,91 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* De sectie "De 4 afdelingen" van de Quickscan (`CLAUDE.md`, scherm 2, Quickscan Ziekenhuis): Vier kaarten naast elkaar, niet klikbaar. */
+.ap-afdelingen {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+.ap-afdeling {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-6);
+  background: var(--bg);
+}
+.ap-afdeling h3 {
+  margin: 0;
+  font-size: var(--fs-18);
+  font-weight: 700;
+}
+.ap-afdeling-nr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding-top: 0.09em;
+  border: 2px solid var(--or);
+  border-radius: 50%;
+  font-size: var(--fs-14);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+}
+.ap-afdeling-def {
+  flex: 1;
+  margin: 0;
+  font-size: var(--fs-14);
+  line-height: 22px;
+  color: var(--ink-m);
+}
+.ap-afdeling-dim {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0 0;
+  padding: var(--sp-3) 0 0;
+  border-top: 1px solid var(--border);
+  list-style: none;
+}
+.ap-afdeling-dim li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  font-size: var(--fs-12);
+  color: var(--ink-m);
+}
+.ap-afdeling-dim li span:last-child {
+  color: var(--ink-s);
+  white-space: nowrap;
+}
+.ap-afdelingen-voet {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+@media (max-width: 1000px) {
+  .ap-afdelingen {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .ap-afdelingen {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* De Spanningsmeter: Twee kolommen van 320px en 536px met 40px ertussen, gecentreerd (`visualisatie-spanningsmeter.md`, Landingspagina, PR 166). */
+.br-stage--twee {
+  grid-template-columns: minmax(200px, 320px) minmax(0, 536px);
+  justify-content: center;
+  gap: 40px;
+}
+@media (max-width: 900px) {
+  .br-stage--twee {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

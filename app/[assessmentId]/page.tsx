@@ -20,6 +20,7 @@ import { AiDomeinenSectie } from "@/components/assessment/AiDomeinenSectie";
 import { Content2030Sectie } from "@/components/assessment/Content2030Sectie";
 import { SpanningVeldenSectie } from "@/components/assessment/SpanningVeldenSectie";
 import { SpanningVisieSectie } from "@/components/assessment/SpanningVisieSectie";
+import { AfdelingenSectie } from "@/components/assessment/AfdelingenSectie";
 import { KAART_ICONEN, KlokIcoon, SlotIcoon, StaafIcoon, icoonVoorSubtitel } from "@/components/icons/LandingIcons";
 
 export default function AssessmentLandingPage({
@@ -135,15 +136,17 @@ function AssessmentLanding({ assessmentId }: { assessmentId: string }) {
       warm={warm}
       kop="Zo ziet je resultaat eruit"
       inleiding={
-        soort === "spanning"
+        soort === "quickscan"
+          ? "Na afronding zie je meteen je totaalpercentage en je score per afdeling. Hieronder zie je hoe dat eruitziet, met voorbeelddata."
+          : soort === "spanning"
           ? "Je krijgt direct je eigen Spanningsprofiel. Daarna leggen we de profielen van de groep naast elkaar. Alle cijfers hieronder zijn voorbeelddata."
           : soort === "ai"
           ? "Na afronding zie je meteen je totaalscore en je score per domein. Hieronder zie je hoe dat eruitziet, met voorbeelddata."
           : "Na afronding zie je meteen je totaalscore en je score per categorie en per bouwblok. Hieronder zie je hoe dat eruitziet, met voorbeelddata."
       }
       kinderen={
-        soort === "spanning" ? (
-          // De Spanningsmeter heeft één film en geen feature-kaarten, en het Dossier is er niet voor (`visualisatie-spanningsmeter.md`).
+        soort === "spanning" || soort === "quickscan" ? (
+          // De Spanningsmeter en de Quickscan hebben alleen de film Wat krijg ik: De Spanningsmeter heeft geen Dossier, de Quickscan geen bouwblokken met een radar. De Spanningsmeter heeft één film en geen feature-kaarten, en het Dossier is er niet voor (`visualisatie-spanningsmeter.md`).
           <HelpFilm naam="wat-krijg-ik" assessment={assessment} opmerking="Alle cijfers in de film zijn voorbeelddata." knop={voorbeeldKnop} />
         ) : (
           // De drie feature-cards komen niet meer terug (besloten door Joost op 21 oktober 2026): De zin over aantoonbaar bewijs staat bij Praktisch.
@@ -159,6 +162,8 @@ function AssessmentLanding({ assessmentId }: { assessmentId: string }) {
     (warm) =>
       soort === "spanning" ? (
         <SpanningVeldenSectie key="velden" assessment={assessment} warm={warm} />
+      ) : soort === "quickscan" ? (
+        <AfdelingenSectie key="afdelingen" assessment={assessment} warm={warm} />
       ) : soort === "ai" ? (
         <AiDomeinenSectie key="ai" warm={warm} />
       ) : (

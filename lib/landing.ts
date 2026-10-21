@@ -34,10 +34,12 @@ export function bouwstenenLink(assessment: Assessment): { tekst: string; href: s
  * bij de Bouwsteen als eenheid en een categorielaag, dus de Klantcontact Volwassenheidsscan en de Zorgscan, "ai" (AI in klantcontact en 2030) bij
  * de AI-domeinen, "spanning" (De spanningsvelden, Praktisch, Wat krijg ik en Visie) bij de Spanningsmeter. De Quickscan en elk ander type hebben voorlopig geen extra content: `null`, en dan ook geen sub-nav.
  */
-export type ContentSoort = "volwassenheid" | "ai" | "spanning";
+export type ContentSoort = "volwassenheid" | "ai" | "spanning" | "quickscan";
 
 export function contentSoort(assessment: Assessment): ContentSoort | null {
   if (assessment.antwoordType === "spanning") return "spanning";
+  // De Quickscan (Ja / Nee / Weet ik niet) heeft sinds PR 166 dezelfde kop en sub-nav, met de sectie "De 4 afdelingen" als inhoud.
+  if (assessment.antwoordType === "ja-nee-weetniet") return "quickscan";
   if (assessment.bouwblokLabel === "AI-domein") return "ai";
   if (assessment.bouwblokLabel === "Bouwsteen" && (assessment.categorieen ?? []).some((c) => !c.gearchiveerd)) return "volwassenheid";
   return null;
@@ -58,7 +60,9 @@ export function paginaSecties(assessment: Assessment): PaginaSectie[] {
       ? { id: "ai", label: "AI in klantcontact" }
       : soort === "spanning"
         ? { id: "velden", label: `De ${actieveBouwblokkenMetGroep(assessment).length} spanningsvelden` }
-        : { id: "bouwblokken", label: "De 15 bouwblokken" };
+        : soort === "quickscan"
+          ? { id: "afdelingen", label: `De ${(assessment.categorieen ?? []).filter((c) => !c.gearchiveerd).length} afdelingen` }
+          : { id: "bouwblokken", label: "De 15 bouwblokken" };
   const laatste: PaginaSectie = soort === "ai" ? { id: "2030", label: "Klantcontact richting 2030" } : { id: "visie", label: "Visie" };
   return [eerste, { id: "praktisch", label: "Praktisch" }, { id: "wat", label: "Wat krijg ik" }, laatste];
 }
@@ -67,7 +71,8 @@ export function paginaSecties(assessment: Assessment): PaginaSectie[] {
 export function overDezeScan(assessment: Assessment | undefined): { tekst: string; href: string } | null {
   if (!assessment) return null;
   const soort = contentSoort(assessment);
-  if (!soort) return null;
+  // Bij de Quickscan staat de link er niet (`CLAUDE.md`, scherm 5).
+  if (!soort || soort === "quickscan") return null;
   return {
     tekst: soort === "ai" ? "Over deze scan: AI-domeinen en 2030" : soort === "spanning" ? "Over deze scan: spanningsvelden en visie" : "Over deze scan: visie en bouwblokken",
     href: `/${assessment.id}`,
@@ -147,4 +152,16 @@ export function tegelInhoud(assessment: Assessment): TegelInhoud {
       { tekst: "Concrete verbeterkansen", icoon: "vlag" },
     ],
   };
+}
+
+/**
+ * De definitie van een afdeling in een zin, zonder de aanloop "Polikliniek = " (`content-ziekenhuis-quickscan.md`, De 4 afdelingen, besloten door
+ * Joost op 21 oktober 2026): De tekst na het eerste "=", met een hoofdletter en een punt aan het einde.
+ */
+export function afdelingDefinitie(omschrijving: string | null | undefined): string {
+  const tekst = (omschrijving ?? "").trim();
+  if (!tekst) return "";
+  const naGelijk = tekst.replace(/^[^=]{1,60}=\s*/, "").trim();
+  const zin = naGelijk.charAt(0).toUpperCase() + naGelijk.slice(1);
+  return /[.!?]$/.test(zin) ? zin : `${zin}.`;
 }

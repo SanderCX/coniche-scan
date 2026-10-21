@@ -10,7 +10,8 @@ import { Assessment } from "@/lib/types";
  * toelichting. Bij een Assessment met domeinen staat er "per domein" in plaats van "per bouwblok".
  */
 export function PraktischSectie({ assessment, aantalVragen, warm }: { assessment: Assessment; aantalVragen: number; warm: boolean }) {
-  const eenheid = assessment.bouwblokLabel === "AI-domein" ? "domein" : "bouwblok";
+  // De Quickscan toont zijn score per afdeling (`CLAUDE.md`, scherm 2, Praktisch).
+  const eenheid = assessment.antwoordType === "ja-nee-weetniet" ? "afdeling" : assessment.bouwblokLabel === "AI-domein" ? "domein" : "bouwblok";
   const spanning = assessment.antwoordType === "spanning";
   const kaarten = [
     { Icoon: KlokIcoon, titel: "Invultijd", tekst: `${assessment.geschatteDuur}${spanning ? " voor" : ", verdeeld over"} ${aantalVragen} vragen.` },

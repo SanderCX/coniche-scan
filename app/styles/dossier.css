@@ -126,9 +126,10 @@
 .dp-radarrij {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
+  gap: 20px;
   width: 100%;
-  padding: var(--sp-2) var(--sp-3);
+  min-height: 64px;
+  padding: 14px 16px;
   border: 1px solid var(--border);
   border-radius: var(--r);
   background: var(--bg);
@@ -150,12 +151,19 @@
   min-width: 0;
 }
 .dp-radarrij-tekst strong {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   font-size: var(--fs-14);
+  line-height: 20px;
   font-weight: 700;
   color: var(--ink);
 }
 .dp-radarrij-tekst span {
+  margin-top: 4px;
   font-size: var(--fs-12);
+  line-height: 16px;
   color: var(--ink-s);
 }
 .dp-radarrij-aantal {
@@ -512,40 +520,35 @@
   height: 28px;
 }
 .dp-verdeling--score .dp-radarrij,
-.dp-verdeling--score .dp-zones {
+.dp-verdeling--score .dp-ankers {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) 230px 120px;
+  grid-template-columns: 28px minmax(0, 1fr) 190px 128px;
   align-items: center;
-  gap: var(--sp-3);
+  gap: 20px;
 }
-.dp-zones {
-  padding: 0 var(--sp-3) var(--sp-1);
+.dp-ankers {
+  padding: var(--sp-1) var(--sp-4) 0;
   border: 1px solid transparent;
-  font-size: var(--fs-12);
-  color: var(--ink-s);
 }
-.dp-zones-namen {
+.dp-ankers-rij {
   position: relative;
   display: block;
   height: 16px;
 }
-/* De drie klassenamen boven hun zone: Basis op Orde links, Uitbouwen in het midden van zijn zone (50%) en Sterk punt rechts. */
-.dp-zones-namen span {
+/* De ankers 1, 2,5, 3,5 en 5 staan onder de balk op de grenzen van de zones (`dossier.md`, Balk). */
+.dp-ankers-rij span {
   position: absolute;
   top: 0;
-  white-space: nowrap;
+  transform: translateX(-50%);
   font-size: var(--fs-12);
   line-height: 16px;
+  color: var(--ink-s);
 }
-.dp-zones-namen span:nth-child(1) {
-  left: 0;
+.dp-ankers-rij span:first-child {
+  transform: none;
 }
-.dp-zones-namen span:nth-child(2) {
-  left: 50%;
-  transform: translateX(-50%);
-}
-.dp-zones-namen span:nth-child(3) {
-  right: 0;
+.dp-ankers-rij span:last-child {
+  transform: translateX(-100%);
 }
 .dp-balk {
   position: relative;
@@ -558,13 +561,28 @@
 .dp-balk i {
   position: absolute;
   top: 50%;
-  width: 12px;
-  height: 12px;
-  margin: -6px 0 0 -6px;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
   border: 2px solid #fff;
   border-radius: 50%;
   background: var(--or);
   box-sizing: border-box;
+  /* Een duidelijke gloed, ook op de gekleurde zones: Oranje licht rondom de stip. */
+  box-shadow: 0 0 0 3px rgba(255, 103, 31, 0.25), 0 0 10px 3px rgba(255, 103, 31, 0.6);
+}
+.dp-bron {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-12);
+  line-height: 16px;
+  color: var(--ink-s);
+}
+.dp-bron a {
+  color: var(--or);
+  text-decoration: none;
+}
+.dp-bron a:hover {
+  text-decoration: underline;
 }
 .dp-score {
   display: flex;
@@ -667,8 +685,12 @@
   text-decoration: none;
 }
 .dp-rail a.is-huidig {
-  background: var(--or);
-  color: #fff;
+  background: var(--or-faint);
+  color: var(--ink);
+  font-weight: 700;
+}
+.dp-rail a.is-huidig .dp-rail-aantal {
+  color: var(--ink-m);
 }
 .dp-rail-naam {
   flex: 1;
@@ -694,8 +716,8 @@
   line-height: 1;
 }
 .dp-rail a.is-huidig .dp-rail-nr {
-  background: #fff;
-  color: var(--or);
+  background: var(--or);
+  color: #fff;
 }
 .dp-rail-nr.is-algemeen {
   background: var(--bg-mid);

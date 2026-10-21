@@ -134,7 +134,7 @@ Door Joost, 14 oktober 2026.
   telefonisch klantcontact per afdeling is geregeld en waar ze het
   eerst moeten verbeteren."
 - Geschatte duur: ±15 minuten.
-- Assessment-pagina (besloten door Joost op 21 oktober 2026, `CLAUDE.md`, scherm 2, ontwerp `Herontwerp-Quickscan`): Compacte kop met het icoon `cross`, sub-nav met "De 4 afdelingen", "Praktisch", "Wat krijg ik" en "Visie". De sectie "De 4 afdelingen" toont per afdeling de definitie (hieronder, zonder "X =") en de vragen per dimensie. De feature-cards komen niet meer terug. De beschrijving hieronder is de inleiding van die sectie.
+- Assessment-pagina (besloten door Joost op 21 oktober 2026, `CLAUDE.md`, scherm 2, ontwerp `Herontwerp-Quickscan`): Gebouwd op 21 oktober 2026 (PR 166): Compacte kop met het icoon `cross`, sub-nav met "De 4 afdelingen", "Praktisch", "Wat krijg ik" en "Visie". De sectie "De 4 afdelingen" toont per afdeling de definitie (hieronder, zonder "X =") en de vragen per dimensie. De feature-cards komen niet meer terug. De beschrijving hieronder is de inleiding van die sectie.
 - Feature-cards (voorstel, vervallen op de pagina): "4 afdelingen", "Resultaat per dimensie",
   "Direct resultaat".
 - Instructieregel (`Assessment.instructieregel`, voorstel): "Kies Ja als
