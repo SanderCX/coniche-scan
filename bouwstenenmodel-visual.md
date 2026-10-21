@@ -41,6 +41,18 @@ Naam, categorie en volgnummer: Zoals al doorgevoerd in
 
 ---
 
+## Herontwerp van 21 oktober 2026: Radar met bouwblokken (nog te bouwen)
+
+Besloten door Joost op 21 oktober 2026, ontwerp `Herontwerp-Volwassenheid` in het Design-artifact (sectie "De 15 bouwblokken"). De opzet met balken, de hero en het grid van hieronder (Hero, Structuur, Wat strakker moet dan de schets) vervalt; de Kleuren blijven. Het component staat als sectie op de Assessment-pagina (`CLAUDE.md`, sectie 3, scherm 2) en heeft geen eigen hero meer.
+
+- **Stage.** Drie kolommen in de container van de pagina (1096px bij een venster van 1240px): links 280px, midden 536px, rechts 280px, verticaal gecentreerd. In het midden staat de radar (536 bij 536px), links de groepen Mens (bouwblok 11 tot en met 14) en Fundament (15), rechts Overkoepelend (1 en 2) en Organisatie (3 tot en met 6), en onder de radar, over 536px breed in twee kolommen, Proces & Tech (7 tot en met 10).
+- **Groep.** Een kop in hoofdletters (12px, gewicht 700, `--ink-m`) met een balk van 4px erboven in de categoriekleur en 12px ruimte, daaronder de bouwblokken als pillen onder elkaar met 8px ertussen.
+- **Pil.** Rand 1px, 10px radius, wit, padding 8px 10px, tekst 13px met regelhoogte 18px en gewicht 600, links een nummer in een cirkel van 22px met een rand van 2px in de categoriekleur. De tekst breekt af op meerdere regels en loopt nooit uit de pil (`min-width: 0`, `overflow-wrap: anywhere`). Dit was de fout in de eerste bouwpoging, waar "Organisatiestrategie" buiten het vak liep.
+- **Radar.** Vijftien taartpunten, één per bouwblok, op `(n - 1) × 24°` vanaf boven met de klok mee, straal 190px, gevuld met de categoriekleur op 22% dekking en een witte rand van 1,5px. Ringen bij score 2, 3, 4 en 5 (wit op 70%, score 5 op straal 150px). Een veelhoek in `--or` met voorbeeldscores, zonder getallen, zodat het een radar lijkt; dit zijn geen echte scores. Buiten elke taartpunt, op straal 226px, staat het nummer in een cirkel van 26px in de categoriekleur (wit nummer, bij Fundament `--ink`).
+- **Kaart met de centrale vraag.** Boven de stage, gecentreerd, hoogstens 720px breed, 96px hoog, `--bg-mid`, 1px rand, 10px radius, padding 16px 24px. Zonder hover staat er het label "De 15 bouwblokken" met de zin "Beweeg over een bouwblok of een nummer in de radar om de centrale vraag te zien." Bij hover staat er "n · Naam" (label, 12px, hoofdletters) met de centrale vraag (17px, regelhoogte 26px).
+- **Hover** (op een pil of een nummer, beide werken hetzelfde): De taartpunt gaat naar 62% dekking en de andere taartpunten naar 10%. De pil krijgt een rand in de categoriekleur en een ring van 2px op 20%. Het nummer in de radar wordt 1,25 keer zo groot. Focus met het toetsenbord doet hetzelfde als hover.
+- **Klik** op een pil of een nummer opent de Toelichtingsmodal (`stylesheet.md`, Toelichtingsmodal, opbouw): kop, centrale vraag, beschrijving. In het ontwerp staat de modal over de sectie; in de app is het de gewone overlay over de hele pagina.
+
 ## Hero
 
 Oranje-getinte hero bovenaan de pagina, verloop van `--or-faint` naar
@@ -239,17 +251,16 @@ een paneel dat onder de grid verschijnt, met het geklikte blok in de
 actieve staat. Dat is niet de spec. Vervang dit door de modal-overlay.
 
 Inhoud van de overlay (voor alle triggers gelijk, de volledige
-beschrijving staat in `stylesheet.md`):
-1. Klein label met categorie en bouwsteennummer (zie de tweede schets:
-   "OVERKOEPELEND · BOUWSTEEN 1"), stijl zoals `.eyebrow` in
-   `stylesheet.md`, kleur de categorietoken.
-2. Naam van de bouwsteen (kop).
-3. Centrale vraag, met een linker accentbalk in de categoriekleur en een
-   klein label "CENTRALE VRAAG" erboven, zoals de tweede schets al
-   toont. Dat patroon is goed, overnemen.
-4. Beschrijving (`visie-coniche.md`) als gewone body-tekst eronder.
+beschrijving staat in `stylesheet.md`, Toelichtingsmodal, opbouw; volgorde
+aangepast op 21 oktober 2026, besloten door Joost):
+1. Kop: Het nummer in een cirkel met een rand in de categoriekleur, de
+   naam van de bouwsteen als titel en daaronder de categorie in
+   hoofdletters in de categoriekleur. Het label "BOUWSTEEN n" vervalt.
+2. Centrale vraag, met een linker accentbalk in de categoriekleur en een
+   klein label "CENTRALE VRAAG" erboven. Dit staat vóór de beschrijving.
+3. Beschrijving (`visie-coniche.md`) als gewone body-tekst eronder.
 
-Sluiten: Dezelfde `.modal-close` als elders, plus de Escape-toets en een
+Sluiten: Een ronde sluitknop rechtsboven (zoals gebouwd), plus de Escape-toets en een
 klik buiten de modal.
 
 ## Niet responsive
