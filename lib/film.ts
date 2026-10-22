@@ -40,6 +40,6 @@ export function filmWeging(assessment: Assessment | null | undefined): { regel: 
   const factor = gelijk ? `${String(gewichten[0]).replace(".", ",")}×` : null;
   const woord = n <= 10 ? GETALWOORD[n] : String(n);
   const begin = `${woord.charAt(0).toUpperCase()}${woord.slice(1)}`;
-  const regel = n === 1 ? `${begin} bouwblok telt ${factor ?? "zwaarder"} mee` : `${begin} bouwblokken tellen ${factor ?? "zwaarder"} mee`;
-  return { regel, zin: "Bouwblokken die zwaarder meetellen, tonen hun factor" + (factor ? `, zoals ${factor}.` : ".") };
+  const regel = n === 1 ? `${begin} bouwsteen telt ${factor ?? "zwaarder"} mee` : `${begin} bouwstenen tellen ${factor ?? "zwaarder"} mee`;
+  return { regel, zin: "Bouwstenen die zwaarder meetellen, tonen hun factor" + (factor ? `, zoals ${factor}.` : ".") };
 }

@@ -139,7 +139,7 @@ export function SpanningResultaat({
       {gedeeld.gemiddeld ? (
         <Totaalkaart
           ring={ringVanGemiddeld(assessment, gedeeld.gemiddeld)}
-          ringLabel="Niveau"
+          ringLabel="Gemiddeld niveau"
           ringAlt={`Gemiddeld niveau ${fmt1(gedeeld.gemiddeld.score)}, ${niveauNaam(assessment, gedeeld.gemiddeld.niveau)}`}
           uitleg={NIVEAUS[gedeeld.gemiddeld.niveau - 1].betekenis}
           feiten={[

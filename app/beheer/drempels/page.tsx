@@ -5,6 +5,7 @@ import { InfoIcoon } from "@/components/InfoIcoon";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magGebruikersBeheren } from "@/lib/rechten";
 import { useInstellingen, zetInstellingen } from "@/lib/instellingen-store";
+import { SPREIDING_SLEUTELS, SpreidingSleutel, controleerSpreidingGrenzen, grensTekst } from "@/lib/spreiding-grenzen";
 
 interface VerkennenVeld {
   sleutel: "verkennenMinGroep" | "verkennenMinVergelijking" | "verkennenMinPool" | "verkennenMaxGroepen" | "verkennenMinIngevuldPct";
@@ -49,6 +50,19 @@ const VERKENNEN_VELDEN: VerkennenVeld[] = [
   },
 ];
 
+interface SpreidingVeld {
+  sleutel: SpreidingSleutel;
+  label: string;
+  uitleg: string;
+}
+
+const SPREIDING_VELDEN: SpreidingVeld[] = [
+  { sleutel: "spreidingWisselend", label: "Wisselend vanaf (schaalscans)", uitleg: "Standaardafwijking van de bouwsteenscores vanaf waar het label Wisselend is." },
+  { sleutel: "spreidingVerdeeld", label: "Verdeeld vanaf (schaalscans)", uitleg: "Standaardafwijking vanaf waar het label Verdeeld is." },
+  { sleutel: "spreidingWisselendQuickscan", label: "Wisselend vanaf (Quickscan)", uitleg: "Standaardafwijking van de percentages, in procentpunten, vanaf waar het label Wisselend is." },
+  { sleutel: "spreidingVerdeeldQuickscan", label: "Verdeeld vanaf (Quickscan)", uitleg: "Standaardafwijking in procentpunten vanaf waar het label Verdeeld is." },
+];
+
 /**
  * Drempels en termijnen (`beheerpagina.md`, punt 10, heette eerder Instellingen), Admin-only, een tab onder Instellingen
  * in het Accountmenu. Nu de
@@ -70,6 +84,8 @@ export default function DrempelsEnTermijnenPage() {
   const [benchmarkOpgeslagen, setBenchmarkOpgeslagen] = useState(false);
   const [verkennenInput, setVerkennenInput] = useState<Record<string, string>>({});
   const [verkennenOpgeslagen, setVerkennenOpgeslagen] = useState(false);
+  const [spreidingInput, setSpreidingInput] = useState<Partial<Record<SpreidingSleutel, string>>>({});
+  const [spreidingOpgeslagen, setSpreidingOpgeslagen] = useState(false);
 
   if (!magGebruikersBeheren(gebruiker)) {
     return (
@@ -120,6 +136,21 @@ export default function DrempelsEnTermijnenPage() {
     setVerkennenInput({});
     setVerkennenOpgeslagen(true);
     setTimeout(() => setVerkennenOpgeslagen(false), 1600);
+  }
+
+  // De grenzen van het spreidingslabel (`beheerpagina.md`, formulier Spreiding): Getallen met een komma, groter dan 0, en Verdeeld boven Wisselend.
+  const spreidingWaarde = (sleutel: SpreidingSleutel) => spreidingInput[sleutel] ?? grensTekst(instellingen[sleutel]);
+  const spreidingControle = controleerSpreidingGrenzen(
+    Object.fromEntries(SPREIDING_SLEUTELS.map((k) => [k, spreidingWaarde(k)])) as Record<SpreidingSleutel, string>
+  );
+
+  function handleSpreidingOpslaan(e: React.FormEvent) {
+    e.preventDefault();
+    if (!spreidingControle.ok) return;
+    zetInstellingen(spreidingControle.waarde);
+    setSpreidingInput({});
+    setSpreidingOpgeslagen(true);
+    setTimeout(() => setSpreidingOpgeslagen(false), 1600);
   }
 
   function handleOpslaan(e: React.FormEvent) {
@@ -200,6 +231,39 @@ export default function DrempelsEnTermijnenPage() {
           </button>
           <InfoIcoon naastVeld sleutel="info.benchmarkInstellingen" />
           {benchmarkOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
+        </span>
+      </form>
+
+      <h2 style={{ marginTop: "2rem" }}>Spreiding</h2>
+      <form onSubmit={handleSpreidingOpslaan}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sp-4)", alignItems: "flex-start" }}>
+          {SPREIDING_VELDEN.map((v) => (
+            <div key={v.sleutel} className="admin-field" style={{ marginBottom: 0, width: "13rem", minWidth: 0 }}>
+              <label htmlFor={`spreiding-${v.sleutel}`}>{v.label}</label>
+              <input
+                id={`spreiding-${v.sleutel}`}
+                type="text"
+                inputMode="decimal"
+                value={spreidingWaarde(v.sleutel)}
+                onChange={(e) => setSpreidingInput({ ...spreidingInput, [v.sleutel]: e.target.value })}
+              />
+              <p className="text-xs text-ink-s" style={{ margin: "var(--sp-1) 0 0" }}>
+                {v.uitleg}
+              </p>
+            </div>
+          ))}
+        </div>
+        <span className="knop-met-icoon" style={{ marginTop: "var(--sp-4)" }}>
+          <button type="submit" className="btn btn-or btn-compact" disabled={!spreidingControle.ok}>
+            Opslaan
+          </button>
+          <InfoIcoon naastVeld sleutel="info.spreidingGrenzen" />
+          {!spreidingControle.ok && (
+            <span className="text-sm" style={{ color: "var(--stat-red)", whiteSpace: "normal" }}>
+              {spreidingControle.reden}
+            </span>
+          )}
+          {spreidingOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
         </span>
       </form>
 

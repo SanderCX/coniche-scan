@@ -43,9 +43,9 @@ export function QuickscanBenchmarkView({
       <Tegels
         tegels={[
           { label: "Vergelijkgroep", waarde: String(view.groepsgrootte), sub: "ziekenhuizen, X inbegrepen" },
-          { label: "Boven het gemiddelde", waarde: String(view.boven), sub: `van ${view.aantalMetScore} bouwblokken` },
-          { label: "Bovenste kwart", waarde: String(view.inBovensteKwart), sub: "bouwblokken" },
-          { label: "Onderste kwart", waarde: String(view.inOndersteKwart), sub: "bouwblokken" },
+          { label: "Boven het gemiddelde", waarde: String(view.boven), sub: `van ${view.aantalMetScore} bouwstenen` },
+          { label: "Bovenste kwart", waarde: String(view.inBovensteKwart), sub: "bouwstenen" },
+          { label: "Onderste kwart", waarde: String(view.inOndersteKwart), sub: "bouwstenen" },
         ]}
       />
       <div className="qv-kaart">

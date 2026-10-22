@@ -81,7 +81,7 @@ describe("een Assessment verwijderen", () => {
     expect(v.verwijderAssessment("bestaat-niet", [])).toEqual({ ok: false, reden: "onbekend" });
   });
 
-  it("de effecten tellen alle categorieën, bouwblokken en vragen en noemen benchmarks en afgeleide Assessments", () => {
+  it("de effecten tellen alle categorieën, bouwstenen en vragen en noemen benchmarks en afgeleide Assessments", () => {
     const alle = assessments.getAssessments();
     const doel = alle[0];
     const effecten = v.assessmentEffecten(doel, alle, [{ id: "b", naam: "Groep", assessmentIds: [doel.id], leden: [], meldingen: [], aangemaaktOp: "x", aangemaaktDoor: "g" }]);

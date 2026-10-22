@@ -51,7 +51,7 @@ describe("klasse en afronding", () => {
 });
 
 describe("A. Eén meting", () => {
-  it("toont het gemiddelde per bouwblok, de laagste en hoogste scan en de totaalscore uit de gedeelde scorefunctie", () => {
+  it("toont het gemiddelde per bouwsteen, de laagste en hoogste scan en de totaalscore uit de gedeelde scorefunctie", () => {
     const scans = [scan("s1", 2), scan("s2", 4), scan("s3", 3, "bezig")];
     const w = eenMeting(a, scans);
     expect(w.aantalScans).toBe(2);
@@ -66,7 +66,7 @@ describe("A. Eén meting", () => {
     expect(w.verdeling).toEqual({ rood: 0, oranje: 15, groen: 0 });
   });
 
-  it("de totaalscore komt uit de ruwe antwoorden met de gewichten, niet uit het gemiddelde van de bouwblokken", () => {
+  it("de totaalscore komt uit de ruwe antwoorden met de gewichten, niet uit het gemiddelde van de bouwstenen", () => {
     const s = scan("s", (i) => (i % 3) + 1);
     const w = eenMeting(a, [s]);
     expect(w.totaal).toBe(overallScore(a, s.antwoorden));
@@ -80,7 +80,7 @@ describe("A. Eén meting", () => {
     expect(w.hoogsteBouwblok).toBeNull();
   });
 
-  it("noemt het hoogste en laagste bouwblok bij naam", () => {
+  it("noemt het hoogste en laagste bouwsteen bij naam", () => {
     const eersteBouwblokVragen = new Set(a.categorieen![0].bouwblokken[0].vragen.map((v) => v.id));
     const s = scan("s", 3);
     for (const id of eersteBouwblokVragen) s.antwoorden[id] = 5;
@@ -124,7 +124,7 @@ describe("B. Spreiding", () => {
     expect(w.aantalOnderGemiddelde).toBe(15);
   });
 
-  it("noemt het meest verdeelde en meest eensgezinde bouwblok", () => {
+  it("noemt het meest verdeelde en meest eensgezinde bouwsteen", () => {
     const bouwblok = a.categorieen![0].bouwblokken[0];
     const ids = new Set(bouwblok.vragen.map((v) => v.id));
     const s1 = scan("s1", 3);
@@ -173,7 +173,7 @@ describe("C. Tussen Metingen", () => {
     expect(w.gestegen + w.gedaald + w.gewisseld).toBe(0);
   });
 
-  it("een bouwblok zonder antwoorden in een van de Metingen heeft geen verschil", () => {
+  it("een bouwsteen zonder antwoorden in een van de Metingen heeft geen verschil", () => {
     const leeg = { ...scan("h", 3), antwoorden: {} };
     const w = tussenMetingen(a, [scan("v", 3)], [leeg]);
     expect(w.rijen.every((r) => r.verschil === null && r.richting === null)).toBe(true);
@@ -201,7 +201,7 @@ describe("D. Tussen organisaties", () => {
     expect(tussenOrganisaties(a, scan("x", 1).antwoorden, anderen).rijen[0].positie).toBe("Onderste kwart");
   });
 
-  it("telt de bouwblokken boven het groepsgemiddelde en in de kwarten", () => {
+  it("telt de bouwstenen boven het groepsgemiddelde en in de kwarten", () => {
     const anderen = [2, 3, 4].map((w) => scan(`o${w}`, w).antwoorden);
     const w = tussenOrganisaties(a, scan("x", 5).antwoorden, anderen);
     expect(w.grootte).toBe(3);
@@ -221,7 +221,7 @@ describe("D. Tussen organisaties", () => {
 describe("E. Matrix", () => {
   const kolom = (label: string, waarde: number, aantal = 4) => ({ label, aantalScans: aantal, antwoorden: scan(label, waarde).antwoorden });
 
-  it("toont per bouwblok de score van elke Meting, met klasse, rijgemiddelde en bereik", () => {
+  it("toont per bouwsteen de score van elke Meting, met klasse, rijgemiddelde en bereik", () => {
     const m = matrix(a, [kolom("Nul", 2), kolom("Vervolg", 4)]);
     expect(m.rijen[0].cellen.map((c) => c.score)).toEqual([2, 4]);
     expect(m.rijen[0].cellen.map((c) => c.klasse)).toEqual(["rood", "groen"]);
@@ -245,7 +245,7 @@ describe("E. Matrix", () => {
     expect(m.rijen[0].cellen.map((c) => c.afwijkend)).toEqual([true, true]);
   });
 
-  it("noemt de hoogste en laagste Meting en het bouwblok met het grootste verschil", () => {
+  it("noemt de hoogste en laagste Meting en de bouwsteen met het grootste verschil", () => {
     const bouwblok = a.categorieen![0].bouwblokken[1];
     const ids = new Set(bouwblok.vragen.map((v) => v.id));
     const hoog = kolom("Hoog", 4);
@@ -282,7 +282,7 @@ describe("E. Matrix", () => {
       expect(m.groepRijen).toEqual([]);
     });
 
-    it("geeft per categorie een rij met score en verschil, na het laatste bouwblok van de categorie", () => {
+    it("geeft per categorie een rij met score en verschil, na de laatste bouwsteen van de categorie", () => {
       const m = matrix(a, [kolom("Oud", 2), kolom("Nieuw", 4)], { groepsvergelijking: false });
       expect(m.groepRijen).toHaveLength(a.categorieen!.length);
       const eerste = m.groepRijen[0];
@@ -336,7 +336,7 @@ describe("G. Antwoorden per vraag", () => {
     expect(initialenVan("")).toBe("?");
   });
 
-  it("toont per vraag de antwoorden, per bouwblok de score van de respondent, en de gemiddelden en N", () => {
+  it("toont per vraag de antwoorden, per bouwsteen de score van de respondent, en de gemiddelden en N", () => {
     const w = antwoordenPerVraag(a, [scan("s1", 2), scan("s2", 4)], naamVan);
     expect(w.rijen).toHaveLength(15);
     const eerste = w.rijen[0];
@@ -503,10 +503,10 @@ describe("I. Eenheden: onderdelen en organisaties", () => {
     expect(stapelStappen([3, 3])).toEqual([-0.5, 0.5]);
   });
 
-  it("het woord voor een bouwblok is bouwblok waar de Assessment bouwsteen zegt, en anders de eigen eenheid", () => {
+  it("het woord voor een bouwsteen is de eigen eenheid van de Assessment, met een kleine letter", () => {
     expect(bouwblokWoorden({ bouwblokEenheidEnkelvoud: "Bouwsteen", bouwblokEenheidMeervoud: "bouwstenen" })).toEqual({
-      enkelvoud: "bouwblok",
-      meervoud: "bouwblokken",
+      enkelvoud: "bouwsteen",
+      meervoud: "bouwstenen",
     });
     expect(bouwblokWoorden({ bouwblokEenheidEnkelvoud: "Domein", bouwblokEenheidMeervoud: "domeinen" })).toEqual({
       enkelvoud: "domein",

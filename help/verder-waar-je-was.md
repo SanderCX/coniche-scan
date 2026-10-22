@@ -11,7 +11,7 @@ bijgewerkt: 2026-10-19
 Je hoeft een scan niet in één keer af te maken. Je kunt altijd stoppen en later verder gaan.
 
 ## In het kort
-Je antwoorden worden bewaard terwijl je invult. Open je persoonlijke link opnieuw en klik op "Ga verder", dan sta je weer op het bouwblok waar je bleef.
+Je antwoorden worden bewaard terwijl je invult. Open je persoonlijke link opnieuw en klik op "Ga verder", dan sta je weer op de bouwsteen waar je bleef.
 
 ## Wat je ziet
 1. **Je persoonlijke link.** Bewaar de link of de e-mail waarin je hem kreeg. De link blijft werken zolang je als Respondent bestaat.

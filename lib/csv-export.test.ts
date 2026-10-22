@@ -36,23 +36,23 @@ const kolom = (csv: string, naam: string) => {
 };
 
 describe("CSV groepsScores met gewicht", () => {
-  it("bij categorieën: per groep een lijst bouwblokken met nummer, naam, score en gewicht (altijd aanwezig, komma bij decimalen)", () => {
+  it("bij categorieën: per groep een lijst bouwstenen met nummer, naam, score en gewicht (altijd aanwezig, komma bij decimalen)", () => {
     const csv = genereerScansCsv([{ organisatie: organisatie(zorgscan, [scan(zorgscan)]), scanUitvoering: organisatie(zorgscan, []).scanUitvoeringen[0], lid, invulling: scan(zorgscan), assessment: zorgscan }]);
     const groepsScores = kolom(csv, "groepsScores");
     expect(groepsScores).toContain('"type":"categorie"');
-    expect(groepsScores).toContain('"bouwblokken":[');
+    expect(groepsScores).toContain('"bouwstenen":[');
     expect(groepsScores).toMatch(/\{"nummer":4,"naam":"Leren uit klantcontact","score":4,0,"gewicht":1,5\}/);
     expect(groepsScores).toMatch(/\{"nummer":10,"naam":"Kanaalmanagement","score":4,0,"gewicht":2\}/);
     // Ook bij gewicht 1.
     expect(groepsScores).toMatch(/\{"nummer":1,"naam":"Organisatiestrategie","score":4,0,"gewicht":1\}/);
   });
 
-  it("zonder categorieën: nummer en gewicht staan direct op de groep, zonder lijst bouwblokken", () => {
+  it("zonder categorieën: nummer en gewicht staan direct op de groep, zonder lijst bouwstenen", () => {
     const o = organisatie(aiVolwassenheid, [scan(aiVolwassenheid)]);
     const csv = genereerScansCsv([{ organisatie: o, scanUitvoering: o.scanUitvoeringen[0], lid, invulling: scan(aiVolwassenheid), assessment: aiVolwassenheid }]);
     const groepsScores = kolom(csv, "groepsScores");
-    expect(groepsScores).toContain('"type":"bouwblok"');
-    expect(groepsScores).not.toContain('"bouwblokken"');
+    expect(groepsScores).toContain('"type":"bouwsteen"');
+    expect(groepsScores).not.toContain('"bouwstenen"');
     expect(groepsScores).toMatch(/"nummer":1,"gewicht":1\}/);
   });
 });
@@ -148,5 +148,19 @@ describe("CSV scan_notitie", () => {
     expect(kolom(csv, "scan_notitie")).toBe("Jan Jansen, Service");
     const zonder = genereerScansCsv([{ organisatie: o, scanUitvoering: o.scanUitvoeringen[0], lid, invulling: scan(zorgscan), assessment: zorgscan }]);
     expect(kolom(zonder, "scan_notitie")).toBe("");
+  });
+});
+
+describe("de namen van bouwsteen in de CSV (22 oktober 2026)", () => {
+  it("heeft de kolom opmerkingen_per_bouwsteen en in de antwoorden bouwsteenId en bouwsteenNaam", () => {
+    const o = organisatie(zorgscan, [scan(zorgscan)]);
+    const csv = genereerScansCsv([{ organisatie: o, scanUitvoering: o.scanUitvoeringen[0], lid, invulling: scan(zorgscan), assessment: zorgscan }]);
+    const kop = csv.split("\n")[0];
+    expect(kop).toContain("opmerkingen_per_bouwsteen");
+    expect(kop).not.toContain("opmerkingen_per_bouwblok");
+    const antwoorden = kolom(csv, "antwoorden");
+    expect(antwoorden).toContain("bouwsteenId");
+    expect(antwoorden).toContain("bouwsteenNaam");
+    expect(antwoorden).not.toContain("bouwblokId");
   });
 });

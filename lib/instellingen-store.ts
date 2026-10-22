@@ -2,6 +2,7 @@ import { useSyncExternalStore } from "react";
 import { Kanaal, KpiDefinitie, ScanInvulling } from "./types";
 import { STANDAARD_KANALEN, STANDAARD_KPIS } from "./kpi";
 import type { KorteNamen } from "./korte-namen";
+import { SPREIDING_STANDAARDWAARDEN, SpreidingGrenzen } from "./spreiding-grenzen";
 import { haalServerKopieOp, stuurNaarServer } from "./server-sync";
 import { logAudit } from "./audit-store";
 
@@ -46,6 +47,14 @@ export interface Instellingen {
   verkennenMaxGroepen: number;
   /** Een kenmerk dat bij een lager percentage van de organisaties in het Assessment is ingevuld, kan niet groeperen. Startwaarde 40. */
   verkennenMinIngevuldPct: number;
+  /** Het spreidingslabel van de schaalscans (`beheerpagina.md`, formulier Spreiding): Vanaf deze standaardafwijking is het label Wisselend. Startwaarde 0,55. */
+  spreidingWisselend: number;
+  /** Vanaf deze standaardafwijking is het label Verdeeld. Moet boven `spreidingWisselend` liggen. Startwaarde 0,8. */
+  spreidingVerdeeld: number;
+  /** Idem voor de Quickscan, in procentpunten. Startwaarde 14. */
+  spreidingWisselendQuickscan: number;
+  /** Idem voor de Quickscan, in procentpunten. Moet boven `spreidingWisselendQuickscan` liggen. Startwaarde 20. */
+  spreidingVerdeeldQuickscan: number;
   /**
    * De korte namen voor veldnamen en waarden (`datamodel.md`, Korte namen). Ze staan hier, bij de instellingen, omdat het
    * weergavenamen zijn en de organisatievelden zelf vaste data zijn.
@@ -69,6 +78,7 @@ const STANDAARDWAARDEN: Instellingen = {
   verkennenMinPool: 6,
   verkennenMaxGroepen: 12,
   verkennenMinIngevuldPct: 40,
+  ...SPREIDING_STANDAARDWAARDEN,
   korteNamen: { velden: {}, waarden: [] },
   kpiDefinities: STANDAARD_KPIS,
   kanalen: STANDAARD_KANALEN,
@@ -137,6 +147,15 @@ export function useInstellingen(): Instellingen {
 /** De instellingen buiten React om, voor berekeningen in de opslag. */
 export function getInstellingen(): Instellingen {
   return parseSnapshot(getSnapshot());
+}
+
+/** De grenzen van het spreidingslabel uit de instellingen, voor de schaalscans en voor de Quickscan (`lib/spreiding-grenzen.ts`). */
+export function getSpreidingGrenzen(): { schaal: SpreidingGrenzen; quickscan: SpreidingGrenzen } {
+  const i = getInstellingen();
+  return {
+    schaal: { wisselend: i.spreidingWisselend, verdeeld: i.spreidingVerdeeld },
+    quickscan: { wisselend: i.spreidingWisselendQuickscan, verdeeld: i.spreidingVerdeeldQuickscan },
+  };
 }
 
 export function schrijfInstellingen(patch: Partial<Instellingen>): void {

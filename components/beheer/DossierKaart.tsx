@@ -27,6 +27,9 @@ import {
   TOT_RESULTAAT_MAX,
   aantalZichtbaarVoorLead,
   aantallPerSoort,
+  aantalOrganisatiesInBenchmark,
+  benchmarkRijRegel,
+  benchmarksVoorDossier,
   brancheVan,
   datumKort,
   dossierBouwblokkenPerAssessment,
@@ -43,7 +46,12 @@ import { automatischeRadarMeting, metingZichtbaarVoorLead, radarBronVan, radarKe
 import { aantalAfgerondInMeting } from "@/lib/metingen";
 import { langeDatum, maandJaarLang } from "@/lib/mijn-metingen";
 import { kopNaam } from "@/lib/korte-namen";
-import { Dossieritem, Organisatie, ScanUitvoering } from "@/lib/types";
+import { Assessment, Benchmark, Dossieritem, Organisatie, ScanUitvoering } from "@/lib/types";
+import { SoortIcoon } from "@/components/icons/DossierIcons";
+import { useBenchmarksMetLeden } from "@/lib/use-benchmarks";
+import { useBeheerOverzicht } from "@/lib/beheer-url";
+import { magLeadToekennen } from "@/lib/rechten";
+import { leadsMetBenchmark } from "@/lib/lead-toegang";
 
 type Filter = "alles" | DossierSoort;
 
@@ -58,6 +66,8 @@ export function DossierKaart({ organisatie }: { organisatie: Organisatie }) {
   const gebruiker = useIngelogdeGebruiker();
   const alle = useOrganisaties();
   const { korteNamen } = useInstellingen();
+  const benchmarks = useBenchmarksMetLeden();
+  const assessments = useAssessments();
   const kanBewerken = magDossierBewerken(gebruiker, organisatie);
   const dossier = dossierVan(organisatie);
   const [filter, setFilter] = useState<Filter>("alles");
@@ -73,7 +83,7 @@ export function DossierKaart({ organisatie }: { organisatie: Organisatie }) {
         <h2 className="dos-kop-titel">Dossier</h2>
       </div>
 
-      <InstellingenVoorLead organisatie={organisatie} alle={alle} kanBewerken={kanBewerken} />
+      <InstellingenVoorLead organisatie={organisatie} alle={alle} benchmarks={benchmarks} kanBewerken={kanBewerken} />
 
       <div className="dos-filterrij">
         <WeergaveWissel<Filter>
@@ -83,6 +93,7 @@ export function DossierKaart({ organisatie }: { organisatie: Organisatie }) {
           opties={[
             { waarde: "alles", label: `Alles ${telling.alles}` },
             { waarde: "case", label: `Cases ${telling.cases}` },
+            { waarde: "benchmark", label: `Benchmarks ${telling.benchmarks}` },
             { waarde: "nieuws", label: `Nieuws ${telling.nieuws}` },
             { waarde: "event", label: `Events ${telling.events}` },
             { waarde: "blog", label: `Blogs ${telling.blogs}` },
@@ -102,7 +113,17 @@ export function DossierKaart({ organisatie }: { organisatie: Organisatie }) {
       ) : (
         <ul className="dos-lijst">
           {gefilterd.map((item) => (
-            <ItemRij key={item.id} item={item} alle={alle} kanBewerken={kanBewerken} onBewerk={() => setModal(item)} korteNamen={korteNamen} />
+            <ItemRij
+              key={item.id}
+              item={item}
+              organisatie={organisatie}
+              alle={alle}
+              benchmarks={benchmarks}
+              assessments={assessments}
+              kanBewerken={kanBewerken}
+              onBewerk={() => setModal(item)}
+              korteNamen={korteNamen}
+            />
           ))}
         </ul>
       )}
@@ -134,14 +155,14 @@ function metingTekst(organisatie: Organisatie, meting: ScanUitvoering): string {
  * die na een bevestiging aangaat), Naam voor de Lead (een potlood naar een modal) en Scores in de radar (een tabel met per Assessment de Meting
  * en de bron, met een potlood naar een modal). Verliest een gekozen Meting haar zichtbaarheid, dan staat het Dossier uit en meldt het paneel waarom.
  */
-function InstellingenVoorLead({ organisatie, alle, kanBewerken }: { organisatie: Organisatie; alle: Organisatie[]; kanBewerken: boolean }) {
+function InstellingenVoorLead({ organisatie, alle, benchmarks, kanBewerken }: { organisatie: Organisatie; alle: Organisatie[]; benchmarks: Benchmark[]; kanBewerken: boolean }) {
   const assessments = useAssessments();
   const dossier = dossierVan(organisatie);
   const [bevestigOpen, setBevestigOpen] = useState(false);
   const [naamOpen, setNaamOpen] = useState(false);
   const [bronOpen, setBronOpen] = useState<string | null>(null);
   const [fout, setFout] = useState<string | null>(null);
-  const zichtbaar = aantalZichtbaarVoorLead(organisatie, alle);
+  const zichtbaar = aantalZichtbaarVoorLead(organisatie, alle, new Date(), benchmarks);
   const eigenNaam = dossier.naamVoorLead.trim();
   const verloren = verlorenRadarBronnen(organisatie);
   const assessmentNaam = (id: string) => assessments.find((a) => a.id === id)?.naam ?? id;
@@ -392,19 +413,26 @@ function BronModal({ organisatie, assessmentId, assessmentNaam, onSluit }: { org
 
 function ItemRij({
   item,
+  organisatie,
   alle,
+  benchmarks,
+  assessments,
   kanBewerken,
   onBewerk,
   korteNamen,
 }: {
   item: Dossieritem;
+  organisatie: Organisatie;
   alle: Organisatie[];
+  benchmarks: Benchmark[];
+  assessments: Assessment[];
   kanBewerken: boolean;
   onBewerk: () => void;
   korteNamen: ReturnType<typeof useInstellingen>["korteNamen"];
 }) {
   const isCase = item.soort === "case";
-  const status = itemStatus(item, alle);
+  const status = itemStatus(item, alle, new Date(), { benchmarks, organisatie });
+  const benchmark = item.soort === "benchmark" ? benchmarks.find((b) => b.id === item.benchmarkId) : undefined;
   const caseOrg = isCase ? alle.find((o) => o.id === item.caseOrganisatieId) : undefined;
   let regel: string;
   if (isCase) {
@@ -416,6 +444,8 @@ function ItemRij({
     ]
       .filter(Boolean)
       .join(", ");
+  } else if (item.soort === "benchmark") {
+    regel = benchmarkRijRegel(benchmark, assessments, organisatie);
   } else if (item.soort === "event") {
     // "{datum}, {plaats}", bij een meerdaags event "{datum} tot {einddatum}, {plaats}". Een lege plaats valt weg.
     const wanneer = item.einddatum && item.einddatum !== item.datum ? `${datumKort(item.datum)} tot ${datumKort(item.einddatum)}` : datumKort(item.datum);
@@ -425,9 +455,14 @@ function ItemRij({
   }
   return (
     <li className="dos-rij">
-      <span className="dos-eyebrow">{SOORT_LABEL[item.soort]}</span>
+      <span className={`dos-soort dos-soort--${item.soort}${status === "verlopen" ? " is-verlopen" : ""}`}>
+        <span className="dos-soort-tegel">
+          <SoortIcoon soort={item.soort} size={20} />
+        </span>
+        <span className="dos-eyebrow">{SOORT_LABEL[item.soort]}</span>
+      </span>
       <div className="dos-tekst">
-        <h3 className="dos-titel">{item.titel}</h3>
+        <h3 className="dos-titel">{item.soort === "benchmark" ? (benchmark?.naam ?? "Kies een benchmark") : item.titel}</h3>
         {regel && <span className="dos-regel">{regel}</span>}
       </div>
       <div className="dos-acties">
@@ -456,6 +491,7 @@ function TekstMetTeller({
   waarde,
   onChange,
   hint,
+  placeholder,
 }: {
   id: string;
   label: string;
@@ -464,11 +500,12 @@ function TekstMetTeller({
   waarde: string;
   onChange: (waarde: string) => void;
   hint: string;
+  placeholder?: string;
 }) {
   return (
     <div className="admin-field">
       <label htmlFor={id}>{label}</label>
-      <textarea id={id} className={`dos-tekstvak dos-tekstvak--${hoogte}`} maxLength={max} value={waarde} onChange={(e) => onChange(e.target.value)} />
+      <textarea id={id} className={`dos-tekstvak dos-tekstvak--${hoogte}`} maxLength={max} value={waarde} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
       <span className="dos-hint dos-hint--teller">
         <span>{hint}</span>
         <span className="dos-teller">
@@ -493,7 +530,7 @@ function chipGroepen<T extends { bouwblok: { volgnummer: number }; groepNaam: st
 /** De namen op de pillen van de koppeling: De volledige naam is te lang voor een pil. */
 const KOPPEL_NAAM: Record<string, string> = { "klantcontact-volwassenheid": "Klantcontact Volwassenheid", "ai-volwassenheid": "AI-volwassenheid" };
 
-const SOORT_LABEL: Record<DossierSoort, string> = { case: "Case", nieuws: "Nieuws", event: "Event", blog: "Blog" };
+const SOORT_LABEL: Record<DossierSoort, string> = { case: "Case", benchmark: "Benchmark", nieuws: "Nieuws", event: "Event", blog: "Blog" };
 
 /**
  * Item toevoegen of bewerken (`dossier.md`, Scherm 3): Een modal van 640px met de soort (bij Bewerken vast), de velden van dat soort, de
@@ -504,6 +541,8 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
   const assessments = useAssessments();
   const alle = useOrganisaties();
   const { korteNamen } = useInstellingen();
+  const benchmarks = useBenchmarksMetLeden();
+  const { open: openOverzicht } = useBeheerOverzicht();
   const [invoer, setInvoer] = useState<DossierInvoer>(item ? invoerVanItem(item) : leegDossierInvoer("nieuws"));
   const [fout, setFout] = useState<string | null>(null);
   const [bevestig, setBevestig] = useState(false);
@@ -515,6 +554,7 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
   const koppel = perAssessment.find((a) => a.assessment.id === koppelAssessmentId) ?? perAssessment[0];
   const isCase = invoer.soort === "case";
   const isEvent = invoer.soort === "event";
+  const isBenchmark = invoer.soort === "benchmark";
 
   const zet = (patch: Partial<DossierInvoer>) => {
     setInvoer((v) => ({ ...v, ...patch }));
@@ -533,6 +573,16 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
   const schakelaarUit = reden !== null && !(item?.zichtbaarVoorLead && invoer.zichtbaarVoorLead);
   const kanCaseVlag = magCaseVlagZetten(gebruiker);
 
+  // Benchmark: Alleen benchmarks waar de Organisatie in zit en die nog niet in het Dossier staan (de eigen keuze van dit item blijft staan).
+  const andereBenchmarkIds = dossierVan(organisatie)
+    .items.filter((i) => i.soort === "benchmark" && i.benchmarkId && i.id !== item?.id)
+    .map((i) => i.benchmarkId as string);
+  const benchmarkKeuzes = benchmarksVoorDossier(benchmarks, organisatie.id).filter((b) => !andereBenchmarkIds.includes(b.id));
+  const gekozenBenchmark = isBenchmark ? benchmarks.find((b) => b.id === invoer.benchmarkId) : undefined;
+  const aantalLeads = organisatie.leden.filter((l) => l.lead === true).length;
+  const leadsMetToegang = gekozenBenchmark ? leadsMetBenchmark(organisatie, gekozenBenchmark.id).length : 0;
+  const kanLeadsOpenen = magLeadToekennen(gebruiker);
+
   function opslaan(e: React.FormEvent) {
     e.preventDefault();
     const r = item ? wijzigDossieritem(organisatie.id, item.id, invoer) : voegDossieritemToe(organisatie.id, invoer);
@@ -548,6 +598,11 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
       return setFout(r.reden);
     }
     onSluit();
+  }
+
+  function naarLeads() {
+    onSluit();
+    openOverzicht("leads", organisatie.id);
   }
 
   function naarAfspraken() {
@@ -569,7 +624,7 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
               ariaLabel="Soort"
               waarde={invoer.soort}
               onChange={(soort) => zet({ soort })}
-              opties={(["nieuws", "case", "event", "blog"] as DossierSoort[]).map((soort) => ({
+              opties={(["nieuws", "case", "event", "blog", "benchmark"] as DossierSoort[]).map((soort) => ({
                 waarde: soort,
                 label: SOORT_LABEL[soort],
                 disabled: !!item && item.soort !== soort,
@@ -577,12 +632,66 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
             />
           </div>
 
-          <div className="admin-field">
-            <label htmlFor="dos-titel">Titel</label>
-            <input id="dos-titel" type="text" autoFocus maxLength={TITEL_MAX} value={invoer.titel} onChange={(e) => zet({ titel: e.target.value })} />
-          </div>
+          {!isBenchmark && (
+            <div className="admin-field">
+              <label htmlFor="dos-titel">Titel</label>
+              <input id="dos-titel" type="text" autoFocus maxLength={TITEL_MAX} value={invoer.titel} onChange={(e) => zet({ titel: e.target.value })} />
+            </div>
+          )}
 
-          {isCase ? (
+          {isBenchmark ? (
+            <div className="admin-field">
+              <label htmlFor="dos-benchmark">Benchmark</label>
+              <select id="dos-benchmark" value={invoer.benchmarkId ?? ""} onChange={(e) => zet({ benchmarkId: e.target.value || null })}>
+                <option value="">Kies een benchmark</option>
+                {benchmarkKeuzes.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.naam}
+                  </option>
+                ))}
+              </select>
+              <span className="dos-hint">
+                Alleen benchmarks waar {organisatie.naam} in zit. De Lead ziet de naam van de benchmark, dus kies een naam zonder organisatienamen.
+              </span>
+              {gekozenBenchmark && (
+                <>
+                  <dl className="dos-benchmark-gegevens">
+                    <div>
+                      <dt>Assessment</dt>
+                      <dd>{gekozenBenchmark.assessmentIds.map((id) => assessments.find((a) => a.id === id)?.naam).filter(Boolean).join(", ")}</dd>
+                    </div>
+                    <div>
+                      <dt>Vergelijking</dt>
+                      <dd>
+                        {aantalOrganisatiesInBenchmark(gekozenBenchmark)} {aantalOrganisatiesInBenchmark(gekozenBenchmark) === 1 ? "organisatie" : "organisaties"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Soort</dt>
+                      <dd>{gekozenBenchmark.soort === "verkenning" ? "Verkenning" : "Vaste groep"}</dd>
+                    </div>
+                  </dl>
+                  {leadsMetToegang > 0 ? (
+                    <p className="dos-paneel dos-paneel--groen">
+                      {leadsMetToegang} van {aantalLeads} Leads van {organisatie.naam} hebben toegang tot deze benchmark. Alleen zij zien dit item.
+                    </p>
+                  ) : (
+                    <p className="dos-paneel dos-paneel--oranje">
+                      Geen enkele Lead van {organisatie.naam} heeft toegang tot deze benchmark. Een Admin geeft toegang in het Leads-venster. Zolang dat niet is gebeurd,
+                      ziet niemand dit item.{" "}
+                      {kanLeadsOpenen ? (
+                        <button type="button" className="btn btn-outline btn-compact dos-paneel-knop" onClick={naarLeads}>
+                          Naar Leads
+                        </button>
+                      ) : (
+                        <strong>Vraag een Admin om de Lead toegang te geven.</strong>
+                      )}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          ) : isCase ? (
             <>
               <TekstMetTeller
                 id="dos-samenvatting"
@@ -689,6 +798,7 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
           <TekstMetTeller
             id="dos-toelichting"
             label={isCase ? "Waarom dit voor jullie telt" : "Toelichting"}
+            placeholder={isBenchmark ? "Waarom is deze vergelijking relevant voor deze organisatie?" : undefined}
             hoogte="toelichting"
             max={TOELICHTING_MAX}
             waarde={invoer.toelichting}
@@ -697,11 +807,11 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
           />
 
           <div className="admin-field">
-            <span className="dos-label">Gaat over bouwblokken (optioneel)</span>
+            <span className="dos-label">Gaat over bouwstenen (optioneel)</span>
             {perAssessment.length > 1 && (
               <div className="dos-koppel">
                 <WeergaveWissel<string>
-                  ariaLabel="Assessment van de bouwblokken"
+                  ariaLabel="Assessment van de bouwstenen"
                   waarde={koppel?.assessment.id ?? ""}
                   onChange={setKoppelAssessmentId}
                   opties={perAssessment.map((a) => ({
@@ -736,7 +846,7 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
                 </div>
               ))}
             </div>
-            <span className="dos-hint">De Lead ziet de gekozen bouwblokken bij het item en kan in de radar op deze bouwblokken filteren.</span>
+            <span className="dos-hint">De Lead ziet de gekozen bouwstenen bij het item en kan in de radar op deze bouwstenen filteren.</span>
           </div>
 
           <div className={`dos-zichtbaar ${schakelaarUit ? "is-uit" : ""}`}>
@@ -755,7 +865,9 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
               {schakelaarUit && reden
                 ? reden
                 : invoer.zichtbaarVoorLead
-                  ? "De Lead ziet dit item zodra het Dossier zichtbaar is voor de Lead."
+                  ? isBenchmark
+                    ? "De Lead ziet dit item zodra het Dossier zichtbaar is voor de Lead, en alleen een Lead met toegang tot de benchmark."
+                    : "De Lead ziet dit item zodra het Dossier zichtbaar is voor de Lead."
                   : "Alleen jij en je collega-consultants zien dit item."}
             </span>
           </div>
@@ -787,7 +899,7 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
       <BevestigModal
         open={bevestig}
         titel="Item verwijderen"
-        bericht={`"${item?.titel ?? ""}" wordt verwijderd uit het Dossier van ${organisatie.naam}. Dit kan niet ongedaan worden gemaakt.`}
+        bericht={`"${item?.soort === "benchmark" ? (gekozenBenchmark?.naam ?? "Benchmark") : (item?.titel ?? "")}" wordt verwijderd uit het Dossier van ${organisatie.naam}. Dit kan niet ongedaan worden gemaakt.`}
         onBevestigen={verwijder}
         onAnnuleren={() => setBevestig(false)}
       />

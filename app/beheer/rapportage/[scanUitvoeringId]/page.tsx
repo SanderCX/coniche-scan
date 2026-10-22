@@ -188,7 +188,7 @@ export default function RapportagePage({
       {samengesteld && isAdmin(ingelogd) && (
         // De matrix met de onderliggende Metingen als kolommen, alleen voor de Admin (`visualisatie-scores.md`, E).
         <div className="mt-8">
-          <h2>Per bouwblok en per Meting</h2>
+          <h2>Per bouwsteen en per Meting</h2>
           <WeergaveMatrix
             assessment={assessment}
             weergave={matrix(

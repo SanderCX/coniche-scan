@@ -120,7 +120,7 @@ export function BouwblokForm({
       ))}
 
       <div className="field opmerking-veld" id="bouwblok-einde">
-        <label>Opmerkingen bij dit bouwblok (optioneel)</label>
+        <label>Opmerkingen bij deze bouwsteen (optioneel)</label>
         <textarea
           value={respondent.opmerkingenPerBouwblok[bouwblok.id] ?? ""}
           onChange={(e) => onOpmerking(e.target.value)}

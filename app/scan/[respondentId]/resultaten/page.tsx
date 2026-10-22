@@ -121,7 +121,7 @@ export default function ResultatenPage({
           relevantie={invulling.relevantie}
           respondentNaam={lid.naam}
           subregel={[lid.naam, scanUitvoering.label, invulling.afgerondOp ? `afgerond op ${langeDatum(dagVan(invulling.afgerondOp))}` : null]}
-          bouwblokHref={(bouwblokId) => `/scan/${respondentId}/doorloop?bouwblok=${bouwblokId}`}
+          bouwblokHref={(bouwblokId) => `/scan/${respondentId}/doorloop?bouwsteen=${bouwblokId}`}
         />
         )}
       </div>

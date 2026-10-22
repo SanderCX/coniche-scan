@@ -45,7 +45,7 @@ export function Totaalkaart({
   ringAlt,
 }: {
   ring: RingGegevens;
-  /** Het label onder het getal in de ring: Standaard "Totaalscore", bij de Spanningsmeter "Niveau". */
+  /** Het label onder het getal in de ring: Standaard "Totaalscore", bij de Spanningsmeter "Gemiddeld niveau". */
   ringLabel?: string;
   /** Het tekstalternatief van de ring. */
   ringAlt?: string;

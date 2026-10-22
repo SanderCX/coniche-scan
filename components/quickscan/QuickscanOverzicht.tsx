@@ -102,8 +102,8 @@ export function QuickscanOverzicht({ resultaat }: { resultaat: QuickscanResultaa
         </table>
       </section>
 
-      <section className="qv-kaart" aria-label="Alle bouwblokken">
-        <h3>Alle bouwblokken, van laag naar hoog</h3>
+      <section className="qv-kaart" aria-label="Alle bouwstenen">
+        <h3>Alle bouwstenen, van laag naar hoog</h3>
         <p className="qv-kaart-sub">Gesorteerd op de exacte verhouding. Bij gelijkspel staat de volgorde van het model.</p>
         {lijst.length === 0 && <p className="text-sm text-ink-m">Er is nog niets om te tonen.</p>}
         {lijst.map(({ afdeling, b }) => {

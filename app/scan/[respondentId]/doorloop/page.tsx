@@ -25,10 +25,11 @@ export default function DoorloopPage({
   searchParams,
 }: {
   params: Promise<{ respondentId: string }>;
-  searchParams: Promise<{ bouwblok?: string }>;
+  searchParams: Promise<{ bouwsteen?: string; bouwblok?: string }>;
 }) {
   const { respondentId } = use(params);
-  const { bouwblok: gevraagdBouwblokId } = use(searchParams);
+  const { bouwsteen: gevraagdBouwsteenId, bouwblok: oudBouwblokId } = use(searchParams);
+  const gevraagdBouwblokId = gevraagdBouwsteenId ?? oudBouwblokId;
   const gegevens = useScanInvulling(respondentId);
   const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
   const router = useRouter();

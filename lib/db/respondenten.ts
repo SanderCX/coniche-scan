@@ -262,7 +262,7 @@ export function slaLeadToegangOp(organisatieId: string, wijzigingen: LeadToegang
 }
 
 /**
- * "Gegevens bekijken/wijzigen" in het "Mijn gegevens"-menu (CLAUDE.md
+ * "Gegevens bekijken/bewerken" in het "Mijn gegevens"-menu (CLAUDE.md
  * sectie 3): schrijft direct naar `Respondent`, geen aparte
  * bevestigingsstap. In tegenstelling tot `voltooiIntake` hierboven raakt
  * dit nooit `ScanInvulling.status`/`gestartOp` — puur de persoonsgegevens,

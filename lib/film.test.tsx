@@ -19,24 +19,24 @@ describe("de variant van de film Wat krijg ik", () => {
 });
 
 describe("de weging in de film", () => {
-  it("telt de bouwblokken met een gewicht ongelijk aan 1 en noemt de factor, zonder namen", () => {
+  it("telt de bouwstenen met een gewicht ongelijk aan 1 en noemt de factor, zonder namen", () => {
     const w = filmWeging(zorgscan);
-    expect(w?.regel).toBe("Drie bouwblokken tellen 2× mee");
-    expect(w?.zin).toBe("Bouwblokken die zwaarder meetellen, tonen hun factor, zoals 2×.");
+    expect(w?.regel).toBe("Drie bouwstenen tellen 2× mee");
+    expect(w?.zin).toBe("Bouwstenen die zwaarder meetellen, tonen hun factor, zoals 2×.");
   });
   it("is er niet zonder gewichten ongelijk aan 1, en niet bij de Quickscan", () => {
     expect(filmWeging(klantcontactVolwassenheid)).toBeNull();
     expect(filmWeging(aiVolwassenheid)).toBeNull();
     expect(filmWeging(null)).toBeNull();
   });
-  it("noemt bij verschillende factoren geen factor en bij één bouwblok het enkelvoud", () => {
+  it("noemt bij verschillende factoren geen factor en bij één bouwsteen het enkelvoud", () => {
     const kopie = structuredClone(zorgscan);
     const blokken = kopie.categorieen!.flatMap((c) => c.bouwblokken).filter((b) => b.gewicht !== 1);
     blokken[0].gewicht = 3;
-    expect(filmWeging(kopie)?.regel).toBe("Drie bouwblokken tellen zwaarder mee");
+    expect(filmWeging(kopie)?.regel).toBe("Drie bouwstenen tellen zwaarder mee");
     blokken[1].gewicht = 1;
     blokken[2].gewicht = 1;
-    expect(filmWeging(kopie)?.regel).toBe("Één bouwblok telt 3× mee");
+    expect(filmWeging(kopie)?.regel).toBe("Één bouwsteen telt 3× mee");
   });
 });
 
@@ -52,8 +52,8 @@ describe("de film Wat krijg ik per type", () => {
   });
   it("toont bij de Zorgscan de weging onder de klassenaam en op stapkaart 2", () => {
     const h = html(zorgscan);
-    expect(h).toContain('class="film-weging">Drie bouwblokken tellen 2× mee');
-    expect(h).toContain("Bouwblokken die zwaarder meetellen, tonen hun factor, zoals 2×.");
+    expect(h).toContain('class="film-weging">Drie bouwstenen tellen 2× mee');
+    expect(h).toContain("Bouwstenen die zwaarder meetellen, tonen hun factor, zoals 2×.");
   });
   it("toont bij de AI-scan acht rijen met nummercirkel, ring 2,5 tot 37,5% en een staaf per domein", () => {
     const h = html(aiVolwassenheid);

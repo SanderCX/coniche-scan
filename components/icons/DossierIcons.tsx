@@ -56,10 +56,20 @@ export function BlogIcoon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** Een staafdiagram met drie staven voor een Benchmark. */
+export function BenchmarkIcoon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...basis} aria-hidden="true" {...props}>
+      <path d="M6 20v-7M12 20V5M18 20v-10M3.5 20h17" />
+    </svg>
+  );
+}
+
 /** De icoon per soort, met de maat. */
-export function SoortIcoon({ soort, size = 26 }: { soort: "case" | "nieuws" | "event" | "blog"; size?: number }) {
+export function SoortIcoon({ soort, size = 26 }: { soort: "case" | "benchmark" | "nieuws" | "event" | "blog"; size?: number }) {
   const props = { width: size, height: size };
   if (soort === "case") return <CaseIcoon {...props} />;
+  if (soort === "benchmark") return <BenchmarkIcoon {...props} />;
   if (soort === "nieuws") return <NieuwsIcoon {...props} />;
   if (soort === "event") return <EventIcoon {...props} />;
   return <BlogIcoon {...props} />;

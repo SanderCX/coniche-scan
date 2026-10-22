@@ -45,7 +45,7 @@ export function MijnGegevensMenu({ lid }: { lid: OrganisatieLid }) {
       <DropdownKnop
         label="Mijn gegevens"
         opties={[
-          { label: "Gegevens bekijken/wijzigen", onClick: () => setOpen(true) },
+          { label: "Gegevens bekijken/bewerken", onClick: () => setOpen(true) },
           { label: "Help", onClick: () => router.push(`/help?code=${lid.toegangscode}`) },
           { label: "Uitloggen", onClick: handleUitloggen },
         ]}

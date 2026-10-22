@@ -12,7 +12,8 @@ const TYPE_LABEL: Record<string, string> = {
   respons: "Respons",
   scan: "Scan",
   gebruiker: "Gebruiker",
-  bouwblok: "Bouwblok",
+  bouwsteen: "Bouwsteen",
+  bouwblok: "Bouwsteen",
   import: "Import",
   algemeneTekst: "Algemene tekst",
   instellingen: "Instellingen",
@@ -58,7 +59,8 @@ const DETAIL_LABEL: Record<string, string> = {
   benchmarkNaam: "Benchmark",
   kortLabel: "Kort label",
   aantalCategorieen: "Categorieën",
-  aantalBouwblokken: "Bouwblokken",
+  aantalBouwstenen: "Bouwstenen",
+  aantalBouwblokken: "Bouwstenen",
   aantalVragen: "Vragen",
   benchmarkNamen: "Uit benchmarks gehaald",
   niveau: "Niveau",
@@ -92,7 +94,8 @@ const DETAIL_LABEL: Record<string, string> = {
   kanaalNaam: "Kanaal",
   kpiNaam: "KPI",
   wijzigingen: "Wijzigingen",
-  bouwblokNaam: "Bouwblok",
+  bouwsteenNaam: "Bouwsteen",
+  bouwblokNaam: "Bouwsteen",
   oudGewicht: "Oud gewicht",
   nieuwGewicht: "Nieuw gewicht",
   aantalScans: "Aantal scans",
@@ -159,8 +162,10 @@ export function detailTekst(e: AuditEvent): string {
   if (!e.details) return "";
   const delen: string[] = [];
   const details = e.details;
-  if (e.actie === "bouwblok.gewichtGewijzigd") {
-    delen.push(`Bouwblok: #${details.volgnummer ?? "?"} ${details.bouwblokNaam ?? ""}`.trim());
+  // Tot 22 oktober 2026 heette de actie `bouwblok.gewichtGewijzigd`: Bestaande regels blijven leesbaar.
+  const isGewicht = e.actie === "bouwsteen.gewichtGewijzigd" || e.actie === "bouwblok.gewichtGewijzigd";
+  if (isGewicht) {
+    delen.push(`Bouwsteen: #${details.volgnummer ?? "?"} ${details.bouwsteenNaam ?? details.bouwblokNaam ?? ""}`.trim());
   }
   if (e.actie === "instellingen.gewijzigd" && details.gewijzigd && typeof details.gewijzigd === "object") {
     for (const [k, v] of Object.entries(details.gewijzigd as Record<string, { oud: unknown; nieuw: unknown }>)) {
@@ -172,7 +177,7 @@ export function detailTekst(e: AuditEvent): string {
     if (ID_SLEUTEL.test(sleutel)) continue;
     // De rijenlijst van `import.gestart` staat als tabel in de uitgeklapte groep, niet als lange tekstregel.
     if (sleutel === "rijen") continue;
-    if (e.actie === "bouwblok.gewichtGewijzigd" && (sleutel === "bouwblokNaam" || sleutel === "volgnummer")) continue;
+    if (isGewicht && (sleutel === "bouwsteenNaam" || sleutel === "bouwblokNaam" || sleutel === "volgnummer")) continue;
     const tekst = waardeTekst(sleutel, waarde);
     if (tekst === "") continue;
     delen.push(`${DETAIL_LABEL[sleutel] ?? sleutel}: ${tekst}`);

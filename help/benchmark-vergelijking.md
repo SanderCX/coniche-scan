@@ -17,7 +17,7 @@ Heeft een Admin een benchmark voor je aangezet, dan staat er op Mijn metingen ee
 ## Wat je ziet
 1. **De kaart.** Met de naam van de benchmark en het aantal deelnemende Organisaties. Dat aantal staat er alleen als er genoeg deelnemers zijn.
 2. **Jouw Organisatie tegenover de groep.** Een radar en een staafdiagram met twee reeksen: Jouw Organisatie en de rest van de groep.
-3. **De positie per bouwblok.** Per bouwblok zie je het bereik van de groep, het middelste deel en jouw score, met een label voor je positie.
+3. **De positie per bouwsteen.** Per bouwsteen zie je het bereik van de groep, het middelste deel en jouw score, met een label voor je positie.
 4. **Een vergelijking tussen Metingen.** Heb je Resultaten op twee Metingen van de vergelijking, dan zie je hoe de scores zich ontwikkelen of naast elkaar liggen.
 
 ## Let op

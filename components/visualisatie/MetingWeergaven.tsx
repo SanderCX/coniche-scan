@@ -84,7 +84,7 @@ interface Props {
   toonBenchmarkLink: boolean;
   /**
    * Een Meting van een Assessment met Ja / Nee / Weet ik niet (`visualisatie-quickscan.md`, 3 en 4): De schakelaar heeft dan
-   * Overzicht, "Gemiddelde en spreiding" en Antwoorden, in plaats van Per bouwblok en Spreiding. Overzicht is `overzicht`, met
+   * Overzicht, "Spreiding" en Antwoorden, in plaats van Per bouwblok en Spreiding. Overzicht is `overzicht`, met
    * het gemiddelde van de Meting in de kaarten.
    */
   quickscan?: {
@@ -177,9 +177,9 @@ function MetingWeergavenInhoud({
       onderdelenOpties(onderdelen.length, antwoordenToegestaan)
     : [
     { waarde: "overzicht", label: "Overzicht" },
-    ...(quickscan ? [] : [{ waarde: "bouwblok" as Weergave, label: "Per bouwblok" }]),
+    ...(quickscan ? [] : [{ waarde: "bouwblok" as Weergave, label: "Per bouwsteen" }]),
     ...(spreidingToegestaan
-      ? [{ waarde: "spreiding" as Weergave, label: quickscan ? "Gemiddelde en spreiding" : "Spreiding" }]
+      ? [{ waarde: "spreiding" as Weergave, label: "Spreiding" }]
       : []),
     // Een samengestelde Meting heeft geen scans en dus geen antwoorden per respondent.
     ...(antwoordenToegestaan && !isSamengesteld(scanUitvoering) ? [{ waarde: "antwoorden" as Weergave, label: "Antwoorden" }] : []),

@@ -155,7 +155,7 @@ export default function ContentEditorPage({
                   bouwblokEenheidEnkelvoud: e.target.value,
                 }))
               }
-              placeholder="Bouwblok / Domein"
+              placeholder="Bouwsteen / Domein"
               className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
@@ -169,7 +169,7 @@ export default function ContentEditorPage({
                   bouwblokEenheidMeervoud: e.target.value,
                 }))
               }
-              placeholder="bouwblokken / AI-domeinen"
+              placeholder="bouwstenen / AI-domeinen"
               className="w-full rounded-lg border border-gray-200 p-2 text-sm"
             />
           </label>
@@ -177,15 +177,15 @@ export default function ContentEditorPage({
 
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="block text-sm">
-            <span className="mb-1 block text-ink">Bouwblok-label</span>
+            <span className="mb-1 block text-ink">Bouwsteen-label</span>
             <div className="flex items-center gap-2">
               <input
                 value={assessment.bouwblokLabel}
                 onChange={(e) => updateAssessment(assessmentId, (a) => ({ ...a, bouwblokLabel: e.target.value }))}
-                placeholder="Bouwblok / AI-domein"
+                placeholder="Bouwsteen / AI-domein"
                 className="w-full rounded-lg border border-gray-200 p-2 text-sm"
               />
-              <InfoIcoon sleutel="info.contentBouwblokLabel" />
+              <InfoIcoon sleutel="info.contentBouwsteenLabel" />
             </div>
           </label>
           {!spanning && (
@@ -272,7 +272,7 @@ export default function ContentEditorPage({
             checked={heeftCategorieen}
             onChange={(e) => schakelCategorieLaag(assessmentId, e.target.checked)}
           />
-          Bouwblokken groeperen in categorieën
+          Bouwstenen groeperen in categorieën
         </label>
 
         <div className="mt-6">
@@ -385,7 +385,7 @@ export default function ContentEditorPage({
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-ink">
             {heeftCategorieen
-              ? "Categorieën & bouwblokken"
+              ? "Categorieën & bouwstenen"
               : `${assessment.bouwblokEenheidMeervoud} (geen categorie-laag)`}
           </h2>
           {heeftCategorieen ? (
@@ -590,7 +590,7 @@ export default function ContentEditorPage({
       <BevestigModal
         open={categorieArchiveren !== null}
         titel="Categorie archiveren"
-        bericht={`Categorie "${categorieArchiveren?.naam ?? ""}" archiveren? Ze en haar bouwblokken verdwijnen uit de doorloopflow voor nieuwe invullingen, maar bestaande scores blijven behouden. Je kunt dit terugzetten via "Gearchiveerde categorieën" hieronder.`}
+        bericht={`Categorie "${categorieArchiveren?.naam ?? ""}" archiveren? Ze en haar bouwstenen verdwijnen uit de doorloopflow voor nieuwe invullingen, maar bestaande scores blijven behouden. Je kunt dit terugzetten via "Gearchiveerde categorieën" hieronder.`}
         bevestigLabel="Archiveren"
         onBevestigen={() => {
           if (categorieArchiveren) removeCategorie(assessmentId, categorieArchiveren.id);

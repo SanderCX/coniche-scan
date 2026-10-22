@@ -40,7 +40,7 @@ export function onderdelenOpties(aantal: number, metAntwoorden: boolean, meervou
   const spreidingKan = aantal >= MIN_ONDERDELEN_SPREIDING;
   return [
     { waarde: "overzicht", label: "Overzicht" },
-    { waarde: "bouwblok", label: "Per bouwblok" },
+    { waarde: "bouwblok", label: "Per bouwsteen" },
     {
       waarde: "spreiding",
       label: "Spreiding",

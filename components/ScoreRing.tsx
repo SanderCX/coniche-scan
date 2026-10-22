@@ -50,7 +50,7 @@ export function ScoreRing({
   tegel?: boolean;
   /** De klassenchip onder de ring. In de Resultaatkop staat hij rechts ervan. */
   metChip?: boolean;
-  /** Het label onder het getal. Bij de Spanningsmeter "Niveau": Daar is het getal het gemiddeld niveau en geen totaalscore. */
+  /** Het label onder het getal. Bij de Spanningsmeter "Gemiddeld niveau": Daar is het getal het gemiddeld niveau en geen totaalscore. */
   label?: string;
 }) {
   const fractie = Math.min(1, Math.max(0, ring.fractie));
@@ -89,7 +89,12 @@ export function ScoreRing({
           <span className="score-ring-getal" style={mini && ring.getal.length > 3 ? { fontSize: "var(--fs-12)" } : undefined}>
             {ring.getal}
           </span>
-          {!mini && !tegel && <span className="score-ring-label">{label}</span>}
+          {!mini && !tegel && (
+            <span className="score-ring-label">
+              {/* Een lang label ("Gemiddeld niveau") staat op twee regels (`visualisatie-mijn-metingen.md`, Kaart met cirkel). */}
+              {label.length > 12 ? label.split(" ").map((woord) => <span key={woord} className="score-ring-label-regel">{woord}</span>) : label}
+            </span>
+          )}
         </div>
       </div>
       {metChip && !mini && !tegel && ring.klasseNaam && (

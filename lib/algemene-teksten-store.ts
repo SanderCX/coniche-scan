@@ -52,10 +52,19 @@ if (typeof window !== "undefined") {
   haalServerKopieOp(SERVER_SLEUTEL, KEY, emitChange);
 }
 
+/** De sleutel heette tot 22 oktober 2026 `info.contentBouwblokLabel` (hernoemd met de bouwblokken, `datamodel.md`): Een opgeslagen tekst gaat mee. */
+function hernoemOudeSleutels(waarden: Record<string, string>): Record<string, string> {
+  if (waarden && typeof waarden === "object" && "info.contentBouwblokLabel" in waarden) {
+    if (!("info.contentBouwsteenLabel" in waarden)) waarden["info.contentBouwsteenLabel"] = waarden["info.contentBouwblokLabel"];
+    delete waarden["info.contentBouwblokLabel"];
+  }
+  return waarden;
+}
+
 function parseSnapshot(snapshot: string): Record<string, string> {
   if (snapshot === SERVER_SENTINEL) return { ...STANDAARDWAARDEN };
   try {
-    const waarden = JSON.parse(snapshot) as Record<string, string>;
+    const waarden = hernoemOudeSleutels(JSON.parse(snapshot) as Record<string, string>);
     return waarden && typeof waarden === "object" ? { ...STANDAARDWAARDEN, ...waarden } : { ...STANDAARDWAARDEN };
   } catch {
     return { ...STANDAARDWAARDEN };
@@ -80,7 +89,7 @@ export function useOpgeslagenTeksten(): Record<string, string> {
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   if (snapshot === SERVER_SENTINEL) return {};
   try {
-    const waarden = JSON.parse(snapshot);
+    const waarden = hernoemOudeSleutels(JSON.parse(snapshot));
     return waarden && typeof waarden === "object" ? (waarden as Record<string, string>) : {};
   } catch {
     return {};

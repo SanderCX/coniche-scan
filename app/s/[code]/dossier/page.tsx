@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useOrganisaties, useRespondentPerToegangscode, markeerDossierGezien } from "@/lib/db";
 import { useAssessments } from "@/lib/assessment-store";
 import { useInstellingen } from "@/lib/instellingen-store";
+import { useBenchmarksMetLeden } from "@/lib/use-benchmarks";
 import { PageWithChrome } from "@/components/PageWithChrome";
 import { MijnGegevensMenu } from "@/components/MijnGegevensMenu";
 import { RadarChartView } from "@/components/RadarChartView";
@@ -24,6 +25,7 @@ import {
   DOSSIER_ASSESSMENT_IDS,
   DossierSectieInhoud,
   DossierLijsten,
+  LeadBenchmark,
   LeadBlog,
   LeadCase,
   LeadDossier,
@@ -44,7 +46,7 @@ import {
 /**
  * De Dossierpagina van een Lead (`dossier.md`, Scherm 5): Het Dossier dat de Consultant voor deze Lead heeft opengezet, met een kop, een radar
  * per Assessment (de Klantcontact Volwassenheidsscan en de AI-scan) in een filtermodus, de Cases, het Nieuws, de Events en de Blogs. De naam van
- * de Organisatie in een Case staat er nergens, alleen de branche. Het gekozen bouwblok of AI-domein staat in de URL (`?bouwblok=…`), zodat de
+ * de Organisatie in een Case staat er nergens, alleen de branche. Het gekozen bouwblok of AI-domein staat in de URL (`?bouwsteen=…`, een oude `?bouwblok=` werkt nog), zodat de
  * terugknop van de browser werkt. Opent de Lead de pagina, dan wordt `dossierGezienOp` gezet.
  */
 export default function DossierPage({ params }: { params: Promise<{ code: string }> }) {
@@ -67,13 +69,14 @@ interface RadarGegevens {
 }
 
 /** Het woord voor een bouwblok in een tekst: Bij de AI-scan een domein. */
-const eenheid = (a: Assessment) => (a.bouwblokLabel === "AI-domein" ? "domein" : "bouwblok");
+const eenheid = (a: Assessment) => (a.bouwblokLabel === "AI-domein" ? "domein" : "bouwsteen");
 
 function DossierInhoud({ code }: { code: string }) {
   const gegevens = useRespondentPerToegangscode(code);
   const alle = useOrganisaties();
   const assessments = useAssessments();
-  const { korteNamen } = useInstellingen();
+  const { korteNamen, benchmarkMinOrganisaties } = useInstellingen();
+  const benchmarks = useBenchmarksMetLeden();
   const router = useRouter();
   const zoek = useSearchParams();
   const [pilId, setPilId] = useState<string | null>(null);
@@ -83,7 +86,7 @@ function DossierInhoud({ code }: { code: string }) {
 
   const lid = gegevens?.lid;
   const organisatie = gegevens?.organisatie;
-  const dossier: LeadDossier | null = lid?.lead === true && organisatie ? leadDossier(organisatie, alle, korteNamen) : null;
+  const dossier: LeadDossier | null = lid?.lead === true && organisatie ? leadDossier(organisatie, alle, korteNamen, new Date(), { leadId: lid.id, benchmarks, assessments, minOrganisaties: benchmarkMinOrganisaties }) : null;
   const dossierAanwezig = dossier !== null;
   const organisatieId = organisatie?.id;
   const lidId = lid?.id;
@@ -113,7 +116,7 @@ function DossierInhoud({ code }: { code: string }) {
     return resultaten.some((r) => telling.has(r.bouwblok.id)) ? [{ assessment, resultaten, heeftScores, meting }] : [];
   });
   const alleBouwblokken = radars.flatMap((r) => r.resultaten.map((res) => ({ ...res, assessment: r.assessment })));
-  const gevraagd = zoek.get("bouwblok");
+  const gevraagd = zoek.get("bouwsteen") ?? zoek.get("bouwblok");
   const gekozen = gevraagd && telling.has(gevraagd) && alleBouwblokken.some((r) => r.bouwblok.id === gevraagd) ? gevraagd : null;
   const gekozenResultaat = alleBouwblokken.find((r) => r.bouwblok.id === gekozen);
   const gefilterd = filterOpBouwblok(dossier, gekozen);
@@ -124,7 +127,7 @@ function DossierInhoud({ code }: { code: string }) {
   const actief = radars.find((r) => r.assessment.id === gekozenResultaat?.assessment.id) ?? radars.find((r) => r.assessment.id === pilId) ?? meeste;
 
   function kies(id: string | null) {
-    router.push(id ? `/s/${code}/dossier?bouwblok=${encodeURIComponent(id)}` : `/s/${code}/dossier`, { scroll: false });
+    router.push(id ? `/s/${code}/dossier?bouwsteen=${encodeURIComponent(id)}` : `/s/${code}/dossier`, { scroll: false });
   }
 
   function kiesPil(id: string) {
@@ -155,6 +158,7 @@ function DossierInhoud({ code }: { code: string }) {
   const heeftAi = radars.some((r) => r.assessment.bouwblokLabel === "AI-domein");
   const tegels = [
     { n: dossier.cases.length, een: "Case", meer: "Cases" },
+    { n: dossier.benchmarks.length, een: "Benchmark", meer: "Benchmarks" },
     { n: dossier.nieuws.length, een: "Nieuwsbericht", meer: "Nieuwsberichten" },
     { n: komendTotaal, een: "Event", meer: "Events" },
     { n: dossier.blogs.length, een: "Blog", meer: "Blogs" },
@@ -163,12 +167,12 @@ function DossierInhoud({ code }: { code: string }) {
   // Het soortfilter telt wat er nu in de lijst past (met het filter op een bouwblok, zonder verlopen events). De lijst volgt beide filters.
   const aantallen = aantallenPerSoortLead(gefilterd);
   const lijsten: DossierLijsten = filterOpSoort(gefilterd, soort);
-  const totaalInLijst = lijsten.cases.length + lijsten.nieuws.length + lijsten.events.length + lijsten.blogs.length;
+  const totaalInLijst = lijsten.cases.length + lijsten.benchmarks.length + lijsten.nieuws.length + lijsten.events.length + lijsten.blogs.length;
 
   // De klassen bestaan alleen met een Meting waarvan de Lead de Resultaten mag zien: Anders geen verdeling, geen rail en geen secties.
   const scores = new Map<string, number | null>(alleBouwblokken.map((r) => [r.bouwblok.id, r.score]));
   const metScores = radars.some((r) => r.heeftScores);
-  const secties: DossierSectieInhoud[] = metScores ? verdeelOverSecties(lijsten, scores, heeftAi && radars.length === 1 ? "domein" : "bouwblok") : [];
+  const secties: DossierSectieInhoud[] = metScores ? verdeelOverSecties(lijsten, scores, heeftAi && radars.length === 1 ? "domein" : "bouwsteen") : [];
 
   function wisselEerdere(sleutel: string) {
     const nieuw = new Set(eerdereOpen);
@@ -189,6 +193,15 @@ function DossierInhoud({ code }: { code: string }) {
             <SectieKop soort="case" titel="Cases" regel="Zo hebben andere organisaties het aangepakt" />
             {l.cases.map((c) => (
               <CaseKaart key={c.id} item={c} chips={chips(c.bouwblokIds)} />
+            ))}
+          </section>
+        )}
+
+        {l.benchmarks.length > 0 && (
+          <section className="dp-sectie" aria-label="Benchmarks">
+            <SectieKop soort="benchmark" titel="Benchmarks" regel="Zo doen jullie het naast andere organisaties" />
+            {l.benchmarks.map((b) => (
+              <BenchmarkRij key={b.id} item={b} chips={chips(b.bouwblokIds)} href={`/s/${code}/benchmark/${encodeURIComponent(b.benchmarkId)}`} />
             ))}
           </section>
         )}
@@ -245,8 +258,8 @@ function DossierInhoud({ code }: { code: string }) {
             <span className="dp-eyebrow">Dossier</span>
             <h1 className="page-title">{dossier.naam}</h1>
             <p>
-              Je consultant heeft cases, nieuws, events en blogs verzameld die passen bij jullie situatie, met bij elk item uitleg waarom. Bij elk item staat het{" "}
-              {heeftAi ? "bouwblok of AI-domein" : "bouwblok"} waar het over gaat.
+              Je consultant heeft cases, benchmarks, nieuws, events en blogs verzameld die passen bij jullie situatie, met bij elk item uitleg waarom. Bij elk item staat{" "}
+              {heeftAi ? "de bouwsteen of het AI-domein" : "de bouwsteen"} waar het over gaat.
             </p>
             <div className="dp-kop-chips">
               <span className="dp-kopchip">Gedeeld door je consultant</span>
@@ -332,6 +345,7 @@ function DossierInhoud({ code }: { code: string }) {
             opties={[
               { waarde: "alles", label: `Alles ${aantallen.alles}` },
               { waarde: "case", label: `Cases ${aantallen.case}` },
+              { waarde: "benchmark", label: `Benchmarks ${aantallen.benchmark}` },
               { waarde: "nieuws", label: `Nieuws ${aantallen.nieuws}` },
               { waarde: "event", label: `Events ${aantallen.event}` },
               { waarde: "blog", label: `Blogs ${aantallen.blog}` },
@@ -454,7 +468,7 @@ function Verdeling({
   onKies: (bouwblokId: string) => void;
 }) {
   const woord = eenheid(assessment);
-  const meervoud = woord === "domein" ? "domeinen" : "bouwblokken";
+  const meervoud = woord === "domein" ? "domeinen" : "bouwstenen";
   const rijen = sorteerVerdeling(resultaten.map((r) => ({ r, score: heeftScores ? r.score : null, volgnummer: r.bouwblok.volgnummer })));
   const zichtbaar = open ? rijen : rijen.slice(0, VERDELING_EERST);
   const rest = rijen.length - zichtbaar.length;
@@ -530,7 +544,7 @@ function Verdeling({
 /** De namen op de pillen boven de radar. */
 const PIL_NAAM: Record<string, string> = { "klantcontact-volwassenheid": "Klantcontact Volwassenheid", "ai-volwassenheid": "AI-volwassenheid" };
 
-function SectieKop({ soort, titel, regel }: { soort: "case" | "nieuws" | "event" | "blog"; titel: string; regel: string }) {
+function SectieKop({ soort, titel, regel }: { soort: "case" | "benchmark" | "nieuws" | "event" | "blog"; titel: string; regel: string }) {
   return (
     <div className="dp-sectiekop">
       <span className={`dp-sectie-icoon dp-sectie-icoon--${soort}`} aria-hidden="true">
@@ -593,6 +607,36 @@ function CaseKaart({ item, chips }: { item: LeadCase; chips: React.ReactNode[] }
           </div>
         )}
       </div>
+    </article>
+  );
+}
+
+/**
+ * Een Benchmark: Een tegel van 64px met het staafdiagram in paars, de naam van de benchmark als link, "Vergelijking van {n} organisaties, {Assessment}", de
+ * toelichting, de chips "Gaat over" en de knop "Bekijk vergelijking". Link en knop gaan naar de benchmarkpagina van de Lead, in hetzelfde tabblad.
+ */
+function BenchmarkRij({ item, chips, href }: { item: LeadBenchmark; chips: React.ReactNode[]; href: string }) {
+  return (
+    <article className="dp-nieuws">
+      <div className="dp-datumtegel dp-datumtegel--benchmark" aria-hidden="true">
+        <SoortIcoon soort="benchmark" size={28} />
+      </div>
+      <div className="dp-nieuws-tekst">
+        <Link href={href} className="dp-nieuws-titel">
+          {item.titel}
+        </Link>
+        <span className="dp-nieuws-bron">{item.regel}</span>
+        {item.toelichting && <p>{item.toelichting}</p>}
+        {chips.length > 0 && (
+          <div className="dp-gaatover">
+            <span>Gaat over</span>
+            {chips}
+          </div>
+        )}
+      </div>
+      <Link href={href} className="btn btn-outline btn-compact">
+        Bekijk vergelijking
+      </Link>
     </article>
   );
 }

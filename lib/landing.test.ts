@@ -7,15 +7,15 @@ import { actieveSectie } from "@/components/assessment/AssessmentSubNav";
 import { afdelingDefinitie, bouwstenenLink, contentSoort, heroUitleg, overDezeScan, paginaSecties, tegelInhoud } from "./landing";
 
 describe("de hero van de landingspagina", () => {
-  it("toont alleen de eerste zin en laat het stuk over de bouwblokken uit de oude tekst weg", () => {
-    expect(heroUitleg("Breng in kaart hoe volwassen jouw klantcontactorganisatie is op 15 bouwblokken, verdeeld over 5 pijlers — van strategie tot cultuur. Elke vraag is gebaseerd op bewijs.")).toBe(
+  it("toont alleen de eerste zin en laat het stuk over de bouwstenen uit de oude tekst weg", () => {
+    expect(heroUitleg("Breng in kaart hoe volwassen jouw klantcontactorganisatie is op 15 bouwstenen, verdeeld over 5 pijlers — van strategie tot cultuur. Elke vraag is gebaseerd op bewijs.")).toBe(
       "Breng in kaart hoe volwassen jouw klantcontactorganisatie is.",
     );
     expect(heroUitleg("Breng in kaart hoe volwassen jouw organisatie is. Elke vraag is gebaseerd op bewijs.")).toBe("Breng in kaart hoe volwassen jouw organisatie is.");
     expect(heroUitleg("Eén zin zonder tweede.")).toBe("Eén zin zonder tweede.");
   });
-  it("noemt het aantal bouwblokken en pijlers als ankerlink naar de sectie, en bij de AI-scan het aantal domeinen", () => {
-    expect(bouwstenenLink(klantcontactVolwassenheid)).toEqual({ tekst: "15 bouwblokken in 5 pijlers", href: "#bouwblokken" });
+  it("noemt het aantal bouwstenen en pijlers als ankerlink naar de sectie, en bij de AI-scan het aantal domeinen", () => {
+    expect(bouwstenenLink(klantcontactVolwassenheid)).toEqual({ tekst: "15 bouwstenen in 5 pijlers", href: "#bouwblokken" });
     expect(bouwstenenLink(aiScan)).toEqual({ tekst: "8 domeinen", href: "#ai" });
     expect(bouwstenenLink(ziekenhuisQuickscan)).toBeNull();
   });
@@ -35,7 +35,7 @@ describe("de content op de Assessment-pagina", () => {
     expect(contentSoort({ ...klantcontactVolwassenheid, id: "eigen", afgeleidVanAssessmentId: null })).toBeNull();
   });
   it("heeft per type de secties van de sub-nav, bij de Quickscan met De 4 afdelingen", () => {
-    expect(paginaSecties(klantcontactVolwassenheid).map((s) => s.label)).toEqual(["De 15 bouwblokken", "Praktisch", "Wat krijg ik", "Visie"]);
+    expect(paginaSecties(klantcontactVolwassenheid).map((s) => s.label)).toEqual(["De 15 bouwstenen", "Praktisch", "Wat krijg ik", "Visie"]);
     expect(paginaSecties(aiScan).map((s) => s.id)).toEqual(["ai", "praktisch", "wat", "2030"]);
     expect(paginaSecties(ziekenhuisQuickscan).map((s) => [s.id, s.label])).toEqual([
       ["afdelingen", "De 4 afdelingen"],
@@ -45,8 +45,8 @@ describe("de content op de Assessment-pagina", () => {
     ]);
   });
   it("geeft de link Over deze scan met de tekst per type en niet bij de Quickscan", () => {
-    expect(overDezeScan(klantcontactVolwassenheid)).toEqual({ tekst: "Over deze scan: visie en bouwblokken", href: "/klantcontact-volwassenheid" });
-    expect(overDezeScan(zorgscan)?.tekst).toBe("Over deze scan: visie en bouwblokken");
+    expect(overDezeScan(klantcontactVolwassenheid)).toEqual({ tekst: "Over deze scan: Visie en bouwstenen", href: "/klantcontact-volwassenheid" });
+    expect(overDezeScan(zorgscan)?.tekst).toBe("Over deze scan: Visie en bouwstenen");
     expect(overDezeScan(aiScan)?.tekst).toBe("Over deze scan: AI-domeinen en 2030");
     expect(overDezeScan(ziekenhuisQuickscan)).toBeNull();
     expect(overDezeScan(undefined)).toBeNull();
@@ -57,7 +57,7 @@ describe("de tegels op scherm 1", () => {
   it("noemt de aantallen uit het Assessment in het eerste en tweede punt", () => {
     const t = tegelInhoud(klantcontactVolwassenheid);
     expect(t.zin).toBe("Breng in kaart hoe volwassen jouw klantcontactorganisatie is.");
-    expect(t.punten.map((p) => p.tekst)).toEqual(["60 vragen, ±30 minuten", "15 bouwblokken in 5 categorieën", "Concrete stappen op basis van je scores"]);
+    expect(t.punten.map((p) => p.tekst)).toEqual(["60 vragen, ±30 minuten", "15 bouwstenen in 5 categorieën", "Concrete stappen op basis van je scores"]);
   });
   it("heeft per Assessment eigen punten", () => {
     expect(tegelInhoud(aiScan).punten.map((p) => p.tekst)).toEqual(["40 vragen, ±20 minuten", "8 AI-domeinen", "Concrete stappen per domein"]);

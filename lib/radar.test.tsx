@@ -21,11 +21,11 @@ const aiGroepen = alleGroepResultaten(aiVolwassenheid, aiBouwblokken, aiAntwoord
 
 describe("de radar met knooppunten", () => {
   const html = renderToStaticMarkup(<RadarChartView resultaten={bouwblokken} />);
-  it("heeft per bouwblok een knooppunt met een aria-label met nummer, naam, score en klasse", () => {
+  it("heeft per bouwsteen een knooppunt met een aria-label met nummer, naam, score en klasse", () => {
     expect(html.match(/class="radar-knoop /g)).toHaveLength(15);
-    expect(html).toMatch(/aria-label="1, Organisatiestrategie, \d,\d, (Basis op Orde|Uitbouwen|Sterk punt)/);
+    expect(html).toMatch(/aria-label="1, Organisatiestrategie, \d,\d, (Basis op orde|Uitbouwen|Sterk punt)/);
   });
-  it("toont de namen alleen in de tooltip en de factor bij een gewogen bouwblok", () => {
+  it("toont de namen alleen in de tooltip en de factor bij een gewogen bouwsteen", () => {
     expect(html).toContain('role="tooltip"');
     expect(html).toContain("4 · Leren uit klantcontact 2×");
     expect(html).toContain("<strong>1 · Organisatiestrategie</strong>");
@@ -62,7 +62,7 @@ describe("de radar met knooppunten", () => {
     expect(m).toMatch(/fill-opacity="0\.5"/);
     expect(m).toMatch(/fill-opacity="0\.09"/);
   });
-  it("laat bij een hele categorie alle bouwblokken ervan oplichten", () => {
+  it("laat bij een hele categorie alle bouwstenen ervan oplichten", () => {
     const b = bouwblokken[3];
     const m = renderToStaticMarkup(<RadarChartView resultaten={bouwblokken} actief={{ groepKey: b.groepId }} onActief={() => {}} />);
     const inGroep = bouwblokken.filter((r) => r.groepId === b.groepId).length;
@@ -71,14 +71,14 @@ describe("de radar met knooppunten", () => {
 });
 
 describe("de actieve staat", () => {
-  it("geeft een bouwblok de staat actief, groep, gedimd of normaal", () => {
+  it("geeft een bouwsteen de staat actief, groep, gedimd of normaal", () => {
     expect(staatVan(null, "a", "1")).toBe("normaal");
     expect(staatVan({ groepKey: "a", bouwblokId: "1" }, "a", "1")).toBe("actief");
     expect(staatVan({ groepKey: "a", bouwblokId: "1" }, "a", "2")).toBe("groep");
     expect(staatVan({ groepKey: "a", bouwblokId: "1" }, "b", "3")).toBe("gedimd");
     expect(staatVan({ groepKey: "a" }, "a", "2")).toBe("actief");
   });
-  it("gebruikt zonder categorielaag het bouwblok zelf als groep", () => {
+  it("gebruikt zonder categorielaag de bouwsteen zelf als groep", () => {
     expect(groepSleutel("_vlak", "b7")).toBe("b7");
     expect(groepSleutel("cat1", "b7")).toBe("cat1");
   });
@@ -96,7 +96,7 @@ describe("het staafdiagram per categorie", () => {
     expect(html).not.toContain("De stippellijnen bij 2,5 en 3,5");
     expect(html).not.toContain("recharts");
   });
-  it("zet de nummers van de bouwblokken bij de categorienaam", () => {
+  it("zet de nummers van de bouwstenen bij de categorienaam", () => {
     expect(html).toContain('<span class="cat-nummers">1–2</span>');
     expect(html).toContain('<span class="cat-nummers">15</span>');
     expect(html).toContain('<span class="cat-nummers">7–10</span>');
@@ -158,7 +158,7 @@ describe("het kolomdiagram per domein", () => {
 
 describe("de radar in de filtermodus (Dossier)", () => {
   const actief = new Set([bouwblokken[0].bouwblok.id, bouwblokken[3].bouwblok.id]);
-  it("maakt alleen de actieve bouwblokken tot knoppen met aria-pressed en dimt de rest", () => {
+  it("maakt alleen de actieve bouwstenen tot knoppen met aria-pressed en dimt de rest", () => {
     const m = renderToStaticMarkup(<RadarChartView resultaten={bouwblokken} filter={{ actief, gekozen: bouwblokken[3].bouwblok.id, onKies: () => {} }} />);
     expect(m.match(/aria-pressed="/g)).toHaveLength(2);
     expect(m.match(/aria-pressed="true"/g)).toHaveLength(1);
@@ -167,12 +167,12 @@ describe("de radar in de filtermodus (Dossier)", () => {
     expect(m.match(/is-gekozen/g)).toHaveLength(1);
     expect(m.match(/aria-disabled="true"/g)).toHaveLength(13);
   });
-  it("zet de taartpunt van het gekozen bouwblok op 50% en de rest op 20%", () => {
+  it("zet de taartpunt van de gekozen bouwsteen op 50% en de rest op 20%", () => {
     const m = renderToStaticMarkup(<RadarChartView resultaten={bouwblokken} filter={{ actief, gekozen: bouwblokken[3].bouwblok.id, onKies: () => {} }} />);
     expect(m.match(/fill-opacity="0\.5"/g)).toHaveLength(1);
     expect(m.match(/class="radar-taart"[^>]*fill-opacity="0\.2"/g)).toHaveLength(14);
   });
-  it("toont score-stippen alleen bij de actieve bouwblokken", () => {
+  it("toont score-stippen alleen bij de actieve bouwstenen", () => {
     const m = renderToStaticMarkup(<RadarChartView resultaten={bouwblokken} filter={{ actief, gekozen: null, onKies: () => {} }} />);
     expect(m.match(/class="radar-stip"/g)).toHaveLength(2);
   });
@@ -206,7 +206,7 @@ describe("één tooltip tegelijk en het staafdiagram met twee reeksen", () => {
     expect(html).toMatch(/Org \d,\d · /);
     expect(html).toMatch(/Groep \d,\d/);
     expect(html).toContain("Verschil");
-    for (const klasse of ["Sterk punt", "Uitbouwen", "Basis op Orde"]) expect(html).toContain(`>${klasse}</span>`);
+    for (const klasse of ["Sterk punt", "Uitbouwen", "Basis op orde"]) expect(html).toContain(`>${klasse}</span>`);
     expect(html).toContain("Groep</li>");
     expect(html).not.toContain("recharts");
   });

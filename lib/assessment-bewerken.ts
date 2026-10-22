@@ -93,7 +93,7 @@ export function addBouwblok(assessmentId: string, categorieId: string | null) {
       {
         id: nieuwId(),
         volgnummer: maxVolgnummer + 1,
-        naam: "Nieuw bouwblok",
+        naam: "Nieuw bouwsteen",
         omschrijving: "",
         toelichting: "",
         tags: [],
@@ -279,7 +279,7 @@ export function aantalScansMetAntwoordInBouwblok(
 /**
  * Past één of meer gewichten in één opslagactie toe (`beheerpagina.md` punt 2,
  * Weging per bouwblok) en logt per gewijzigd bouwblok één
- * `bouwblok.gewichtGewijzigd` (`datamodel.md`, Audit, Gewichtswijziging).
+ * `bouwsteen.gewichtGewijzigd` (`datamodel.md`, Audit, Gewichtswijziging).
  * Zonder opgegeven `organisaties` wordt het aantal scans als 0 gelogd.
  */
 export function pasGewichtenToe(
@@ -300,13 +300,13 @@ export function pasGewichtenToe(
     const nieuw = gewicht.get(bouwblok.id);
     if (nieuw === undefined || nieuw === bouwblok.gewicht) continue;
     gelogd.push({
-      actie: "bouwblok.gewichtGewijzigd",
-      entiteitType: "bouwblok",
+      actie: "bouwsteen.gewichtGewijzigd",
+      entiteitType: "bouwsteen",
       entiteitId: bouwblok.id,
       entiteitNaam: bouwblok.naam,
       groepId,
       details: {
-        bouwblokNaam: bouwblok.naam,
+        bouwsteenNaam: bouwblok.naam,
         volgnummer: bouwblok.volgnummer,
         assessmentNaam: assessment.naam,
         assessmentId: assessment.id,

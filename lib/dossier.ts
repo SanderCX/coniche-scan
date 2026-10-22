@@ -6,11 +6,12 @@
  * de Case, zodat die gegevens niet in de schermen van de Lead kunnen komen (`dossier.md`, Wat de Lead ziet). In het prototype staat alle
  * data in de browser; met de database wordt dit aan de serverkant bepaald.
  */
-import type { Assessment, Dossier, Dossieritem, Organisatie, OrganisatieLid } from "./types";
+import type { Assessment, Benchmark, Dossier, Dossieritem, Organisatie, OrganisatieLid } from "./types";
 import { KorteNamen, SECTOR_VELD_ID, korteNaamWaarde } from "./korte-namen";
 import { Controle, normaliseerUrl, schoon } from "./contactpersonen";
 import { alleBouwblokkenMetGroep } from "./assessment-structuur";
 import { classificatie } from "./scoring";
+import { benchmarkGeldigVoorOrganisatie, heeftBenchmarkToegang, leadsMetBenchmark } from "./lead-toegang";
 
 export const TITEL_MAX = 200;
 export const TOELICHTING_MAX = 400;
@@ -53,7 +54,7 @@ export const DOSSIER_ASSESSMENT_IDS = ["klantcontact-volwassenheid", "ai-volwass
 
 export type DossierSoort = Dossieritem["soort"];
 
-export const DOSSIER_SOORTEN: DossierSoort[] = ["case", "nieuws", "event", "blog"];
+export const DOSSIER_SOORTEN: DossierSoort[] = ["case", "benchmark", "nieuws", "event", "blog"];
 
 export function leegDossier(): Dossier {
   return { zichtbaar: false, zichtbaarSinds: null, naamVoorLead: "", radarBronnen: [], gewijzigdOp: null, items: [] };
@@ -100,6 +101,7 @@ export interface DossierInvoer {
   caseOrganisatieId: string | null;
   omvang: string;
   totResultaat: string;
+  benchmarkId: string | null;
 }
 
 /** Een lege invoer voor een nieuw item van dit soort. */
@@ -120,6 +122,7 @@ export function leegDossierInvoer(soort: DossierSoort): DossierInvoer {
     caseOrganisatieId: null,
     omvang: "",
     totResultaat: "",
+    benchmarkId: null,
   };
 }
 
@@ -136,7 +139,8 @@ export function invoerVanItem(item: Dossieritem): DossierInvoer {
  * Organisatie in de case (die niet de eigen Organisatie is). Velden van de andere soorten worden leeg bewaard. Of het item open mag staan, hangt af van de Afspraak en de Sector van de Organisatie in de case: Dat controleert
  * `kanOpenZetten`, omdat het van andere Organisaties afhangt.
  */
-export function controleerDossieritem(invoer: DossierInvoer, eigenOrganisatieId: string): Controle<DossierInvoer> {
+export function controleerDossieritem(invoer: DossierInvoer, eigenOrganisatieId: string, benchmarkKeuze?: BenchmarkKeuze): Controle<DossierInvoer> {
+  if (invoer.soort === "benchmark") return controleerBenchmarkItem(invoer, benchmarkKeuze);
   const titel = schoon(invoer.titel);
   if (!titel) return { ok: false, reden: "Vul een titel in." };
   if (titel.length > TITEL_MAX) return { ok: false, reden: `De titel mag maximaal ${TITEL_MAX} tekens hebben.` };
@@ -191,6 +195,73 @@ export function controleerDossieritem(invoer: DossierInvoer, eigenOrganisatieId:
   return { ok: true, waarde: { ...basis, samenvatting, caseOrganisatieId: invoer.caseOrganisatieId, omvang, totResultaat } };
 }
 
+/**
+ * De keuze voor een item van soort Benchmark: De benchmarks waaruit gekozen kan worden (die de Organisatie van het Dossier bevatten) en de
+ * benchmarks die al in het Dossier staan, zonder het item dat nu bewerkt wordt (`dossier.md`, Regels, Soort Benchmark).
+ */
+export interface BenchmarkKeuze {
+  kiesbaar: Pick<Benchmark, "id">[];
+  alInDossier: string[];
+}
+
+/**
+ * Een item van soort Benchmark controleren (`dossier.md`, Regels, Soort Benchmark): Een benchmark is verplicht, er is geen eigen titel en geen eigen
+ * link (de titel is de naam van de benchmark en de link volgt uit `benchmarkId`). Dezelfde benchmark staat hoogstens één keer in een Dossier.
+ * Zonder `keuze` wordt alleen gecontroleerd of er een benchmark is gekozen.
+ */
+function controleerBenchmarkItem(invoer: DossierInvoer, keuze?: BenchmarkKeuze): Controle<DossierInvoer> {
+  const toelichting = invoer.toelichting.trim();
+  if (toelichting.length > TOELICHTING_MAX) return { ok: false, reden: `De toelichting mag maximaal ${TOELICHTING_MAX} tekens hebben.` };
+  if (!invoer.benchmarkId) return { ok: false, reden: "Kies een benchmark." };
+  if (keuze) {
+    if (!keuze.kiesbaar.some((b) => b.id === invoer.benchmarkId)) return { ok: false, reden: "Deze benchmark is niet te kiezen: De organisatie doet er niet aan mee." };
+    if (keuze.alInDossier.includes(invoer.benchmarkId)) return { ok: false, reden: "Deze benchmark staat al in het Dossier." };
+  }
+  return {
+    ok: true,
+    waarde: {
+      ...leegDossierInvoer("benchmark"),
+      toelichting,
+      bouwblokIds: [...new Set(invoer.bouwblokIds)],
+      zichtbaarVoorLead: invoer.zichtbaarVoorLead,
+      benchmarkId: invoer.benchmarkId,
+    },
+  };
+}
+
+/**
+ * De benchmarks waaruit een Consultant kiest bij een Benchmark-item: Alleen die waarin de Organisatie zit (bij een Verkenning: waarvan de uitkomst haar
+ * bevat). De benchmarks moeten hun leden hebben (`getBenchmarksMetLeden`). Op alfabet. Een benchmark die per scan vergelijkt (niveau 3) heeft geen
+ * view voor een Lead en valt dus af (`benchmarkGeldigVoorOrganisatie`).
+ */
+export function benchmarksVoorDossier(benchmarks: Benchmark[], organisatieId: string): Benchmark[] {
+  return benchmarks.filter((b) => benchmarkGeldigVoorOrganisatie(b, organisatieId)).sort((a, b) => a.naam.localeCompare(b.naam, "nl"));
+}
+
+/** Het aantal organisaties in een benchmark (bij een benchmark binnen een organisatie is dat altijd 1). */
+export function aantalOrganisatiesInBenchmark(benchmark: Pick<Benchmark, "leden">): number {
+  return new Set(benchmark.leden.map((l) => l.organisatieId)).size;
+}
+
+/** De regel onder de naam van een benchmark: "{Assessment}, {n} organisaties, {k} van {m} Leads hebben toegang" (`dossier.md`, Scherm 1, Rijen). */
+export function benchmarkRijRegel(benchmark: Benchmark | undefined, assessments: Pick<Assessment, "id" | "naam">[], organisatie: Pick<Organisatie, "leden" | "leadToegang">): string {
+  if (!benchmark) return "";
+  const namen = benchmark.assessmentIds.map((id) => assessments.find((a) => a.id === id)?.naam).filter((n): n is string => !!n).join(", ");
+  const leads = organisatie.leden.filter((l) => l.lead === true).length;
+  const metToegang = leadsMetBenchmark(organisatie, benchmark.id).length;
+  const n = aantalOrganisatiesInBenchmark(benchmark);
+  const delen = [namen, `${n} ${n === 1 ? "organisatie" : "organisaties"}`, metToegang === 0 ? "geen Lead heeft toegang" : `${metToegang} van ${leads} Leads hebben toegang`];
+  return delen.filter(Boolean).join(", ");
+}
+
+/** De regel op de pagina van de Lead: "Vergelijking van {n} organisaties, {Assessment}" (het aantal valt weg onder `benchmarkMinOrganisaties`), of van Metingen. */
+export function benchmarkLeadRegel(benchmark: Benchmark, assessments: Pick<Assessment, "id" | "naam">[], minOrganisaties: number): string {
+  const namen = benchmark.assessmentIds.map((id) => assessments.find((a) => a.id === id)?.naam).filter((n): n is string => !!n).join(", ");
+  if ((benchmark.niveau ?? "organisaties") === "metingen") return `Vergelijking van Metingen, ${namen}`;
+  const n = aantalOrganisatiesInBenchmark(benchmark);
+  return n >= minOrganisaties ? `Vergelijking van ${n} organisaties, ${namen}` : `Vergelijking, ${namen}`;
+}
+
 /** De Sector van een Organisatie (`sbi-indeling.md`), leeg als die niet is ingevuld. */
 function sectorVan(organisatie: Pick<Organisatie, "kenmerken">): string {
   let huidig: unknown = organisatie.kenmerken;
@@ -226,7 +297,13 @@ export function kanOpenZetten(
   return null;
 }
 
-export type DossierStatus = "zichtbaar" | "intern" | "verlopen" | "toestemming-ontbreekt" | "kies-organisatie";
+export type DossierStatus = "zichtbaar" | "intern" | "verlopen" | "toestemming-ontbreekt" | "kies-organisatie" | "geen-toegang" | "kies-benchmark";
+
+/** De benchmarks en de Organisatie die nodig zijn om de status van een Benchmark-item te bepalen (bestaat de benchmark nog, heeft een Lead toegang). */
+export interface BenchmarkContext {
+  benchmarks: Pick<Benchmark, "id">[];
+  organisatie: Pick<Organisatie, "leden" | "leadToegang">;
+}
 
 export const DOSSIER_STATUS_LABEL: Record<DossierStatus, string> = {
   zichtbaar: "Zichtbaar voor Lead",
@@ -234,6 +311,8 @@ export const DOSSIER_STATUS_LABEL: Record<DossierStatus, string> = {
   verlopen: "Verlopen",
   "toestemming-ontbreekt": "Toestemming ontbreekt",
   "kies-organisatie": "Kies een organisatie",
+  "geen-toegang": "Geen toegang voor Lead",
+  "kies-benchmark": "Kies een benchmark",
 };
 
 /**
@@ -241,8 +320,21 @@ export const DOSSIER_STATUS_LABEL: Record<DossierStatus, string> = {
  * "Toestemming ontbreekt" bij een Case waarvan de Organisatie de Afspraak niet (meer) heeft, ook als het item op Zichtbaar voor Lead
  * stond, "Verlopen" bij een Event waarvan de datum voorbij is, anders "Zichtbaar voor Lead" of "Intern".
  */
-export function itemStatus(item: Dossieritem, alle: Pick<Organisatie, "id" | "caseToegestaan">[], nu: Date = new Date()): DossierStatus {
+export function itemStatus(
+  item: Dossieritem,
+  alle: Pick<Organisatie, "id" | "caseToegestaan">[],
+  nu: Date = new Date(),
+  benchmarkContext?: BenchmarkContext
+): DossierStatus {
   if (isVerlopen(item, nu)) return "verlopen";
+  if (item.soort === "benchmark") {
+    // Zonder benchmarks (de context) is niet te zien of de benchmark nog bestaat of een Lead er toegang toe heeft.
+    if (!item.benchmarkId) return "kies-benchmark";
+    if (benchmarkContext) {
+      if (!benchmarkContext.benchmarks.some((b) => b.id === item.benchmarkId)) return "kies-benchmark";
+      if (item.zichtbaarVoorLead && leadsMetBenchmark(benchmarkContext.organisatie, item.benchmarkId).length === 0) return "geen-toegang";
+    }
+  }
   if (item.soort === "case") {
     if (!item.caseOrganisatieId) return "kies-organisatie";
     const o = alle.find((x) => x.id === item.caseOrganisatieId);
@@ -260,6 +352,11 @@ export function datumKort(d: string): string {
 /** Cases met de nieuwste bovenaan, op het moment van toevoegen (`dossier.md`, Regels, Volgorde). */
 export function casesNieuwsteEerst<T extends Pick<Dossieritem, "soort" | "aangemaaktOp">>(lijst: T[]): T[] {
   return lijst.filter((i) => i.soort === "case").sort((a, b) => b.aangemaaktOp.localeCompare(a.aangemaaktOp));
+}
+
+/** Benchmarks met de nieuwste bovenaan, op het moment van toevoegen. */
+export function benchmarksNieuwsteEerst<T extends Pick<Dossieritem, "soort" | "aangemaaktOp">>(lijst: T[]): T[] {
+  return lijst.filter((i) => i.soort === "benchmark").sort((a, b) => b.aangemaaktOp.localeCompare(a.aangemaaktOp));
 }
 
 /** Nieuws met het nieuwste bovenaan: Op publicatiedatum, en zonder datum op het moment van toevoegen. */
@@ -286,22 +383,23 @@ export function blogsNieuwsteEerst<T extends Pick<Dossieritem, "soort" | "gepubl
     .sort((a, b) => sleutel(b).localeCompare(sleutel(a)) || b.aangemaaktOp.localeCompare(a.aangemaaktOp));
 }
 
-/** Alle items voor de Consultant: Eerst de Cases, dan het Nieuws, de Events en de Blogs, elk in de eigen volgorde. */
+/** Alle items voor de Consultant: Eerst de Cases, dan de Benchmarks, het Nieuws, de Events en de Blogs, elk in de eigen volgorde. */
 export function itemsInVolgorde<T extends Dossieritem>(lijst: T[], nu: Date = new Date()): T[] {
-  return [...casesNieuwsteEerst(lijst), ...nieuwsNieuwsteEerst(lijst), ...eventsInVolgorde(lijst, nu), ...blogsNieuwsteEerst(lijst)];
+  return [...casesNieuwsteEerst(lijst), ...benchmarksNieuwsteEerst(lijst), ...nieuwsNieuwsteEerst(lijst), ...eventsInVolgorde(lijst, nu), ...blogsNieuwsteEerst(lijst)];
 }
 
 /** Het aantal items per soort. Een verlopen Event telt mee (`dossier.md`, Scherm 1, Filter). */
-export function aantallPerSoort(lijst: Pick<Dossieritem, "soort">[]): { alles: number; cases: number; nieuws: number; events: number; blogs: number } {
+export function aantallPerSoort(lijst: Pick<Dossieritem, "soort">[]): { alles: number; cases: number; benchmarks: number; nieuws: number; events: number; blogs: number } {
   const n = (soort: DossierSoort) => lijst.filter((i) => i.soort === soort).length;
-  return { alles: lijst.length, cases: n("case"), nieuws: n("nieuws"), events: n("event"), blogs: n("blog") };
+  return { alles: lijst.length, cases: n("case"), benchmarks: n("benchmark"), nieuws: n("nieuws"), events: n("event"), blogs: n("blog") };
 }
 
 /** Het aantal items dat de Lead nu zou zien als het Dossier zichtbaar was (voor de bevestiging bij Zichtbaar voor Lead). */
-export function aantalZichtbaarVoorLead(organisatie: Organisatie, alle: Organisatie[], nu: Date = new Date()): number {
+export function aantalZichtbaarVoorLead(organisatie: Organisatie, alle: Organisatie[], nu: Date = new Date(), benchmarks?: Benchmark[]): number {
   // Een verlopen Event dat op Zichtbaar voor Lead staat, ziet de Lead onder "Eerdere events": Het telt dus mee.
+  const context = benchmarks ? { benchmarks, organisatie } : undefined;
   return dossierVan(organisatie).items.filter((i) => {
-    const status = itemStatus(i, alle, nu);
+    const status = itemStatus(i, alle, nu, context);
     return status === "zichtbaar" || (status === "verlopen" && i.zichtbaarVoorLead);
   }).length;
 }
@@ -349,6 +447,20 @@ export interface LeadCase {
   aangemaaktOp: string;
 }
 
+/** Een Benchmark in het Dossier zoals de Lead hem ziet: De naam van de benchmark is de titel, de link volgt uit `benchmarkId`. */
+export interface LeadBenchmark {
+  id: string;
+  /** `Benchmark.id`, voor de link naar de benchmarkpagina van de Lead. */
+  benchmarkId: string;
+  /** De naam van de benchmark. */
+  titel: string;
+  /** "Vergelijking van {n} organisaties, {Assessment}". */
+  regel: string;
+  toelichting: string;
+  bouwblokIds: string[];
+  aangemaaktOp: string;
+}
+
 export interface LeadNieuws {
   id: string;
   titel: string;
@@ -385,10 +497,23 @@ export interface LeadDossier {
   zichtbaarSinds: string | null;
   gewijzigdOp: string | null;
   cases: LeadCase[];
+  benchmarks: LeadBenchmark[];
   nieuws: LeadNieuws[];
   /** Eerst de komende events, daarna de verlopen (`eventsInVolgorde`). */
   events: LeadEvent[];
   blogs: LeadBlog[];
+}
+
+/**
+ * Wat nodig is om te bepalen welke Benchmarks deze Lead ziet (`dossier.md`, Wat de Lead ziet, voorwaarde 5): De Lead zelf, de benchmarks (met hun
+ * leden) en de Assessments voor de regel. Zonder deze context ziet de Lead geen Benchmark-items.
+ */
+export interface LeadContext {
+  leadId: string;
+  benchmarks: Benchmark[];
+  assessments: Pick<Assessment, "id" | "naam">[];
+  /** `benchmarkMinOrganisaties`: Onder dit aantal staat het aantal organisaties niet in de regel. */
+  minOrganisaties: number;
 }
 
 /**
@@ -397,7 +522,7 @@ export interface LeadDossier {
  * Organisatie in de case de Afspraak heeft en een Sector (de branche). De Case heeft in dit resultaat geen Organisatie-id en geen naam. Een
  * Event of Blog heeft geen toestemming van een andere Organisatie nodig.
  */
-export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korteNamen?: KorteNamen, nu: Date = new Date()): LeadDossier | null {
+export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korteNamen?: KorteNamen, nu: Date = new Date(), lead?: LeadContext): LeadDossier | null {
   const dossier = dossierVan(organisatie);
   if (!dossier.zichtbaar) return null;
   const zichtbaar = dossier.items.filter((i) => i.zichtbaarVoorLead);
@@ -416,6 +541,24 @@ export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korte
         omvang: i.omvang,
         totResultaat: i.totResultaat,
         url: i.url,
+        bouwblokIds: i.bouwblokIds,
+        aangemaaktOp: i.aangemaaktOp,
+      },
+    ];
+  });
+  // Een Benchmark ziet deze Lead alleen met zijn eigen vinkje voor die benchmark, en zolang de Organisatie nog in de benchmark zit.
+  const benchmarks: LeadBenchmark[] = benchmarksNieuwsteEerst(zichtbaar).flatMap((i) => {
+    if (!lead || !i.benchmarkId) return [];
+    const benchmark = lead.benchmarks.find((b) => b.id === i.benchmarkId);
+    if (!benchmark || !benchmarkGeldigVoorOrganisatie(benchmark, organisatie.id)) return [];
+    if (!heeftBenchmarkToegang(organisatie, lead.leadId, benchmark.id)) return [];
+    return [
+      {
+        id: i.id,
+        benchmarkId: benchmark.id,
+        titel: benchmark.naam,
+        regel: benchmarkLeadRegel(benchmark, lead.assessments, lead.minOrganisaties),
+        toelichting: i.toelichting,
         bouwblokIds: i.bouwblokIds,
         aangemaaktOp: i.aangemaaktOp,
       },
@@ -445,13 +588,14 @@ export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korte
     aangemaaktOp: i.aangemaaktOp,
     verlopen: isVerlopen(i, nu),
   }));
-  if (cases.length + nieuws.length + events.length + blogs.length === 0) return null;
+  if (cases.length + benchmarks.length + nieuws.length + events.length + blogs.length === 0) return null;
   return {
     organisatieNaam: organisatie.naam,
     naam: naamVoorLeadVan(organisatie),
     zichtbaarSinds: dossier.zichtbaarSinds,
     gewijzigdOp: dossier.gewijzigdOp,
     cases,
+    benchmarks,
     nieuws,
     events,
     blogs,
@@ -470,12 +614,13 @@ function komendeEvents(d: Pick<LeadDossier, "events">): LeadEvent[] {
   return d.events.filter((e) => !e.verlopen);
 }
 
-export type VoorproefSoort = "case" | "nieuws" | "event" | "blog";
+export type VoorproefSoort = "case" | "benchmark" | "nieuws" | "event" | "blog";
 
 /** De voorproef op de kaart (`visualisatie-mijn-metingen.md`, Dossierkaart): Ten hoogste drie titels, eerst de Cases, dan Nieuws, Events en Blogs. */
-export function voorproef(d: Pick<LeadDossier, "cases" | "nieuws" | "events" | "blogs">, max = 3): { titels: { soort: VoorproefSoort; titel: string }[]; meer: number } {
+export function voorproef(d: Pick<LeadDossier, "cases" | "benchmarks" | "nieuws" | "events" | "blogs">, max = 3): { titels: { soort: VoorproefSoort; titel: string }[]; meer: number } {
   const alle = [
     ...d.cases.map((c) => ({ soort: "case" as const, titel: c.titel })),
+    ...d.benchmarks.map((b) => ({ soort: "benchmark" as const, titel: b.titel })),
     ...d.nieuws.map((n) => ({ soort: "nieuws" as const, titel: n.titel })),
     ...komendeEvents(d).map((e) => ({ soort: "event" as const, titel: e.titel })),
     ...d.blogs.map((b) => ({ soort: "blog" as const, titel: b.titel })),
@@ -483,13 +628,14 @@ export function voorproef(d: Pick<LeadDossier, "cases" | "nieuws" | "events" | "
   return { titels: alle.slice(0, max), meer: Math.max(0, alle.length - max) };
 }
 
-/** "2 cases · 2 nieuwsberichten · 2 events · 1 blog", met het enkelvoud bij 1 en een soort zonder items weggelaten. Een verlopen Event telt niet mee. */
-export function aantalTekst(d: Pick<LeadDossier, "cases" | "nieuws" | "events" | "blogs">): string {
+/** "2 cases · 1 benchmark · 2 nieuwsberichten · 2 events · 1 blog", met het enkelvoud bij 1 en een soort zonder items weggelaten. Een verlopen Event telt niet mee. */
+export function aantalTekst(d: Pick<LeadDossier, "cases" | "benchmarks" | "nieuws" | "events" | "blogs">): string {
   const delen: string[] = [];
   const voeg = (n: number, een: string, meer: string) => {
     if (n > 0) delen.push(`${n} ${n === 1 ? een : meer}`);
   };
   voeg(d.cases.length, "case", "cases");
+  voeg(d.benchmarks.length, "benchmark", "benchmarks");
   voeg(d.nieuws.length, "nieuwsbericht", "nieuwsberichten");
   voeg(komendeEvents(d).length, "event", "events");
   voeg(d.blogs.length, "blog", "blogs");
@@ -497,17 +643,18 @@ export function aantalTekst(d: Pick<LeadDossier, "cases" | "nieuws" | "events" |
 }
 
 /** Het aantal zichtbare items per bouwblok (`Bouwblok.id`), voor de radar en de lijst naast de radar. Ook de verlopen Events tellen mee. */
-export function itemsPerBouwblok(d: Pick<LeadDossier, "cases" | "nieuws" | "events" | "blogs">): Map<string, number> {
+export function itemsPerBouwblok(d: Pick<LeadDossier, "cases" | "benchmarks" | "nieuws" | "events" | "blogs">): Map<string, number> {
   const kaart = new Map<string, number>();
-  for (const i of [...d.cases, ...d.nieuws, ...d.events, ...d.blogs]) for (const id of i.bouwblokIds) kaart.set(id, (kaart.get(id) ?? 0) + 1);
+  for (const i of [...d.cases, ...d.benchmarks, ...d.nieuws, ...d.events, ...d.blogs]) for (const id of i.bouwblokIds) kaart.set(id, (kaart.get(id) ?? 0) + 1);
   return kaart;
 }
 
 /** Filtert de zichtbare items op één bouwblok. Zonder bouwblok blijft alles staan. */
-export function filterOpBouwblok(d: LeadDossier, bouwblokId: string | null): { cases: LeadCase[]; nieuws: LeadNieuws[]; events: LeadEvent[]; blogs: LeadBlog[] } {
-  if (!bouwblokId) return { cases: d.cases, nieuws: d.nieuws, events: d.events, blogs: d.blogs };
+export function filterOpBouwblok(d: LeadDossier, bouwblokId: string | null): DossierLijsten {
+  if (!bouwblokId) return { cases: d.cases, benchmarks: d.benchmarks, nieuws: d.nieuws, events: d.events, blogs: d.blogs };
   return {
     cases: d.cases.filter((c) => c.bouwblokIds.includes(bouwblokId)),
+    benchmarks: d.benchmarks.filter((b) => b.bouwblokIds.includes(bouwblokId)),
     nieuws: d.nieuws.filter((n) => n.bouwblokIds.includes(bouwblokId)),
     events: d.events.filter((e) => e.bouwblokIds.includes(bouwblokId)),
     blogs: d.blogs.filter((b) => b.bouwblokIds.includes(bouwblokId)),
@@ -577,7 +724,7 @@ export function zetNieuwsartikelenOm(ruw: Record<string, unknown>): Dossier {
 function vulItemAan(i: Partial<Dossieritem>): Dossieritem {
   return {
     id: i.id ?? "",
-    soort: i.soort === "case" || i.soort === "event" || i.soort === "blog" ? i.soort : "nieuws",
+    soort: i.soort === "case" || i.soort === "event" || i.soort === "blog" || i.soort === "benchmark" ? i.soort : "nieuws",
     titel: i.titel ?? "",
     toelichting: i.toelichting ?? "",
     zichtbaarVoorLead: i.zichtbaarVoorLead === true,
@@ -594,19 +741,30 @@ function vulItemAan(i: Partial<Dossieritem>): Dossieritem {
     caseOrganisatieId: i.caseOrganisatieId ?? null,
     omvang: i.omvang ?? "",
     totResultaat: i.totResultaat ?? "",
+    benchmarkId: i.benchmarkId ?? null,
   };
 }
 
 /**
  * Een Case waarvan de Organisatie niet meer bestaat, krijgt `caseOrganisatieId: null` en staat niet meer open (`dossier.md`, Verwijderen en
- * datakoppelingen). Eén plek, aangeroepen bij elke schrijfactie. Geeft het aantal aangepaste Cases terug.
+ * datakoppelingen). Eén plek, aangeroepen bij elke schrijfactie. Een Benchmark waarvan de benchmark is verwijderd, wordt hetzelfde opgeruimd (alleen met `benchmarks`). Geeft het aantal aangepaste items terug.
  */
-export function ruimDossierOp(alles: Organisatie[]): number {
+export function ruimDossierOp(alles: Organisatie[], benchmarks?: Pick<Benchmark, "id">[]): number {
   const bestaand = new Set(alles.map((o) => o.id));
+  const bestaandeBenchmarks = benchmarks ? new Set(benchmarks.map((b) => b.id)) : null;
   let aantal = 0;
   for (const o of alles) {
     if (!o.dossier) continue;
     for (const i of o.dossier.items) {
+      // Een Benchmark die niet meer bestaat: Het item vraagt om een nieuwe keuze en staat niet meer open (`dossier.md`, Verwijderen en datakoppelingen).
+      if (i.soort === "benchmark" && i.benchmarkId && bestaandeBenchmarks && !bestaandeBenchmarks.has(i.benchmarkId)) {
+        i.benchmarkId = null;
+        i.zichtbaarVoorLead = false;
+        i.gewijzigdOp = new Date().toISOString();
+        o.dossier.gewijzigdOp = i.gewijzigdOp;
+        aantal += 1;
+        continue;
+      }
       if (i.soort === "case" && i.caseOrganisatieId && !bestaand.has(i.caseOrganisatieId)) {
         i.caseOrganisatieId = null;
         i.zichtbaarVoorLead = false;
@@ -622,6 +780,7 @@ export function ruimDossierOp(alles: Organisatie[]): number {
 /** De vier lijsten van het Dossier zoals de Lead ze ziet, of een gefilterd deel ervan. */
 export interface DossierLijsten {
   cases: LeadCase[];
+  benchmarks: LeadBenchmark[];
   nieuws: LeadNieuws[];
   events: LeadEvent[];
   blogs: LeadBlog[];
@@ -635,6 +794,7 @@ export function filterOpSoort(l: DossierLijsten, soort: SoortFilter): DossierLij
   if (soort === "alles") return l;
   return {
     cases: soort === "case" ? l.cases : [],
+    benchmarks: soort === "benchmark" ? l.benchmarks : [],
     nieuws: soort === "nieuws" ? l.nieuws : [],
     events: soort === "event" ? l.events : [],
     blogs: soort === "blog" ? l.blogs : [],
@@ -642,9 +802,16 @@ export function filterOpSoort(l: DossierLijsten, soort: SoortFilter): DossierLij
 }
 
 /** Het aantal items per soort voor de pillen van het soortfilter: Een verlopen Event telt niet mee. */
-export function aantallenPerSoortLead(l: DossierLijsten): { alles: number; case: number; nieuws: number; event: number; blog: number } {
+export function aantallenPerSoortLead(l: DossierLijsten): { alles: number; case: number; benchmark: number; nieuws: number; event: number; blog: number } {
   const event = l.events.filter((e) => !e.verlopen).length;
-  return { alles: l.cases.length + l.nieuws.length + event + l.blogs.length, case: l.cases.length, nieuws: l.nieuws.length, event, blog: l.blogs.length };
+  return {
+    alles: l.cases.length + l.benchmarks.length + l.nieuws.length + event + l.blogs.length,
+    case: l.cases.length,
+    benchmark: l.benchmarks.length,
+    nieuws: l.nieuws.length,
+    event,
+    blog: l.blogs.length,
+  };
 }
 
 /**
@@ -699,8 +866,8 @@ export interface DossierSectieInhoud {
 export function verdeelOverSecties(l: DossierLijsten, scores: ReadonlyMap<string, number | null>, eenheid: string): DossierSectieInhoud[] {
   return DOSSIER_SECTIES.flatMap((definitie) => {
     const in_ = <T extends { bouwblokIds: string[] }>(lijst: T[]) => lijst.filter((i) => sectiesVanItem(i.bouwblokIds, scores).includes(definitie.sectie));
-    const lijsten: DossierLijsten = { cases: in_(l.cases), nieuws: in_(l.nieuws), events: in_(l.events), blogs: in_(l.blogs) };
-    const totaal = lijsten.cases.length + lijsten.nieuws.length + lijsten.events.length + lijsten.blogs.length;
+    const lijsten: DossierLijsten = { cases: in_(l.cases), benchmarks: in_(l.benchmarks), nieuws: in_(l.nieuws), events: in_(l.events), blogs: in_(l.blogs) };
+    const totaal = lijsten.cases.length + lijsten.benchmarks.length + lijsten.nieuws.length + lijsten.events.length + lijsten.blogs.length;
     if (totaal === 0) return [];
     return [{ ...definitie, regel: definitie.regel.replace("{eenheid}", eenheid), lijsten, aantal: aantallenPerSoortLead(lijsten).alles }];
   });

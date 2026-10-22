@@ -147,7 +147,7 @@ export function WeergaveAntwoorden({ assessment, weergave }: { assessment: Asses
       </div>
       <p className="vis-onderschrift">
         Elke kolom is een respondent{kolommen.some((k) => k.naam) ? ", met de naam in een tooltip" : " (anoniem, in een vaste volgorde)"}.
-        Een bouwblokcel toont de bouwblokscore van die respondent, een lege cel is een onbeantwoorde vraag.
+        Een bouwsteencel toont de bouwsteenscore van die respondent, een lege cel is een onbeantwoorde vraag.
       </p>
     </div>
   );

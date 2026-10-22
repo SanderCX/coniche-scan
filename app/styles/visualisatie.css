@@ -114,7 +114,7 @@
   color: var(--ink-s);
 }
 
-/* Het spoor met de drie banden: 37,5% Basis op Orde, 25% Uitbouwen, 37,5% Sterk punt. */
+/* Het spoor met de drie banden: 37,5% Basis op orde, 25% Uitbouwen, 37,5% Sterk punt. */
 .vis-spoor {
   position: relative;
   height: 36px;

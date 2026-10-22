@@ -44,7 +44,7 @@ const KOLOMMEN = [
   "organisatie_kenmerken",
   "organisatie_kpis",
   "antwoorden",
-  "opmerkingen_per_bouwblok",
+  "opmerkingen_per_bouwsteen",
 ];
 
 function labelVoorSchaal(assessment: Assessment, score: number): string {
@@ -94,7 +94,7 @@ const csvScore = (score: number | null) => (score !== null ? csvGetal(score) : "
  * (export-csv.md). Het gewicht staat er altijd, ook bij 1: Dit is machinedata,
  * geen weergave.
  */
-function groepsScoresVeld(type: "categorie" | "bouwblok", groepen: CsvGroepScore[]): string {
+function groepsScoresVeld(type: "categorie" | "bouwsteen", groepen: CsvGroepScore[]): string {
   const items = groepen
     .map((g) => {
       const basis = `"naam":${JSON.stringify(g.groepNaam)},"score":${csvScore(g.score)}`;
@@ -105,7 +105,7 @@ function groepsScoresVeld(type: "categorie" | "bouwblok", groepen: CsvGroepScore
               `{"nummer":${b.nummer},"naam":${JSON.stringify(b.naam)},"score":${csvScore(b.score)},"gewicht":${csvGewicht(b.gewicht)}}`
           )
           .join(",");
-        return `{${basis},"bouwblokken":[${blokken}]}`;
+        return `{${basis},"bouwstenen":[${blokken}]}`;
       }
       return `{${basis},"nummer":${g.nummer ?? 0},"gewicht":${csvGewicht(g.gewicht ?? 1)}}`;
     })
@@ -122,7 +122,7 @@ function bouwRijRecord(ctx: CsvRijContext): Record<string, string> {
 
   // Score-samenvatting alleen bij een afgeronde invulling (export-csv.md,
   // "Berekende score-samenvatting"): geen score op een onvolledige invulling.
-  // `antwoorden`/`opmerkingen_per_bouwblok` hieronder kennen die restrictie
+  // `antwoorden`/`opmerkingen_per_bouwsteen` hieronder kennen die restrictie
   // niet — die tonen gewoon wat er tot nu toe al ingevuld is, ook bij
   // "bezig" (`aantal_beantwoord` hierboven doet dat ook al).
   if (invulling.status === "afgerond") {
@@ -133,7 +133,7 @@ function bouwRijRecord(ctx: CsvRijContext): Record<string, string> {
 
     const vlak = isVlakkeAssessment(assessment);
     groepen = groepsScoresVeld(
-      vlak ? "bouwblok" : "categorie",
+      vlak ? "bouwsteen" : "categorie",
       groepResultaten.map((g) => {
         if (vlak) {
           // De groep is het bouwblok zelf.
@@ -155,8 +155,8 @@ function bouwRijRecord(ctx: CsvRijContext): Record<string, string> {
     bouwblok.vragen
       .filter((v) => typeof invulling.antwoorden[v.id] === "number")
       .map((v) => ({
-        bouwblokId: bouwblok.id,
-        bouwblokNaam: bouwblok.naam,
+        bouwsteenId: bouwblok.id,
+        bouwsteenNaam: bouwblok.naam,
         vraagId: v.id,
         vraagTekst: v.tekst,
         score: invulling.antwoorden[v.id] as number,
@@ -202,7 +202,7 @@ function bouwRijRecord(ctx: CsvRijContext): Record<string, string> {
     // De KPI's en de contacten per kanaal staan niet meer in de kenmerken maar als KPI-waarden (`datamodel.md`, KPI's en kanalen).
     organisatie_kpis: JSON.stringify(kpiExportRegels(organisatie, getInstellingen().kpiDefinities, getInstellingen().kanalen)),
     antwoorden: antwoordenVeld,
-    opmerkingen_per_bouwblok: opmerkingenVeld,
+    opmerkingen_per_bouwsteen: opmerkingenVeld,
   };
 }
 

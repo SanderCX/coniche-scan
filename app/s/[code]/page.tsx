@@ -100,7 +100,14 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
     : [];
 
   // Het Dossier (`dossier.md`, Scherm 4): Eén kaart onder Vergelijkingen, alleen als het open staat en er minstens één item zichtbaar is.
-  const dossier = isLeadLid ? leadDossier(organisatie, organisaties, instellingen.korteNamen) : null;
+  const dossier = isLeadLid
+    ? leadDossier(organisatie, organisaties, instellingen.korteNamen, new Date(), {
+        leadId: lid.id,
+        benchmarks,
+        assessments,
+        minOrganisaties: instellingen.benchmarkMinOrganisaties,
+      })
+    : null;
 
   const heeftEigen = invullingen.length > 0;
   const leeg = !heeftEigen && leadMetingen.length === 0 && benchmarkKaarten.length === 0 && !dossier;

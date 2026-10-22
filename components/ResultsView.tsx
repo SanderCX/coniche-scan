@@ -127,7 +127,7 @@ export function ResultsView({
         bouwblokResultaten={bouwblokResultaten}
         groepResultaten={groepResultaten}
         vlak={vlak}
-        radarTitel={vlak ? `Per ${kleineLetter(assessment.bouwblokEenheidEnkelvoud)}` : "Per bouwblok"}
+        radarTitel={vlak ? `Per ${kleineLetter(assessment.bouwblokEenheidEnkelvoud)}` : "Per bouwsteen"}
         groepTitel={groepHeading}
       />
 

@@ -35,7 +35,7 @@ export default function PrivacyPage() {
         <ul className="list-disc pl-5 space-y-1">
           <li>E-mailadres (bij uitnodigen)</li>
           <li>Naam, functie, team, notities (bij de intake, optioneel)</li>
-          <li>Antwoorden op de scanvragen (1-5) en opmerkingen per bouwblok</li>
+          <li>Antwoorden op de scanvragen (1-5) en opmerkingen per bouwsteen</li>
           <li>
             Technische gegevens die nodig zijn om de link te laten werken (de toegangscode zelf)
           </li>

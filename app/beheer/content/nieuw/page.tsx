@@ -56,7 +56,7 @@ export default function NieuwAssessmentPage() {
 
       {modus === "template" && (
         <p className="text-sm text-ink-m" style={{ maxWidth: "28rem", marginTop: "-0.5rem" }}>
-          Kopieert alle categorieën, bouwblokken en vragen van het gekozen Assessment naar nieuwe,
+          Kopieert alle categorieën, bouwstenen en vragen van het gekozen Assessment naar nieuwe,
           losse content-records. Daarna bewerk je de kopie als een gewoon Assessment — een latere
           wijziging op het origineel werkt niet door (datamodel.md, Sector-varianten).
         </p>

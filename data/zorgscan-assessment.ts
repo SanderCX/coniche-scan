@@ -392,17 +392,17 @@ export const zorgscan: Assessment = {
   pdfContentSecties: { titel: "Visie", bron: "visie-coniche.md-deel1" },
   bouwblokken: null,
   scoresPerGroepGesorteerd: false,
-  bouwblokLabel: "Bouwblok",
-  bouwblokEenheidEnkelvoud: "Bouwblok",
-  bouwblokEenheidMeervoud: "bouwblokken",
+  bouwblokLabel: "Bouwsteen",
+  bouwblokEenheidEnkelvoud: "Bouwsteen",
+  bouwblokEenheidMeervoud: "bouwstenen",
   featureCards: [
     {
       titel: "Volledig beeld",
-      tekst: "15 bouwblokken, verdeeld over 5 pijlers — van strategie tot cultuur.",
+      tekst: "15 bouwstenen, verdeeld over 5 pijlers — van strategie tot cultuur.",
     },
     {
       titel: "Direct inzicht",
-      tekst: "Score per bouwblok, categorie en totaal, met sterktes en verbeterkansen.",
+      tekst: "Score per bouwsteen, categorie en totaal, met sterktes en verbeterkansen.",
     },
     {
       titel: "Herkenbaar voor de zorg",

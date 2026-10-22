@@ -14,6 +14,7 @@ import { SpanningVeldenSectie } from "@/components/assessment/SpanningVeldenSect
 import { SpanningResultaat } from "@/components/spanning/SpanningResultaat";
 import { Antwoordkeuze } from "@/components/spanning/Antwoordkeuze";
 import { SpanningVeldForm } from "@/components/spanning/SpanningVeldForm";
+import { ScoreRing, ringVanTeaser } from "@/components/ScoreRing";
 import { ScanInvulling } from "./types";
 
 const veld = (spanningsmeter.bouwblokken ?? [])[0];
@@ -33,7 +34,7 @@ describe("de Spanningsmeter op de Assessment-pagina en scherm 1", () => {
       ["wat", "Wat krijg ik"],
       ["visie", "Visie"],
     ]);
-    expect(overDezeScan(spanningsmeter)).toEqual({ tekst: "Over deze scan: spanningsvelden en visie", href: "/spanningsmeter" });
+    expect(overDezeScan(spanningsmeter)).toEqual({ tekst: "Over deze scan: Spanningsvelden en visie", href: "/spanningsmeter" });
   });
 
   it("noemt in de tegel het aantal vragen en velden en het eigen profiel", () => {
@@ -60,7 +61,7 @@ describe("Mijn metingen bij de Spanningsmeter", () => {
     const t = teaserVoorScan(spanningsmeter, demoAntwoordenSpanning)!;
     expect(t.getal).toBe("3,1");
     expect(t.klasseNaam).toBe("Georganiseerd");
-    expect(t.ringLabel).toBe("Niveau");
+    expect(t.ringLabel).toBe("Gemiddeld niveau");
     expect(t.rijenLabel).toBe("Per spanningsveld");
     expect(t.rijen.map((r) => [r.naam, r.waarde])).toEqual([
       ["Verhaal", "3,8"],
@@ -204,5 +205,18 @@ describe("de teksten van de Spanningsmeter in het register", () => {
   it("heeft geen Info-teksten meer voor de rolgroep", () => {
     expect(standaardInfoTekst("info.spanningMinPerRol")).toBe("");
     expect(standaardInfoTekst("info.rolgroep")).toBe("");
+  });
+});
+
+describe("het label in de ring van de Spanningsmeter (22 oktober 2026)", () => {
+  it("heet Gemiddeld niveau en staat op twee regels, en Totaalscore blijft op één regel", () => {
+    const t = teaserVoorScan(spanningsmeter, demoAntwoordenSpanning)!;
+    const html = renderToStaticMarkup(<ScoreRing ring={ringVanTeaser(t)} label={t.ringLabel} />);
+    expect(html.match(/score-ring-label-regel/g)).toHaveLength(2);
+    expect(html).toContain(">Gemiddeld<");
+    expect(html).toContain(">niveau<");
+    const gewoon = renderToStaticMarkup(<ScoreRing ring={ringVanTeaser(t)} />);
+    expect(gewoon).not.toContain("score-ring-label-regel");
+    expect(gewoon).toContain("Totaalscore");
   });
 });

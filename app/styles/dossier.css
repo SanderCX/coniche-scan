@@ -231,6 +231,10 @@
   background: var(--or-faint);
   color: var(--or);
 }
+.dp-sectie-icoon--benchmark {
+  background: #efeaf2;
+  color: var(--pu);
+}
 .dp-sectie-icoon--nieuws {
   background: var(--bl-faint);
   color: var(--bl);
@@ -403,6 +407,10 @@
   background: var(--bl-faint);
   color: var(--bl);
 }
+.dp-datumtegel--benchmark {
+  background: #efeaf2;
+  color: var(--pu);
+}
 .dp-datumtegel--event {
   background: #e7f6ef;
   color: var(--gr);
@@ -529,7 +537,7 @@
   align-items: center;
   gap: 20px;
 }
-/* De balk: 10px hoog, afgerond, een rand van 1px en drie bleke zones (Basis op Orde 37,5%, Uitbouwen 25%, Sterk punt 37,5%). Geen lijnen op de grenzen en geen getallen onder de balken. */
+/* De balk: 10px hoog, afgerond, een rand van 1px en drie bleke zones (Basis op orde 37,5%, Uitbouwen 25%, Sterk punt 37,5%). Geen lijnen op de grenzen en geen getallen onder de balken. */
 .dp-balk {
   position: relative;
   display: block;

@@ -110,7 +110,7 @@ export function BenchmarkOrganisatieView({
             ariaLabel="Weergave van de resultaten"
             opties={[
               { waarde: "overzicht", label: "Overzicht" },
-              { waarde: "bouwblok", label: "Per bouwblok" },
+              { waarde: "bouwblok", label: "Per bouwsteen" },
               {
                 waarde: "spreiding",
                 label: "Spreiding",
@@ -141,7 +141,7 @@ export function BenchmarkOrganisatieView({
           vlak={vlak}
           naam={organisatieNaam}
           vergelijkingNaam={tekst.rest}
-          radarTitel={vlak ? `Per ${woorden.enkelvoud}` : "Per bouwblok"}
+          radarTitel={vlak ? `Per ${woorden.enkelvoud}` : "Per bouwsteen"}
           groepTitel={vlak ? `Scores per ${woorden.enkelvoud}` : "Per categorie"}
         />
       )}

@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { parseOpslag, stringifyOpslag } from "./opslag-namen";
 import { Assessment, Bouwblok, Vraag } from "./types";
 import { assessments as seedAssessments } from "@/data/assessments";
 import { nieuwId } from "./id";
@@ -47,7 +48,7 @@ function voegNieuweSeedsToe(): void {
   const ruw = window.localStorage.getItem(KEY);
   if (!ruw) return;
   try {
-    const lijst = JSON.parse(ruw) as Assessment[];
+    const lijst = parseOpslag<Assessment[]>(ruw);
     const verwijderd = leesVerwijderd();
     const nieuw = seedAssessments.filter(
       (a) => !EERDERE_SEEDS.includes(a.id) && !verwijderd.includes(a.id) && !lijst.some((x) => x.id === a.id)
@@ -72,7 +73,7 @@ function voegNieuweSeedsToe(): void {
       }
     }
     if (nieuw.length > 0 || gewijzigd) {
-      window.localStorage.setItem(KEY, JSON.stringify([...lijst, ...structuredClone(nieuw)]));
+      window.localStorage.setItem(KEY, stringifyOpslag([...lijst, ...structuredClone(nieuw)]));
     }
   } catch {
     // Beschadigde opslag: parseSnapshot valt terug op de seeds.
@@ -86,7 +87,7 @@ function getSnapshot(): string {
   if (ruw) return ruw;
   // Niet meteen pushen naar de server, zie dezelfde kanttekening in
   // lib/db.ts hierboven (race met `haalServerKopieOp`'s async ophaalronde).
-  const seed = JSON.stringify(structuredClone(seedAssessments));
+  const seed = stringifyOpslag(structuredClone(seedAssessments));
   window.localStorage.setItem(KEY, seed);
   return seed;
 }
@@ -107,7 +108,7 @@ if (typeof window !== "undefined") {
 function parseSnapshot(snapshot: string): Assessment[] {
   if (snapshot === SERVER_SENTINEL) return seedAssessments;
   try {
-    return (JSON.parse(snapshot) as Assessment[]).map(verrijkAssessment);
+    return parseOpslag<Assessment[]>(snapshot).map(verrijkAssessment);
   } catch {
     return seedAssessments;
   }
@@ -119,7 +120,7 @@ function laadAlles(): Assessment[] {
 
 function slaAlles(alles: Assessment[]): void {
   if (typeof window === "undefined") return;
-  const json = JSON.stringify(alles);
+  const json = stringifyOpslag(alles);
   window.localStorage.setItem(KEY, json);
   emitChange();
   stuurNaarServer(SERVER_SLEUTEL, json);
@@ -156,7 +157,7 @@ export function createAssessment(input: { naam: string; kortLabel: string }): As
     doelgroep: "",
     icoon: "sparkle",
     geschatteDuur: "",
-    bouwblokLabel: "Bouwblok",
+    bouwblokLabel: "Bouwsteen",
     wegingTitel: null,
     wegingToelichting: null,
     kortLabel: input.kortLabel,
@@ -164,8 +165,8 @@ export function createAssessment(input: { naam: string; kortLabel: string }): As
     categorieen: null,
     bouwblokken: [],
     scoresPerGroepGesorteerd: false,
-    bouwblokEenheidEnkelvoud: "Bouwblok",
-    bouwblokEenheidMeervoud: "bouwblokken",
+    bouwblokEenheidEnkelvoud: "Bouwsteen",
+    bouwblokEenheidMeervoud: "bouwstenen",
     featureCards: [],
     schaal: [
       { waarde: 1, label: "Niet aanwezig" },

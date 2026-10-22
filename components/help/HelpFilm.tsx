@@ -280,11 +280,11 @@ const RADAR: FilmGegevens = {
   titel: "De radar in je resultaten",
   duur: 16,
   beschrijving:
-    "Je ziet je score per bouwblok in de radar en per categorie in het staafdiagram. De cursor gaat over bouwblok 4, Leren uit klantcontact: het knooppunt, de taartpunt en de score-stip lichten op, de balk van de categorie Organisatie krijgt een ring en de andere balken dimmen, en een tooltip toont 4, Leren uit klantcontact en 2,3, Basis op Orde. Daarna gaat de cursor over de balk Mens: de bouwblokken 11 tot en met 14 lichten op in de radar en de tooltip boven de balk toont Mens en 3,7, Sterk punt.",
+    "Je ziet je score per bouwsteen in de radar en per categorie in het staafdiagram. De cursor gaat over bouwsteen 4, Leren uit klantcontact: het knooppunt, de taartpunt en de score-stip lichten op, de balk van de categorie Organisatie krijgt een ring en de andere balken dimmen, en een tooltip toont 4, Leren uit klantcontact en 2,3, Basis op orde. Daarna gaat de cursor over de balk Mens: de bouwstenen 11 tot en met 14 lichten op in de radar en de tooltip boven de balk toont Mens en 3,7, Sterk punt.",
   stappen: [
-    "Je ziet je score per bouwblok in de radar en per categorie in het staafdiagram.",
-    "Wijs je een bouwblok aan, dan lichten het bolletje, de taartpunt en de balk van zijn categorie op. De tooltip noemt de naam, de score en de klasse.",
-    "Wijs je een balk aan, dan lichten de bouwblokken van die categorie op in de radar.",
+    "Je ziet je score per bouwsteen in de radar en per categorie in het staafdiagram.",
+    "Wijs je een bouwsteen aan, dan lichten het bolletje, de taartpunt en de balk van zijn categorie op. De tooltip noemt de naam, de score en de klasse.",
+    "Wijs je een balk aan, dan lichten de bouwstenen van die categorie op in de radar.",
   ],
   podium: <RadarFilmPodium />,
 };
@@ -294,10 +294,10 @@ const DOSSIER: FilmGegevens = {
   titel: "Het dossier, de radar voor de Lead",
   duur: 16,
   beschrijving:
-    "De radar toont alleen actieve knooppunten voor de bouwblokken 4, 7 en 13, waar items bij staan, met rechts de lijst met bouwblokken. Een klik op bouwblok 7, Systemen en Tools, toont de filterbalk met 2 items in dit dossier en laat alleen de items bij dat bouwblok staan: een case en een nieuwsbericht. Een klik op Alle items tonen haalt het filter weg. De voorbeelditems noemen geen organisatie.",
+    "De radar toont alleen actieve knooppunten voor de bouwstenen 4, 7 en 13, waar items bij staan, met rechts de lijst met bouwstenen. Een klik op bouwsteen 7, Systemen en Tools, toont de filterbalk met 2 items in dit dossier en laat alleen de items bij die bouwsteen staan: een case en een nieuwsbericht. Een klik op Alle items tonen haalt het filter weg. De voorbeelditems noemen geen organisatie.",
   stappen: [
-    "De radar toont alleen de bouwblokken waar je consultant items bij heeft gezet. Rechts staat de lijst met die bouwblokken.",
-    "Kies een bouwblok, in de radar of in de lijst: Alleen de cases en het nieuws bij dat bouwblok blijven staan.",
+    "De radar toont alleen de bouwstenen waar je consultant items bij heeft gezet. Rechts staat de lijst met die bouwstenen.",
+    "Kies een bouwsteen, in de radar of in de lijst: Alleen de cases en het nieuws bij die bouwsteen blijven staan.",
     "Kies Alle items tonen om het filter weg te halen en alles weer te zien.",
   ],
   podium: <DossierFilmPodium />,

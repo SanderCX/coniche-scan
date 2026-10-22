@@ -115,7 +115,7 @@ export function RadarFilmPodium() {
         <MiniRadar />
         <span className="fr-tip fr-tip--a" role="presentation">
           <strong>4 · {NAMEN[3]}</strong>
-          <span>{komma(SCORES[3])} · Basis op Orde</span>
+          <span>{komma(SCORES[3])} · Basis op orde</span>
         </span>
       </div>
       <div className="fr-staven">
@@ -183,7 +183,7 @@ export function DossierFilmPodium({ ai = false }: { ai?: boolean }) {
   const actiefNrs = ai ? [3, 5, 6] : [4, 7, 13];
   const gekozen = ai ? 3 : 7;
   const actief = new Set(actiefNrs);
-  const eenheid = ai ? "domein" : "bouwblok";
+  const eenheid = ai ? "domein" : "bouwsteen";
   const rijen = sorteerVerdeling(actiefNrs.map((n) => ({ n, score: soort.scores[n - 1], volgnummer: n })));
   return (
     <div className={`fd ${ai ? "fd--ai" : ""}`}>
@@ -194,7 +194,7 @@ export function DossierFilmPodium({ ai = false }: { ai?: boolean }) {
         <div className="fd-verdeling">
           <h4 className="fd-kop">Waar dit dossier over gaat</h4>
           <p className="fd-zin">
-            Kies een {eenheid} om de cases, het nieuws, de events en de blogs daarover te zien. Onder de radar staan de {ai ? "domeinen" : "bouwblokken"} met de
+            Kies een {eenheid} om de cases, het nieuws, de events en de blogs daarover te zien. Onder de radar staan de {ai ? "domeinen" : "bouwstenen"} met de
             laagste score bovenaan.
           </p>
           <ul className="fd-lijst">
