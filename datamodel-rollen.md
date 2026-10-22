@@ -470,6 +470,7 @@ gebeurtenis, zonder persoonsgegevens uit scans.
 - `dossier.zichtbaarGemaakt` en `dossier.verborgen` (voorheen `dossier.geopend` en `dossier.gesloten`; hernoemd op):
   `zichtbaar` is aan of uit gezet. `details` bevat de Organisatie en het
   aantal zichtbare items.
+- `dossier.profielGewijzigd`: Een schakelaar van `toonProfiel` is gewijzigd. `details` bevat de Organisatie, het blok (cijfers, kanalen, techstack of overig) en de nieuwe waarde.
 - `dossier.instellingGewijzigd`: `naamVoorLead` of
   een `radarBronnen` is gewijzigd. `details` bevat de Organisatie, het veld, bij
   een scorebron het Assessment en de Meting (of "automatisch"), en de oude en
@@ -509,7 +510,7 @@ Een streepje betekent geen toegang.
 | `organisaties.toewijzen` (aan een Consultant) | alle | - | - | - |
 | `organisaties.bewerken` (incl. kenmerken, KPI-waarden en Onderdelen) | alle | eigen | te bevestigen | - |
 | `contactpersonen.bewerken` (Contactpersonen aanmaken, wijzigen en verwijderen; een Consultant ziet ze wel; vooralsnog alleen Admin, later waarschijnlijk eigen voor een Consultant) | alle | - | - | - |
-| `dossier.bewerken` (Dossieritems aanmaken, wijzigen en verwijderen, Zichtbaar voor Lead, de naam en de scorebron van het Dossier; `dossier.md`) | alle | eigen | - | - |
+| `dossier.bewerken` (Dossieritems aanmaken, wijzigen en verwijderen, Zichtbaar voor Lead, de naam en de scorebron van het Dossier, de blokken van het profiel die de Lead ziet; `dossier.md`) | alle | eigen | - | - |
 | `dossier.inzien` | alle | eigen | alleen openstaande items van de eigen Organisatie | - |
 | `organisaties.verwijderen` | alle | eigen | - | - |
 | `metingen.plannen` (ook een nieuw Onderdeel aanmaken in het formulier) | alle | eigen | - | - |

@@ -428,7 +428,8 @@ standaardteksten zoals ze nu in de app staan):
 | `info.mijnAccountWachtwoord` | Mijn account, naast de uitgeschakelde knop "Wachtwoord wijzigen" | Wachtwoord wijzigen komt met de echte inlog. Tot die tijd vraag je een Admin om je wachtwoord te wijzigen. |
 | `info.benchmarkInstellingen` | Instellingen, Drempels en termijnen, formulier Benchmark | Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. Het aantal dagen tussen Metingen is voor een vergelijking met de lezing Naast elkaar: Liggen de meetdata verder uit elkaar, dan krijg je bij het opslaan een waarschuwing. Opslaan blijft mogelijk. |
 | `info.verkennen` | Verkennen, naast de paginatitel | Verkennen werkt op de pool van één Assessment: De Organisaties met toestemming voor benchmark die een Meting hebben met genoeg afgeronde scans, per Organisatie de Meting die telt volgens de Meetperiode, of de meest recente als je geen periode kiest. Elke Organisatie telt even zwaar mee. Het scherm slaat niets op en een Lead ziet het nooit. |
-| `info.organisatieToegang` | Organisatie-detail, kaart Toegang, naast de titel | De eigenaar is de Consultant die de organisatie heeft aangemaakt. Een toegewezen Consultant mag deze organisatie ook zien en beheren, en dezelfde gegevens inzien. Intrekken haalt die toegang weer weg. |
+| `info.organisatieToegang` | Organisatie-detail, vlak Toegang, naast de titel | De eigenaar is de Consultant die de organisatie heeft aangemaakt. Een toegewezen Consultant mag deze organisatie ook zien en beheren, en dezelfde gegevens inzien. Intrekken haalt die toegang weer weg. |
+| `info.profielLead` | Organisatie-detail, modal Kenmerken bewerken, naast de kop Zichtbaar voor de Lead | De Lead ziet de blokken die aan staan bovenaan het Dossier, alleen van de eigen organisatie. Het Dossier zelf moet ook zichtbaar zijn voor de Lead. Toegang, Afspraken en Contactpersonen zijn nooit zichtbaar voor de Lead. |
 | `info.benchmarkVlag` | Organisatie-detail, bij de schakelaar "Doet mee aan benchmark" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks. |
 | `info.leadToegangCel` | Leads-venster van de organisatie, in een grijze cel | De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark. Bij een Verkenning met te weinig Organisaties staat er: "Te weinig Organisaties in deze groep: {n}, minimaal {min}." |
 | `info.antwoordenMetNamen` | Organisatie-detail, bij het vinkje "Namen tonen bij Antwoorden" | Uit: Leads zien de antwoorden als R1 tot en met Rn. Aan: Leads zien de namen van de respondenten. Stem dit af met de opdrachtgever voordat je het aanzet. Het geldt voor alle Leads van deze organisatie. |
@@ -881,12 +882,13 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   bovenop de eigenaar. Intrekken van een toewijzing is de spiegel van
   toewijzen, geen aparte permissie. De eigenaar (`aangemaaktDoor`) en wie
   toegewezen is blijven twee onderscheiden dingen, ook al vallen ze in de
-  rechtenmatrix allebei onder hetzelfde bereik "eigen". De Toegang is een kaart en geen uitklapbaar
+  rechtenmatrix allebei onder hetzelfde bereik "eigen". De Toegang is een vlak en geen uitklapbaar
   blok met losse tekst en selectievakjes. Het gaat over wie bij de gegevens van
-  de organisatie mag, en hoort dus bij de kaart Afspraken, in één rij met
-  die kaart.
-  - **Plek**: Onder de kaart Kenmerken, links van de kaart Afspraken (twee
-    kaarten van gelijke breedte, 24px ertussen). Alleen voor een Admin.
+  de organisatie mag, en hoort dus bij het vlak Afspraken, in één rij met
+  dat vlak.
+  - **Plek**: In het organisatiepaneel, onder de lijn, links van het vlak Afspraken
+    (twee vlakken van gelijke breedte, 24px ertussen, opmaak bij Onder de lijn).
+    Alleen voor een Admin.
   - **Kop**: De titel Toegang met een Info-icoon (`info.organisatieToegang`).
     De uitleg staat in het Info-icoon en niet als vaste tekst eronder. Rechts de
     knop "+ Consultant toewijzen" (`.btn-or .btn-compact`).
@@ -903,18 +905,17 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     keuzes in een lijst, dus een modal (`stylesheet.md`, Bewerken: Op de plek of
     in een modal). Is er geen Consultant meer om toe te wijzen, dan is de knop
     uitgeschakeld.
-  - **Regel onder de naam**: De regel "Aangemaakt door: … · Ook toegewezen aan: …"
-    onder de paginatitel blijft staan, voor iedereen die de organisatie ziet,
-    als alleen-lezen tekst. De kaart Toegang is de plek om het te wijzigen.
+  - **Regel onder de naam**: Zie Organisatiepaneel. Een Admin ziet de regel niet
+    meer, want Toegang toont de eigenaar en de toegewezen Consultants. De kaart
+    Toegang is de plek om het te wijzigen.
   - **Logging**: Zoals nu (`datamodel.md`, Audit).
-- **Afspraken** (in `components/beheer/AfsprakenKaart.tsx`, Admin-only): Een smalle kaart
-  direct onder de kaart Kenmerken en boven de kaart KPI's, rechts van de kaart
-  Toegang, met de titel "Afspraken" en de drie schakelaars hieronder naast
-  elkaar in één rij, elk met Info-icoon. Ze leggen vast wat met de organisatie
+- **Afspraken** (in `components/beheer/AfsprakenKaart.tsx`, Admin-only): Een vlak
+  in het organisatiepaneel, onder de lijn, rechts van het vlak Toegang, met de
+  titel "Afspraken" en de drie schakelaars onder elkaar, elk met Info-icoon. Ze leggen vast wat met de organisatie
   is afgesproken over haar gegevens, en staan uit bij een nieuwe organisatie.
   Daarom horen ze bovenaan en niet onderaan de pagina: Een Admin ziet in één
   blik wat aan staat. Een Consultant en een Lead zien de kaart niet.
-- **Benchmark-vlag** (Admin-only): In de kaart Afspraken, links, een
+- **Benchmark-vlag** (Admin-only): In het vlak Afspraken, links, een
   schakelaar "Doet mee aan benchmark"
   (`Organisatie.benchmarkToegestaan`, `datamodel.md`, Deel 2: Benchmark). Hij staat
   uit bij een nieuwe organisatie. Een Admin zet hem aan nadat dit met de
@@ -923,7 +924,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   meedoet. De leden van de organisatie vallen dan uit die benchmarks.
   Wijzigen wordt gelogd (`organisatie.benchmarkVlagGewijzigd`). Zie
   `benchmark.md`, Toestemming en privacy.
-- **Namen tonen bij Antwoorden** (Admin-only): In de kaart Afspraken,
+- **Namen tonen bij Antwoorden** (Admin-only): In het vlak Afspraken,
   rechts van de Benchmark-vlag, een schakelaar (`Organisatie.antwoordenMetNamen`,
   `datamodel.md`, Deel 2: Benchmark). Hij staat uit bij een nieuwe organisatie. Uit: Leads
   zien bij Antwoorden R1 tot en met Rn. Aan: Ze zien de namen. Een Admin zet
@@ -931,7 +932,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   bevestiging die zegt dat de Leads van deze organisatie dan namen zien,
   uitzetten kan zonder bevestiging. Wijzigen wordt gelogd
   (`organisatie.antwoordenNamenGewijzigd`). Zie punt 6a, Namen bij Antwoorden.
-- **Case-vlag** (Admin-only, in `components/beheer/CaseVlag.tsx`): In de kaart Afspraken,
+- **Case-vlag** (Admin-only, in `components/beheer/CaseVlag.tsx`): In het vlak Afspraken,
   rechts van het vinkje "Namen tonen bij Antwoorden", een vinkje
   "Mag als case gebruikt worden" (`Organisatie.caseToegestaan`, `datamodel.md`
   deel 3) met een Info-icoon (`info.caseVlag`). Hij staat uit bij een nieuwe
@@ -956,7 +957,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   `organisatie.hernoemd`, met de oude en de nieuwe naam in `details`
   (`datamodel.md`, Audit). Oudere audit-regels houden de naam zoals die was
   bij het loggen.
-- **Detail**: Kenmerken (altijd bewerkbaar), "Aangemaakt door" (zie
+- **Detail**: Het organisatiepaneel (Kenmerken altijd bewerkbaar, met Toegang, Afspraken en Contactpersonen), "Aangemaakt door" (zie
   hierboven), de metingen van deze organisatie met "Bekijk" naar het
   Meting-overzicht (punt 5), op meetdatum, de nieuwste bovenaan, en de respondenten met hun
   status, elk met alleen "Bekijk" dat het Respondent-overzicht opent
@@ -970,43 +971,41 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   filter Organisatie al ingesteld op deze organisatie (in de URL, zoals de
   andere filters). Zijn het er 5 of minder, dan is er geen link. Er komt
   geen link naar de lijst over alle organisaties heen.
-- **Kenmerken** (design in `Claude outputs/kpi-design/`, bord 1 en 2, linksboven): De kaart bovenaan
-  het organisatie-detail, boven de kaarten KPI's en Metingen. Ze toont de
-  waarden van de organisatievelden (`datamodel.md`, Organisatievelden) als een
-  rustig raster, en laat bewerken op dezelfde plek.
-  - **Kaart**: Zoals Kaarten in `stylesheet.md` (wit, `1px solid var(--border)`,
-    `border-radius: 10px`). Bovenin links de titel Kenmerken (18px, gewicht 700),
-    rechts de knop "Bewerken" (`.btn-outline .btn-compact`, vraagt
-    `organisaties.bewerken`). Een Lead of Respondent ziet deze kaart niet.
-  - **Raster**: Vier kolommen van gelijke breedte, 32px tussen de kolommen en
-    16px tussen de rijen, met de velden rij na rij van links naar rechts, in de volgorde die
-    onder Volgorde staat. Per veld
-    staat het label boven de waarde, op twee regels en zonder lijnen of vlakken
-    ertussen.
-  - **Label**: 12px, gewicht 400, in `--ink-s`. Het label is de veldnaam
-    (`VeldDefinitie.label`, nooit de korte naam). Heeft de waarde meer delen, dan
-    noemt het label die delen in dezelfde volgorde, gescheiden door een komma
-    of een schuine streep met een spatie aan weerskanten: "Klanten, B2B / B2C".
-  - **Waarde**: 16px, gewicht 600, in `--ink`, op één regel. Past ze niet, dan
-    breekt ze af op een spatie en blijft het label bij de eerste regel staan. De
-    waarde staat letterlijk zoals ze is opgeslagen, dus ook bij "Anders…" in de
-    spelling van de invoer. Bij een keuzelijst met korte namen (Sector, Subsector,
-    de techstack-leveranciers) staat de korte naam (`datamodel.md`, Korte namen),
-    met de originele naam in de tooltip.
+  **Eén kaart per sectie**: Het organisatiepaneel, het Dossier, de KPI's, de
+  Metingen, de Respondenten en de Leads staan elk op een eigen witte kaart
+  (`stylesheet.md`, Sectiekaart), in die volgorde. De kop van een kaart heeft
+  links de titel en rechts de actie van die sectie.
+- **Organisatiepaneel** (design: Design-artifact "Organisatiescherm: visuele varianten", bord C; de organisatievelden heten in het datamodel nog Kenmerken): De witte kaart bovenaan het organisatie-detail, boven de kaarten Dossier, KPI's, Metingen, Respondenten en Leads. Ze toont de waarden van de organisatievelden (`datamodel.md`, Organisatievelden) visueel, laat bewerken op dezelfde plek en bevat verderop in dezelfde kaart Toegang, Afspraken en Contactpersonen. Welke blokken de Lead in het Dossier ziet, stelt een Consultant of Admin in bij Bewerken (zie Zichtbaar voor de Lead hieronder en `dossier.md`, Profiel van de Organisatie).
+  - **Kaart**: Zoals Kaarten in `stylesheet.md` (wit, `1px solid var(--border)`, `border-radius: 10px`), met padding 24px en 24px tussen de onderdelen.
+  - **Kop**: Links een vierkant van 56px met de beginletter van de organisatie (radius 14px, achtergrond `--or-faint`, letter 28px, gewicht 800, `--or`). Daarnaast de naam (24px, gewicht 800) en eronder de pillen Sector en Subsector (12px, gewicht 700, radius 12px, padding 4px 10px). Sector heeft `--bl-faint` met tekst `--bl`, Subsector `--bg-mid` met tekst `--ink-m`. Ze tonen de korte naam, met de originele naam in de tooltip (zie Korte namen in kaart en formulier). Een pil zonder waarde valt weg. Rechts staat de knop "Bewerken" (`.btn-outline .btn-compact`, vraagt `organisaties.bewerken`). Een Lead of Respondent ziet dit paneel niet.
+  - **Regel onder de naam**: In het design staat de regel "Aangemaakt door: … · Ook toegewezen aan: …" niet meer onder de naam, omdat Toegang dit toont. Een Consultant ziet de kaart Toegang niet en houdt de regel daarom (12px, `--ink-s`, onder de pillen), als alleen-lezen tekst.
+  - **Cijferrij**: Onder de kop, tussen twee lijnen van 1px `--border`, vier kolommen met een lijn van 1px `--border` ertussen en 24px padding links van elke kolom behalve de eerste. Elke kolom heeft een getal (32px, gewicht 800) en eronder een toelichting (14px, `--ink-m`):
+    - **Klanten**: Het totaal aantal klanten, vanaf een miljoen als "2,4 mln", daaronder met het aandeel B2C: "klanten, 92% B2C".
+    - **FTE klantcontact**: Het aantal Klantcontactmedewerkers, daaronder "FTE klantcontact, 70% inhouse".
+    - **Contacten per jaar**: De waarde Algemeen van de KPI Contacten per jaar (`datamodel.md`, KPI's en kanalen), "1,9 mln", daaronder "contacten per jaar".
+    - **Digitalisering**: "50% → 80%" (2026 en ambitie 2030), daaronder "digitalisering 2026 en 2030".
+    Een kolom waarvan de waarde ontbreekt, valt weg en de rest schuift op.
+  - **Kanalen**: Onder de cijferrij het label Kanalen (12px, gewicht 700, hoofdletters, letterafstand .08em, `#6b6a63`) en daaronder een pil per Kanaal, in de volgorde van `Kanaal.volgorde`, die afbreekt naar een nieuwe regel. Een pil is 36px hoog (radius 18px, 8px tussen de delen), met links een cirkel van 24px met het icoon van het kanaal en rechts de naam. Een Kanaal is ingezet als Contacten per jaar bij dat kanaal groter is dan 0.
+    - **Ingezet**: Gekleurd. De cirkel heeft de kleur van het kanaal, de pil de lichte variant daarvan met een rand in dezelfde tint, de naam staat in gewicht 700 en daarachter het aantal contacten per jaar in 14px `--ink-m` ("850k").
+    - **Niet ingezet**: Lichtgrijs, zodat het kanaal zichtbaar blijft zonder op te vallen. Achtergrond `--bg-warm`, rand `#efede8`, cirkel `#efede8` met icoon `#a9a69e`, naam in gewicht 600 en `#8f8c84`, zonder aantal.
+    - **Kleur per kanaal** (`stylesheet.md`, Kanaalkleuren): Het icoon en de kleur horen bij het kanaal, maar de kleur is nooit het enige verschil, want de naam staat er altijd bij.
+  - **Techstack**: Onder de kanalen het label Techstack (zelfde opmaak als Kanalen) en zes tegels in één rij, een per categorie. Een tegel is `--bg-warm`, heeft radius 8px en padding 10px 12px, en toont de categorie (12px, `--ink-m`) en de oplossing (14px, gewicht 700, korte naam als die er is). Wie de oplossing ondersteunt, het deploymentmodel en de cloudleverancier staan niet in het paneel, alleen in het formulier. Dat is bewust: Op dit scherm is wie ondersteunt veel minder belangrijk dan welke oplossing er staat.
+  - **Overige velden**: Adoptie mijnomgeving/app, Klantcontact management & support en IT DevOps-medewerkers staan niet in het design van bord C. Ze staan als kleine regel onder de Techstack, als label (12px, `--ink-s`) boven een waarde (14px, gewicht 600), in een rij die afbreekt. Dit onderdeel moet nog in het design worden gezet.
+  - **Onder de lijn**: Onder de Techstack staat een lijn van 1px `--border` en daaronder twee vlakken van gelijke breedte met 24px ertussen: links Toegang en rechts Afspraken (beide alleen voor een Admin, zie hierboven). Een vlak heeft `--bg-warm`, `1px solid #efede8`, radius 10px en padding 16px 20px. Voor een Consultant staat hier niets, en Contactpersonen staan direct onder de Techstack.
+  - **Contactpersonen**: Onderaan het paneel, onder Toegang en Afspraken (zie hieronder).
   - **Opmaak per soort veld**: Getallen met duizendtalpunt en komma als
     decimaalteken (410.000). Een percentage met het procentteken direct achter het
     getal (38%). Bij meer delen staan de delen achter elkaar: "410.000, 15 / 85%"
     (aantal klanten, daarna B2B / B2C), "140, 70% inhouse" (FTE, daarna het
     aandeel inhouse) en "31% / 60%" (digitalisering 2026 / 2030). Een
-    techstack-categorie toont de oplossing en daarachter hoe ze wordt
-    ondersteund: "Pakket 1, extern ondersteund" of, bij "Geen ondersteuning",
-    "Pakket 1, zelf ondersteund". Deploymentmodel en cloudleverancier staan alleen
-    in het formulier. Een keuze als "Nog niet ingezet" is een waarde en staat er
+    techstack-categorie toont alleen de oplossing. Wie ondersteunt,
+    deploymentmodel en cloudleverancier staan alleen in het formulier. Een keuze als "Nog niet ingezet" is een waarde en staat er
     gewoon.
-  - **Lege velden**: Een veld zonder waarde staat niet in het raster, zodat de
-    kaart alleen laat zien wat bekend is. Is geen enkel veld ingevuld, dan staat
-    er in plaats van het raster de tekst "Er zijn nog geen kenmerken ingevuld."
-    in `--ink-s` (14px), met "Bewerken" rechtsboven zoals altijd.
+  - **Lege velden**: Een veld zonder waarde staat niet in het paneel, zodat het
+    alleen laat zien wat bekend is. Is geen enkel veld ingevuld, dan staat
+    er in plaats van de cijferrij, de Techstack en de overige velden de tekst "Er zijn nog geen kenmerken ingevuld."
+    in `--ink-s` (14px), met "Bewerken" rechtsboven zoals altijd. De kanalen
+    blijven staan als ze er zijn.
   - **Bewerken** (volgt de regel Bewerken in `stylesheet.md`): "Bewerken" opent een modal (`.modal-box--breed`, titel
     "Kenmerken bewerken" met de naam van de Organisatie eronder) met de velden
     van `datamodel.md`, Organisatievelden, in een raster van twee kolommen. Het
@@ -1017,10 +1016,12 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     Annuleren en het kruisje gooien de wijzigingen weg. Terwijl de modal open
     staat, geldt het Bewerkslot (`datamodel.md`, Bewerkslot). Een veld dat van een
     ander veld afhangt (Subsector bij Sector) volgt de regels uit het datamodel.
-  - **Wat de kaart niet bevat**: De KPI's en de contacten per kanaal staan in de
-    kaart eronder (hieronder). De Meting, het benchmarkvinkje en de Leads hebben
-    eigen blokken.
-  - **Contactpersonen** (op verzoek van Sander; Nieuws is op verhuisd naar de kaart Dossier, zie hieronder): Onder het raster van de Kenmerken, in dezelfde kaart,
+  - **Zichtbaar voor de Lead**: Onderin de modal Kenmerken bewerken, onder het formulier en boven de knoppen, staat een groep met de kop "Zichtbaar voor de Lead" (14px, gewicht 700, met Info-icoon `info.profielLead`) en vier schakelaars onder elkaar, elk met een label: Cijfers (klanten, FTE klantcontact, contacten per jaar en digitalisering), Kanalen, Techstack en Overige velden. Ze horen bij `Organisatie.dossier.toonProfiel` (`datamodel.md`, Dossieritem) en staan standaard uit. De groep is alleen zichtbaar voor wie `dossier.bewerken` heeft. Staat het Dossier niet zichtbaar voor de Lead (`Organisatie.dossier.zichtbaar` uit), dan zijn de schakelaars wel te zetten, met onder de groep de hint "De Lead ziet dit pas als het Dossier zichtbaar is gemaakt." Opslaan schrijft ze samen met de velden. Toegang, Afspraken en Contactpersonen hebben geen schakelaar, want de Lead ziet ze nooit. Een wijziging wordt gelogd als `dossier.profielGewijzigd`.
+  - **Wat het paneel niet bevat**: De KPI's staan in de kaart eronder
+    (hieronder). Het paneel toont alleen Contacten per jaar (Algemeen en per
+    kanaal) uit die KPI's, als leesweergave. De Meting, het benchmarkvinkje en de
+    Leads hebben eigen kaarten.
+  - **Contactpersonen** (op verzoek van Sander; Nieuws is op verhuisd naar de kaart Dossier, zie hieronder): Onderaan het organisatiepaneel, onder Toegang en Afspraken,
     gescheiden door een lijn van 1px `--border` en 24px ruimte, staat de lijst
     Contactpersonen met een kop van 16px, gewicht 700, een Info-icoon
     (`info.contactpersonen`) en rechts een knop "+ Toevoegen"
@@ -1045,12 +1046,11 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
       "Verwijderen" (`.btn-danger`), dat om een bevestiging vraagt
       (`BevestigModal`), zoals bij een Onderdeel.
   - **Dossier** (`dossier.md`): Een eigen kaart
-    onder de Kenmerken en onder de rij Toegang en Afspraken, boven de kaart
+    onder het organisatiepaneel, boven de kaart
     KPI's, met de lijst Cases en Nieuws, het paneel "Instellingen voor de Lead" (de schakelaar "Zichtbaar voor Lead", de naam voor de Lead en de Meting per radar) en de
     knop "+ Toevoegen". Voor een Admin en voor een Consultant met toegang tot de
     Organisatie. De opmaak, het formulier en de regels staan in `dossier.md`,
-    Organisatie-detail, kaart Dossier en Item toevoegen of bewerken. Het Dossier vervangt de lijst Nieuws in de kaart
-    Kenmerken.
+    Organisatie-detail, kaart Dossier en Item toevoegen of bewerken. Het Dossier vervangt de lijst Nieuws in het organisatiepaneel. Boven de titel Dossier staat niet nog eens de naam van de organisatie, want de pagina is die van de organisatie.
   - **Volgorde**: De spec bepaalt de volgorde, niet de code. De velden staan in
     de volgorde van `datamodel.md`, Organisatievelden: Sector, Subsector, Totaal
     aantal klanten, Adoptie mijnomgeving/app, Percentage 2026, Ambitie 2030 (de
@@ -1064,7 +1064,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
 
   - **Korte namen in kaart en formulier** (Sector, Subsector en de techstack-leveranciers in de kaart, en Sector en Subsector in het formulier als keuzelijst met zoekveld, `components/ZoekSelect.tsx`): De korte
     namen die een Admin heeft ingevuld (tab Korte namen) staan ook in het
-    organisatie-detail. In de kaart Kenmerken toont Sector de korte naam, met de
+    organisatie-detail. In het organisatiepaneel toont Sector de korte naam, met de
     originele SBI-titel in de tooltip. In het formulier tonen de keuzelijsten
     Sector en Subsector de korte naam per optie, in de volgorde van
     `sbi-indeling.md`, met de originele titel in de tooltip van de optie en

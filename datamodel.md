@@ -328,6 +328,12 @@ Organisatie.dossier {
   zichtbaar: boolean                // standaard false
   zichtbaarSinds: datetime | null   // het moment waarop zichtbaar voor het laatst aan ging
   naamVoorLead: string              // maximaal 80 tekens, leeg = "Dossier {Organisatie.naam}"
+  toonProfiel: {                    // welke blokken van het organisatiepaneel de Lead ziet
+    cijfers: boolean                // standaard false
+    kanalen: boolean                // standaard false
+    techstack: boolean              // standaard false
+    overig: boolean                 // standaard false
+  }
   radarBronnen: RadarBron[]         // hoogstens één per Assessment met een radar, leeg = overal automatisch
   gewijzigdOp: datetime | null      // laatste wijziging in wat een Lead ziet
   items: Dossieritem[]
@@ -364,6 +370,7 @@ Dossieritem {
 - **Event verlopen** is afgeleid uit `datum` of `einddatum` (`dossier.md`, Regels), er is geen veld voor.
 - **Een Lead ziet een item** als `Organisatie.dossier.zichtbaar` aan staat, `zichtbaarVoorLead` aan staat en, bij een Case, `Organisatie.caseToegestaan` van `caseOrganisatieId` aan staat. De naam van de Organisatie in de Case gaat nooit naar de Lead. Bij een Benchmark komt daar bij dat de Lead het vinkje heeft (`LeadToegang` met `weergave: "benchmark"`) en de Organisatie nog in de benchmark zit (`dossier.md`, Wat de Lead ziet).
 - **Naam en scorebron.** `naamVoorLead` is de titel van het Dossier bij de Lead. `radarBronnen` bepaalt per Assessment welke Meting de scores in de radar en de verdeling levert: `metingId` leeg is automatisch (de meest recente Meting waarvan de Lead de Resultaten mag inzien), anders een vaste Meting die de Lead mag inzien. Wie `dossier.bewerken` heeft, mag beide wijzigen. De regels staan in `dossier.md` (Welke scores).
+- **Profiel voor de Lead.** `toonProfiel` bepaalt welke blokken van het organisatiepaneel (`beheerpagina.md`, Organisatiepaneel) de Lead bovenaan het Dossier ziet: `cijfers` (klanten, FTE klantcontact, contacten per jaar en digitalisering), `kanalen`, `techstack` en `overig` (Adoptie mijnomgeving/app, Klantcontact management & support en IT DevOps-medewerkers). Alle vier staan standaard uit. Een blok is alleen zichtbaar als `Organisatie.dossier.zichtbaar` ook aan staat. Toegang, Afspraken en Contactpersonen zijn nooit zichtbaar voor de Lead. Wie `dossier.bewerken` heeft, mag `toonProfiel` wijzigen. De regels staan in `dossier.md` (Wat de Lead ziet, Profiel).
 - **`OrganisatieLid.dossierGezienOp`** (datetime of null) bepaalt of de kaart Dossier bij een Lead de tag "Nieuw" krijgt.
 
 
@@ -875,7 +882,7 @@ KorteNaam {
 - Een veldnaam heeft zijn korte naam in `VeldDefinitie.korteNaam`. `KorteNaam` is er voor waarden.
 - Een lege of ontbrekende korte naam betekent het origineel.
 - De rij hoort bij de combinatie van veld en waarde. Bij een waarde via "Anders…" ontstaat de rij pas zodra een Admin een korte naam invult. Verdwijnt de waarde uit de lijst en uit alle Organisaties, dan kan de rij weg (Data-integriteit, `beheerpagina.md`, punt 13).
-- De korte naam staat in Verkennen, in het organisatie-detail (de kaart Kenmerken en de keuzelijsten Sector en Subsector in het formulier, met het origineel in de tooltip) en in andere schermen waar ruimte krap is. Hij staat niet in de exports, de import en de PDF, want daar blijft het origineel staan.
+- De korte naam staat in Verkennen, in het organisatie-detail (het organisatiepaneel en de keuzelijsten Sector en Subsector in het formulier, met het origineel in de tooltip) en in andere schermen waar ruimte krap is. Hij staat niet in de exports, de import en de PDF, want daar blijft het origineel staan.
 - Wijzigen vraagt `content.beheren` (alleen Admin) en wordt gelogd (zie Audit).
 - **Opslag.** De korte namen staan niet op de definities (`organisatie-velden.ts` is vaste data) maar bij de
   instellingen: `Instellingen.korteNamen = { velden: { [veldId]: string }, waarden: KorteNaam[] }`, met het veld-id als pad
@@ -1028,9 +1035,10 @@ KpiWaarde {
   kanalen). Een leeg veld is onbekend en telt niet als "niet ingezet".
 - **Startset KPI's**, aanpasbaar door een Admin: Contacten per jaar (aantal, per
   Onderdeel, per kanaal), AHT (s, per Onderdeel, per kanaal), NPS (geen eenheid,
-  per Onderdeel, niet per kanaal), CSAT (geen eenheid, per Onderdeel, per
+  per Onderdeel, per kanaal), CSAT (geen eenheid, per Onderdeel, per
   kanaal), SLA (%, per Onderdeel, per kanaal) en FTR (%, per Onderdeel, per
   kanaal).
+- **NPS per kanaal.** Het kanaal waar het contact plaatsvond, bepaalt waar de uitvraag vandaan komt, en de uitkomst wordt onder dat kanaal gerapporteerd. Algemeen is het gemiddelde cijfer en een kanaalcijfer is de NPS van alleen dat kanaal. Beide kunnen naast elkaar bestaan en Algemeen wordt niet uit de kanalen berekend (zie Algemeen is een gewone waarde).
 - **Korte naam.** Een KPI heeft een korte naam zoals een organisatieveld. Hij
   staat in `Instellingen.korteNamen.velden` onder het pad `kpis.<id>`, dus een
   bestaande korte naam van `kpis.aht` blijft werken. Wijzigen wordt gelogd als
