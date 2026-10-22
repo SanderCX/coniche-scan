@@ -29,6 +29,12 @@ Organisatie.dossier {
   zichtbaar: boolean                // standaard false
   zichtbaarSinds: datetime | null   // het moment waarop zichtbaar voor het laatst aan ging
   naamVoorLead: string              // maximaal 80 tekens, leeg = "Dossier {Organisatie.naam}"
+  toonProfiel: {                    // welke blokken van het organisatiepaneel de Lead ziet
+    cijfers: boolean                // standaard false
+    kanalen: boolean                // standaard false
+    techstack: boolean              // standaard false
+    overig: boolean                 // standaard false
+  }
   radarBronnen: RadarBron[]         // hoogstens één per Assessment met een radar, leeg of ontbrekend = overal automatisch
   gewijzigdOp: datetime | null      // laatste wijziging in wat een Lead ziet
   items: Dossieritem[]
@@ -112,6 +118,17 @@ Een Lead ziet een item alleen als alle voorwaarden gelden:
 5. Bij een Benchmark: Deze Lead heeft het vinkje voor die benchmark (`LeadToegang` met `weergave: "benchmark"`, `datamodel-rollen.md`) en de Organisatie zit nog in de benchmark. Het vinkje bestaat alleen als de benchmark aan de drempels voldoet (`benchmark.md`, Drempels), dus de kaart linkt nooit naar een view die voor deze Lead leeg is. Dit hangt van de Lead af: Twee Leads van dezelfde Organisatie kunnen een ander Dossier zien.
 
 Dit wordt aan de serverkant bepaald, bij elke keer laden. Het prototype bepaalt het in de browser (`leadDossier`). Dat is alleen toelaatbaar met demodata, want de browser van de Lead krijgt dan ook wat hij niet mag zien. Zodra er echte Organisaties en Cases in staan, moet de server het bepalen (`go-live-plan.md`). De regels over toestemming en branche gelden alleen voor Cases, de regel over het vinkje alleen voor Benchmarks. De Lead krijgt `caseOrganisatieId` en de naam van die Organisatie nooit in de gegevens die naar de browser gaan, alleen de branche. Wordt de Afspraak later uitgezet, dan verdwijnt de Case bij de eerstvolgende keer laden voor de Lead, en blijft hij bij de Consultant staan met de status "Toestemming ontbreekt". Het Dossier is voor een Lead geen cijfer uit een andere Organisatie: Er staan geen scores van de Organisatie in de Case.
+
+### Profiel van de Organisatie
+
+Naast de items kan de Lead bovenaan het Dossier een compact profiel van zijn eigen Organisatie zien, opgebouwd uit de blokken van het organisatiepaneel (`beheerpagina.md`, Organisatiepaneel). Een Consultant of Admin met `dossier.bewerken` kiest per blok of de Lead het ziet, met de schakelaars Zichtbaar voor de Lead in het venster Kenmerken bewerken (`beheerpagina.md`, Zichtbaar voor de Lead).
+
+- **Blokken.** Cijfers (klanten, FTE klantcontact, contacten per jaar, digitalisering), Kanalen, Techstack en Overige velden. Elk blok heeft een eigen schakelaar in `Organisatie.dossier.toonProfiel`, standaard uit.
+- **Voorwaarde.** Een blok is alleen zichtbaar als `Organisatie.dossier.zichtbaar` aan staat. Staat het Dossier uit, dan ziet de Lead niets, ook niet als de schakelaars aan staan.
+- **Nooit zichtbaar.** Toegang, Afspraken en Contactpersonen. Ze gaan over de relatie tussen Coniche en de Organisatie en staan niet in het profiel dat de Lead ziet.
+- **Alleen de eigen Organisatie.** De Lead ziet nooit het profiel van een andere Organisatie.
+- **Waarden.** Wat de Lead ziet, zijn dezelfde waarden als in het organisatiepaneel. Een wijziging daar is dus direct zichtbaar voor de Lead zodra het blok aan staat. Bij de Techstack staat alleen de oplossing, zoals in het paneel.
+- **Zichtbaarheid wijzigen.** Een wijziging van een schakelaar telt als wijziging in wat een Lead ziet en zet `gewijzigdOp`.
 
 ### Verwijderen en datakoppelingen
 
@@ -209,6 +226,7 @@ Ontwerp: Bord 5. Een pagina van de Lead bij de persoonlijke link. De nav is die 
 Van boven naar beneden:
 
 1. **Kop.** Achtergrond `--or-faint` met concentrische cirkels in `--or-mid` rechts. Er is geen paars in de kop (de kop lijkt anders te veel op een andere Coniche-site). Eyebrow "Dossier" (`--or`, donkerder variant `#c2570c` voor tekst), titel {naam voor de Lead} (32px), een zin ("Je consultant heeft cases en nieuws verzameld die passen bij jullie situatie, met bij elk item uitleg waarom. Bij elk item staat de bouwsteen waar het over gaat."), twee chips ("Gedeeld door je consultant", de datum van `zichtbaarSinds`) en rechts een tegel per soort dat items heeft, met het aantal (Cases, Benchmarks, Nieuwsberichten, Events, Blogs). Een verlopen Event telt niet mee.
+1a. **Profiel van de Organisatie.** Alleen als minstens één blok van `toonProfiel` aan staat. Een kaart (witte achtergrond, 1px `--border`, 10px radius, padding 24px) direct onder de kop, zonder knoppen en zonder Bewerken. Bovenin links de beginletter in een vierkant van 56px (`--or-faint`, letter 28px, `--or`), daarnaast de naam van de Organisatie (24px, gewicht 800) met de pillen Sector en Subsector. Daaronder alleen de blokken die aan staan, met dezelfde opmaak als in het organisatiepaneel: de cijferrij, de Kanalen (ingezet gekleurd, niet ingezet lichtgrijs), de Techstack en de overige velden. Staat er alleen een blok zonder gegevens aan, dan valt dat blok weg, en zijn alle blokken leeg, dan valt de hele kaart weg.
 2. **Waar dit dossier over gaat.** Een kaart (10px radius, `--bg-warm`, padding 32px) met links de radar en rechts de verdeling (zie Verdeling rechts van de radar). Alleen aanwezig als minstens één zichtbaar item bouwstenen heeft. Hebben items bouwstenen in twee Assessments, dan staat boven de radar een pil-groep met de namen van die Assessments en toont de kaart er één tegelijk, met bij elke pil het aantal items. Bij maar één Assessment staat die pil-groep er niet. De eerste keer staat het Assessment met de meeste zichtbare items open. Een filter op een bouwsteen van het andere Assessment zet de pil om. Eerdere events tellen hier mee, ook als ze nog dichtgeklapt zijn. Zie Radar met filter.
 3. **Filterbalk.** Alleen als er een filter staat: Een balk in `--or-faint` met de bouwsteen (cirkel met nummer, naam, "n items in dit dossier") en rechts de knop "Alle items tonen ×" (`.btn-outline`, 32px hoog).
 4. **Soortfilter.** Een rij pillen: Alles, Cases, Benchmarks, Nieuws, Events, Blogs, elk met het aantal items dat nu in de lijst past (een verlopen Event telt niet mee, het filter op een bouwsteen telt wel mee). Eén pil is tegelijk gekozen, standaard Alles. De pil van de gekozen soort is oranje gevuld. Het soortfilter en het filter op een bouwsteen werken samen.
@@ -266,6 +284,7 @@ Nieuwe gebeurtenissen (`datamodel.md`, Audit), in plaats van `nieuwsartikel.*`:
 
 - `dossier.itemToegevoegd`, `dossier.itemGewijzigd` en `dossier.itemVerwijderd`. `details` bevat de Organisatie, de soort (nieuws, case, event, blog of benchmark), de titel (bij een Benchmark de naam van de benchmark), en bij `itemGewijzigd` de namen van de gewijzigde velden. Bij een Case staat ook de naam van de Organisatie in de case erin (de log is alleen voor een Admin).
 - `dossier.zichtbaarGemaakt` en `dossier.verborgen` (voorheen `dossier.geopend` en `dossier.gesloten`): `zichtbaar` is aan of uit gezet, met de Organisatie en het aantal zichtbare items. Gaat het Dossier uit omdat een gekozen Meting niet meer zichtbaar is voor de Lead, dan staat daar ook de reden en de Meting bij.
+- `dossier.profielGewijzigd`: Een schakelaar van `toonProfiel` is gewijzigd. `details` bevat de Organisatie, het blok (cijfers, kanalen, techstack of overig) en de nieuwe waarde.
 - `dossier.instellingGewijzigd`: `naamVoorLead` of een `radarBronnen` is gewijzigd. `details` bevat de Organisatie, het veld, bij een scorebron het Assessment en de Meting (of "automatisch"), en de oude en nieuwe waarde.
 - `organisatie.caseVlagGewijzigd`: `caseToegestaan` is gewijzigd, met de Organisatie en de nieuwe waarde.
 

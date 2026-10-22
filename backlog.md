@@ -694,3 +694,4 @@ Plekken waar de code nog moet worden aangepast aan de spec.
 - Startset KPI's: NPS krijgt `perKanaal` waar (`datamodel.md`, KPI's en kanalen), zodat NPS per kanaal in te vullen is.
 - Open: Kleur en icoon per Kanaal staan alleen in `stylesheet.md` voor de zes startkanalen. Een door een Admin toegevoegd Kanaal heeft geen kleur. Besluit nodig: Een veld `kleur` op `Kanaal`, of een neutrale kleur (`--ink-m`) met een standaard icoon.
 - Open: De velden Adoptie mijnomgeving/app, Klantcontact management & support en IT DevOps-medewerkers staan nog niet in het design van het organisatiepaneel.
+- Profiel voor de Lead in het Dossier: veld `Organisatie.dossier.toonProfiel` (vier schakelaars), de groep Zichtbaar voor de Lead in het venster Kenmerken bewerken, de profielkaart bij de Lead (`dossier.md`, Profiel van de Organisatie), `info.profielLead` en het audit-event `dossier.profielGewijzigd`. Design: bord D en E in het Design-artifact "Organisatiescherm: visuele varianten".

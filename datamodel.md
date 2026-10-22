@@ -328,6 +328,12 @@ Organisatie.dossier {
   zichtbaar: boolean                // standaard false
   zichtbaarSinds: datetime | null   // het moment waarop zichtbaar voor het laatst aan ging
   naamVoorLead: string              // maximaal 80 tekens, leeg = "Dossier {Organisatie.naam}"
+  toonProfiel: {                    // welke blokken van het organisatiepaneel de Lead ziet
+    cijfers: boolean                // standaard false
+    kanalen: boolean                // standaard false
+    techstack: boolean              // standaard false
+    overig: boolean                 // standaard false
+  }
   radarBronnen: RadarBron[]         // hoogstens één per Assessment met een radar, leeg = overal automatisch
   gewijzigdOp: datetime | null      // laatste wijziging in wat een Lead ziet
   items: Dossieritem[]
@@ -364,6 +370,7 @@ Dossieritem {
 - **Event verlopen** is afgeleid uit `datum` of `einddatum` (`dossier.md`, Regels), er is geen veld voor.
 - **Een Lead ziet een item** als `Organisatie.dossier.zichtbaar` aan staat, `zichtbaarVoorLead` aan staat en, bij een Case, `Organisatie.caseToegestaan` van `caseOrganisatieId` aan staat. De naam van de Organisatie in de Case gaat nooit naar de Lead. Bij een Benchmark komt daar bij dat de Lead het vinkje heeft (`LeadToegang` met `weergave: "benchmark"`) en de Organisatie nog in de benchmark zit (`dossier.md`, Wat de Lead ziet).
 - **Naam en scorebron.** `naamVoorLead` is de titel van het Dossier bij de Lead. `radarBronnen` bepaalt per Assessment welke Meting de scores in de radar en de verdeling levert: `metingId` leeg is automatisch (de meest recente Meting waarvan de Lead de Resultaten mag inzien), anders een vaste Meting die de Lead mag inzien. Wie `dossier.bewerken` heeft, mag beide wijzigen. De regels staan in `dossier.md` (Welke scores).
+- **Profiel voor de Lead.** `toonProfiel` bepaalt welke blokken van het organisatiepaneel (`beheerpagina.md`, Organisatiepaneel) de Lead bovenaan het Dossier ziet: `cijfers` (klanten, FTE klantcontact, contacten per jaar en digitalisering), `kanalen`, `techstack` en `overig` (Adoptie mijnomgeving/app, Klantcontact management & support en IT DevOps-medewerkers). Alle vier staan standaard uit. Een blok is alleen zichtbaar als `Organisatie.dossier.zichtbaar` ook aan staat. Toegang, Afspraken en Contactpersonen zijn nooit zichtbaar voor de Lead. Wie `dossier.bewerken` heeft, mag `toonProfiel` wijzigen. De regels staan in `dossier.md` (Wat de Lead ziet, Profiel).
 - **`OrganisatieLid.dossierGezienOp`** (datetime of null) bepaalt of de kaart Dossier bij een Lead de tag "Nieuw" krijgt.
 
 
