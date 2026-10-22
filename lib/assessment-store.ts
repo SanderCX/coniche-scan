@@ -156,7 +156,7 @@ export function createAssessment(input: { naam: string; kortLabel: string }): As
     doelgroep: "",
     icoon: "sparkle",
     geschatteDuur: "",
-    bouwblokLabel: "Bouwsteen",
+    bouwblokLabel: "Bouwblok",
     wegingTitel: null,
     wegingToelichting: null,
     kortLabel: input.kortLabel,

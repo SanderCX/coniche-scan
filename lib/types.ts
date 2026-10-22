@@ -178,7 +178,7 @@ export interface Assessment {
   bouwblokken: Bouwblok[] | null;
   /** AI-scan sorteert groepsscores op waarde, Klantcontact-scan houdt vaste volgorde aan. */
   scoresPerGroepGesorteerd: boolean;
-  /** Eyebrow in de Toelichtingsmodal, standaard "Bouwsteen" (Klantcontact, Zorg) of "AI-domein" (AI-scan). */
+  /** Eyebrow in de Toelichtingsmodal, standaard "Bouwblok" (Klantcontact, Zorg) of "AI-domein" (AI-scan). */
   bouwblokLabel: string;
   /** Kop van de wegingskaart op de intake (`CLAUDE.md`, scherm 4). Leeg: standaardtitel. */
   wegingTitel?: string | null;

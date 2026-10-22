@@ -28,6 +28,12 @@ describe("de content op de Assessment-pagina", () => {
     expect(contentSoort(aiScan)).toBe("ai");
     expect(contentSoort(ziekenhuisQuickscan)).toBe("quickscan");
   });
+  it("herkent Volwassenheid en Zorg niet aan het label: Een Admin mag het label aanpassen", () => {
+    expect(contentSoort({ ...klantcontactVolwassenheid, bouwblokLabel: "Pijler" })).toBe("volwassenheid");
+    expect(contentSoort({ ...zorgscan, bouwblokLabel: "Pijler" })).toBe("volwassenheid");
+    // Een eigen Assessment met categorieën is geen Klantcontact Volwassenheidsscan.
+    expect(contentSoort({ ...klantcontactVolwassenheid, id: "eigen", afgeleidVanAssessmentId: null })).toBeNull();
+  });
   it("heeft per type de secties van de sub-nav, bij de Quickscan met De 4 afdelingen", () => {
     expect(paginaSecties(klantcontactVolwassenheid).map((s) => s.label)).toEqual(["De 15 bouwblokken", "Praktisch", "Wat krijg ik", "Visie"]);
     expect(paginaSecties(aiScan).map((s) => s.id)).toEqual(["ai", "praktisch", "wat", "2030"]);

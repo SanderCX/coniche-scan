@@ -41,7 +41,7 @@ describe("de kop van een bouwblok in de doorloopflow (22 oktober 2026)", () => {
     // De centrale vraag komt in de app uit de bouwsteenteksten bij het laden; hier zetten we hem zelf.
     const html = kop(klantcontactVolwassenheid, 0, {}, { centraleVraag: "Wat is de koers?", toelichting: "Eerste alinea.\n\nTweede alinea." });
     expect(html).toContain("bouwblok-kop-eyebrow");
-    expect(html).toContain(`${b.groepNaam!.toUpperCase()} · BOUWSTEEN ${b.bouwblok.volgnummer}`);
+    expect(html).toContain(`${b.groepNaam!.toUpperCase()} · BOUWBLOK ${b.bouwblok.volgnummer}`);
     expect(html).toContain(`<h2>${b.bouwblok.naam}</h2>`);
     expect(html).toContain("Centrale vraag");
     expect(html).toContain("bouwblok-kop-centrale-vraag");

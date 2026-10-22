@@ -392,7 +392,7 @@ export const zorgscan: Assessment = {
   pdfContentSecties: { titel: "Visie", bron: "visie-coniche.md-deel1" },
   bouwblokken: null,
   scoresPerGroepGesorteerd: false,
-  bouwblokLabel: "Bouwsteen",
+  bouwblokLabel: "Bouwblok",
   bouwblokEenheidEnkelvoud: "Bouwblok",
   bouwblokEenheidMeervoud: "bouwblokken",
   featureCards: [

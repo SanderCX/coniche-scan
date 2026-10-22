@@ -43,7 +43,8 @@ export function verrijkAssessment(assessment: Assessment): Assessment {
   const isAi = alleBouwblokken.some((b) => b.id.startsWith("ai"));
   return {
     ...assessment,
-    bouwblokLabel: assessment.bouwblokLabel ?? (isAi ? "AI-domein" : "Bouwsteen"),
+    // Het label heet sinds 22 oktober 2026 "Bouwblok" (`datamodel.md`, Assessment): Opgeslagen kopieën met het oude "Bouwsteen" worden omgezet.
+    bouwblokLabel: !assessment.bouwblokLabel || assessment.bouwblokLabel === "Bouwsteen" ? (isAi ? "AI-domein" : "Bouwblok") : assessment.bouwblokLabel,
     wegingTitel: assessment.wegingTitel ?? null,
     wegingToelichting: assessment.wegingToelichting ?? null,
     // De Quickscan had eerst een tijdelijke emoji: Opgeslagen kopieën krijgen het SVG-icoon (`stylesheet.md`, Assessment-icoon).
