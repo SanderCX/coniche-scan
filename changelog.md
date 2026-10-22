@@ -1,5 +1,18 @@
 # Coniche Scan — Changelog
 
+## 2026-10-22 (32) — Specs van Joost, PR 170 en 171: Label Bouwblok in plaats van Bouwsteen
+
+Op verzoek van Sander ("pull devops", daarna "ja bouw maar"). De specs zijn door Joost opgeschoond (`CLAUDE.md` korter, nieuw `schermen.md`, `datamodel-rollen.md`, `bouwnotities.md` en `visual-bouwblokken-en-domeinen.md`); alleen het label raakt code.
+
+**Gedaan**:
+- `bouwblokLabel` is "Bouwblok" in de seed van Klantcontact en Zorg en bij een nieuw Assessment, en een opgeslagen "Bouwsteen" wordt bij het laden "Bouwblok" (`lib/assessment-migratie.ts`). De eyebrow in de doorloopflow zegt nu "OVERKOEPELEND · BOUWBLOK 1".
+- `contentSoort` (`lib/landing.ts`) herkent Volwassenheid en Zorg aan het id (of `afgeleidVanAssessmentId`) in plaats van aan het label.
+- Tests: `lib/assessment-migratie.test.ts` (nieuw), `lib/landing.test.ts`, `lib/doorloop-ui.test.tsx`.
+
+**Specs bijgewerkt**: `bouwnotities.md` (nieuwe regel) en in `CLAUDE.md` de status van de Spanningsmeter ("Deels gebouwd" in plaats van "Ontworpen, niet gebouwd"; zie de lijst van wat er nog niet is in `bouwnotities.md` en `backlog.md`).
+
+**Afwijkingen en interpretaties**: Een eigen label dat een Admin eerder letterlijk op "Bouwsteen" zette, verandert ook mee. Dit vervangt interpretatie 1 van PR 168.
+
 ## 2026-10-22 (31) — Specs van Joost, PR 168: Doorloopflow met de toelichting in de kop, AI-scan op Mijn metingen, Dossier zichtbaar met naam en scorebron
 
 Op verzoek van Sander ("pull devops", daarna "ja bouw maar").

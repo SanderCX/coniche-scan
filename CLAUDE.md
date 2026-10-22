@@ -123,7 +123,7 @@ Wat gebouwd is, per onderdeel. De spec van het onderdeel beschrijft hoe het moet
 | Opmaak (lettergroottes, pil, scorekleur, balklijst, resultaatkop, radar en staafdiagram) | Gebouwd | `stylesheet.md` | De PDF-export valt er niet onder |
 | Help | Gebouwd | `help.md` | De inhoud wacht op beoordeling door Joost |
 | Quickscan Ziekenhuis | Deels gebouwd | `content-ziekenhuis-quickscan.md`, `visualisatie-quickscan.md` | Doorloopflow, resultaat en visualisaties zijn gebouwd; PDF, CSV, InDesign, import, vergelijking tussen Metingen en benchmark binnen een organisatie of Meting volgen (`backlog.md`) |
-| Spanningsmeter | Ontworpen, niet gebouwd | `content-spanningsmeter.md`, `visualisatie-spanningsmeter.md` | Open: De validatie van de vragen en de verificatie van de teksten |
+| Spanningsmeter | Deels gebouwd | `content-spanningsmeter.md`, `visualisatie-spanningsmeter.md` | Open: De validatie van de vragen en de verificatie van de teksten |
 | AI-managementsamenvatting | Uitgesteld | `backlog.md` | |
 | Adoptiescan | Niet gestart | | |
 

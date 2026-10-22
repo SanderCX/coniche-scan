@@ -80,7 +80,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
   {
     sleutel: "info.contentBouwblokLabel",
     plek: "Content, veld Bouwblok-label",
-    tekst: "De kleine kop boven de titel in de Toelichtingsmodal, bijvoorbeeld \"Bouwsteen\" of \"AI-domein\", gevolgd door het nummer.",
+    tekst: "De kleine kop boven de titel in de Toelichtingsmodal, bijvoorbeeld \"Bouwblok\" of \"AI-domein\", gevolgd door het nummer.",
   },
   {
     sleutel: "info.conflictOplossen",

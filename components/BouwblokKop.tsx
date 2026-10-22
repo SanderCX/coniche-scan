@@ -27,7 +27,7 @@ export function BouwblokKop({
   bouwblok: Bouwblok;
   /** De naam van de categorie of afdeling, `null` zonder categorielaag. */
   groepNaam: string | null;
-  /** `Assessment.bouwblokLabel`, bijv. "Bouwsteen", "AI-domein" of "Dimensie". */
+  /** `Assessment.bouwblokLabel`, bijv. "Bouwblok", "AI-domein" of "Dimensie". */
   bouwblokLabel: string;
   /** De stijlvariabelen van de categoriekleur (`accentStijl`), `undefined` valt terug op `--or`. */
   accentStyle?: React.CSSProperties;

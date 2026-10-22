@@ -14,7 +14,7 @@ export function heroUitleg(beschrijving: string): string {
 
 /**
  * De ankerlink onder de uitleg (`CLAUDE.md`, scherm 2, Herontwerp): "15 bouwblokken in 5 pijlers" naar de sectie "De 15 bouwblokken" op dezelfde
- * pagina, bij een Assessment met de Bouwsteen als eenheid en een categorielaag (de Klantcontact Volwassenheidsscan en de Zorgscan), en "8 domeinen"
+ * pagina, bij de Klantcontact Volwassenheidsscan en de Zorgscan, en "8 domeinen"
  * naar de sectie "AI in klantcontact" bij de AI-scan. Het aantal komt uit de actieve content.
  */
 export function bouwstenenLink(assessment: Assessment): { tekst: string; href: string } | null {
@@ -31,7 +31,7 @@ export function bouwstenenLink(assessment: Assessment): { tekst: string; href: s
 
 /**
  * Welke content een Assessment op zijn pagina heeft (`CLAUDE.md`, scherm 2, Secties per Assessment): "volwassenheid" (Visie en de 15 bouwblokken)
- * bij de Bouwsteen als eenheid en een categorielaag, dus de Klantcontact Volwassenheidsscan en de Zorgscan, "ai" (AI in klantcontact en 2030) bij
+ * bij de Klantcontact Volwassenheidsscan en de Zorgscan (de sector-variant ervan), "ai" (AI in klantcontact en 2030) bij
  * de AI-domeinen, "spanning" (De spanningsvelden, Praktisch, Wat krijg ik en Visie) bij de Spanningsmeter. De Quickscan en elk ander type hebben voorlopig geen extra content: `null`, en dan ook geen sub-nav.
  */
 export type ContentSoort = "volwassenheid" | "ai" | "spanning" | "quickscan";
@@ -41,7 +41,9 @@ export function contentSoort(assessment: Assessment): ContentSoort | null {
   // De Quickscan (Ja / Nee / Weet ik niet) heeft sinds PR 166 dezelfde kop en sub-nav, met de sectie "De 4 afdelingen" als inhoud.
   if (assessment.antwoordType === "ja-nee-weetniet") return "quickscan";
   if (assessment.bouwblokLabel === "AI-domein") return "ai";
-  if (assessment.bouwblokLabel === "Bouwsteen" && (assessment.categorieen ?? []).some((c) => !c.gearchiveerd)) return "volwassenheid";
+  // De Klantcontact Volwassenheidsscan en de sector-varianten ervan (de Zorgscan): Niet langer herkend aan het label "Bouwsteen", dat nu "Bouwblok" heet en door een Admin aan te passen is.
+  const isVolwassenheid = assessment.id === "klantcontact-volwassenheid" || assessment.afgeleidVanAssessmentId === "klantcontact-volwassenheid";
+  if (isVolwassenheid && (assessment.categorieen ?? []).some((c) => !c.gearchiveerd)) return "volwassenheid";
   return null;
 }
 

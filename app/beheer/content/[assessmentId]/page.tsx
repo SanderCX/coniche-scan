@@ -182,7 +182,7 @@ export default function ContentEditorPage({
               <input
                 value={assessment.bouwblokLabel}
                 onChange={(e) => updateAssessment(assessmentId, (a) => ({ ...a, bouwblokLabel: e.target.value }))}
-                placeholder="Bouwsteen / AI-domein"
+                placeholder="Bouwblok / AI-domein"
                 className="w-full rounded-lg border border-gray-200 p-2 text-sm"
               />
               <InfoIcoon sleutel="info.contentBouwblokLabel" />
