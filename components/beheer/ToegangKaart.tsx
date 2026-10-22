@@ -8,7 +8,7 @@ import { updateOrganisatie } from "@/lib/db";
 import { Gebruiker, Organisatie } from "@/lib/types";
 
 /**
- * De kaart Toegang op het organisatie-detail (`beheerpagina.md`, punt 4, Organisatie-toegang toewijzen, voorstel van 19 oktober 2026),
+ * Het vlak Toegang in het organisatiepaneel (`beheerpagina.md`, punt 4, Organisatie-toegang toewijzen, voorstel van 19 oktober 2026),
  * alleen voor een Admin: Wie bij de gegevens van de organisatie mag. De eigenaar (`aangemaaktDoor`) staat er met een badge en kan niet
  * worden ingetrokken, een toegewezen Consultant heeft een knop "Intrekken" met een korte bevestiging, en "+ Consultant toewijzen" opent een
  * modal met de actieve Consultants die nog geen toegang hebben. Intrekken is de spiegel van toewijzen.
@@ -27,7 +27,7 @@ export function ToegangKaart({ organisatie, gebruikers }: { organisatie: Organis
   }
 
   return (
-    <section className="beheer-kaart" aria-label="Toegang">
+    <section className="op-vlak" aria-label="Toegang">
       <div className="beheer-kaart-kop">
         <div className="titel-rij">
           <h2>Toegang</h2>

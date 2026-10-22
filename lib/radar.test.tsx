@@ -224,6 +224,14 @@ describe("één tooltip tegelijk en het staafdiagram met twee reeksen", () => {
     expect(css).toMatch(/\.cat-item\.is-actief \.cat-naam,\s*\.cat-item\.is-actief \.cat-nummers \{[^}]*font-weight: 700/);
   });
 
+  it("kent geen liggend staafdiagram: Een kolom is minstens 88px en onder de 440px staan alleen de nummers onder de balk", () => {
+    const css = readFileSync(new URL("../app/styles/charts.css", import.meta.url), "utf8");
+    expect(css).not.toContain("left: 158px");
+    expect(css).not.toMatch(/\.cat-kolommen \{[^}]*flex-direction: column/);
+    expect(css).toMatch(/\.cat-item \{\s*min-width: 88px/);
+    expect(css).toMatch(/@container \(max-width: 439px\) \{[^@]*\.cat-naam \{[^}]*font-size: 0/);
+  });
+
   it("geeft de radar 460px en het staafdiagram de rest van de breedte", () => {
     const css = readFileSync(new URL("../app/styles/components.css", import.meta.url), "utf8");
     expect(css).toMatch(/\.resultaat-kaarten \{[^}]*grid-template-columns: minmax\(0, 460px\) minmax\(0, 1fr\)/);

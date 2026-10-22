@@ -22,9 +22,9 @@ export function LeadsBlok({ organisatie }: { organisatie: Organisatie }) {
   };
 
   return (
-    <section style={{ marginTop: "2rem" }}>
-      <div className="flex flex-wrap items-center gap-3">
-        <h2 style={{ margin: 0 }}>Leads</h2>
+    <section className="beheer-kaart" aria-label="Leads">
+      <div className="beheer-kaart-kop">
+        <h2>Leads</h2>
         <button
           type="button"
           className="btn btn-outline btn-compact"

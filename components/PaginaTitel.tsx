@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { paginaTitel } from "@/data/pagina-titels";
+import { useTitelOverride } from "@/lib/pagina-titel";
 
 /**
  * Zet de tabbladtitel op `<Paginanaam> | Coniche Scan` (`stylesheet.md`, Browsericoon). Staat één keer in de
@@ -11,8 +12,9 @@ import { paginaTitel } from "@/data/pagina-titels";
  */
 export function PaginaTitel() {
   const pad = usePathname();
+  const eigen = useTitelOverride();
   useEffect(() => {
-    const gewenst = paginaTitel(pad);
+    const gewenst = eigen ?? paginaTitel(pad);
     const zet = () => {
       if (document.title !== gewenst) document.title = gewenst;
     };
@@ -22,6 +24,6 @@ export function PaginaTitel() {
     const waker = new MutationObserver(zet);
     waker.observe(document.head, { childList: true, subtree: true, characterData: true });
     return () => waker.disconnect();
-  }, [pad]);
+  }, [pad, eigen]);
   return null;
 }

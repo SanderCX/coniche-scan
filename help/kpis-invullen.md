@@ -6,9 +6,9 @@ rollen: [Consultant, Admin]
 afbeelding:
 film:
 bronnen: [beheerpagina.md, datamodel.md]
-bijgewerkt: 2026-10-19
+bijgewerkt: 2026-10-22
 ---
-KPI's zoals de gemiddelde afhandeltijd, de NPS en het aantal contacten per jaar horen bij de Organisatie. Je vult ze in op het organisatie-detail, per plek en eventueel per kanaal.
+KPI's zoals de gemiddelde afhandeltijd, de NPS en het aantal contacten per jaar horen bij de Organisatie. Je vult ze in op het organisatie-detail, per plek en eventueel per kanaal. De NPS kun je ook per kanaal invullen: Het kanaal waar het contact plaatsvond, bepaalt waar de uitvraag vandaan komt.
 
 ## In het kort
 Op het organisatie-detail staat de kaart KPI's met een tabel. De kolom Algemeen geldt voor de hele Organisatie, de andere kolommen zijn de onderdelen. Met "KPI's invullen" vul je alles in één venster in.

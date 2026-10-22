@@ -1,6 +1,7 @@
-import { Dossieritem, Organisatie, ScanUitvoering } from "../types";
+import { Dossieritem, Organisatie, ScanUitvoering, ToonProfiel } from "../types";
+import { PROFIEL_BLOKKEN } from "../organisatie-profiel";
 import { laadAlles, slaAlles } from "./store";
-import { logAudit } from "../audit-store";
+import { logAudit, nieuweGroepId } from "../audit-store";
 import { organisatieContext } from "../audit-context";
 import { nieuwId } from "../id";
 import { getAssessment } from "../assessment-store";
@@ -180,6 +181,37 @@ export function zetNaamVoorLead(organisatieId: string, invoer: string): Resultaa
     entiteitNaam: organisatie.naam,
     details: { ...organisatieContext(organisatie), veld: "naamVoorLead", oud: oud || null, nieuw: c.waarde || null },
   });
+  return { ok: true };
+}
+
+/**
+ * Welke blokken van het organisatiepaneel de Lead bovenaan het Dossier ziet (`dossier.md`, Profiel van de Organisatie): Elk blok van `toonProfiel` aan of
+ * uit. Een wijziging telt als wijziging in wat een Lead ziet (`gewijzigdOp`) en wordt per blok gelogd als `dossier.profielGewijzigd`. Wie dit mag,
+ * bepaalt `dossier.bewerken`; de aanroeper (het formulier Kenmerken bewerken) toont de schakelaars alleen aan wie dat recht heeft.
+ */
+export function zetToonProfiel(organisatieId: string, patch: Partial<ToonProfiel>): Resultaat {
+  const { alles, organisatie } = context(organisatieId);
+  if (!organisatie) return { ok: false, reden: "Organisatie niet gevonden." };
+  const dossier = dossierVanOrg(organisatie);
+  const huidig = dossier.toonProfiel ?? { cijfers: false, kanalen: false, techstack: false, overig: false };
+  const gewijzigd = PROFIEL_BLOKKEN.filter((b) => patch[b] !== undefined && patch[b] !== huidig[b]);
+  if (gewijzigd.length === 0) return { ok: true };
+  const nu = new Date().toISOString();
+  dossier.toonProfiel = { ...huidig, ...Object.fromEntries(gewijzigd.map((b) => [b, patch[b] === true])) };
+  dossier.gewijzigdOp = nu;
+  organisatie.gewijzigdOp = nu;
+  slaAlles(alles);
+  const groepId = gewijzigd.length > 1 ? nieuweGroepId() : null;
+  for (const blok of gewijzigd) {
+    logAudit({
+      actie: "dossier.profielGewijzigd",
+      entiteitType: "organisatie",
+      entiteitId: organisatie.id,
+      entiteitNaam: organisatie.naam,
+      groepId,
+      details: { ...organisatieContext(organisatie), blok, nieuw: patch[blok] === true },
+    });
+  }
   return { ok: true };
 }
 

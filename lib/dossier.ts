@@ -6,7 +6,9 @@
  * de Case, zodat die gegevens niet in de schermen van de Lead kunnen komen (`dossier.md`, Wat de Lead ziet). In het prototype staat alle
  * data in de browser; met de database wordt dit aan de serverkant bepaald.
  */
-import type { Assessment, Benchmark, Dossier, Dossieritem, Organisatie, OrganisatieLid } from "./types";
+import type { Assessment, Benchmark, Dossier, Dossieritem, Kanaal, Organisatie, OrganisatieLid, ToonProfiel } from "./types";
+import { OrganisatieProfiel, PROFIEL_BLOKKEN, ProfielBlok, organisatieProfiel } from "./organisatie-profiel";
+import { organisatieVelden } from "@/data/organisatie-velden";
 import { KorteNamen, SECTOR_VELD_ID, korteNaamWaarde } from "./korte-namen";
 import { Controle, normaliseerUrl, schoon } from "./contactpersonen";
 import { alleBouwblokkenMetGroep } from "./assessment-structuur";
@@ -56,8 +58,13 @@ export type DossierSoort = Dossieritem["soort"];
 
 export const DOSSIER_SOORTEN: DossierSoort[] = ["case", "benchmark", "nieuws", "event", "blog"];
 
+/** Alle blokken van het profiel uit: De beginstand van `Dossier.toonProfiel` (`dossier.md`, Profiel van de Organisatie). */
+export function geenProfiel(): ToonProfiel {
+  return { cijfers: false, kanalen: false, techstack: false, overig: false };
+}
+
 export function leegDossier(): Dossier {
-  return { zichtbaar: false, zichtbaarSinds: null, naamVoorLead: "", radarBronnen: [], gewijzigdOp: null, items: [] };
+  return { zichtbaar: false, zichtbaarSinds: null, naamVoorLead: "", toonProfiel: geenProfiel(), radarBronnen: [], gewijzigdOp: null, items: [] };
 }
 
 /** Het Dossier van een Organisatie, of een leeg en dicht Dossier bij data van vóór het Dossier. */
@@ -490,8 +497,19 @@ export interface LeadEvent {
   verlopen: boolean;
 }
 
+/**
+ * Het profiel van de eigen Organisatie zoals de Lead het ziet: Alleen de blokken die de Consultant aan zette en die gegevens hebben. De andere
+ * blokken zijn leeg. Toegang, Afspraken en Contactpersonen zitten er nooit in (`dossier.md`, Profiel van de Organisatie).
+ */
+export interface LeadProfiel extends Pick<OrganisatieProfiel, "naam" | "letter" | "sector" | "subsector" | "cijfers" | "kanalen" | "techstack" | "overig"> {
+  /** De blokken die de Lead ziet, in vaste volgorde. */
+  blokken: ProfielBlok[];
+}
+
 export interface LeadDossier {
   organisatieNaam: string;
+  /** Het profiel bovenaan, `null` als er geen blok aan staat of de blokken die aan staan leeg zijn. */
+  profiel: LeadProfiel | null;
   /** De titel van het Dossier bij de Lead: De naam voor de Lead, of "Dossier {Organisatie}" (`dossier.md`, Naam en scorebron). */
   naam: string;
   zichtbaarSinds: string | null;
@@ -514,6 +532,8 @@ export interface LeadContext {
   assessments: Pick<Assessment, "id" | "naam">[];
   /** `benchmarkMinOrganisaties`: Onder dit aantal staat het aantal organisaties niet in de regel. */
   minOrganisaties: number;
+  /** De kanalen (`Instellingen.kanalen`) voor het blok Kanalen van het profiel. Zonder staat dat blok leeg. */
+  kanalen?: Kanaal[];
 }
 
 /**
@@ -591,6 +611,7 @@ export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korte
   if (cases.length + benchmarks.length + nieuws.length + events.length + blogs.length === 0) return null;
   return {
     organisatieNaam: organisatie.naam,
+    profiel: leadProfiel(organisatie, korteNamen, lead?.kanalen ?? []),
     naam: naamVoorLeadVan(organisatie),
     zichtbaarSinds: dossier.zichtbaarSinds,
     gewijzigdOp: dossier.gewijzigdOp,
@@ -599,6 +620,29 @@ export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korte
     nieuws,
     events,
     blogs,
+  };
+}
+
+/**
+ * Het profiel dat de Lead bovenaan het Dossier ziet (`dossier.md`, Wat de Lead ziet, Profiel): Alleen de eigen Organisatie en alleen de blokken van
+ * `toonProfiel` die gegevens hebben. De blokken die uit staan, gaan nooit mee naar de Lead. `null` als er niets te tonen is.
+ */
+export function leadProfiel(organisatie: Organisatie, korteNamen: KorteNamen | undefined, kanalen: Kanaal[]): LeadProfiel | null {
+  const toon = dossierVan(organisatie).toonProfiel ?? geenProfiel();
+  if (!PROFIEL_BLOKKEN.some((b) => toon[b])) return null;
+  const volledig = organisatieProfiel(organisatie, { kanalen, techstackVeld: organisatieVelden.find((v) => v.id === "techstack"), korteNamen });
+  const blokken = PROFIEL_BLOKKEN.filter((b) => toon[b] && volledig[b].length > 0);
+  if (blokken.length === 0) return null;
+  return {
+    naam: volledig.naam,
+    letter: volledig.letter,
+    sector: volledig.sector,
+    subsector: volledig.subsector,
+    cijfers: blokken.includes("cijfers") ? volledig.cijfers : [],
+    kanalen: blokken.includes("kanalen") ? volledig.kanalen : [],
+    techstack: blokken.includes("techstack") ? volledig.techstack : [],
+    overig: blokken.includes("overig") ? volledig.overig : [],
+    blokken,
   };
 }
 
@@ -713,6 +757,13 @@ export function zetNieuwsartikelenOm(ruw: Record<string, unknown>): Dossier {
     zichtbaar: bestaand?.zichtbaar === true || (bestaand?.zichtbaar === undefined && oudeNamen?.openVoorLead === true),
     zichtbaarSinds: bestaand?.zichtbaarSinds ?? oudeNamen?.openSinds ?? null,
     naamVoorLead: typeof bestaand?.naamVoorLead === "string" ? bestaand.naamVoorLead : "",
+    // Data van vóór het profiel heeft geen `toonProfiel`: Alles uit (`dossier.md`, Profiel van de Organisatie).
+    toonProfiel: {
+      cijfers: bestaand?.toonProfiel?.cijfers === true,
+      kanalen: bestaand?.toonProfiel?.kanalen === true,
+      techstack: bestaand?.toonProfiel?.techstack === true,
+      overig: bestaand?.toonProfiel?.overig === true,
+    },
     radarBronnen: Array.isArray(bestaand?.radarBronnen)
       ? bestaand!.radarBronnen.filter((b) => b && typeof b.assessmentId === "string").map((b) => ({ assessmentId: b.assessmentId, metingId: b.metingId ?? null }))
       : [],

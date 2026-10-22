@@ -766,3 +766,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+/* Het profiel van de eigen Organisatie direct onder de kop (`dossier.md`, Scherm 5, 1a): Dezelfde opmaak als het organisatiepaneel, zonder knoppen. */
+.dp-profiel {
+  margin-top: var(--sp-6);
+}

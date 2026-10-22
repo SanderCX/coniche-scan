@@ -135,7 +135,7 @@ describe("KPI's als kenmerk", () => {
     expect(aht.kpi).toEqual({ kpiId: "aht", kanaalId: null });
     expect(aht.kpiPerKanaal).toBe(true);
     expect(aht.eenheid).toBe("s");
-    expect(filterVelden().find((v) => v.id === "kpis.nps")?.kpiPerKanaal).toBe(false);
+    expect(filterVelden().find((v) => v.id === "kpis.nps")?.kpiPerKanaal).toBe(true);
     // Contacten per jaar heeft de eenheid "aantal": Die staat niet achter de drempel.
     expect(filterVelden().find((v) => v.id === "kpis.contacten")?.eenheid).toBeUndefined();
   });

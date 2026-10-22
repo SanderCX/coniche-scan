@@ -85,10 +85,13 @@ describe("waarden per plek", () => {
   });
 
   it("een KPI mag alleen op de plekken die de definitie toestaat, Algemeen altijd", () => {
+    // NPS is per kanaal in de startset (`datamodel.md`, KPI's en kanalen): Het kanaal waar het contact plaatsvond, bepaalt de uitvraag.
     const nps = STANDAARD_KPIS.find((k) => k.id === "nps")!;
-    expect(kpiMagOpPlek(nps, { onderdeelId: null, kanaalId: null })).toBe(true);
-    expect(kpiMagOpPlek(nps, { onderdeelId: "a", kanaalId: null })).toBe(true);
-    expect(kpiMagOpPlek(nps, { onderdeelId: null, kanaalId: "kanaal-call" })).toBe(false);
+    expect(kpiMagOpPlek(nps, { onderdeelId: null, kanaalId: "kanaal-call" })).toBe(true);
+    const zonderKanaal = { ...nps, perKanaal: false };
+    expect(kpiMagOpPlek(zonderKanaal, { onderdeelId: null, kanaalId: null })).toBe(true);
+    expect(kpiMagOpPlek(zonderKanaal, { onderdeelId: "a", kanaalId: null })).toBe(true);
+    expect(kpiMagOpPlek(zonderKanaal, { onderdeelId: null, kanaalId: "kanaal-call" })).toBe(false);
   });
 
   it("getallen kennen een komma en een punt, en een tekst die geen getal is geeft NaN", () => {
@@ -213,10 +216,12 @@ describe("opslag van waarden en definities", () => {
 
   it("bewaren logt één gebeurtenis per plek met één groep, en weigert wat de KPI niet toestaat", () => {
     zet(org({ onderdelen: [{ id: "od1", organisatieId: "O", naam: "Team A", aangemaaktOp: "x" }] }));
+    // Een Admin heeft NPS niet per kanaal gezet: Dan weigert het bewaren een kanaalwaarde.
+    opslag.set("coniche-scan:instellingen", JSON.stringify({ kpiDefinities: STANDAARD_KPIS.map((k) => (k.id === "nps" ? { ...k, perKanaal: false } : k)) }));
     const r = db.bewaarKpiWaarden("O", [
       { kpiId: "aht", onderdeelId: null, kanaalId: null, waarde: 300 },
       { kpiId: "aht", onderdeelId: "od1", kanaalId: "kanaal-call", waarde: 280 },
-      // NPS mag niet per kanaal, een onbekend onderdeel bestaat niet.
+      // Hier mag NPS niet per kanaal, een onbekend onderdeel bestaat niet.
       { kpiId: "nps", onderdeelId: null, kanaalId: "kanaal-call", waarde: 30 },
       { kpiId: "aht", onderdeelId: "bestaat-niet", kanaalId: null, waarde: 1 },
     ]);

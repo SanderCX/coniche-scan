@@ -175,8 +175,14 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Kies waarover je vergelijkt. Bij Organisaties telt elke Organisatie één keer, met één Meting (zie Meetperiode). Bij Onderdelen telt elk onderdeel van een Organisatie apart, en elk onderdeel telt even zwaar mee.",
   },
   {
+    sleutel: "info.profielLead",
+    plek: "Organisatie-detail, modal Kenmerken bewerken, naast de kop Zichtbaar voor de Lead",
+    tekst:
+      "De Lead ziet de blokken die aan staan bovenaan het Dossier, alleen van de eigen organisatie. Het Dossier zelf moet ook zichtbaar zijn voor de Lead. Toegang, Afspraken en Contactpersonen zijn nooit zichtbaar voor de Lead.",
+  },
+  {
     sleutel: "info.contactpersonen",
-    plek: "Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen",
+    plek: "Organisatie-detail, organisatiepaneel, naast de kop Contactpersonen",
     tekst:
       "Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze.",
   },
