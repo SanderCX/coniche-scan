@@ -62,7 +62,7 @@ export function magContactpersonenBewerken(gebruiker: Gebruiker | null): boolean
 }
 
 /**
- * `dossier.bewerken` (`dossier.md`, Rechten): Items van het Dossier aanmaken, wijzigen en verwijderen, Zichtbaar voor klant en Open voor Lead.
+ * `dossier.bewerken` (`dossier.md`, Rechten): Items van het Dossier aanmaken, wijzigen en verwijderen, Zichtbaar voor Lead, de naam voor de Lead en de scorebron.
  * Alle Organisaties voor een Admin, de eigen Organisaties voor een Consultant (hetzelfde bereik als `organisaties.bewerken`). Ook
  * `dossier.inzien` voor de beheerkant gebruikt dit bereik. Een Lead leest het Dossier via `leadDossier` (`lib/dossier.ts`).
  */

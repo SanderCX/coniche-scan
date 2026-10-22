@@ -1718,76 +1718,175 @@ a.cn-titel {
 }
 .dos-kop {
   display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  margin-bottom: var(--sp-6);
+}
+.dos-kop-eyebrow {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--or);
+}
+.dos-kop-titel {
+  margin: 0;
+  font-size: var(--fs-32);
+  font-weight: 800;
+}
+
+/* Het paneel "Instellingen voor de Lead" (`dossier.md`, Scherm 1, ontwerp `Dossier-beheer-B`): Een witte kaart met drie rijen. */
+.dos-instellingen {
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-6);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.dos-instellingen-kop {
+  margin-bottom: var(--sp-4);
+}
+.dos-instellingen-kop h3 {
+  margin: 0;
+  font-size: var(--fs-18);
+  font-weight: 800;
+}
+.dos-melding {
+  margin: 0 0 var(--sp-4);
+  background: var(--stat-amber-faint);
+  border-color: var(--stat-amber);
+}
+.dos-instelling {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr) 40px;
+  align-items: start;
+  gap: var(--sp-4);
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--border);
+}
+.dos-instelling-label {
+  padding-top: var(--sp-2);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.dos-instelling-waarde {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+  font-size: var(--fs-14);
+  color: var(--ink);
+}
+.dos-instelling-regel {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 24px;
+  padding-top: var(--sp-2);
+}
+.dos-instelling-regel strong {
+  font-weight: 700;
+}
+.dos-instelling--tabel {
+  grid-template-columns: 200px minmax(0, 1fr);
+}
+.dos-fout {
+  font-size: var(--fs-12);
+  color: var(--stat-red);
+}
+.dos-potlood {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--border-d);
+  border-radius: var(--r);
+  background: var(--bg);
+  color: var(--or);
+  cursor: pointer;
+}
+.dos-potlood:hover {
+  background: var(--bg-warm);
+}
+.dos-badge-grijs,
+.dos-badge-oranje,
+.dos-badge-oranje-faint {
+  display: inline-block;
+  padding: 2px var(--sp-2);
+  border-radius: 999px;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.dos-badge-grijs {
+  background: var(--bg-mid);
+  color: var(--ink-m);
+}
+.dos-badge-oranje-faint {
+  background: var(--or-faint);
+  color: var(--dal);
+}
+.dos-badge-oranje {
+  margin-left: var(--sp-2);
+  background: var(--stat-amber-faint);
+  color: var(--dal);
+}
+.dos-bronnen {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-14);
+}
+.dos-bronnen th {
+  padding: 0 var(--sp-3) var(--sp-2) 0;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.dos-bronnen td {
+  padding: var(--sp-2) var(--sp-3) var(--sp-2) 0;
+  border-top: 1px solid var(--border);
+  vertical-align: middle;
+}
+.dos-bronnen-actie {
+  width: 40px;
+  padding-right: 0 !important;
+}
+
+.dos-filterrij {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-4);
   margin-bottom: var(--sp-4);
 }
-.dos-kop-rechts {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-6);
-}
-.dos-open {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  font-size: var(--fs-14);
-  font-weight: 600;
-  color: var(--ink);
-  cursor: pointer;
-}
-.dos-open-stand {
-  font-weight: 400;
-  color: var(--ink-s);
-}
-.dos-filter {
-  margin-bottom: var(--sp-4);
-}
+
+/* De items in één witte kaart, gescheiden door een lijn (`dossier.md`, Scherm 1, Rijen): Vier kolommen (80px, 1fr, auto en 112px). */
 .dos-lijst {
   list-style: none;
   margin: 0;
   padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
 }
 .dos-rij {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) auto;
+  grid-template-columns: 80px minmax(0, 1fr) auto 112px;
   align-items: center;
-  gap: var(--sp-4);
-  padding: var(--sp-4) 0;
+  gap: var(--sp-6);
+  padding: var(--sp-4) var(--sp-6);
   border-top: 1px solid var(--border);
 }
 .dos-rij:first-child {
   border-top: 0;
-}
-.dos-icoon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-}
-.dos-icoon--case {
-  background: var(--or-faint);
-  color: var(--or);
-}
-.dos-icoon--nieuws {
-  background: var(--bl-faint);
-  color: var(--bl);
-}
-/* Soortkleuren van Events en Blogs (`stylesheet.md`, Soortkleuren van Dossieritems): Event groen op `#e7f6ef`, Blog `#7a5600` op `#fff6e0`, een verlopen Event grijs. */
-.dos-icoon--event {
-  background: #e7f6ef;
-  color: var(--gr);
-}
-.dos-icoon--blog {
-  background: #fff6e0;
-  color: #7a5600;
-}
-.dos-icoon.is-verlopen {
-  background: var(--bg-warm);
-  color: var(--ink-s);
 }
 .dos-tekst {
   display: flex;
@@ -1800,37 +1899,24 @@ a.cn-titel {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-}
-.dos-eyebrow--case {
   color: var(--or);
-}
-.dos-eyebrow--nieuws {
-  color: var(--bl);
-}
-.dos-eyebrow--event {
-  color: var(--gr);
-}
-.dos-eyebrow--blog {
-  color: #7a5600;
 }
 .dos-titel {
   margin: 0;
-  font-size: var(--fs-18);
-  font-weight: 800;
+  font-size: var(--fs-14);
+  font-weight: 700;
   color: var(--ink);
 }
 .dos-regel {
   font-size: var(--fs-14);
-  color: var(--ink-s);
-}
-.dos-toelichting {
-  font-size: var(--fs-14);
   color: var(--ink-m);
 }
 .dos-acties {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
+  display: contents;
+}
+.dos-acties .btn {
+  width: 112px;
+  justify-content: center;
 }
 .dos-status {
   display: inline-block;
@@ -1861,8 +1947,17 @@ a.cn-titel {
   background: var(--stat-amber-faint);
   color: var(--dal);
 }
+/* De modal Item toevoegen/bewerken: 640px breed, padding 32px (`dossier.md`, Scherm 3). */
 .modal-box--dossier {
-  max-width: 640px;
+  width: 640px;
+  max-width: calc(100vw - 2rem);
+  padding: var(--sp-8);
+}
+/* De modals Naam voor de Lead en Meting voor de radar: 560px breed. */
+.modal-box--instelling {
+  width: 560px;
+  max-width: calc(100vw - 2rem);
+  padding: var(--sp-8);
 }
 .dos-label {
   display: block;
@@ -1883,6 +1978,30 @@ a.cn-titel {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--sp-4);
+}
+.dos-twee--boven {
+  align-items: start;
+}
+/* Samenvatting en Toelichting hebben een vaste hoogte en een tekenteller (`dossier.md`, Scherm 3). */
+.dos-tekstvak {
+  resize: none;
+}
+.dos-tekstvak--samenvatting {
+  height: 72px;
+  min-height: 72px;
+}
+.dos-tekstvak--toelichting {
+  height: 96px;
+  min-height: 96px;
+}
+.dos-hint--teller {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+.dos-teller {
+  flex: none;
+  font-variant-numeric: tabular-nums;
 }
 .dos-paneel {
   margin: var(--sp-2) 0 0;
@@ -1914,6 +2033,92 @@ a.cn-titel {
 }
 .dos-zichtbaar.is-uit {
   opacity: 0.5;
+}
+.dos-zichtbaar-rij {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+.dos-zichtbaar-label {
+  font-size: var(--fs-14);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* De chips "Gaat over bouwblokken" per categorie: Links de naam van de categorie, rechts de chips (`dossier.md`, Scherm 3). */
+.dos-chipgroepen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.dos-chipgroep {
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--sp-3);
+}
+.dos-chipgroep--zonder {
+  grid-template-columns: minmax(0, 1fr);
+}
+.dos-chipgroep-naam {
+  padding-top: 6px;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+
+/* De drie even brede knoppen onderin (128px × 40px): Links Verwijderen, rechts Annuleren en Opslaan. */
+.dos-knoppen {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+.dos-knoppen-rechts {
+  display: flex;
+  gap: var(--sp-2);
+}
+.btn.dos-knop {
+  width: 128px;
+  justify-content: center;
+}
+
+/* De keuzes in de modal Meting voor de radar. */
+.dos-keuzes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+.dos-keuze {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  font-size: var(--fs-14);
+  cursor: pointer;
+}
+.dos-keuze > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dos-keuze.is-gekozen {
+  border-color: var(--or);
+  background: var(--or-faint);
+}
+.dos-keuze.is-uit {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.dos-bron-regel {
+  margin-top: var(--sp-4);
 }
 .dos-cirkel {
   display: inline-flex;

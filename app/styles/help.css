@@ -257,11 +257,33 @@
 .fr .mr-stip--11, .fr .mr-stip--12, .fr .mr-stip--13, .fr .mr-stip--14,
 .fr .mr-ring--11, .fr .mr-ring--12, .fr .mr-ring--13, .fr .mr-ring--14 { opacity: 1; }
 
-.fd { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--sp-8); align-items: start; }
+.fd { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); align-items: start; }
+/* De kaart met de radar en de verdeling in de opmaak van de Dossierpagina (`dossier.md`, Verdeling rechts van de radar). */
+.fd-kaart { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--sp-6); align-items: center; padding: var(--sp-6); border: 1px solid var(--border); border-radius: 10px; background: var(--bg-warm); }
+.fd-verdeling { min-width: 0; }
+.fd-kop { margin: 0; font-size: var(--fs-18); font-weight: 800; color: var(--ink); }
+.fd-zin { margin: var(--sp-2) 0 var(--sp-4); font-size: var(--fs-14); line-height: 22px; color: var(--ink-m); }
+.fd-cirkel--groot { width: 28px; height: 28px; }
+.fd-balk { position: relative; display: block; height: 10px; border-radius: 5px; background: linear-gradient(90deg, rgba(217, 56, 58, 0.1) 0 37.5%, rgba(232, 137, 43, 0.13) 37.5% 62.5%, rgba(28, 154, 91, 0.11) 62.5% 100%); box-shadow: inset 0 0 0 1px var(--border); }
+.fd-balk i { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; box-sizing: border-box; border: 2px solid #fff; border-radius: 50%; background: var(--or); box-shadow: 0 0 0 3px rgba(255, 103, 31, 0.25), 0 0 10px 3px rgba(255, 103, 31, 0.6); }
+.fd-score { display: flex; align-items: center; justify-content: flex-end; gap: var(--sp-2); }
+.fd-score strong { font-size: var(--fs-14); font-variant-numeric: tabular-nums; color: var(--ink); }
+.fd-klasse { display: inline-flex; align-items: center; height: 24px; padding: 0 var(--sp-2); border-radius: 12px; font-size: var(--fs-12); font-weight: 700; white-space: nowrap; }
+.fd-klasse--rood { background: var(--score-1-cel); color: var(--score-1-cel-tekst); }
+.fd-klasse--oranje { background: var(--score-2-cel); color: var(--score-2-cel-tekst); }
+.fd-klasse--groen { background: var(--score-5-cel); color: var(--score-5-cel-tekst); }
+.fd-legenda { display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-4); margin: var(--sp-3) 0 0; padding: 0 0 0 var(--sp-4); list-style: none; font-size: var(--fs-12); }
+.fd-legenda li { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.fd-legenda strong { color: var(--ink); }
+.fd-legenda span { color: var(--ink-s); }
+.fd-legenda-stip { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
+.fd-legenda-stip--rood { background: #d9383a; }
+.fd-legenda-stip--oranje { background: #e8892b; }
+.fd-legenda-stip--groen { background: #1c9a5b; }
 .fd-kolom { display: grid; gap: var(--sp-3); }
 .fd-lijst, .fd-items { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
-.fd-rij { position: relative; display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-3); border: 1px solid var(--border); border-radius: var(--r); background: #fff; }
-.fd-rij::after { content: ""; position: absolute; inset: -1px; border: 2px solid var(--or); border-radius: var(--r); opacity: 0; pointer-events: none; }
+.fd-rij { position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr) 96px auto; align-items: center; gap: var(--sp-3); padding: 10px var(--sp-3); border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+.fd-rij::after { content: ""; position: absolute; inset: -1px; border: 2px solid var(--or); border-radius: 10px; opacity: 0; pointer-events: none; }
 .fd-cirkel { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 22px; height: 22px; padding-top: 0.09em; border-radius: 50%; font-size: var(--fs-12); font-weight: 700; line-height: 1; }
 .fd-cirkel--klein { margin-left: auto; }
 .fd-rij-tekst { display: flex; flex: 1; flex-direction: column; min-width: 0; }
@@ -373,8 +395,10 @@
 .help-film--radar .fr-staaf-kolom--1 { animation: fr-dim3 var(--film-duur) linear infinite; }
 .help-film--radar .fr-staaf-kolom--3 { animation: fr-dim2 var(--film-duur) linear infinite; }
 .help-film--radar .fr-staaf-kolom--0, .help-film--radar .fr-staaf-kolom--2, .help-film--radar .fr-staaf-kolom--4 { animation: fr-dim23 var(--film-duur) linear infinite; }
-.help-film--dossier .mr-vol--7, .help-film--dossier .mr-taart-op--7, .help-film--dossier .mr-ring--7, .help-film--dossier .fd-rij--7::after, .help-film--dossier .fd-filterbalk { animation: fr-s2 var(--film-duur) linear infinite; }
-.help-film--dossier .fd-item--4, .help-film--dossier .fd-item--13, .help-film--dossier .fd-item--2 { animation: fd-weg var(--film-duur) linear infinite; }
+.help-film--dossier .fd:not(.fd--ai) .mr-vol--7, .help-film--dossier .fd:not(.fd--ai) .mr-taart-op--7, .help-film--dossier .fd:not(.fd--ai) .mr-ring--7, .help-film--dossier .fd:not(.fd--ai) .fd-rij--7::after, .help-film--dossier .fd:not(.fd--ai) .fd-filterbalk,
+.help-film--dossier .fd--ai .mr-vol--3, .help-film--dossier .fd--ai .mr-taart-op--3, .help-film--dossier .fd--ai .mr-ring--3, .help-film--dossier .fd--ai .fd-rij--3::after, .help-film--dossier .fd--ai .fd-filterbalk { animation: fr-s2 var(--film-duur) linear infinite; }
+.help-film--dossier .fd:not(.fd--ai) .fd-item--4, .help-film--dossier .fd:not(.fd--ai) .fd-item--13,
+.help-film--dossier .fd--ai .fd-item--5, .help-film--dossier .fd--ai .fd-item--6 { animation: fd-weg var(--film-duur) linear infinite; }
 @keyframes rf-stap-1 { 0%, 33.99% { border-color: var(--or); color: var(--or); } 34%, 100% { border-color: var(--border); color: var(--ink-s); } }
 @keyframes rf-stap-2 { 0%, 33.99% { border-color: var(--border); color: var(--ink-s); } 34%, 66.99% { border-color: var(--or); color: var(--or); } 67%, 100% { border-color: var(--border); color: var(--ink-s); } }
 @keyframes rf-stap-3 { 0%, 66.99% { border-color: var(--border); color: var(--ink-s); } 67%, 100% { border-color: var(--or); color: var(--or); } }
@@ -390,5 +414,5 @@
 @media (max-width: 900px) {
   .help-film-stappen { grid-template-columns: minmax(0, 1fr); }
   .film-resultaat { grid-template-columns: minmax(0, 1fr); }
-  .fr, .fd { grid-template-columns: minmax(0, 1fr); }
+  .fr, .fd, .fd-kaart { grid-template-columns: minmax(0, 1fr); }
 }

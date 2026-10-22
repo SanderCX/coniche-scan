@@ -1,13 +1,15 @@
-import { Dossieritem, Organisatie } from "../types";
+import { Dossieritem, Organisatie, ScanUitvoering } from "../types";
 import { laadAlles, slaAlles } from "./store";
 import { logAudit } from "../audit-store";
 import { organisatieContext } from "../audit-context";
 import { nieuwId } from "../id";
-import { DossierInvoer, aantalZichtbaarVoorLead, controleerDossieritem, dossierVan, kanOpenZetten, leegDossier } from "../dossier";
+import { getAssessment } from "../assessment-store";
+import { DOSSIER_ASSESSMENT_IDS, DossierInvoer, aantalZichtbaarVoorLead, controleerDossieritem, controleerNaamVoorLead, dossierVan, kanOpenZetten, leegDossier } from "../dossier";
+import { metingZichtbaarVoorLead, radarBronVan, verlorenRadarBronnen } from "../dossier-radar";
 import type { Resultaat } from "./meting-plannen";
 
 /**
- * Het Dossier van een Organisatie: Items toevoegen, wijzigen en verwijderen, het Dossier openzetten voor de Lead, de Afspraak "Mag als case
+ * Het Dossier van een Organisatie: Items toevoegen, wijzigen en verwijderen, het Dossier zichtbaar maken voor de Lead, de naam voor de Lead en de scorebron, de Afspraak "Mag als case
  * gebruikt worden" en het moment waarop een Lead het Dossier las (`dossier.md`). Elke wijziging wordt gelogd. Bij een Case staat de naam van
  * de Organisatie in de case in de log (alleen een Admin leest die, `dossier.md`, Audit).
  */
@@ -108,27 +110,98 @@ export function verwijderDossieritem(organisatieId: string, id: string): Resulta
   return { ok: true };
 }
 
-/** "Open voor Lead" aan- of uitzetten (`dossier.md`, Scherm 1). Aanzetten zet `openSinds` op nu. */
-export function zetDossierOpen(organisatieId: string, open: boolean): Resultaat {
+/**
+ * "Zichtbaar voor Lead" aan- of uitzetten (`dossier.md`, Scherm 1; voorheen "Open voor Lead"). Aanzetten zet `zichtbaarSinds` op nu en kan niet zolang
+ * een handmatig gekozen Meting voor de radar niet zichtbaar is voor de Lead (`dossier.md`, Welke scores). Uitzetten kan altijd.
+ */
+export function zetDossierZichtbaar(organisatieId: string, zichtbaar: boolean): Resultaat {
   const { alles, organisatie } = context(organisatieId);
   if (!organisatie) return { ok: false, reden: "Organisatie niet gevonden." };
   const dossier = dossierVanOrg(organisatie);
-  if (dossier.openVoorLead === open) return { ok: true };
+  if (dossier.zichtbaar === zichtbaar) return { ok: true };
+  if (zichtbaar && verlorenRadarBronnen(organisatie).length > 0) {
+    return { ok: false, reden: "Een gekozen Meting voor de radar is niet zichtbaar voor de Lead. Kies een andere Meting of Automatisch." };
+  }
   const nu = new Date().toISOString();
-  dossier.openVoorLead = open;
-  if (open) {
-    dossier.openSinds = nu;
+  dossier.zichtbaar = zichtbaar;
+  if (zichtbaar) {
+    dossier.zichtbaarSinds = nu;
     dossier.gewijzigdOp = nu;
   }
   organisatie.gewijzigdOp = nu;
   const aantal = aantalZichtbaarVoorLead(organisatie, alles);
   slaAlles(alles);
   logAudit({
-    actie: open ? "dossier.geopend" : "dossier.gesloten",
+    actie: zichtbaar ? "dossier.zichtbaarGemaakt" : "dossier.verborgen",
     entiteitType: "organisatie",
     entiteitId: organisatie.id,
     entiteitNaam: organisatie.naam,
     details: { ...organisatieContext(organisatie), aantalZichtbaar: aantal },
+  });
+  return { ok: true };
+}
+
+/** De naam van het Dossier bij de Lead wijzigen (`dossier.md`, Naam en scorebron). Leeg geeft weer "Dossier {Organisatie}". */
+export function zetNaamVoorLead(organisatieId: string, invoer: string): Resultaat {
+  const { alles, organisatie } = context(organisatieId);
+  if (!organisatie) return { ok: false, reden: "Organisatie niet gevonden." };
+  const c = controleerNaamVoorLead(invoer);
+  if (!c.ok) return { ok: false, reden: c.reden };
+  const dossier = dossierVanOrg(organisatie);
+  const oud = dossier.naamVoorLead ?? "";
+  if (oud === c.waarde) return { ok: true };
+  const nu = new Date().toISOString();
+  dossier.naamVoorLead = c.waarde;
+  // De titel is wat een Lead ziet: Zichtbaar dossier telt dit als wijziging (de tag "Nieuw").
+  if (dossier.zichtbaar) dossier.gewijzigdOp = nu;
+  organisatie.gewijzigdOp = nu;
+  slaAlles(alles);
+  logAudit({
+    actie: "dossier.instellingGewijzigd",
+    entiteitType: "organisatie",
+    entiteitId: organisatie.id,
+    entiteitNaam: organisatie.naam,
+    details: { ...organisatieContext(organisatie), veld: "naamVoorLead", oud: oud || null, nieuw: c.waarde || null },
+  });
+  return { ok: true };
+}
+
+/**
+ * De Meting kiezen die de scores in de radar levert voor één Assessment (`dossier.md`, Naam en scorebron). `metingId` leeg is automatisch. Een
+ * vaste Meting moet van dit Assessment en deze Organisatie zijn en door minstens één Lead van de Organisatie ingezien kunnen worden.
+ */
+export function zetRadarBron(organisatieId: string, assessmentId: string, metingId: string | null): Resultaat {
+  const { alles, organisatie } = context(organisatieId);
+  if (!organisatie) return { ok: false, reden: "Organisatie niet gevonden." };
+  if (!DOSSIER_ASSESSMENT_IDS.includes(assessmentId as (typeof DOSSIER_ASSESSMENT_IDS)[number])) return { ok: false, reden: "Dit Assessment heeft geen radar." };
+  let meting: ScanUitvoering | undefined;
+  if (metingId) {
+    meting = organisatie.scanUitvoeringen.find((m) => m.id === metingId);
+    if (!meting || meting.assessmentId !== assessmentId) return { ok: false, reden: "Deze Meting hoort niet bij dit Assessment." };
+    if (!metingZichtbaarVoorLead(organisatie, meting.id)) return { ok: false, reden: "De Resultaten van deze Meting zijn niet opengezet voor de Lead." };
+  }
+  const dossier = dossierVanOrg(organisatie);
+  const oud = radarBronVan(organisatie, assessmentId);
+  if (oud === metingId) return { ok: true };
+  const nu = new Date().toISOString();
+  dossier.radarBronnen = [...dossier.radarBronnen.filter((b) => b.assessmentId !== assessmentId), ...(metingId ? [{ assessmentId, metingId }] : [])];
+  if (dossier.zichtbaar) dossier.gewijzigdOp = nu;
+  organisatie.gewijzigdOp = nu;
+  slaAlles(alles);
+  const oudeMeting = oud ? organisatie.scanUitvoeringen.find((m) => m.id === oud) : undefined;
+  logAudit({
+    actie: "dossier.instellingGewijzigd",
+    entiteitType: "organisatie",
+    entiteitId: organisatie.id,
+    entiteitNaam: organisatie.naam,
+    details: {
+      ...organisatieContext(organisatie),
+      veld: "radarBron",
+      assessmentId,
+      assessmentNaam: getAssessment(assessmentId)?.naam ?? null,
+      oud: oudeMeting?.label ?? "automatisch",
+      nieuw: meting?.label ?? "automatisch",
+    },
   });
   return { ok: true };
 }
@@ -161,7 +234,7 @@ export function markeerDossierGezien(organisatieId: string, lidId: string): void
   const lid = organisatie?.leden.find((l) => l.id === lidId);
   if (!organisatie || !lid) return;
   const dossier = dossierVan(organisatie);
-  const laatste = [dossier.gewijzigdOp, dossier.openSinds].filter((x): x is string => !!x).sort().pop();
+  const laatste = [dossier.gewijzigdOp, dossier.zichtbaarSinds].filter((x): x is string => !!x).sort().pop();
   if (lid.dossierGezienOp && (!laatste || lid.dossierGezienOp >= laatste)) return;
   lid.dossierGezienOp = new Date().toISOString();
   slaAlles(alles);

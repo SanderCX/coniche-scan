@@ -3,7 +3,9 @@
  * met 15 genummerde knooppunten in de categoriekleuren, met voorbeelddata. De basisstaat van elk element is het eindbeeld (stap 3), zodat een film bij
  * verminderde beweging stil op het eindbeeld staat. De animaties staan in `app/styles/help.css`.
  */
-import { CATEGORIE_COLORS, DOMEIN_KLEUREN, tekstOpKleur } from "@/lib/colors";
+import { CATEGORIE_COLORS, CLASSIFICATIE_INFO, DOMEIN_KLEUREN, tekstOpKleur } from "@/lib/colors";
+import { classificatie } from "@/lib/scoring";
+import { sorteerVerdeling } from "@/lib/dossier";
 
 const MAAT = 240;
 const MIDDEN = MAAT / 2;
@@ -151,52 +153,94 @@ const ITEMS = [
 ];
 const AANTAL_ITEMS: Record<number, number> = { 4: 1, 7: 2, 13: 1 };
 
-/** De AI-variant van de film (`Film-Dossier-AI`, `ai-domeinenmodel-visual.md`, Film en Dossier): Dezelfde opbouw met de domeinen 2, 4 en 7 actief. */
+/**
+ * De AI-variant van de film (`Film-Dossier-AI`, `ai-domeinenmodel-visual.md`, Film en Dossier, aangepast op 21 oktober 2026): Dezelfde opbouw met de
+ * domeinen 3, 5 en 6 actief (de scores 2,0, 2,4 en 3,6) en een klik op domein 3.
+ */
 const ITEMS_AI = [
-  { soort: "Case", titel: "Van pilot naar structurele AI-inzet", bouwblok: 4 },
-  { soort: "Nieuws", titel: "Gemeente zet AI in voor klantvragen", bouwblok: 7 },
-  { soort: "Case", titel: "Een operating model voor AI-teams", bouwblok: 7 },
-  { soort: "Nieuws", titel: "Nieuwe regels voor AI en klantdata", bouwblok: 2 },
+  { soort: "Case", titel: "Mensen meenemen in AI-adoptie", bouwblok: 5 },
+  { soort: "Nieuws", titel: "Gemeente zet AI in voor klantvragen", bouwblok: 3 },
+  { soort: "Case", titel: "Een use-case van pilot naar productie", bouwblok: 3 },
+  { soort: "Nieuws", titel: "Nieuwe regels voor AI en klantdata", bouwblok: 6 },
 ];
-const AANTAL_ITEMS_AI: Record<number, number> = { 2: 1, 4: 1, 7: 2 };
+const AANTAL_ITEMS_AI: Record<number, number> = { 3: 2, 5: 1, 6: 1 };
 
-/** "Het dossier lezen": De radar met alleen actieve knooppunten, een klik filtert de lijst en "Alle items tonen" haalt het filter weg (`dossier.md`, scherm 5). Met `ai` de variant met de AI-domeinen. */
+/** De voorbeeldscores van de film Het dossier lezen bij de Klantcontact Volwassenheidsscan: 7 (2,2), 4 (2,3) en 13 (4,1) (`help.md`, Films). */
+const DOSSIER_SCORES = SCORES.map((s, i) => (i === 6 ? 2.2 : i === 12 ? 4.1 : s));
+const VOLWASSENHEID_DOSSIER: RadarSoort = { ...VOLWASSENHEID, scores: DOSSIER_SCORES };
+
+/**
+ * "Het dossier lezen": De radar met alleen actieve knooppunten, een klik filtert de lijst en "Alle items tonen" haalt het filter weg (`dossier.md`, scherm
+ * 5). Rechts van de radar staat de verdeling in de opmaak van de Dossierpagina (`dossier.md`, Verdeling rechts van de radar): In een warme kaart met
+ * rand de kop en de zin, een witte kaart per bouwblok op laagste score met de cirkel in de categoriekleur, een slanke balk met stip, de score en de klasse, en
+ * de legenda onder de rijen zonder aswaarden. Met `ai` de variant met de AI-domeinen.
+ */
 export function DossierFilmPodium({ ai = false }: { ai?: boolean }) {
-  const soort = ai ? AI : VOLWASSENHEID;
+  const soort = ai ? AI : VOLWASSENHEID_DOSSIER;
   const items = ai ? ITEMS_AI : ITEMS;
   const aantal = ai ? AANTAL_ITEMS_AI : AANTAL_ITEMS;
   const namen = ai ? AI_NAMEN : NAMEN;
-  const actiefNrs = ai ? [2, 4, 7] : [4, 7, 13];
+  const actiefNrs = ai ? [3, 5, 6] : [4, 7, 13];
+  const gekozen = ai ? 3 : 7;
   const actief = new Set(actiefNrs);
+  const eenheid = ai ? "domein" : "bouwblok";
+  const rijen = sorteerVerdeling(actiefNrs.map((n) => ({ n, score: soort.scores[n - 1], volgnummer: n })));
   return (
-    <div className="fd">
-      <div className="fd-radar">
-        <MiniRadar soort={soort} gedimd={(n) => !actief.has(n)} basisVol={(n) => actief.has(n)} />
+    <div className={`fd ${ai ? "fd--ai" : ""}`}>
+      <div className="fd-kaart">
+        <div className="fd-radar">
+          <MiniRadar soort={soort} gedimd={(n) => !actief.has(n)} basisVol={(n) => actief.has(n)} />
+        </div>
+        <div className="fd-verdeling">
+          <h4 className="fd-kop">Waar dit dossier over gaat</h4>
+          <p className="fd-zin">
+            Kies een {eenheid} om de cases, het nieuws, de events en de blogs daarover te zien. Onder de radar staan de {ai ? "domeinen" : "bouwblokken"} met de
+            laagste score bovenaan.
+          </p>
+          <ul className="fd-lijst">
+            {rijen.map(({ n, score }) => {
+              const klasse = classificatie(score);
+              return (
+                <li key={n} className={`fd-rij fd-rij--${n}`}>
+                  <span className="fd-cirkel fd-cirkel--groot" style={{ background: soort.kleur(n), color: soort.tekst(n) }}>
+                    {n}
+                  </span>
+                  <span className="fd-rij-tekst">
+                    <strong>{namen[n - 1]}</strong>
+                    <span>
+                      {aantal[n]} {aantal[n] === 1 ? "item" : "items"}
+                    </span>
+                  </span>
+                  <span className="fd-balk" aria-hidden="true">
+                    <i style={{ left: `${(((score - 1) / 4) * 100).toFixed(1)}%` }} />
+                  </span>
+                  <span className="fd-score">
+                    <strong>{komma(score)}</strong>
+                    <span className={`fd-klasse fd-klasse--${klasse}`}>{CLASSIFICATIE_INFO[klasse].label}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          <ul className="fd-legenda" aria-hidden="true">
+            {(["rood", "oranje", "groen"] as const).map((k) => (
+              <li key={k}>
+                <i className={`fd-legenda-stip fd-legenda-stip--${k}`} />
+                <strong>{CLASSIFICATIE_INFO[k].label}</strong>
+                <span>{k === "rood" ? "onder 2,5" : k === "oranje" ? "2,5 tot 3,5" : "vanaf 3,5"}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
       <div className="fd-kolom">
-        <ul className="fd-lijst">
-          {actiefNrs.map((n) => (
-            <li key={n} className={`fd-rij fd-rij--${n}`}>
-              <span className="fd-cirkel" style={{ background: soort.kleur(n), color: soort.tekst(n) }}>
-                {n}
-              </span>
-              <span className="fd-rij-tekst">
-                <strong>{namen[n - 1]}</strong>
-                <span>{ai ? komma(soort.scores[n - 1]) : `${CATEGORIE_NAMEN[categorieVan(n)]} · ${komma(soort.scores[n - 1])}`}</span>
-              </span>
-              <span className="fd-aantal">
-                {aantal[n]} {aantal[n] === 1 ? "item" : "items"}
-              </span>
-            </li>
-          ))}
-        </ul>
         <div className="fd-filterbalk" aria-hidden="true">
-          <span className="fd-cirkel" style={{ background: soort.kleur(7), color: soort.tekst(7) }}>
-            7
+          <span className="fd-cirkel" style={{ background: soort.kleur(gekozen), color: soort.tekst(gekozen) }}>
+            {gekozen}
           </span>
           <span className="fd-rij-tekst">
-            <strong>{namen[6]}</strong>
-            <span>2 items in dit dossier</span>
+            <strong>{namen[gekozen - 1]}</strong>
+            <span>{aantal[gekozen]} items in dit dossier</span>
           </span>
           <span className="fd-wis">Alle items tonen ×</span>
         </div>

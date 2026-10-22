@@ -1,19 +1,15 @@
-import { useState } from "react";
 import { Antwoord, Bouwblok, Categorie, ScanWeergave, SchaalLabel } from "@/lib/types";
 import { CATEGORIE_COLORS, accentStijl } from "@/lib/colors";
-import { toelichtingVoor } from "@/lib/bouwblok-info";
-import { gewichtMarkering } from "@/lib/weging";
 import { ScaleRadio } from "./ScaleRadio";
 import { JaNeeRadio } from "./JaNeeRadio";
 import { AfdelingKaarten } from "./AfdelingKaarten";
-import { ToelichtingModal } from "./ToelichtingModal";
+import { BouwblokKop } from "./BouwblokKop";
 
 export function BouwblokForm({
   bouwblok,
   categorieKleur,
   categorieNaam,
   bouwblokLabel,
-  eenheid,
   schaal,
   respondent,
   isLaatsteBouwblok,
@@ -28,10 +24,8 @@ export function BouwblokForm({
   bouwblok: Bouwblok;
   categorieKleur: string | null;
   categorieNaam: string | null;
-  /** Eyebrow in de Toelichtingsmodal (`Assessment.bouwblokLabel`). */
+  /** Eyebrow in de kop van het bouwblok (`Assessment.bouwblokLabel`). */
   bouwblokLabel: string;
-  /** UI-woord voor dit bouwblok, bijv. "Bouwblok" of "Domein". */
-  eenheid: string;
   schaal: SchaalLabel[];
   respondent: ScanWeergave;
   isLaatsteBouwblok: boolean;
@@ -45,6 +39,7 @@ export function BouwblokForm({
    */
   afdeling?: {
     categorie: Categorie;
+    nummer: number;
     relevantieVraag: string;
     relevantie: boolean | undefined;
     onRelevantie: (relevant: boolean) => void;
@@ -63,14 +58,6 @@ export function BouwblokForm({
   const alleBeantwoord = toonVragen
     ? bouwblok.vragen.every((v) => respondent.antwoorden[v.id] !== undefined)
     : afdeling.relevantie === false;
-  const [toelichtingOpen, setToelichtingOpen] = useState(false);
-
-  const toelichtingInfo = toelichtingVoor(bouwblok, {
-    bouwblokLabel,
-    groepNaam: categorieNaam,
-    groepKleur: categorieKleur,
-  });
-
   /** Scrollt na het kiezen van een antwoord naar de volgende vraag (of, bij
    * de laatste vraag, naar het opmerkingenveld/de knop) — een korte
    * vertraging zodat de gekozen radio eerst zichtbaar gevuld wordt voordat
@@ -94,6 +81,7 @@ export function BouwblokForm({
       {afdeling && (
         <AfdelingKaarten
           categorie={afdeling.categorie}
+          nummer={afdeling.nummer}
           relevantieVraag={afdeling.relevantieVraag}
           relevantie={afdeling.relevantie}
           onRelevantie={afdeling.onRelevantie}
@@ -101,48 +89,7 @@ export function BouwblokForm({
       )}
       {toonVragen && (
       <>
-      <div className="bouwblok-kop" style={accentStyle}>
-        <p className="eyebrow" style={accentStyle}>
-          {eenheid} {bouwblok.volgnummer}
-        </p>
-        <div className="bouwblok-kop-titelrij">
-          <h2>{bouwblok.naam}</h2>
-          {gewichtMarkering(bouwblok) && <span className="gewicht-chip">{gewichtMarkering(bouwblok)}</span>}
-          {toelichtingInfo && (
-            <button
-              type="button"
-              onClick={() => setToelichtingOpen(true)}
-              aria-label={`Meer uitleg over ${bouwblok.naam}`}
-              title="Meer uitleg"
-              className="toelichting-link"
-              style={accentStyle}
-            >
-              ⓘ
-            </button>
-          )}
-        </div>
-        <p className="bouwblok-omschrijving">{bouwblok.omschrijving}</p>
-        <div className="tags-rij" style={{ marginTop: "0.8rem" }}>
-          {bouwblok.tags.map((tag) => (
-            <span key={tag} className="g-badge">
-              {tag}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {toelichtingInfo && (
-        <ToelichtingModal
-          open={toelichtingOpen}
-          onClose={() => setToelichtingOpen(false)}
-          nummer={toelichtingInfo.nummer}
-          naam={bouwblok.naam}
-          categorie={toelichtingInfo.categorie}
-          kleur={toelichtingInfo.kleur}
-          centraleVraag={toelichtingInfo.centraleVraag}
-          beschrijving={toelichtingInfo.beschrijving}
-        />
-      )}
+      <BouwblokKop bouwblok={bouwblok} groepNaam={categorieNaam} bouwblokLabel={bouwblokLabel} accentStyle={accentStyle} />
 
       <div className="instructievlak">
         {instructieregel?.trim() ||
@@ -151,7 +98,7 @@ export function BouwblokForm({
 
       {bouwblok.vragen.map((vraag) => (
         <div key={vraag.id} id={`vraag-${vraag.id}`} className="vraag-blok">
-          <p className="vraag-tekst">
+          <p className={`vraag-tekst ${jaNee ? "vraag-tekst--groot" : ""}`}>
             {vraag.volgnummer}. {vraag.tekst}
           </p>
           {jaNee ? (
@@ -159,7 +106,6 @@ export function BouwblokForm({
               naam={vraag.id}
               waarde={respondent.antwoorden[vraag.id]}
               onChange={(waarde) => handleAntwoord(vraag.id, waarde)}
-              accentHex={kleur?.hex}
             />
           ) : (
             <ScaleRadio

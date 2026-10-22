@@ -1,5 +1,19 @@
 # Coniche Scan — Changelog
 
+## 2026-10-22 (31) — Specs van Joost, PR 168: Doorloopflow met de toelichting in de kop, AI-scan op Mijn metingen, Dossier zichtbaar met naam en scorebron
+
+Op verzoek van Sander ("pull devops", daarna "ja bouw maar").
+
+**Gedaan**:
+- **Doorloopflow, alle typen** (`BouwblokKop`, `Sidebar`, `SpanningSidebar`, `BouwblokForm`, `AfdelingKaarten`, `JaNeeRadio`, `SpanningVeldForm`): De toelichting staat direct in de kop van het bouwblok (balk, eyebrow, titel 32px, centrale vraag, toelichting), zonder i-icoon, modal, omschrijving en tags. De sidebar heeft een vlak in `#e7e4dc` voor het actieve bouwblok en een lijn van 3px langs de actieve categorie, bij de AI-scan en de Spanningsmeter een streepje (in `--or` of de veldkleur). De Quickscan heeft de afdelingskop (AFDELING n, definitie, kaart met de relevantievraag), antwoordpillen van 40px, "· N.V.T." met doorgestreepte dimensies en "4/4" achter een dimensie. De Spanningsmeter heeft de veldkop "VELD n" met de basis onder de omschrijving en zonder Info-icoon.
+- **Mijn metingen**: De AI-scan is nu een kaart met cirkel en een rij per domein (nummer in de domeinkleur, "Per domein", bij de hele Meting stip en lijn per domein) (`lib/mijn-metingen.ts`, `CirkelPaneel`).
+- **Dossier** (`lib/dossier.ts`, `lib/dossier-radar.ts`, `lib/db/dossier.ts`, `lib/db/store.ts`, `components/beheer/DossierKaart.tsx`, `components/Schakelaar.tsx`): `openVoorLead` en `openSinds` heten `zichtbaar` en `zichtbaarSinds` (met omzetting bij het laden), de acties `dossier.zichtbaarGemaakt` en `dossier.verborgen`, de naam voor de Lead, de scorebron per Assessment (Automatisch of een vaste Meting) met de regel dat het Dossier uitgaat als die Meting niet meer zichtbaar is voor de Lead, het paneel "Instellingen voor de Lead" met twee modals, het itemformulier met schakelaar, tellers en bouwblokken per categorie, de items in één kaart, een item in elke sectie waarin een van zijn bouwblokken valt, en de verdeling in de nieuwe opmaak. De film Het dossier lezen volgt die opmaak (KC: 7, 4 en 13, AI: 3, 5 en 6).
+- **Tests**: `lib/doorloop-ui.test.tsx` (nieuw), uitgebreid `lib/dossier.test.ts` (secties, naam, oude veldnamen, scorebron, verbergen), `lib/mijn-metingen.test.ts` (AI-rijen) en `lib/dossier-ai-ui.test.tsx` (de film).
+
+**Specs bijgewerkt**: `CLAUDE.md` (status), `stylesheet.md` (Doorloopflow, Zo gebouwd), `dossier.md` (Zo gebouwd (22 oktober 2026)), `datamodel.md`, `beheerpagina.md`, `visualisatie-mijn-metingen.md`, `visualisatie-spanningsmeter.md`, `content-ziekenhuis-quickscan.md`, `help.md`. Help: `een-scan-invullen`, `mijn-metingen`, `het-dossier-van-een-organisatie`, `het-dossier-van-je-consultant` en `het-dossier-lezen`.
+
+**Afwijkingen en interpretaties**: (1) De eyebrow van een bouwblok volgt `Assessment.bouwblokLabel` ("BOUWSTEEN"), terwijl `stylesheet.md` "BOUWBLOK {n}" noemt. (2) Een bouwbloknaam in de sidebar breekt bij alle typen af op een tweede regel. (3) Een Meting is "zichtbaar voor de Lead" als minstens één Lead de Resultaten ziet, en zonder Leads altijd. (4) De melding bij een verloren scorebron blijft staan zolang de Meting verloren is. (5) De Quickscan toont "4/4" achter een dimensie ook als die klaar is. (6) Een tweede reeks bewerkingen van de ontwerpen (`Vragenlijst-*`, `Dossier-beheer-B`) kon ik niet inzien: De opmaak volgt de maten uit de specs.
+
 ## 2026-10-21 (30) — Specs van Joost, PR 166: De cirkel volledig beschreven, Quickscan-pagina, Dossier-rail en bron van de scores
 
 Op verzoek van Sander ("pull devops", daarna "ja bouw maar").

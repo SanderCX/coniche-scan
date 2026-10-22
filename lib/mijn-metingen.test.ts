@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { zorgscan } from "@/data/zorgscan-assessment";
 import { ziekenhuisQuickscan } from "@/data/ziekenhuis-quickscan-assessment";
-import { alleVragen } from "./assessment-structuur";
+import { aiVolwassenheid } from "@/data/ai-scan-assessment";
+import { alleBouwblokkenMetGroep, alleVragen } from "./assessment-structuur";
 import {
   celStap,
   isEindstand,
@@ -182,5 +183,37 @@ describe("secties en respons", () => {
     expect(isEindstand(r)).toBe(false);
     expect(isEindstand(responsVan([{ status: "afgerond" }]))).toBe(true);
     expect(responsVan([]).compleet).toBe(false);
+  });
+});
+
+describe("teaser van de AI-scan (domeinrijen, 22 oktober 2026)", () => {
+  const ai = aiVolwassenheid;
+  const domeinen = alleBouwblokkenMetGroep(ai).map((b) => b.bouwblok);
+  const antwoorden = (waarde: number) => Object.fromEntries(alleVragen(ai).map((v) => [v.id, waarde]));
+
+  it("heeft een rij per domein in de vaste volgorde 1 tot en met 8, met het nummer in de domeinkleur", () => {
+    const t = teaserVoorScan(ai, antwoorden(2))!;
+    expect(t.rijen).toHaveLength(domeinen.length);
+    expect(t.rijen.map((r) => r.nummer?.nr)).toEqual(domeinen.map((d) => d.volgnummer));
+    expect(t.rijen.map((r) => r.naam)).toEqual(domeinen.map((d) => d.naam));
+    expect(t.rijen[0].nummer).toMatchObject({ achtergrond: "#ff671f", tekst: "#fff" });
+    // De domeinen 5, 6 en 8 hebben een donker nummer op een lichte kleur.
+    expect([4, 5, 7].map((i) => t.rijen[i].nummer?.tekst)).toEqual(["var(--ink)", "var(--ink)", "var(--ink)"]);
+    expect(t.rijenLabel).toBe("Per domein");
+    expect(t.klasseNaam).toBe("Basis op Orde");
+  });
+
+  it("heeft een tekstalternatief per rij met domein, naam en score", () => {
+    const t = teaserVoorScan(ai, antwoorden(2))!;
+    expect(t.rijen[2].alt).toBe(`Domein 3, ${domeinen[2].naam}, jouw score 2,0`);
+  });
+
+  it("toont bij de hele meting het gemiddelde met de laagste en hoogste score per domein", () => {
+    const scanAi = (waarde: number) => ({ ...scan(waarde), antwoorden: antwoorden(waarde) }) as unknown as ScanInvulling;
+    const t = teaserVoorMeting(ai, [scanAi(2), scanAi(4)])!;
+    expect(t.stijl).toBe("stip");
+    expect(t.rijen[0].fractie).toBeCloseTo(0.5, 5);
+    expect(t.rijen[0].lijn).toEqual({ van: expect.closeTo(0.25, 5), tot: expect.closeTo(0.75, 5) });
+    expect(t.rijen[0].alt).toBe(`Domein 1, ${domeinen[0].naam}, gemiddelde 3,0, laagste 2,0, hoogste 4,0`);
   });
 });

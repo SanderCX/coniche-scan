@@ -150,7 +150,7 @@ function DossierInhoud({ code }: { code: string }) {
       ];
     });
 
-  const datum = langeDatum(dossier.openSinds);
+  const datum = langeDatum(dossier.zichtbaarSinds);
   const komendTotaal = dossier.events.filter((e) => !e.verlopen).length;
   const heeftAi = radars.some((r) => r.assessment.bouwblokLabel === "AI-domein");
   const tegels = [
@@ -243,7 +243,7 @@ function DossierInhoud({ code }: { code: string }) {
         <header className="dp-kop">
           <div className="dp-kop-tekst">
             <span className="dp-eyebrow">Dossier</span>
-            <h1 className="page-title">Dossier {dossier.organisatieNaam}</h1>
+            <h1 className="page-title">{dossier.naam}</h1>
             <p>
               Je consultant heeft cases, nieuws, events en blogs verzameld die passen bij jullie situatie, met bij elk item uitleg waarom. Bij elk item staat het{" "}
               {heeftAi ? "bouwblok of AI-domein" : "bouwblok"} waar het over gaat.
@@ -426,9 +426,10 @@ function SectiesMetRail({ secties, soorten }: { secties: DossierSectieInhoud[]; 
 }
 
 /**
- * De verdeling rechts van de radar (`dossier.md`, Verdeling rechts van de radar): Per actief bouwblok een rij, de laagste score eerst, met de cirkel,
- * de naam en het aantal items, een balk met de plek van de score in de drie zones en de score met de klasse. Eerst vier rijen, de rest achter "Nog {n}
- * bouwblokken tonen". Zonder scores staat er een lijst op het nummer, zonder balk, score en klasse.
+ * De verdeling rechts van de radar (`dossier.md`, Verdeling rechts van de radar, opmaak `Dossier-verdeling-origineel`): Per actief bouwblok een rij in een
+ * eigen witte kaart, de laagste score eerst, met de cirkel, de naam en het aantal items, een slanke balk met de plek van de score in de drie zones en de
+ * score met de klasse. Onder de rijen staat de legenda met de drie klassen en hun grenzen. Eerst vier rijen, de rest achter "Nog {n} bouwblokken tonen".
+ * Zonder scores staat er een lijst op het nummer, zonder balk, score en klasse.
  */
 function Verdeling({
   assessment,
@@ -464,17 +465,6 @@ function Verdeling({
         Kies een {woord} om de cases, het nieuws, de events en de blogs daarover te zien.
         {heeftScores && ` Onder de radar staan de ${meervoud} met de laagste score bovenaan.`}
       </p>
-      {heeftScores && (
-        <ul className="dp-klassenuitleg" aria-label="De klassen">
-          {(["rood", "oranje", "groen"] as const).map((k) => (
-            <li key={k}>
-              <i className={`dp-klassestip dp-klassestip--${k}`} aria-hidden="true" />
-              {CLASSIFICATIE_INFO[k].label}
-              <span>{k === "rood" ? "onder 2,5" : k === "oranje" ? "2,5 tot 3,5" : "vanaf 3,5"}</span>
-            </li>
-          ))}
-        </ul>
-      )}
       <ul className={`dp-verdeling ${heeftScores ? "dp-verdeling--score" : ""}`}>
         {zichtbaar.map(({ r, score }) => {
           const n = telling.get(r.bouwblok.id) ?? 0;
@@ -510,20 +500,18 @@ function Verdeling({
             </li>
           );
         })}
-        {heeftScores && (
-          <li className="dp-ankers" aria-hidden="true">
-            <span />
-            <span />
-            <span className="dp-ankers-rij">
-              <span style={{ left: "0%" }}>1</span>
-              <span style={{ left: "37.5%" }}>2,5</span>
-              <span style={{ left: "62.5%" }}>3,5</span>
-              <span style={{ left: "100%" }}>5</span>
-            </span>
-            <span />
-          </li>
-        )}
       </ul>
+      {heeftScores && (
+        <ul className="dp-legenda" aria-label="De klassen">
+          {(["rood", "oranje", "groen"] as const).map((k) => (
+            <li key={k}>
+              <i className={`dp-klassestip dp-klassestip--${k}`} aria-hidden="true" />
+              <strong>{CLASSIFICATIE_INFO[k].label}</strong>
+              <span>{k === "rood" ? "onder 2,5" : k === "oranje" ? "2,5 tot 3,5" : "vanaf 3,5"}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       {rijen.length > VERDELING_EERST && (
         <button type="button" className="dp-meer" aria-expanded={open} onClick={() => onOpen(!open)}>
           {open ? "Minder tonen ▴" : `Nog ${rest} ${rest === 1 ? woord : meervoud} tonen ▾`}

@@ -206,7 +206,7 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
           <>
             <span className="mm-label">Dossier, 1</span>
             <div className="mm-grid">
-              <DossierKaart code={code} lid={lid} dossier={dossier} openSinds={dossier.openSinds} gewijzigdOp={dossier.gewijzigdOp} />
+              <DossierKaart code={code} lid={lid} dossier={dossier} zichtbaarSinds={dossier.zichtbaarSinds} gewijzigdOp={dossier.gewijzigdOp} />
             </div>
           </>
         )}

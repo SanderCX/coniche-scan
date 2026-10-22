@@ -5,24 +5,30 @@
   max-width: 1000px;
 }
 
+/* De veldkop (`visualisatie-spanningsmeter.md`, Doorloopflow, Veldkop; besloten door Joost op 22 oktober 2026): Een balk van 4px in de
+   veldkleur met 28px ruimte erachter, de eyebrow "VELD n", de naam in 32px en de omschrijving. */
 .sp-kop {
   margin-bottom: var(--sp-6);
-  padding-left: 20px;
+  padding-left: 28px;
   border-left: 4px solid var(--or);
 }
-.sp-kop-titelrij {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
+.sp-kop-eyebrow {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 .sp-kop h2 {
   margin: 0;
-  font-size: var(--fs-24);
+  font-size: var(--fs-32);
   font-weight: 800;
 }
-.sp-kop p {
-  margin: var(--sp-1) 0 0;
+.sp-kop .sp-kop-omschrijving {
+  margin: var(--sp-3) 0 0;
+  max-width: 760px;
   font-size: var(--fs-16);
+  line-height: 26px;
   color: var(--ink-m);
 }
 
@@ -242,6 +248,7 @@
 
 /* Sidebar */
 .sp-side-rij {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -253,13 +260,26 @@
   cursor: pointer;
   text-align: left;
 }
-.sp-side-rij:hover,
-.sp-side-rij.actief {
+.sp-side-rij:hover {
   background: var(--bg-mid);
 }
+/* Het actieve veld (`stylesheet.md`, Doorloopflow, Sidebar): Een vlak in #e7e4dc met de naam in gewicht 700 en een streepje van 3px in
+   de veldkleur, 14px links van het vlak, met 3px marge boven en onder de rij. */
 .sp-side-rij.actief {
+  background: #e7e4dc;
+  border-radius: 6px;
   font-weight: 700;
   color: var(--ink);
+}
+.sp-side-rij.actief::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: 3px;
+  bottom: 3px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--veld, var(--or));
 }
 .sp-nr {
   display: inline-flex;
@@ -579,6 +599,23 @@
 .sp-nr--rij {
   margin-right: var(--sp-2);
   vertical-align: middle;
+}
+/* Een rij met een nummerbolletje (een spanningsveld of een AI-domein): Het bolletje en de naam staan naast elkaar, en past een naam niet op
+   één regel ("Performance, monitoring en kwaliteit"), dan loopt hij door op een tweede regel van 18px en blijft de rij 40px. */
+.mm-paneel--spanning .mm-paneel-naam {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  overflow: visible;
+  white-space: normal;
+  line-height: 18px;
+}
+.mm-paneel--spanning .mm-paneel-naam .sp-nr--rij {
+  margin-right: 0;
+}
+.mm-paneel-naamtekst {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 /* De kolom met de veldnaam is 190px breed en de kop staat op één regel. */
 .mm-paneel--spanning .mm-paneel-rij {

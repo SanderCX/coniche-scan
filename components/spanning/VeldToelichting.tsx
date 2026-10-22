@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Assessment, Bouwblok } from "@/lib/types";
 import { veldKleur } from "@/lib/colors";
 import { niveauNaam, Niveau } from "@/lib/spanning";
@@ -43,20 +42,5 @@ export function VeldToelichtingModal({
       ijkpunten={ijkpuntenMetNaam(assessment, veld)}
       basis={veld.toelichting}
     />
-  );
-}
-
-/** Een Info-icoon dat de Toelichtingsmodal van een veld opent (`stylesheet.md`, Info-icoon). Beheert zijn eigen open-staat. */
-export function VeldInfoKnop({ assessment, veld }: { assessment: Assessment; veld: Bouwblok }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <span className="info-icoon-wrap">
-        <button type="button" className="info-icoon" aria-label={`Uitleg over ${veld.naam}`} aria-haspopup="dialog" onClick={() => setOpen(true)}>
-          i
-        </button>
-      </span>
-      <VeldToelichtingModal assessment={assessment} veld={veld} open={open} onClose={() => setOpen(false)} />
-    </>
   );
 }

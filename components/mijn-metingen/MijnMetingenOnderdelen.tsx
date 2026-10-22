@@ -572,14 +572,14 @@ export function BenchmarkKaart({
 
 /**
  * De kaart Dossier van een Lead (`visualisatie-mijn-metingen.md`, Dossierkaart; `dossier.md`, Scherm 4): Eén kaart in de sectie Dossier, volle
- * breedte, met de eyebrow "Dossier", de tag "Nieuw" zolang de Lead de Dossierpagina niet opende na de laatste wijziging, de titel, wie het
+ * breedte, met de eyebrow "Dossier", de tag "Nieuw" zolang de Lead de Dossierpagina niet opende na de laatste wijziging, de titel (de naam voor de Lead), wie het
  * deelde en wanneer, een voorproef van ten hoogste drie titels (eerst de Cases) en het aantal. De knop heeft dezelfde breedte als die op de
  * benchmarkkaart.
  */
-export function DossierKaart({ code, lid, dossier, openSinds, gewijzigdOp }: { code: string; lid: OrganisatieLid; dossier: LeadDossier; openSinds: string | null; gewijzigdOp: string | null }) {
-  const nieuw = isNieuwVoorLead(lid, { openSinds, gewijzigdOp });
+export function DossierKaart({ code, lid, dossier, zichtbaarSinds, gewijzigdOp }: { code: string; lid: OrganisatieLid; dossier: LeadDossier; zichtbaarSinds: string | null; gewijzigdOp: string | null }) {
+  const nieuw = isNieuwVoorLead(lid, { zichtbaarSinds, gewijzigdOp });
   const proef = voorproef(dossier);
-  const datum = langeDatum(openSinds);
+  const datum = langeDatum(zichtbaarSinds);
   return (
     <article className="mm-kaart mm-kaart--vol mm-kaart--benchmark">
       <div className="mm-benchmark">
@@ -591,7 +591,7 @@ export function DossierKaart({ code, lid, dossier, openSinds, gewijzigdOp }: { c
             <span className="mm-label-klein mm-label-klein--oranje">Dossier</span>
             {nieuw && <span className="mm-tag-nieuw">Nieuw</span>}
           </div>
-          <h2>Dossier {dossier.organisatieNaam}</h2>
+          <h2>{dossier.naam}</h2>
           <p>Gedeeld door je consultant{datum ? ` op ${datum}` : ""}</p>
           <div className="mm-voorproef" aria-label="Voorproef">
             {proef.titels.map((t) => (

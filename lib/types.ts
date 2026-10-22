@@ -351,13 +351,25 @@ export interface Dossieritem {
 
 /** Het Dossier van een Organisatie (`datamodel.md`, Dossieritem). */
 export interface Dossier {
-  /** Of de Leads van de Organisatie het Dossier zien. Standaard `false`. */
-  openVoorLead: boolean;
-  /** Het moment waarop `openVoorLead` voor het laatst aan ging. */
-  openSinds: string | null;
+  /** Of de Leads van de Organisatie het Dossier zien (voorheen `openVoorLead`, hernoemd op 22 oktober 2026). Standaard `false`. */
+  zichtbaar: boolean;
+  /** Het moment waarop `zichtbaar` voor het laatst aan ging (voorheen `openSinds`). */
+  zichtbaarSinds: string | null;
+  /** De titel van het Dossier bij de Lead, maximaal 80 tekens. Leeg: "Dossier {Organisatie.naam}" (`dossier.md`, Naam en scorebron). */
+  naamVoorLead: string;
+  /** Per Assessment met een radar de Meting die de scores levert. Ontbreekt een Assessment, dan geldt automatisch (de meest recente Meting). */
+  radarBronnen: RadarBron[];
   /** De laatste wijziging in wat een Lead ziet. */
   gewijzigdOp: string | null;
   items: Dossieritem[];
+}
+
+/** Welke Meting de scores in de radar en de verdeling van het Dossier levert (`dossier.md`, Naam en scorebron). */
+export interface RadarBron {
+  /** Het Assessment van de radar: De Klantcontact Volwassenheidsscan of de AI-scan. */
+  assessmentId: string;
+  /** `null` is automatisch (de meest recente Meting), anders een vaste Meting van deze Organisatie en dit Assessment. */
+  metingId: string | null;
 }
 
 export interface Organisatie {
