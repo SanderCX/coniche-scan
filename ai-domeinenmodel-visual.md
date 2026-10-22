@@ -8,7 +8,7 @@ Eén visuele component, een overzicht van de 8 AI-domeinen. Beweeg je over een d
 
 ## Hergebruik van bestaande content, geen nieuwe
 
-De Toelichtingsmodal (`stylesheet.md`, "Modal en Toelichtingsmodal"), dezelfde als bij het i-icoontje per bouwblok in de doorloopflow en als in `bouwstenenmodel-visual.md`. Een klik op een domein in dit overzicht en het i-icoontje in de doorloopflow openen dezelfde modal met dezelfde content (`Bouwblok.toelichting` en `Bouwblok.centraleVraag`, gevuld vanuit `visie-ai-klantcontact.md`). Eén functie en één opmaak: Geen tweede modalfunctie, geen eigen stijlen, geen content dupliceren.
+De Toelichtingsmodal (`stylesheet.md`, "Modal en Toelichtingsmodal"), dezelfde als in `bouwstenenmodel-visual.md`. Een klik op een domein in dit overzicht opent die modal. De doorloopflow toont dezelfde content sinds 22 oktober 2026 direct in de kop van het bouwblok (`stylesheet.md`, Doorloopflow) en heeft geen modal meer. Beide gebruiken dezelfde content (`Bouwblok.toelichting` en `Bouwblok.centraleVraag`, gevuld vanuit `visie-ai-klantcontact.md`). Eén functie en één opmaak: Geen tweede modalfunctie, geen eigen stijlen, geen content dupliceren.
 
 ## Waar dit component een plek krijgt
 

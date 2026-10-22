@@ -169,13 +169,26 @@ tekst van deze spec aangepast.
 Elke afdeling begint in de doorloopflow met twee kaarten boven de vragen
 (`CLAUDE.md`, scherm 5):
 
-1. Een kaart met de naam van de afdeling, een oranje balk links ervan en
-   daaronder de definitie (`Categorie.omschrijving`).
-2. Een kaart met `Assessment.relevantieVraag` en de keuzes Ja en Nee.
+1. De kop van de afdeling (besloten door Joost op 22 oktober 2026, nog te bouwen, ontwerp
+   `Vragenlijst-Quickscan`): Een oranje balk van 4px links met 28px ruimte
+   erachter, de eyebrow "AFDELING {n}" (12px, hoofdletters, gewicht 700,
+   letterafstand .14em, `--or`), de naam (32px, gewicht 800) en daaronder de
+   definitie (`Categorie.omschrijving`, 16px, regelhoogte 26px, `--ink-m`,
+   hoogstens 700px breed).
+2. Een witte kaart (rand 1px `--border`, 10px radius, padding 20px 24px) met
+   `Assessment.relevantieVraag` in 18px, gewicht 700, en daaronder de keuzes
+   Ja en Nee als pillen van 40px hoog (gekozen massief `--or`).
+
+Daarna volgt per bouwblok (dimensie) een kop met alleen de balk, de eyebrow
+"{AFDELING} · DIMENSIE {n}" en de naam, zonder centrale vraag en toelichting,
+want die zijn bij dit Assessment leeg. De antwoorden Ja, Nee en Weet ik niet
+staan per vraag als drie pillen van 40px hoog onder de vraag (18px,
+gewicht 700), met de gekozen pil massief `--or`.
 
 Pas na Ja volgen de bouwblokken van de afdeling. Bij Nee gaat
 "Volgende" naar de volgende afdeling. In de sidebar staat een afdeling
-die niet van toepassing is grijs met "n.v.t." (voorstel). De Respondent
+die niet van toepassing is grijs (`#b3b0a8`) met "· N.V.T." achter het kopje en
+doorgestreepte namen van de dimensies (ontwerp `Vragenlijst-Quickscan`). De Respondent
 kan zijn keuze later wijzigen; de regels voor voortgang, afronden en
 bewaarde antwoorden staan in `datamodel.md`, Antwoordtype, Optionele
 categorieën.

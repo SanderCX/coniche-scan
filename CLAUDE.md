@@ -609,12 +609,14 @@ geen afwijking van de spec maar een gat erin.
       `datamodel.md` deel 2), en de link naar deze pagina blijft
       hetzelfde.
 5. **Doorloopflow**: Sidebar met naam respondent, voortgang, categorieën
-   met genummerde bouwblokken, actief bouwblok gemarkeerd en drie
+   met genummerde bouwblokken, actief bouwblok gemarkeerd met een lijn langs de actieve categorie en drie
    statussen. De sidebar blijft staan als de inhoud rechts scrolt (zie
-   `stylesheet.md`). Per bouwblok: Een kop in de categoriekleur met titel
-   en omschrijving, een icoon naast de titel dat de Toelichtingsmodal
-   opent (`stylesheet.md`: eyebrow, naam, centrale vraag en
-   `toelichting`, dezelfde modal als in de visuals), tags, de instructieregel "Beantwoord op basis van
+   `stylesheet.md`). Per bouwblok: Een kop met een accentbalk in de
+   categoriekleur met de eyebrow, de titel, de centrale vraag en de
+   toelichting, direct zichtbaar (besloten door Joost op 22 oktober
+   2026, nog te bouwen; er is geen i-icoon en geen modal meer, en de omschrijving en de
+   tags staan niet meer in de doorloopflow, `stylesheet.md`,
+   Doorloopflow), de instructieregel "Beantwoord op basis van
    wat aantoonbaar geregeld is (documenten, ritmes, tooling,
    afspraken).", de vragen met 5-puntsschaal en één opmerkingenveld per
    bouwblok. Heeft een bouwblok een gewicht ongelijk aan 1, dan staat

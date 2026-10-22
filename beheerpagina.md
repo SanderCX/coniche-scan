@@ -410,8 +410,8 @@ standaardteksten zoals ze nu in de app staan):
 | `info.auditLog` | Audit-log, naast de paginatitel | Wie (of het Systeem) wat deed, wanneer en op welk record. Alleen-lezen. Geen persoonsgegevens uit scans. |
 | `info.algemeneTekstenPagina` | Algemene teksten, naast de paginatitel | Teksten los van één Assessment-type. Wijzigingen zijn direct zichtbaar, geen aparte publicatiestap. |
 | `info.algemeneTekstenInfoIconen` | Algemene teksten, naast de kop Info-iconen | Alle toelichtingen achter een Info-icoon, met de plek en de actuele tekst. Aanpassen kan op de plek zelf, met het potlood in het open Info-icoon. |
-| `info.contentToelichting` | Content, veld Toelichting van een bouwblok | Lopende tekst in de Toelichtingsmodal bij dit bouwblok. Een lege regel scheidt de alinea's. Laat je het veld leeg, dan ontbreekt dit onderdeel in de modal. |
-| `info.contentBouwblokLabel` | Content, veld Bouwblok-label | De kleine kop boven de titel in de Toelichtingsmodal, bijvoorbeeld "Bouwsteen" of "AI-domein", gevolgd door het nummer. |
+| `info.contentToelichting` | Content, veld Toelichting van een bouwblok | Lopende tekst in de Toelichtingsmodal en in de kop van dit bouwblok in de doorloopflow. Een lege regel scheidt de alinea's. Laat je het veld leeg, dan ontbreekt dit onderdeel in de modal en in de kop. |
+| `info.contentBouwblokLabel` | Content, veld Bouwblok-label | De kleine kop boven de titel in de Toelichtingsmodal en in de doorloopflow, bijvoorbeeld "Bouwsteen" of "AI-domein", gevolgd door het nummer. |
 | `info.conflictOplossen` | Conflict oplossen, naast de titel van de modal | Een Respondent heeft per Meting één scan. Hang één van de twee scans aan een andere Respondent. Alleen die scan gaat mee, de oorspronkelijke Respondent blijft bestaan met de andere scan. |
 | `info.dataIntegriteit` | Instellingen, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
 | `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
@@ -446,7 +446,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.verkennenOpslaan` | Verkennen, naast de knop Opslaan als benchmark | Je slaat de filters op en niet de uitkomst. De groep volgt de filters: Komt er een Organisatie bij die erbij past, dan telt die mee. Daarna wijs je de benchmark toe aan een Lead van een Organisatie die erin zit, in het Leads-venster van die Organisatie. |
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
 | `info.contactpersonen` | Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen | Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze. |
-| `info.dossier` (gebouwd op 21 oktober 2026, vervangt `info.nieuwsartikelen`) | Organisatie-detail, kaart Dossier, naast de titel | Cases, nieuws, events en blogs die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier open staat én het item op Zichtbaar voor klant staat. Een case kan alleen open als de organisatie in de case dat heeft toegestaan. |
+| `info.dossier` (gebouwd op 21 oktober 2026, vervangt `info.nieuwsartikelen`; de tekst is aangepast op 21 oktober 2026, nog niet gebouwd) | Organisatie-detail, kaart Dossier, naast de titel | Cases, nieuws, events en blogs die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier zichtbaar is én het item op Zichtbaar voor Lead staat. Een case kan alleen zichtbaar worden als de organisatie in de case dat heeft toegestaan. |
 | `info.caseVlag` (gebouwd op 21 oktober 2026) | Organisatie-detail, bij het vinkje "Mag als case gebruikt worden" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads. |
 | `info.kpiBlok` | Organisatie-detail, blok KPI's, naast de titel | Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet. |
 | `info.kpiPlek` | Modal KPI's invullen, naast het label Plek | Kies voor welk deel van de organisatie je invult. Algemeen is de hele organisatie. |
@@ -649,7 +649,7 @@ verplaatsen, omhangen en verwijderen (`datamodel.md`, Audit), met in
 Aanmaken en bewerken van een `Assessment` (`datamodel.md`): Naam, kort
 label (voor de PDF-footer, bijv. "Volwassenheidsscan"), subtitel,
 beschrijving, doelgroep, geschatte duur, het bouwblok-label (de eyebrow
-in de Toelichtingsmodal, standaard "Bouwsteen", bij de AI-scan
+in de Toelichtingsmodal en de doorloopflow, standaard "Bouwsteen", bij de AI-scan
 "AI-domein"), de vijf schaallabels, en de
 slotsectie voor de PDF-export (`pdfContentSecties`, zie
   `export-pdf-visual-volwassenheidsscan.md`, Slotsectie per scan-type):
@@ -1069,7 +1069,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
       verhuisd naar het Dossier (`lib/dossier.ts`).
   - **Dossier** (voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026, `dossier.md`): Een eigen kaart
     onder de Kenmerken en onder de rij Toegang en Afspraken, boven de kaart
-    KPI's, met de lijst Cases en Nieuws, de schakelaar "Open voor Lead" en de
+    KPI's, met de lijst Cases en Nieuws, het paneel "Instellingen voor de Lead" (de schakelaar "Zichtbaar voor Lead", de naam voor de Lead en de Meting per radar) en de
     knop "+ Toevoegen". Voor een Admin en voor een Consultant met toegang tot de
     Organisatie. De opmaak, het formulier en de regels staan in `dossier.md`,
     scherm 1 en scherm 3. Het Dossier vervangt de lijst Nieuws in de kaart
