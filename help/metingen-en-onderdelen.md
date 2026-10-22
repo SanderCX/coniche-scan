@@ -6,12 +6,12 @@ rollen: [Consultant, Admin]
 afbeelding: 
 film: 
 bronnen: [beheerpagina.md, datamodel.md]
-bijgewerkt: 2026-10-19
+bijgewerkt: 2026-10-22
 ---
 Een Organisatie kan meerdere Metingen hebben, voor verschillende onderdelen en op verschillende momenten.
 
 ## In het kort
-Een Meting hoort bij één Organisatie, één Assessment, één onderdeel en één meetdatum. Een onderdeel is een deel van de Organisatie, zoals een team of een afdeling. Je beheert onderdelen vanuit de Meting zelf.
+Een Meting hoort bij één Organisatie, één Assessment, één onderdeel en één meetdatum. Een onderdeel is een deel van de Organisatie, zoals een team of een afdeling. Je beheert onderdelen vanuit de Meting zelf en op het organisatie-detail, onder "Bewerken" en dan "Onderdelen".
 
 ## Wat je ziet
 1. **Onderdeel.** Hele organisatie of een naam zoals "Team A". Een nieuw onderdeel ontstaat zodra je de Meting opslaat.

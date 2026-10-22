@@ -268,3 +268,119 @@
   font-size: var(--fs-12);
   color: var(--ink-s);
 }
+/* Het blok KPI's: Het label met rechts de legenda of een keuzelijst, en een rij ringen links uitgelijnd met 64px ertussen (`dossier.md`, KPI-ringen). */
+.op-kpis-kop {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 32px;
+}
+.op-kpis-rechts {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin-left: auto;
+}
+.op-kpis-rechts select {
+  height: 32px;
+  font-size: var(--fs-14);
+}
+.op-legenda {
+  display: inline-flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.op-legenda-stip {
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+}
+.op-ringen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-6) 64px;
+  margin-top: var(--sp-1);
+}
+.op-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 132px;
+}
+.op-ring-figuur {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  margin-bottom: var(--sp-2);
+}
+.op-ring-waarde {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-24);
+  font-weight: 800;
+  line-height: 1;
+  padding-top: 0.09em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.op-ring-streep {
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  background: #c9c6be;
+}
+.op-ring-naam {
+  font-size: var(--fs-14);
+  font-weight: 700;
+  color: var(--ink);
+}
+.op-ring-regel {
+  min-height: 16px;
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+  text-align: center;
+  white-space: pre;
+}
+.op-ring.is-grijs .op-ring-naam,
+.op-ring.is-grijs .op-ring-regel {
+  color: #a9a69e;
+}
+/* Een kanaalpil die te kiezen is voor de ringen: Een knop met dezelfde opmaak als de pil. */
+.op-kanaal--knop {
+  font: inherit;
+  font-size: var(--fs-14);
+  cursor: pointer;
+}
+/* De modal Onderdelen: Een rij per Onderdeel met de naam en "Verwijderen", en onderaan de rij om er een toe te voegen. */
+.od-lijst {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.od-rij {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.od-veld {
+  flex: 1;
+  min-width: 0;
+  margin: 0 !important;
+}
+.od-rij--nieuw {
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border);
+}

@@ -1,6 +1,7 @@
 import { KanaalIcoon } from "@/components/icons/KanaalIcons";
 import { kanaalStijl } from "@/lib/kanaal-stijl";
 import type { ProfielCijfer, ProfielKanaal, ProfielOverig, ProfielTegel } from "@/lib/organisatie-profiel";
+import type { KpiRing } from "@/lib/kpi-ringen";
 
 /**
  * De blokken van het organisatiepaneel (`beheerpagina.md`, Organisatiepaneel): De kop met de beginletter, de naam en de pillen Sector en Subsector, de
@@ -77,7 +78,7 @@ export function Cijferrij({ cijfers }: { cijfers: ProfielCijfer[] }) {
 }
 
 /** Een pil per Kanaal: Ingezet gekleurd met het aantal contacten per jaar, niet ingezet lichtgrijs. Het blok staat er zodra er kanalen zijn. */
-export function KanalenBlok({ kanalen }: { kanalen: ProfielKanaal[] }) {
+export function KanalenBlok({ kanalen, gekozen = null, onKies }: { kanalen: ProfielKanaal[]; gekozen?: string | null; onKies?: (kanaalId: string | null) => void }) {
   if (kanalen.length === 0) return null;
   return (
     <div className="op-blok">
@@ -85,17 +86,32 @@ export function KanalenBlok({ kanalen }: { kanalen: ProfielKanaal[] }) {
       <ul className="op-kanalen">
         {kanalen.map((k) => {
           const stijl = kanaalStijl(k.naam);
-          return (
-            <li
-              key={k.id}
-              className={`op-kanaal ${k.ingezet ? "is-ingezet" : "is-uit"}`}
-              style={k.ingezet ? { background: stijl.licht, borderColor: stijl.rand } : undefined}
-            >
+          const inhoud = (
+            <>
               <span className="op-kanaal-cirkel" style={k.ingezet ? { background: stijl.kleur, color: stijl.icoonKleur } : undefined}>
                 <KanaalIcoon soort={stijl.icoon} size={14} />
               </span>
               <span className="op-kanaal-naam">{k.naam}</span>
               {k.aantal && <span className="op-kanaal-aantal">{k.aantal}</span>}
+            </>
+          );
+          const isGekozen = gekozen === k.id;
+          const stijlAan = k.ingezet
+            ? { background: stijl.licht, borderColor: isGekozen ? stijl.kleur : stijl.rand, boxShadow: isGekozen ? `0 0 0 2px ${stijl.kleur}` : undefined }
+            : undefined;
+          // Een kanaal kiezen kan als er een keuze is (`onKies`) en het kanaal bij de gekozen plek ingezet is; een klik op het gekozen kanaal wist de keuze.
+          if (onKies && k.klikbaar) {
+            return (
+              <li key={k.id}>
+                <button type="button" className="op-kanaal op-kanaal--knop is-ingezet" style={stijlAan} aria-pressed={isGekozen} onClick={() => onKies(isGekozen ? null : k.id)}>
+                  {inhoud}
+                </button>
+              </li>
+            );
+          }
+          return (
+            <li key={k.id} className={`op-kanaal ${k.ingezet ? "is-ingezet" : "is-uit"}`} style={stijlAan}>
+              {inhoud}
             </li>
           );
         })}
@@ -134,5 +150,96 @@ export function OverigBlok({ overig }: { overig: ProfielOverig[] }) {
         </div>
       ))}
     </dl>
+  );
+}
+
+/**
+ * Eén ring van het blok KPI's (`dossier.md`, KPI-ringen): 132px met een lijn van 12px, het spoor `#efede8` en een vulling met afgeronde uiteinden die bovenaan begint
+ * en met de klok mee loopt. In het midden de waarde (met de eenheid), onder de ring de naam en een regel. Een uitgegrijsde ring heeft alleen het spoor en een
+ * streepje in het midden. Elke ring is een afbeelding met een `aria-label`.
+ */
+const RING = 132;
+const LIJN = 12;
+const STRAAL = (RING - LIJN) / 2;
+const OMTREK = 2 * Math.PI * STRAAL;
+
+export function KpiRingFiguur({ ring, kleur }: { ring: KpiRing; kleur: string }) {
+  const grijs = ring.toestand === "leeg" || ring.toestand === "nvt";
+  const kleurVol = ring.toestand === "kanaal" ? kleur : "var(--or)";
+  const hoek = ring.stip === null ? 0 : ring.stip * 2 * Math.PI - Math.PI / 2;
+  return (
+    <div className={`op-ring ${grijs ? "is-grijs" : ""}`}>
+      <div className="op-ring-figuur" role="img" aria-label={ring.ariaLabel}>
+        <svg width={RING} height={RING} viewBox={`0 0 ${RING} ${RING}`} aria-hidden="true">
+          <circle cx={RING / 2} cy={RING / 2} r={STRAAL} fill="none" stroke="#efede8" strokeWidth={LIJN} />
+          {!grijs && ring.fractie > 0 && (
+            <circle
+              cx={RING / 2}
+              cy={RING / 2}
+              r={STRAAL}
+              fill="none"
+              stroke={kleurVol}
+              strokeWidth={LIJN}
+              strokeLinecap="round"
+              strokeDasharray={`${OMTREK * ring.fractie} ${OMTREK}`}
+              transform={`rotate(-90 ${RING / 2} ${RING / 2})`}
+            />
+          )}
+          {ring.stip !== null && <circle cx={RING / 2 + STRAAL * Math.cos(hoek)} cy={RING / 2 + STRAAL * Math.sin(hoek)} r={7} fill="#fff" stroke="var(--ink)" strokeWidth={3} />}
+        </svg>
+        <span className="op-ring-waarde" aria-hidden="true">
+          {grijs ? <span className="op-ring-streep" /> : ring.tekst}
+        </span>
+      </div>
+      <span className="op-ring-naam">{ring.naam}</span>
+      <span className="op-ring-regel">{ring.regel || " "}</span>
+    </div>
+  );
+}
+
+/**
+ * Het blok KPI's: Het label (met, bij een gekozen kanaal en Onderdeel, die erachter), rechts de legenda of een keuzelijst, en de rij ringen. Eén opmaak voor
+ * het organisatiepaneel en voor het profiel van de Lead.
+ */
+export function KpiRingenBlok({
+  kop,
+  ringen,
+  kanaalKleur,
+  legenda,
+  info,
+  rechts,
+}: {
+  kop: string;
+  ringen: KpiRing[];
+  /** De kleur van het gekozen kanaal. */
+  kanaalKleur: string;
+  /** Bij een gekozen kanaal: De legenda "Algemeen (alle kanalen)" met het stipje. */
+  legenda: boolean;
+  info?: React.ReactNode;
+  /** Rechts op de regel van het label, bijvoorbeeld de keuzelijst van het Onderdeel. */
+  rechts?: React.ReactNode;
+}) {
+  if (ringen.length === 0) return null;
+  return (
+    <div className="op-blok op-kpis">
+      <div className="op-kpis-kop">
+        <span className="op-label">{kop}</span>
+        {info}
+        <span className="op-kpis-rechts">
+          {legenda && (
+            <span className="op-legenda">
+              <span className="op-legenda-stip" aria-hidden="true" />
+              Algemeen (alle kanalen)
+            </span>
+          )}
+          {rechts}
+        </span>
+      </div>
+      <div className="op-ringen">
+        {ringen.map((r) => (
+          <KpiRingFiguur key={r.id} ring={r} kleur={kanaalKleur} />
+        ))}
+      </div>
+    </div>
   );
 }

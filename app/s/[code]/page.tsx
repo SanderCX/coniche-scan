@@ -107,6 +107,7 @@ export default function ToegangscodePage({ params }: { params: Promise<{ code: s
         assessments,
         minOrganisaties: instellingen.benchmarkMinOrganisaties,
         kanalen: instellingen.kanalen,
+        kpiDefinities: instellingen.kpiDefinities,
       })
     : null;
 

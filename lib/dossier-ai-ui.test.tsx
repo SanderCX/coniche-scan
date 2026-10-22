@@ -47,9 +47,9 @@ describe("de film Het dossier lezen", () => {
       expect(html).toContain("fd-legenda");
       expect(html).not.toContain("dp-ankers");
     }
-    // De cirkels van 5 en 6 hebben een donker nummer op geel en groenblauw.
+    // Alleen de cirkel van 5 heeft een donker nummer (op geel), die van 6 (groenblauw) heeft een wit nummer.
     expect(ai).toMatch(/background:#ffc043;color:var\(--ink\)">5</);
-    expect(ai).toMatch(/background:#1f9aa0;color:var\(--ink\)">6</);
+    expect(ai).toMatch(/background:#1f9aa0;color:#fff">6</);
     // Het gekozen domein staat in de filterbalk, het gekozen bouwblok 7 bij de Klantcontact Volwassenheid.
     expect(ai).toMatch(/fd-filterbalk[^]*?>3<[^]*?2 items in dit dossier/);
     expect(standaard).toMatch(/fd-filterbalk[^]*?>7<[^]*?2 items in dit dossier/);

@@ -6,8 +6,9 @@
  * de Case, zodat die gegevens niet in de schermen van de Lead kunnen komen (`dossier.md`, Wat de Lead ziet). In het prototype staat alle
  * data in de browser; met de database wordt dit aan de serverkant bepaald.
  */
-import type { Assessment, Benchmark, Dossier, Dossieritem, Kanaal, Organisatie, OrganisatieLid, ToonProfiel } from "./types";
+import type { Assessment, Benchmark, Dossier, Dossieritem, Kanaal, KpiDefinitie, Organisatie, OrganisatieLid, ToonProfiel } from "./types";
 import { OrganisatieProfiel, PROFIEL_BLOKKEN, ProfielBlok, organisatieProfiel } from "./organisatie-profiel";
+import { KpiRingInvoer, kpiRingInvoer, kpiRingInvoerVoorLead } from "./kpi-ringen";
 import { organisatieVelden } from "@/data/organisatie-velden";
 import { KorteNamen, SECTOR_VELD_ID, korteNaamWaarde } from "./korte-namen";
 import { Controle, normaliseerUrl, schoon } from "./contactpersonen";
@@ -60,7 +61,7 @@ export const DOSSIER_SOORTEN: DossierSoort[] = ["case", "benchmark", "nieuws", "
 
 /** Alle blokken van het profiel uit: De beginstand van `Dossier.toonProfiel` (`dossier.md`, Profiel van de Organisatie). */
 export function geenProfiel(): ToonProfiel {
-  return { cijfers: false, kanalen: false, techstack: false, overig: false };
+  return { cijfers: false, kanalen: false, techstack: false, overig: false, kpis: false };
 }
 
 export function leegDossier(): Dossier {
@@ -502,6 +503,8 @@ export interface LeadEvent {
  * blokken zijn leeg. Toegang, Afspraken en Contactpersonen zitten er nooit in (`dossier.md`, Profiel van de Organisatie).
  */
 export interface LeadProfiel extends Pick<OrganisatieProfiel, "naam" | "letter" | "sector" | "subsector" | "cijfers" | "kanalen" | "techstack" | "overig"> {
+  /** De KPI's van de hele Organisatie als ringen (`lib/kpi-ringen.ts`), leeg als dat blok uit staat. */
+  kpis: KpiRingInvoer[];
   /** De blokken die de Lead ziet, in vaste volgorde. */
   blokken: ProfielBlok[];
 }
@@ -534,6 +537,8 @@ export interface LeadContext {
   minOrganisaties: number;
   /** De kanalen (`Instellingen.kanalen`) voor het blok Kanalen van het profiel. Zonder staat dat blok leeg. */
   kanalen?: Kanaal[];
+  /** De KPI-definities (`Instellingen.kpiDefinities`) voor het blok KPI's van het profiel. Zonder staat dat blok leeg. */
+  kpiDefinities?: KpiDefinitie[];
 }
 
 /**
@@ -611,7 +616,7 @@ export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korte
   if (cases.length + benchmarks.length + nieuws.length + events.length + blogs.length === 0) return null;
   return {
     organisatieNaam: organisatie.naam,
-    profiel: leadProfiel(organisatie, korteNamen, lead?.kanalen ?? []),
+    profiel: leadProfiel(organisatie, korteNamen, lead?.kanalen ?? [], lead?.kpiDefinities ?? []),
     naam: naamVoorLeadVan(organisatie),
     zichtbaarSinds: dossier.zichtbaarSinds,
     gewijzigdOp: dossier.gewijzigdOp,
@@ -627,21 +632,27 @@ export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korte
  * Het profiel dat de Lead bovenaan het Dossier ziet (`dossier.md`, Wat de Lead ziet, Profiel): Alleen de eigen Organisatie en alleen de blokken van
  * `toonProfiel` die gegevens hebben. De blokken die uit staan, gaan nooit mee naar de Lead. `null` als er niets te tonen is.
  */
-export function leadProfiel(organisatie: Organisatie, korteNamen: KorteNamen | undefined, kanalen: Kanaal[]): LeadProfiel | null {
+export function leadProfiel(organisatie: Organisatie, korteNamen: KorteNamen | undefined, kanalen: Kanaal[], kpiDefinities: KpiDefinitie[] = []): LeadProfiel | null {
   const toon = dossierVan(organisatie).toonProfiel ?? geenProfiel();
   if (!PROFIEL_BLOKKEN.some((b) => toon[b])) return null;
   const volledig = organisatieProfiel(organisatie, { kanalen, techstackVeld: organisatieVelden.find((v) => v.id === "techstack"), korteNamen });
-  const blokken = PROFIEL_BLOKKEN.filter((b) => toon[b] && volledig[b].length > 0);
+  // De KPI's van de hele Organisatie (nooit van een Onderdeel); de waarden per kanaal alleen als ook het blok Kanalen aan staat.
+  const kpis = toon.kpis ? kpiRingInvoerVoorLead(kpiRingInvoer(organisatie, kpiDefinities, { onderdeelId: null, metKanalen: toon.kanalen })) : [];
+  const heeft = (b: ProfielBlok) => (b === "kpis" ? kpis.length > 0 : volledig[b].length > 0);
+  const blokken = PROFIEL_BLOKKEN.filter((b) => toon[b] && heeft(b));
   if (blokken.length === 0) return null;
+  // Een kanaal is te kiezen voor de ringen als beide blokken aan staan en het kanaal ingezet is (`dossier.md`, KPI-ringen, Kanaal kiezen).
+  const kanaalKeuze = blokken.includes("kpis") && blokken.includes("kanalen");
   return {
     naam: volledig.naam,
     letter: volledig.letter,
     sector: volledig.sector,
     subsector: volledig.subsector,
     cijfers: blokken.includes("cijfers") ? volledig.cijfers : [],
-    kanalen: blokken.includes("kanalen") ? volledig.kanalen : [],
+    kanalen: blokken.includes("kanalen") ? volledig.kanalen.map((k) => ({ ...k, klikbaar: kanaalKeuze && k.ingezet })) : [],
     techstack: blokken.includes("techstack") ? volledig.techstack : [],
     overig: blokken.includes("overig") ? volledig.overig : [],
+    kpis: blokken.includes("kpis") ? kpis : [],
     blokken,
   };
 }
@@ -763,6 +774,7 @@ export function zetNieuwsartikelenOm(ruw: Record<string, unknown>): Dossier {
       kanalen: bestaand?.toonProfiel?.kanalen === true,
       techstack: bestaand?.toonProfiel?.techstack === true,
       overig: bestaand?.toonProfiel?.overig === true,
+      kpis: bestaand?.toonProfiel?.kpis === true,
     },
     radarBronnen: Array.isArray(bestaand?.radarBronnen)
       ? bestaand!.radarBronnen.filter((b) => b && typeof b.assessmentId === "string").map((b) => ({ assessmentId: b.assessmentId, metingId: b.metingId ?? null }))

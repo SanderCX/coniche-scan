@@ -200,7 +200,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
   },
   {
     sleutel: "info.kpiBlok",
-    plek: "Organisatie-detail, blok KPI's, naast de titel",
+    plek: "Organisatie-detail, organisatiepaneel, naast het label KPI's",
     tekst: "Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet.",
   },
   {
@@ -216,7 +216,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
   {
     sleutel: "info.kpiDefinities",
     plek: "Organisatievelden, tab KPI's en kanalen, naast de titel KPI's",
-    tekst: "Per KPI bepaal je of hij per onderdeel en per kanaal ingevuld mag worden. Algemeen is altijd mogelijk.",
+    tekst: "Per KPI bepaal je of hij per onderdeel en per kanaal ingevuld mag worden. Algemeen is altijd mogelijk. Met Schaal van en Schaal tot bepaal je hoe ver de ring van de KPI gevuld is in het organisatiepaneel en bij de Lead. Laat je ze allebei leeg, dan heeft de KPI geen ring.",
   },
   {
     sleutel: "info.kanalen",

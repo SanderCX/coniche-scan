@@ -276,6 +276,13 @@ export interface KpiDefinitie {
   perOnderdeel: boolean;
   perKanaal: boolean;
   volgorde: number;
+  /**
+   * De ondergrens van de ring in het blok KPI's (`datamodel.md`, KPI's en kanalen, Schaal), `null` zonder ring. Samen met `schaalMax`: Beide
+   * ingevuld en `schaalMin` kleiner dan `schaalMax`, of allebei leeg.
+   */
+  schaalMin: number | null;
+  /** De bovengrens van de ring, `null` zonder ring. */
+  schaalMax: number | null;
 }
 
 /**
@@ -374,6 +381,8 @@ export interface ToonProfiel {
   kanalen: boolean;
   techstack: boolean;
   overig: boolean;
+  /** De KPI's van de hele Organisatie als ringen (`dossier.md`, KPI-ringen). */
+  kpis: boolean;
 }
 
 /** Welke Meting de scores in de radar en de verdeling van het Dossier levert (`dossier.md`, Naam en scorebron). */

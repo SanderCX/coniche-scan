@@ -4,7 +4,6 @@ import { use } from "react";
 import Link from "next/link";
 import { useOrganisatie, updateOrganisatie } from "@/lib/db";
 import { OrganisatiePaneel } from "@/components/beheer/OrganisatiePaneel";
-import { KpiBlok } from "@/components/beheer/KpiBlok";
 import { DossierKaart } from "@/components/beheer/DossierKaart";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { RespondentStatusBadge } from "@/components/beheer/overzicht-helpers";
@@ -71,7 +70,6 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
         <OrganisatiePaneel organisatie={organisatie} gebruikers={alleGebruikers} onOpslaan={handleKenmerkenOpslaan} />
         {/* Het Dossier (`dossier.md`): Voor een Admin en voor een Consultant met toegang. */}
         <DossierKaart organisatie={organisatie} />
-        <KpiBlok organisatie={organisatie} />
         <MetingenSectie organisatie={organisatie} />
 
         <section className="beheer-kaart" aria-label="Respondenten">

@@ -19,6 +19,8 @@ import { ScanBezet } from "@/components/ScanBezet";
 import { SpanningSidebar } from "@/components/spanning/SpanningSidebar";
 import { SpanningVeldForm } from "@/components/spanning/SpanningVeldForm";
 import { useBewerkslot } from "@/lib/bewerkslot";
+import { useIngelogdeGebruiker } from "@/lib/admin-auth";
+import { useInstellingen } from "@/lib/instellingen-store";
 
 export default function DoorloopPage({
   params,
@@ -33,6 +35,9 @@ export default function DoorloopPage({
   const gegevens = useScanInvulling(respondentId);
   const assessment = useAssessment(gegevens?.scanUitvoering.assessmentId ?? "");
   const router = useRouter();
+  // De testknop staat alleen aan als een Admin de instelling aanzette en alleen voor een ingelogde Admin of Consultant (`beheerpagina.md`, Schakelaar Testknop).
+  const { testknopAan } = useInstellingen();
+  const beheerder = useIngelogdeGebruiker();
   // Eén persoon tegelijk per scan (lib/bewerkslot.ts): De eerste houdt het slot, een tweede ziet een melding.
   const slot = useBewerkslot("scan", gegevens ? respondentId : null);
 
@@ -178,12 +183,10 @@ export default function DoorloopPage({
       identiteitMenu={<MijnGegevensMenu lid={lid} />}
     >
       {/* Geen testknop bij de Quickscan Ziekenhuis: Daar vult de respondent de scan zelf in (op verzoek van Sander). */}
-      {!jaNee && (
+      {!jaNee && testknopAan && beheerder && (
         <>
-        {/* TIJDELIJKE TESTKNOP — op verzoek van Sander, om het resultatenscherm
-            (classificatiekleuren, radar chart, spreiding) te kunnen testen
-            zonder alle vragen met de hand te beantwoorden. Verwijderen voor
-            productie. */}
+        {/* TESTKNOP — om het resultatenscherm (classificatiekleuren, radar chart, spreiding) te kunnen testen zonder alle vragen met de hand te
+            beantwoorden. Alleen zichtbaar met de instelling `testknopAan` (standaard uit) en alleen voor een ingelogde Admin of Consultant. */}
         <div
           className="container"
           style={{

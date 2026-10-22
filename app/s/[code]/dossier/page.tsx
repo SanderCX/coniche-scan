@@ -14,7 +14,7 @@ import { RadarChartView } from "@/components/RadarChartView";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
 import { BouwblokChip, BouwblokCirkel } from "@/components/dossier/BouwblokChip";
 import { SoortIcoon } from "@/components/icons/DossierIcons";
-import { Cijferrij, KanalenBlok, OverigBlok, ProfielKop, TechstackBlok } from "@/components/organisatie/ProfielBlokken";
+import { LeadProfielKaart } from "@/components/organisatie/LeadProfielKaart";
 import { CLASSIFICATIE_INFO } from "@/lib/colors";
 import { classificatie } from "@/lib/scoring";
 import { formatScore } from "@/lib/format";
@@ -77,7 +77,7 @@ function DossierInhoud({ code }: { code: string }) {
   const gegevens = useRespondentPerToegangscode(code);
   const alle = useOrganisaties();
   const assessments = useAssessments();
-  const { korteNamen, benchmarkMinOrganisaties, kanalen } = useInstellingen();
+  const { korteNamen, benchmarkMinOrganisaties, kanalen, kpiDefinities } = useInstellingen();
   const benchmarks = useBenchmarksMetLeden();
   const router = useRouter();
   const zoek = useSearchParams();
@@ -88,7 +88,7 @@ function DossierInhoud({ code }: { code: string }) {
 
   const lid = gegevens?.lid;
   const organisatie = gegevens?.organisatie;
-  const dossier: LeadDossier | null = lid?.lead === true && organisatie ? leadDossier(organisatie, alle, korteNamen, new Date(), { leadId: lid.id, benchmarks, assessments, minOrganisaties: benchmarkMinOrganisaties, kanalen }) : null;
+  const dossier: LeadDossier | null = lid?.lead === true && organisatie ? leadDossier(organisatie, alle, korteNamen, new Date(), { leadId: lid.id, benchmarks, assessments, minOrganisaties: benchmarkMinOrganisaties, kanalen, kpiDefinities }) : null;
   // De tabbladtitel is de naam van het Dossier: `{naam voor de Lead} | Coniche Scan`, of "Dossier {Organisatie} | Coniche Scan" (`stylesheet.md`, Tabbladtitel).
   useEigenPaginaTitel(dossier?.naam ?? null);
   const dossierAanwezig = dossier !== null;
@@ -280,15 +280,7 @@ function DossierInhoud({ code }: { code: string }) {
           </div>
         </header>
 
-        {dossier.profiel && (
-          <section className="op-paneel dp-profiel" aria-label={`Profiel van ${dossier.profiel.naam}`}>
-            <ProfielKop letter={dossier.profiel.letter} naam={dossier.profiel.naam} sector={dossier.profiel.sector} subsector={dossier.profiel.subsector} niveau="h2" />
-            <Cijferrij cijfers={dossier.profiel.cijfers} />
-            <KanalenBlok kanalen={dossier.profiel.kanalen} />
-            <TechstackBlok tegels={dossier.profiel.techstack} />
-            <OverigBlok overig={dossier.profiel.overig} />
-          </section>
-        )}
+        {dossier.profiel && <LeadProfielKaart profiel={dossier.profiel} />}
 
         {actief && (
           <section className="dp-radarkaart-wrap" aria-label="Waar dit dossier over gaat">

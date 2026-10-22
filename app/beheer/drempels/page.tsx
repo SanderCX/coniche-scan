@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { InfoIcoon } from "@/components/InfoIcoon";
+import { Schakelaar } from "@/components/Schakelaar";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magGebruikersBeheren } from "@/lib/rechten";
 import { useInstellingen, zetInstellingen } from "@/lib/instellingen-store";
@@ -233,6 +234,20 @@ export default function DrempelsEnTermijnenPage() {
           {benchmarkOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
         </span>
       </form>
+
+      <h2 style={{ marginTop: "2rem" }} id="testknop-kop">
+        Testknop in de vragenlijst
+      </h2>
+      {/* De schakelaar bewaart direct en wordt gelogd als instellingen.gewijzigd (`beheerpagina.md`, Schakelaar Testknop). */}
+      <div className="op-zichtbaar-lijst" style={{ marginTop: 0 }}>
+        <span className="flex items-center gap-3">
+          <Schakelaar aan={instellingen.testknopAan} ariaLabelledBy="testknop-kop" onChange={(aan) => zetInstellingen({ testknopAan: aan })} />
+          <strong>{instellingen.testknopAan ? "Aan" : "Uit"}</strong>
+        </span>
+      </div>
+      <p className="text-xs text-ink-s" style={{ margin: "var(--sp-1) 0 0" }}>
+        Toont een knop waarmee je een vragenlijst automatisch invult, om te testen. Zet hem uit in productie.
+      </p>
 
       <h2 style={{ marginTop: "2rem" }}>Spreiding</h2>
       <form onSubmit={handleSpreidingOpslaan}>
