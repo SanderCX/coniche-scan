@@ -1,8 +1,8 @@
 # Coniche Scan: Content Spanningsmeter
 
-De vragen, de schaal en de ijkpunten van de Spanningsmeter. Dit bestand is de enige plek voor de inhoud. De regels voor rekenen staan in `datamodel.md` (Antwoordtype, Scoreberekening), de schermen in `CLAUDE.md` (scherm 1 tot en met 6) en de opmaak in `visualisatie-spanningsmeter.md`.
+De vragen, de schaal en de ijkpunten van de Spanningsmeter. Dit bestand is de enige plek voor de inhoud. De regels voor rekenen staan in `datamodel.md` (Antwoordtype, Scoreberekening), de schermen in `schermen.md` en de opmaak in `visualisatie-spanningsmeter.md`.
 
-**Status: Voorstel van 21 oktober 2026, gebouwd op 21 oktober 2026 (zie Zo gebouwd onderaan).** Bron is het document "Digitale Spanningsmeter – vragenset" van Martijn (20 oktober 2026, 13 pagina's), dat op zijn beurt op het boek "Onder Spanning" (Franssen, 2026) en de literatuur steunt. De vragen zijn nog niet getest (zie Validatie). De naam van het bronbestand zegt "15 vragen per spanningsveld", de inhoud heeft er 5 gescoord en 1 open per veld, samen 30 gescoorde vragen en 6 open vragen. Het aantal van 5 is hier aangehouden.
+Bron is het document "Digitale Spanningsmeter – vragenset" van Martijn (13 pagina's), dat op zijn beurt op het boek "Onder Spanning" (Franssen, 2026) en de literatuur steunt. De vragen zijn nog niet getest (zie Validatie). De naam van het bronbestand zegt "15 vragen per spanningsveld", de inhoud heeft er 5 gescoord en 1 open per veld, samen 30 gescoorde vragen en 6 open vragen. Het aantal van 5 is hier aangehouden.
 
 ## Opzet
 
@@ -12,7 +12,7 @@ De vragen, de schaal en de ijkpunten van de Spanningsmeter. Dit bestand is de en
 - **Antwoordtype**: `"spanning"` (nieuw, `datamodel.md`, Antwoordtype): Een schaal van 1 tot en met 5 met als extra antwoord 0, "Kan ik niet beoordelen".
 - **Vragen**: 30 gescoorde vragen, 5 per veld, en per veld 1 open vraag (zie Open vraag). Een gescoorde vraag heeft een invalshoek, de vraag zelf en een toelichting "Waar je op let".
 - **Duur**: Ongeveer 10 tot 15 minuten, inclusief de voorbeelden (`Assessment.geschatteDuur` "±10 tot 15 minuten").
-- **Geen totaalscore**: De Spanningsmeter kent geen overall-score. Er is een score per veld en een spanning tussen de velden (`datamodel.md`, Scoreberekening). Waar het scherm toch één getal toont, is dat een weergave (Gemiddeld niveau, zie `visualisatie-spanningsmeter.md`) en geen score waarop de meter stuurt.
+- **Geen totaalscore**: De Spanningsmeter kent geen totaalscore. Er is een score per veld en een spanning tussen de velden (`datamodel.md`, Scoreberekening). Waar het scherm toch één getal toont, is dat een weergave (Gemiddeld niveau, zie `visualisatie-spanningsmeter.md`) en geen score waarop de meter stuurt.
 - **Neutrale vragen**: Geen enkele vraag is op een bepaald niveau gericht. Elke vraag beschrijft een invalshoek van het veld en de deelnemer bepaalt zelf waar de organisatie daarop staat.
 - **Spanning is vooral een profiel**: Iedere deelnemer ziet na het invullen direct zijn of haar eigen profiel. Pas daarna worden de profielen van de groep naast elkaar gelegd.
 
@@ -33,7 +33,7 @@ De schaal is geen volwassenheidsschaal met de labels "Niet aanwezig" tot "Geopti
 
 ## Ijkpunt per veld
 
-Bij elk veld staat de Spanningsmeter uit het boek, met de vijf niveaus voor dat veld. Die helpt deelnemers hun score te plaatsen. In de doorloopflow staan de vijf ijkpunten bovenaan het veld, onder de instructie (`CLAUDE.md`, scherm 5). Ze zijn gegevens van het veld (`Bouwblok.ijkpunten`, `datamodel.md`), niet van de vraag.
+Bij elk veld staat de Spanningsmeter uit het boek, met de vijf niveaus voor dat veld. Die helpt deelnemers hun score te plaatsen. In de doorloopflow staan de vijf ijkpunten bovenaan het veld, onder de instructie (`schermen.md`, Doorloopflow). Ze zijn gegevens van het veld (`Bouwblok.ijkpunten`, `datamodel.md`), niet van de vraag.
 
 ## Open vraag per veld
 
@@ -65,7 +65,7 @@ De namen, de korte namen en de volgorde zijn de bouwlogica: Verhaal, Regie, Gedr
 | 5 | Processen | Processen | `--pu` |
 | 6 | Technologie | Technologie | `--ye` |
 
-De kleuren staan in `stylesheet.md`, Veldkleuren Spanningsmeter.
+De kleuren staan in `stylesheet.md`, Groepskleuren.
 
 ### 1. Verhaal & leiderschap
 
@@ -96,7 +96,7 @@ Basis: Armenakis & Harris (2002), Readiness for Change (Holt e.a., 2007), visiec
 
 ### 2. Governance, regie & control
 
-`omschrijving`: Meet wat regie in de praktijk doet: kiezen, stoppen, eigenaarschap over grenzen heen en bijsturen.
+`omschrijving`: Meet wat regie in de praktijk doet: Kiezen, stoppen, eigenaarschap over grenzen heen en bijsturen.
 
 Basis: Levers of Control (Simons, 1995), beslisrechten (Rogers & Blenko, 2006), strategie-executie (Sull, Homkes & Sull, 2015; Mankins & Steele, 2005) en dynamic capabilities (Teece, 2007).
 
@@ -231,9 +231,9 @@ Basis: UTAUT (Venkatesh e.a., 2003), Brynjolfsson, Rock & Syverson (2021), Desig
 
 ## Hoe de app de content gebruikt
 
-- **Doorloopflow** (`CLAUDE.md`, scherm 5): Per veld de `omschrijving`, de vijf ijkpunten, de vijf vragen met de invalshoek erboven, de toelichting "Waar je op let" achter een Info-knop bij elke vraag, en daaronder de open vraag.
+- **Doorloopflow** (`schermen.md`, Doorloopflow): Per veld de `omschrijving`, de vijf ijkpunten, de vijf vragen met de invalshoek erboven, de toelichting "Waar je op let" achter een Info-knop bij elke vraag, en daaronder de open vraag.
 - **Toelichting "Waar je op let"** stuurt niet naar een score. De tekst is een gegeven van de vraag (`Vraag.aandachtspunt`, `datamodel.md`) en door een Admin te bewerken (`beheerpagina.md`).
-- **Toelichtingsmodal** bij het veld (Info-icoon naast de veldnaam, `stylesheet.md`, Toelichtingsmodal): De `omschrijving`, de ijkpunten en de basis (de literatuur). Een centrale vraag is er niet voor dit Assessment (`Bouwblok.centraleVraag` is leeg).
+- **Toelichtingsmodal** bij een klik op een veld in de radar op de Assessment-pagina (`visualisatie-spanningsmeter.md`, `stylesheet.md`, Toelichtingsmodal): De `omschrijving`, de ijkpunten en de basis (de literatuur). In de doorloopflow staat die inhoud direct in de veldkop, zonder modal. Een centrale vraag is er niet voor dit Assessment (`Bouwblok.centraleVraag` is leeg).
 - **Gearchiveerde vragen**: Zie `datamodel.md`, Content bewerken. Het aantal vragen per veld mag veranderen, de berekening neemt `n` per veld (`datamodel.md`, Scoreberekening).
 
 ## Validatie
@@ -254,7 +254,3 @@ De bron levert een Excelbestand en los een CSV met dezelfde inhoud: De 30 vragen
 ## Bron
 
 Franssen, M. (2026). Onder Spanning. De literatuur per veld staat in de bron, in het document "Digitale Spanningsmeter – vragenset", onder Literatuur. Dit bestand noemt per veld alleen de basis, niet de volledige verwijzing.
-
-## Zo gebouwd
-
-Gebouwd op 21 oktober 2026 in `data/spanningsmeter-assessment.ts` (`id: "spanningsmeter"`, de zes velden als `Bouwblok` met `ijkpunten`, `korteNaam` en de basis als `toelichting`, de 30 vragen met `invalshoek` en `aandachtspunt`, `openVraag`, `schaal`, `icoon: "gauge"`). De vraag-id's zijn de bronnen (`VL1` tot en met `TE5`), de open vragen hebben geen eigen record maar het ID `VL6` enzovoort wordt afgeleid in de doorloopflow. Het importbestand van de bron is niet ingelezen: De inhoud is overgenomen uit dit bestand. Het rekenvoorbeeld staat in `lib/spanning.test.ts` en de voorbeelddata in `data/demo-antwoorden-spanning.ts`. De validatie van de vragen is niet gedaan en het resultaat toont nog geen label "pilot" (`backlog.md`).

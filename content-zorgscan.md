@@ -2,7 +2,7 @@
 
 Vragen en tags voor het `Assessment`-object "Klantcontact Volwassenheid –
 Zorg" (`id: "zorgscan"`, `kortLabel: "Volwassenheidsscan Zorg"`, `icoon:
-"🩺"` — stethoscoop, gekozen door Joost boven een hartje-outline, zie
+"🩺"`, stethoscoop, gekozen door Joost boven een hartje-outline, zie
 `datamodel.md`, `Assessment.icoon`; zie `export-pdf-visual-zorgscan.md`
 voor de PDF-bestandsnaam die daaruit volgt): 15 bouwblokken, 5
 categorieën, 60 vragen op de 1–5-schaal uit `datamodel.md`. Sector-variant
@@ -16,21 +16,21 @@ bouwblokken hebben een zwaarder gewicht (zie Weging hieronder).
 **Bron**: Joost, aangeleverd als PDF-export ("Volwassenheidsmodel
 Klantcontact – Resultaten") en CSV-export van een proefinvulling voor een
 fictieve huisartsenpraktijk (alle antwoorden op 2, "Deels / incidenteel",
-puur om de vraagteksten door te nemen — geen echte meting).
+puur om de vraagteksten door te nemen, geen echte meting).
 
 **Open punt, terug te leggen bij Joost**: Bouwblok-naam, -omschrijving,
 -toelichting en -tags staan hieronder nog identiek aan de generieke
 Klantcontact Volwassenheidsscan (`content-klantcontact-volwassenheid.md`).
 In de brontekst van Joost stond de expliciete notitie "LET OP: Terminologie
-in toelichtingenbalkje bovenaan de pagina nog wel aanpassen op zorg(taal)"
-— die sectorvertaling van de intro-/toelichtingteksten (en van de
+in toelichtingenbalkje bovenaan de pagina nog wel aanpassen op zorg(taal)",
+die sectorvertaling van de intro-/toelichtingteksten (en van de
 overlay-toelichting die een respondent opent via het icoon naast de titel)
 is dus bewust nog niet gemaakt, alleen de 60 vraagteksten zijn af en
 overgenomen.
 
 **Tijdelijk, tot die sectorvertaling er is**: De toelichting-overlay en de
 PDF-export tonen per bouwblok wél de volledige rijke content (eyebrow,
-"CENTRALE VRAAG"-blok, beschrijving) — maar dat is letterlijk dezelfde
+"CENTRALE VRAAG"-blok, beschrijving), maar dat is letterlijk dezelfde
 tekst als bij de Klantcontact Volwassenheidsscan, gematcht op
 `volgnummer` in plaats van op een eigen zorg-versie. Zonder deze
 hergebruik-stap ontbrak die content voor de Zorgscan volledig. Zodra er
@@ -38,7 +38,7 @@ een zorg-versie van `visie-coniche.md` deel 2 komt, vervangt die dit
 hergebruik.
 
 **Weging.** Drie bouwblokken tellen in deze scan dubbel mee in de
-categoriescore en in de overall-score (`Bouwblok.gewicht = 2`, zie
+categoriescore en in de totaalscore (`Bouwblok.gewicht = 2`, zie
 `datamodel.md`, Bouwblok en Scoreberekening). De nummers zijn de
 `volgnummer`s van de bouwblokken:
 
@@ -52,7 +52,7 @@ een gewicht later verandert (bijvoorbeeld naar 1,3), dan rekent dat in
 paste deze weging niet toe: Bij geïmporteerde Zorgscans staat daar overal
 gewicht 1, zie `import-scans.md`.
 
-De wegingskaart bij aanvang van de scan (CLAUDE.md, sectie 3) gebruikt
+De wegingskaart bij aanvang van de scan (`schermen.md`, Intake) gebruikt
 voor deze scan de volgende tekst (`Assessment.wegingTitel` en
 `wegingToelichting`):
 
@@ -129,7 +129,7 @@ Root cause analysis, Closed feedback loop, Verbeterbacklog
    en trends worden besproken met het hele team?
 3. Is er een verbeterbacklog met prioritering (impact/effort), eigenaar,
    status en evaluatie van gerealiseerde benefits?
-4. Is er een closed-loop terugkoppeling: verbeteringen resulteren
+4. Is er een closed-loop terugkoppeling: Verbeteringen resulteren
    aantoonbaar in updates in kennis/training/proces?
 
 **5. Financial control**
@@ -284,7 +284,7 @@ Besluitvaardigheid, Stakeholder management, Teamontwikkeling
    ontwikkeld?
 3. Is er een structureel overleg met belangrijke stakeholders buiten
    klantcontact (zorg/IT/facilitair) met besluiten en opvolging?
-4. Is er opvolgingsplanning in de HR-cyclus: jaargesprek,
+4. Is er opvolgingsplanning in de HR-cyclus: Jaargesprek,
    functioneringsgesprek of beoordelingsgesprek (minimaal jaarlijks) voor
    sleutelrollen binnen patiënten- of cliëntencontact?
 

@@ -1,6 +1,6 @@
 # Visie: AI-volwassenheid in klantcontact
 
-**Plaats in de app (21 oktober 2026):** De domeinteksten staan in de Toelichtingsmodal van de sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan (`ai-domeinenmodel-visual.md`).
+**Plaats in de app:** De domeinteksten staan in de Toelichtingsmodal van de sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan (`visual-bouwblokken-en-domeinen.md`).
 
 **Status: Concept.** Beschrijving en centrale vraag per domein van de
 AI-Volwassenheidsscan (`content-ai-scan.md`), naar het patroon van

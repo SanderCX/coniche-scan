@@ -18,7 +18,7 @@ Wie de PDF nabouwt of aanpast, vindt hier de maten en keuzes.
 Uitsluitend één scan per PDF: Geen geaggregeerde data over meerdere
 respondenten. De aggregatieweergave zelf (gemiddelde per Meting op
 organisatieniveau) is er wel, zie `beheerpagina.md`,
-Organisatie-resultaten — alleen een PDF-export daarvan bestaat nog
+Organisatie-resultaten, alleen een PDF-export daarvan bestaat nog
 niet.
 
 **Bulk-export vanuit Ingevulde scans (`beheerpagina.md` punt 7)
@@ -42,7 +42,7 @@ de modal in de interactieve visuals gebruikt), en de slotsectie uit
 
 Eén contentbestand komt volledig en apart terug in de PDF: Als
 allerlaatste sectie van het document, na alle bouwblokken/domeinen.
-Bouwstenen deel 2 en de AI-domeinen-beschrijvingen zijn geen aparte
+Bouwblokken deel 2 en de AI-domeinen-beschrijvingen zijn geen aparte
 sectie: Die tekst zit al per bouwblok verweven, via `Bouwblok.toelichting`
 (zie "Per bouwblok" hieronder), dus geen dubbele bron nodig.
 
@@ -113,44 +113,44 @@ gelijkmatig vullen.
    kop een oranje lijn (3px).
 2. **Scores**: Classificatiecirkel (108px, rand 7px in de scorekleur,
    score 23pt), "Resultaat voor `<naam>`", scannaam, voortgang ("x van y
-   vragen beantwoord"). Daaronder twee kolommen: Radar (alle bouwstenen)
+   vragen beantwoord"). Daaronder twee kolommen: Radar (alle bouwblokken)
    en staafdiagram per categorie.
 3. **Top 3 Sterktes / Verbeterkansen**: Twee kolommen, per rij een
-   scorebadge en de bouwsteennaam.
-4. **Legenda**: Drie kolommen (Basis op Orde, Uitbouwen, Sterk punt) met
+   scorebadge en de bouwblok-naam.
+4. **Legenda**: Drie kolommen (Basis op orde, Uitbouwen, Sterk punt) met
    scorestippen in de scorekleur, label en omschrijving, woordelijk de
-   toelichtingstekst uit CLAUDE.md sectie 1.
+   toelichtingstekst uit `CLAUDE.md`, Classificatie.
 
-## Pagina 2 t/m 9: Bouwstenen, 2 per pagina
+## Pagina 2 t/m 9: Bouwblokken, 2 per pagina
 
-Acht pagina's, elk een paar bouwstenen (15 bouwstenen; het laatste paar
+Acht pagina's, elk een paar bouwblokken (15 bouwblokken; het laatste paar
 telt er één). Per pagina een flex-kolom (`min-height: 245mm`) met de
-**oranje horizontale lijn (2px)** tussen de twee bouwstenen. De twee
-bouwstenen staan top-aligned direct onder elkaar, met de lijn op een
+**oranje horizontale lijn (2px)** tussen de twee bouwblokken. De twee
+bouwblokken staan top-aligned direct onder elkaar, met de lijn op een
 vaste, kleine afstand ertussen (ca. 1 regel: 3mm onder de eerste
-bouwsteen, 4mm boven de tweede — bij de compacte variant 2mm/3mm, zie
+bouwblok, 4mm boven de tweede, bij de compacte variant 2mm/3mm, zie
 `export-pdf-visual-ai-scan.md`), **geen ruimteverdeling meer via
-`margin: auto`** op de lijn (op verzoek van Sander teruggedraaid: dat liet
+`margin: auto`** op de lijn (op verzoek van Sander teruggedraaid: Dat liet
 de lijn voorheen zweven in het midden van de vrije ruimte op de pagina,
 met een veel grotere en per pagina wisselende afstand tot gevolg).
 Onbenutte ruimte op een korter paar blijft nu gewoon onderaan de pagina
-staan. Een bouwsteen wordt nooit over twee pagina's gesplitst.
+staan. Een bouwblok wordt nooit over twee pagina's gesplitst.
 
-**Val op, opgelost**: Een lange opmerking bij een of beide bouwstenen van
-een paar kon het paar over de beschikbare paginahoogte laten heen groeien
-— omdat elk bouwsteenblok ongesplitst moet blijven, sprong het tweede
+**Val op, opgelost**: Een lange opmerking bij een of beide bouwblokken van
+een paar kon het paar over de beschikbare paginahoogte laten heen groeien,
+omdat elk bouwblok ongesplitst moet blijven, sprong het tweede
 blok dan in zijn geheel naar een volgende, verder lege pagina (bijv.
-bouwsteen 7 wel, bouwsteen 8 niet meer op dezelfde pagina). De tekst en
+bouwblok 7 wel, bouwblok 8 niet meer op dezelfde pagina). De tekst en
 marges zijn daarom verdicht t.o.v. een eerdere versie van deze pagina's,
-met meer buffer voor een opmerking — de kleinere, vaste ruimte rond de
+met meer buffer voor een opmerking, de kleinere, vaste ruimte rond de
 lijn (hierboven) vergroot die buffer verder. Bij een uitzonderlijk lange
 opmerking kan dit zich nog steeds voordoen; zie "Let op bij
 aanpassingen".
 
-Per bouwsteen, van boven naar beneden:
+Per bouwblok, van boven naar beneden:
 
 - **Kop**: Eyebrow (categorienaam) in de categoriekleur, "{CATEGORIE} ·
-  BOUWSTEEN {N}" (bijv. "OVERKOEPELEND · BOUWSTEEN 1"), titel 10,5pt.
+  BOUWBLOK {N}" (bijv. "OVERKOEPELEND · BOUWBLOK 1"), titel 10,5pt.
   Rechts, op dezelfde hoogte: De **score-badge** (gemiddelde, kleur volgt
   de scorekleur).
 - **Centrale vraag**: Blok met linkerrand 3px in de categoriekleur, label
@@ -160,11 +160,11 @@ Per bouwsteen, van boven naar beneden:
   bij die score hoort, `SchaalLabel`, `datamodel.md`, niet het cijfer
   nogmaals). De **score-cel is een badge met conditionele kleur** naar
   het antwoord (`ANTWOORD_KLEUR`, 1 rood tot 5 donkergroen), tekstkleur
-  ink op geel en lichtgroen, anders wit. Onbeantwoord: streepje.
+  ink op geel en lichtgroen, anders wit. Onbeantwoord: Streepje.
 - **Opmerking** (alleen als ingevuld, `ScanInvulling.opmerkingenPerBouwblok`):
   Vlak `#faf9f7`, rand, radius 8px.
 
-## Pagina 10: Slotsectie — Visie (stijl van de sectie Visie op de Assessment-pagina)
+## Pagina 10: Slotsectie: Visie (stijl van de sectie Visie op de Assessment-pagina)
 
 Eén pagina zonder bovenmarge, zodat de gloed vanaf de paginarand loopt.
 Tekst iets verdicht (8,5pt, regelhoogte 1,42) zodat alles past.
@@ -185,8 +185,8 @@ Tekst iets verdicht (8,5pt, regelhoogte 1,42) zodat alles past.
 ## Bron van de tekst
 
 Zelfde databestanden als de webpagina's, zodat pagina en PDF nooit uit
-elkaar lopen: `data/visie-content.ts` (Visie), `data/bouwstenen-
-content.ts` (uitleg per bouwsteen), `data/klantcontact-assessment.ts`
+elkaar lopen: `data/visie-content.ts` (Visie), `data/bouwblokken-
+content.ts` (uitleg per bouwblok), `data/klantcontact-assessment.ts`
 (vragen, schaal, en de scan-brede PDF-instellingen, `Assessment.
 pdfContentSecties` in `datamodel.md`).
 
@@ -200,5 +200,5 @@ pdfContentSecties` in `datamodel.md`).
 - Wordt de tekst van de Visie langer, dan past hij niet meer op 1
   pagina: Verdicht verder in `.pdf-pagina.visie` of verdeel over twee
   `.pdf-pagina`'s.
-- Bouwstenen met veel langere uitleg kunnen het paar over de pagina
+- Bouwblokken met veel langere uitleg kunnen het paar over de pagina
   duwen; controleer na een contentwijziging het aantal pagina's (10).

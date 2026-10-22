@@ -15,7 +15,7 @@ volgens `datamodel.md`, niet als kopie van de oude tekst.
   (zie `stylesheet.md`, Componenten, Footer).
 - **Route**: `/privacy`, publiek toegankelijk, geen inlog nodig.
 - **Ook te koppelen** vanaf het toestemmingsvakje op de respondent-
-  intake (CLAUDE.md scherm 4: "Ik geef toestemming om mijn antwoorden
+  intake (`schermen.md`, Intake: "Ik geef toestemming om mijn antwoorden
   ... te delen met Coniche"), als link binnen die tekst.
 
 ## Vormgeving
@@ -58,7 +58,7 @@ openbare bronnen, ter voorbereiding van gesprekken. Geen privégegevens. Zij
 zijn geen gebruiker van de app, doen niet mee aan een scan en krijgen niets
 toegestuurd. Wie niet als contactpersoon vermeld wil staan, kan Coniche
 vragen het te verwijderen (`datamodel.md`, Contactpersoon).
-Voorstel van 20 oktober 2026.
+
 
 **Van beheerders** (Coniche-medewerkers): E-mailadres en naam voor het
 beheeraccount.
@@ -88,7 +88,7 @@ een scan geaggregeerd en anoniem in een benchmark worden gebruikt
   groepsgrootte (`benchmarkMinOrganisaties`, `beheerpagina.md`, punt 10, Drempels en termijnen).
   Deze sectie noemt dezelfde waarde.
 - Een organisatie doet alleen mee nadat een Admin dat heeft vastgelegd
-  (`Organisatie.benchmarkToegestaan`, `datamodel.md` deel 3).
+  (`Organisatie.benchmarkToegestaan`, `datamodel.md`, Deel 2: Benchmark).
 - Verwijdert Coniche een scan, dan verdwijnt die ook uit de benchmark,
   omdat de cijfers altijd uit de actuele gegevens worden berekend.
 - Een vergelijking binnen één organisatie (tussen haar Metingen of binnen
@@ -102,7 +102,7 @@ in een benchmark mogen komen. Juridische toetsing volgt.
 
 ### 4. Toestemming
 
-Verwijst naar het toestemmingsvakje op scherm 4: "Ik geef toestemming
+Verwijst naar het toestemmingsvakje op de Intake: "Ik geef toestemming
 om mijn antwoorden (en eventueel ingevulde contactgegevens) te delen
 met Coniche voor analyse en advies." Die tekst en deze pagina moeten
 inhoudelijk hetzelfde blijven zeggen. De tekst van het vakje wordt
@@ -120,9 +120,9 @@ concrete termijn noemen.
 
 - Respondenten: Alleen hun eigen scan-invulling(en).
 - Coniche-beheerders: Organisaties en respondenten die zij zelf
-  beheren, of, met de rol Admin, alles (`datamodel.md` deel 2).
+  beheren, of, met de rol Admin, alles (`datamodel-rollen.md`).
 - Een Lead (zodra gebouwd): De weergaven die een Admin voor hem heeft
-  aangevinkt (`datamodel.md` deel 2): De resultaten van die Metingen, de
+  aangevinkt (`datamodel-rollen.md`): De resultaten van die Metingen, de
   antwoorden per vraag (anoniem, of met namen als dat met de organisatie is
   afgesproken) en een vergelijking met de anonieme gemiddelden van andere
   organisaties (`benchmark.md`).
@@ -157,7 +157,7 @@ gebruikt buiten wat technisch noodzakelijk is voor de sessie.
   gezien Coniche in deze opzet de gegevens verwerkt namens de klant.
   Losstaand van deze pagina, wel eraan gerelateerd.
 - Exacte bewaartermijn (het getal, niet het mechanisme): Het mechanisme
-  staat vast (`datamodel.md` deel 2, Bewaartermijn ingevulde scans;
+  staat vast (`datamodel-rollen.md`, Bewaartermijn ingevulde scans;
   `beheerpagina.md`, punt 4), de waarde van `bewaarTermijnDagen` zelf
   nog niet.
 - De formulering van de benchmark-disclaimer (sectie 3a) en van het

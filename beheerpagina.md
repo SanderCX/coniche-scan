@@ -2,11 +2,24 @@
 
 De omgeving waarin Coniche scans, content en organisaties beheert.
 
+## Inhoud
+
+De nummers (punt 1 tot en met 15) zijn de nummers waarmee andere specs naar een onderdeel verwijzen.
+
+| Gedeelte | Onderdelen |
+|---|---|
+| Algemeen | Toegang, Vormgeving, Accountmenu, Navigatie in beheer |
+| Instellingen (Admin) | 9 Gebruikers, 10 Drempels en termijnen, 2a Algemene teksten, 11 Content-pagina's, 12 Audit-log, 13 Data-integriteit |
+| Assessments (Admin) | 1 Assessment-types, 2 Content |
+| Organisaties | 3 Organisatievelden, 4 Organisaties, 5 Metingen, 6 Respondenten uitnodigen, 6a Leads: Toegang per weergave, 6b Respondenten, 8 Import van historische scans |
+| Resultaten | 7 Resultaten, 14 Benchmarks, 15 Verkennen |
+| Afsluitend | Verwijderen, Ter overweging, Open punten |
+
 ## Toegang
 
 Beheer is alleen toegankelijk met een account. Nu met e-mail en
 wachtwoord; 2FA volgt zodra er een backend is. Rollen binnen beheer
-(Admin, Consultant) staan in `datamodel.md` deel 2. Ze zijn nu
+(Admin, Consultant) staan in `datamodel-rollen.md`. Ze zijn nu
 ingericht als testhulp (prototype). Het inlogscherm heeft geen
 rolkeuze: De rol volgt uit het account waarmee iemand inlogt. De
 definitieve rollen en rechten volgen met de backend. Admin-accounts
@@ -45,17 +58,17 @@ Niet te verwarren met beheeronderdeel 9, "Gebruikers" (de link naar het
 beheerscherm voor Admin/Consultant-accounts): Dit is de weergave van de
 ingelogde gebruiker zelf, in `.nav-right`.
 
-Helemaal uiterst rechts: Punt 7 van de nav-volgorderegel in CLAUDE.md,
+Helemaal uiterst rechts: Punt 5 van de navigatieregel in `schermen.md`,
 Globale layout. Conventie: Een account-/profielmenu staat vrijwel altijd
 als allerlaatste element in een nav. Volgorde in `.nav-right`, van links
 naar rechts: Scherm-specifieke acties ("Assessments"/"Organisaties"/
-"Benchmark" voor een Admin, alleen "Organisaties" voor een Consultant
-— zie Wat beheerbaar is hieronder) → scheidingslijn → Accountmenu.
+"Benchmark" voor een Admin, alleen "Organisaties" voor een Consultant,
+zie Wat beheerbaar is hieronder) → scheidingslijn → Accountmenu.
 
 **Geen "← Terug naar site" in beheer.** Voegt niets toe en verwart met
 "Uitloggen" (twee manieren om "weg te gaan" naast elkaar, onduidelijk
-welke wat doet) — beheer heeft dus geen exit-actie (punt 5 van de
-nav-volgorderegel), en dus ook geen scheidingslijn ervóór (punt 4):
+welke wat doet), beheer heeft dus geen exit-actie (punt 3 van de
+navigatieregel), en dus ook geen scheidingslijn ervóór (punt 2):
 Alleen scherm-specifieke acties, één scheidingslijn, Accountmenu.
 Uitloggen is de enige manier om beheer te verlaten, via het accountmenu
 hieronder. Was tot nu toe wél gespecificeerd; hierbij vervallen.
@@ -71,8 +84,7 @@ losse elementen naast elkaar.
   daarna de klikbare rij "Mijn account" (zie Mijn account hieronder) en voor
   een Admin daaronder de klikbare rij "Instellingen", die de pagina
   Instellingen opent (zie Instellingen hieronder). Daaronder staat voor elke
-  rol de klikbare rij "Help", die de helppagina opent (`help.md`, gebouwd op
-  19 oktober 2026). Boven de laatste rij
+  rol de klikbare rij "Help", die de helppagina opent (`help.md`). Boven de laatste rij
   staat een scheidingslijn. Laatste rij, klikbaar: "Uitloggen". Een
   Consultant heeft geen rij "Instellingen": Zijn menu bestaat uit de eerste
   rij, "Mijn account", "Help" en "Uitloggen". Functionaliteit van uitloggen blijft
@@ -84,8 +96,8 @@ losse elementen naast elkaar.
 - **Toetsenbord**: Zoals de Dropdown-knop in `stylesheet.md`: Enter of spatie
   opent het menu, pijltjestoetsen lopen door de rijen, Esc sluit.
 
-**Mijn account** (gebouwd op 13 oktober 2026, het wachtwoord komt met de echte inlog). Een modal volgens het patroon van "Mijn
-gegevens" aan de respondentkant (`CLAUDE.md`, scherm 4), voor Admin en
+**Mijn account** (het wachtwoord komt met de echte inlog). Een modal volgens het patroon van "Mijn
+gegevens" aan de respondentkant (`schermen.md`, Mijn gegevens-menu), voor Admin en
 Consultant. Hier wijzigt een gebruiker zijn eigen gegevens. Wat een Admin bij
 een andere gebruiker wijzigt, staat bij Gebruikers (punt 9).
 
@@ -182,7 +194,7 @@ Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
 
 **Naar de resultaten van een scan** (via "Resultaten bekijken" in het
 Scan-overzicht of "Bekijk resultaten" in een scanregel van het
-Respondent-overzicht): Het resultatenscherm (CLAUDE.md, scherm 6) toont in
+Respondent-overzicht): Het resultatenscherm (`schermen.md`, Resultatenpagina) toont in
 beheer de gewone beheer-nav met het kruimelpad Organisaties › Organisatie
 › Meting › Resultaten van {Respondent} (via Resultaten: Resultaten › Organisatie
 › Meting › Resultaten van {Respondent}; de hoofdlink waarlangs je kwam
@@ -190,31 +202,10 @@ bepaalt het begin van het pad), en niet de respondentacties
 "Terug naar de scan" en "Terug naar Mijn metingen". Wel de dropdown
 "Exporteren". Terug gaat via het kruimelpad. Dat wordt het Meting-overzicht
 en niet de Respondent-modal, want die is niet meer open. Boven de resultaten
-staat een schakelaar met Scores van deze scan en Positie in de Meting
-(besloten op 12 oktober 2026, gebouwd op 13 oktober 2026, zie `visualisatie-scores.md`,
-Navigatie).
+staat een schakelaar met Scores van deze scan en Positie in de Meting (zie `visualisatie-scores.md`, Navigatie).
 
 **Organisatie-resultaten** (punt 4): Zelfde kruimelpad, eindigend op
 Resultaten van de Meting.
-
-## Status
-
-- **Gebouwd**: Organisaties (lijst, aanmaken, detail), metingen per
-  organisatie, respondenten uitnodigen, Ingevulde scans met filters, Import
-  (beide op 14 oktober 2026 omgezet, zie punt 7 en 8), Assessments, Content, Gebruikersbeheer (punt 9), Drempels en termijnen (punt 10),
-  Audit-log (punt 12) en Data-integriteit (punt 13). Ook gebouwd zijn de
-  resultatenpagina's in beheer: de Organisatie-resultaten per Meting
-  (punt 4) en de resultaten van één scan, met het kruimelpad hierboven en
-  de dropdown "Exporteren". De audit-log staat nog alleen in de browser,
-  tot de database er is (`azure-plan.md`).
-- **Nog te bouwen**: Organisatievelden (punt 3): De editor
-  `VeldDefinitieEditor` staat klaar, maar geen pagina gebruikt hem. En
-  Het verwijderen van een Assessment (punt 1), gespecificeerd op 8 oktober
-  2026. En Content-pagina's (punt 11), na overleg. De spec is leidend. Verder de
-  hoofdlink Resultaten met de tab Metingen (punt 7, gebouwd op 14
-  oktober 2026) en de Benchmark (punt 14, `benchmark.md`): Het niveau tussen organisaties is
-  gebouwd (PR 61). De niveaus binnen een organisatie en binnen een Meting zijn
-  besproken en nog niet gebouwd.
 
 ---
 
@@ -232,7 +223,7 @@ op een van de hoofdlinks.
 
 De nummering van de onderdelen hieronder (1 t/m 12) is ongewijzigd ten
 opzichte van eerdere versies van dit document waar al naar "punt X"
-verwezen wordt elders (`datamodel.md`, `CLAUDE.md`) — alleen de
+verwezen wordt elders (`datamodel.md`, `CLAUDE.md`), alleen de
 indeling in drie navigatielinks hieronder is nieuw, met drie nieuwe
 onderdelen (2a, 11 en 12). Benchmark is nummer 14.
 
@@ -240,8 +231,8 @@ onderdelen (2a, 11 en 12). Benchmark is nummer 14.
 |---|---|
 | **Instellingen** (Admin-only, via het Accountmenu) | 9. Gebruikers, 10. Drempels en termijnen, 2a. Algemene teksten, 11. Content-pagina's, 12. Audit-log, 13. Data-integriteit |
 | **Assessments** (Admin-only) | 1. Assessment-types, 2. Content |
-| **Organisaties** (Admin: alle, Consultant: eigen) | 3. Organisatievelden, 4. Organisaties, 5. Metingen, 6. Respondenten uitnodigen, 6a. Leads (toegang per weergave, Admin-only), 6b. Respondenten, 8. Import (knop in het organisatie-detail, alleen voor een Admin) |
-| **Resultaten** (Admin: alle, Consultant: eigen) | 7. Resultaten (tab Metingen), 14. Benchmarks (tab, Admin-only) |
+| **Organisaties** (Admin: Alle, Consultant: Eigen) | 3. Organisatievelden, 4. Organisaties, 5. Metingen, 6. Respondenten uitnodigen, 6a. Leads (toegang per weergave, Admin-only), 6b. Respondenten, 8. Import (knop in het organisatie-detail, alleen voor een Admin) |
+| **Resultaten** (Admin: Alle, Consultant: Eigen) | 7. Resultaten (tab Metingen), 14. Benchmarks (tab, Admin-only) |
 
 ### Instellingen (Admin-only)
 
@@ -257,7 +248,7 @@ de adresregel, zoals elke Admin-only pagina.
 #### 9. Gebruikers (Admin-only)
 
 Los beheeronderdeel met de lijst en het beheer van alle Admin- en
-Consultant-accounts (`datamodel.md` deel 2, `Gebruiker`). Het hele
+Consultant-accounts (`datamodel-rollen.md`, `Gebruiker`). Het hele
 onderdeel is Admin-only: Een Consultant ziet het niet, ook niet als
 lijst, en heeft er geen link naar. Respondenten en Leads blijven
 bereikbaar via de organisatie (punt 4), niet hier.
@@ -270,27 +261,27 @@ bereikbaar via de organisatie (punt 4), niet hier.
   wachtwoord instelt volgt met de mailserver (`backlog.md`).
 - **Wijzigen**: Naam, e-mail, rol.
 - **Deactiveren, niet verwijderen**: Nooit hard verwijderd
-  (`datamodel.md` deel 2). Actie heet "Deactiveren", `.btn-danger` met
+  (`datamodel-rollen.md`). Actie heet "Deactiveren", `.btn-danger` met
   bevestiging.
 - **Eigenaarschap bij deactiveren van een Consultant**: Verplicht
   overzetten van diens organisaties naar een andere Consultant of Admin
   vóórdat deactiveren definitief is (per organisatie of in bulk).
   Organisaties die alleen aan hem waren **toegewezen** (niet
   aangemaakt) hoeven niet overgezet te worden: Die toewijzing vervalt
-  gewoon, dat blokkeert het deactiveren niet (`datamodel.md` deel 2,
+  gewoon, dat blokkeert het deactiveren niet (`datamodel-rollen.md`,
   Eigenaarschap en toegang van/tot organisaties).
 - **Minimaal 1 actieve Admin verplicht**: Deactiveren van een Admin is
   geblokkeerd zolang hij de laatste actieve Admin is, met een duidelijke
   melding waarom. Geldt ook bij zelf-deactivering: Geen aparte regel
   nodig, dezelfde check geldt altijd.
 - **2FA**: `tfaActief` verplicht voordat beheer toegankelijk is, via
-  TOTP (authenticator-app, `datamodel.md` deel 2, 2FA: TOTP via
-  authenticator-app) — geen sms of e-mail. Komt met de backend, niet in
+  TOTP (authenticator-app, `datamodel-rollen.md`, 2FA: TOTP via
+  authenticator-app), geen sms of e-mail. Komt met de backend, niet in
   dit punt. Al genoteerd in `backlog.md` onder rollen/rechten/inlog.
   **Reset-actie op een andere Gebruiker**: Een Admin kan diens
   `tfaActief` terugzetten (bijv. bij een kwijtgeraakt toestel zonder
   geldige herstelcodes meer), niet bij zichzelf zolang hij de laatste
-  actieve Admin is — zelfde soort regel als hierboven.
+  actieve Admin is, zelfde soort regel als hierboven.
 
 **Toegang tot dit scherm**: Alleen Admin (`gebruikers.beheren`, bereik
 `alle`, Rechtenmatrix). Een Consultant ziet "Instellingen" niet in
@@ -307,7 +298,7 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
   getal, geldt voor de hele omgeving, niet per organisatie of
   respondent.
 - **Bewaartermijn ingevulde scans** (`bewaarTermijnDagen`,
-  `datamodel.md` deel 2, Bewaartermijn ingevulde scans). **Opmaak van de
+  `datamodel-rollen.md`, Bewaartermijn ingevulde scans). **Opmaak van de
   rij**: Veld, eenheid ("dagen") en Info-icoon staan op één regel en het
   icoon valt nooit naar een eigen regel (`stylesheet.md`, Info-icoon, Nooit
   van de regel af). Hetzelfde geldt voor de aantallen scans bij de
@@ -326,7 +317,7 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
 - **Minimale groepsgrootte benchmark** (`benchmarkMinOrganisaties`,
   startwaarde 5): Het minimale aantal organisaties per Assessment in een
   benchmark, inclusief de organisatie van de view, om die view voor een Lead
-  aan te kunnen vinken in het Leads-venster. Bij een opgeslagen verkenning telt hij altijd Organisaties, ook bij de eenheid Onderdelen (gebouwd op 17 oktober 2026). Eén getal voor deze drempel van niveau 1. De betekenis
+  aan te kunnen vinken in het Leads-venster. Bij een opgeslagen verkenning telt hij altijd Organisaties, ook bij de eenheid Onderdelen. Eén getal voor deze drempel van niveau 1. De betekenis
   staat in `benchmark.md`, Drempels. Het privacy statement noemt dezelfde
   waarde (`privacy-pagina.md`, sectie 3a).
 - **Minimaal aantal scans per Meting in een benchmark**
@@ -334,19 +325,19 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
   scans dat een Meting moet hebben om in een benchmark gekozen te kunnen
   worden.
 - **Maximaal aantal dagen tussen Metingen bij Naast elkaar**
-  (`benchmarkMaxDagenTussenMetingen`, gebouwd op 14 oktober 2026, startwaarde 90): Het aantal
+  (`benchmarkMaxDagenTussenMetingen`, startwaarde 90): Het aantal
   dagen tussen de oudste en de nieuwste meetdatum in een vergelijking met de
   lezing Naast elkaar, waarboven de Admin bij het opslaan een waarschuwing
   krijgt (`benchmark.md`, Niveau 2, Lezing). Het is geen blokkade en geldt niet
   bij Ontwikkeling over tijd. Een geheel getal van minstens 1.
 - **Minimaal aantal scans per Meting voor een Lead**
-  (`benchmarkMinRespondenten`, voorstel, startwaarde 5): Het minimale aantal
+  (`benchmarkMinRespondenten`, startwaarde 5): Het minimale aantal
   afgeronde scans in een Meting om de kolom Antwoorden bij anonieme namen voor
   een Lead aan te kunnen vinken (punt 6a), om Spreiding voor een Lead aan te kunnen vinken en om voor een Lead de lijn van
   laagste tot hoogste score aan te zetten (`visualisatie-scores.md`,
   onderdeel A).
 
-**Formulier Verkennen** (gebouwd op 15 oktober 2026, `visualisatie-verkennen.md`, Drempels). Een eigen formulier onder Drempels en termijnen, naast de formulieren Bewaartermijn en Benchmark, met de kop Verkennen en een Info-icoon (`info.verkennenInstellingen`). Het bevat de grenzen die bepalen wanneer Verkennen een groep, een vergelijking of een groepering toestaat. De eerste twee velden staan op 15 oktober 2026 al in de app (`verkennenMinGroep` en `verkennenWaarschuwingGroep`, met het Info-icoon `info.verkennenDrempels`), door Joost op 2 en 2 gezet om te proberen. Dit voorstel maakt er vijf van, hernoemt `verkennenWaarschuwingGroep` naar `verkennenMinVergelijking` en vervangt het Info-icoon door `info.verkennenInstellingen`. De rij `info.verkennenDrempels` hieronder is de gebouwde versie en vervalt bij het bouwen van dit voorstel. De startwaarden 3, 5, 6, 12 en 40 zijn de norm vanuit het ontwerp en blijven de beginstand. Een Admin kan elke waarde in de praktijk aanpassen.
+**Formulier Verkennen** (`visualisatie-verkennen.md`, Drempels). Een eigen formulier onder Drempels en termijnen, naast de formulieren Bewaartermijn en Benchmark, met de kop Verkennen en een Info-icoon (`info.verkennenInstellingen`). Het bevat de grenzen die bepalen wanneer Verkennen een groep, een vergelijking of een groepering toestaat. Het formulier heeft vijf velden: `verkennenMinGroep`, `verkennenMinVergelijking`, `verkennenMinPool`, `verkennenMinIngevuldPct` en een vijfde grens (`visualisatie-verkennen.md`, Drempels), met het Info-icoon `info.verkennenInstellingen`. De startwaarden 3, 5, 6, 12 en 40 zijn de norm vanuit het ontwerp en blijven de beginstand. Een Admin kan elke waarde in de praktijk aanpassen.
 
 | Veld | Instelling | Startwaarde | Wat het doet |
 |---|---|---|---|
@@ -354,10 +345,10 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
 | Organisaties in focus of rest, waarschuwing | `verkennenMinVergelijking` | 5 | Een kleinere focus of rest krijgt een waarschuwing. Het is geen blokkade. |
 | Organisaties in de pool, minimum | `verkennenMinPool` | 6 | In een kleinere pool kan er niet gegroepeerd worden. |
 | Waarden per kenmerk, maximum | `verkennenMaxGroepen` | 12 | Een select-kenmerk met meer verschillende waarden in de pool kan niet groeperen. |
-| Kenmerk ingevuld, minimum | `verkennenMinIngevuldPct` | 40 | Een kenmerk dat bij een lager percentage van de Organisaties in het Assessment is ingevuld, kan niet groeperen en staat grijs in het menu Kenmerk toevoegen. Bij 0 geldt geen ondergrens (gebouwd op 15 oktober 2026). |
+| Kenmerk ingevuld, minimum | `verkennenMinIngevuldPct` | 40 | Een kenmerk dat bij een lager percentage van de Organisaties in het Assessment is ingevuld, kan niet groeperen en staat grijs in het menu Kenmerk toevoegen. Bij 0 geldt geen ondergrens. |
 
 - **Opmaak**: Eén rij velden die op een smal scherm doorloopt naar de volgende regel. Per veld het label in het label-formaat (`--fs-12`, gewicht 700, hoofdletters) boven een invoerveld van `--control-h` (40px), met onder het veld in `--fs-12` en `var(--ink-s)` wat het doet (bij het percentage de eenheid). Onder de velden de knop Opslaan en het Info-icoon op één regel. Het formulier heeft geen Annuleren, net als Benchmark.
-- **Invoer**: Gehele getallen van minstens 1. Gebouwd op 15 oktober 2026: Alleen het percentage mag 0 zijn (dan geldt geen ondergrens voor hoe vaak een kenmerk is ingevuld) en ligt tussen 0 en 100. Bij een ongeldige waarde staat er naast Opslaan "Vul bij elk veld een geheel getal van minstens 1 in (bij het percentage mag 0). Het percentage kan niet boven 100." en schrijft Opslaan niets.
+- **Invoer**: Gehele getallen van minstens 1. Alleen het percentage mag 0 zijn (dan geldt geen ondergrens voor hoe vaak een kenmerk is ingevuld) en ligt tussen 0 en 100. Bij een ongeldige waarde staat er naast Opslaan "Vul bij elk veld een geheel getal van minstens 1 in (bij het percentage mag 0). Het percentage kan niet boven 100." en schrijft Opslaan niets.
 - **Opslaan** schrijft direct. De nieuwe waarden gelden vanaf het volgende scherm Verkennen, voor alle Assessments. Het scherm slaat zijn eigen keuzes niet op, dus er valt niets te migreren.
 - **Alleen een Admin** ziet dit formulier en kan het wijzigen.
 
@@ -410,8 +401,8 @@ standaardteksten zoals ze nu in de app staan):
 | `info.auditLog` | Audit-log, naast de paginatitel | Wie (of het Systeem) wat deed, wanneer en op welk record. Alleen-lezen. Geen persoonsgegevens uit scans. |
 | `info.algemeneTekstenPagina` | Algemene teksten, naast de paginatitel | Teksten los van één Assessment-type. Wijzigingen zijn direct zichtbaar, geen aparte publicatiestap. |
 | `info.algemeneTekstenInfoIconen` | Algemene teksten, naast de kop Info-iconen | Alle toelichtingen achter een Info-icoon, met de plek en de actuele tekst. Aanpassen kan op de plek zelf, met het potlood in het open Info-icoon. |
-| `info.contentToelichting` | Content, veld Toelichting van een bouwblok | Lopende tekst in de Toelichtingsmodal en in de kop van dit bouwblok in de doorloopflow. Een lege regel scheidt de alinea's. Laat je het veld leeg, dan ontbreekt dit onderdeel in de modal en in de kop. |
-| `info.contentBouwblokLabel` | Content, veld Bouwblok-label | De kleine kop boven de titel in de Toelichtingsmodal en in de doorloopflow, bijvoorbeeld "Bouwsteen" of "AI-domein", gevolgd door het nummer. |
+| `info.contentToelichting` | Content, veld Toelichting van een bouwblok | Lopende tekst in de Toelichtingsmodal op de Assessment-pagina en in de kop van dit bouwblok in de doorloopflow. Een lege regel scheidt de alinea's. Laat je het veld leeg, dan ontbreekt dit onderdeel in de modal en in de kop. |
+| `info.contentBouwblokLabel` | Content, veld Bouwblok-label | De kleine kop boven de titel in de Toelichtingsmodal en in de doorloopflow, bijvoorbeeld "Bouwblok" of "AI-domein", gevolgd door het nummer. |
 | `info.conflictOplossen` | Conflict oplossen, naast de titel van de modal | Een Respondent heeft per Meting één scan. Hang één van de twee scans aan een andere Respondent. Alleen die scan gaat mee, de oorspronkelijke Respondent blijft bestaan met de andere scan. |
 | `info.dataIntegriteit` | Instellingen, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
 | `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
@@ -428,11 +419,10 @@ standaardteksten zoals ze nu in de app staan):
 | `info.mijnAccountWachtwoord` | Mijn account, naast de uitgeschakelde knop "Wachtwoord wijzigen" | Wachtwoord wijzigen komt met de echte inlog. Tot die tijd vraag je een Admin om je wachtwoord te wijzigen. |
 | `info.benchmarkInstellingen` | Instellingen, Drempels en termijnen, formulier Benchmark | Een Lead ziet een vergelijking pas als de groep groot genoeg is, inclusief het lid van de view: Zoveel organisaties (tussen organisaties), Metingen (binnen een organisatie) of scans in de Meting (binnen een Meting). Het aantal scans per gekozen Meting is hoeveel afgeronde scans een Meting minstens moet hebben om in een benchmark gekozen te kunnen worden. Het aantal dagen tussen Metingen is voor een vergelijking met de lezing Naast elkaar: Liggen de meetdata verder uit elkaar, dan krijg je bij het opslaan een waarschuwing. Opslaan blijft mogelijk. |
 | `info.verkennen` | Verkennen, naast de paginatitel | Verkennen werkt op de pool van één Assessment: De Organisaties met toestemming voor benchmark die een Meting hebben met genoeg afgeronde scans, per Organisatie de Meting die telt volgens de Meetperiode, of de meest recente als je geen periode kiest. Elke Organisatie telt even zwaar mee. Het scherm slaat niets op en een Lead ziet het nooit. |
-| `info.verkennenDrempels` | Instellingen, Drempels en termijnen, formulier Verkennen | Een groep met minder organisaties dan het minimum is gestreept en krijgt in de heatmap geen cijfers. Heeft de focus of de rest minder organisaties dan de waarschuwingsgrens, dan staat er een waarschuwing dat verschillen voorzichtig gelezen moeten worden. Dat is geen blokkade. |
 | `info.organisatieToegang` | Organisatie-detail, kaart Toegang, naast de titel | De eigenaar is de Consultant die de organisatie heeft aangemaakt. Een toegewezen Consultant mag deze organisatie ook zien en beheren, en dezelfde gegevens inzien. Intrekken haalt die toegang weer weg. |
 | `info.benchmarkVlag` | Organisatie-detail, bij de schakelaar "Doet mee aan benchmark" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Zonder deze schakelaar staat de organisatie niet in de keuzelijst van een benchmark. Uitzetten haalt de organisatie uit alle benchmarks. |
 | `info.leadToegangCel` | Leads-venster van de organisatie, in een grijze cel | De reden volgt de situatie. Spreiding, Antwoorden en Exporteren kunnen pas aan als Resultaten van dezelfde Meting aan staat. Een samengestelde Meting heeft alleen Resultaten. Spreiding heeft te weinig scans om anoniem te blijven. Bij anonieme namen heeft de Meting te weinig afgeronde scans om anoniem te blijven. Een benchmark is er pas als de groep groot genoeg is, en bij een benchmark binnen een organisatie ook als de Lead Resultaten heeft van een Meting in die benchmark. Bij een Verkenning met te weinig Organisaties staat er: "Te weinig Organisaties in deze groep: {n}, minimaal {min}." |
-| `info.antwoordenMetNamen` | Organisatie-detail, bij de schakelaar "Namen tonen bij Antwoorden" | Uit: Leads zien de antwoorden als R1 tot en met Rn. Aan: Leads zien de namen van de respondenten. Stem dit af met de opdrachtgever voordat je het aanzet. Het geldt voor alle Leads van deze organisatie. |
+| `info.antwoordenMetNamen` | Organisatie-detail, bij het vinkje "Namen tonen bij Antwoorden" | Uit: Leads zien de antwoorden als R1 tot en met Rn. Aan: Leads zien de namen van de respondenten. Stem dit af met de opdrachtgever voordat je het aanzet. Het geldt voor alle Leads van deze organisatie. |
 | `info.benchmarkAanmaken` | Benchmark aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark heeft een naam nodig, minstens één Assessment en minstens één organisatie die je hebt aangevinkt. Een organisatie staat alleen in de lijst als ze meedoet aan benchmarks en een Meting heeft van een gekozen Assessment met genoeg afgeronde scans. |
 | `info.benchmarkAanmakenMetingen` | Benchmark binnen een organisatie aanmaken of wijzigen, achter de uitgeschakelde knop | Een vergelijking tussen Metingen heeft een naam nodig, een organisatie, een Assessment en precies twee Metingen. Een Meting is alleen te kiezen met een meetdatum en genoeg afgeronde scans. |
 | `info.benchmarkAanmakenScans` | Benchmark binnen een Meting aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark binnen een Meting heeft een naam nodig, een organisatie, een Assessment en een Meting. Een Meting is alleen te kiezen met genoeg afgeronde scans. |
@@ -442,12 +432,12 @@ standaardteksten zoals ze nu in de app staan):
 | `info.verkennenKenmerken` | Verkennen, kaart Kenmerken, naast de titel | Zet hier een kenmerk neer om op te filteren en om op te groeperen. Een kenmerk zonder gekozen waarde filtert niets. Filteren op bereik bij getallen volgt later. |
 | `info.verkennenGroeperen` | Verkennen, naast het label Groeperen op | Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties. Is er nog geen kenmerk, dan staat er: Er is nog geen kenmerk om op te groeperen. Voeg bij Kenmerken een kenmerk toe, dan kun je de Organisaties erop in groepen verdelen. |
 | `info.verkennenEenheid` | Verkennen, naast het label Eenheid | Kies waarover je vergelijkt. Bij Organisaties telt elke Organisatie één keer, met de Meting uit de Meetperiode. Bij Onderdelen telt elk onderdeel van een Organisatie apart, en elk onderdeel telt even zwaar mee. Een samengestelde Meting telt bij Onderdelen niet mee. |
-| `info.verkennenMeetperiode` | Verkennen en het wijzigen van een opgeslagen verkenning, naast het label Meetperiode | Per Organisatie telt de laatste Meting met een meetdatum in deze periode. Zo kun je ronde 1 blijven vergelijken, ook als ronde 2 al deels binnen is. Zonder periode telt de meest recente Meting. Een Organisatie zonder Meting in de periode doet niet mee. |
+| `info.verkennenMeetperiode` | Verkennen en het wijzigen van een opgeslagen verkenning, naast het label Meetperiode | Per Organisatie telt de laatste Meting met een meetdatum in deze periode. Zo kun je de eerste meting blijven vergelijken, ook als de volgende al deels binnen is. Zonder periode telt de meest recente Meting. Een Organisatie zonder Meting in de periode doet niet mee. |
 | `info.verkennenOpslaan` | Verkennen, naast de knop Opslaan als benchmark | Je slaat de filters op en niet de uitkomst. De groep volgt de filters: Komt er een Organisatie bij die erbij past, dan telt die mee. Daarna wijs je de benchmark toe aan een Lead van een Organisatie die erin zit, in het Leads-venster van die Organisatie. |
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
 | `info.contactpersonen` | Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen | Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze. |
-| `info.dossier` (gebouwd op 21 oktober 2026, vervangt `info.nieuwsartikelen`; de tekst is aangepast op 21 oktober 2026, gebouwd op 22 oktober 2026) | Organisatie-detail, kaart Dossier, naast de kop van het paneel Instellingen voor de Lead | Cases, nieuws, events en blogs die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier zichtbaar is én het item op Zichtbaar voor Lead staat. Een case kan alleen zichtbaar worden als de organisatie in de case dat heeft toegestaan. |
-| `info.caseVlag` (gebouwd op 21 oktober 2026) | Organisatie-detail, bij het vinkje "Mag als case gebruikt worden" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads. |
+| `info.dossier` (vervangt `info.nieuwsartikelen`) | Organisatie-detail, kaart Dossier, naast de titel | Cases en nieuws die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier zichtbaar is én het item op Zichtbaar voor Lead staat. Een case kan alleen zichtbaar worden als de organisatie in de case dat heeft toegestaan. |
+| `info.caseVlag` | Organisatie-detail, bij het vinkje "Mag als case gebruikt worden" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads. |
 | `info.kpiBlok` | Organisatie-detail, blok KPI's, naast de titel | Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet. |
 | `info.kpiPlek` | Modal KPI's invullen, naast het label Plek | Kies voor welk deel van de organisatie je invult. Algemeen is de hele organisatie. |
 | `info.kpiKanalen` | Modal KPI's invullen, naast het label Kanalen uitsplitsen | Kies alleen de kanalen waarvoor je cijfers hebt. De kolom Algemeen blijft altijd staan. |
@@ -459,35 +449,31 @@ Elk nieuw Info-icoon krijgt hier een regel en een regel in
 `data/info-teksten.ts`. Een standaardtekst bevat geen verwijzing naar een
 document of andere bouwerstekst.
 
-#### 11. Content-pagina's (Visie, Bouwstenen, AI, 2030)
+#### 11. Content-pagina's (Visie, Bouwblokken, AI, 2030)
 
-**Nieuw, nog niet gebouwd.** De content van Visie, Bouwstenen, AI en 2030
-staat sinds 21 oktober 2026 als secties op de Assessment-pagina (CLAUDE.md,
-sectie 3, scherm 2) en niet meer achter links in de nav. Ze komt nu uit losse
-bronbestanden en is nergens beheerbaar. Dit onderdeel maakt ze
-bewerkbaar vanuit beheer, net als Algemene teksten hierboven:
+De content van Visie, Bouwblokken, AI en 2030 staat als secties op de Assessment-pagina (`schermen.md`, Assessment-pagina). Dit onderdeel maakt ze bewerkbaar vanuit beheer, net als Algemene teksten hierboven:
 
 - **Visie** (`visie-coniche.md` deel 1) en **2030**
   (`content-2030.md`): Secties met tekst (de Visie met drie kaarten, de 2030 met vijf kaarten en een uitklapbaar stuk). Eén
   tekstveld per pagina, zelfde soort component als Algemene teksten.
-- **Bouwstenen**: De 15 bouwstenen uit `visie-coniche.md` /
-  `bouwstenenmodel-visual.md`. Titel en omschrijving per bouwsteen
+- **Bouwblokken**: De 15 bouwblokken uit `visie-coniche.md` /
+  `visual-bouwblokken-en-domeinen.md`. Titel en omschrijving per bouwblok
   bewerkbaar. De interactieve visual zelf (indeling, volgorde,
-  interactie) niet — dat blijft vast, alleen de tekstinhoud erin wordt
+  interactie) niet, dat blijft vast, alleen de tekstinhoud erin wordt
   beheerbaar.
 - **AI**: De 8 AI-domeinen uit `visie-ai-klantcontact.md` /
-  `ai-domeinenmodel-visual.md`. Titel en modal-tekst per domein
-  bewerkbaar, de visual zelf niet, zelfde uitgangspunt als Bouwstenen.
+  `visual-bouwblokken-en-domeinen.md`. Titel en modal-tekst per domein
+  bewerkbaar, de visual zelf niet, zelfde uitgangspunt als Bouwblokken.
 
 **Nog open**: Het onderliggende datamodel hiervoor (records per
-bouwsteen/domein, versiebeheer, of het archiveren i.p.v. verwijderen
-zoals bij Content per Assessment) is nog niet uitgewerkt — dit
+bouwblok/domein, versiebeheer, of het archiveren i.p.v. verwijderen
+zoals bij Content per Assessment) is nog niet uitgewerkt, dit
 beschrijft alleen wélke content beheerbaar wordt, niet de
 implementatie ervan. Zie Open punten onderaan dit document.
 
 #### 12. Audit-log
 
-**Gebouwd.** `AuditEvent` (`datamodel.md` deel 2,
+`AuditEvent` (`datamodel-rollen.md`,
 Audit) wordt al gelogd: Wie (of "Systeem") wat deed, wanneer, op welk
 record. Er was nergens een scherm om die logging terug te zien.
 Alleen-lezen overzicht, Admin-only (net als de rest van Instellingen):
@@ -529,7 +515,7 @@ Alleen-lezen overzicht, Admin-only (net als de rest van Instellingen):
   Er staat nooit ruwe JSON, een ID of een lange lijst bestandsnamen in
   een tekstregel. De groepsregel zelf houdt de korte samenvatting met
   aantallen. De losse gebeurtenis "import.gestart" toont geen eigen
-  detailtekst met bestandslijst: de tabel vervangt die. De groep begint
+  detailtekst met bestandslijst: De tabel vervangt die. De groep begint
   bij de eerste keer dat de knop "N rijen importeren" wordt gebruikt;
   goedkeuren en annuleren daarvoor logt niets. Rijen die later alsnog worden
   geïmporteerd,
@@ -546,7 +532,7 @@ Alleen-lezen overzicht, Admin-only (net als de rest van Instellingen):
   en Aangepast, standaard 7 dagen. Een knop vult Vanaf en Tot met dat
   bereik; een datum aanpassen zet de keuze op Aangepast. De gekozen
   periode staat zichtbaar boven de lijst. Is er niets in de periode, dan
-  staat er geen aparte melding en geen knop: de regel met de aantallen
+  staat er geen aparte melding en geen knop: De regel met de aantallen
   ("0 gebeurtenissen (van 0 in totaal)") zegt dat al, en de
   periodeknoppen bovenaan het formulier zijn de enige plek om het bereik
   te wijzigen. De lijst eronder blijft leeg. Een groep verschijnt zodra een van zijn gebeurtenissen in de
@@ -584,7 +570,7 @@ Alleen-lezen overzicht, Admin-only (net als de rest van Instellingen):
   niets te selecteren of per regel te verwijderen. Exporteren en het
   opruimen na de bewaartermijn (zie Bewaartermijn) zijn de enige acties.
 - **Niet bedoeld als vervanging** van de acties die al ergens anders
-  zichtbaar zijn (zoals de status van een Ingevulde scan, punt 7) —
+  zichtbaar zijn (zoals de status van een Ingevulde scan, punt 7),
   dit is het overkoepelende overzicht voor wie/wat/wanneer, niet een
   tweede plek voor dingen die al een eigen scherm hebben.
 
@@ -649,7 +635,7 @@ verplaatsen, omhangen en verwijderen (`datamodel.md`, Audit), met in
 Aanmaken en bewerken van een `Assessment` (`datamodel.md`): Naam, kort
 label (voor de PDF-footer, bijv. "Volwassenheidsscan"), subtitel,
 beschrijving, doelgroep, geschatte duur, het bouwblok-label (de eyebrow
-in de Toelichtingsmodal en de doorloopflow, standaard "Bouwsteen", bij de AI-scan
+in de Toelichtingsmodal en de doorloopflow, standaard "Bouwblok", bij de AI-scan
 "AI-domein"), de vijf schaallabels, en de
 slotsectie voor de PDF-export (`pdfContentSecties`, zie
   `export-pdf-visual-volwassenheidsscan.md`, Slotsectie per scan-type):
@@ -753,24 +739,23 @@ Content-beheer.
 **Wegingstekst per Assessment.** Twee velden bij het Assessment: "Titel
 wegingskaart" en "Tekst wegingskaart" (`wegingTitel`,
 `wegingToelichting`). Dit is de tekst op de kaart bij aanvang van de
-scan (CLAUDE.md, sectie 3, Wegingskaart). De velden mogen leeg blijven:
+scan (`schermen.md`, Intake, Wegingskaart). De velden mogen leeg blijven:
 Dan geldt de standaardtekst. Bij een Assessment zonder afwijkende
 gewichten verschijnt de kaart niet, ook als de velden gevuld zijn. De
 bouwblokken en hun factor onder de tekst komen uit de gewichten zelf en
 hoeven niet in de tekst te staan.
 
 Teksten die niet aan één Assessment hangen (zoals de introtekst op
-"Mijn metingen"): zie 2a, Algemene teksten, onder Instellingen hierboven
-— niet hier.
+"Mijn metingen"): Zie 2a, Algemene teksten, onder Instellingen hierboven,
+niet hier.
 
-### Organisaties (Admin: alle, Consultant: eigen)
+### Organisaties (Admin: Alle, Consultant: Eigen)
 
 #### 3. Organisatievelden
 
 De organisatievelden uit `datamodel.md` (volume en klantbasis,
 digitalisering, techstack, FTE) worden zelf ook beheerbaar: Label,
-type en vaste antwoordcategorieën. De KPI's en de kanalen hebben sinds het
-19 oktober 2026 een eigen tab (KPI's en kanalen, hieronder).
+type en vaste antwoordcategorieën. De KPI's en de kanalen hebben een eigen tab (KPI's en kanalen, hieronder).
 
 Dit punt gaat over de definitie van de velden en is Admin-only
 (`content.beheren`, Rechtenmatrix). Een Consultant ziet dit onderdeel
@@ -781,12 +766,11 @@ en voor een Consultant bij zijn eigen organisaties
 aan de klant, tijdens een gesprek over de inrichting en omvang, en moet
 het antwoord daarom zelf kunnen vastleggen.
 
-**Korte namen (gebouwd op 15 oktober 2026).** Veldnamen en waarden zoals
+**Korte namen.** Veldnamen en waarden zoals
 "Activiteiten op het gebied van financiële dienstverlening en verzekeringen"
 zijn te lang voor de chips en lijsten van Verkennen. Een Admin geeft ze hier een
 korte naam (`visualisatie-verkennen.md`, Korte namen). De pagina heeft een
-schakelaar Velden | KPI's en kanalen | Korte namen (`.weergave-wissel`, de
-middelste tab is gebouwd op 19 oktober 2026), en de derde weergave is
+schakelaar Velden | KPI's en kanalen | Korte namen (`.weergave-wissel`, de middelste tab is), en de derde weergave is
 een tabel met de kolommen Soort (Veldnaam of Waarde), Veld, Origineel, Korte
 naam en In gebruik.
 
@@ -810,7 +794,7 @@ naam en In gebruik.
 - **Uitleg**: In een Info-icoon (`info.korteNamen`, punt 2a), niet als vaste
   tekst. Het visual design toont hem als vaste tekst.
 
-**KPI's en kanalen (gebouwd op 19 oktober 2026, ontworpen door Joost).** De tab voor de definities uit `datamodel.md`, KPI's en kanalen.
+**KPI's en kanalen (ontworpen door Joost).** De tab voor de definities uit `datamodel.md`, KPI's en kanalen.
 Alleen voor een Admin (`content.beheren`). Het design staat in
 `Claude outputs/kpi-design/`, bord 4.
 
@@ -835,8 +819,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
 - **Recht en log.** `content.beheren`. Gelogd als `kpiDefinitie.aangemaakt`,
   `kpiDefinitie.gewijzigd`, `kanaal.aangemaakt` en `kanaal.verwijderd`, en voor
   de korte naam als `korteNaam.gewijzigd` (`datamodel.md`, Audit).
-- **Hernoemen, verwijderen en volgorde (gebouwd op 19 oktober 2026, niet in het
-  design van Joost).** Door Claude Code ingevuld, Joost beoordeelt het.
+- **Hernoemen, verwijderen en volgorde (niet in het design van Joost).** Door Claude Code ingevuld, Joost beoordeelt het.
   - **Een kanaal hernoemen**: De naam in de lijst Kanalen is een invoerveld. Enter
     of het verlaten van het veld bewaart, Esc zet de naam terug. Alleen de naam
     verandert, het id en alle KPI-waarden blijven. De naam blijft hoofdletterongevoelig
@@ -854,16 +837,16 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
 #### 4. Organisaties
 
 - **Lijst**: Voor een Admin alle organisaties. Voor een Consultant
-  alleen zijn **eigen** organisaties (`datamodel.md` deel 2,
+  alleen zijn **eigen** organisaties (`datamodel-rollen.md`,
   Eigenaarschap en toegang van/tot organisaties): Die hij zelf
   aanmaakte, plus die een Admin expliciet aan hem toewees. Per rij de
   naam, het aantal respondenten, het aantal afgeronde scans, en
-  **"Aangemaakt door"** (de naam van de eigenaar) — altijd zichtbaar,
+  **"Aangemaakt door"** (de naam van de eigenaar), altijd zichtbaar,
   voor iedereen die de organisatie ziet, ongeacht of hij eigenaar of
   toegewezen is. Puur informatief, geen filter.
 - **Score en voortgang, alléén op de Consultant-lijst** (portfolio-
   overzicht, om te zien welke klant aandacht nodig heeft): Twee extra
-  kolommen, niet op de Admin-lijst — een Admin beheert het systeem,
+  kolommen, niet op de Admin-lijst, een Admin beheert het systeem,
   volgt geen individuele klantrelaties op, dus is hier geen
   actiehouder.
   - **Score**: Het gemiddelde van de meest recente Meting van deze
@@ -873,11 +856,11 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   - **Voortgang**: Van diezelfde meest recente Meting, "X van Y
     afgerond" (afgeronde `ScanInvulling`s van het totaal uitgenodigde).
     Is de meest recente Meting al volledig afgerond, dan blijft de
-    kolom leeg — voortgang is alleen relevant zolang een Meting nog
+    kolom leeg, voortgang is alleen relevant zolang een Meting nog
     loopt.
 - **Aanmaken**: Naam en kenmerken invullen. Zowel Admin als Consultant;
   de aanmaker wordt automatisch eigenaar (`aangemaaktDoor`).
-- **Korte naam** (optioneel, gebouwd op 15 oktober 2026): Een tweede,
+- **Korte naam** (optioneel): Een tweede,
   korte naam van de Organisatie voor kolomkoppen in matrices en heatmaps
   (`stylesheet.md`, Kolomkop en rijkop), maximaal 30 tekens, bij voorkeur
   tot 12 zodat hij zonder afkapping in een kolom van 96px past. Leeg
@@ -888,8 +871,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   bovenop de eigenaar. Intrekken van een toewijzing is de spiegel van
   toewijzen, geen aparte permissie. De eigenaar (`aangemaaktDoor`) en wie
   toegewezen is blijven twee onderscheiden dingen, ook al vallen ze in de
-  rechtenmatrix allebei onder hetzelfde bereik "eigen". Voorstel van
-  19 oktober 2026, gebouwd op 19 oktober 2026 (`components/beheer/ToegangKaart.tsx`): Dit is de kaart Toegang, en niet langer een uitklapbaar
+  rechtenmatrix allebei onder hetzelfde bereik "eigen". De Toegang is een kaart en geen uitklapbaar
   blok met losse tekst en selectievakjes. Het gaat over wie bij de gegevens van
   de organisatie mag, en hoort dus bij de kaart Afspraken, in één rij met
   die kaart.
@@ -915,7 +897,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     onder de paginatitel blijft staan, voor iedereen die de organisatie ziet,
     als alleen-lezen tekst. De kaart Toegang is de plek om het te wijzigen.
   - **Logging**: Zoals nu (`datamodel.md`, Audit).
-- **Afspraken** (voorstel van 19 oktober 2026, gebouwd op 19 oktober 2026 in `components/beheer/AfsprakenKaart.tsx`, Admin-only): Een smalle kaart
+- **Afspraken** (in `components/beheer/AfsprakenKaart.tsx`, Admin-only): Een smalle kaart
   direct onder de kaart Kenmerken en boven de kaart KPI's, rechts van de kaart
   Toegang, met de titel "Afspraken" en de drie schakelaars hieronder naast
   elkaar in één rij, elk met Info-icoon. Ze leggen vast wat met de organisatie
@@ -924,7 +906,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   blik wat aan staat. Een Consultant en een Lead zien de kaart niet.
 - **Benchmark-vlag** (Admin-only): In de kaart Afspraken, links, een
   schakelaar "Doet mee aan benchmark"
-  (`Organisatie.benchmarkToegestaan`, `datamodel.md` deel 3). Hij staat
+  (`Organisatie.benchmarkToegestaan`, `datamodel.md`, Deel 2: Benchmark). Hij staat
   uit bij een nieuwe organisatie. Een Admin zet hem aan nadat dit met de
   organisatie is afgesproken, bijvoorbeeld via contract of mail. Uitzetten
   gaat na een bevestiging die noemt in hoeveel benchmarks de organisatie
@@ -933,33 +915,29 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   `benchmark.md`, Toestemming en privacy.
 - **Namen tonen bij Antwoorden** (Admin-only): In de kaart Afspraken,
   rechts van de Benchmark-vlag, een schakelaar (`Organisatie.antwoordenMetNamen`,
-  `datamodel.md` deel 3). Hij staat uit bij een nieuwe organisatie. Uit: Leads
+  `datamodel.md`, Deel 2: Benchmark). Hij staat uit bij een nieuwe organisatie. Uit: Leads
   zien bij Antwoorden R1 tot en met Rn. Aan: Ze zien de namen. Een Admin zet
   hem aan na afstemming met de opdrachtgever. Aanzetten gaat na een
   bevestiging die zegt dat de Leads van deze organisatie dan namen zien,
   uitzetten kan zonder bevestiging. Wijzigen wordt gelogd
   (`organisatie.antwoordenNamenGewijzigd`). Zie punt 6a, Namen bij Antwoorden.
-- **Case-vlag** (Admin-only, voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 in `components/beheer/CaseVlag.tsx`): In de kaart Afspraken,
-  rechts van de schakelaar "Namen tonen bij Antwoorden", een vinkje
+- **Case-vlag** (Admin-only, in `components/beheer/CaseVlag.tsx`): In de kaart Afspraken,
+  rechts van het vinkje "Namen tonen bij Antwoorden", een vinkje
   "Mag als case gebruikt worden" (`Organisatie.caseToegestaan`, `datamodel.md`
   deel 3) met een Info-icoon (`info.caseVlag`). Hij staat uit bij een nieuwe
   organisatie en bij alle bestaande. Een Admin zet hem aan nadat dit met de
   organisatie is afgesproken. Aanzetten kan zonder bevestiging. Uitzetten gaat na
   een bevestiging die zegt in hoeveel Cases bij andere organisaties deze
   organisatie voorkomt en dat die voor de Leads verdwijnen. Wijzigen wordt
-  gelogd (`organisatie.caseVlagGewijzigd`). De Afspraken zijn in de bouw
-  vinkjes, ook deze (de beschrijving van de andere twee als schakelaar hierboven
-  is achterhaald). Past het derde vinkje niet in de rij, dan staat het eronder
-  (zo gebouwd, de kaart is een rij die afbreekt). De bevestiging bij uitzetten telt
+  gelogd (`organisatie.caseVlagGewijzigd`). De Afspraken zijn vinkjes, ook "Namen tonen bij Antwoorden". Past het derde vinkje niet in de rij, dan staat het eronder
+  (de kaart is een rij die afbreekt). De bevestiging bij uitzetten telt
   alleen de Cases die voor een Lead zichtbaar zijn (`zichtbaarVoorLead`), en een
   Case waarvan de vlag uitgaat blijft bij de Consultant staan met de status
   "Toestemming ontbreekt". Zie `dossier.md`.
 - **Naam wijzigen** (`organisaties.bewerken`, dus Admin voor alle
   organisaties en Consultant voor zijn eigen): Op het organisatie-detail
   staat de naam in de kop met een potlood ernaast. Een klik opent een modal
-  met de velden Naam en Korte naam, met "Annuleren" en "Opslaan" (twee velden,
-  dus een modal volgens `stylesheet.md`, Bewerken: op de plek of in een modal,
-  gebouwd op 19 oktober 2026). Er gelden dezelfde
+  met de velden Naam en Korte naam, met "Annuleren" en "Opslaan" (twee velden, dus een modal volgens `stylesheet.md`, Bewerken: Op de plek of in een modal). Er gelden dezelfde
   regels als bij Aanmaken: De naam is verplicht en wordt getrimd. Na opslaan
   staat de nieuwe naam direct in de kop, het kruimelpad, de lijst en overal
   waar de organisatie wordt genoemd (Respondent-overzicht, Resultaten,
@@ -982,8 +960,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   filter Organisatie al ingesteld op deze organisatie (in de URL, zoals de
   andere filters). Zijn het er 5 of minder, dan is er geen link. Er komt
   geen link naar de lijst over alle organisaties heen.
-- **Kenmerken** (uitgeschreven op 19 oktober 2026 naar de gebouwde kaart, gebouwd op 19 oktober 2026, zie "Zo gebouwd" onderaan dit punt; design
-  in `Claude outputs/kpi-design/`, bord 1 en 2, linksboven): De kaart bovenaan
+- **Kenmerken** (design in `Claude outputs/kpi-design/`, bord 1 en 2, linksboven): De kaart bovenaan
   het organisatie-detail, boven de kaarten KPI's en Metingen. Ze toont de
   waarden van de organisatievelden (`datamodel.md`, Organisatievelden) als een
   rustig raster, en laat bewerken op dezelfde plek.
@@ -1020,8 +997,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     kaart alleen laat zien wat bekend is. Is geen enkel veld ingevuld, dan staat
     er in plaats van het raster de tekst "Er zijn nog geen kenmerken ingevuld."
     in `--ink-s` (14px), met "Bewerken" rechtsboven zoals altijd.
-  - **Bewerken** (voorstel van 19 oktober 2026, volgt de regel Bewerken in
-    `stylesheet.md`): "Bewerken" opent een modal (`.modal-box--breed`, titel
+  - **Bewerken** (volgt de regel Bewerken in `stylesheet.md`): "Bewerken" opent een modal (`.modal-box--breed`, titel
     "Kenmerken bewerken" met de naam van de Organisatie eronder) met de velden
     van `datamodel.md`, Organisatievelden, in een raster van twee kolommen. Het
     zijn er te veel om in de kaart zelf te bewerken, en een formulier in de kaart
@@ -1034,15 +1010,12 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   - **Wat de kaart niet bevat**: De KPI's en de contacten per kanaal staan in de
     kaart eronder (hieronder). De Meting, het benchmarkvinkje en de Leads hebben
     eigen blokken.
-  - **Contactpersonen** (besloten en gebouwd op 20 oktober 2026, op
-    verzoek van Sander; Nieuws is op 20 oktober 2026 verhuisd naar de kaart
-    Dossier, zie hieronder): Onder het raster van de Kenmerken, in dezelfde kaart,
+  - **Contactpersonen** (op verzoek van Sander; Nieuws is op verhuisd naar de kaart Dossier, zie hieronder): Onder het raster van de Kenmerken, in dezelfde kaart,
     gescheiden door een lijn van 1px `--border` en 24px ruimte, staat de lijst
     Contactpersonen met een kop van 16px, gewicht 700, een Info-icoon
     (`info.contactpersonen`) en rechts een knop "+ Toevoegen"
     (`.btn-outline .btn-compact`). Alleen een Admin mag toevoegen, bewerken en
-    verwijderen (`contactpersonen.bewerken`, besloten op 20 oktober 2026; de
-    eerste bouw gebruikte `organisaties.bewerken` en moet worden aangepast). Een
+    verwijderen (`contactpersonen.bewerken`; de eerste bouw gebruikte `organisaties.bewerken` en moet worden aangepast). Een
     Consultant met toegang tot de Organisatie ziet de lijst zonder de knoppen
     "+ Toevoegen" en "Bewerken". Later krijgt een Consultant het recht ook,
     beperkt tot eigen Organisaties. Een Lead en een Respondent zien ze niet. Het
@@ -1056,27 +1029,18 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
       Naam (verplicht), Functie, LinkedIn-profiel (optioneel,
       een adres van linkedin.com, met `https://` als het ontbreekt) en Notitie.
       Onder Notitie staat in 12px `--ink-s`: "Alleen zakelijke, openbaar
-      vindbare informatie. Geen privégegevens." (besloten op 20 oktober 2026).
+      vindbare informatie. Geen privégegevens.".
       Een fout staat boven de knoppen in een `.overzicht-melding`
       (bijvoorbeeld "Dit is geen LinkedIn-adres."). Bij Bewerken staat links
       "Verwijderen" (`.btn-danger`), dat om een bevestiging vraagt
       (`BevestigModal`), zoals bij een Onderdeel.
-    - **Zo gebouwd (20 oktober 2026, bijgewerkt op 21 oktober 2026)**:
-      `components/beheer/Contactpersonen.tsx`, in `KenmerkenKaart` onder het
-      raster. De regels staan in `lib/contactpersonen.ts`, de opslag in
-      `lib/db/contactpersonen.ts` en de test in `lib/contactpersonen.test.ts`
-      (voorheen `contacten-nieuws`). Het deel voor nieuwsartikelen is
-      verhuisd naar het Dossier (`lib/dossier.ts`).
-  - **Dossier** (voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026, `dossier.md`): Een eigen kaart
+  - **Dossier** (`dossier.md`): Een eigen kaart
     onder de Kenmerken en onder de rij Toegang en Afspraken, boven de kaart
     KPI's, met de lijst Cases en Nieuws, het paneel "Instellingen voor de Lead" (de schakelaar "Zichtbaar voor Lead", de naam voor de Lead en de Meting per radar) en de
     knop "+ Toevoegen". Voor een Admin en voor een Consultant met toegang tot de
     Organisatie. De opmaak, het formulier en de regels staan in `dossier.md`,
-    scherm 1 en scherm 3. Het Dossier vervangt de lijst Nieuws in de kaart
-    Kenmerken. Zo gebouwd: `components/beheer/DossierKaart.tsx` met het
-    formulier erin, de opslag in `lib/db/dossier.ts` en de regels in
-    `lib/dossier.ts`.
-  - **Zo gebouwd (19 oktober 2026)**: `KenmerkenKaart` (`components/beheer/KenmerkenKaart.tsx`) en de opmaak in `lib/kenmerken-weergave.ts`, met een test. De kaart staat bovenaan het organisatie-detail, daaronder de kaart KPI's en dan Metingen. Het raster volgt de volgorde van de lijst in `organisatie-velden.ts`, dus Digitalisering staat na Volume en klantbasis. Een veld dat de spec niet noemt, valt terug op zijn label en waarde. De modal gebruikt het bestaande formulier (`KenmerkenForm`) in twee kolommen, met een groep van groepen (Volume en klantbasis, Techstack, FTE) over de volle breedte. Het label voor FTE van de klantcontactmedewerkers is "Klantcontactmedewerkers, inhouse" met "140, 70% inhouse", en het aandeel BPO staat niet in de kaart (alleen in het formulier). Voor IT DevOps staat "12, 25% digital". De blokken Benchmark en Namen tonen (Admin) staan onder het blok Leads, zonder eigen kop, omdat de kop Organisatiekenmerken vervalt. Het Bewerkslot geldt al zolang het organisatie-detail open is.
+    Organisatie-detail, kaart Dossier en Item toevoegen of bewerken. Het Dossier vervangt de lijst Nieuws in de kaart
+    Kenmerken.
   - **Volgorde**: De spec bepaalt de volgorde, niet de code. De velden staan in
     de volgorde van `datamodel.md`, Organisatievelden: Sector, Subsector, Totaal
     aantal klanten, Adoptie mijnomgeving/app, Percentage 2026, Ambitie 2030 (de
@@ -1084,13 +1048,11 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     techstack-categorieën (Contact center, WFM, CRM, Kennismanagement,
     Conversational AI, LLM-oplossing), Klantcontactmedewerkers (FTE), Klantcontact
     management & support en IT DevOps-medewerkers. Lege velden vallen weg, de rest
-    schuift op. De gebouwde kaart moet deze volgorde volgen. Wijkt ze af
-    (de schermafbeelding van 19 oktober 2026 zet Digitalisering tussen CRM en
-    Conversational AI), dan wordt de code aangepast en niet de spec. Bij Sector
+    schuift op. De kaart volgt deze volgorde. Bij Sector
     staat de korte naam, met de volledige SBI-naam (`sbi-indeling.md`) in de
     tooltip (zie de bullet hieronder).
 
-  - **Korte namen in kaart en formulier** (besluit van 19 oktober 2026, gebouwd op 19 oktober 2026: Sector, Subsector en de techstack-leveranciers in de kaart, en Sector en Subsector in het formulier als keuzelijst met zoekveld, `components/ZoekSelect.tsx`): De korte
+  - **Korte namen in kaart en formulier** (Sector, Subsector en de techstack-leveranciers in de kaart, en Sector en Subsector in het formulier als keuzelijst met zoekveld, `components/ZoekSelect.tsx`): De korte
     namen die een Admin heeft ingevuld (tab Korte namen) staan ook in het
     organisatie-detail. In de kaart Kenmerken toont Sector de korte naam, met de
     originele SBI-titel in de tooltip. In het formulier tonen de keuzelijsten
@@ -1100,8 +1062,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     origineel. Bewaard wordt altijd het origineel (`Organisatie.kenmerken`), dus
     een korte naam wijzigen verandert geen gegevens. De exports, de import en de
     PDF houden het origineel (`datamodel.md`, Korte namen).
-- **KPI's** (gebouwd op 19 oktober 2026, ontworpen; design
-  in `Claude outputs/kpi-design/`, bord 1 en 2, de kolommen in bord 6): Een eigen kaart onder de
+- **KPI's** (ontworpen; design in `Claude outputs/kpi-design/`, bord 1 en 2, de kolommen in bord 6): Een eigen kaart onder de
   Kenmerken. De KPI's en de contacten per kanaal staan niet meer bij de
   Kenmerken (`datamodel.md`, KPI's en kanalen). De Kenmerken zelf zijn in het
   design een compacte lijst met "Bewerken", uitgeschreven in het punt Kenmerken
@@ -1116,8 +1077,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     `--bg-warm` als achtergrond. De tabel staat in een vak met `overflow-x:
     auto`, met de eerste kolom vast (`position: sticky; left: 0`) zodra de
     tabel breder is dan het vak.
-  - **Kolomkop** (besloten en gebouwd op 19 oktober 2026, design bord 1 en 6, volgt
-    `stylesheet.md`, Kolomkop en rijkop): Elke kolom met cijfers is 96px breed
+  - **Kolomkop** (design bord 1 en 6, volgt `stylesheet.md`, Kolomkop en rijkop): Elke kolom met cijfers is 96px breed
     (`--kolom-b`), ook Algemeen, en de eerste kolom is 240px. Op de eerste regel
     staat de naam in 14px, gewicht 700, rechts uitgelijnd, op één regel en met
     een afkapping (`…`) als hij niet past. Een korte naam bestaat hier niet
@@ -1127,8 +1087,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     waarde bij het kanaal Algemeen voor die plek, en m het aantal KPI's dat op
     die plek mag (bij Algemeen alle KPI's, bij een Onderdeel de KPI's met
     `perOnderdeel`). De tooltip (`title`) noemt de volledige naam, "n van m
-    KPI's ingevuld" en bij een Onderdeel "Klik om te wijzigen". Zo gebouwd met
-    "Klik om te bewerken", volgens de regel Bewerken in `stylesheet.md`. De
+    KPI's ingevuld" en bij een Onderdeel "Klik om te bewerken" (de regel Bewerken in `stylesheet.md`). De
     tabel heeft vaste kolommen (`table-layout: fixed`, 240px en 96px) en elke rij
     is 48px hoog (gemeten in de browser), een kanaalrij 40px.
     - **Onderdeel wijzigen**: De kop van een Onderdeel is zelf een knop (hover
@@ -1155,8 +1114,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   - **Zonder Onderdelen**: Dan toont de tabel alleen de kolom Algemeen, met
     eronder de regel "Er zijn nog geen onderdelen. De waarden gelden voor de
     hele organisatie en voor alle kanalen samen."
-- **KPI's invullen** (gebouwd op 19 oktober 2026, ontworpen;
-  design bord 3): Een modal in plaats van een zijpaneel, omdat de specs alleen
+- **KPI's invullen** (ontworpen; design bord 3): Een modal in plaats van een zijpaneel, omdat de specs alleen
   de modal kennen voor een formulier met "Annuleren" en "Opslaan" (zoals de modal
   Korte namen). `.modal-box--breed` (maximaal 720px), met `max-height: 88vh` en
   scrollen binnen de modal.
@@ -1188,7 +1146,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   - **Slot en log**: Openen neemt het Bewerkslot van de Organisatie
     (`datamodel.md`, Bewerkslot). Opslaan logt `kpi.waardenGewijzigd`, één
     gebeurtenis per plek met wijzigingen.
-- **Data ouder dan de bewaartermijn** (`datamodel.md` deel 2,
+- **Data ouder dan de bewaartermijn** (`datamodel-rollen.md`,
   Bewaartermijn ingevulde scans). De twee instellingen (bewaartermijn en
   verlengtermijn) staan bij Drempels en termijnen (punt 10) en zijn Admin-only.
   De lijst en acties hieronder zijn ook voor een Consultant, zoals de
@@ -1196,14 +1154,14 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   - **Geen automatische verwijdering.** Zodra `bewaarTermijnDagen`
     verstreken is (en, bij eerder verlengen, ook `bewaarVerlengdTot`,
     `datamodel.md`), verschijnt de scan in een lijst **"Data ouder dan
-    de bewaartermijn"** — over alle organisaties heen voor Admin, eigen
+    de bewaartermijn"**, over alle organisaties heen voor Admin, eigen
     organisaties voor Consultant, zelfde bereik als de rest van dit
     scherm. Per rij twee acties, voor **beide** rollen: **"Verwijderen"**
     (bestaande verwijderactie op de ingevulde scan) of **"Verlengen"**
     (zet `bewaarVerlengdTot` op het moment van de klik plus
     `verlengTermijnDagen`, dus vanaf nu en niet vanaf de oude einddatum.
     De scan verdwijnt uit de lijst tot die nieuwe datum verstreken is).
-    Zonder actie blijft de scan gewoon bestaan en in de lijst staan —
+    Zonder actie blijft de scan gewoon bestaan en in de lijst staan,
     niets gebeurt vanzelf.
 - **Verlengd, nog niet opnieuw te beoordelen**: Tweede lijst onder de eerste,
   met tussen haakjes het aantal. Kolommen: Organisatie, Respondent,
@@ -1215,7 +1173,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   een link "Naar resultaten →", naar het gemiddelde van alle afgeronde
   ingevulde scans binnen die Meting (dus per scanronde, niet over
   meerdere Metingen of scan-types heen). Zelfde opbouw als het
-  resultatenscherm van één scan (CLAUDE.md, schermflow punt 6:
+  resultatenscherm van één scan (`schermen.md`, Resultatenpagina:
   classificatiecirkel, radar, staafdiagram per categorie, top 3, legenda),
   alleen met de gemiddelde scores van de Meting in plaats van die van
   één respondent. De weging uit `Bouwblok.gewicht` werkt hier hetzelfde
@@ -1226,9 +1184,9 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   weergave gebruikt de Lead-rol op zijn eigen pagina (`datamodel.md`
   deel 2, Rollen).
 
-  **Weergaven (besloten op 12 oktober 2026, gebouwd op 13 oktober 2026).** Boven de
+  **Weergaven.** Boven de
   inhoud staat een weergave-schakelaar (`stylesheet.md`, Weergave-schakelaar)
-  met Overzicht, Per bouwblok en Spreiding, en voor een Admin en Consultant ook Antwoorden (de antwoorden per vraag en per respondent, gebouwd op 13 oktober 2026). Overzicht is de standaard en de
+  met Overzicht, Per bouwblok en Spreiding, en voor een Admin en Consultant ook Antwoorden (de antwoorden per vraag en per respondent). Overzicht is de standaard en de
   opbouw hierboven, die ongewijzigd blijft. Rechts van de schakelaar staat de
   knop "Vergelijking", actief als de Meting in een vergelijking tussen Metingen zit
   (punt 14). De weergaven, de knop en de
@@ -1247,9 +1205,9 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   **Nog niet gedekt**: Export (PDF/CSV/InDesign) van dit
   organisatieresultaat. De bestaande exports blijven per één scan, zie
   `export-pdf-visual-volwassenheidsscan.md`, "Export van één scan, geen
-  aggregatie". Zodra dit gebouwd wordt: een Lead ziet die export alleen op
+  aggregatie". Voor die export geldt: Een Lead ziet die export alleen op
   Metingen waarvoor hij Resultaten heeft (`LeadToegang`), niet op elke
-  Meting die hij verder kan bereiken — zie `datamodel.md` deel 2,
+  Meting die hij verder kan bereiken, zie `datamodel-rollen.md`,
   Rechtenmatrix, `export.uitvoeren`, en `export-indesign.md`, "Waar dit een
   plek krijgt".
 - **Acties op een Respondent** (AVG-verzoek, verplaatsen naar een andere
@@ -1262,11 +1220,6 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
 Vanuit de organisatie: Een Meting aanmaken met een assessment-type, een
 onderdeel en een meetdatum. Een organisatie kan meerdere Metingen hebben, ook
 van verschillende scan-types.
-
-**Status.** Besloten door Joost en gebouwd op 14 oktober 2026. De ronde
-vervalt. Wat op 13 oktober 2026 met rondes is gebouwd (rondekoppen, "Nieuwe
-ronde starten", "Naar ronde…", het overzicht van een ronde) wordt vervangen
-door wat hieronder staat. Zie Overgang aan het eind van dit punt.
 
 **Begrippen**, ook als Info-icoon boven de lijst Metingen
 (`info.metingBegrippen`):
@@ -1284,8 +1237,7 @@ door wat hieronder staat. Zie Overgang aan het eind van dit punt.
 Meetdatum (`datamodel.md`, Meting). Alle drie zijn verplicht.
 
 - **Onderdeel**: Een keuzelijst, voorgevuld met "Hele organisatie"
-  (gebouwd op 19 oktober 2026, design bord 5a en 5b; daarvoor was het een
-  tekstveld met suggesties). Zie Het veld Onderdeel hieronder.
+  (design bord 5a en 5b; daarvoor was het een tekstveld met suggesties). Zie Het veld Onderdeel hieronder.
 - **Meetdatum**: Een datumveld, leeg bij aanmaken, zodat de gebruiker bewust
   een datum kiest. Een datum in de toekomst mag, want een Meting kan vooraf
   worden gepland.
@@ -1301,7 +1253,7 @@ Meetdatum (`datamodel.md`, Meting). Alle drie zijn verplicht.
   "Wordt: …" verschuift niets in de rij (`stylesheet.md`, Formulieren,
   Veldenrij met labels en een knop).
 
-**Het veld Onderdeel** (gebouwd op 19 oktober 2026, ontworpen). Het onderdeel is een Onderdeel van de Organisatie (`datamodel.md`,
+**Het veld Onderdeel** (ontworpen). Het onderdeel is een Onderdeel van de Organisatie (`datamodel.md`,
 Onderdeel), en geen tekst meer. Het veld is overal dezelfde keuzelijst: In "+
 Meting plannen", in Wijzigen van een Meting, in "Gemiddelde maken", in "Scans
 samenbrengen" (punt 6b) en bij de import (punt 8).
@@ -1338,15 +1290,13 @@ Selecteer je één of meer Metingen, dan komen daar de acties "Meetdatum
 instellen…" en, voor het samenvoegen van losse Metingen, "Samenbrengen in één
 Meting…" (punt 6b) bij.
 
-**Meetdatum instellen…** (gebouwd op 14 oktober 2026): Opent een modal met één datumveld en de
+**Meetdatum instellen…**: Opent een modal met één datumveld en de
 lijst van de geselecteerde Metingen, die de datum allemaal krijgen. Bedoeld
-voor de bestaande Metingen die na het wegvallen van de rondes nog geen
-meetdatum hebben. Gelogd als `meting.meetdatumGewijzigd` (`datamodel.md`,
+voor Metingen die nog geen meetdatum hebben. Gelogd als `meting.meetdatumGewijzigd` (`datamodel.md`,
 Audit), één gebeurtenis per Meting.
 
 **Bewerken**: Een potlood naast de naam van de Meting in het Meting-overzicht.
-Het opent een modal (drie velden, `stylesheet.md`, Bewerken: op de plek of in
-een modal, gebouwd op 19 oktober 2026) met de velden Onderdeel, Meetdatum en
+Het opent een modal (drie velden, `stylesheet.md`, Bewerken: Op de plek of in een modal) met de velden Onderdeel, Meetdatum en
 Naam, met Annuleren en Opslaan, en verder niets. Naam is voorgevuld met de huidige naam. Pas je
 de naam aan, dan volgt hij onderdeel en meetdatum niet meer
 (`Meting.labelHandmatig`). Een knop "Standaardnaam herstellen" naast het veld
@@ -1355,13 +1305,11 @@ zou de al ingevulde antwoorden inconsistent maken met een ander scan-type. Voor
 een ander scan-type maak je een nieuwe Meting aan. Een samengestelde Meting
 heeft geen eigen meetdatum om te wijzigen (zie hieronder).
 
-**Overgang van wat op 13 oktober 2026 is gebouwd.**
+**Metingen zonder meetdatum.**
 
-- De entiteit Ronde, het veld `rondeId`, "Nieuwe ronde starten", "Naar ronde…",
-  het hernoemen van een ronde en het overzicht van een ronde vervallen.
-- Bestaande Metingen houden hun naam, onderdeel en samenstelling. Hun
-  meetdatum is leeg en staat als "Datum ontbreekt" onderaan de lijst, tot de
-  Admin of Consultant hem invult met Wijzigen of "Meetdatum instellen…".
+- Een Meting zonder meetdatum staat als "Datum ontbreekt" onderaan de lijst,
+  tot de Admin of Consultant de datum invult met Wijzigen of "Meetdatum
+  instellen…".
 - Zonder meetdatum doet een Meting niet mee aan een samenstelling of aan een
   vergelijking tussen Metingen. Ze blijft wel zichtbaar en bruikbaar voor
   resultaten en uitnodigen.
@@ -1402,8 +1350,7 @@ alle Metingen, een Consultant die van zijn eigen organisaties.
   "Respons naar andere Meting verplaatsen") en de Meting verwijderen (de
   bestaande verwijderfunctie, ook voor een lege import-Meting).
 
-**Samengestelde Meting** (gebouwd op 13 oktober 2026, aangepast in het voorstel van
-14 oktober 2026; `benchmark.md`, Onderdeel en samengestelde Meting): Een
+**Samengestelde Meting** (aangepast in het ; `benchmark.md`, Onderdeel en samengestelde Meting): Een
 gemiddelde over meerdere Metingen van één organisatie en één Assessment,
 bruikbaar als één deelnemer in een benchmark tussen organisaties en in een
 vergelijking tussen Metingen. Admin en Consultant (bij zijn eigen organisaties,
@@ -1465,17 +1412,8 @@ Leads-venster (punt 6a).
 
 #### 6a. Leads: Toegang per weergave
 
-**Status.** Gebouwd op 14 oktober 2026. Dit verving het bereik van een Lead
-(Specifieke Metingen of Hele organisatie), `RespondentRolMeting`,
-`leadVoorOrganisatie` en het toewijzen van benchmarkviews op de views zelf.
-Wat daarvan op 13 oktober 2026 was gebouwd, is omgezet (zie Overgang onder dit
-punt).
-De tabel Leads stond als blok op de pagina van het organisatie-detail. Het
-blok Leads met het Leads-venster (modal) is gebouwd op 14 oktober 2026 en
-verving die tabel op de pagina.
-
 Lead worden en een vragenlijst krijgen zijn twee losse acties. Een Lead is een
-Respondent met de Lead-rol (`RespondentRol`, `datamodel.md` deel 2) en hoeft
+Respondent met de Lead-rol (`RespondentRol`, `datamodel-rollen.md`) en hoeft
 geen enkele `ScanInvulling` te hebben. Wat een Lead mag zien, staat op één
 plek: Het Leads-venster van de organisatie.
 
@@ -1521,8 +1459,7 @@ daarom staat ze niet op de pagina zelf maar in een eigen venster.
     de kolom Resultaten, want ze heeft geen scans en geen Respondenten.
   - Per benchmark waar deze organisatie in zit één kolom, met de naam van de
     benchmark. Onder de naam staat een badge, Vaste groep of Verkenning, en
-    het aantal Organisaties in de groep (gebouwd op 17 oktober 2026,
-    `benchmark.md`, Opgeslagen verkenning). Bij een Verkenning zit de
+    het aantal Organisaties in de groep (`benchmark.md`, Opgeslagen verkenning). Bij een Verkenning zit de
     organisatie in de groep als ze aan de filters voldoet, bij de eenheid
     Onderdelen als minstens één onderdeel van haar eraan voldoet. Een
     Verkenning waarin de organisatie niet zit, heeft geen kolom. Is de groep
@@ -1583,7 +1520,7 @@ een Info-icoon (`info.leadToegangCel`, de tekst volgt de reden).
   Uitnodigen is onafhankelijk.
 - Een samengestelde Meting heeft alleen de kolom Resultaten.
 - Spreiding is grijs zolang de Meting minder afgeronde scans heeft dan
-  `benchmarkMinRespondenten` (voorstel, startwaarde 5), want met weinig
+  `benchmarkMinRespondenten` (startwaarde 5), want met weinig
   stippen is een scan te herleiden tot een persoon.
 - Bij anonieme namen (zie hieronder) geldt dezelfde drempel voor Antwoorden.
   Bij namen geldt de drempel voor Antwoorden niet.
@@ -1599,15 +1536,15 @@ een Info-icoon (`info.leadToegangCel`, de tekst volgt de reden).
 Toegang erft niet mee. Een samengestelde Meting en haar onderliggende Metingen
 zijn elk een eigen kolom.
 
-**Namen bij Antwoorden.** Per organisatie een schakelaar "Namen tonen bij
+**Namen bij Antwoorden.** Per organisatie een vinkje "Namen tonen bij
 Antwoorden" (`Organisatie.antwoordenMetNamen`, standaard uit), alleen voor een
 Admin, op het organisatie-detail naast de Benchmark-vlag (punt 4), met een
 Info-icoon (`info.antwoordenMetNamen`).
 
 - **Uit**: Een Lead ziet de kolommen R1 tot en met Rn, zonder naam in een
   tooltip. De volgorde volgt niet de naam en niet het moment van afronden,
-  zodat die geen aanwijzing geeft (voorstel: Een vaste volgorde uit een hash
-  van het scan-id, per Meting).
+  zodat die geen aanwijzing geeft. De volgorde is een vaste volgorde uit een hash
+  van het scan-id, per Meting.
 - **Aan**: Een Lead ziet dezelfde kolomkoppen als een Admin, de initialen met
   de volledige naam in een tooltip.
 - **Afstemming**: Of namen getoond mogen worden, stemmen Coniche en de
@@ -1656,7 +1593,7 @@ deel 2, Rechtenmatrix). Een Consultant ziet het blok en het venster niet en kan
 geen Lead aanmaken. Een Lead ziet ze nooit.
 
 **Wat de persoonlijke link laat zien (de landingspagina van een Lead)**:
-"Mijn metingen" (CLAUDE.md, schermflow punt 4) toont voor een Lead alleen wat
+"Mijn metingen" (`schermen.md`) toont voor een Lead alleen wat
 een Admin heeft aangevinkt.
 
 - **Kop**: De naam van de organisatie. Een Lead die geen respondent is, ziet
@@ -1681,26 +1618,15 @@ een Admin heeft aangevinkt.
   melding "Er staat nog niets voor je klaar. Neem contact op met Coniche als
   je dit niet verwacht."
 
-**Overgang van wat op 13 oktober 2026 is gebouwd.**
-
-- Een Lead met `leadMetingIds` krijgt Resultaten, Uitnodigen en Exporteren aan
-  voor die Metingen, want dat kon hij al.
-- Een Lead met `leadVoorOrganisatie` krijgt die drie aan voor alle Metingen
-  die nu bestaan, en niet voor latere. De Admin krijgt op de organisatie een
-  melding dat dit zo is omgezet.
-- Elke `BenchmarkToewijzing` op niveau 1 of 2 wordt een aangevinkte
-  benchmarkkolom voor die Lead. Een toewijzing op niveau 3 wordt Spreiding aan
-  voor die Meting, zonder ring op de scan, met een melding aan de Admin.
-
 **Open punten.**
 
 - Een Consultant heeft in deze opzet geen enkele rol bij Leads. Dat volgt uit
   "alles Admin-only", en kan later worden verruimd.
 
 **Verificatie-blokkade opheffen**: Na 3 mislukte pogingen op een
-verificatiecode raakt die geblokkeerd (`datamodel.md` deel 2, Toegang
+verificatiecode raakt die geblokkeerd (`datamodel-rollen.md`, Toegang
 voor respondenten). De respondent kan zelf gewoon een nieuwe code
-aanvragen — dat lost de meeste gevallen vanzelf op. Blijkt dat zelf
+aanvragen, dat lost de meeste gevallen vanzelf op. Blijkt dat zelf
 herhaaldelijk aanvragen ook misbruikt te worden, dan kan een Admin of
 Consultant (bereik `eigen`) de blokkade voor deze respondent expliciet
 opheffen, actie in het Respondent-overzicht (punt 6b). Analoog aan de
@@ -1713,7 +1639,7 @@ twee.** Op die kaart staan naast elkaar twee knoppen, waarvan de eerste
 afhangt van de status van zijn eigen `ScanInvulling`:
 
 - **Eigen scan, afhankelijk van de status** (de gewone knop uit de
-  status-routing van "Mijn metingen", CLAUDE.md, schermflow punt 4):
+  status-routing van "Mijn metingen", `schermen.md`):
   - `"uitgenodigd"`: "Start de scan".
   - `"bezig"`: "Ga verder".
   - `"afgerond"`: "Bekijk jouw resultaten" → zijn eigen `ScanInvulling`
@@ -1737,7 +1663,7 @@ staan. Dit vervangt de losse acties per rij in het organisatie-detail
 (punt 4), dat daardoor weer over de organisatie zelf gaat.
 **Zelfde bereik als de rest van dit onderdeel**: Een Admin ziet alle
 Respondenten over alle organisaties heen, een Consultant alleen die van
-zijn eigen organisaties (`datamodel.md` deel 2, Rechtenmatrix).
+zijn eigen organisaties (`datamodel-rollen.md`, Rechtenmatrix).
 
 Het verschil met de scanlijst in het Meting-overzicht (punt 5): Die lijst gaat
 over de scan, met resultaten en export. Deze lijst gaat over de persoon, met zijn
@@ -1792,11 +1718,11 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
 - **Rechten**: Elke actie in het overzicht heeft dezelfde rechten als
   voorheen (Admin en Consultant met bereik `eigen`, niet de Lead), behalve
   het selectievakje Lead, dat alleen een Admin mag zetten (punt 6a), zie
-  `datamodel.md` deel 2, Rechtenmatrix.
+  `datamodel-rollen.md`, Rechtenmatrix.
 
 **Acties in het overzicht** (de regels van voorheen, nu hier):
 
-- **AVG-verzoek verwerken** (Admin: alle organisaties, Consultant:
+- **AVG-verzoek verwerken** (Admin: Alle organisaties, Consultant:
   eigen): Actie in het blok "Hele Respondent" van het
   Respondent-overzicht. Twee opties:
   - **Inzage**: Downloadt een CSV met alle data van deze respondent:
@@ -1807,7 +1733,7 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
     niets wijzigt.
   - **Verwijdering**: Hergebruikt de bestaande verwijderactie op de
     respondent (Verwijderen hieronder), geen nieuwe verwijderlogica.
-  Beide acties worden gelogd (`datamodel.md` deel 2, Audit) — dat is
+  Beide acties worden gelogd (`datamodel-rollen.md`, Audit), dat is
   meteen ook het bewijs dat een AVG-verzoek daadwerkelijk is
   afgehandeld.
 - **Respondent of losse respons naar een andere organisatie
@@ -1900,7 +1826,7 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   onder hangt, is te verwijderen via de bestaande verwijderfunctie
   hieronder (Verwijderen). Die cascade is dan leeg, geen nieuwe logica
   nodig.
-- **Respons naar andere Meting verplaatsen** (1 oktober 2026): Hangt een
+- **Respons naar andere Meting verplaatsen**: Hangt een
   ingevulde scan onder een andere Meting van dezelfde organisatie.
   Bedoeld voor de responsen die de import (`import-scans.md`) in een
   eigen import-Meting heeft gezet, maar bruikbaar voor elke
@@ -1975,7 +1901,7 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   **Lege Meting**: Blijft staan na het verplaatsen van de laatste respons.
   Opruimen is een aparte actie, via de bestaande verwijderfunctie
   (Verwijderen).
-- **Scans samenbrengen in één Meting** (gebouwd op 13 oktober 2026): Zet
+- **Scans samenbrengen in één Meting**: Zet
   scans die na een import verspreid over losse Metingen staan en onder één
   Respondent hangen, in één keer in één Meting en koppelt ze aan de juiste
   Respondent. Het voorbeeld is een import van tien bestanden waarin steeds
@@ -2040,8 +1966,8 @@ na het verplaatsen van zijn laatste respons, staat alleen hier.
   **Niet automatisch**: De app probeert de Respondent niet zelf uit de notitie
   te halen. Notities zijn vrije tekst, en een verkeerde koppeling merkt
   niemand op. De beheerder leest de notitie en kiest.
-- **Respondent bewerken** (1 oktober 2026): Actie in het Respondent-overzicht
-  (Admin: alle organisaties, Consultant: eigen). Bedoeld om een Respondent die de import
+- **Respondent bewerken**: Actie in het Respondent-overzicht
+  (Admin: Alle organisaties, Consultant: Eigen). Bedoeld om een Respondent die de import
   aanmaakt (`import-scans.md`, "Wie de Respondent wordt"), vaak een
   Coniche-medewerker, later aan de echte persoon te koppelen, maar
   bruikbaar voor elke Respondent.
@@ -2107,16 +2033,13 @@ met een waarschuwing (een 95%+-match) tellen pas mee na een expliciete
 goedkeuring per rij; er is geen import per rij (`import-scans.md`,
 Werkwijze in beheer, punt 6).
 
-### Resultaten (Admin: alle, Consultant: eigen)
+### Resultaten (Admin: Alle, Consultant: Eigen)
 
 #### 7. Resultaten
 
-**Status.** Gebouwd op 14 oktober 2026. Dit verving de pagina Ingevulde
-scans en de hoofdlink Benchmark. Zie Overgang onder dit punt.
-
 Alles wat uit ingevulde scans komt, staat onder één hoofdlink: Resultaten. Een
 Admin ziet alles, een Consultant alleen de Metingen van zijn eigen
-organisaties (`datamodel.md` deel 2, Rechtenmatrix, `resultaten.inzien`).
+organisaties (`datamodel-rollen.md`, Rechtenmatrix, `resultaten.inzien`).
 Benchmarks zijn alleen voor een Admin (`benchmark.beheren`). De hoofdlink staat
 in `.nav-right` na Organisaties.
 
@@ -2136,7 +2059,7 @@ een view een niveau dieper.
   scan. Je komt dus altijd van organisatie via Meting bij de scan.
 - **Benchmarks** (alleen Admin): De benchmarks, punt 14. Daaronder vallen ook
   de vergelijkingen tussen Metingen (`benchmark.md`, Niveau 2).
-- **Verkennen** (alleen Admin, gebouwd op 15 oktober 2026): Alle
+- **Verkennen** (alleen Admin): Alle
   Organisaties van één Assessment filteren, groeperen en vergelijken, punt 15.
 - **Selectie**: Selectievakje per rij, met de acties "Exporteren" voor de
   afgeronde scans van de geselecteerde Metingen (zie Export hieronder) en
@@ -2163,9 +2086,9 @@ een view een niveau dieper.
   1. **Kop**: Naam van de Respondent, daaronder Organisatie, Meting en
      Assessment, en de status als badge.
   2. **Scan**: Beschrijvingslijst met Rol/Team (volgens de lege-waarderegel
-     hierboven), Notitie (gebouwd, alleen als de scan er een heeft), Gestart, Afgerond (alleen bij een afgeronde scan),
+     hierboven), Notitie (alleen als de scan er een heeft), Gestart, Afgerond (alleen bij een afgeronde scan),
      Voortgang ("60 van 60 vragen", bij een lopende scan met percentage)
-     en Overall score met het niveau (alleen bij een afgeronde scan). Geen
+     en Totaalscore met het niveau (alleen bij een afgeronde scan). Geen
      tegels.
   3. **Toegang**: De persoonlijke link in een alleen-lezen veld met
      "Kopieer" eraan vast en "Openen" ernaast, zoals bij het
@@ -2186,7 +2109,7 @@ een view een niveau dieper.
      die Respondent, en het formulier zegt dat (punt 6b). Alleen deze scan
      onder een andere naam is "Andere Respondent koppelen".
 
-     **Andere Respondent koppelen** (gebouwd op 13 oktober 2026): Opent een vervolgstap met
+     **Andere Respondent koppelen**: Opent een vervolgstap met
      hetzelfde blok als in "Conflict oplossen" (punt 6b): Een keuzelijst met
      "Nieuwe Respondent" en de bestaande Respondenten van dezelfde
      organisatie. Bij "Nieuwe Respondent" zijn Naam, E-mail, Functie, Team en
@@ -2200,7 +2123,7 @@ een view een niveau dieper.
      `respons.respondentGewijzigd`. Verplaatsen
      naar een andere organisatie staat alleen in het Respondent-overzicht.
   Rechten per actie zijn gelijk aan die op deze lijst en het resultaten-
-  en exportbereik uit `datamodel.md` deel 2, Rechtenmatrix.
+  en exportbereik uit `datamodel-rollen.md`, Rechtenmatrix.
 - **Export**: Eén gedeelde exportfunctie voor een selectie scans (Meting-overzicht),
   een selectie Metingen (deze lijst) en de resultatenpagina (één
   scan), zie `export-csv.md` voor de exacte kolommen. Een selectie Metingen
@@ -2218,18 +2141,6 @@ een view een niveau dieper.
 Selecteren en verwijderen is een terugkerend patroon: Dezelfde component
 komt ook op de lijst van organisaties, de metingen en de respondenten.
 
-**Overgang van wat op 13 oktober 2026 is gebouwd.**
-
-- De hoofdlink Benchmark heet Resultaten. De bestaande benchmarkschermen staan
-  onder de tab Benchmarks, met het kruimelpad Resultaten › Benchmarks › {naam}.
-  De oude adressen verwijzen door.
-- De pagina Ingevulde scans en de tab Import vervallen. Het oude adres van
-  Ingevulde scans verwijst door naar Resultaten › Metingen.
-- De rondekop in het organisatie-detail en de knop "Overzicht" daarin vervallen
-  met de ronde (`beheerpagina.md`, punt 5, Overgang).
-- Het Scan-overzicht, de filters in de URL en de bulk-export blijven
-  werken zoals nu, op de nieuwe plekken.
-
 **Open punten.**
 
 - Een Consultant ziet geen Benchmarks. Verruimen kan later (`benchmark.md`).
@@ -2237,19 +2148,17 @@ komt ook op de lijst van organisaties, de metingen en de respondenten.
 #### 14. Benchmarks
 
 De tab Benchmarks onder Resultaten (punt 7), alleen zichtbaar voor een Admin
-(`benchmark.beheren`, `datamodel.md` deel 2, Rechtenmatrix). Een Consultant
-ziet de tab niet. Tot 14 oktober 2026 was dit een eigen hoofdlink Benchmark. Het gedrag staat in `benchmark.md`, de records in
-`datamodel.md` deel 3. Hier staan de schermen.
+(`benchmark.beheren`, `datamodel-rollen.md`, Rechtenmatrix). Een Consultant
+ziet de tab niet. Het gedrag staat in `benchmark.md`, de records in
+`datamodel.md`, Deel 2: Benchmark. Hier staan de schermen.
 
 Alle drie de niveaus staan op deze plek (`benchmark.md`, Wat het is). De
-schermen hieronder zijn gebouwd voor niveau 1 (tussen organisaties). Wat voor
-niveau 2 en 3 anders is, staat onder Niveau 2 en 3 aan het eind van dit punt
-en is voorstel.
+schermen hieronder gelden voor niveau 1 (tussen organisaties). Wat voor
+niveau 2 en 3 anders is, staat onder Niveau 2 en 3 aan het eind van dit punt.
 
 - **Lijst**: Alle benchmarks, per rij de naam, de Assessments, per
   Assessment het aantal organisaties als "X van Y" (`benchmark.md`, Teller)
-  en wanneer de benchmark is aangemaakt. Voorstel: Een kolom Niveau, zodra
-  er meer dan één niveau bestaat, en bij niveau 2 de lezing. Gebouwd op 17 oktober 2026: Bij niveau 1 een badge Vaste groep of Verkenning. Boven de lijst een oranje knop
+  en wanneer de benchmark is aangemaakt. Bij niveau 1 een badge Vaste groep of Verkenning. Zodra er meer dan één niveau bestaat, komt er een kolom Niveau en bij niveau 2 de lezing. Boven de lijst een oranje knop
   "+ Benchmark aanmaken" (`.btn-or .btn-compact`).
 - **Aanmaken en wijzigen**: Eerst de Assessments, daarna de organisaties
   met het optionele sectorfilter, en per organisatie de Meting per
@@ -2259,8 +2168,8 @@ en is voorstel.
   Organisaties met de vlag die niet in de lijst staan, komen onder de lijst
   met de reden. De knop "Benchmark aanmaken" is uitgeschakeld tot de benchmark een naam,
   een Assessment en een organisatie heeft, met de reden in
-  `info.benchmarkAanmaken`. Voorstel: Eerst een keuze voor het niveau.
-- **Verkenning** (gebouwd op 17 oktober 2026): Een benchmark die uit
+  `info.benchmarkAanmaken`. Zodra er meer dan één niveau bestaat, komt eerst een keuze voor het niveau.
+- **Verkenning**: Een benchmark die uit
   Verkennen komt (`benchmark.md`, Opgeslagen verkenning) staat in de lijst met
   de badge Verkenning en het aantal Organisaties van dit moment. Het detail
   toont erboven de filters als regels ("CRM-pakket is Salesforce"), de Meetperiode en de eenheid. De
@@ -2279,8 +2188,7 @@ en is voorstel.
   ontbreken (`benchmark.md`, Weergave voor de Admin). Onder de gemiddelden
   staat per Assessment de matrix "Per bouwblok en per organisatie", met de
   bouwblokken als rijen en de organisaties als kolommen (`benchmark.md`,
-  Weergave voor de Admin, en `visualisatie-scores.md`, onderdeel E). Nog niet
-  gebouwd. Is een lid
+  Weergave voor de Admin, en `visualisatie-scores.md`, onderdeel E). Is een lid
   automatisch weggevallen, dan staat boven het detail een melding
   (`Benchmark.meldingen`) die de Admin kan wegklikken. Onder de cijfers
   staat de peildatum.
@@ -2288,16 +2196,15 @@ en is voorstel.
   deelnemende organisatie een view met die organisatie tegenover de rest
   van de groep (`benchmark.md`, View per organisatie). Het groepsgemiddelde
   staat in het staafdiagram als tweede, neutrale balk.
-- **Leads**: Op de view staat geen blok meer om een Lead te kiezen. Wie de
+- **Leads**: Op de view staat geen blok om een Lead te kiezen. Wie de
   view ziet, vink je aan in het Leads-venster van de organisatie (punt 6a). Onder
   de view staat alleen een lijst van de Leads die hem nu zien, met per Lead de
   knop "Bekijk" (Respondent-overzicht, punt 6b) en een verwijzing naar de
-  tabel. Gebouwd op 14 oktober 2026, dit vervangt het blok "Toewijzen aan een
-  Lead" (`benchmark.md`, View voor een Lead).
+  tabel. Zie `benchmark.md`, View voor een Lead.
 - **Verwijderen**: Met een bevestiging die noemt hoeveel vinkjes van Leads
   meegaan.
 
-**Niveau 2 en 3 (niveau 2 gebouwd op 14 oktober 2026).** Niveau 2 gebruikt dezelfde schermen met een
+**Niveau 2 en 3 (niveau 2).** Niveau 2 gebruikt dezelfde schermen met een
 andere keuzelijst: Eerst één organisatie, dan één Assessment, dan de Metingen
 daarvan (de eerste versie precies twee, zonder vlag). Elke Meting heeft een
 meetdatum en minimaal `benchmarkMinScans` afgeronde scans, en ook een
@@ -2326,26 +2233,21 @@ spreiding binnen een Meting (niveau 3) krijgt een Lead als kolom Spreiding
 
 #### 15. Verkennen
 
-**Status.** Gebouwd op 15 oktober 2026, naar het visual design met
-voorbeelddata, met filters en een vaste groepering. De korte namen op de pillen
-en het potlood naast de kop van een filter zijn gebouwd op 15 oktober 2026. De
-kaart Kenmerken en Groeperen op met pillen (het potlood naast de naam van een
-kenmerk) zijn gebouwd op 15 oktober 2026. Het gedrag staat in
-`visualisatie-verkennen.md`, hier staat de plek in beheer.
+Het gedrag staat in `visualisatie-verkennen.md`, hier staat de plek in beheer.
 
 De tab Verkennen onder Resultaten (punt 7), alleen zichtbaar voor een Admin
-(`verkennen.inzien`, `datamodel.md` deel 2, Rechtenmatrix). Een Consultant ziet
-de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat zelf niets op. Alleen de knop Opslaan als benchmark bewaart de filters (gebouwd op 17 oktober 2026).
+(`verkennen.inzien`, `datamodel-rollen.md`, Rechtenmatrix). Een Consultant ziet
+de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat zelf niets op. Alleen de knop Opslaan als benchmark bewaart de filters.
 
 - **Bovenaan**: De eyebrow Resultaten, de paginatitel Verkennen en een
   keuze van het Assessment. Alles op de pagina werkt binnen dat ene
   Assessment.
-- **Eenheid** (gebouwd op 17 oktober 2026): Een pilvormige groep
+- **Eenheid**: Een pilvormige groep
   Organisaties of Onderdelen naast de keuze van het Assessment
   (`visualisatie-verkennen.md`, Eenheid). Bij Onderdelen komen de kenmerken
   Organisatie en Onderdeel erbij, en tellen de teller, de teksten en de
   drempels in onderdelen.
-- **Opslaan als benchmark** (gebouwd op 17 oktober 2026): Onder
+- **Opslaan als benchmark**: Onder
   de teller en de balk in de kaart Kenmerken staat de knop "Opslaan als
   benchmark" met een Info-icoon (`info.verkennenOpslaan`). De knop opent een
   paneel met het veld Naam (zichtbaar voor de Lead), de filters als regels,
@@ -2353,8 +2255,7 @@ de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat zelf niets op
   groene regel met de naam en de verwijzing naar het Leads-venster
   (`visualisatie-verkennen.md`, Opslaan als benchmark).
 - **Kenmerken**: De kaart Kenmerken (`visualisatie-verkennen.md`, Kenmerken
-  en filters). Een KPI staat erin met een keuze van het kanaal (voorstel van 19
-  oktober 2026, `visualisatie-verkennen.md`, KPI's als kenmerk). Het scherm begint leeg, met "Snel beginnen" (CRM-pakket,
+  en filters). Een KPI staat erin met een keuze van het kanaal (`visualisatie-verkennen.md`, KPI's als kenmerk). Het scherm begint leeg, met "Snel beginnen" (CRM-pakket,
   Sector, AHT) en een knop "Kenmerk toevoegen" met een menu per groep van
   velden met zoekveld. Per kenmerk een rij met de korte naam, een potlood voor
   de korte namen van dat veld (punt 3), een kruisje en de keuzepillen met het
@@ -2383,10 +2284,10 @@ Wat er precies wordt verwijderd, staat in `datamodel.md` onder
 - **Respondent**: De persoon met al zijn ingevulde scans.
 - **Meting**: De meting met alle ingevulde scans daarin. Het Onderdeel blijft
   bestaan.
-- **Onderdeel** (gebouwd op 19 oktober 2026): Alleen zonder Metingen, met de
+- **Onderdeel**: Alleen zonder Metingen, met de
   KPI-waarden van het Onderdeel. De knop staat uitgeschakeld zolang er Metingen
   zijn, met de reden.
-- **Kanaal** (gebouwd op 19 oktober 2026): Het kanaal met al zijn KPI-waarden
+- **Kanaal**: Het kanaal met al zijn KPI-waarden
   bij alle Organisaties.
 - **Organisatie**: Alles wat eronder hangt, ook de Onderdelen en de KPI-waarden.
 - **Benchmark**: De benchmark met de vinkjes van Leads voor die benchmark.
@@ -2426,8 +2327,8 @@ doet, niet een beheeractie (`backlog.md`).
   CLAUDE.md die wel heeft voor de respondentkant. De top-level
   navigatie ligt nu vast (Assessments/Organisaties/Benchmark, met Instellingen in het Accountmenu, zie Wat
   beheerbaar is hierboven), maar een doorlopende flow-beschrijving per
-  scherm binnen die drie onderdelen ontbreekt nog — de schermen staan
+  scherm binnen die drie onderdelen ontbreekt nog, de schermen staan
   alleen hier, per onderdeel, niet als samenhangende flow.
 - Het datamodel achter onderdeel 11, Content-pagina's (Visie,
-  Bouwstenen, AI, 2030): welke records, versiebeheer, archiveren i.p.v.
+  Bouwblokken, AI, 2030): Welke records, versiebeheer, archiveren i.p.v.
   verwijderen zoals bij Content per Assessment.

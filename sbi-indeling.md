@@ -146,7 +146,7 @@ genegeerd is").
 | 98 | Niet-gedifferentieerde productie van goederen en diensten door particuliere huishoudens voor eigen gebruik |
 | 99 | Activiteiten van extraterritoriale organisaties en instanties |
 
-## Korte namen (gebouwd op 15 oktober 2026)
+## Korte namen
 
 De lange SBI-titels passen niet op een chip of in een kolomkop (`visualisatie-verkennen.md`, Korte namen). Een korte naam is een weergavenaam. De Organisatie bewaart de originele titel. Voorstel voor de beginwaarden van de 22 Secties, door een Admin aan te passen (`beheerpagina.md`, punt 3, Korte namen):
 

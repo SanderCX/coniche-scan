@@ -65,7 +65,7 @@ Root cause analysis, Closed feedback loop, Verbeterbacklog
    en trends worden besproken met owners buiten klantcontact?
 3. Is er een verbeterbacklog met prioritering (impact/effort), eigenaar,
    status en evaluatie van gerealiseerde benefits?
-4. Is er een closed-loop terugkoppeling: verbeteringen resulteren
+4. Is er een closed-loop terugkoppeling: Verbeteringen resulteren
    aantoonbaar in updates in kennis/training/proces?
 
 **5. Financial control**

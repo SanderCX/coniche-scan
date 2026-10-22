@@ -2,16 +2,14 @@
 
 De vaste lijst bij het veld "Rol / functie" van een Respondent. Dit bestand is de
 enige plek voor de lijst zelf. De regels staan in `datamodel.md` (Respondent, Rol /
-functie), `CLAUDE.md` (scherm 4, Respondent-intake) en `beheerpagina.md` (punt 6b,
-Respondent bewerken). De lijst is aangeleverd door Sander op 12 oktober 2026.
+functie), `schermen.md` (Intake) en `beheerpagina.md` (punt 6b,
+Respondent bewerken).
 
-**Status**: Besloten op 12 oktober 2026: Rol / functie wordt een keuzelijst met deze
-waarden, in de intake, in "Mijn gegevens" en in beheer. Opgenomen in de specs en
-gebouwd op 13 oktober 2026: Een keuzelijst met "Anders…" in de intake, in "Mijn gegevens" en in beheer. De punten onder 4 zijn open.
+Rol / functie is een keuzelijst met deze waarden, met "Anders…", in de intake, in "Mijn gegevens" en in beheer. De punten onder 4 zijn open.
 
 **Let op de naam.** Dit gaat over de functie van de persoon in zijn organisatie,
 niet over een autorisatierol. Het bestand heet `content-respondentrol.md`, maar
-`RespondentRol` in `datamodel.md` deel 2 is de Lead-rol (rechten). De twee hebben
+`RespondentRol` in `datamodel-rollen.md` is de Lead-rol (rechten). De twee hebben
 niets met elkaar te maken. In de interface heet het veld "Rol / functie" en in de
 code `functie`.
 
@@ -19,8 +17,8 @@ code `functie`.
 
 | Plek | Nu | Spec |
 |---|---|---|
-| Respondent-intake (de eerste keer) | Verplicht tekstveld "Rol / functie" | `CLAUDE.md`, scherm 4 |
-| "Mijn gegevens" (Gegevens bekijken/wijzigen) | Hetzelfde formulier, vooringevuld | `CLAUDE.md`, scherm 4 |
+| Respondent-intake (de eerste keer) | Verplicht tekstveld "Rol / functie" | `schermen.md`, Intake |
+| "Mijn gegevens" (Gegevens bekijken/bewerken) | Hetzelfde formulier, vooringevuld | `schermen.md`, Mijn gegevens-menu |
 | Beheer: Respondent bewerken, conflict oplossen, nieuwe Respondent | Tekstveld | `beheerpagina.md`, punt 6b |
 | Import | Kolom uit het bronbestand | `import-scans.md` |
 | CSV-export | Kolom `functie` | `export-csv.md` |
@@ -74,9 +72,7 @@ Zelfde patroon als de keuzelijsten bij Techstack (`content-techstack.md`):
   verplaatsen en samenvoegen veranderen niet.
 - Bestaande vrije tekst blijft staan en wordt vanzelf een extra keuze.
 
-De keuzelijst zelf is besloten. De uitwerking hierboven (met "Anders…", eigen invoer in
-de lijst) volgt het patroon van Techstack en is zo gebouwd. De lijst in de code
-(`data/respondent-rollen.ts`) wordt door een test gelijk gehouden aan dit bestand.
+De uitwerking hierboven (met "Anders…", eigen invoer in de lijst) volgt het patroon van Techstack. De lijst in de code wordt door een test gelijk gehouden aan dit bestand.
 
 ## 4. Punten voor Joost
 
@@ -88,8 +84,8 @@ de lijst) volgt het patroon van Techstack en is zo gebouwd. De lijst in de code
    gelijk, ook bij een vaste lijst.
 3. **Combinatielabels.** Vier rollen bevatten een schuine streep: "Tweedelijns
    medewerker / specialist", "Outbound / telesales-medewerker", "Supervisor /
-   floormanager" en "Real-time / intraday planner". Is dat één keuze of twee? Zo
-   gebouwd is het één keuze met de tekst zoals aangeleverd.
+   floormanager" en "Real-time / intraday planner". Is dat één keuze of twee? Nu
+   is het één keuze met de tekst zoals aangeleverd.
 4. **Overlap.** "Teamleider", "Supervisor / floormanager", "Operationeel manager",
    "Contactcentermanager" en "Manager klantcontact" liggen dicht bij elkaar, net als
    "CX-manager" en "Productowner klantcontact". Voor een analyse per rol is een
