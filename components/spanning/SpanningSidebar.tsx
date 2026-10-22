@@ -30,7 +30,7 @@ export function SpanningSidebar({
           <div className="progress-bar-fill" style={{ width: `${percentage}%` }} />
         </div>
         <p className="progress-label">
-          {percentage}% — {beantwoord} van {totaal} vragen
+          {percentage}% – {beantwoord} van {totaal} vragen
         </p>
       </div>
 
@@ -47,6 +47,7 @@ export function SpanningSidebar({
                     onClick={() => onSelecteer(veld.id)}
                     className={`sp-side-rij w-full border-0 bg-transparent ${actief ? "actief" : ""}`}
                     aria-current={actief ? "step" : undefined}
+                    style={{ ["--veld" as string]: veldKleur(veld.volgnummer) } as React.CSSProperties}
                   >
                     <span className="sp-nr" style={{ background: veldKleur(veld.volgnummer), color: tekstOpVeldKleur(veld.volgnummer) }}>
                       {veld.volgnummer}

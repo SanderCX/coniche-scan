@@ -6,15 +6,17 @@ import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { WeergaveWissel } from "@/components/visualisatie/WeergaveWissel";
 import { BouwblokChip } from "@/components/dossier/BouwblokChip";
-import { SoortIcoon } from "@/components/icons/DossierIcons";
 import { useAssessments } from "@/lib/assessment-store";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { magCaseVlagZetten, magDossierBewerken } from "@/lib/rechten";
-import { useOrganisaties, verwijderDossieritem, voegDossieritemToe, wijzigDossieritem, zetDossierOpen } from "@/lib/db";
+import { Schakelaar } from "@/components/Schakelaar";
+import { useOrganisaties, verwijderDossieritem, voegDossieritemToe, wijzigDossieritem, zetDossierZichtbaar, zetNaamVoorLead, zetRadarBron } from "@/lib/db";
 import {
   BRON_MAX,
+  DOSSIER_ASSESSMENT_IDS,
   DOSSIER_STATUS_LABEL,
+  NAAM_VOOR_LEAD_MAX,
   DossierInvoer,
   DossierSoort,
   OMVANG_MAX,
@@ -29,23 +31,28 @@ import {
   datumKort,
   dossierBouwblokkenPerAssessment,
   dossierVan,
-  isVerlopen,
   invoerVanItem,
   itemStatus,
   itemsInVolgorde,
   kanOpenZetten,
   leegDossierInvoer,
+  naamVoorLeadVan,
+  standaardNaamVoorLead,
 } from "@/lib/dossier";
+import { automatischeRadarMeting, metingZichtbaarVoorLead, radarBronVan, radarKeuzes, verlorenRadarBronnen } from "@/lib/dossier-radar";
+import { aantalAfgerondInMeting } from "@/lib/metingen";
+import { langeDatum, maandJaarLang } from "@/lib/mijn-metingen";
 import { kopNaam } from "@/lib/korte-namen";
-import { Dossieritem, Organisatie } from "@/lib/types";
+import { Dossieritem, Organisatie, ScanUitvoering } from "@/lib/types";
 
 type Filter = "alles" | DossierSoort;
 
 /**
- * De kaart Dossier op het organisatie-detail (`dossier.md`, Scherm 1; `beheerpagina.md`, punt 4, Dossier): Onder de Kenmerken en de rij
- * Toegang en Afspraken, boven de KPI's. Met het vinkje "Open voor Lead", een filter Alles, Cases, Nieuws, Events en Blogs, en per item een rij met een
- * statusbadge en de knop "Bewerken". Voor een Admin en voor een Consultant met toegang tot de Organisatie (`dossier.bewerken`). Het Bewerkslot
- * van de Organisatie geldt voor de hele pagina (`MetBewerkslot`).
+ * De kaart Dossier op het organisatie-detail (`dossier.md`, Scherm 1; `beheerpagina.md`, punt 4, Dossier; ontwerp `Dossier-beheer-B`): Onder de
+ * Kenmerken en de rij Toegang en Afspraken, boven de KPI's. Met het paneel "Instellingen voor de Lead" (de schakelaar Zichtbaar voor Lead, de naam
+ * voor de Lead en de Meting per radar), een filter Alles, Cases, Nieuws, Events en Blogs met de knop "+ Toevoegen", en de items in één kaart met
+ * per item een statusbadge en de knop "Bewerken". Voor een Admin en voor een Consultant met toegang tot de Organisatie (`dossier.bewerken`). Het
+ * Bewerkslot van de Organisatie geldt voor de hele pagina (`MetBewerkslot`).
  */
 export function DossierKaart({ organisatie }: { organisatie: Organisatie }) {
   const gebruiker = useIngelogdeGebruiker();
@@ -55,44 +62,20 @@ export function DossierKaart({ organisatie }: { organisatie: Organisatie }) {
   const dossier = dossierVan(organisatie);
   const [filter, setFilter] = useState<Filter>("alles");
   const [modal, setModal] = useState<"nieuw" | Dossieritem | null>(null);
-  const [bevestigOpen, setBevestigOpen] = useState(false);
 
   const telling = aantallPerSoort(dossier.items);
-  const zichtbaar = aantalZichtbaarVoorLead(organisatie, alle);
   const gefilterd = itemsInVolgorde(dossier.items).filter((i) => filter === "alles" || i.soort === filter);
-
-  function wissel(aan: boolean) {
-    if (aan) setBevestigOpen(true);
-    else zetDossierOpen(organisatie.id, false);
-  }
 
   return (
     <section className="beheer-kaart dos-kaart" aria-label="Dossier">
       <div className="dos-kop">
-        <div className="titel-rij">
-          <h2 style={{ margin: 0 }}>Dossier</h2>
-          <InfoIcoon sleutel="info.dossier" />
-        </div>
-        <div className="dos-kop-rechts">
-          <label className="dos-open">
-            <input
-              type="checkbox"
-              checked={dossier.openVoorLead}
-              disabled={!kanBewerken}
-              onChange={(e) => wissel(e.target.checked)}
-            />
-            <span className="dos-open-label">Open voor Lead</span>
-            {!dossier.openVoorLead && <span className="dos-open-stand">Niet gedeeld</span>}
-          </label>
-          {kanBewerken && (
-            <button type="button" className="btn btn-or btn-compact" onClick={() => setModal("nieuw")}>
-              + Toevoegen
-            </button>
-          )}
-        </div>
+        <span className="dos-kop-eyebrow">{organisatie.naam}</span>
+        <h2 className="dos-kop-titel">Dossier</h2>
       </div>
 
-      <div className="dos-filter">
+      <InstellingenVoorLead organisatie={organisatie} alle={alle} kanBewerken={kanBewerken} />
+
+      <div className="dos-filterrij">
         <WeergaveWissel<Filter>
           ariaLabel="Soort item"
           waarde={filter}
@@ -105,6 +88,11 @@ export function DossierKaart({ organisatie }: { organisatie: Organisatie }) {
             { waarde: "blog", label: `Blogs ${telling.blogs}` },
           ]}
         />
+        {kanBewerken && (
+          <button type="button" className="btn btn-or btn-compact" onClick={() => setModal("nieuw")}>
+            + Toevoegen
+          </button>
+        )}
       </div>
 
       {dossier.items.length === 0 ? (
@@ -119,24 +107,286 @@ export function DossierKaart({ organisatie }: { organisatie: Organisatie }) {
         </ul>
       )}
 
+      {kanBewerken && modal && <DossierItemModal organisatie={organisatie} item={modal === "nieuw" ? null : modal} onSluit={() => setModal(null)} />}
+    </section>
+  );
+}
+
+/** Het potlood in een rij van het paneel: Een knop van 40×40px met een oranje icoon (`dossier.md`, Scherm 1). */
+function PotloodKnop({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button type="button" className="dos-potlood" aria-label={label} title={label} onClick={onClick}>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </button>
+  );
+}
+
+/** "Meting oktober 2026 · 12 scans". */
+function metingTekst(organisatie: Organisatie, meting: ScanUitvoering): string {
+  const n = aantalAfgerondInMeting(organisatie, meting);
+  return `Meting ${maandJaarLang(meting.meetdatum) || meting.label} · ${n} ${n === 1 ? "scan" : "scans"}`;
+}
+
+/**
+ * Het paneel "Instellingen voor de Lead" (`dossier.md`, Scherm 1, Paneel): Een witte kaart met drie rijen. Zichtbaar voor Lead (een schakelaar
+ * die na een bevestiging aangaat), Naam voor de Lead (een potlood naar een modal) en Scores in de radar (een tabel met per Assessment de Meting
+ * en de bron, met een potlood naar een modal). Verliest een gekozen Meting haar zichtbaarheid, dan staat het Dossier uit en meldt het paneel waarom.
+ */
+function InstellingenVoorLead({ organisatie, alle, kanBewerken }: { organisatie: Organisatie; alle: Organisatie[]; kanBewerken: boolean }) {
+  const assessments = useAssessments();
+  const dossier = dossierVan(organisatie);
+  const [bevestigOpen, setBevestigOpen] = useState(false);
+  const [naamOpen, setNaamOpen] = useState(false);
+  const [bronOpen, setBronOpen] = useState<string | null>(null);
+  const [fout, setFout] = useState<string | null>(null);
+  const zichtbaar = aantalZichtbaarVoorLead(organisatie, alle);
+  const eigenNaam = dossier.naamVoorLead.trim();
+  const verloren = verlorenRadarBronnen(organisatie);
+  const assessmentNaam = (id: string) => assessments.find((a) => a.id === id)?.naam ?? id;
+  // Alleen een Assessment met een radar én minstens één Meting bij deze Organisatie staat in de tabel.
+  const radars = DOSSIER_ASSESSMENT_IDS.flatMap((id) => {
+    const assessment = assessments.find((a) => a.id === id);
+    return assessment && organisatie.scanUitvoeringen.some((m) => m.assessmentId === id) ? [assessment] : [];
+  });
+
+  function wissel(aan: boolean) {
+    setFout(null);
+    if (aan) setBevestigOpen(true);
+    else zetDossierZichtbaar(organisatie.id, false);
+  }
+
+  return (
+    <div className="dos-instellingen">
+      <div className="titel-rij dos-instellingen-kop">
+        <h3>Instellingen voor de Lead</h3>
+        <InfoIcoon sleutel="info.dossier" />
+      </div>
+
+      {verloren.length > 0 && (
+        <p className="overzicht-melding dos-melding" role="status">
+          Het Dossier is niet meer zichtbaar voor de Lead, omdat de Meting voor de radar (
+          {verloren.map((v, i) => (
+            <span key={v.assessmentId + v.metingId}>
+              {i > 0 && "; "}
+              {assessmentNaam(v.assessmentId)}, {v.metingLabel ?? "verwijderd"}
+            </span>
+          ))}
+          ) niet meer zichtbaar is voor de Lead. Controleer de Meting en zet het Dossier daarna weer aan.
+        </p>
+      )}
+
+      <div className="dos-instelling">
+        <span id="dos-zichtbaar-label" className="dos-instelling-label">
+          Zichtbaar voor Lead
+        </span>
+        <div className="dos-instelling-waarde">
+          <span className="dos-instelling-regel">
+            <Schakelaar aan={dossier.zichtbaar} onChange={wissel} disabled={!kanBewerken} ariaLabelledBy="dos-zichtbaar-label" />
+            <strong>{dossier.zichtbaar ? "Aan" : "Uit"}</strong>
+          </span>
+          <span className="dos-hint">
+            De Lead ziet het dossier en de items die zichtbaar zijn gemaakt. Uit: alleen jij en je collega-Consultants zien het.
+          </span>
+          {fout && <span className="dos-fout">{fout}</span>}
+        </div>
+        <span />
+      </div>
+
+      <div className="dos-instelling">
+        <span className="dos-instelling-label">Naam voor de Lead</span>
+        <div className="dos-instelling-waarde">
+          <span className="dos-instelling-regel">
+            <strong>{naamVoorLeadVan(organisatie)}</strong>
+            {!eigenNaam && <span className="dos-badge-grijs">Standaard</span>}
+          </span>
+          <span className="dos-hint">Titel van het dossier voor de Lead. Leeg laten geeft &ldquo;{standaardNaamVoorLead("{Organisatie}")}&rdquo;.</span>
+        </div>
+        {kanBewerken ? <PotloodKnop label="Naam voor de Lead wijzigen" onClick={() => setNaamOpen(true)} /> : <span />}
+      </div>
+
+      {radars.length > 0 && (
+        <div className="dos-instelling dos-instelling--tabel">
+          <span className="dos-instelling-label">Scores in de radar</span>
+          <table className="dos-bronnen">
+            <thead>
+              <tr>
+                <th scope="col">Assessment</th>
+                <th scope="col">Meting</th>
+                <th scope="col">Bron</th>
+                <th scope="col" />
+              </tr>
+            </thead>
+            <tbody>
+              {radars.map((a) => {
+                const vast = radarBronVan(organisatie, a.id);
+                const vasteMeting = vast ? organisatie.scanUitvoeringen.find((m) => m.id === vast) : undefined;
+                const nu = vast ? vasteMeting : automatischeRadarMeting(organisatie, a.id);
+                const niet = vast ? !vasteMeting || !metingZichtbaarVoorLead(organisatie, vast) : false;
+                return (
+                  <tr key={a.id}>
+                    <td>{a.naam}</td>
+                    <td>
+                      {nu ? metingTekst(organisatie, nu) : vast ? "Meting verwijderd" : "Geen Meting"}
+                      {niet && <span className="dos-badge-oranje">Niet zichtbaar voor de Lead</span>}
+                    </td>
+                    <td>
+                      <span className={vast ? "dos-badge-oranje-faint" : "dos-badge-grijs"}>{vast ? "Handmatig" : "Automatisch (meest recent)"}</span>
+                    </td>
+                    <td className="dos-bronnen-actie">{kanBewerken && <PotloodKnop label={`Meting voor de radar kiezen: ${a.naam}`} onClick={() => setBronOpen(a.id)} />}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       <BevestigModal
         open={bevestigOpen}
-        titel="Dossier openzetten"
-        bevestigLabel="Openzetten"
+        titel="Dossier zichtbaar maken"
+        bevestigLabel="Zichtbaar maken"
         bevestigVariant="primair"
         bericht={
           zichtbaar > 0
             ? `Het Dossier wordt zichtbaar voor de Leads van ${organisatie.naam}. Ze zien ${zichtbaar} ${zichtbaar === 1 ? "item" : "items"}.`
-            : `Het Dossier wordt zichtbaar voor de Leads van ${organisatie.naam}. Er staan nog geen items op Zichtbaar voor klant.`
+            : `Het Dossier wordt zichtbaar voor de Leads van ${organisatie.naam}. Er staan nog geen items op Zichtbaar voor Lead.`
         }
         onBevestigen={() => {
-          zetDossierOpen(organisatie.id, true);
+          const r = zetDossierZichtbaar(organisatie.id, true);
+          if (!r.ok) setFout(r.reden);
           setBevestigOpen(false);
         }}
         onAnnuleren={() => setBevestigOpen(false)}
       />
-      {kanBewerken && modal && <DossierItemModal organisatie={organisatie} item={modal === "nieuw" ? null : modal} onSluit={() => setModal(null)} />}
-    </section>
+      {naamOpen && <NaamModal organisatie={organisatie} onSluit={() => setNaamOpen(false)} />}
+      {bronOpen && <BronModal organisatie={organisatie} assessmentId={bronOpen} assessmentNaam={assessmentNaam(bronOpen)} onSluit={() => setBronOpen(null)} />}
+    </div>
+  );
+}
+
+/** De modal "Naam voor de Lead" (`dossier.md`, Scherm 1): Een invoerveld, de hint en de knoppen Annuleren en Opslaan. */
+function NaamModal({ organisatie, onSluit }: { organisatie: Organisatie; onSluit: () => void }) {
+  const [naam, setNaam] = useState(dossierVan(organisatie).naamVoorLead);
+  const [fout, setFout] = useState<string | null>(null);
+
+  function opslaan(e: React.FormEvent) {
+    e.preventDefault();
+    const r = zetNaamVoorLead(organisatie.id, naam);
+    if (!r.ok) return setFout(r.reden);
+    onSluit();
+  }
+
+  return (
+    <OverzichtModal label="Naam voor de Lead" onSluit={onSluit} className="modal-box--instelling">
+      <form onSubmit={opslaan}>
+        <div className="overzicht-kop">
+          <h2>Naam voor de Lead</h2>
+        </div>
+        <div className="admin-field">
+          <label htmlFor="dos-naam">Naam</label>
+          <input
+            id="dos-naam"
+            type="text"
+            autoFocus
+            maxLength={NAAM_VOOR_LEAD_MAX}
+            placeholder={standaardNaamVoorLead(organisatie.naam)}
+            value={naam}
+            onChange={(e) => {
+              setNaam(e.target.value);
+              setFout(null);
+            }}
+          />
+          <span className="dos-hint">
+            Leeg laten geeft &ldquo;{standaardNaamVoorLead(organisatie.naam)}&rdquo; (de naam van de Organisatie). De naam komt alleen in het Dossier voor.
+          </span>
+        </div>
+        {fout && (
+          <p className="overzicht-melding fout" role="alert">
+            {fout}
+          </p>
+        )}
+        <div className="btn-rij">
+          <button type="button" className="btn btn-outline btn-compact" onClick={onSluit}>
+            Annuleren
+          </button>
+          <button type="submit" className="btn btn-or btn-compact">
+            Opslaan
+          </button>
+        </div>
+      </form>
+    </OverzichtModal>
+  );
+}
+
+/**
+ * De modal "Meting voor de radar" (`dossier.md`, Scherm 1): Een keuze "Automatisch (meest recent)" met de hint welke Meting dat nu is, en per Meting een keuze
+ * "Handmatig: {Meting}" met de afrondingsdatum en het aantal scans. Een Meting waarvan de Lead de Resultaten niet mag inzien staat er uitgeschakeld.
+ */
+function BronModal({ organisatie, assessmentId, assessmentNaam, onSluit }: { organisatie: Organisatie; assessmentId: string; assessmentNaam: string; onSluit: () => void }) {
+  const [keuze, setKeuze] = useState<string | null>(radarBronVan(organisatie, assessmentId));
+  const [fout, setFout] = useState<string | null>(null);
+  const keuzes = radarKeuzes(organisatie, assessmentId, (m) => aantalAfgerondInMeting(organisatie, m));
+  const nu = automatischeRadarMeting(organisatie, assessmentId);
+
+  function opslaan(e: React.FormEvent) {
+    e.preventDefault();
+    const r = zetRadarBron(organisatie.id, assessmentId, keuze);
+    if (!r.ok) return setFout(r.reden);
+    onSluit();
+  }
+
+  /** De dag van de laatst afgeronde scan van de Meting, "Afgerond op 15 oktober 2026". */
+  const afgerondOp = (m: ScanUitvoering) => {
+    const laatste = m.invullingen.map((i) => i.afgerondOp).filter((x): x is string => !!x).sort().pop();
+    return laatste ? `Afgerond op ${langeDatum(laatste)}` : "Nog geen afgeronde scans";
+  };
+
+  return (
+    <OverzichtModal label="Meting voor de radar" onSluit={onSluit} className="modal-box--instelling">
+      <form onSubmit={opslaan}>
+        <div className="overzicht-kop">
+          <h2>Meting voor de radar</h2>
+          <p>{assessmentNaam}</p>
+        </div>
+        <div className="dos-keuzes" role="radiogroup" aria-label="Meting voor de radar">
+          <label className={`dos-keuze ${keuze === null ? "is-gekozen" : ""}`}>
+            <input type="radio" name="dos-bron" checked={keuze === null} onChange={() => setKeuze(null)} />
+            <span>
+              <strong>Automatisch (meest recent)</strong>
+              <span className="dos-hint">{nu ? `Nu: ${metingTekst(organisatie, nu)}` : "Er is nog geen Meting waarvan de Lead de Resultaten ziet."}</span>
+            </span>
+          </label>
+          {keuzes.map((k) => (
+            <label key={k.meting.id} className={`dos-keuze ${keuze === k.meting.id ? "is-gekozen" : ""} ${k.zichtbaar ? "" : "is-uit"}`}>
+              <input type="radio" name="dos-bron" checked={keuze === k.meting.id} disabled={!k.zichtbaar} onChange={() => setKeuze(k.meting.id)} />
+              <span>
+                <strong>Handmatig: Meting {maandJaarLang(k.meting.meetdatum) || k.meting.label}</strong>
+                <span className="dos-hint">
+                  {afgerondOp(k.meting)} · {k.aantalScans} {k.aantalScans === 1 ? "scan" : "scans"}
+                </span>
+                {!k.zichtbaar && <span className="dos-hint">Resultaten niet opengezet voor de Lead, daarom niet te kiezen</span>}
+              </span>
+            </label>
+          ))}
+        </div>
+        <p className="dos-hint dos-bron-regel">De Lead ziet in het dossier welke Meting dit is, met een link naar de resultaten ervan.</p>
+        {fout && (
+          <p className="overzicht-melding fout" role="alert">
+            {fout}
+          </p>
+        )}
+        <div className="btn-rij">
+          <button type="button" className="btn btn-outline btn-compact" onClick={onSluit}>
+            Annuleren
+          </button>
+          <button type="submit" className="btn btn-or btn-compact">
+            Opslaan
+          </button>
+        </div>
+      </form>
+    </OverzichtModal>
   );
 }
 
@@ -175,25 +425,69 @@ function ItemRij({
   }
   return (
     <li className="dos-rij">
-      <span className={`dos-icoon dos-icoon--${item.soort} ${isVerlopen(item) ? "is-verlopen" : ""}`} aria-hidden="true">
-        <SoortIcoon soort={item.soort} />
-      </span>
+      <span className="dos-eyebrow">{SOORT_LABEL[item.soort]}</span>
       <div className="dos-tekst">
-        <span className={`dos-eyebrow dos-eyebrow--${item.soort}`}>{SOORT_LABEL[item.soort]}</span>
         <h3 className="dos-titel">{item.titel}</h3>
         {regel && <span className="dos-regel">{regel}</span>}
-        {item.toelichting && <span className="dos-toelichting">{item.toelichting}</span>}
       </div>
       <div className="dos-acties">
         <span className={`dos-status dos-status--${status}`}>{DOSSIER_STATUS_LABEL[status]}</span>
-        {kanBewerken && (
+        {kanBewerken ? (
           <button type="button" className="btn btn-outline btn-compact" onClick={onBewerk}>
             Bewerken
           </button>
+        ) : (
+          <span />
         )}
       </div>
     </li>
   );
+}
+
+/**
+ * Een meerregelig veld met een vaste hoogte en een tekenteller (`dossier.md`, Scherm 3, Samenvatting en Toelichting): Samenvatting 72px (twee regels),
+ * Toelichting 96px (drie regels). Onder het veld links de hint en rechts "{n} / {max}"; typen stopt bij het maximum.
+ */
+function TekstMetTeller({
+  id,
+  label,
+  hoogte,
+  max,
+  waarde,
+  onChange,
+  hint,
+}: {
+  id: string;
+  label: string;
+  hoogte: "samenvatting" | "toelichting";
+  max: number;
+  waarde: string;
+  onChange: (waarde: string) => void;
+  hint: string;
+}) {
+  return (
+    <div className="admin-field">
+      <label htmlFor={id}>{label}</label>
+      <textarea id={id} className={`dos-tekstvak dos-tekstvak--${hoogte}`} maxLength={max} value={waarde} onChange={(e) => onChange(e.target.value)} />
+      <span className="dos-hint dos-hint--teller">
+        <span>{hint}</span>
+        <span className="dos-teller">
+          {waarde.length} / {max}
+        </span>
+      </span>
+    </div>
+  );
+}
+
+/** De bouwblokken van één Assessment, gegroepeerd per categorie in de volgorde van de nummers. Zonder categorielaag (de AI-scan) is er één groep zonder naam. */
+function chipGroepen<T extends { bouwblok: { volgnummer: number }; groepNaam: string | null }>(bouwblokken: T[]): { naam: string | null; bouwblokken: T[] }[] {
+  const groepen: { naam: string | null; bouwblokken: T[] }[] = [];
+  for (const b of bouwblokken) {
+    const laatste = groepen[groepen.length - 1];
+    if (laatste && laatste.naam === b.groepNaam) laatste.bouwblokken.push(b);
+    else groepen.push({ naam: b.groepNaam, bouwblokken: [b] });
+  }
+  return groepen;
 }
 
 /** De namen op de pillen van de koppeling: De volledige naam is te lang voor een pil. */
@@ -203,7 +497,7 @@ const SOORT_LABEL: Record<DossierSoort, string> = { case: "Case", nieuws: "Nieuw
 
 /**
  * Item toevoegen of bewerken (`dossier.md`, Scherm 3): Een modal van 640px met de soort (bij Bewerken vast), de velden van dat soort, de
- * chips "Gaat over bouwblokken" en de schakelaar Zichtbaar voor klant. Bij Bewerken staat links "Verwijderen" met een bevestiging.
+ * chips "Gaat over bouwblokken" en de schakelaar Zichtbaar voor Lead. Bij Bewerken staat links "Verwijderen" met een bevestiging.
  */
 function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organisatie; item: Dossieritem | null; onSluit: () => void }) {
   const gebruiker = useIngelogdeGebruiker();
@@ -235,7 +529,7 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
   const reden = isCase ? kanOpenZetten(invoer, caseOrg) : null;
   const toestemming = isCase && caseOrg ? caseOrg.caseToegestaan === true : null;
   const branche = brancheVan(caseOrg, korteNamen);
-  // Een item dat al open stond, mag open blijven; nieuw openzetten kan alleen als het mag.
+  // Een item dat al zichtbaar was, mag zichtbaar blijven; nieuw zichtbaar maken kan alleen als het mag.
   const schakelaarUit = reden !== null && !(item?.zichtbaarVoorLead && invoer.zichtbaarVoorLead);
   const kanCaseVlag = magCaseVlagZetten(gebruiker);
 
@@ -290,42 +584,48 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
 
           {isCase ? (
             <>
-              <div className="admin-field">
-                <label htmlFor="dos-samenvatting">Samenvatting</label>
-                <textarea id="dos-samenvatting" rows={3} maxLength={SAMENVATTING_MAX} value={invoer.samenvatting} onChange={(e) => zet({ samenvatting: e.target.value })} />
-                <span className="dos-hint">Noem de organisatie niet bij naam.</span>
-              </div>
-              <div className="admin-field">
-                <label htmlFor="dos-case-org">Organisatie in de case</label>
-                <select id="dos-case-org" value={invoer.caseOrganisatieId ?? ""} onChange={(e) => zet({ caseOrganisatieId: e.target.value || null })}>
-                  <option value="">Kies een organisatie</option>
-                  {keuzes.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.naam}
-                      {o.caseToegestaan === true ? "" : " (Geen toestemming)"}
-                    </option>
-                  ))}
-                </select>
-                {caseOrg && toestemming && <p className="dos-paneel dos-paneel--groen">Toestemming staat vastgelegd bij de Afspraken van {caseOrg.naam}.</p>}
-                {caseOrg && !toestemming && (
-                  <p className="dos-paneel dos-paneel--oranje">
-                    {caseOrg.naam} heeft de Afspraak &ldquo;Mag als case gebruikt worden&rdquo; niet. Zonder die toestemming kan deze case niet open voor de Lead.{" "}
-                    {kanCaseVlag ? (
-                      <button type="button" className="btn btn-outline btn-compact dos-paneel-knop" onClick={naarAfspraken}>
-                        Naar Afspraken
-                      </button>
-                    ) : (
-                      <strong>Vraag een Admin om &lsquo;Mag als case gebruikt worden&rsquo; aan te zetten.</strong>
-                    )}
-                  </p>
-                )}
-              </div>
-              <div className="admin-field">
-                <label htmlFor="dos-branche">Branche</label>
-                <input id="dos-branche" type="text" readOnly value={branche} placeholder={caseOrg ? "" : "Volgt uit de organisatie in de case"} />
-                <span className="dos-hint">
-                  {caseOrg && !branche ? `Vul de Sector in bij de Kenmerken van ${caseOrg.naam}.` : "Uit de kenmerken van de organisatie."}
-                </span>
+              <TekstMetTeller
+                id="dos-samenvatting"
+                label="Samenvatting"
+                hoogte="samenvatting"
+                max={SAMENVATTING_MAX}
+                waarde={invoer.samenvatting}
+                onChange={(samenvatting) => zet({ samenvatting })}
+                hint="Noem de organisatie niet bij naam."
+              />
+              <div className="dos-twee dos-twee--boven">
+                <div className="admin-field">
+                  <label htmlFor="dos-case-org">Organisatie in de case</label>
+                  <select id="dos-case-org" value={invoer.caseOrganisatieId ?? ""} onChange={(e) => zet({ caseOrganisatieId: e.target.value || null })}>
+                    <option value="">Kies een organisatie</option>
+                    {keuzes.map((o) => (
+                      <option key={o.id} value={o.id}>
+                        {o.naam}
+                        {o.caseToegestaan === true ? "" : " (Geen toestemming)"}
+                      </option>
+                    ))}
+                  </select>
+                  {caseOrg && toestemming && <p className="dos-paneel dos-paneel--groen">Toestemming staat vastgelegd bij de Afspraken van {caseOrg.naam}.</p>}
+                  {caseOrg && !toestemming && (
+                    <p className="dos-paneel dos-paneel--oranje">
+                      {caseOrg.naam} heeft de Afspraak &ldquo;Mag als case gebruikt worden&rdquo; niet. Zonder die toestemming kan deze case niet zichtbaar worden voor de Lead.{" "}
+                      {kanCaseVlag ? (
+                        <button type="button" className="btn btn-outline btn-compact dos-paneel-knop" onClick={naarAfspraken}>
+                          Naar Afspraken
+                        </button>
+                      ) : (
+                        <strong>Vraag een Admin om &lsquo;Mag als case gebruikt worden&rsquo; aan te zetten.</strong>
+                      )}
+                    </p>
+                  )}
+                </div>
+                <div className="admin-field">
+                  <label htmlFor="dos-branche">Branche</label>
+                  <input id="dos-branche" type="text" readOnly value={branche} placeholder={caseOrg ? "" : "Volgt uit de organisatie in de case"} />
+                  <span className="dos-hint">
+                    {caseOrg && !branche ? `Vul de Sector in bij de Kenmerken van ${caseOrg.naam}.` : "Uit de kenmerken van de organisatie."}
+                  </span>
+                </div>
               </div>
               <div className="dos-twee">
                 <div className="admin-field">
@@ -386,11 +686,15 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
             </>
           )}
 
-          <div className="admin-field">
-            <label htmlFor="dos-toelichting">{isCase ? "Waarom dit voor jullie telt" : "Toelichting"}</label>
-            <textarea id="dos-toelichting" rows={3} maxLength={TOELICHTING_MAX} value={invoer.toelichting} onChange={(e) => zet({ toelichting: e.target.value })} />
-            <span className="dos-hint">De Lead leest deze tekst als je het item openzet.</span>
-          </div>
+          <TekstMetTeller
+            id="dos-toelichting"
+            label={isCase ? "Waarom dit voor jullie telt" : "Toelichting"}
+            hoogte="toelichting"
+            max={TOELICHTING_MAX}
+            waarde={invoer.toelichting}
+            onChange={(toelichting) => zet({ toelichting })}
+            hint="De Lead leest deze tekst zodra het item zichtbaar is voor de Lead."
+          />
 
           <div className="admin-field">
             <span className="dos-label">Gaat over bouwblokken (optioneel)</span>
@@ -407,42 +711,51 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
                 />
               </div>
             )}
-            <div className="dos-chips">
-              {(koppel?.bouwblokken ?? []).map(({ bouwblok, groepKleur }) => (
-                <BouwblokChip
-                  key={bouwblok.id}
-                  volgnummer={bouwblok.volgnummer}
-                  naam={bouwblok.naam}
-                  groepKleur={groepKleur}
-                  gekozen={invoer.bouwblokIds.includes(bouwblok.id)}
-                  onClick={() =>
-                    zet({
-                      bouwblokIds: invoer.bouwblokIds.includes(bouwblok.id)
-                        ? invoer.bouwblokIds.filter((id) => id !== bouwblok.id)
-                        : [...invoer.bouwblokIds, bouwblok.id],
-                    })
-                  }
-                />
+            <div className="dos-chipgroepen">
+              {chipGroepen(koppel?.bouwblokken ?? []).map((groep) => (
+                <div key={groep.naam ?? "_"} className={`dos-chipgroep ${groep.naam ? "" : "dos-chipgroep--zonder"}`}>
+                  {groep.naam && <span className="dos-chipgroep-naam">{groep.naam}</span>}
+                  <div className="dos-chips">
+                    {groep.bouwblokken.map(({ bouwblok, groepKleur }) => (
+                      <BouwblokChip
+                        key={bouwblok.id}
+                        volgnummer={bouwblok.volgnummer}
+                        naam={bouwblok.naam}
+                        groepKleur={groepKleur}
+                        gekozen={invoer.bouwblokIds.includes(bouwblok.id)}
+                        onClick={() =>
+                          zet({
+                            bouwblokIds: invoer.bouwblokIds.includes(bouwblok.id)
+                              ? invoer.bouwblokIds.filter((id) => id !== bouwblok.id)
+                              : [...invoer.bouwblokIds, bouwblok.id],
+                          })
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
             <span className="dos-hint">De Lead ziet de gekozen bouwblokken bij het item en kan in de radar op deze bouwblokken filteren.</span>
           </div>
 
           <div className={`dos-zichtbaar ${schakelaarUit ? "is-uit" : ""}`}>
-            <label className="dos-open">
-              <input
-                type="checkbox"
-                checked={invoer.zichtbaarVoorLead}
+            <div className="dos-zichtbaar-rij">
+              <span id="dos-zichtbaar-item-label" className="dos-zichtbaar-label">
+                Zichtbaar voor Lead
+              </span>
+              <Schakelaar
+                aan={invoer.zichtbaarVoorLead}
                 disabled={schakelaarUit}
-                onChange={(e) => zet({ zichtbaarVoorLead: e.target.checked })}
+                ariaLabelledBy="dos-zichtbaar-item-label"
+                onChange={(aan) => zet({ zichtbaarVoorLead: aan })}
               />
-              <span className="dos-open-label">{invoer.zichtbaarVoorLead ? "Zichtbaar voor klant" : "Alleen intern"}</span>
-            </label>
+            </div>
             <span className="dos-hint">
               {schakelaarUit && reden
                 ? reden
                 : invoer.zichtbaarVoorLead
-                  ? "De Lead ziet dit item zodra het Dossier open staat."
+                  ? "De Lead ziet dit item zodra het Dossier zichtbaar is voor de Lead."
                   : "Alleen jij en je collega-consultants zien dit item."}
             </span>
           </div>
@@ -452,17 +765,19 @@ function DossierItemModal({ organisatie, item, onSluit }: { organisatie: Organis
               {fout}
             </p>
           )}
-          <div className="btn-rij" style={{ justifyContent: item ? "space-between" : "flex-end", flexWrap: "wrap", gap: "0.5rem" }}>
-            {item && (
-              <button type="button" className="btn btn-danger btn-compact" onClick={() => setBevestig(true)}>
+          <div className="dos-knoppen">
+            {item ? (
+              <button type="button" className="btn btn-danger btn-compact dos-knop" onClick={() => setBevestig(true)}>
                 Verwijderen
               </button>
+            ) : (
+              <span />
             )}
-            <span className="knoppenrij">
-              <button type="button" className="btn btn-outline btn-compact" onClick={onSluit}>
+            <span className="dos-knoppen-rechts">
+              <button type="button" className="btn btn-outline btn-compact dos-knop" onClick={onSluit}>
                 Annuleren
               </button>
-              <button type="submit" className="btn btn-or btn-compact">
+              <button type="submit" className="btn btn-or btn-compact dos-knop">
                 Opslaan
               </button>
             </span>

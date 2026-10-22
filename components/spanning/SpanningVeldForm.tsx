@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { Antwoord, Assessment, Bouwblok, ScanWeergave } from "@/lib/types";
-import { veldKleur } from "@/lib/colors";
+import { lijnKleur, veldKleur } from "@/lib/colors";
+import { alineas } from "@/components/BouwblokKop";
 import { Antwoordkeuze } from "./Antwoordkeuze";
-import { VeldInfoKnop, ijkpuntenMetNaam } from "./VeldToelichting";
+import { ijkpuntenMetNaam } from "./VeldToelichting";
 
 /** Het ID van de open vraag van een veld: Het voorvoegsel van de vragen met een 6 erachter ("VL" wordt "VL6"). */
 export function openVraagId(veld: Bouwblok): string {
@@ -13,7 +14,7 @@ export function openVraagId(veld: Bouwblok): string {
 
 /**
  * Een veld van de Spanningsmeter in de doorloopflow (`visualisatie-spanningsmeter.md`, Doorloopflow, `CLAUDE.md`, scherm 5): De
- * veldkop met een Info-icoon, het instructievlak met de vijf ijkpunten, een kaart per vraag met de invalshoek, de antwoordkeuze en
+ * veldkop (zonder Info-icoon en modal sinds 22 oktober 2026), het instructievlak met de vijf ijkpunten, een kaart per vraag met de invalshoek, de antwoordkeuze en
  * de toelichting "Waar je op let" achter een Info-knop, de open vraag die niet verplicht is en geen score krijgt, en onderaan
  * Vorig veld en Volgend veld.
  */
@@ -57,11 +58,17 @@ export function SpanningVeldForm({
   return (
     <div>
       <div className="sp-kop" style={{ borderLeftColor: kleur }}>
-        <div className="sp-kop-titelrij">
-          <h2>{veld.naam}</h2>
-          <VeldInfoKnop assessment={assessment} veld={veld} />
-        </div>
-        <p>{veld.omschrijving}</p>
+        <p className="sp-kop-eyebrow" style={{ color: lijnKleur(kleur) }}>
+          Veld {veld.volgnummer}
+        </p>
+        <h2>{veld.naam}</h2>
+        <p className="sp-kop-omschrijving">{veld.omschrijving}</p>
+        {/* De basis stond in de Toelichtingsmodal; nu onder de omschrijving, in dezelfde opmaak (`visualisatie-spanningsmeter.md`, Veldkop). */}
+        {alineas(veld.toelichting).map((a, i) => (
+          <p key={i} className="sp-kop-omschrijving">
+            {a}
+          </p>
+        ))}
       </div>
 
       <div className="sp-instructie">

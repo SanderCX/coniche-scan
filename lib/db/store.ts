@@ -13,6 +13,9 @@ import { ruimLeadToegangOp, toegangSleutel, zetLegacyBereikOm } from "@/lib/lead
 import { techstackCategorieIdsMetLijst } from "@/data/organisatie-velden";
 import { migreerFteManagementSupport } from "@/lib/fte";
 import { ruimDossierOp, zetNieuwsartikelenOm } from "@/lib/dossier";
+import { verbergDossiersMetVerlorenBron } from "@/lib/dossier-radar";
+import { logAudit } from "@/lib/audit-store";
+import { organisatieContext } from "@/lib/audit-context";
 
 const KEY = "coniche-scan:organisaties";
 const SERVER_SLEUTEL = "organisaties";
@@ -186,6 +189,22 @@ export function slaAlles(alles: Organisatie[]): void {
   for (const organisatie of alles) ruimLeadToegangOp(organisatie, benchmarks);
   // Een Case bij een andere Organisatie die naar een verwijderde Organisatie verwees, vraagt om een nieuwe keuze (`dossier.md`, Verwijderen en datakoppelingen).
   ruimDossierOp(alles);
+  // Een gekozen Meting voor de radar die niet meer zichtbaar is voor de Lead (de weergave Resultaten staat uit of de Meting is weg): Het Dossier gaat dan uit
+  // (`dossier.md`, Welke scores). Eén plek, zodat geen schrijfactie het vergeet.
+  const verborgen = verbergDossiersMetVerlorenBron(alles);
+  for (const { organisatie, verloren } of verborgen) {
+    logAudit({
+      actie: "dossier.verborgen",
+      entiteitType: "organisatie",
+      entiteitId: organisatie.id,
+      entiteitNaam: organisatie.naam,
+      details: {
+        ...organisatieContext(organisatie),
+        reden: "Meting voor de radar niet meer zichtbaar voor de Lead",
+        metingen: verloren.map((v) => ({ assessmentId: v.assessmentId, meting: v.metingLabel ?? "verwijderd" })),
+      },
+    });
+  }
   const json = JSON.stringify(alles);
   window.localStorage.setItem(KEY, json);
   emitChange();

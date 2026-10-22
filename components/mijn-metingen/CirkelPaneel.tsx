@@ -8,8 +8,8 @@ import { dagVan } from "@/lib/metingen";
 /**
  * De Kaart met cirkel (`visualisatie-mijn-metingen.md`, Kaart met cirkel, voorstel van 19 oktober 2026): Een paneel met links een
  * zijblok (de cirkel met de totaalscore, de klassenchip en bij een Lead de groep) en rechts een rij per categorie of afdeling met Jij en
- * Groep op één spoor. Eén paneel voor een Respondent, een Lead en een Lead die ook invult, voor elk Assessment met categorieën of
- * afdelingen. De groep staat er alleen bij een Lead met Resultaten en genoeg afgeronde scans.
+ * Groep op één spoor. Eén paneel voor een Respondent, een Lead en een Lead die ook invult, voor elk Assessment met categorieën,
+ * afdelingen of domeinen (de AI-scan, besloten door Joost op 22 oktober 2026). De groep staat er alleen bij een Lead met Resultaten en genoeg afgeronde scans.
  */
 
 export function CirkelPaneel({
@@ -89,7 +89,7 @@ export function CirkelPaneel({
                     {r.nummer.nr}
                   </span>
                 )}
-                {r.naam}
+                <span className="mm-paneel-naamtekst">{r.naam}</span>
               </span>
               <span className="mm-paneel-spoor" aria-hidden="true">
                 {metJij && !jijLeeg && <i {...vul(r.fractie * 100, r.kleur)} />}

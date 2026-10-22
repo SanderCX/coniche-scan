@@ -16,7 +16,8 @@ import { KLASSE_NAAM, isJaNeeWeetNiet, quickscanResultaat, QuickscanResultaat } 
 import { metingAlsResultaat, quickscanMeting, quickscanScansVan } from "./quickscan-groep";
 import { Classificatie } from "./types";
 import { isSpanning, spanningZin, spanningProfiel, groepProfiel, spanningScansVan, fmt1, niveauNaam, veldKorteNaam } from "./spanning";
-import { veldKleur, tekstOpVeldKleur } from "./colors";
+import { veldKleur, tekstOpVeldKleur, domeinKleur, tekstOpKleur } from "./colors";
+import { kleineLetter } from "./visualisatie";
 import { CATEGORIE_COLORS, CLASSIFICATIE_INFO } from "./colors";
 
 const MAANDEN_LANG = [
@@ -147,6 +148,11 @@ export function schaalFractie(score: number): number {
   return Math.min(1, Math.max(0, (score - 1) / 4));
 }
 
+/** "domein" wordt "Domein" (de eerste letter als hoofdletter). */
+function komaHoofd(woord: string): string {
+  return woord.charAt(0).toUpperCase() + woord.slice(1);
+}
+
 function schaalTeaser(
   assessment: Assessment,
   antwoorden: Record<string, Antwoord>,
@@ -158,8 +164,29 @@ function schaalTeaser(
   const stap = celStap(overall);
   const klasse = classificatie(overall);
   const rijen: TeaserRij[] = [];
-  // Zonder categorielaag (de AI-scan) is er alleen het totaal met de klassenpil.
-  if (!isVlakkeAssessment(assessment)) {
+  if (isVlakkeAssessment(assessment)) {
+    // Zonder categorielaag (de AI-scan, besloten door Joost op 22 oktober 2026): Een rij per domein, in de vaste volgorde 1 tot en met 8
+    // (niet op score), met het nummer in de domeinkleur en "Per domein" als kop (`visualisatie-mijn-metingen.md`, AI-scan).
+    for (const b of alleBouwblokResultaten(assessment, antwoorden)) {
+      if (b.score === null) continue;
+      const nr = b.bouwblok.volgnummer;
+      const kleur = CATEGORIE_COLORS[domeinKleur(nr)].hex;
+      const bereik = spreiding?.get(b.bouwblok.id);
+      rijen.push({
+        sleutel: b.bouwblok.id,
+        naam: b.bouwblok.naam,
+        nummer: { nr, achtergrond: kleur, tekst: tekstOpKleur(kleur) },
+        kleur,
+        fractie: schaalFractie(b.score),
+        ...(bereik ? { lijn: { van: schaalFractie(bereik.van), tot: schaalFractie(bereik.tot) } } : {}),
+        // Bijvoorbeeld "Domein 3, Use-cases en automatisering, jouw score 2,0, gemiddelde 3,4, laagste 2,0, hoogste 4,2".
+        alt: bereik
+          ? `${komaHoofd(assessment.bouwblokEenheidEnkelvoud)} ${nr}, ${b.bouwblok.naam}, gemiddelde ${komma(b.score)}, laagste ${komma(bereik.van)}, hoogste ${komma(bereik.tot)}`
+          : `${komaHoofd(assessment.bouwblokEenheidEnkelvoud)} ${nr}, ${b.bouwblok.naam}, ${aantalScans === undefined ? "jouw score" : "gemiddelde"} ${komma(b.score)}`,
+        waarde: komma(b.score),
+      });
+    }
+  } else {
     const groepen = alleGroepResultaten(assessment, alleBouwblokResultaten(assessment, antwoorden), antwoorden);
     for (const g of groepen) {
       if (g.score === null) continue;
@@ -191,6 +218,7 @@ function schaalTeaser(
     ...(aantalScans !== undefined ? { aantalScans } : {}),
     rijen,
     ring: { fractie: schaalFractie(overall), kleur: `var(--score-${stap})`, chipAchtergrond: `var(--score-${stap}-cel)`, chipTekst: `var(--score-${stap}-cel-tekst)` },
+    ...(isVlakkeAssessment(assessment) && rijen.length > 0 ? { rijenLabel: `Per ${kleineLetter(assessment.bouwblokEenheidEnkelvoud)}` } : {}),
   };
 }
 
@@ -320,10 +348,20 @@ export function teaserVoorScan(
   return schaalTeaser(assessment, antwoorden);
 }
 
-/** Per categorie de laagste en hoogste score van een afgeronde scan. Leeg zonder categorielaag. */
+/** Per categorie de laagste en hoogste score van een afgeronde scan. Zonder categorielaag per domein (het bouwblok). */
 function spreidingPerGroep(assessment: Assessment, afgerond: ScanInvulling[]): Map<string, { van: number; tot: number }> {
   const uit = new Map<string, { van: number; tot: number }>();
-  if (isVlakkeAssessment(assessment)) return uit;
+  if (isVlakkeAssessment(assessment)) {
+    // Zonder categorielaag per domein (het bouwblok zelf).
+    for (const scan of afgerond) {
+      for (const b of alleBouwblokResultaten(assessment, scan.antwoorden)) {
+        if (b.score === null) continue;
+        const huidig = uit.get(b.bouwblok.id);
+        uit.set(b.bouwblok.id, huidig ? { van: Math.min(huidig.van, b.score), tot: Math.max(huidig.tot, b.score) } : { van: b.score, tot: b.score });
+      }
+    }
+    return uit;
+  }
   for (const scan of afgerond) {
     const groepen = alleGroepResultaten(assessment, alleBouwblokResultaten(assessment, scan.antwoorden), scan.antwoorden);
     for (const g of groepen) {

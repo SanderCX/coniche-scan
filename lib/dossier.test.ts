@@ -3,7 +3,9 @@ import {
   aantalTekst,
   aantallenPerSoortLead,
   filterOpSoort,
-  sectieVanItem,
+  sectiesVanItem,
+  naamVoorLeadVan,
+  controleerNaamVoorLead,
   sectieVanScore,
   sorteerVerdeling,
   verdeelOverSecties,
@@ -24,13 +26,15 @@ import {
   itemsPerBouwblok,
   kanOpenZetten,
   leadDossier,
+  leegDossier as leegDossierVoorTest,
   leegDossierInvoer,
   nieuwsNieuwsteEerst,
   casesNieuwsteEerst,
   voorproef,
   zetNieuwsartikelenOm,
 } from "./dossier";
-import type { Dossieritem, Organisatie } from "./types";
+import { automatischeRadarMeting, dossierRadarMeting, radarBronVan, verlorenRadarBronnen } from "./dossier-radar";
+import type { Dossieritem, LeadToegang, Organisatie, OrganisatieLid, ScanUitvoering } from "./types";
 
 const opslag = new Map<string, string>();
 const KEY = "coniche-scan:organisaties";
@@ -93,7 +97,7 @@ describe("openzetten van een case", () => {
   it("vraagt toestemming en een Sector bij de organisatie in de case", () => {
     const c = caseInvoer();
     expect(kanOpenZetten(c, undefined)).toBe("Kies de organisatie in de case.");
-    expect(kanOpenZetten(c, org("C"))).toBe("Zonder toestemming van de organisatie in de case kan een case niet open.");
+    expect(kanOpenZetten(c, org("C"))).toBe("Zonder toestemming van de organisatie in de case kan een case niet zichtbaar worden.");
     expect(kanOpenZetten(c, org("C", { caseToegestaan: true }))).toBe("Vul de Sector in bij de Kenmerken van Org C.");
     expect(kanOpenZetten(c, metSector("C"))).toBeNull();
     expect(kanOpenZetten(nieuws(), undefined)).toBeNull();
@@ -159,22 +163,22 @@ describe("opslaan, openzetten en loggen", () => {
     expect(audit().find((e) => e.actie === "dossier.itemToegevoegd")?.details).toMatchObject({ caseOrganisatieNaam: "Org C" });
     expect(audit().find((e) => e.actie === "organisatie.caseVlagGewijzigd")?.details).toMatchObject({ caseToegestaan: true });
   });
-  it("openzetten zet openSinds en logt het aantal zichtbare items", () => {
+  it("openzetten zet zichtbaarSinds en logt het aantal zichtbare items", () => {
     zet(org("O"));
     db.voegDossieritemToe("O", nieuws({ zichtbaarVoorLead: true }));
     db.voegDossieritemToe("O", nieuws({ titel: "Intern" }));
-    db.zetDossierOpen("O", true);
-    expect(laad("O").dossier!.openVoorLead).toBe(true);
-    expect(laad("O").dossier!.openSinds).not.toBeNull();
-    expect(audit().find((e) => e.actie === "dossier.geopend")?.details).toMatchObject({ aantalZichtbaar: 1 });
-    db.zetDossierOpen("O", false);
-    expect(audit().map((e) => e.actie)).toContain("dossier.gesloten");
+    db.zetDossierZichtbaar("O", true);
+    expect(laad("O").dossier!.zichtbaar).toBe(true);
+    expect(laad("O").dossier!.zichtbaarSinds).not.toBeNull();
+    expect(audit().find((e) => e.actie === "dossier.zichtbaarGemaakt")?.details).toMatchObject({ aantalZichtbaar: 1 });
+    db.zetDossierZichtbaar("O", false);
+    expect(audit().map((e) => e.actie)).toContain("dossier.verborgen");
   });
   it("een onbekende organisatie of item geeft een fout", () => {
     zet(org("O"));
     expect(db.voegDossieritemToe("X", nieuws()).ok).toBe(false);
     expect(db.verwijderDossieritem("O", "nope").ok).toBe(false);
-    expect(db.zetDossierOpen("X", true).ok).toBe(false);
+    expect(db.zetDossierZichtbaar("X", true).ok).toBe(false);
   });
 });
 
@@ -195,7 +199,7 @@ describe("verwijderen van een organisatie in een case", () => {
 describe("overgang van de nieuwsartikelen", () => {
   it("wordt Dossieritem van soort nieuws, zonder iets open te zetten", () => {
     const d = zetNieuwsartikelenOm({ nieuwsartikelen: [{ id: "n1", titel: "Overname", url: "https://nu.nl/a", bron: "NU.nl", gepubliceerdOp: "2026-10-14", notitie: "Past bij 4", aangemaaktOp: "2026-10-15T00:00:00Z" }] });
-    expect(d.openVoorLead).toBe(false);
+    expect(d.zichtbaar).toBe(false);
     expect(d.items).toHaveLength(1);
     expect(d.items[0]).toMatchObject({ soort: "nieuws", titel: "Overname", toelichting: "Past bij 4", zichtbaarVoorLead: false, bouwblokIds: [] });
   });
@@ -206,11 +210,11 @@ describe("overgang van de nieuwsartikelen", () => {
     expect(geladen.dossier!.items).toHaveLength(1);
     expect(geladen.nieuwsartikelen).toBeUndefined();
     expect(geladen.caseToegestaan).toBe(false);
-    expect(geladen.dossier!.openVoorLead).toBe(false);
+    expect(geladen.dossier!.zichtbaar).toBe(false);
   });
   it("een bestaand Dossier blijft zoals het is", () => {
-    const d = zetNieuwsartikelenOm({ dossier: { openVoorLead: true, openSinds: "2026-10-16T00:00:00Z", gewijzigdOp: null, items: [] } });
-    expect(d).toMatchObject({ openVoorLead: true, openSinds: "2026-10-16T00:00:00Z" });
+    const d = zetNieuwsartikelenOm({ dossier: { zichtbaar: true, zichtbaarSinds: "2026-10-16T00:00:00Z", gewijzigdOp: null, items: [] } });
+    expect(d).toMatchObject({ zichtbaar: true, zichtbaarSinds: "2026-10-16T00:00:00Z" });
   });
 });
 
@@ -218,7 +222,7 @@ describe("wat de Lead ziet", () => {
   const opgezet = () => {
     const o = org("O", {
       dossier: {
-        openVoorLead: true, openSinds: "2026-10-16T08:00:00Z", gewijzigdOp: "2026-10-17T08:00:00Z",
+        zichtbaar: true, zichtbaarSinds: "2026-10-16T08:00:00Z", naamVoorLead: "", radarBronnen: [], gewijzigdOp: "2026-10-17T08:00:00Z",
         items: [
           { ...vul("c1", "case"), zichtbaarVoorLead: true, caseOrganisatieId: "C", bouwblokIds: ["b1", "b2"], omvang: "800 medewerkers" },
           { ...vul("c2", "case"), zichtbaarVoorLead: true, caseOrganisatieId: "Z" },
@@ -247,9 +251,9 @@ describe("wat de Lead ziet", () => {
   });
   it("toont niets bij een gesloten Dossier, zonder zichtbare items of zonder Sector in de case", () => {
     const alle = opgezet();
-    alle[0].dossier!.openVoorLead = false;
+    alle[0].dossier!.zichtbaar = false;
     expect(leadDossier(alle[0], alle)).toBeNull();
-    alle[0].dossier!.openVoorLead = true;
+    alle[0].dossier!.zichtbaar = true;
     alle[0].dossier!.items.forEach((i) => (i.zichtbaarVoorLead = false));
     expect(leadDossier(alle[0], alle)).toBeNull();
     const [o, c] = opgezet();
@@ -268,7 +272,7 @@ describe("wat de Lead ziet", () => {
     expect(aantalTekst(d)).toBe("1 case · 1 nieuwsbericht");
   });
   it("de tag Nieuw staat er tot de Lead de pagina opende na de laatste wijziging", () => {
-    const dossier = { gewijzigdOp: "2026-10-17T08:00:00Z", openSinds: "2026-10-16T08:00:00Z" };
+    const dossier = { gewijzigdOp: "2026-10-17T08:00:00Z", zichtbaarSinds: "2026-10-16T08:00:00Z" };
     expect(isNieuwVoorLead({}, dossier)).toBe(true);
     expect(isNieuwVoorLead({ dossierGezienOp: "2026-10-16T09:00:00Z" }, dossier)).toBe(true);
     expect(isNieuwVoorLead({ dossierGezienOp: "2026-10-18T09:00:00Z" }, dossier)).toBe(false);
@@ -338,10 +342,10 @@ describe("een event verlopen", () => {
     const volgorde = eventsInVolgorde([e("a", "2026-12-01"), e("oud1", "2026-09-01"), e("b", "2026-10-25"), e("oud2", "2026-10-01")], NU);
     expect(volgorde.map((x) => x.id)).toEqual(["b", "a", "oud2", "oud1"]);
   });
-  it("heeft de status Verlopen, ook als het op Zichtbaar voor klant stond, en telt dan nog mee voor de Lead", () => {
+  it("heeft de status Verlopen, ook als het op Zichtbaar voor Lead stond, en telt dan nog mee voor de Lead", () => {
     const o = org("O", {
       dossier: {
-        openVoorLead: true, openSinds: null, gewijzigdOp: null,
+        zichtbaar: true, zichtbaarSinds: null, naamVoorLead: "", radarBronnen: [], gewijzigdOp: null,
         items: [
           basisItem({ id: "oud", datum: "2026-09-01", zichtbaarVoorLead: true }),
           basisItem({ id: "komt", datum: "2026-12-01", zichtbaarVoorLead: true }),
@@ -374,7 +378,7 @@ describe("wat de Lead ziet bij events en blogs", () => {
   const dossier = () =>
     org("O", {
       dossier: {
-        openVoorLead: true, openSinds: "2026-10-16T08:00:00Z", gewijzigdOp: null,
+        zichtbaar: true, zichtbaarSinds: "2026-10-16T08:00:00Z", naamVoorLead: "", radarBronnen: [], gewijzigdOp: null,
         items: [
           basisItem({ id: "e1", soort: "event", datum: "2026-11-12", plaats: "Utrecht", zichtbaarVoorLead: true, bouwblokIds: ["ai1"] }),
           basisItem({ id: "e2", soort: "event", datum: "2026-05-01", zichtbaarVoorLead: true }),
@@ -445,7 +449,7 @@ describe("opslaan van events en blogs", () => {
     expect(laad("O").dossier!.items[0]).toMatchObject({ soort: "event", datum: "2026-11-20" });
   });
   it("laadt data van vóór events en blogs met lege velden", () => {
-    const d = zetNieuwsartikelenOm({ dossier: { openVoorLead: false, openSinds: null, gewijzigdOp: null, items: [{ id: "a", soort: "nieuws", titel: "t" }] } });
+    const d = zetNieuwsartikelenOm({ dossier: { zichtbaar: false, zichtbaarSinds: null, gewijzigdOp: null, items: [{ id: "a", soort: "nieuws", titel: "t" }] } });
     expect(d.items[0]).toMatchObject({ datum: "", einddatum: "", plaats: "" });
   });
 });
@@ -466,16 +470,18 @@ describe("de verdeling over secties in de lijst van de Lead", () => {
     expect(sectieVanScore(3.5)).toBe("sterk");
   });
 
-  it("zet een item in de sectie van zijn laagst scorende bouwblok, over beide Assessments heen", () => {
-    expect(sectieVanItem(["b3", "b2"], scores)).toBe("uitbouwen");
-    expect(sectieVanItem(["b3", "b1", "b2"], scores)).toBe("basis");
-    expect(sectieVanItem(["b3"], scores)).toBe("sterk");
+  it("zet een item in elke sectie waarin een van zijn bouwblokken valt, over beide Assessments heen", () => {
+    expect(sectiesVanItem(["b3", "b2"], scores)).toEqual(["uitbouwen", "sterk"]);
+    expect(sectiesVanItem(["b3", "b1", "b2"], scores)).toEqual(["basis", "uitbouwen", "sterk"]);
+    expect(sectiesVanItem(["b3"], scores)).toEqual(["sterk"]);
+    expect(sectiesVanItem(["b1", "b1"], scores)).toEqual(["basis"]);
   });
 
-  it("zet een item zonder bouwblok of zonder score in Algemeen", () => {
-    expect(sectieVanItem([], scores)).toBe("algemeen");
-    expect(sectieVanItem(["b4"], scores)).toBe("algemeen");
-    expect(sectieVanItem(["onbekend"], scores)).toBe("algemeen");
+  it("zet een item zonder bouwblok of zonder score in Algemeen, en een bouwblok zonder score geeft geen sectie", () => {
+    expect(sectiesVanItem([], scores)).toEqual(["algemeen"]);
+    expect(sectiesVanItem(["b4"], scores)).toEqual(["algemeen"]);
+    expect(sectiesVanItem(["onbekend"], scores)).toEqual(["algemeen"]);
+    expect(sectiesVanItem(["b4", "b1"], scores)).toEqual(["basis"]);
   });
 
   it("verdeelt de lijsten, laat lege secties weg en houdt de volgorde van de secties vast", () => {
@@ -520,5 +526,150 @@ describe("de verdeling over secties in de lijst van de Lead", () => {
     ]);
     expect(zonder.map((r) => r.naam)).toEqual(["y", "x"]);
     expect(VERDELING_EERST).toBe(4);
+  });
+});
+
+describe("een item in meerdere secties (22 oktober 2026)", () => {
+  const scores = new Map<string, number | null>([
+    ["b1", 1.8],
+    ["b2", 3.0],
+    ["b3", 4.2],
+  ]);
+  const item = (id: string, bouwblokIds: string[]) => ({ id, bouwblokIds });
+
+  it("zet een item in elke sectie waarin een bouwblok valt en telt het per sectie", () => {
+    const l = {
+      cases: [item("c1", ["b1", "b3"])],
+      nieuws: [item("n1", ["b1"]), item("n2", ["b2"])],
+      events: [],
+      blogs: [],
+    } as unknown as Parameters<typeof verdeelOverSecties>[0];
+    const secties = verdeelOverSecties(l, scores, "bouwblok");
+    expect(secties.map((x) => [x.sectie, x.aantal])).toEqual([
+      ["basis", 2],
+      ["uitbouwen", 1],
+      ["sterk", 1],
+    ]);
+    // De case staat in twee secties, maar de tegels en pillen tellen hem één keer.
+    expect(aantallenPerSoortLead(l).alles).toBe(3);
+    expect(secties[0].lijsten.cases.map((c) => c.id)).toEqual(["c1"]);
+    expect(secties[2].lijsten.cases.map((c) => c.id)).toEqual(["c1"]);
+  });
+});
+
+describe("naam voor de Lead", () => {
+  it("is standaard Dossier {Organisatie} en anders de eigen naam", () => {
+    expect(naamVoorLeadVan(org("O"))).toBe("Dossier Org O");
+    expect(naamVoorLeadVan(org("O", { dossier: { ...leegDossierVoorTest(), naamVoorLead: "  Onze aanpak  " } }))).toBe("Onze aanpak");
+    expect(naamVoorLeadVan(org("O", { dossier: { ...leegDossierVoorTest(), naamVoorLead: "   " } }))).toBe("Dossier Org O");
+  });
+
+  it("controleert de lengte (hoogstens 80 tekens) en trimt", () => {
+    expect(controleerNaamVoorLead("  Naam ")).toEqual({ ok: true, waarde: "Naam" });
+    expect(controleerNaamVoorLead("")).toEqual({ ok: true, waarde: "" });
+    expect(controleerNaamVoorLead("x".repeat(81)).ok).toBe(false);
+    expect(controleerNaamVoorLead("x".repeat(80)).ok).toBe(true);
+  });
+
+  it("komt in het Dossier van de Lead, en in de log als instelling gewijzigd (zonder persoonsgegevens)", () => {
+    zet(org("O", { caseToegestaan: false }));
+    db.voegDossieritemToe("O", nieuws({ zichtbaarVoorLead: true }));
+    expect(db.zetNaamVoorLead("O", "Onze aanpak").ok).toBe(true);
+    db.zetDossierZichtbaar("O", true);
+    const o = laad("O");
+    expect(leadDossier(o, db.laadAlles())?.naam).toBe("Onze aanpak");
+    expect(audit().find((e) => e.actie === "dossier.instellingGewijzigd")?.details).toMatchObject({ veld: "naamVoorLead", nieuw: "Onze aanpak" });
+    expect(db.zetNaamVoorLead("O", "x".repeat(81)).ok).toBe(false);
+    // Leeg geeft weer de standaardnaam.
+    db.zetNaamVoorLead("O", "");
+    expect(leadDossier(laad("O"), db.laadAlles())?.naam).toBe("Dossier Org O");
+  });
+});
+
+describe("de oude veldnamen van het Dossier", () => {
+  it("openVoorLead en openSinds worden zichtbaar en zichtbaarSinds, met een lege naam en bronnen", () => {
+    const d = zetNieuwsartikelenOm({ dossier: { openVoorLead: true, openSinds: "2026-10-16T08:00:00Z", gewijzigdOp: null, items: [] } });
+    expect(d).toMatchObject({ zichtbaar: true, zichtbaarSinds: "2026-10-16T08:00:00Z", naamVoorLead: "", radarBronnen: [] });
+    expect(d).not.toHaveProperty("openVoorLead");
+  });
+  it("laden zet een opgeslagen Dossier met de oude namen om", () => {
+    const oud = { ...org("O"), dossier: { openVoorLead: true, openSinds: "2026-10-16T08:00:00Z", gewijzigdOp: null, items: [] } };
+    opslag.set(KEY, JSON.stringify([oud]));
+    expect(laad("O").dossier).toMatchObject({ zichtbaar: true, zichtbaarSinds: "2026-10-16T08:00:00Z", naamVoorLead: "", radarBronnen: [] });
+  });
+});
+
+describe("de scorebron van het Dossier", () => {
+  const AID = "klantcontact-volwassenheid";
+  const meting = (id: string, meetdatum: string, extra: Partial<ScanUitvoering> = {}): ScanUitvoering => ({
+    id, organisatieId: "O", assessmentId: AID, label: `Meting ${id}`, meetdatum, aangemaaktOp: "x", invullingen: [], ...extra,
+  });
+  const lid = (id: string, lead: boolean) => ({
+    id, organisatieId: "O", email: `${id}@x.nl`, naam: null, functie: "", team: "", notities: "", toegangscode: id.padEnd(10, "x"), lead,
+  }) as unknown as OrganisatieLid;
+  const toegang = (respondentId: string, metingId: string): LeadToegang => ({ respondentId, weergave: "resultaten", metingId, toegekendDoor: "A", toegekendOp: "x" });
+  const opgezet = (extra: Partial<Organisatie> = {}) =>
+    zet(
+      org("O", {
+        leden: [lid("L1", true)],
+        scanUitvoeringen: [meting("m1", "2026-03-01"), meting("m2", "2026-09-01"), meting("m3", "2026-10-01")],
+        leadToegang: [toegang("L1", "m1"), toegang("L1", "m2")],
+        ...extra,
+      })
+    );
+
+  it("is automatisch de meest recente Meting die de Lead mag zien", () => {
+    opgezet();
+    const o = laad("O");
+    expect(dossierRadarMeting(o, "L1", AID)?.id).toBe("m2");
+    expect(automatischeRadarMeting(o, AID)?.id).toBe("m2");
+    expect(radarBronVan(o, AID)).toBeNull();
+  });
+
+  it("kiest handmatig één Meting, en onzichtbare Metingen zijn niet te kiezen", () => {
+    opgezet();
+    expect(db.zetRadarBron("O", AID, "m1").ok).toBe(true);
+    expect(dossierRadarMeting(laad("O"), "L1", AID)?.id).toBe("m1");
+    expect(db.zetRadarBron("O", AID, "m3").ok).toBe(false);
+    expect(db.zetRadarBron("O", AID, "bestaat-niet").ok).toBe(false);
+    expect(db.zetRadarBron("O", "quickscan-ziekenhuis", "m1").ok).toBe(false);
+    expect(audit().find((e) => e.actie === "dossier.instellingGewijzigd")?.details).toMatchObject({ veld: "radarBron", nieuw: "Meting m1", oud: "automatisch" });
+    // Terug naar automatisch.
+    expect(db.zetRadarBron("O", AID, null).ok).toBe(true);
+    expect(laad("O").dossier!.radarBronnen).toEqual([]);
+  });
+
+  it("geeft een Lead zonder de gekozen Meting geen scores", () => {
+    opgezet({ leden: [lid("L1", true), lid("L2", true)], leadToegang: [toegang("L1", "m1"), toegang("L2", "m2")] });
+    db.zetRadarBron("O", AID, "m1");
+    expect(dossierRadarMeting(laad("O"), "L1", AID)?.id).toBe("m1");
+    expect(dossierRadarMeting(laad("O"), "L2", AID)).toBeNull();
+  });
+
+  it("zet het Dossier uit als een gekozen Meting niet meer zichtbaar is voor de Lead, en aanzetten kan dan niet", () => {
+    opgezet();
+    db.voegDossieritemToe("O", nieuws({ zichtbaarVoorLead: true }));
+    db.zetRadarBron("O", AID, "m1");
+    expect(db.zetDossierZichtbaar("O", true).ok).toBe(true);
+    // De Admin zet Resultaten van m1 uit voor de Lead.
+    db.slaLeadToegangOp("O", [{ respondentId: "L1", weergave: "resultaten", metingId: "m1", aan: false }], "A");
+    expect(laad("O").dossier!.zichtbaar).toBe(false);
+    expect(verlorenRadarBronnen(laad("O"))).toMatchObject([{ assessmentId: AID, metingId: "m1", reden: "niet-zichtbaar", metingLabel: "Meting m1" }]);
+    const verborgen = audit().filter((e) => e.actie === "dossier.verborgen");
+    expect(verborgen.at(-1)?.details).toMatchObject({ reden: expect.stringContaining("niet meer zichtbaar") });
+    expect(db.zetDossierZichtbaar("O", true).ok).toBe(false);
+    // Weer Automatisch kiezen maakt aanzetten mogelijk.
+    db.zetRadarBron("O", AID, null);
+    expect(db.zetDossierZichtbaar("O", true).ok).toBe(true);
+  });
+
+  it("zet het Dossier ook uit als de gekozen Meting is verwijderd", () => {
+    opgezet();
+    db.zetRadarBron("O", AID, "m2");
+    db.zetDossierZichtbaar("O", true);
+    db.verwijderMeting("m2");
+    const o = laad("O");
+    expect(o.dossier!.zichtbaar).toBe(false);
+    expect(verlorenRadarBronnen(o)).toMatchObject([{ metingId: "m2", reden: "verwijderd", metingLabel: null }]);
   });
 });

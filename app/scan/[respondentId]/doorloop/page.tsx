@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useScanInvulling, updateScanInvulling, scanWeergave } from "@/lib/db";
 import { useAssessment } from "@/lib/assessment-store";
-import { actieveBouwblokkenMetGroep, actieveVragen } from "@/lib/assessment-structuur";
+import { actieveBouwblokkenMetGroep, actieveGroepen, actieveVragen } from "@/lib/assessment-structuur";
 import { categorieVanToepassing, isVolledigIngevuld } from "@/lib/scoring";
 import { isJaNeeWeetNiet } from "@/lib/quickscan";
 import { isSpanning } from "@/lib/spanning";
@@ -108,6 +108,8 @@ export default function DoorloopPage({
   const eersteVanOptioneleCategorie =
     categorie?.optioneel === true &&
     actieveBouwblokkenMetGroep(assessmentVast).find((b) => b.groepId === huidig.groepId)?.bouwblok.id === huidig.bouwblok.id;
+  // Het nummer van de afdeling: De plek van de categorie in de volgorde van de afdelingen (`AFDELING {n}`).
+  const afdelingNummer = actieveGroepen(assessment).findIndex((g) => g.id === huidig.groepId) + 1;
   const kanAfronden = isVolledigIngevuld(invulling.antwoorden, assessment, invulling.relevantie);
 
   function handleAntwoord(vraagId: string, waarde: Antwoord) {
@@ -263,10 +265,10 @@ export default function DoorloopPage({
           ) : (
             <BouwblokForm
               bouwblok={huidig.bouwblok}
-              categorieKleur={huidig.groepKleur}
+              // Zonder categorielaag (de AI-scan) geldt `--or` als accent, niet de kleur van het domein (`stylesheet.md`, Doorloopflow).
+              categorieKleur={huidig.groepNaam ? huidig.groepKleur : null}
               categorieNaam={huidig.groepNaam}
               bouwblokLabel={assessment.bouwblokLabel}
-              eenheid={assessment.bouwblokEenheidEnkelvoud}
               schaal={assessment.schaal}
               respondent={respondent}
               isLaatsteBouwblok={isLaatsteBouwblok}
@@ -276,6 +278,7 @@ export default function DoorloopPage({
                 eersteVanOptioneleCategorie && categorie
                   ? {
                       categorie,
+                      nummer: afdelingNummer,
                       relevantieVraag: assessment.relevantieVraag?.trim() || "Is dit onderdeel relevant voor uw situatie?",
                       relevantie: invulling.relevantie?.[categorie.id],
                       onRelevantie: (relevant) => handleRelevantie(categorie.id, relevant),

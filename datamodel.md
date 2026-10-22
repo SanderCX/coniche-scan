@@ -327,7 +327,7 @@ Contactpersoon {
 
 ### Dossieritem
 
-**Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 voor Nieuws en Cases, en op 21 oktober 2026 (PR 160) ook voor Events, Blogs en de koppeling aan AI-domeinen; de hernoeming naar zichtbaar, de naam voor de Lead en de scorebron van 21 oktober 2026 zijn nog niet gebouwd.** Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws, Cases, Events en Blogs, en kan het zichtbaar maken voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
+**Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 voor Nieuws en Cases, en op 21 oktober 2026 (PR 160) ook voor Events, Blogs en de koppeling aan AI-domeinen; de hernoeming naar zichtbaar, de naam voor de Lead en de scorebron van 21 oktober 2026 zijn gebouwd op 22 oktober 2026.** Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws, Cases, Events en Blogs, en kan het zichtbaar maken voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
 
 ```
 Organisatie.dossier {
@@ -1604,10 +1604,10 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   gewijzigde velden. Bij een Case staat ook de naam van de Organisatie in de
   Case erin.
 - `dossier.zichtbaarGemaakt` en `dossier.verborgen` (voorheen `dossier.geopend` en
-  `dossier.gesloten`; gebouwd op 21 oktober 2026 onder de oude namen, hernoemd op 21 oktober 2026, de hernoeming is nog niet gebouwd):
+  `dossier.gesloten`; gebouwd op 21 oktober 2026 onder de oude namen, hernoemd op 21 oktober 2026 en gebouwd op 22 oktober 2026):
   `zichtbaar` is aan of uit gezet. `details` bevat de Organisatie en het
   aantal zichtbare items.
-- `dossier.instellingGewijzigd` (voorstel van 21 oktober 2026): `naamVoorLead` of
+- `dossier.instellingGewijzigd` (gebouwd op 22 oktober 2026): `naamVoorLead` of
   een `radarBronnen` is gewijzigd. `details` bevat de Organisatie, het veld, bij
   een scorebron het Assessment en de Meting (of "automatisch"), en de oude en
   nieuwe waarde.
@@ -1646,7 +1646,7 @@ Een streepje betekent geen toegang.
 | `organisaties.toewijzen` (aan een Consultant) | alle | - | - | - |
 | `organisaties.bewerken` (incl. kenmerken, KPI-waarden en Onderdelen) | alle | eigen | te bevestigen | - |
 | `contactpersonen.bewerken` (Contactpersonen aanmaken, wijzigen en verwijderen; een Consultant ziet ze wel; vooralsnog alleen Admin, later waarschijnlijk eigen voor een Consultant) | alle | - | - | - |
-| `dossier.bewerken` (Dossieritems aanmaken, wijzigen en verwijderen, Zichtbaar voor Lead, de naam en de scorebron van het Dossier; gebouwd op 21 oktober 2026, de naam en de scorebron nog niet gebouwd, `dossier.md`) | alle | eigen | - | - |
+| `dossier.bewerken` (Dossieritems aanmaken, wijzigen en verwijderen, Zichtbaar voor Lead, de naam en de scorebron van het Dossier; gebouwd op 21 oktober 2026, de naam en de scorebron op 22 oktober 2026, `dossier.md`) | alle | eigen | - | - |
 | `dossier.inzien` (gebouwd op 21 oktober 2026) | alle | eigen | alleen openstaande items van de eigen Organisatie | - |
 | `organisaties.verwijderen` | alle | eigen | - | - |
 | `metingen.plannen` (ook een nieuw Onderdeel aanmaken in het formulier) | alle | eigen | - | - |

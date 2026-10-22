@@ -176,9 +176,9 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
   },
   {
     sleutel: "info.dossier",
-    plek: "Organisatie-detail, kaart Dossier, naast de titel",
+    plek: "Organisatie-detail, kaart Dossier, naast de kop van het paneel Instellingen voor de Lead",
     tekst:
-      "Cases, nieuws, events en blogs die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier open staat én het item op Zichtbaar voor klant staat. Een case kan alleen open als de organisatie in de case dat heeft toegestaan.",
+      "Cases, nieuws, events en blogs die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier zichtbaar is én het item op Zichtbaar voor Lead staat. Een case kan alleen zichtbaar worden als de organisatie in de case dat heeft toegestaan.",
   },
   {
     sleutel: "info.caseVlag",

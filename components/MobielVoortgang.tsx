@@ -26,7 +26,7 @@ export function MobielVoortgang({
         <div className="progress-bar-fill" style={{ width: `${percentage}%` }} />
       </div>
       <p className="progress-label" style={{ marginBottom: 0 }}>
-        {percentage}% — {beantwoord} van {totaal} vragen
+        {percentage}% – {beantwoord} van {totaal} vragen
       </p>
     </div>
   );

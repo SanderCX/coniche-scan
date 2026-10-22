@@ -169,7 +169,7 @@ tekst van deze spec aangepast.
 Elke afdeling begint in de doorloopflow met twee kaarten boven de vragen
 (`CLAUDE.md`, scherm 5):
 
-1. De kop van de afdeling (besloten door Joost op 22 oktober 2026, nog te bouwen, ontwerp
+1. De kop van de afdeling (besloten door Joost op 22 oktober 2026, gebouwd op 22 oktober 2026, ontwerp
    `Vragenlijst-Quickscan`): Een oranje balk van 4px links met 28px ruimte
    erachter, de eyebrow "AFDELING {n}" (12px, hoofdletters, gewicht 700,
    letterafstand .14em, `--or`), de naam (32px, gewicht 800) en daaronder de

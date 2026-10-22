@@ -21,6 +21,26 @@ export const TOT_RESULTAAT_MAX = 40;
 
 export const PLAATS_MAX = 80;
 
+/** De naam van het Dossier bij de Lead: Hoogstens 80 tekens (`dossier.md`, Naam en scorebron). */
+export const NAAM_VOOR_LEAD_MAX = 80;
+
+/** De standaardnaam van het Dossier bij de Lead: "Dossier {Organisatie}". */
+export function standaardNaamVoorLead(organisatieNaam: string): string {
+  return `Dossier ${organisatieNaam}`;
+}
+
+/** De naam van het Dossier bij de Lead: De eigen naam, of "Dossier {Organisatie}" zolang er geen is (`dossier.md`, Naam en scorebron). */
+export function naamVoorLeadVan(organisatie: Pick<Organisatie, "naam" | "dossier">): string {
+  const eigen = organisatie.dossier?.naamVoorLead?.trim();
+  return eigen || standaardNaamVoorLead(organisatie.naam);
+}
+
+/** Controleert een nieuwe naam voor de Lead: Getrimd, hoogstens 80 tekens. Leeg is toegestaan (dan geldt de standaardnaam). */
+export function controleerNaamVoorLead(invoer: string): Controle<string> {
+  const naam = invoer.trim();
+  if (naam.length > NAAM_VOOR_LEAD_MAX) return { ok: false, reden: `De naam mag hoogstens ${NAAM_VOOR_LEAD_MAX} tekens hebben.` };
+  return { ok: true, waarde: naam };
+}
 /** Het Assessment waarvan de bouwblokken als eerste aan een item gekoppeld kunnen worden (`dossier.md`, Koppeling aan bouwblokken). */
 export const DOSSIER_ASSESSMENT_ID = "klantcontact-volwassenheid";
 
@@ -36,7 +56,7 @@ export type DossierSoort = Dossieritem["soort"];
 export const DOSSIER_SOORTEN: DossierSoort[] = ["case", "nieuws", "event", "blog"];
 
 export function leegDossier(): Dossier {
-  return { openVoorLead: false, openSinds: null, gewijzigdOp: null, items: [] };
+  return { zichtbaar: false, zichtbaarSinds: null, naamVoorLead: "", radarBronnen: [], gewijzigdOp: null, items: [] };
 }
 
 /** Het Dossier van een Organisatie, of een leeg en dicht Dossier bij data van vóór het Dossier. */
@@ -201,7 +221,7 @@ export function kanOpenZetten(
 ): string | null {
   if (invoer.soort !== "case") return null;
   if (!invoer.caseOrganisatieId || !caseOrganisatie) return "Kies de organisatie in de case.";
-  if (caseOrganisatie.caseToegestaan !== true) return "Zonder toestemming van de organisatie in de case kan een case niet open.";
+  if (caseOrganisatie.caseToegestaan !== true) return "Zonder toestemming van de organisatie in de case kan een case niet zichtbaar worden.";
   if (!sectorVan(caseOrganisatie)) return `Vul de Sector in bij de Kenmerken van ${caseOrganisatie.naam}.`;
   return null;
 }
@@ -209,7 +229,7 @@ export function kanOpenZetten(
 export type DossierStatus = "zichtbaar" | "intern" | "verlopen" | "toestemming-ontbreekt" | "kies-organisatie";
 
 export const DOSSIER_STATUS_LABEL: Record<DossierStatus, string> = {
-  zichtbaar: "Zichtbaar voor klant",
+  zichtbaar: "Zichtbaar voor Lead",
   intern: "Intern",
   verlopen: "Verlopen",
   "toestemming-ontbreekt": "Toestemming ontbreekt",
@@ -218,8 +238,8 @@ export const DOSSIER_STATUS_LABEL: Record<DossierStatus, string> = {
 
 /**
  * De status van een item voor de Consultant (`dossier.md`, Scherm 1): "Kies een organisatie" bij een Case zonder Organisatie,
- * "Toestemming ontbreekt" bij een Case waarvan de Organisatie de Afspraak niet (meer) heeft, ook als het item op Zichtbaar voor klant
- * stond, "Verlopen" bij een Event waarvan de datum voorbij is, anders "Zichtbaar voor klant" of "Intern".
+ * "Toestemming ontbreekt" bij een Case waarvan de Organisatie de Afspraak niet (meer) heeft, ook als het item op Zichtbaar voor Lead
+ * stond, "Verlopen" bij een Event waarvan de datum voorbij is, anders "Zichtbaar voor Lead" of "Intern".
  */
 export function itemStatus(item: Dossieritem, alle: Pick<Organisatie, "id" | "caseToegestaan">[], nu: Date = new Date()): DossierStatus {
   if (isVerlopen(item, nu)) return "verlopen";
@@ -277,9 +297,9 @@ export function aantallPerSoort(lijst: Pick<Dossieritem, "soort">[]): { alles: n
   return { alles: lijst.length, cases: n("case"), nieuws: n("nieuws"), events: n("event"), blogs: n("blog") };
 }
 
-/** Het aantal items dat de Lead nu zou zien als het Dossier open stond (voor de bevestiging bij Open voor Lead). */
+/** Het aantal items dat de Lead nu zou zien als het Dossier zichtbaar was (voor de bevestiging bij Zichtbaar voor Lead). */
 export function aantalZichtbaarVoorLead(organisatie: Organisatie, alle: Organisatie[], nu: Date = new Date()): number {
-  // Een verlopen Event dat op Zichtbaar voor klant staat, ziet de Lead onder "Eerdere events": Het telt dus mee.
+  // Een verlopen Event dat op Zichtbaar voor Lead staat, ziet de Lead onder "Eerdere events": Het telt dus mee.
   return dossierVan(organisatie).items.filter((i) => {
     const status = itemStatus(i, alle, nu);
     return status === "zichtbaar" || (status === "verlopen" && i.zichtbaarVoorLead);
@@ -360,7 +380,9 @@ export interface LeadEvent {
 
 export interface LeadDossier {
   organisatieNaam: string;
-  openSinds: string | null;
+  /** De titel van het Dossier bij de Lead: De naam voor de Lead, of "Dossier {Organisatie}" (`dossier.md`, Naam en scorebron). */
+  naam: string;
+  zichtbaarSinds: string | null;
   gewijzigdOp: string | null;
   cases: LeadCase[];
   nieuws: LeadNieuws[];
@@ -370,14 +392,14 @@ export interface LeadDossier {
 }
 
 /**
- * Het Dossier zoals een Lead het ziet (`dossier.md`, Wat de Lead ziet): `null` als het Dossier niet open staat of er geen enkel item
- * zichtbaar is. Een item is zichtbaar als `openVoorLead` aan staat, het item op Zichtbaar voor klant staat en, bij een Case, de
+ * Het Dossier zoals een Lead het ziet (`dossier.md`, Wat de Lead ziet): `null` als het Dossier niet zichtbaar is of er geen enkel item
+ * zichtbaar is. Een item is zichtbaar als `zichtbaar` aan staat, het item op Zichtbaar voor Lead staat en, bij een Case, de
  * Organisatie in de case de Afspraak heeft en een Sector (de branche). De Case heeft in dit resultaat geen Organisatie-id en geen naam. Een
  * Event of Blog heeft geen toestemming van een andere Organisatie nodig.
  */
 export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korteNamen?: KorteNamen, nu: Date = new Date()): LeadDossier | null {
   const dossier = dossierVan(organisatie);
-  if (!dossier.openVoorLead) return null;
+  if (!dossier.zichtbaar) return null;
   const zichtbaar = dossier.items.filter((i) => i.zichtbaarVoorLead);
   const cases: LeadCase[] = casesNieuwsteEerst(zichtbaar).flatMap((i) => {
     const o = alle.find((x) => x.id === i.caseOrganisatieId);
@@ -424,13 +446,22 @@ export function leadDossier(organisatie: Organisatie, alle: Organisatie[], korte
     verlopen: isVerlopen(i, nu),
   }));
   if (cases.length + nieuws.length + events.length + blogs.length === 0) return null;
-  return { organisatieNaam: organisatie.naam, openSinds: dossier.openSinds, gewijzigdOp: dossier.gewijzigdOp, cases, nieuws, events, blogs };
+  return {
+    organisatieNaam: organisatie.naam,
+    naam: naamVoorLeadVan(organisatie),
+    zichtbaarSinds: dossier.zichtbaarSinds,
+    gewijzigdOp: dossier.gewijzigdOp,
+    cases,
+    nieuws,
+    events,
+    blogs,
+  };
 }
 
 /** Of de kaart Dossier de tag "Nieuw" krijgt: Zolang de Lead de pagina niet heeft geopend na de laatste wijziging. */
-export function isNieuwVoorLead(lid: Pick<OrganisatieLid, "dossierGezienOp">, dossier: Pick<Dossier, "gewijzigdOp" | "openSinds">): boolean {
+export function isNieuwVoorLead(lid: Pick<OrganisatieLid, "dossierGezienOp">, dossier: Pick<Dossier, "gewijzigdOp" | "zichtbaarSinds">): boolean {
   if (!lid.dossierGezienOp) return true;
-  const laatste = [dossier.gewijzigdOp, dossier.openSinds].filter((x): x is string => !!x).sort().pop();
+  const laatste = [dossier.gewijzigdOp, dossier.zichtbaarSinds].filter((x): x is string => !!x).sort().pop();
   return !!laatste && lid.dossierGezienOp < laatste;
 }
 
@@ -529,9 +560,15 @@ export function zetNieuwsartikelenOm(ruw: Record<string, unknown>): Dossier {
       gewijzigdOp: String(n.aangemaaktOp ?? ""),
     });
   }
+  // Data met de oude veldnamen `openVoorLead` en `openSinds` wordt omgezet naar `zichtbaar` en `zichtbaarSinds` (`dossier.md`, Overgang).
+  const oudeNamen = bestaand as { openVoorLead?: boolean; openSinds?: string | null } | undefined;
   return {
-    openVoorLead: bestaand?.openVoorLead === true,
-    openSinds: bestaand?.openSinds ?? null,
+    zichtbaar: bestaand?.zichtbaar === true || (bestaand?.zichtbaar === undefined && oudeNamen?.openVoorLead === true),
+    zichtbaarSinds: bestaand?.zichtbaarSinds ?? oudeNamen?.openSinds ?? null,
+    naamVoorLead: typeof bestaand?.naamVoorLead === "string" ? bestaand.naamVoorLead : "",
+    radarBronnen: Array.isArray(bestaand?.radarBronnen)
+      ? bestaand!.radarBronnen.filter((b) => b && typeof b.assessmentId === "string").map((b) => ({ assessmentId: b.assessmentId, metingId: b.metingId ?? null }))
+      : [],
     gewijzigdOp: bestaand?.gewijzigdOp ?? null,
     items,
   };
@@ -611,8 +648,9 @@ export function aantallenPerSoortLead(l: DossierLijsten): { alles: number; case:
 }
 
 /**
- * De sectie van een item in de lijst van de Lead (`dossier.md`, Scherm 5, Lijst met rail "In dit dossier"): De klasse van het laagst scorende
- * bouwblok van het item, over beide Assessments heen. Een item zonder bouwblok of zonder score staat in Algemeen.
+ * De secties van een item in de lijst van de Lead (`dossier.md`, Scherm 5, Lijst met rail "In dit dossier", besloten door Joost op 22 oktober
+ * 2026): Een item staat in elke sectie waarin minstens één van zijn bouwblokken valt, met de klasse van de eigen score van dat bouwblok, over beide
+ * Assessments heen. Een item zonder bouwblok, of waarvan geen enkel bouwblok een score heeft, staat in Algemeen.
  */
 export type DossierSectie = "basis" | "uitbouwen" | "sterk" | "algemeen";
 
@@ -630,15 +668,19 @@ export function sectieVanScore(score: number): Exclude<DossierSectie, "algemeen"
   return klasse === "rood" ? "basis" : klasse === "oranje" ? "uitbouwen" : "sterk";
 }
 
-/** De sectie van een item uit de scores per bouwblok (`Bouwblok.id`). Een bouwblok zonder score telt niet mee. */
-export function sectieVanItem(bouwblokIds: string[], scores: ReadonlyMap<string, number | null>): DossierSectie {
-  let laagste: number | null = null;
+/**
+ * De secties van een item uit de scores per bouwblok (`Bouwblok.id`), in de vaste volgorde van de secties. Een bouwblok zonder score geeft geen
+ * sectie. Heeft het item geen enkel bouwblok met een score, dan is Algemeen de enige sectie.
+ */
+export function sectiesVanItem(bouwblokIds: string[], scores: ReadonlyMap<string, number | null>): DossierSectie[] {
+  const secties = new Set<DossierSectie>();
   for (const id of bouwblokIds) {
     const score = scores.get(id);
     if (score === null || score === undefined) continue;
-    if (laagste === null || score < laagste) laagste = score;
+    secties.add(sectieVanScore(score));
   }
-  return laagste === null ? "algemeen" : sectieVanScore(laagste);
+  if (secties.size === 0) return ["algemeen"];
+  return DOSSIER_SECTIES.map((d) => d.sectie).filter((x) => secties.has(x));
 }
 
 export interface DossierSectieInhoud {
@@ -650,10 +692,13 @@ export interface DossierSectieInhoud {
   aantal: number;
 }
 
-/** Verdeelt de lijsten over de secties. Een sectie zonder items valt weg. De volgorde in een sectie blijft die van de lijsten. */
+/**
+ * Verdeelt de lijsten over de secties. Een item staat in elke sectie waarin een van zijn bouwblokken valt, dus de aantallen samen mogen hoger zijn
+ * dan het aantal items. Een sectie zonder items valt weg. De volgorde in een sectie blijft die van de lijsten.
+ */
 export function verdeelOverSecties(l: DossierLijsten, scores: ReadonlyMap<string, number | null>, eenheid: string): DossierSectieInhoud[] {
   return DOSSIER_SECTIES.flatMap((definitie) => {
-    const in_ = <T extends { bouwblokIds: string[] }>(lijst: T[]) => lijst.filter((i) => sectieVanItem(i.bouwblokIds, scores) === definitie.sectie);
+    const in_ = <T extends { bouwblokIds: string[] }>(lijst: T[]) => lijst.filter((i) => sectiesVanItem(i.bouwblokIds, scores).includes(definitie.sectie));
     const lijsten: DossierLijsten = { cases: in_(l.cases), nieuws: in_(l.nieuws), events: in_(l.events), blogs: in_(l.blogs) };
     const totaal = lijsten.cases.length + lijsten.nieuws.length + lijsten.events.length + lijsten.blogs.length;
     if (totaal === 0) return [];
