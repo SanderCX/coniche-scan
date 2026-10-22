@@ -7,7 +7,7 @@ beheer"):
 
 - **"Oude tool"**: Export uit de oude (vibe-gecodeerde, stopgezette)
   tool, zodat historische klantdata niet verloren gaat. Gebaseerd op
-  twee daadwerkelijke exports van dezelfde klant: één Klantcontact
+  twee daadwerkelijke exports van dezelfde klant: Één Klantcontact
   Volwassenheidsscan en één AI-volwassenheidsscan (`<organisatie-
   slug>`), beide met exact dezelfde bouwblokken/domeinen en
   vraagteksten als de huidige content. **Tijdelijk**: Verdwijnt zodra
@@ -55,8 +55,7 @@ alleen voor een Admin. De import hoort bij die ene organisatie: Alle scans
 komen daar terecht. Een bestand kan rijen van andere organisaties bevatten;
 die koppel je aan deze organisatie of sla je over (zie Organisatie-matching).
 Een Consultant ziet de knop niet en krijgt bij de importroute een melding in
-plaats van de importfunctie. Tot 14 oktober 2026 was dit een tab Import met
-de organisatie per rij; die tab vervalt.
+plaats van de importfunctie.
 
 ## Bronformaat "oude tool"
 
@@ -99,7 +98,7 @@ Kolommen, gegroepeerd naar wat ermee gebeurt:
 | `respondent_email` | `Respondent.email`, genormaliseerd |
 | `respondent_role` | `Respondent.functie` |
 | `team_name` | `Respondent.team` |
-| `start_comment` | `ScanInvulling.notitie` (gebouwd op 13 oktober 2026, zie "Notitie per scan") |
+| `start_comment` | `ScanInvulling.notitie` (zie "Notitie per scan") |
 | `created_at` | `ScanInvulling.gestartOp` |
 | (geen kolom) | `ScanInvulling.aangemaaktOp`: Het moment van importeren, niet de datum uit het bestand |
 | `completed_at` | `ScanInvulling.afgerondOp` |
@@ -137,7 +136,7 @@ item, uit de daadwerkelijke CSV's:
   cijfer op, de labeltekst volgt al uit `datamodel.md` (SchaalLabel).
 - **`weight`**: Niet per antwoord geïmporteerd. Dit hoort inhoudelijk
   bij de bouwblok-definitie (`Bouwblok.gewicht`, zie `datamodel.md`),
-  niet bij de losse invulling — en al helemaal niet bij de losse vraag, ook al staat
+  niet bij de losse invulling, en al helemaal niet bij de losse vraag, ook al staat
   het in de CSV op elk vraag-item: Gecontroleerd over beide bestanden
   is deze waarde overal `1`, ook binnen elk blok, dus niets wijst
   erop dat er ooit per vraag gevarieerd werd. Bij beide huidige CSV's
@@ -150,7 +149,7 @@ item, uit de daadwerkelijke CSV's:
   overal op 1, terwijl de Zorgscan in de nieuwe tool gewogen is (bouwblok
   4, 10 en 11 op 2, zie `content-zorgscan.md`). De oude tool paste de
   weging dus nooit toe. Geïmporteerde Zorgscans worden met de nieuwe
-  weging berekend, zoals alle scans van dat Assessment. Hun overall wijkt
+  weging berekend, zoals alle scans van dat Assessment. Hun totaalscore wijkt
   daardoor af van de oude `overall_score`, en dat is bedoeld.
 
 ### Bewust niet geïmporteerd
@@ -158,7 +157,7 @@ item, uit de daadwerkelijke CSV's:
 - **Alle afgeleide scores**: `overall_score`, `overall_label`,
   `scores_by_building_block`, `scores_by_category`, `radar_chart_data`,
   `strengths`, `weaknesses`. De app berekent dit altijd live uit
-  `antwoorden` (CLAUDE.md sectie 1); apart importeren zou een tweede,
+  `antwoorden` (`datamodel.md`, Scoreberekening); apart importeren zou een tweede,
   potentieel afwijkende bron van waarheid opleveren.
 - **De AI-samenvatting**: `ai_summary_generated`, `ai_summary_overall`,
   `ai_summary_per_block`, `ai_summary_next_steps`, `ai_summary_cta`,
@@ -167,17 +166,15 @@ item, uit de daadwerkelijke CSV's:
   contentversie; de nieuwe AI-managementsamenvatting (`backlog.md`)
   start straks vers, geen import van oude AI-tekst.
 - **Consent**: `consent_given`, `consent_timestamp`. De huidige intake
-  slaat bewust geen serverside toestemmingsstatus op (CLAUDE.md
-  sectie 3, scherm 4); historische toestemmingsdata importeren zou dat
+  slaat bewust geen serverside toestemmingsstatus op (`schermen.md`,
+  Intake); historische toestemmingsdata importeren zou dat
   weer via een achterdeur doen.
 - `export_timestamp`: Moment van de CSV-export uit de oude tool, geen
   betekenis in het nieuwe model.
 - `respondent_phone`: `Respondent` heeft geen telefoonveld en krijgt er
   voor deze import ook geen.
 - **Contactpersonen en het Dossier**: Ze staan niet in de oude tool en
-  niet in de eigen export, dus ook niet in de import (`datamodel.md`,
-  Contactpersoon, Privacy; besloten op 20 oktober 2026, het Dossier sinds
-  `dossier.md`, Exports).
+  niet in de eigen export, dus ook niet in de import (`datamodel.md`, Contactpersoon, Privacy; het Dossier sinds `dossier.md`, Exports).
 
 ## Wie de Respondent wordt
 
@@ -200,14 +197,14 @@ wordt vanzelf een extra keuze zolang een Respondent hem heeft.
 | `respondent_email` | `email`, genormaliseerd (getrimd, lowercase) |
 | `respondent_role` | `functie` |
 | `team_name` | `team` |
-| `start_comment` | `ScanInvulling.notitie`, ongewijzigd en zonder opbouwtekst (gebouwd, zie "Notitie per scan") |
+| `start_comment` | `ScanInvulling.notitie`, ongewijzigd en zonder opbouwtekst (zie "Notitie per scan") |
 
 - **Hergebruik**: De regel uit `datamodel.md` (Respondent) geldt
   ongewijzigd. Hetzelfde genormaliseerde e-mailadres binnen een
   organisatie is één Respondent, binnen één import en ook in latere
   imports. De gegevens van een bestaande Respondent worden niet
   overschreven, ook `Respondent.notities` niet.
-- **Notitie per scan (gebouwd op 13 oktober 2026)**: Elke rij houdt zijn eigen
+- **Notitie per scan**: Elke rij houdt zijn eigen
   `start_comment` als notitie op zijn eigen scan. Er wordt niets aan de
   Respondent geplakt, ook niet als meerdere rijen of bestanden dezelfde
   Respondent hebben. Dit was de fout bij het importeren van meerdere
@@ -241,7 +238,7 @@ aan een bestaande organisatie (bijv. "<Organisatie> Zuid-Nederland" en
 nieuwe aanmaken. **Geen automatische fuzzy-match**: Dat risico (twee
 losse klanten samen laten vallen) is groter dan het gemak.
 
-**Vanuit een organisatie (gebouwd op 14 oktober 2026).** De import start in
+**Vanuit een organisatie.** De import start in
 het organisatie-detail, dus de doelorganisatie ligt vast. Per unieke
 organisatienaam in het bestand zijn er twee keuzes: Koppelen aan deze
 organisatie (de standaard bij een exacte match met de naam van deze
@@ -307,7 +304,7 @@ duidelijk matchingprobleem (blok- of vraagaantal komt niet overeen),
 nooit een stilzwijgend foute import. De handmatige keuze kostte dus een
 stap zonder een risico weg te nemen.
 
-De tool bepaalt het type in twee stappen. **Eerste stap**: de
+De tool bepaalt het type in twee stappen. **Eerste stap**: De
 (gegroepeerde, zie hieronder) bloknamen uit de CSV vergelijken met de
 bouwblokken/domeinen van elk Assessment-type. Is er precies één type
 waarvan zowel het aantal als alle namen exact overeenkomen, dan is dat
@@ -315,7 +312,7 @@ het gedetecteerde type.
 
 **Tweede stap, nodig sinds sector-varianten bestaan** (`datamodel.md`,
 Sector-varianten): Een sector-variant kopieert de bouwblok-namen van zijn
-template één-op-één — de Zorgscan heeft bijvoorbeeld exact dezelfde 15
+template één-op-één, de Zorgscan heeft bijvoorbeeld exact dezelfde 15
 bouwblok-namen als de Klantcontact Volwassenheidsscan, alleen de
 vraagteksten wijken af. De eerste stap levert dan meerdere kandidaten op
 in plaats van precies één. In dat geval beslissen de **vraagteksten**, met
@@ -323,22 +320,22 @@ een matchpercentage in plaats van alles-of-niets (dit voorkwam eerder dat
 een CSV die vóór een latere, kleine tekstcorrectie in de content was
 geëxporteerd, helemaal niet meer te importeren was):
 
-Per kandidaat-type: het percentage vragen (op volgorde, per blok) dat
+Per kandidaat-type: Het percentage vragen (op volgorde, per blok) dat
 woordelijk overeenkomt met de CSV, van het totaal aantal vragen van dat
 Assessment-type.
 
-- **Precies één kandidaat op 100%**: gedetecteerd, automatisch, zoals
+- **Precies één kandidaat op 100%**: Gedetecteerd, automatisch, zoals
   voorheen.
 - **Geen enkele kandidaat op 100%, maar precies één op of boven 95%, en
   duidelijk de hoogste** (geen andere kandidaat binnen dezelfde marge):
-  ook gedetecteerd, maar niet automatisch — de voorbeeldweergave per rij
+  ook gedetecteerd, maar niet automatisch, de voorbeeldweergave per rij
   (zie "Werkwijze in beheer") toont het percentage en welke vragen
   afwijken, en de beheerder keurt de rij expliciet goed. Een niet
   goedgekeurde rij telt niet mee op de knop "rijen importeren" (Werkwijze
   in beheer, punt 6): Het blijft een afwijking die bewust goedgekeurd
   wordt, alleen kan het nu wél in plaats van nooit.
 - **Geen enkele kandidaat op of boven 95%, of meerdere kandidaten op of
-  boven 95%**: onbepaald, zoals hieronder.
+  boven 95%**: Onbepaald, zoals hieronder.
 
 **Drempel vast op 95%**, niet beheerbaar (net als de rest van deze
 matchingregels). Bewust ruimer dan de eerder overwogen 99%: Bij 60
@@ -348,7 +345,7 @@ tekstcorrectie alsnog blokkeren. 95% laat een handvol kleine
 wijzigingen toe (spelling, woordvolgorde, een enkele herschreven vraag)
 zonder de garantie los te laten: Nog steeds altijd een expliciete
 goedkeuring per rij, nooit automatisch en nooit voor alle rijen tegelijk.
-Geldt alléén voor deze vraagtekst-tiebreak in stap 2 — stap 1
+Geldt alléén voor deze vraagtekst-tiebreak in stap 2, stap 1
 (bouwblok-namen en -aantal) blijft 100% exact, geen tolerantie: Wijkt
 een bouwblok af, dan blijft dat gewoon "niet importeren en melden".
 
@@ -363,7 +360,7 @@ beheer").
 Na die detectie valideert de tool per rij:
 1. Aantal blokken/domeinen in `answers` moet overeenkomen met het
    gedetecteerde Assessment (15 bij Klantcontact Volwassenheid, 8 bij
-   AI-volwassenheid) — al gegarandeerd door de detectiestap hierboven,
+   AI-volwassenheid), al gegarandeerd door de detectiestap hierboven,
    maar blijft hier ook expliciet gecontroleerd.
 2. Elk blok wordt gematcht op **naam** (`buildingBlockName` in de CSV
    tegen `Bouwblok.naam`), niet op het CSV-eigen `buildingBlockId`
@@ -383,7 +380,7 @@ geïmporteerd wordt.** De koppeling gebeurt op positie/volgnummer (punt 3
 hierboven), niet op de letterlijke tekst uit de CSV. De vraagtekst-match
 in stap 2 van de type-detectie hierboven is dus alleen het signaal om
 het juiste Assessment-type te herkennen, niet de bron van de
-uiteindelijke koppeling — dat was al zo, en blijft zo.
+uiteindelijke koppeling, dat was al zo, en blijft zo.
 
 Bij twijfel geldt: **Niet importeren en melden**, boven een deel
 importeren dat er correct uitziet maar het niet is.
@@ -451,8 +448,7 @@ Neem je een rij later alsnog mee met dezelfde knop (zie
 sessie al voor die combinatie is aangemaakt. Een nieuwe upload, ook van
 hetzelfde bestand, begint met nieuwe Metingen.
 
-**Meetdatum en onderdeel (gebouwd op 14 oktober 2026, ter vervanging van de
-ronde van 13 oktober 2026).** De oude tool kende geen onderdeel en geen
+**Meetdatum en onderdeel.** De oude tool kende geen onderdeel en geen
 meetdatum (`datamodel.md`, Meting). De import leidt ze af uit wat hij al weet.
 
 - **Meetdatum.** De oudste `created_at` van de scans die in de Meting komen
@@ -466,15 +462,13 @@ meetdatum (`datamodel.md`, Meting). De import leidt ze af uit wat hij al weet.
   zijn gekoppeld. In de voorbeeldweergave staat dan per bronnaam een veld
   "Onderdeel", voorgevuld met de bronnaam en aanpasbaar. Bij één bronnaam is het
   onderdeel "Hele organisatie". Bij de eigen export geldt het onderdeel uit de
-  kolom `onderdeel`, als die er is (`export-csv.md`). Gebouwd op 19 oktober
-  2026: Het veld is de keuzelijst Onderdeel (`beheerpagina.md`, punt 5, Het veld
+  kolom `onderdeel`, als die er is (`export-csv.md`). Het veld is de keuzelijst Onderdeel (`beheerpagina.md`, punt 5, Het veld
   Onderdeel). De bronnaam staat gekozen als er een Onderdeel met die naam
   bestaat (hoofdletterongevoelig), anders als "Nieuw onderdeel…" met de bronnaam
   ingevuld. Het Onderdeel ontstaat bij het importeren. De KPI's uit een eigen
   export (`organisatie_kpis`) worden teruggelezen en overschrijven bij een
   bestaande Organisatie niets, zoals `organisatie_kenmerken`. Een oudere eigen
-  export met KPI's in `organisatie_kenmerken` wordt omgezet volgens
-  `datamodel.md`, KPI's en kanalen, Overgang.
+  export met KPI's in `organisatie_kenmerken` wordt omgezet: De KPI's krijgen `onderdeelId: null` en `kanaalId: null`, en de zes getalvelden voor contacten per kanaal worden KPI-waarden van Contacten per jaar, met het kanaal erbij.
 - **Dezelfde Respondent twee keer.** Krijgt een scan een eigen Meting omdat
   dezelfde Respondent al een scan heeft in die Meting (zie hierboven), dan hoort
   die Meting bij zijn eigen meetdatum. Het label krijgt dezelfde datumconventie,
@@ -581,13 +575,13 @@ Leest de kolommen van `export-csv.md` terug. Verschillen met het "oude"
 formaat hierboven:
 
 - **Scheidingsteken puntkomma**, niet komma, en het bestand mag een
-  UTF-8-BOM bevatten — beide precies zoals `export-csv.md` ze zelf
+  UTF-8-BOM bevatten, beide precies zoals `export-csv.md` ze zelf
   schrijft.
 - **Geen naam-/volgorde-matching nodig**: `antwoorden` bevat al onze
   eigen `bouwblokId` en `vraagId` (het is immers onze eigen data), dus
   de import matcht daar rechtstreeks op. Bestaat een `vraagId` niet meer
   in de huidige content (bijv. na een contentwijziging), dan wordt die
-  rij overgeslagen met een duidelijke melding — dezelfde "niet
+  rij overgeslagen met een duidelijke melding, dezelfde "niet
   importeren en melden"-regel als het oude formaat.
 - **Assessment-type wordt gematcht op `assessment_naam`** (exacte
   naam), niet gedetecteerd uit de bouwblokken: Onze eigen export
@@ -600,12 +594,12 @@ formaat hierboven:
   Sector/Subsector) bij het aanmaken van een nieuwe organisatie, van de
   eerste rij in bestandsvolgorde (zie "Over rijen heen in één bestand").
   Wordt een bestaande organisatie hergebruikt, dan blijven haar eigen
-  kenmerken staan — geen overschrijving met mogelijk oudere geëxporteerde
+  kenmerken staan, geen overschrijving met mogelijk oudere geëxporteerde
   data.
 - **Respondenten uit de export zelf**: De
   Respondent komt uit `respondent_naam`, `respondent_email`,
   `respondent_functie` en `respondent_team`, en `Respondent.notities` wordt
-  niet aangepast. De kolom `scan_notitie` (gebouwd, `export-csv.md`) wordt
+  niet aangepast. De kolom `scan_notitie` (`export-csv.md`) wordt
   `ScanInvulling.notitie`. Ontbreekt de kolom, dan blijft de notitie leeg.
 - **Meting**: Een nieuwe Meting met het label "Import {meting_label}",
   met het `meting_label` uit de export erin, niet het label "Legacy-import
@@ -615,7 +609,7 @@ formaat hierboven:
   wordt niet hergebruikt. Het onderdeel komt uit de kolom `onderdeel` en de meetdatum uit de
   kolom `meting_meetdatum`, als die in het bestand staan (`export-csv.md`).
   Ontbreken ze, dan geldt de afleiding bij "Meetdatum en onderdeel" hierboven.
-  De kolom `ronde` uit de export van 13 oktober 2026 wordt genegeerd.
+  Een oude kolom `ronde` in het bestand wordt genegeerd.
 
 ## Audit-log
 
@@ -636,7 +630,7 @@ Meting.
 
 ## Beslist
 
-- **Goedkeuren en importeren op één plek** (5 oktober 2026): Een rij met een
+- **Goedkeuren en importeren op één plek**: Een rij met een
   waarschuwing (95%+-match) wordt niet meer los geïmporteerd. De beheerder
   keurt de rij goed, waarna ze meetelt op de knop "N rijen importeren".
   Importeren gebeurt alleen met die ene knop, voor de hele set. Goedkeuren
@@ -657,7 +651,7 @@ Meting.
   importeren), dan is dit opnieuw te bekijken. Het enige vangnet is de
   markering "geïmporteerd" per rij binnen de geladen sessie
   ("Rijen die niet lukken") en het importlogboek in `go-live-plan.md`.
-- **Gecombineerd bestand** (1 oktober 2026): Bij beide formaten
+- **Gecombineerd bestand**: Bij beide formaten
   ondersteund, één bronformaat per bestand. Organisatie wordt één keer per
   unieke naam gekozen, kenmerken komen van de eerste rij, en elke import
   maakt nieuwe Metingen met "import" in het label die de beheerder later
@@ -665,16 +659,15 @@ Meting.
 - **Deels mislukte import**: Alleen aangeven wat niet is gelukt, geen
   downloadbestand met overgeslagen rijen. Rijen die niet zijn
   geïmporteerd blijven in beeld en importeer je alsnog met dezelfde knop.
-- **Map met losse bestanden** (1 oktober 2026): Alleen bij "Oude tool",
+- **Map met losse bestanden**: Alleen bij "Oude tool",
   omdat de batch-export van de oude tool geen antwoorden per vraag
   bevat. Alleen bestanden direct in de gekozen map, geen submappen. De
   rijen worden samengevoegd en verder verwerkt als gecombineerd bestand.
-- **Respondent uit het bestand bij "Oude tool"** (5 oktober 2026): Elke
+- **Respondent uit het bestand bij "Oude tool"**: Elke
   geïmporteerde scan krijgt een Respondent met de gegevens uit het bestand
   (naam, e-mailadres, functie, team en notitie), in plaats van een
-  neutrale Respondent. Dat kan nu, omdat de beheerder een Respondent
-  achteraf kan bewerken. Dit vervangt de beslissing van 1 oktober 2026 over
-  de neutrale Respondent "Coniche (historische scan)".
+  neutrale Respondent. Dat kan, omdat de beheerder een Respondent
+  achteraf kan bewerken.
 
 ## Open
 

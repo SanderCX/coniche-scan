@@ -8,9 +8,7 @@ afdeling. Elke vraag wordt beantwoord met Ja, Nee of Weet ik niet.
 Standalone Assessment (`afgeleidVanAssessmentId: null`), dus geen
 sector-variant van de Zorgscan. Het antwoordtype en de score in punten
 staan in `datamodel.md` (Antwoordtype, Scoreberekening). De classificatie
-staat in `CLAUDE.md`, sectie 1.
-
-**Status**: Gebouwd op 14 oktober 2026, zie Gebouwd onderaan.
+staat in `CLAUDE.md`, Scoringslogica.
 
 **Bron**: Joost, aangeleverd als PDF-resultaat van een ingevulde
 proefscan voor een fictief ziekenhuis in de oude tool, plus twee
@@ -20,9 +18,7 @@ daaruit overgenomen; er is geen aparte brontekst of CSV met de vragen.
 De CSV-export van de oude tool (overzicht van scans) bevat geen vragen
 en geen antwoorden en is niet gebruikt.
 
-## Besloten
-
-Door Joost, 14 oktober 2026.
+## Afspraken over de inhoud
 
 - **Indeling over de dimensies.** De indeling uit de PDF is juist.
   Receptie / Centrale en Patiëntenservice hebben dus geen bouwblok
@@ -32,7 +28,7 @@ Door Joost, 14 oktober 2026.
 - **Namen van de klassen.** Bij een afdeling en een dimensie: "Goed op
   orde", "Gemiddeld inzicht" en "Ontwikkelruimte". Bij de totaalscore,
   met dezelfde grenzen: "Sterk ontwikkeld", "Gemiddeld ontwikkeld" en
-  "Aanzienlijke ontwikkelruimte" (`CLAUDE.md`, sectie 1, Classificatie).
+  "Aanzienlijke ontwikkelruimte" (`CLAUDE.md`, Classificatie).
   De legenda van de oude tool noemt het midden "Gemiddeld / Aandacht
   nodig" en toont 13–15 en 8–12 punten; die puntenrange is hier
   gecorrigeerd naar 12–15 en 8–11, want 12 van 15 is 80%.
@@ -41,7 +37,7 @@ Door Joost, 14 oktober 2026.
   zelf geschreven en kunnen worden vervangen door de teksten uit de
   oude tool.
 
-## Open punten, terug te leggen bij Joost
+## Open punten
 
 1. **Minimaal 3 vragen voor "Relatief sterkste basis".** In de oude tool
    telde een dimensie met 2 vragen (Mensen, 2/2) wel mee als sterkste
@@ -51,10 +47,10 @@ Door Joost, 14 oktober 2026.
 2. **Radar, top 3 en staafdiagram per categorie vervallen** voor dit
    Assessment. Een radar met 4 assen zegt weinig, en de oude tool
    toonde in plaats daarvan "Sterkste onderdeel" en "Meeste
-   ontwikkelruimte". Voorstel, graag bevestigen.
+   ontwikkelruimte". Nog te bevestigen.
 3. **Namen van bouwblokken komen vier keer terug.** "Organisatie" staat bij
    elke afdeling. In de wegingskaart en bij de factor ("2×") is dan niet
-   te zien om welke afdeling het gaat. Voorstel: Bij dit Assessment
+   te zien om welke afdeling het gaat. Mogelijke oplossing: Bij dit Assessment
    tonen die plekken "Afdeling · Dimensie", bijvoorbeeld "Poliklinieken ·
    Organisatie (2×)".
 4. **Alle teksten die hieronder als voorstel staan** (de zin bij de
@@ -95,7 +91,7 @@ Door Joost, 14 oktober 2026.
 - **Weging kan.** `Bouwblok.gewicht` werkt zoals bij de Zorgscan en
   staat nu overal op 1. Een afdeling zwaarder laten wegen betekent hetzelfde
   gewicht op al haar bouwblokken. De wegingskaart verschijnt pas als een
-  bouwblok een ander gewicht krijgt (`CLAUDE.md`, scherm 4).
+  bouwblok een ander gewicht krijgt (`schermen.md`, Intake).
 - **Eigen resultatenscherm**, zie Resultaten hieronder.
 - **Buiten scope voor nu**: PDF-export, CSV-export, InDesign-export,
   import, managementsamenvatting, spreiding, benchmark en de matrix over
@@ -106,15 +102,14 @@ Door Joost, 14 oktober 2026.
 - Naam: "Klantcontact Quickscan – Ziekenhuis"
 - `kortLabel`: "Quickscan Ziekenhuis" (voorstel)
 - `icoon`: `cross`, een plusteken als omtrek in dezelfde lijnstijl als
-  de andere drie (`stylesheet.md`, Assessment-icoon). Gebouwd op 14
-  oktober 2026, op verzoek van Sander; de tijdelijke emoji 🏥 vervalt.
+  de andere drie (`stylesheet.md`, Assessment-icoon).
 - `antwoordType`: `"ja-nee-weetniet"`, `schaal`: `null`
 - `relevantieVraag`: "Is deze afdeling relevant voor uw situatie?" (in de
   oude tool "Is dit organisatieonderdeel relevant voor uw situatie?")
 - `categorieen`: De 4 afdelingen, elk met `optioneel: true` en een
   `omschrijving` (de definitie, zie De 4 afdelingen), `bouwblokken`:
   `null`. `Categorie.kleur`
-  voorstel: Voor alle vier de oranje van de AI-volwassenheidsscan, want de
+  is voor alle vier de oranje van de AI-volwassenheidsscan, want de
   afdelingen hebben geen eigen betekenis in kleur. De resultaten gebruiken
   de klassekleuren, geen categoriekleur.
 - `Bouwblok.volgnummer` loopt door over de afdelingen, 1 tot en met 10.
@@ -134,8 +129,8 @@ Door Joost, 14 oktober 2026.
   telefonisch klantcontact per afdeling is geregeld en waar ze het
   eerst moeten verbeteren."
 - Geschatte duur: ±15 minuten.
-- Assessment-pagina (besloten door Joost op 21 oktober 2026, `CLAUDE.md`, scherm 2, ontwerp `Herontwerp-Quickscan`): Gebouwd op 21 oktober 2026 (PR 166): Compacte kop met het icoon `cross`, sub-nav met "De 4 afdelingen", "Praktisch", "Wat krijg ik" en "Visie". De sectie "De 4 afdelingen" toont per afdeling de definitie (hieronder, zonder "X =") en de vragen per dimensie. De feature-cards komen niet meer terug. De beschrijving hieronder is de inleiding van die sectie.
-- Feature-cards (voorstel, vervallen op de pagina): "4 afdelingen", "Resultaat per dimensie",
+- Assessment-pagina (`schermen.md`, ontwerp `Herontwerp-Quickscan`): Compacte kop met het icoon `cross`, sub-nav met "De 4 afdelingen", "Praktisch", "Wat krijg ik" en "Visie". De sectie "De 4 afdelingen" toont per afdeling de definitie (hieronder, zonder "X =") en de vragen per dimensie. De feature-cards komen niet meer terug. De beschrijving hieronder is de inleiding van die sectie.
+- Feature-cards (vervallen op de pagina): "4 afdelingen", "Resultaat per dimensie",
   "Direct resultaat".
 - Instructieregel (`Assessment.instructieregel`, voorstel): "Kies Ja als
   dit aantoonbaar geregeld is. Is het niet geregeld, kies Nee. Weet je
@@ -167,10 +162,9 @@ tekst van deze spec aangepast.
 ## Doorloop per afdeling
 
 Elke afdeling begint in de doorloopflow met twee kaarten boven de vragen
-(`CLAUDE.md`, scherm 5):
+(`schermen.md`, Doorloopflow):
 
-1. De kop van de afdeling (besloten door Joost op 22 oktober 2026, nog te bouwen, ontwerp
-   `Vragenlijst-Quickscan`): Een oranje balk van 4px links met 28px ruimte
+1. De kop van de afdeling (ontwerp `Vragenlijst-Quickscan`): Een oranje balk van 4px links met 28px ruimte
    erachter, de eyebrow "AFDELING {n}" (12px, hoofdletters, gewicht 700,
    letterafstand .14em, `--or`), de naam (32px, gewicht 800) en daaronder de
    definitie (`Categorie.omschrijving`, 16px, regelhoogte 26px, `--ink-m`,
@@ -196,14 +190,12 @@ categorieën.
 ## Resultaten
 
 Dit Assessment heeft een eigen opbouw van het resultatenscherm
-(scherm 6 in `CLAUDE.md`). Alle onderdelen gebruiken de bestaande
+(`schermen.md`, Resultatenpagina). Alle onderdelen gebruiken de bestaande
 componenten en tokens uit `stylesheet.md` (kaart, badge, voortgangsbalk,
 scorekleuren). Klassen en grenzen: `CLAUDE.md`, sectie 1,
 Classificatie. Van boven naar beneden:
 
-1. **Resultaatkop** (voorstel van 19 oktober 2026, `stylesheet.md`,
-   Resultaatkop, vervangt de totaalkaart van 19 oktober 2026 met het label
-   "OVERALL VOLWASSENHEID" en de gekleurde klassenaam). Dezelfde kop als bij de
+1. **Resultaatkop** (`stylesheet.md`, Resultaatkop, vervangt de totaalkaart van met het label "OVERALL VOLWASSENHEID" en de gekleurde klassenaam). Dezelfde kop als bij de
    andere scans: Eyebrow, titel, subregel en een totaalkaart met de ring, de
    klassechip en de feiten "{x} van 4 afdelingen beoordeeld" en "{punten} van
    {maximum} punten". Alleen de afdelingen die van toepassing zijn tellen mee,
@@ -213,7 +205,7 @@ Classificatie. Van boven naar beneden:
    telt niet mee in het totaal." De tekst noemt niet dat de afdeling niet
    relevant is, omdat iemand van die afdeling het kan lezen. Met weging staan
    hier de gewogen punten (`datamodel.md`, Scoreberekening). Op de eigen
-   resultaten van een Respondent staat geen groepsstip op de ring. De totaalkaart van 19 oktober 2026 is gebouwd in `components/QuickscanResultaten.tsx`; de Resultaatkop vervangt haar en is gebouwd op 19 oktober 2026 (`components/QuickscanResultaten.tsx`, `components/Resultaatkop.tsx`).
+   resultaten van een Respondent staat geen groepsstip op de ring.
 2. **Scores per afdeling.** Een kaart per categorie, twee kolommen, in
    de volgorde van de afdelingen. Een afdeling die niet van toepassing is
    krijgt een grijze kaart met de naam doorgestreept, de tekst "Niet van
@@ -222,11 +214,9 @@ Classificatie. Van boven naar beneden:
    - Linkerrand en badge in de klassekleur van de afdeling; de badge
      toont de klassenaam.
    - De naam van de afdeling, daaronder "{punten}" groot met "/ {aantal
-     vragen}" en het percentage in een kleine ring (`.score-ring--mini`, 44px,
-     gevuld tot het percentage in de klassekleur, besloten op 20 oktober 2026 en
-     gebouwd, eerder het percentage als getal in de klassekleur), en een
+     vragen}" en het percentage in een kleine ring (`.score-ring--mini`, 44px, gevuld tot het percentage in de klassekleur), en een
      voortgangsbalk in klassekleur.
-   - De tellingen "Ja: 10", "Nee: 3", "Weet niet: 2", in de kleuren
+   - De tellingen "Ja: 10", "Nee: 3", "Weet ik niet: 2", in de kleuren
      groen, rood en grijs.
    - Het blok "Verdieping op dimensies": Per bouwblok van de afdeling de
      naam, een balk in de klassekleur van dat bouwblok en "x/y (z%)", in
@@ -234,12 +224,10 @@ Classificatie. Van boven naar beneden:
    - Onder de balken de `aandachtZin` (14px, `--ink-s`) en, in plaats van twee
      omrande chips, twee gewone regels van 12px in `--ink-m` met een stip van
      8px ervoor (rood bij "Grootste aandachtspunt", groen bij "Relatief sterkste
-     basis"), zie Regels hieronder. Voorstel van 19 oktober 2026, omdat de kaart
-     met vier omrande en gekleurde elementen druk was. Het aantal gekleurde
-     elementen per kaart is nu de rand, de chip met de klasse, de balken en de
+     basis"), zie Regels hieronder. Het aantal gekleurde
+     elementen per kaart is de rand, de chip met de klasse, de balken en de
      twee stippen.
-3. **Sterkste afdeling en Meeste ontwikkelruimte.** Voorstel van 19 oktober
-   2026, gebouwd op 19 oktober 2026 (`components/quickscan/SterksteMeeste.tsx`, ook onder de weergave Gemiddelde en spreiding): Geen kaarten met een gekleurde rand, maar dezelfde component als "Top 3
+3. **Sterkste afdeling en Meeste ontwikkelruimte.** Ook onder de weergave Spreiding: Geen kaarten met een gekleurde rand, maar dezelfde component als "Top 3
    Sterktes" en "Top 3 Verbeterkansen" bij de andere scans, twee kolommen naast
    elkaar. Boven elke kolom staat de kop in 16px, gewicht 700 ("Sterkste
    afdeling" en "Meeste ontwikkelruimte"), daaronder per afdeling een rij (kaart
@@ -248,11 +236,7 @@ Classificatie. Van boven naar beneden:
    `--stat-green-faint` (Goed op orde), `--stat-amber-faint` (Gemiddeld inzicht)
    of `--stat-red-faint` (Ontwikkelruimte), met `1px solid` in de randkleur van de
    chip van die klasse. Links staat de naam van de afdeling in 14px `--ink` en
-   rechts het percentage in een kleine ring (`.score-ring--mini`, 44px, gevuld
-   tot het percentage in de klassekleur, het percentage erin in 14px en bij 100%
-   in 12px, besloten op 20 oktober 2026 en gebouwd; eerder het percentage in 16px,
-   gewicht 600, in de tekstkleur van de chip van die klasse). Een voorstel van 19 oktober 2026
-   (eerder `--bg-warm` met een neutrale rand), de tint in de klasse gebouwd op 19 oktober 2026 (`KLASSE_STIJL[klasse].vulling`, `.rand` en `.tekst`). Het hoogste percentage is de sterkste
+   rechts het percentage in een kleine ring (`.score-ring--mini`, 44px, gevuld tot het percentage in de klassekleur, het percentage erin in 14px en bij 100% in 12px). Het hoogste percentage is de sterkste
    afdeling, het laagste de meeste ontwikkelruimte. Afdelingen die niet van
    toepassing zijn doen niet mee. Bij gelijkstand staat elke gelijke afdeling als
    eigen rij onder de kop. Is er maar één afdeling van toepassing, of zijn alle
@@ -260,7 +244,7 @@ Classificatie. Van boven naar beneden:
    de top 3 bij de andere scans onder de grafieken staat.
 4. **Classificatie.** Een legenda met de drie klassen: Naam,
    percentagegrens en, omdat alle afdelingen hier 15 vragen hebben, de
-   punten per afdeling. Voorstel van 19 oktober 2026: Alleen de stip draagt
+   punten per afdeling. Alleen de stip draagt
    de klassekleur, de naam staat in `--ink` (`stylesheet.md`, Resultaatkop,
    Opbouw van de hele pagina). Zijn de aantallen vragen per afdeling ooit
    ongelijk, dan toont de legenda alleen percentages.
@@ -460,42 +444,3 @@ en klachten van patiënten afhandelt, buiten de directe behandeling om"
    tevredenheidsmetingen?
 10. Worden resultaten (bijv. wachttijd, volumes, succes selfservice)
     gebruikt om de organisatie te adviseren of beleid aan te passen?
-
-## Gebouwd
-
-Gebouwd op 14 oktober 2026. De scoring staat in `lib/quickscan.ts` (met tests in
-`lib/quickscan.test.ts`), de content in `data/ziekenhuis-quickscan-assessment.ts`, de demo-antwoorden voor de
-voorbeeld-output in `data/demo-antwoorden-quickscan.ts`, de kaarten in `components/AfdelingKaarten.tsx`,
-`components/JaNeeRadio.tsx` en `components/QuickscanResultaten.tsx`.
-
-**De open punten bovenaan, zoals gebouwd**
-
-1. Het minimum van 3 vragen voor "Relatief sterkste basis" staat als één constante (`MIN_VRAGEN_STERKSTE_BASIS`).
-   "Grootste aandachtspunt" en "Relatief sterkste basis" komen alleen bij minstens twee dimensies in een afdeling en
-   alleen als er één laagste respectievelijk hoogste is. Bij gelijkstand staat er geen chip.
-2. Radar, top 3 en staafdiagram per categorie vervallen voor dit Assessment. In plaats daarvan staan "Sterkste afdeling" en
-   "Meeste ontwikkelruimte" (alle gelijke afdelingen bij gelijkstand, geen van beide bij één afdeling of als alles gelijk is).
-3. De wegingskaart toont de naam als "Afdeling · Dimensie", bijvoorbeeld "Poliklinieken · Organisatie (2×)". De factor in de
-   doorloopflow en in de sidebar staat al binnen de afdeling en blijft "2×".
-4. De voorgestelde teksten staan zoals in dit bestand en zijn te wijzigen in beheer: Bij het Assessment de instructieregel en
-   de relevantievraag, bij een afdeling de omschrijving en het vinkje Optioneel, bij een dimensie de zin bij het grootste
-   aandachtspunt (`aandachtZin`).
-
-**Keuzes bij het bouwen**
-
-- **Opslag.** De antwoorden staan als `"ja"`, `"nee"` of `"weet-niet"` in `ScanInvulling.antwoorden`, de relevantie per
-  afdeling in `ScanInvulling.relevantie`. Een Assessment met dit type heeft `schaal: []` in de code in plaats van `null`, zodat
-  bestaande schermen die de schaal doorlopen niet breken. Alle schaalfuncties negeren een antwoord dat geen getal is.
-- **Toelichtingsicoon.** De dimensies hebben geen toelichting, centrale vraag of tags. Het ⓘ naast de titel van een bouwblok
-  verschijnt daarom alleen als er een toelichting of centrale vraag is, bij elk Assessment.
-- **Bestaande data.** Een browser of serverkopie met opgeslagen Assessments krijgt de Quickscan er één keer bij. Een Admin die
-  het Assessment verwijdert, ziet het niet terugkomen (per browser onthouden).
-- **Schermen die niet uitgewerkt zijn voor dit type** (besloten bij het bouwen, zie ook `backlog.md`). Het gemiddelde, de
-  spreiding, de antwoorden per vraag en de benchmark tussen organisaties zijn sinds 15 oktober 2026 gebouwd
-  (`visualisatie-quickscan.md`). Nog niet:
-  - Een samengestelde Meting en de benchmark binnen een organisatie of een Meting (de weergaven C, E en H in percentages):
-    Het Assessment staat niet in die keuzelijsten.
-  - Leads-venster: De vinkjes Resultaten, Spreiding, Antwoorden en Uitnodigen werken. Exporteren is grijs met de reden.
-  - Exporteren: De dropdown ontbreekt op de resultatenpagina en in het Meting-overzicht. De CSV-bulkexport slaat deze scans
-    over en meldt dat.
-  - De tijdelijke testknop in de doorloopflow staat niet bij dit Assessment: Een respondent vult de Quickscan zelf in.

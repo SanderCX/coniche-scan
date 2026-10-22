@@ -68,12 +68,11 @@ Bewust nog niet opgepakt. Geen prioritering.
 
 ## Functioneel
 
-- **Zorgspecifieke teksten voor Visie en Bouwstenen** (21 oktober 2026): De
+- **Zorgspecifieke teksten voor Visie en Bouwblokken**: De
   Zorgscan gebruikt op de Assessment-pagina voorlopig dezelfde secties als
-  Klantcontact Volwassenheid (`CLAUDE.md`, sectie 3, scherm 2). Later krijgen
-  Visie en Bouwstenen voor Zorg eigen teksten.
-- **Content voor de Quickscan Ziekenhuis op de Assessment-pagina** (21 oktober
-  2026): Nu geen sub-nav en geen extra content. Nog te bepalen wat er komt.
+  Klantcontact Volwassenheid (`schermen.md`, Assessment-pagina). Later krijgen
+  Visie en Bouwblokken voor Zorg eigen teksten.
+- **Content voor de Quickscan Ziekenhuis op de Assessment-pagina**: Nu geen sub-nav en geen extra content. Nog te bepalen wat er komt.
 
 - **Conflict oplossen bij omhangen naar een andere Meting**
   (`beheerpagina.md`, punt 6b): Heeft de Respondent in de doel-Meting al een
@@ -99,20 +98,19 @@ Bewust nog niet opgepakt. Geen prioritering.
 - **Afwijking en spreiding bovenop de aggregatie**: Het gemiddelde per
   Meting op organisatieniveau is gebouwd (`beheerpagina.md`,
   Organisatie-resultaten). Een maat voor afwijking/spreiding tussen
-  respondenten daarbovenop is ontworpen (besloten op 12 oktober 2026, nog te
-  bouwen): `visualisatie-scores.md`, onderdeel A en B.
-- **Vergelijking tussen Metingen (besloten op 14 oktober 2026)**: Dit item
-  "Trend tussen Metingen van dezelfde organisatie" en de ronde (13 oktober 2026)
+  respondenten daarbovenop is ontworpen: `visualisatie-scores.md`, onderdeel A en B.
+- **Vergelijking tussen Metingen**: Dit item
+  "Trend tussen Metingen van dezelfde organisatie" en de ronde
   zijn vervangen. Een Meting heeft een onderdeel en een meetdatum, en een
   vergelijking tussen Metingen is een benchmark binnen een organisatie
   (niveau 2) die de Admin zelf aanmaakt, eerst met twee Metingen. De Admin
   kiest een lezing, Ontwikkeling over tijd (weergave C) of Naast elkaar
-  (weergave H, gebouwd op 14 oktober 2026):
+  (weergave H):
   `benchmark.md`, Niveau 2, `visualisatie-scores.md`, onderdeel C, E, H,
   `datamodel.md`, Meting en `beheerpagina.md`, punt 5 en 14. Nog niet
   ontworpen: De weergave bij drie of meer Metingen, bijvoorbeeld een lijn per
   bouwblok over de meetdata.
-- **KPI's, peildatum en ontwikkeling in de tijd** (19 oktober 2026): Een
+- **KPI's, peildatum en ontwikkeling in de tijd**: Een
   KPI-waarde heeft in het voorstel geen peildatum, zodat het model niet
   explodeert in waarden maal kanalen maal tijd (`datamodel.md`, KPI's en
   kanalen, Geen tijd). Later komt een peildatum bij de waarde, met een
@@ -123,7 +121,7 @@ Bewust nog niet opgepakt. Geen prioritering.
   het hernoemen van een kanaal. Het potlood en de modal voor het wijzigen van een
   Onderdeel, de modal "+ Onderdeel toevoegen" en de knoppen Opslaan en
   Annuleren in de tab KPI's en kanalen staan niet in het design.
-- **Verkennen (gebouwd op 15 oktober 2026)**: Een Admin-scherm om de hele
+- **Verkennen**: Een Admin-scherm om de hele
   pool van een Assessment te filteren, te groeperen en te vergelijken
   (`visualisatie-verkennen.md`, `beheerpagina.md` punt 15). Kenmerken, Groeperen
   op (versie 6 van het visual design), de drempels als instellingen en de
@@ -144,8 +142,7 @@ Bewust nog niet opgepakt. Geen prioritering.
   - Een eigen veld Branche (vijf of zes Coniche-branches, los van SBI). Vraag
     van 15 oktober 2026, nog niet besloten. SBI-secties sluiten niet aan bij de
     indeling van de eigen klanten (verzekeraars zitten in Sectie L, Afdeling 65).
-- **Kopiëren van een Meting naar een nieuwe meetdatum (bewust niet opgepakt, 14
-  oktober 2026)**: Een functie die onderdeel en Assessment van een eerdere
+- **Kopiëren van een Meting naar een nieuwe meetdatum (bewust niet opgepakt)**: Een functie die onderdeel en Assessment van een eerdere
   Meting overneemt, zoals "Nieuwe ronde starten" dat deed. Joost vond dit te
   complex. Elke Meting wordt apart gepland.
 - **Benchmark, niveau 1 (tussen organisaties)**: Gebouwd (PR 61,
@@ -163,11 +160,9 @@ Bewust nog niet opgepakt. Geen prioritering.
   opzichte van de andere scans in dezelfde Meting. Het kader staat in
   `benchmark.md`. Het ontwerp van de spreiding (een stip per scan, gemiddelde,
   de plek van een scan daarin) en van de hoge en lage scores staat in
-  `visualisatie-scores.md`, onderdeel B (besloten op 12 oktober 2026, nog te
-  bouwen). Houd rekening met herleidbaarheid bij weinig scans, zie de drempel
+  `visualisatie-scores.md`, onderdeel B. Houd rekening met herleidbaarheid bij weinig scans, zie de drempel
   `benchmarkMinRespondenten`.
-- **Benchmark of gemiddelde opslaan als samengestelde Meting (gebouwd op 13
-  oktober 2026)**: Samen met het veld `onderdeel` op de Meting, zie
+- **Benchmark of gemiddelde opslaan als samengestelde Meting**: Samen met het veld `onderdeel` op de Meting, zie
   `benchmark.md`, Onderdeel en samengestelde Meting, en `datamodel.md`,
   Meting. Elke onderliggende Meting telt één keer mee, ongeacht het aantal
   scans. Oorspronkelijke omschrijving: Een
@@ -179,8 +174,7 @@ Bewust nog niet opgepakt. Geen prioritering.
   "Gemiddelde", heeft geen respondenten en is niet invulbaar. Een Lead krijgt
   Resultaten op een samengestelde Meting (`LeadToegang`) en ziet dan alleen het
   gemiddelde, niet de onderliggende Metingen. Dat vinkje zet de Admin expliciet
-  en erft niet mee (besloten op 13 oktober 2026, aangepast op 14 oktober 2026,
-  `benchmark.md`, View voor een Lead). Besloten en gebouwd: Wat er
+  en erft niet mee (`benchmark.md`, View voor een Lead). Besloten en gebouwd: Wat er
   gebeurt als een onderliggende Meting wordt verwijderd. Blokkeren kan niet,
   want verwijderen moet altijd kunnen (bewaartermijn, AVG-verzoek). Zo is het
   gebouwd: De Meting valt uit de samenstelling, de bevestiging noemt de samengestelde
@@ -206,7 +200,7 @@ Bewust nog niet opgepakt. Geen prioritering.
   tonen (`inhoudelijk-fundament.md` sectie 1).
 - **Planning bij een meting**: Open vanaf, sluit op, status.
 - **Content presenteerbaar maken (toggle Lezen/Presenteren)**: Elke
-  contentsectie op de Assessment-pagina (Visie, Bouwstenen, AI-scan, 2030, dus
+  contentsectie op de Assessment-pagina (Visie, Bouwblokken, AI-scan, 2030, dus
   `visie-coniche.md`, `visie-ai-klantcontact.md`, `content-2030.md`)
   krijgt naast de leesweergave een presenteerweergave: Schermvullend,
   stap voor stap, bedoeld voor sales en consultants om het
@@ -223,23 +217,23 @@ Bewust nog niet opgepakt. Geen prioritering.
     aparte afweging, niet automatisch hetzelfde ding.
   Eerste stap: Een proof-of-concept op één of twee onderwerpen, niet in
   één keer alle vier.
-- **Kleine calls to action bij de bouwstenen-content**: Op de
-  secties Bouwstenen en AI op de Assessment-pagina en/of in de modal van de
+- **Kleine calls to action bij de bouwblokken-content**: Op de
+  secties Bouwblokken en AI op de Assessment-pagina en/of in de modal van de
   bouwstenenmodel-visual/ai-domeinenmodel-visual (nog te bepalen welke,
   zie ook de open plek-vraag in die bestanden). Drie soorten links, per
-  bouwsteen of domein:
-  - Naar andere content over die bouwsteen (blogs, whitepapers).
-  - Naar opleidingen/trainingen over de bouwstenen in het algemeen of
-    over die ene bouwsteen specifiek.
-  - Naar een visie- of inspiratiesessie bij Coniche, over de bouwstenen
-    in het algemeen of over die ene bouwsteen specifiek.
+  bouwblok of domein:
+  - Naar andere content over die bouwblok (blogs, whitepapers).
+  - Naar opleidingen/trainingen over de bouwblokken in het algemeen of
+    over die ene bouwblok specifiek.
+  - Naar een visie- of inspiratiesessie bij Coniche, over de bouwblokken
+    in het algemeen of over die ene bouwblok specifiek.
   - Structurele verwijzing vanuit scanresultaten naar concreet
     Coniche-aanbod (modules/producten) dat bij een lage score op die
-    bouwsteen past, niet alleen losse contentlinks maar een brug naar
+    bouwblok past, niet alleen losse contentlinks maar een brug naar
     wat Coniche daadwerkelijk aanbiedt.
   Vormgeving nog open: Een apart paneeltje naast de tekst, een sectie
   onderaan de modal, of iets anders. Vraagt ook een plek in het
-  datamodel om deze links per bouwsteen te kunnen vastleggen (nu nog
+  datamodel om deze links per bouwblok te kunnen vastleggen (nu nog
   geen veld hiervoor op `Bouwblok`, zie `datamodel.md`).
 
 ### Quickscan Ziekenhuis (antwoordType Ja / Nee / Weet ik niet)
@@ -307,7 +301,7 @@ functionaliteit afronden, dan de database en rollen en rechten, en daarna
 deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
 "Gedaan" hieronder en `changelog.md`.
 
-### Gedaan (2 oktober 2026)
+### Gedaan
 
 - Next.js naar 16.3.8 (kritieke RCE), `npm audit` schoon.
 - `/api/mail` en `lib/mailer.ts` verwijderd (open mailrelay, ongebruikt).
@@ -315,7 +309,7 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   wachtwoorden is uit Neon verwijderd. Gebruikers leven nu per browser.
 - `/api/store` begrenst de bodygrootte, `/api/export-pdf` begrenst grootte en
   gelijktijdige headless browsers. Dev-server alleen op `127.0.0.1`.
-- Tests met vitest (`npm test`): scoring, importdetectie, verplaats- en
+- Tests met vitest (`npm test`): Scoring, importdetectie, verplaats- en
   samenvoeglogica.
 - Opgeruimd: `lib/db.ts` gesplitst in `lib/db/`, de Content-pagina gesplitst,
   exportcode in de respondentpagina's naar `lib/scan-export.ts`, het oude
@@ -339,7 +333,7 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
 - **Opsplitsen** van de Import-pagina (590 regels).
 - **Meer tests**: Import (parsen en valideren van rijen), `scan-slot`, de
   overige stores.
-- **Tabel Leads en hoofdlink Resultaten (gebouwd op 14 oktober 2026)**: Eén
+- **Tabel Leads en hoofdlink Resultaten**: Eén
   tabel per organisatie waarin een Admin per Lead aanvinkt welke weergaven hij
   ziet (`beheerpagina.md`, punt 6a), met `LeadToegang` in plaats van
   `RespondentRolMeting`, `leadVoorOrganisatie` en `BenchmarkToewijzing`, en de
@@ -349,13 +343,13 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   De tabel staat als compact blok Leads met een Leads-venster (modal) omdat de
   tabel breed is (`beheerpagina.md`, punt 6a, `stylesheet.md`,
   `.modal-box--vol`).
-- **Andere Respondent koppelen vanuit het Scan-overzicht (gebouwd op 13 oktober 2026)**: Een
+- **Andere Respondent koppelen vanuit het Scan-overzicht**: Een
   naamwijziging via "Respondent bewerken" geldt voor alle scans van de
   Respondent. Nodig: De vaste regel "Deze wijziging geldt voor alle {n} scans"
   in dat formulier, en de actie "Andere Respondent koppelen" in het
   Scan-overzicht (hergebruik het blok uit "Conflict oplossen") voor een
   wijziging bij één scan (`beheerpagina.md`, punt 7).
-- **Rol / functie als keuzelijst (gebouwd op 13 oktober 2026)**: In de intake, in "Mijn gegevens"
+- **Rol / functie als keuzelijst**: In de intake, in "Mijn gegevens"
   en in "Respondent bewerken" (en dus ook in "Nieuwe Respondent" en "Andere
   Respondent koppelen") een keuzelijst met de 29 waarden uit
   `content-respondentrol.md` en "Anders…" met een invoerveld. De waarde blijft
@@ -363,11 +357,11 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   iemand hem gebruikt, zoals bij Techstack (`lib/kenmerken-opties.ts`).
 - **Toelichting-veld in het contentbeheer werkt niet bij de bestaande
   Assessments**: Bij Klantcontact, AI en Zorg gebruikt de toelichting een losse
-  lookup-tabel (`data/bouwstenen-content.ts`, `data/ai-domeinen-content.ts`) en
+  lookup-tabel (`data/bouwblokken-content.ts`, `data/ai-domeinen-content.ts`) en
   niet het veld `Bouwblok.toelichting`. Alleen bij een zelf aangemaakt bouwblok
   heeft het veld effect. Open: Het scherm laten waarschuwen als het veld wordt
   genegeerd, of de lookup-tabellen vervangen door het veld.
-- **Instellingen in het Accountmenu (gebouwd op 13 oktober 2026)**: De hoofdlink "Applicatie" vervalt
+- **Instellingen in het Accountmenu**: De hoofdlink "Applicatie" vervalt
   en wordt de rij "Instellingen" in het Accountmenu, alleen voor een Admin
   (`beheerpagina.md`, Accountmenu en Instellingen). Te bouwen: De rij met
   scheidingslijn boven "Uitloggen"; de pagina met tabbalk (Gebruikers, Drempels
@@ -377,7 +371,7 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   `data/info-teksten.ts` ("Applicatie, Instellingen" wordt "Instellingen,
   Drempels en termijnen"). De actieve staat van de Accountmenu-knop
   staat in `stylesheet.md`, Dropdown-knop.
-- **Mijn account in het Accountmenu (gebouwd op 13 oktober 2026, zonder wachtwoord)**: Een Admin of Consultant wijzigt
+- **Mijn account in het Accountmenu (zonder wachtwoord)**: Een Admin of Consultant wijzigt
   zijn eigen naam en wachtwoord (`beheerpagina.md`, Accountmenu). Het
   e-mailadres is alleen-lezen. Te bouwen: De rij en de modal, het recht
   `account.bewerken` (bereik `zelf`) en `gebruiker.eigenGegevensGewijzigd`. De
@@ -434,7 +428,7 @@ klanten alleen na deze vier punten.
   valideren, inclusief rate limiting.
 - Bevindingen verwerken en een hertest op kritieke kwetsbaarheden.
 
-## Openstaand na de changelog (7 oktober 2026)
+## Openstaand na de changelog
 
 Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De rest van de changelog is gebouwd en staat in de specs.
 
@@ -443,7 +437,7 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   (`CLAUDE.md`, Scoringslogica). De seed staat op 2. Nog te controleren: De
   opgeslagen data in de database en in bestaande browsers.
 - **Fout: Omgehangen scans verschijnen in de data-integriteitscontrole**
-  (8 oktober 2026): Bij elke verplaatsing van een scan (naar een andere
+ : Bij elke verplaatsing van een scan (naar een andere
   organisatie of Meting, hele Respondent of losse respons) werkt de code
   `organisatieLidId` bij maar niet `scanUitvoeringId`. De scan staat dan in de
   doel-Meting, maar verwijst nog naar de oude Meting. Bij een andere
@@ -461,7 +455,7 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   scan een eigen Meting met de datum in het label. Gespecificeerd op 8 oktober
   2026, nog niet gebouwd (nu groepeert `lib/db/import.ts` op organisatie,
   Assessment en label).
-- **Notitie per scan en Scans samenbrengen** (13 oktober 2026, gebouwd):
+- **Notitie per scan en Scans samenbrengen**:
   Bij het importeren van meerdere bestanden kreeg dezelfde Respondent alle
   `start_comment`-teksten als één geplakte notitie. Herstel: `start_comment`
   wordt `ScanInvulling.notitie` en de import schrijft niet meer naar
@@ -473,7 +467,7 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   Meting zet. Ook nodig: Kolom Notitie in de scanlijst van het Meting-overzicht en het
   Scan-overzicht, kolom `scan_notitie` in de CSV-export (`export-csv.md`).
 - **Fout: "Naar ronde…" werkt niet voor Metingen met hetzelfde onderdeel**
-  (13 oktober 2026, hersteld; op 14 oktober 2026 vervallen met de ronde): Geïmporteerde Metingen hebben allemaal het onderdeel "Hele
+  (op vervallen met de ronde): Geïmporteerde Metingen hebben allemaal het onderdeel "Hele
   organisatie", ook als het label een onderdeel noemt ("Zuid-Nederland |
   0-meting"). Ze botsen daardoor op de uniciteitsregel van de ronde, en de actie
   doet dan niets zonder melding. In "Scans samenbrengen" geeft het formulier
@@ -483,19 +477,16 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   vóór " | ", met controle per regel en alles of niets. Ook het Meting-overzicht
   krijgt "Naar ronde…". Meldingen bij een botsing noemen beide uitwegen
   (`datamodel.md`, Botsing).
-- **Label van een Meting verdwijnt als invoerveld** (13 oktober 2026, gebouwd; op 14 oktober 2026 aangepast, met onderdeel en meetdatum in plaats van onderdeel en ronde, en de naam is weer aan te passen): Het
+- **Label van een Meting verdwijnt als invoerveld** (op aangepast, met onderdeel en meetdatum in plaats van onderdeel en ronde, en de naam is weer aan te passen): Het
   label was ambigu naast onderdeel en ronde, en verplicht op sommige schermen en
   leeg toegestaan op andere. Nu vult niemand het in. Een Meting heeft alleen
   Onderdeel en Ronde (plus Assessment bij aanmaken), de naam maakt de app
   (`datamodel.md`, Naam van een Meting). Aanpassen kan achter een potlood naast
-  de naam, met alleen die twee velden. Verwijderen uit: de formulieren voor
+  de naam, met alleen die twee velden. Verwijderen uit: De formulieren voor
   aanmaken, Wijzigen, Samengestelde Meting en Scans samenbrengen. Een Meting
   zonder ronde houdt haar oude label. Nieuw: Info-icoon `info.metingBegrippen` met
   de begrippen boven de lijst Metingen (`beheerpagina.md`, punt 5, Begrippen).
-- **Overzicht per vraag op ronde-niveau, en de samengestelde Meting** (13
-  oktober 2026, nog uit te werken, besproken met Joost; op 14 oktober 2026 is
-  de ronde vervallen, dus "het bereik van een ronde" hieronder moet opnieuw
-  worden bekeken, bijvoorbeeld als de scans van een gekozen groep Metingen): Er is een nieuw overzicht
+- **Overzicht per vraag op ronde-niveau, en de samengestelde Meting** (nog uit te werken, besproken met Joost; op is de ronde vervallen, dus "het bereik van een ronde" hieronder moet opnieuw worden bekeken, bijvoorbeeld als de scans van een gekozen groep Metingen): Er is een nieuw overzicht
   op het laagste niveau, met alle scores per vraag per scan in één beeld. Het
   werkt bij één klant met één Meting en zes Respondenten (Eneco), maar niet bij
   een klant met zes Metingen van elk één scan (Univé), want daar zijn het zes
@@ -530,12 +521,9 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
 - **Organisatievelden** (`beheerpagina.md`, punt 3): De tab bestaat nog
   niet. `VeldDefinitieEditor` staat klaar en moet in een pagina onder
   Instellingen of bij Organisaties worden gebruikt, zoals de spec vraagt.
-- **Losse bestanden in de repo opruimen**: `v1-aanpassingen.md`,
-  `datamodel-rbac-voorstel.md` en `OverlegMetJoost.md` zijn verwijderd
-  (12 oktober), voor zover relevant verwerkt in de andere specs.
-  `coniche_bouwstenen.md` mag ook weg (Joost akkoord, 8 oktober) en staat
-  nog in de repo. De open vragen die alleen in de verwijderde bestanden
-  stonden, zijn hieronder vastgelegd, onder "Open vragen uit de losse
+- **Losse bestanden in de repo opruimen**: `coniche_bouwblokken.md` mag uit
+  de repo (Joost akkoord). De open vragen uit eerder verwijderde
+  losse bestanden staan hieronder, onder "Open vragen uit de losse
   bestanden".
 - **Content-pagina's** (`beheerpagina.md`, punt 11): Beheerbaar maken is
   gespecificeerd en de spec is leidend. Sander twijfelt nog over de beste
@@ -555,18 +543,18 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   pagina's bevatten checklistkaarten, een verbetercyclus van vijf stappen,
   genummerde kaarten en iconen. Per tekstblok verliest niets, één tekstveld
   volgt de spec letterlijk maar maakt de pagina's plat. Nog geen keuze.
-- **Content-pagina's, velden (Bouwstenen en AI)**: Naam, omschrijving en
+- **Content-pagina's, velden (Bouwblokken en AI)**: Naam, omschrijving en
   centrale vraag bewerkbaar, de visual zelf vast. Open: Is er één bron met de
   velden `Bouwblok.toelichting` en `Bouwblok.centraleVraag` van het Assessment
   (een aanpassing in Content wijzigt dan ook de publieke pagina), of mogen ze
-  uit elkaar lopen. Nu gebruiken de secties Bouwstenen en AI op de Assessment-pagina nog hun eigen
+  uit elkaar lopen. Nu gebruiken de secties Bouwblokken en AI op de Assessment-pagina nog hun eigen
   statische content.
 - **Content-pagina's, opslag**: Voorstel is zoals bij Algemene teksten: Een
   gewijzigde tekst gaat voor op de standaardtekst, met "Standaardtekst
   herstellen", zonder versiebeheer, archiveren of publicatiestap, en met een
   auditregel met alleen de sleutel. Nog te bevestigen, evenals Admin-only.
 - **Knop "Bekijk" in lijstrijen**: Het label is "Bekijk" zonder pijltjes (in de
-  code gedaan). Het uiterlijk is nog open. Er zijn drie opties: grijze rand en donkere tekst zoals
+  code gedaan). Het uiterlijk is nog open. Er zijn drie opties: Grijze rand en donkere tekst zoals
   alle compacte knoppen (nu), oranje tekst met grijze rand, of een oranje rand
   bij hover voor alle `.btn-outline` knoppen. Ook de kleur van de aangewezen
   rij hoort daarbij. Volgt in `stylesheet.md`.
@@ -577,7 +565,7 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   Klantcontact-scan, dus niet sector-vertaald. Inhoudelijke input van Joost en
   Sander nodig (`content-zorgscan.md`).
 
-**Te bespreken met Joost: Rol / functie en Techstack** (12 oktober 2026)
+**Te bespreken met Joost: Rol / functie en Techstack**
 
 De volledige punten staan onderaan `content-respondentrol.md` (punt 4) en
 `content-techstack.md` (punt 6). Wat de bouw het meest raakt:
@@ -596,7 +584,7 @@ De volledige punten staan onderaan `content-respondentrol.md` (punt 4) en
 - **Techstack-lijsten beheerbaar maken**: Nu staan ze in de code
   (`beheerpagina.md`, punt 3).
 
-**Te bespreken met Joost: Look & feel** (9 oktober 2026)
+**Te bespreken met Joost: Look & feel**
 
 Suggesties uit een doorloop van de specs en de code, nog niet getoetst aan
 screenshots van de draaiende app. Niets is besloten of gebouwd.
@@ -652,11 +640,11 @@ Voorgestelde volgorde als het wordt opgepakt: Foutstaten, de contrastwijzigingen
 (`--ink-s`, scoretekst) en de display-schaal. Het oranje knopcontrast eerst
 als merkbesluit bespreken.
 
-- **Assessmentcirkel op scherm 1 uitbreiden** (besloten ontwerp van 21 oktober 2026, `CLAUDE.md`, scherm 1): Wat de cirkel doet bij minder of meer dan vijf Assessments (bijvoorbeeld een deel per Assessment met een verschillende grootte, of een tweede cirkel) en of de stip op de visual later het gemiddelde van de branche ten opzichte van de eigen score toont (nu een vaste markering op een hoekpunt van de voorbeeldlijn). Daarnaast de vraag of er een generieke Quickscan komt, zodat de cirkel drie vaste assen heeft (snel, uitgebreid, AI).
+- **Assessmentcirkel op Kies jouw assessment uitbreiden** (besloten ontwerp, `schermen.md`, Kies jouw assessment): Wat de cirkel doet bij minder of meer dan vijf Assessments (bijvoorbeeld een deel per Assessment met een verschillende grootte, of een tweede cirkel) en of de stip op de visual later het gemiddelde van de branche ten opzichte van de eigen score toont (nu een vaste markering op een hoekpunt van de voorbeeldlijn). Daarnaast de vraag of er een generieke Quickscan komt, zodat de cirkel drie vaste assen heeft (snel, uitgebreid, AI).
 
-### Spanningsmeter (antwoordType spanning, voorstel van 21 oktober 2026)
+### Spanningsmeter (antwoordType spanning)
 
-Gebouwd op 21 oktober 2026 (`content-spanningsmeter.md`, `visualisatie-spanningsmeter.md`, Zo gebouwd). Bewust nog niet opgepakt:
+Ontworpen en gespecificeerd (`content-spanningsmeter.md`, `visualisatie-spanningsmeter.md`), nog niet gebouwd. Bewust nog niet opgepakt:
 
 - **Validatie van de vragen**: De vier stappen uit `content-spanningsmeter.md`, Validatie. Zolang die niet gedaan zijn, kan het resultaat een label "pilot" krijgen.
 - **Import**: Het importbestand van de opzet (Excel of CSV) inlezen (`import-scans.md`).
@@ -665,9 +653,7 @@ Gebouwd op 21 oktober 2026 (`content-spanningsmeter.md`, `visualisatie-spannings
 - **Benchmark, Verkennen en vergelijking tussen Metingen**: Nog niet voor dit type (`benchmark.md`, `visualisatie-verkennen.md`).
 - **Dossier en film**: Het Dossier en de film "Het dossier" voor dit type.
 - **Zorg-variant** en andere sector-varianten van de Spanningsmeter.
-- **Beheer van de inhoud**: Ijkpunten, invalshoeken, "Waar je op let" en korte namen van de velden zijn nog niet in beheer te bewerken, alleen de vraagtekst en de open vraag.
-- **Weergaven voor een Lead**: Spreiding en Antwoorden bestaan voor dit type niet, en de samengestelde Meting ook niet.
-- **Cirkel bij meer dan vijf Assessments** en bij minder dan vijf (`CLAUDE.md`, scherm 1, Open punten).
+- **Help**: De helpbestanden en de film Wat krijg ik krijgen een variant voor dit type (`help.md`, Films).
 
 ## Content-onderhoud
 
@@ -675,3 +661,30 @@ Gebouwd op 21 oktober 2026 (`content-spanningsmeter.md`, `visualisatie-spannings
   om te checken of het duidingsstuk nog actueel is: Nieuwe
   onderzoeken/cijfers van de gebruikte bronnen (Stanford HAI, McKinsey,
   Deloitte, Gartner) en eventueel nieuwe, relevant wordende topics.
+
+## Responsive
+
+De app is alleen voor desktopbreedte (`CLAUDE.md`, Uitgangspunten). Onderstaande regels voor smallere schermen zijn uit de specs gehaald en staan hier voor later.
+
+- stylesheet.md: h1 op publieke pagina's: onder 900px 32px; h2 onder 900px 24px.
+- stylesheet.md: Voortgang op smalle schermen: Onder 900px toont `.flow-mobiel-voortgang` een compacte, sticky voortgangsbalk.
+- stylesheet.md: Gelijke breedte van knoppen: Breekt de rij op smalle schermen af naar meerdere regels, dan is de breedste knop per regel leidend.
+- stylesheet.md: Radar en staafdiagram: Onder 1000px schermbreedte staan de twee kaarten onder elkaar. Is de kaart van het staafdiagram smaller dan zijn plot (onder 500px), dan wordt het diagram horizontaal (strijdig met de regel dat een diagram nooit scrolt).
+- stylesheet.md: Classificatie: Onder 640px staan de drie klassen onder elkaar, links uitgelijnd.
+- stylesheet.md: Modal `.modal-box--vol`: Op een scherm smaller dan 720px vult het venster het hele scherm.
+- visualisatie-mijn-metingen.md: Kaarten: Twee kaarten naast elkaar vanaf 1120 px breedte, daaronder onder elkaar. Onder 920 px staan de blokken onder elkaar en zijn de teaser-rijen smaller (naam 130 px, waarde 40 px). Onder 640 px is de h1 32 px, staan knoppen op 100% breedte en de teaser-balken onder het getal. Onder 720 px komt het zijblok van het paneel boven de rijen. Knoppen mogen onder elkaar staan op 100% breedte.
+- visualisatie-spanningsmeter.md: Radar en score per veld: Onder 1000px schermbreedte staan de twee kaarten onder elkaar.
+- visualisatie-verkennen.md: De kaart Kenmerken staat links of boven de kaart Vergelijken (op smalle schermen boven).
+- visualisatie-verkennen.md: De kaart Kenmerken staat links of boven de kaart Vergelijken (op smalle schermen boven).
+- dossier.md: Verdeling rechts van de radar: Op een smaller scherm komt de verdeling onder de radar.
+
+## Code volgt de spec
+
+Plekken waar de code nog moet worden aangepast aan de spec.
+
+- Antraciet `#44403c` als sleutel in de code migreren naar het merkgeel `--fu` (stylesheet.md, Niet gebruiken).
+- Dossier: hernoem in de code `openVoorLead`, `openSinds` en `dossier.geopend` naar de termen uit dossier.md (`zichtbaar` en `zichtbaarSinds`).
+- `Meting.onderdeel` bestaat niet als veld (`datamodel.md`, Meting). Haal resterende verwijzingen in de code weg.
+- Kaart "Lead met een eigen scan die nog niet is afgerond" gebruikt het paneel Lead zonder eigen scan (`visualisatie-mijn-metingen.md`). De build toont nu twee blokken.
+- De Spreidingslabel-drempels (`visualisatie-scores.md`, `visualisatie-quickscan.md`) zijn Admin-instelbare startwaarden. Voeg ze toe aan Instellingen (`beheerpagina.md`) en het datamodel.
+- De sectie "AI in klantcontact" is een radar met acht taartpunten (`visual-bouwblokken-en-domeinen.md`). De build toont nog een raster van vier kolommen.

@@ -2,22 +2,17 @@
 
 Enige bron voor het datamodel.
 
-- **Deel 1: Gebouwd.** Content, organisatie, respondent, meting, ingevulde
+- **Deel 1: Content en gegevens.** Content, organisatie, respondent, meting, ingevulde
   scan, toegangscode, organisatievelden, en de regels voor verwijderen.
-- **Deel 2: Voorstel.** Rollen, rechten, inlog en audit. Wordt gebouwd
-  samen met de Azure SQL-database; clientside zou het alleen schijnveiligheid
-  opleveren.
-- **Deel 3: Gebouwd en voorstel.** Benchmark. Het niveau tussen organisaties
-  is gebouwd, de niveaus binnen een organisatie en binnen een Meting zijn
-  voorstel. Het gedrag staat in `benchmark.md`, hier alleen de records en de
+- **Deel 2: Benchmark.** Het gedrag staat in `benchmark.md`, hier alleen de records en de
   uitbreiding op Organisatie.
 
-Termen (Meting, Respondent, Ingevulde scan) staan in CLAUDE.md onder
+Rollen, rechten, inlog en audit staan in `datamodel-rollen.md`. Termen (Meting, Respondent, Ingevulde scan) staan in CLAUDE.md onder
 Terminologie.
 
 ---
 
-## Deel 1: Gebouwd
+## Deel 1: Content en gegevens
 
 ### Assessment (scan-type)
 
@@ -44,9 +39,9 @@ Assessment {
   relevantieVraag: string | null    // alleen als een Categorie optioneel is: de Ja/Nee-vraag bovenaan die categorie, zie Optionele categorieën
   pdfContentSecties: { titel: string, bron: ContentBron } | null // zie export-pdf-visual-volwassenheidsscan.md
   afgeleidVanAssessmentId: string | null // zie Sector-varianten hieronder
-  bouwblokLabel: string             // eyebrow in de Toelichtingsmodal en in de kop van het bouwblok in de doorloopflow; standaard "Bouwsteen" (Klantcontact, Zorg), "AI-domein" bij de AI-scan
-  bouwblokEenheidEnkelvoud: string  // enkelvoud van de eenheid in lopende tekst, bijv. "bouwsteen" of "domein"
-  bouwblokEenheidMeervoud: string   // meervoud, bijv. "bouwstenen" of "domeinen"
+  bouwblokLabel: string             // eyebrow in de Toelichtingsmodal en in de kop van het bouwblok in de doorloopflow; standaard "Bouwblok" (Klantcontact, Zorg), "AI-domein" bij de AI-scan
+  bouwblokEenheidEnkelvoud: string  // enkelvoud van de eenheid in lopende tekst, bijv. "bouwblok" of "domein"
+  bouwblokEenheidMeervoud: string   // meervoud, bijv. "bouwblokken" of "domeinen"
   wegingTitel: string | null        // kop van de wegingskaart, zie Bouwblok.gewicht; leeg = standaardtitel
   wegingToelichting: string | null  // tekst van de wegingskaart, per Assessment aanpasbaar; leeg = standaardtekst
   openVraag: string | null          // alleen bij antwoordType "spanning": tekst van de open vraag onder elk bouwblok, in plaats van het opmerkingenveld; leeg = het gewone opmerkingenveld, zie content-spanningsmeter.md
@@ -64,9 +59,9 @@ direct, zonder categoriekop. Maak geen kunstmatige categorieën met elk
 
 Een sector-variant (bijv. een Zorg-versie van de Klantcontact
 Volwassenheidsscan) is een **eigen, volwaardig Assessment-record**,
-geen schakelaar binnen één Assessment. Reden: Scherm 1 ("Kies jouw
-assessment", CLAUDE.md sectie 3) toont kaarten per Assessment-type,
-generiek over `Assessment[]` — een sector-variant moet daar als eigen
+geen schakelaar binnen één Assessment. Reden: Het scherm Kies jouw
+assessment (`schermen.md`) toont kaarten per Assessment-type,
+generiek over `Assessment[]`, een sector-variant moet daar als eigen
 kaart verschijnen, met eigen `naam`/`kortLabel` (bijv. "Zorgscan"), dus
 moet het een eigen record zijn. Een Meting koppelt aan precies één
 Assessment (`assessmentId`), dus deze keuze sluit direct aan op het
@@ -76,7 +71,7 @@ bestaande model.
 deze variant is afgeleid (`null` bij een op zichzelf staand
 Assessment, zoals nu de Klantcontact- en AI-volwassenheidsscan). Puur
 herkomstinformatie voor beheer (bijv. "afgeleid van Klantcontact
-Volwassenheid" tonen in de lijst) — geen lopende koppeling. Wordt het
+Volwassenheid" tonen in de lijst), geen lopende koppeling. Wordt het
 template verwijderd, dan wordt het veld `null` en verdwijnt de regel
 "Afgeleid van" (zie Verwijderen en datakoppelingen).
 
@@ -87,7 +82,7 @@ onder het nieuwe Assessment (nieuwe id's). Daarna zijn het gewone,
 onafhankelijke content-records: Wijzig je een vraagtekst of een
 `Bouwblok.gewicht` op de sector-variant, dan raakt dat alleen die
 variant. Een latere correctie op het template werkt dus
-niet automatisch door in bestaande sector-varianten — bewuste keuze,
+niet automatisch door in bestaande sector-varianten, bewuste keuze,
 om dezelfde reden als "Content bewerken" hieronder: Een sector-scan
 die al ingevuld is, mag niet ongemerkt van betekenis veranderen omdat
 iemand het template bijwerkt. Een generieke fix (bijv. een typo in een
@@ -142,10 +137,10 @@ hangt aan het bouwblok en dus aan het bouwstenenmodel, inclusief de
 categorie waarin het blok zit. Bij een Assessment zonder categorielaag
 (AI-volwassenheid) werkt het hetzelfde.
 
-Het gewicht werkt door in de categoriescore en in de overall-score, niet
+Het gewicht werkt door in de categoriescore en in de totaalscore, niet
 in de bouwblokscore zelf (zie Scoreberekening). Een gewicht ongelijk aan
-1 is bewust zichtbaar voor de respondent: Zie CLAUDE.md, sectie 3
-(wegingskaart en factor per bouwblok). Een gewicht van 1 wordt nergens
+1 is bewust zichtbaar voor de respondent: Zie `schermen.md`, Intake
+(Wegingskaart) en `stylesheet.md` (factor per bouwblok). Een gewicht van 1 wordt nergens
 getoond, dat is de normale situatie.
 
 Bij Klantcontact Volwassenheid en AI-volwassenheid staat het overal op
@@ -213,7 +208,7 @@ vragen.
   resultaat per antwoord kan tellen. De score is een aantal punten en een
   percentage (Scoreberekening). Klantcontact Quickscan – Ziekenhuis
   (`content-ziekenhuis-quickscan.md`).
-- `"spanning"` (voorstel van 21 oktober 2026, gebouwd op 21 oktober 2026): Een antwoord
+- `"spanning"`: Een antwoord
   van 1 tot en met 5 volgens `Assessment.schaal`, met als extra waarde `0`
   voor "Kan ik niet beoordelen". Een 0 is een geldig antwoord (de vraag telt
   als beantwoord), maar telt niet mee in de score. Er is geen totaalscore: De
@@ -271,7 +266,7 @@ Die koppeling loopt via Meting.
 Organisatie {
   id: string
   naam: string                      // bewerkbaar via organisaties.bewerken, gelogd als organisatie.hernoemd
-  korteNaam?: string | null         // gebouwd op 15 oktober 2026: weergavenaam in kolomkoppen, maximaal 30 tekens, leeg betekent `naam`
+  korteNaam?: string | null // weergavenaam in kolomkoppen, maximaal 30 tekens, leeg betekent `naam`
   kenmerken: { [veldId: string]: waarde }   // in beheer, altijd bewerkbaar, niet door respondenten
   aangemaaktOp: datetime
 }
@@ -281,7 +276,7 @@ Organisatie {
 
 ### Onderdeel
 
-**Besloten door Joost, gebouwd op 19 oktober 2026.** Een Onderdeel is een deel van een Organisatie waarover een Meting gaat en waarvoor KPI-waarden kunnen worden ingevuld, zoals "Particulier" of "Team A". Tot nu toe was het onderdeel een tekst op de Meting. Nu bestaat het één keer per Organisatie, en gebruiken de Metingen en de KPI's dezelfde lijst.
+Een Onderdeel is een deel van een Organisatie waarover een Meting gaat en waarvoor KPI-waarden kunnen worden ingevuld, zoals "Particulier" of "Team A". Tot nu toe was het onderdeel een tekst op de Meting. Nu bestaat het één keer per Organisatie, en gebruiken de Metingen en de KPI's dezelfde lijst.
 
 ```
 Onderdeel {
@@ -298,12 +293,11 @@ Onderdeel {
 - **Hernoemen** verandert de naam op één plek. De kolomkop bij de KPI's, de Metingen en de naam van elke Meting volgen. Een Meting met `labelHandmatig` houdt haar eigen naam.
 - **Verwijderen** kan alleen als er geen Meting aan hangt. De KPI-waarden van het Onderdeel verdwijnen mee, en de bevestiging noemt hoeveel (Verwijderen en datakoppelingen).
 - **Recht.** `organisaties.bewerken`. Aanmaken kan ook met `metingen.plannen`, omdat een Consultant bij het plannen van een Meting een nieuw team moet kunnen noemen.
-- **Zo gebouwd (afwijking, op 19 oktober 2026 daarna teruggedraaid: `Meting.onderdeel` bleef eerst staan).** `Meting.onderdeelId` is er, maar het tekstveld `Meting.onderdeel` is niet vervallen: Het is de naam van het Onderdeel als kopie, zodat een Meting zonder de Organisatie erbij te lezen is en de vele plekken die de naam tonen niet allemaal de Organisatie hoeven op te zoeken. `zorgOnderdelenKloppend` (`lib/onderdelen.ts`) houdt de twee kloppend bij elke keer laden en bij elke schrijfactie (`slaAlles`): De naam bepaalt het Onderdeel (hoofdletterongevoelig, met de spelling van het bestaande Onderdeel), een naam die nog geen Onderdeel is maakt er een aan, en "Hele organisatie" is `null`. Hernoemen (`hernoemOnderdeel`) werkt de kopie en de naam van elke Meting bij, behalve bij `labelHandmatig`. De overgang loopt bij het laden en is stabiel: Een Onderdeel dat uit bestaande data ontstaat, krijgt een id uit een hash van de Organisatie en de naam, tot het is opgeslagen.
-- **Besluit 19 oktober 2026: `Meting.onderdeel` vervalt, gebouwd op 19 oktober 2026.** Zo gebouwd: `onderdeelVan(organisatie, meting)` zoekt de naam via `onderdeelId` (`lib/onderdelen.ts`, `onderdeelNaamVan`), het veld staat niet meer in het type, `zorgOnderdelenKloppend` leest de oude tekst alleen nog bij het laden om de Onderdelen aan te maken en verwijdert ze daarna, en het aanmaken en wijzigen van een Meting kiest of maakt het Onderdeel met `zorgVoorOnderdeel`. Het is gebouwd als kopie van de naam van het Onderdeel, naast `Meting.onderdeelId`. De spec heeft die kopie niet nodig: De naam komt uit het Onderdeel via `onderdeelId`, en een tweede veld voor dezelfde informatie kan na een hernoeming uit de pas lopen. Op te ruimen: Het veld verdwijnt uit het type, `zorgOnderdelenKloppend` en `hernoemOnderdeel` hoeven de kopie niet meer bij te houden, en de plekken die de naam tonen zoeken het Onderdeel op via `onderdeelId`. De overgang (hieronder) leest de tekst nog één keer om de Onderdelen aan te maken. Hernoemen van een Onderdeel werkt de naam van de Metingen bij, behalve bij `labelHandmatig`, zoals nu.
+- **`Meting.onderdeel` bestaat niet.** De naam van het Onderdeel komt uit het Onderdeel via `onderdeelId`; een tweede veld voor dezelfde informatie kan na een hernoeming uit de pas lopen. Hernoemen van een Onderdeel werkt de naam van de Metingen bij, behalve bij `labelHandmatig`.
 
 ### Contactpersoon
 
-**Besloten en gebouwd op 20 oktober 2026, op verzoek van Sander.** Een Admin legt bij een Organisatie vast welke mensen relevant zijn. Een Consultant ziet ze bij de eigen Organisaties en kan ze vooralsnog niet wijzigen (aangepast op 20 oktober 2026, zie Recht en slot). Ze staan bij de Kenmerken op het organisatie-detail (`beheerpagina.md`, punt 4, Contactpersonen). De nieuwsartikelen die er in de eerste bouw naast stonden, zijn op 20 oktober 2026 opgegaan in het Dossier (zie Dossieritem).
+Een Admin legt bij een Organisatie vast welke mensen relevant zijn. Een Consultant ziet ze bij de eigen Organisaties en kan ze vooralsnog niet wijzigen (zie Recht en slot). Ze staan bij de Kenmerken op het organisatie-detail (`beheerpagina.md`, punt 4, Contactpersonen). Nieuwsartikelen horen bij het Dossier (zie Dossieritem).
 
 ```
 Contactpersoon {
@@ -321,18 +315,18 @@ Contactpersoon {
 - **Geen Respondent, geen gebruiker.** Een Contactpersoon heeft geen e-mailadres, geen toegangscode en geen rol. Er wordt niets naartoe gestuurd, en ze doen niet mee in een scan, een benchmark of een export.
 - **LinkedIn-adres.** Optioneel. Wat is ingevuld, moet een adres van `linkedin.com` of een subdomein zijn (de controle is op het domein, niet op de tekst). Zonder schema wordt `https://` voorgezet. Een ander domein wordt geweigerd.
 - **Volgorde.** Op alfabet, hoofdletterongevoelig.
-- **Recht en slot.** Aanmaken, wijzigen en verwijderen vraagt het recht `contactpersonen.bewerken` en het Bewerkslot van de Organisatie, zoals bij de Kenmerken. Vooralsnog heeft alleen een Admin dat recht (alle Organisaties), besloten op 20 oktober 2026 en gebouwd (`magContactpersonenBewerken`, `lib/rechten.ts`). Een Consultant ziet de lijst bij de eigen Organisaties, zonder de knoppen om te wijzigen. Als de functie stabiel is, krijgt een Consultant het recht ook, beperkt tot eigen Organisaties (zoals bij `organisaties.bewerken`); dan verandert alleen de rechtenmatrix. Een Lead en een Respondent zien ze niet.
+- **Recht en slot.** Aanmaken, wijzigen en verwijderen vraagt het recht `contactpersonen.bewerken` en het Bewerkslot van de Organisatie, zoals bij de Kenmerken. Alleen een Admin heeft dat recht (alle Organisaties). Een Consultant ziet de lijst bij de eigen Organisaties, zonder de knoppen om te wijzigen. Als de functie stabiel is, krijgt een Consultant het recht ook, beperkt tot eigen Organisaties (zoals bij `organisaties.bewerken`); dan verandert alleen de rechtenmatrix. Een Lead en een Respondent zien ze niet.
 - **Verwijderen.** Een eigen verwijderactie per item, met bevestiging. Wordt de Organisatie verwijderd, dan gaan ze mee (Verwijderen en datakoppelingen).
-- **Privacy.** Een Contactpersoon is een persoon buiten de app, en een naam met functie blijft ook als die openbaar is een persoonsgegeven. Daarom staan hun gegevens niet in de audit-log (Audit) en niet in de exports (`export-csv.md`, `export-indesign.md` en `import-scans.md` noemen dat). Alleen openbaar vindbare, zakelijke gegevens zijn toegestaan: Naam, functie, het LinkedIn-profiel en een zakelijke notitie. Geen privégegevens, zoals een privé e-mailadres, telefoonnummer, woonadres of geboortedatum, en niets over de persoon als privépersoon. Onder het veld Notitie staat een korte waarschuwing met die regel, omdat een vrij tekstveld de plek is waar zoiets ongemerkt binnenkomt. Wat er is vastgelegd, is wat Coniche uit openbare bronnen weet, en Coniche is er verantwoordelijk voor dat dat klopt (besloten op 20 oktober 2026).
+- **Privacy.** Een Contactpersoon is een persoon buiten de app, en een naam met functie blijft ook als die openbaar is een persoonsgegeven. Daarom staan hun gegevens niet in de audit-log (Audit) en niet in de exports (`export-csv.md`, `export-indesign.md` en `import-scans.md` noemen dat). Alleen openbaar vindbare, zakelijke gegevens zijn toegestaan: Naam, functie, het LinkedIn-profiel en een zakelijke notitie. Geen privégegevens, zoals een privé e-mailadres, telefoonnummer, woonadres of geboortedatum, en niets over de persoon als privépersoon. Onder het veld Notitie staat een korte waarschuwing met die regel, omdat een vrij tekstveld de plek is waar zoiets ongemerkt binnenkomt. Wat er is vastgelegd, is wat Coniche uit openbare bronnen weet, en Coniche is er verantwoordelijk voor dat dat klopt.
 
 ### Dossieritem
 
-**Voorstel van 20 oktober 2026, gebouwd op 21 oktober 2026 voor Nieuws en Cases, en op 21 oktober 2026 (PR 160) ook voor Events, Blogs en de koppeling aan AI-domeinen; de hernoeming naar zichtbaar, de naam voor de Lead en de scorebron van 21 oktober 2026 zijn nog niet gebouwd.** Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws, Cases, Events en Blogs, en kan het zichtbaar maken voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
+Een Consultant stelt bij een Organisatie een Dossier samen van Nieuws, Cases, Events en Blogs, en kan het zichtbaar maken voor de Lead. De regels, de schermen en de rechten staan in `dossier.md`. Het Dossier vervangt het veld `Organisatie.nieuwsartikelen`.
 
 ```
 Organisatie.dossier {
-  zichtbaar: boolean                // standaard false (voorheen openVoorLead, hernoemd op 21 oktober 2026)
-  zichtbaarSinds: datetime | null   // het moment waarop zichtbaar voor het laatst aan ging (voorheen openSinds)
+  zichtbaar: boolean                // standaard false
+  zichtbaarSinds: datetime | null   // het moment waarop zichtbaar voor het laatst aan ging
   naamVoorLead: string              // maximaal 80 tekens, leeg = "Dossier {Organisatie.naam}"
   radarBronnen: RadarBron[]         // hoogstens één per Assessment met een radar, leeg = overal automatisch
   gewijzigdOp: datetime | null      // laatste wijziging in wat een Lead ziet
@@ -350,7 +344,7 @@ Dossieritem {
   titel: string                     // verplicht, getrimd, maximaal 200 tekens
   toelichting: string               // maximaal 400 tekens, mag leeg zijn
   zichtbaarVoorLead: boolean        // standaard false
-  bouwblokIds: string[]             // Bouwblok.id van de Klantcontact Volwassenheidsscan en de AI-scan (21 oktober 2026), mag leeg zijn
+  bouwblokIds: string[]             // Bouwblok.id van de Klantcontact Volwassenheidsscan en de AI-scan, mag leeg zijn
   url: string                       // Nieuws en Blog: verplicht. Case en Event: optioneel. Altijd http of https
   aangemaaktOp: datetime
   gewijzigdOp: datetime
@@ -368,8 +362,7 @@ Dossieritem {
 
 - **Event verlopen** is afgeleid uit `datum` of `einddatum` (`dossier.md`, Regels), er is geen veld voor.
 - **Een Lead ziet een item** als `Organisatie.dossier.zichtbaar` aan staat, `zichtbaarVoorLead` aan staat en, bij een Case, `Organisatie.caseToegestaan` van `caseOrganisatieId` aan staat. De naam van de Organisatie in de Case gaat nooit naar de Lead.
-- **Naam en scorebron (besloten op 21 oktober 2026).** `naamVoorLead` is de titel van het Dossier bij de Lead. `radarBronnen` bepaalt per Assessment welke Meting de scores in de radar en de verdeling levert: `metingId` leeg is automatisch (de meest recente Meting waarvan de Lead de Resultaten mag inzien), anders een vaste Meting die de Lead mag inzien. Wie `dossier.bewerken` heeft, mag beide wijzigen. De regels staan in `dossier.md` (Welke scores).
-- **Overgang.** Bestaande `nieuwsartikelen` worden bij het laden Dossieritems van soort `nieuws`, met `notitie` als `toelichting`, `zichtbaarVoorLead` op false en zonder bouwblokken (`dossier.md`, Overgang).
+- **Naam en scorebron.** `naamVoorLead` is de titel van het Dossier bij de Lead. `radarBronnen` bepaalt per Assessment welke Meting de scores in de radar en de verdeling levert: `metingId` leeg is automatisch (de meest recente Meting waarvan de Lead de Resultaten mag inzien), anders een vaste Meting die de Lead mag inzien. Wie `dossier.bewerken` heeft, mag beide wijzigen. De regels staan in `dossier.md` (Welke scores).
 - **`OrganisatieLid.dossierGezienOp`** (datetime of null) bepaalt of de kaart Dossier bij een Lead de tag "Nieuw" krijgt.
 
 
@@ -394,12 +387,12 @@ Wordt iemand uitgenodigd met een e-mailadres dat al bestaat binnen de
 organisatie, dan wordt dezelfde respondent hergebruikt.
 
 **E-mailadres altijd genormaliseerd** (getrimd, lowercase) vóór
-opslag én bij elke vergelijking — ook bij de verificatiecode-flow
+opslag én bij elke vergelijking, ook bij de verificatiecode-flow
 (Toegang voor respondenten hieronder) en bij Respondent-matching in
 uitnodigen en import (`import-scans.md`). Zonder normalisatie
 ontstaat bij een andere schrijfwijze (hoofdletters, spaties) een
 dubbele respondent in plaats van hergebruik. Geldt hetzelfde voor
-`Gebruiker.email` hieronder — anders herkent een latere login een
+`Gebruiker.email` hieronder, anders herkent een latere login een
 eerder toegewezen organisatie niet.
 
 Zolang `naam` leeg is, tonen beheeroverzichten het e-mailadres als
@@ -422,18 +415,17 @@ Meting {
   organisatieId: string
   assessmentId: string
   label: string                     // de naam, zie Naam van een Meting
-  labelHandmatig: boolean           // gebouwd op 14 oktober 2026, standaard false
-  onderdeelId: string | null        // gebouwd op 19 oktober 2026, null is "Hele organisatie", zie Onderdeel. Het tekstveld `onderdeel` blijft staan als de naam van dat Onderdeel (zie "Zo gebouwd" bij Onderdeel)
-  meetdatum?: date                  // gebouwd op 14 oktober 2026, zonder tijdstip
-  samenstelling?: string[]          // gebouwd, metingIds, alleen bij een samengestelde Meting
+  labelHandmatig: boolean // standaard false
+  onderdeelId: string | null // null is "Hele organisatie", zie Onderdeel. 
+  meetdatum?: date // zonder tijdstip
+  samenstelling?: string[] // metingIds, alleen bij een samengestelde Meting
   aangemaaktOp: datetime
 }
 ```
 
 **Onderdeel en meetdatum.** Het onderdeel zegt over welk deel van de
 organisatie een Meting gaat, bijvoorbeeld "Team A", en is standaard "Hele
-organisatie". Een Meting kiest een Onderdeel uit de lijst van de Organisatie
-(gebouwd op 19 oktober 2026, zie Onderdeel). Waar de spec hieronder
+organisatie". Een Meting kiest een Onderdeel uit de lijst van de Organisatie (zie Onderdeel). Waar de spec hieronder
 "onderdeel" schrijft, is dat de naam van dat Onderdeel, of "Hele organisatie"
 bij `onderdeelId: null`. De meetdatum is de dag waarop de Meting plaatsvindt. Respondenten
 mogen er daarna nog dagen over doen. Het is niet het moment waarop de Meting in
@@ -442,8 +434,7 @@ de app is aangemaakt (`aangemaaktOp`) en niet het moment van importeren.
 - **Meetdatum is verplicht** bij het aanmaken van een Meting, en is achteraf
   te wijzigen. De datum geeft de volgorde in de tijd, en daarmee de volgorde
   waarin Metingen in een vergelijking staan (`benchmark.md`, Niveau 2). Een
-  Meting zonder meetdatum, zoals een bestaande Meting uit de tijd van de rondes
-  (zie Overgang hieronder), toont "Datum ontbreekt". Ze kan pas in een
+  Meting zonder meetdatum toont "Datum ontbreekt". Ze kan pas in een
   vergelijking of samenstelling als de datum is ingevuld.
 - **Bij een import** is de meetdatum de oudste `created_at` van de scans die in
   de Meting komen (de oude tool), of de kolom `meting_meetdatum` van onze eigen
@@ -459,32 +450,25 @@ de app is aangemaakt (`aangemaaktOp`) en niet het moment van importeren.
   in dezelfde maand voor hetzelfde onderdeel bestaan. `labelHandmatig` staat
   dan op true en de naam volgt onderdeel en meetdatum niet meer. Een
   geïmporteerd label blijft staan tot de beheerder het wijzigt.
-- **Onderdeel uit het label voorstellen (gebouwd op 13 oktober 2026).** Een
+- **Onderdeel uit het label voorstellen.** Een
   geïmporteerde Meting heeft het onderdeel "Hele organisatie", ook als haar
   label een onderdeel noemt (bijv. "Zuid-Nederland | 0-meting" na een import).
   "Scans samenbrengen" en Wijzigen stellen het onderdeel voor uit het label: De
   tekst vóór " | ", anders "Hele organisatie". Het is een voorstel dat de
   beheerder ziet en kan aanpassen, nooit een stille wijziging. Met het Onderdeel
-  als object (gebouwd op 19 oktober 2026) is het voorstel een keuze in de
+  als object is het voorstel een keuze in de
   keuzelijst: Bestaat er een Onderdeel met die naam (hoofdletterongevoelig),
   dan staat dat gekozen. Anders staat er "Nieuw onderdeel…" met de naam
   ingevuld, en ontstaat het Onderdeel pas als de beheerder bevestigt.
-- **Overgang van de rondes (gebouwd op 14 oktober 2026).** `Ronde` en
-  `Meting.rondeId` vervallen. De Metingen houden hun `label`, onderdeel en
-  `samenstelling`. De meetdatum is leeg. Een Admin of Consultant vult hem in
-  per Meting. De audit-regels `ronde.aangemaakt` en `ronde.hernoemd` blijven
-  geldig voor wat al is gelogd.
 
-**Samengestelde Meting (gebouwd op 13 oktober 2026, aangepast in het voorstel van
-14 oktober 2026).** Een Meting met `samenstelling` is een gemiddelde over andere
+**Samengestelde Meting (aangepast in het).** Een Meting met `samenstelling` is een gemiddelde over andere
 Metingen van dezelfde organisatie en hetzelfde Assessment, minstens twee, elk
 hoogstens één keer en zelf niet samengesteld. De Metingen kiest de gebruiker
 zelf, zonder verdere grens. Ze heeft standaard het onderdeel "Hele
 organisatie". Haar meetdatum volgt de onderliggende Metingen: Het is de
 laatste meetdatum van de geselecteerde Metingen. Ze is dus niet los te
 wijzigen, en een geselecteerde Meting zonder datum blokkeert het opslaan. Een
-bestaande samenstelling waarvan de leden geen datum hebben (uit de tijd van de
-rondes) toont "Datum ontbreekt". In de app staat de datum altijd alleen-lezen,
+samenstelling waarvan de leden geen datum hebben toont "Datum ontbreekt". In de app staat de datum altijd alleen-lezen,
 zonder invoerveld, met de toelichting "Volgt de nieuwste Meting in de
 samenstelling". Ze heeft geen Respondenten en geen `ScanInvulling`s, en kopieert geen antwoorden:
 De scores worden berekend uit de onderliggende Metingen (Scoreberekening,
@@ -507,11 +491,11 @@ ScanInvulling {
   uitgenodigdOp: datetime
   gestartOp: datetime | null        // gezet bij het verzenden van de intake
   afgerondOp: datetime | null
-  laatstOpgeslagenOp: datetime | null  // gebouwd op 15 oktober 2026, voor "Laatst opgeslagen" op Mijn metingen (`visualisatie-mijn-metingen.md`); gezet bij elk opslaan van een antwoord
+  laatstOpgeslagenOp: datetime | null // voor "Laatst opgeslagen" op Mijn metingen (`visualisatie-mijn-metingen.md`); gezet bij elk opslaan van een antwoord
   antwoorden: { [vraagId: string]: number | string }   // 1-5, of "ja" | "nee" | "weet-niet" bij antwoordType "ja-nee-weetniet", of 0-5 bij antwoordType "spanning" (0 = kan ik niet beoordelen)
   relevantie: { [categorieId: string]: boolean }       // alleen bij optionele categorieën: true = van toepassing, false = niet van toepassing, ontbreekt = nog niet beantwoord
   opmerkingenPerBouwblok: { [bouwblokId: string]: string }   // bij antwoordType "spanning": het antwoord op de open vraag (Assessment.openVraag) per bouwblok
-  notitie: string | null            // gebouwd op 13 oktober 2026, zie hieronder
+  notitie: string | null // zie hieronder
   bewaarVerlengdTot: datetime | null        // zie Bewaartermijn ingevulde scans
 }
 ```
@@ -519,7 +503,7 @@ ScanInvulling {
 Uniek per combinatie van meting en respondent. Dezelfde scan opnieuw
 invullen gebeurt via een nieuwe meting.
 
-**Notitie op de scan (gebouwd op 13 oktober 2026).** Een notitie bij het starten
+**Notitie op de scan.** Een notitie bij het starten
 van een scan (bij de import `start_comment`, `import-scans.md`) hoort bij die
 ene scan en staat op de `ScanInvulling`, niet op de Respondent. Reden: Eén
 Respondent kan veel scans hebben, en bij een import is dat vaak dezelfde
@@ -543,7 +527,7 @@ worden. Het slot geldt voor een ingevulde scan (invullen en bewerken), een
 Respondent en een Organisatie. Later komt content erbij (Assessments,
 Content-pagina's). Het slot op een Organisatie geldt voor elke bewerking van
 die Organisatie: De Kenmerken, "KPI's invullen" en het toevoegen, wijzigen of
-verwijderen van een Onderdeel (gebouwd op 19 oktober 2026).
+verwijderen van een Onderdeel.
 
 ```
 Bewerkslot {
@@ -574,7 +558,7 @@ gedrag moet zijn.
 
 ### Scoreberekening
 
-Eén gedeelde functie berekent de overall-score en de score per
+Eén gedeelde functie berekent de totaalscore en de score per
 categorie/bouwblok uit `antwoorden` en `Bouwblok.gewicht`. Alle scores
 worden berekend en nooit opgeslagen. Met `g` het gewicht van een
 bouwblok en `n` het aantal vragen in dat blok:
@@ -583,9 +567,9 @@ bouwblok en `n` het aantal vragen in dat blok:
   Ongewogen.
 - **Categoriescore** = `Σ(g × bouwblokscore) / Σ g` over de bouwblokken
   in die categorie. Een blok met gewicht 2 telt dus dubbel mee.
-- **Overall** = `Σ(g × som antwoorden per blok) / Σ(g × n)` over alle
+- **Totaalscore** = `Σ(g × som antwoorden per blok) / Σ(g × n)` over alle
   bouwblokken. Bij gewicht `1` overal is dat de som van alle antwoorden
-  gedeeld door het aantal vragen (60 bij Klantcontact). De overall komt
+  gedeeld door het aantal vragen (60 bij Klantcontact). De totaalscore komt
   uit de ruwe antwoorden en niet uit afgeronde bouwblokscores.
 - **Afronding** alleen op getoonde waarden: 1 decimaal, half-away-from-
   zero (`toFixed(1)`). Classificatie en kleur volgen de afgeronde
@@ -611,13 +595,13 @@ gewicht:
   scoren op Organisatie 2 van 4, Processen en techniek 2 van 10 en Mensen
   1 van 1: De afdeling staat op 5 van 15 (33%), het gemiddelde van de drie
   percentages zou 57% zijn.
-- **Overall** = `Σ(g × p) / Σ(g × n)` als percentage. De getoonde punten
+- **Totaalscore** = `Σ(g × p) / Σ(g × n)` als percentage. De getoonde punten
   zijn `Σ(g × p)` van `Σ(g × n)`. Bij gewicht 1 overal is dat het aantal
   Ja gedeeld door het aantal vragen (60 bij de Quickscan). Net als bij de
-  schaal komt de overall uit de ruwe antwoorden en niet uit afgeronde
+  schaal komt de totaalscore uit de ruwe antwoorden en niet uit afgeronde
   bouwblokpercentages.
 - **Niet van toepassing.** Bouwblokken van een categorie met `relevantie`
-  op `false` doen niet mee. Overall en punten gaan dan over de overige
+  op `false` doen niet mee. Totaalscore en punten gaan dan over de overige
   categorieën, bijvoorbeeld 14 van 15 punten (93%) als alleen
   Patiëntenservice van toepassing is en daar 14 vragen met Ja zijn
   beantwoord. De categorie zelf krijgt geen score en geen klasse.
@@ -638,9 +622,8 @@ berekening. PDF, CSV, InDesign, import, het gemiddelde over meerdere
 Respondenten, spreiding en benchmark zijn er nog niet voor uitgewerkt
 (`backlog.md`).
 
-**Antwoordtype `"spanning"` (Spanningsmeter, voorstel van 21 oktober
-2026, gebouwd op 21 oktober 2026, `lib/spanning.ts`).** Hier is er geen bouwblok-gemiddelde dat in een
-overall-score uitkomt. De uitkomst is een score per spanningsveld, een niveau en
+**Antwoordtype `"spanning"` (Spanningsmeter).** Hier is er geen bouwblok-gemiddelde dat in een
+totaalscore uitkomt. De uitkomst is een score per spanningsveld, een niveau en
 de spanning tussen de velden. Met `a` een antwoord van 1 tot en met 5, een
 vraag met antwoord `0` of zonder antwoord is niet beoordeeld:
 
@@ -725,9 +708,9 @@ scan (niveau 3).
   tweede rekenmethode bij.
 - De leden horen bij hetzelfde Assessment. Een lid zonder afgeronde scan
   telt niet mee.
-- Een samengestelde Meting (gebouwd) volgt dezelfde regel: De onderliggende
+- Een samengestelde Meting volgt dezelfde regel: De onderliggende
   Metingen zijn de leden en elke Meting telt één keer mee, ongeacht het aantal
-  scans. Team A met 5 scans en overall 3,0 en Team B met 40 scans en overall 4,0
+  scans. Team A met 5 scans en totaalscore 3,0 en Team B met 40 scans en totaalscore 4,0
   geven samen 3,5. Per scan gewogen zou het 3,9 zijn, en die variant bestaat
   niet.
 
@@ -753,19 +736,12 @@ Toegangscode {
   gecodeerd.
 - **Codes zijn uniek.** Wordt een respondent verwijderd, dan verdwijnt
   ook zijn code, en werkt de link niet meer.
-- **Wat de link opent**: Zie CLAUDE.md sectie 3, "Openen van de
-  persoonlijke link".
+- **Wat de link opent**: Zie `schermen.md`, Mijn metingen
+  (Openen van de persoonlijke link).
 
-**Afwijking, bewust zo gebouwd**: Gebouwd als veld op `Respondent`
-(`toegangscode`) in plaats van als aparte tabel zoals hierboven staat.
-Geeft hetzelfde resultaat (respondent weg → code weg) zonder een tweede
-structuur ernaast.
-
-Zolang er geen database is, werkt een link alleen in de browser waar de
-data staat: Zonder gegevens in de link kan een andere browser zich niet
-meer "bootstrappen" (zie CLAUDE.md, Status). E-mailverificatie bij het
-openen van de link (code per mail, 15 minuten geldig) blijft het doel,
-maar volgt pas met backend en Coniche-mailserver (`backlog.md`).
+E-mailverificatie bij het
+openen van de link (code per mail, 15 minuten geldig) hoort bij de backend
+en de Coniche-mailserver (`backlog.md`).
 
 ### Verwijderen en datakoppelingen
 
@@ -779,24 +755,20 @@ verwijst wat niet meer bestaat.
   invullingen.
 - **Meting**: De meting en alle invullingen daarbinnen. Respondenten
   en het Onderdeel van de Meting blijven bestaan.
-- **Onderdeel** (gebouwd op 19 oktober 2026): Alleen als er geen Meting
+- **Onderdeel**: Alleen als er geen Meting
   aan hangt. De KPI-waarden van het Onderdeel verdwijnen mee, en de
   bevestiging noemt het aantal.
-- **Kanaal** (gebouwd op 19 oktober 2026): Het kanaal met al zijn
+- **Kanaal**: Het kanaal met al zijn
   KPI-waarden, bij alle Organisaties. De bevestiging noemt het aantal
   waarden en het aantal Organisaties.
 - **Organisatie**: Alles wat eronder hangt: Metingen, respondenten,
-  toegangscodes, invullingen, antwoorden en opmerkingen, en (voorstel van
-  19 oktober 2026) Onderdelen en KPI-waarden, en (gebouwd op 20 oktober 2026)
+  toegangscodes, invullingen, antwoorden en opmerkingen, en Onderdelen en KPI-waarden, en
   Contactpersonen en het Dossier. Het
   assessment-type en de content blijven staan.
-- **Organisatie die in een Case voorkomt** (gebouwd op 21 oktober 2026):
+- **Organisatie die in een Case voorkomt**:
   De Cases bij andere Organisaties die naar haar verwijzen krijgen
-  `caseOrganisatieId: null`, `zichtbaarVoorLead: false` en de status "Kies een
-  organisatie". De bevestiging noemt het aantal (`dossier.md`, Verwijderen en
-  datakoppelingen). Eén plek doet dat voor elke schrijfactie (`ruimDossierOp` in
-  `slaAlles`), de audit-regel `organisatie.verwijderd` noemt het aantal als
-  `aantalCasesLosgemaakt`.
+  `caseOrganisatieId: null` en worden onzichtbaar voor de Lead. De
+  bevestiging noemt het aantal (`dossier.md`, Verwijderen en datakoppelingen).
 - **Assessment**: Alleen als er geen enkele Meting van dit Assessment
   bestaat, bij welke organisatie dan ook (ook geen Meting zonder scans).
   Bestaat er wel een Meting, dan kan het Assessment niet worden verwijderd,
@@ -815,7 +787,7 @@ is alleen herkomstinformatie, zie Sector-varianten). Staat het Assessment in
 (`Benchmark.meldingen`). De kaart op de publieke keuzepagina en de
 landingspagina van het Assessment verdwijnen.
 
-Een benchmark (deel 3) verwijst naar organisaties en Metingen. Een Lead
+Een benchmark (Deel 2) verwijst naar organisaties en Metingen. Een Lead
 krijgt een view van een benchmark via een `LeadToegang` met `weergave:
 "benchmark"` (`benchmark.md`, View voor een Lead). Verdwijnt een van die
 records, dan verdwijnt ook de verwijzing.
@@ -858,8 +830,8 @@ AlgemeneTekst {
 }
 ```
 
-Eerste en enige nu: `mijnMetingenIntro` — de introtekst boven de lijst
-met scans op "Mijn metingen" (CLAUDE.md schermflow, scherm 4). Eén
+Eerste en enige nu: `mijnMetingenIntro`, de introtekst boven de lijst
+met scans op "Mijn metingen" (`schermen.md`, Mijn metingen). Eén
 tekst voor iedereen, niet per Assessment of per organisatie: Die pagina
 toont immers alle scans van een respondent door elkaar, ongeacht
 scan-type. Beheerbaar bij `beheerpagina.md` punt 2a, Algemene teksten. Ook de
@@ -884,12 +856,11 @@ VeldDefinitie {
   afhankelijkVan?: string           // alleen "select-afhankelijk": id van het broer-veld waarvan de keuze de lijst hier bepaalt
   optiesPerWaarde?: { [waarde: string]: string[] } // alleen "select-afhankelijk"
   subvelden?: VeldDefinitie[]       // voor herhalende structuren
-  korteNaam?: string                // voorstel: weergavenaam van het veld in lijsten en grafieken, leeg betekent `label`
-  eenheid?: string                  // gebouwd op 15 oktober 2026: weergave-eenheid bij getal en percentage, bijv. "s" of "%", gebruikt door Verkennen bij de drempel
+  eenheid?: string // weergave-eenheid bij getal en percentage, bijv. "s" of "%", gebruikt door Verkennen bij de drempel
 }
 ```
 
-**Korte namen** (gebouwd op 15 oktober 2026, `visualisatie-verkennen.md`, Korte namen). Een korte naam is een weergavenaam naast het origineel. De Organisatie bewaart altijd de originele waarde.
+**Korte namen** (`visualisatie-verkennen.md`, Korte namen). Een korte naam is een weergavenaam naast het origineel. De Organisatie bewaart altijd de originele waarde.
 
 ```
 KorteNaam {
@@ -903,29 +874,27 @@ KorteNaam {
 - Een veldnaam heeft zijn korte naam in `VeldDefinitie.korteNaam`. `KorteNaam` is er voor waarden.
 - Een lege of ontbrekende korte naam betekent het origineel.
 - De rij hoort bij de combinatie van veld en waarde. Bij een waarde via "Anders…" ontstaat de rij pas zodra een Admin een korte naam invult. Verdwijnt de waarde uit de lijst en uit alle Organisaties, dan kan de rij weg (Data-integriteit, `beheerpagina.md`, punt 13).
-- De korte naam staat in Verkennen, in het organisatie-detail (de kaart Kenmerken en de keuzelijsten Sector en Subsector in het formulier, met het origineel in de tooltip) en in andere schermen waar ruimte krap is. Hij staat niet in de exports, de import en de PDF, want daar blijft het origineel staan. Besloten op 19 oktober 2026: Eerder stond het organisatie-detail bij de uitzonderingen, maar de lange SBI-titels in de keuzelijsten waren onwerkbaar.
+- De korte naam staat in Verkennen, in het organisatie-detail (de kaart Kenmerken en de keuzelijsten Sector en Subsector in het formulier, met het origineel in de tooltip) en in andere schermen waar ruimte krap is. Hij staat niet in de exports, de import en de PDF, want daar blijft het origineel staan.
 - Wijzigen vraagt `content.beheren` (alleen Admin) en wordt gelogd (zie Audit).
-- **Opslag zoals gebouwd.** De korte namen staan niet op de definities (`organisatie-velden.ts` is vaste data) maar bij de
+- **Opslag.** De korte namen staan niet op de definities (`organisatie-velden.ts` is vaste data) maar bij de
   instellingen: `Instellingen.korteNamen = { velden: { [veldId]: string }, waarden: KorteNaam[] }`, met het veld-id als pad
-  met punten (`kpis.aht`). `VeldDefinitie.korteNaam` staat in het type maar wordt niet gebruikt.
+  met punten (`kpis.aht`).
 
 **Sector en subsector**
-- Sector (select, vaste lijst: de SBI-hoofdindeling, `opties` in
+- Sector (select, vaste lijst: De SBI-hoofdindeling, `opties` in
   `sbi-indeling.md`)
-- Subsector (`select-afhankelijk`, afhankelijk van Sector: toont alleen
+- Subsector (`select-afhankelijk`, afhankelijk van Sector: Toont alleen
   de Afdelingen die onder de gekozen Sectie vallen, `optiesPerWaarde` in
   `sbi-indeling.md`. Uitgeschakeld zolang Sector nog leeg is; wijzigt
   Sector achteraf, dan wordt een al gekozen Subsector gewist.
   **Afwijking van een eerdere versie van dit document**: Die koos
-  bewust géén cascading-select — die keuze is teruggedraaid zodra bleek
+  bewust géén cascading-select, die keuze is teruggedraaid zodra bleek
   dat een platte lijst van 87 Afdelingen in de praktijk onwerkbaar is,
   zie `sbi-indeling.md`)
 
 **Volume en klantbasis**
 - Totaal aantal klanten (getal, met B2B/B2C-verdeling als percentage)
-- Contacten per jaar per kanaal: Gebouwd op 19 oktober 2026, verhuisd
-  naar de KPI's (KPI's en kanalen, hieronder). Gebouwd als zes getalvelden met
-  "niet van toepassing" toegestaan, die daarmee vervallen.
+- Contacten per jaar per kanaal: Staan bij de KPI's (KPI's en kanalen, hieronder).
 - Adoptie mijnomgeving/app (percentage)
 
 **Digitalisering**
@@ -946,7 +915,7 @@ herhaald.
   partij), `deploymentmodel` en `cloudleverancier`. Alle vier staan op één
   regel, in deze volgorde. Zelf of extern (`ondersteuning`) volgt uit
   `ondersteuner` en wordt alleen voor de exports afgeleid.
-- **LLM-oplossing**: alleen `leverancier` (de modelfamilie) en
+- **LLM-oplossing**: Alleen `leverancier` (de modelfamilie) en
   `toegangsroute`. Geen Ondersteund door, Deploymentmodel en
   Cloudleverancier.
 
@@ -996,18 +965,14 @@ heeft daarvoor het element `techstackWfm`, en het element
   IT DevOps. Een bestaande waarde zonder groep wordt bij het laden `{ aantal }`)
 - IT DevOps-medewerkers (getal, met percentage gericht op Digital)
 
-**KPI's.** Gebouwd op 19 oktober 2026: De KPI's zijn geen organisatievelden
-meer. Ze staan hieronder bij KPI's en kanalen. Gebouwd waren het vijf
-numerieke velden, AHT, NPS, CSAT, SLA en FTR (veld-id `kpis.aht` enzovoort).
-Verkennen gebruikt ze nog steeds als filter, als groepering (AHT met een
+**KPI's.** De KPI's zijn geen organisatievelden. Ze staan hieronder bij KPI's en kanalen: AHT, NPS, CSAT, SLA en FTR (veld-id `kpis.aht` enzovoort).
+Verkennen gebruikt ze als filter, als groepering (AHT met een
 drempel) en als as in het spreidingsdiagram (`visualisatie-verkennen.md`,
 KPI's als kenmerk).
 
 ### KPI's en kanalen
 
-**Besloten door Joost (`Claude outputs/kpi-design/`), gebouwd op 19 oktober
-2026.** Het voorstel vervangt de vijf losse KPI-velden en de zes
-getalvelden voor contacten per kanaal. Een KPI-waarde hoort bij een plek: De
+Ontwerp: `Claude outputs/kpi-design/`. Een KPI-waarde hoort bij een plek: De
 hele organisatie, een Onderdeel, of een kanaal binnen een van die twee. Je vult
 alleen in wat je weet.
 
@@ -1076,33 +1041,11 @@ KpiWaarde {
   Bewerkslot van de Organisatie. De definities van KPI's en kanalen vragen
   `content.beheren`.
 
-**Overgang van wat er is gebouwd.**
-
-1. Per Organisatie wordt elke tekst in `Meting.onderdeel` die niet "Hele
-   organisatie" is, een Onderdeel. Teksten die hoofdletterongevoelig en
-   zonder voor- en achterspaties gelijk zijn, worden één Onderdeel, met de
-   spelling die het vaakst voorkomt (bij gelijke aantallen die van de oudste
-   Meting). De Metingen krijgen `onderdeelId`. "Hele organisatie" wordt `null`.
-2. De KPI-velden in `Organisatie.kenmerken` worden `KpiWaarde` met
-   `onderdeelId: null` en `kanaalId: null`.
-3. De zes getalvelden voor contacten per kanaal worden `KpiWaarde` voor de KPI
-   Contacten per jaar, met het kanaal erbij. "Niet van toepassing" wordt 0. Voor
-   Verkennen en voor Ingezette kanalen is dat gelijk, want beide tellen "niet
-   van toepassing" als niet ingezet. De waarde Algemeen voor Contacten per jaar
-   bestond niet en blijft leeg.
-4. De kanalenlijst en de startset KPI's worden aangemaakt zoals hierboven.
-5. Een opgeslagen verkenning die naar `kpis.aht` of een ander KPI-veld verwijst,
-   verwijst daarna naar de KPI met het kanaal Algemeen. Een filter op ingezette
-   kanalen blijft werken.
-6. Een CSV van de eigen export uit de tijd voor deze wijziging, met KPI's in
-   `organisatie_kenmerken`, wordt bij import op dezelfde manier omgezet
-   (`import-scans.md`).
-
-**Gevolgen voor andere specs, gebouwd op 19 oktober 2026.**
+**Gevolgen voor andere specs.**
 
 - `export-csv.md`: De kolom `onderdeel` blijft de naam van het Onderdeel.
   `organisatie_kenmerken` bevat de KPI's en de contacten per kanaal niet meer.
-  Gebouwd: Een JSON-kolom `organisatie_kpis` met een lijst van onderdeel,
+  Een JSON-kolom `organisatie_kpis` met een lijst van onderdeel,
   kanaal, KPI en waarde, naast `organisatie_kenmerken`.
 - `import-scans.md`: De kolom `onderdeel` zoekt het Onderdeel bij de Organisatie
   of stelt een nieuw voor (Onderdeel uit het label voorstellen). De kolom
@@ -1117,614 +1060,21 @@ KpiWaarde {
 - `benchmark.md` en `visualisatie-scores.md`: Waar ze het onderdeel van een
   Meting tonen of vergelijken, is dat de naam van het Onderdeel. Er verandert
   niets aan de regels.
-- Help (`help.md`): Gebouwd op 19 oktober 2026 in `help/kpis-invullen.md` en
+- Help (`help.md`): De uitleg staat in `help/kpis-invullen.md` en
   `help/metingen-en-onderdelen.md`.
 
 **Open punten.**
 
 - Of "niet van toepassing" bij een kanaal een eigen stand moet blijven in plaats
-  van 0 (Overgang, punt 3).
+  van 0.
 - Het verwijderen van een KPI-definitie en het hernoemen van een kanaal staan
   niet in het design (`beheerpagina.md`, punt 3, KPI's en kanalen).
 
 ---
 
-## Deel 2: Rollen, rechten en inlog (voorstel)
+## Deel 2: Benchmark
 
-**Status: Voorstel.** De rollen Admin, Consultant, Lead en Respondent zijn
-nu ingericht als testhulp (prototype). De definitieve inrichting volgt
-samen met de backend en de database.
-
-### Uitgangspunten
-
-- Rechten per rol, aan en uit te zetten zonder codewijziging.
-- Minimale toegang per rol, verificatie voor iedereen zonder account,
-  audit van wijzigingen.
-- Beheer en organisatiekant strikt gescheiden: Andere tabellen, ander
-  inlogmechanisme, geen gedeelde accounts.
-
-### Rollen
-
-| Rol | Kant | Wat de rol mag |
-|---|---|---|
-| Admin | Beheer | Alles, inclusief rechten toekennen en verwijderen |
-| Consultant | Beheer | Organisaties en metingen aanmaken, Lead en respondenten koppelen (en weer loskoppelen), resultaten inzien — voor organisaties die hij zelf aanmaakte of die een Admin aan hem toewees |
-| Lead | Organisatie | De weergaven zien en doen die een Admin per Lead heeft aangevinkt: Resultaten, Spreiding, Antwoorden, Uitnodigen, Exporteren en benchmarkviews. Kan ook zelf invullen, maar hoeft niet |
-| (geen rol) | Organisatie | Gewone respondent: Eigen scans invullen en eigen resultaten zien |
-
-**Wat een Lead mag zien (gebouwd op 14 oktober 2026).** Dit vervangt het
-bereik van een Lead (Specifieke Metingen of Hele organisatie), de koppeling
-`RespondentRolMeting`, het veld `leadVoorOrganisatie` en de toewijzing van
-benchmarkviews (`BenchmarkToewijzing`). Wat daarvan op 13 oktober 2026 is
-gebouwd, wordt vervangen (`beheerpagina.md`, punt 6a, Overgang). Een Admin
-vinkt per Lead aan welke weergaven hij ziet, in één tabel per organisatie
-(`beheerpagina.md`, punt 6a).
-
-```
-LeadToegang {
-  respondentId: string           // de Lead
-  weergave: "resultaten" | "spreiding" | "antwoorden" | "uitnodigen"
-            | "exporteren" | "benchmark"
-  metingId?: string              // bij alle weergaven behalve benchmark
-  benchmarkId?: string           // bij benchmark
-  toegekendDoor: string          // Admin
-  toegekendOp: datetime
-}
-```
-
-Een `LeadToegang` is uniek per combinatie van Respondent, weergave en Meting of
-benchmark.
-
-- **Resultaten**: De resultatenpagina van de Meting, met Overzicht, Per
-  bouwblok en de vergelijking met een eerdere Meting waarvoor de Lead ook
-  Resultaten heeft. Een `LeadToegang` mag naar een samengestelde Meting
-  verwijzen. De Lead ziet dan alleen het gemiddelde.
-- **Spreiding**: Weergave B van die Meting, zonder ring
-  (`visualisatie-scores.md`, onderdeel B). Kan alleen als er een `resultaten`
-  voor dezelfde Meting is, en niet voor een samengestelde Meting.
-- **Uitnodigen**: Respondenten voor die Meting uitnodigen. Onafhankelijk van
-  `resultaten`.
-- **Exporteren**: De export van die Meting. Kan alleen als er een `resultaten`
-  voor dezelfde Meting is.
-- **Antwoorden**: Weergave G van die Meting (`visualisatie-scores.md`,
-  onderdeel G). Kan alleen als er een `resultaten` voor dezelfde Meting is, en
-  niet voor een samengestelde Meting. Of de Lead namen ziet, bepaalt
-  `Organisatie.antwoordenMetNamen` (deel 3).
-- **Benchmark**: De view of views die in die benchmark bij deze Lead horen
-  (`benchmark.md`, View voor een Lead). Bij een benchmark tussen organisaties
-  (niveau 1) kan het vinkje voor elke Lead van een organisatie in die
-  benchmark. Bij een benchmark binnen een organisatie (niveau 2) kan het alleen
-  als de Lead `resultaten` heeft voor een lid-Meting van die benchmark.
-
-Een nieuwe Meting of benchmark begint voor elke Lead zonder vinkje. Er is geen
-bereik "hele organisatie" en toegang erft nergens van mee. Een Lead zonder
-`LeadToegang` ziet niets.
-
-**Wat een Lead is.** Een Respondent is Lead als hij de `RespondentRol` Lead
-heeft. Dat geldt overal waar de app dat vraagt: De badge "Lead", de lijsten en
-filters, het Leads-venster en de data-integriteitscontrole.
-
-**Verplaatsen, samenvoegen en importeren.** De Lead-rol gaat niet mee naar een
-andere organisatie. Bij elke verplaatsing van een Respondent naar een andere
-organisatie worden de Lead-rol en al zijn `LeadToegang` verwijderd. Bij een
-samenvoeging behoudt de bestaande Respondent zijn eigen rol en vinkjes, en die
-van de samengevoegde Respondent vervallen. Een Respondent die de import
-aanmaakt, is nooit Lead. Zonder deze regel blijft iemand Lead voor een
-organisatie waar hij niet meer hoort.
-
-**Wat de Lead op zijn eigen pagina ziet**: Zijn eigen vragenlijst, alleen als
-hij ook zelf respondent is (dus zelf invult), en de resultaten van elke Meting
-waarvoor `resultaten` aan staat, zodra daar minstens 1 scan is afgerond, geen
-hoger minimum. Zelfde aggregatieweergave (gemiddelde per Meting) als de
-organisatie-resultaten in beheer, zie `beheerpagina.md`,
-Organisatie-resultaten. Daarnaast Uitnodigen voor elke Meting waarvoor dat aan staat, en Spreiding en
-Antwoorden als weergave op de resultatenpagina van de Meting waarvoor die aan staan, en de views van de benchmarks die aan staan (`benchmark.md`, View voor
-een Lead).
-
----
-
-### 1. Beheerkant
-
-#### Gebruiker
-
-```
-Gebruiker {
-  id: string
-  email: string                  // uniek, genormaliseerd (zie Respondent hierboven)
-  naam: string
-  wachtwoordHash: string
-  tfaGeheim: string | null       // versleuteld opgeslagen, TOTP-secret (zie 2FA hieronder)
-  tfaActief: boolean             // verplicht true voordat beheer toegankelijk is
-  actief: boolean                // false = gedeactiveerd, nooit hard verwijderd
-  laatstIngelogdOp: datetime | null
-  aangemaaktOp: datetime
-}
-```
-
-Een gebruiker wijzigt zijn eigen naam en wachtwoord via "Mijn account"
-(`beheerpagina.md`, Accountmenu), het e-mailadres niet.
-
-#### 2FA: TOTP via authenticator-app
-
-**Gekozen mechanisme: TOTP (RFC 6238)**, niet sms of e-mail. Werkt met
-elke authenticator-app die de standaard volgt (Google Authenticator,
-Microsoft Authenticator, Authy, 1Password, ...) — geen koppeling aan
-één leverancier. Geen extra kosten (in tegenstelling tot sms), werkt
-offline, en is de gangbare standaard voor dit soort tools.
-
-```
-TfaHerstelcode {
-  id: string
-  gebruikerId: string
-  codeHash: string                // nooit leesbaar opgeslagen, net als codeHash bij VerificatieCode
-  gebruiktOp: datetime | null      // eenmalig bruikbaar
-  aangemaaktOp: datetime
-}
-```
-
-**Instellen** (eenmalig, per Gebruiker): `tfaGeheim` genereren, tonen
-als QR-code (en als tekst, voor wie niet kan scannen). Bevestigen door
-éénmalig een geldige code in te voeren, pas dan `tfaActief = true`.
-Tegelijk **10 herstelcodes** tonen (eenmalig zichtbaar, daarna alleen
-gehasht bewaard, net als `VerificatieCode`/`Toegangscode`) — voor een
-kwijtgeraakt toestel. Op = op: Zijn alle 10 gebruikt, dan moet een
-Admin `tfaActief` resetten (zie hieronder), geen automatisch nieuwe
-lichting genereren.
-
-**Inloggen**: Na e-mail + wachtwoord, bij `tfaActief = true`, een
-tweede stap met de 6-cijferige TOTP-code óf een herstelcode.
-
-**Kwijtgeraakt toestel én herstelcodes op**: Een Admin kan bij een
-andere Gebruiker `tfaActief` terugzetten naar `false` (en `tfaGeheim`
-naar `null`), zodat die Gebruiker bij de volgende login opnieuw door
-het instellen heen moet. Geen zelfbediening hiervoor (zou 2FA
-zinloos maken als je 'm zelf kan uitzetten zonder tweede factor).
-Een Admin kan dit niet bij zichzelf doen zolang hij de enige actieve
-Admin is, zelfde soort regel als "Minimaal 1 actieve Admin verplicht"
-(`beheerpagina.md`, punt 9) — anders sluit hij zichzelf mogelijk
-volledig buiten.
-
-#### Sessie
-
-```
-Sessie {
-  id: string
-  gebruikerId: string
-  aangemaaktOp: datetime
-  verlooptOp: datetime
-  ingetrokkenOp: datetime | null // Admin kan een sessie op afstand beëindigen
-}
-```
-
-Een Gebruiker wordt nooit hard verwijderd, alleen gedeactiveerd, zodat
-eigenaarschap en audit blijven kloppen.
-
-#### Eigenaarschap en toegang van/tot organisaties
-
-Organisatie krijgt een veld `aangemaaktDoor` (gebruikerId): De
-Consultant die de organisatie aanmaakte, is er automatisch eigenaar
-van. Een Consultant ziet en beheert niet alleen zijn eigen
-organisaties: Een Admin kan een organisatie ook expliciet aan een
-andere Consultant **toewijzen**, bovenop het eigenaarschap:
-
-```
-OrganisatieToegang {
-  organisatieId: string
-  gebruikerId: string             // de Consultant
-  toegekendDoor: string           // Admin
-  toegekendOp: datetime
-}
-```
-
-Het bereik "eigen" van de Consultant (Rechtenmatrix hieronder) is dus
-`aangemaaktDoor = deze Consultant` **of** een regel in
-`OrganisatieToegang` voor deze Consultant en organisatie. Toewijzen en
-intrekken zijn beide Admin-only acties (`beheerpagina.md`, punt 4,
-Organisatie-toegang toewijzen). Intrekken is de spiegel van toewijzen:
-Kan een Admin toewijzen, dan moet een Admin het ook weer kunnen
-intrekken.
-
-**"Eigen" is alleen een rechten-groepering, geen verlies van herkomst.**
-Wie de organisatie daadwerkelijk aanmaakte (`aangemaaktDoor`) blijft
-altijd apart zichtbaar in beheer, ook al vallen eigenaar en toegewezen
-Consultants samen onder hetzelfde toegangsbereik (`beheerpagina.md`,
-punt 4: "Aangemaakt door" in de lijst en het detail).
-
-Bij het deactiveren van een Consultant kan een Admin het eigenaarschap
-(`aangemaaktDoor`) overzetten naar een andere Consultant of Admin;
-`OrganisatieToegang`-koppelingen van de gedeactiveerde Consultant
-vervallen gewoon, dat blokkeert het deactiveren niet (in tegenstelling
-tot eigenaarschap, dat wél verplicht wordt overgezet, zie
-`beheerpagina.md` punt 9).
-
----
-
-### 2. Rollen en permissies
-
-```
-Rol {
-  id: string
-  sleutel: string                // "admin" | "consultant" | "lead", uitbreidbaar
-  naam: string
-  kant: "beheer" | "organisatie"
-  systeemrol: boolean            // true = niet te verwijderen
-}
-
-Module {
-  id: string
-  sleutel: string                // bijv. "export", "bulkacties", "ai-samenvatting"
-  naam: string
-  actief: boolean                // module uit = bijbehorende permissies uit, voor iedereen
-}
-
-Permissie {
-  id: string
-  sleutel: string                // bijv. "respondenten.uitnodigen"
-  moduleId: string | null        // null = kernfunctie
-  omschrijving: string
-}
-
-RolPermissie {
-  rolId: string
-  permissieId: string
-  bereik: "alle" | "eigen" | "aangevinkte Metingen" | "aangevinkte benchmarks" | "zelf"
-}
-
-GebruikerRol {
-  gebruikerId: string
-  rolId: string                  // alleen rollen met kant "beheer"
-  toegekendDoor: string
-  toegekendOp: datetime
-}
-
-RespondentRol {
-  respondentId: string
-  rolId: string                  // alleen rollen met kant "organisatie"
-  toegekendDoor: string
-  toegekendOp: datetime
-}
-```
-
-Bij de Lead-rol komt hier `LeadToegang` bij (zie Rollen hierboven): Welke
-weergaven deze Lead mag zien, per Meting en per benchmark. Niets is automatisch
-zichtbaar.
-
-Betekenis van `bereik`:
-- `alle`: Alle records (Admin).
-- `eigen`: Organisaties die deze Gebruiker aanmaakte (`aangemaaktDoor`),
-  óf die een Admin expliciet aan hem toewees (`OrganisatieToegang`),
-  met alles wat daaronder hangt (Consultant). Zie Eigenaarschap en
-  toegang van/tot organisaties hierboven.
-- `aangevinkte Metingen`: Alleen de Metingen waarvoor een Admin een
-  `LeadToegang` met `resultaten` of `antwoorden` heeft aangevinkt (Lead).
-- `aangevinkte benchmarks`: Alleen de views van de benchmarks waarvoor een
-  Admin een `LeadToegang` met `weergave: "benchmark"` heeft aangevinkt (Lead,
-  deel 3).
-- `zelf`: Alleen de eigen ingevulde scans (respondent).
-
-Een respondent zonder RespondentRol is een gewone respondent.
-
----
-
-### 3. Toegang voor respondenten
-
-De korte persoonlijke link (Toegangscode, deel 1) wordt aangevuld met
-e-mailverificatie:
-
-```
-VerificatieCode {
-  id: string
-  respondentId: string
-  codeHash: string               // code nooit leesbaar opgeslagen
-  aangemaaktOp: datetime
-  verlooptOp: datetime           // aangemaaktOp + 15 minuten
-  gebruiktOp: datetime | null    // eenmalig bruikbaar
-  mislukkePogingen: number
-  geblokkeerd: boolean           // true na 3 mislukte pogingen
-}
-
-ToegangsSessie {
-  id: string
-  respondentId: string
-  aangemaaktOp: datetime
-  verlooptOp: datetime           // aangemaaktOp + sessieDuurUren, zie Instellingen hieronder
-}
-```
-
-Een code wordt alleen verstuurd als het ingevulde e-mailadres hoort bij
-de respondent van de link. De pagina geeft in beide gevallen dezelfde
-melding. De ToegangsSessie voorkomt dat bij elke pagina opnieuw een code
-nodig is, en staat los van de Sessie aan de beheerkant.
-
-**Lockout na 3 mislukte pogingen**: `mislukkePogingen` telt foutieve
-codes bij deze `VerificatieCode`. Bij de 3e mislukte poging
-`geblokkeerd = true`: Geen nieuwe pogingen meer op déze code, ook al
-is de geldigheidstermijn (15 minuten) nog niet voorbij. De respondent
-kan opnieuw een code aanvragen (nieuwe `VerificatieCode`, nieuwe teller),
-**tenzij** een Admin de blokkade expliciet heeft opgeheven aan de
-beheerkant (`beheerpagina.md`, analoog aan de 2FA-reset bij Gebruikers)
-— dat vangt het scenario op waarin herhaaldelijk aanvragen zelf ook
-wordt misbruikt, niet alleen het gokken op één code.
-
-**Sessieduur, instelbaar**: `ToegangsSessie.verlooptOp` volgt uit een
-globale instelling `sessieDuurUren` (default **4 uur**), door een
-Admin aan te passen in beheer. Na het verlopen moet de respondent
-opnieuw zijn e-mailadres invullen en een nieuwe code opvragen — geen
-stilzwijgende verlenging.
-
-#### Bewaartermijn ingevulde scans
-
-Twee globale instellingen, door een Admin te bepalen in beheer
-(`beheerpagina.md`, punt 10, Drempels en termijnen): `bewaarTermijnDagen`
-(vanaf `ScanInvulling.afgerondOp`, geen default) en
-`verlengTermijnDagen` (hoe lang een expliciete "Verlengen"-actie de
-melding uitstelt). Verstrijkt `bewaarTermijnDagen` (of, na een eerdere
-verlenging, `ScanInvulling.bewaarVerlengdTot`), dan verschijnt de scan in
-een "Data ouder dan de bewaartermijn"-lijst in beheer. **Geen
-automatische verwijdering**: Zonder actie van een Admin/Consultant
-blijft de scan gewoon bestaan. Verwijderen gebruikt de bestaande
-verwijderactie (Verwijderen en datakoppelingen hieronder); Verlengen zet
-`bewaarVerlengdTot` op het moment van de klik plus `verlengTermijnDagen`.
-
----
-
-### 4. Audit
-
-```
-AuditEvent {
-  id: string
-  actorType: "gebruiker" | "respondent" | "systeem"
-  actorId: string | null
-  actie: string                  // bijv. "organisatie.verwijderd", "respondent.uitgenodigd"
-  entiteitType: string
-  entiteitId: string
-  tijdstip: datetime
-  groepId: string | null         // bijv. alle gebeurtenissen van één import, zie `beheerpagina.md` punt 12
-  details: json | null           // bijv. aantallen bij een verwijdering, en de naam van het record bij loggen
-}
-```
-
-Ook uitnodigingen door een Lead worden gelogd.
-
-**Geen persoonsgegevens uit scans in de audittrail.** `details` en
-entiteitsnamen bevatten geen naam, e-mailadres, functie, team,
-notities of antwoorden van een Respondent. De audittrail gaat over wat
-gebruikers van de app deden, niet over de inhoud van een scan. Een scan
-is te herkennen aan Organisatie, Assessment en Meting.
-
-**Namen bij loggen.** Bij een gebeurtenis legt `details` de naam vast van
-Organisatie, Assessment en Meting zoals die op dat moment was, zodat het
-overzicht ook leesbaar blijft als het record later is verwijderd of van
-naam is veranderd.
-
-**Groepen.** `groepId` heeft bij een import één waarde voor alle
-gebeurtenissen van die import. Acties daarbij: `import.gestart` (legt vast
-welke bestanden zijn geladen, en welke direct zijn overgeslagen met
-reden), `scan.geimporteerd`, `import.rijMislukt` en de bestaande
-aanmaakacties (Organisatie, Respondent, Meting). Een groepsoverzicht is
-afgeleid uit deze gebeurtenissen en wordt niet apart opgeslagen. Een
-export van de audit-log is zelf een gebeurtenis (`auditlog.geexporteerd`).
-
-**Verplaatsen en bewerken.** De beheeracties uit `beheerpagina.md`,
-punt 6b (Respondent-overzicht), loggen elk een eigen gebeurtenis:
-
-- `respondent.verplaatst`: Hele Respondent naar een andere organisatie.
-  `details` bevat de bron- en doelorganisatie (met naam), het aantal
-  verplaatste scans, per bron-Meting de gekozen doel-Meting, en of er
-  een samenvoeging was.
-- `respons.verplaatst`: Eén respons naar een andere organisatie, met
-  bron- en doelorganisatie en Meting.
-- `respons.metingVerplaatst`: Eén of meer responsen naar een andere
-  Meting van dezelfde organisatie, met bron- en doel-Meting en het
-  aantal. Bij een bulkactie staat het aantal overgeslagen scans (met
-  reden) in `details`, en geldt één `groepId` voor de hele actie.
-- `respons.respondentGewijzigd`: Eén respons aan een andere Respondent
-  van dezelfde organisatie gehangen, bijvoorbeeld bij het oplossen van een
-  conflict bij "Respons naar andere Meting verplaatsen" (`beheerpagina.md`,
-  punt 6b), of met "Andere Respondent koppelen" in het Scan-overzicht
-  (punt 7). `details` bevat de Meting en of de Respondent nieuw is
-  aangemaakt, zonder persoonsgegevens.
-- `gebruiker.eigenGegevensGewijzigd`: Een Admin of Consultant wijzigde zijn
-  eigen gegevens via "Mijn account" (`beheerpagina.md`, Accountmenu). `details`
-  bevat alleen welke velden zijn gewijzigd (`["naam"]` of `["wachtwoord"]`),
-  nooit de waarden.
-- `respondent.bewerkt`: Alleen welke velden zijn gewijzigd, bijvoorbeeld
-  `["naam", "e-mail"]`. De waarden (oud of nieuw) staan niet in de log,
-  wegens het verbod op persoonsgegevens uit scans hierboven.
-- `respondent.inzage`: Een AVG-inzage van een Respondent (`export-csv.md`,
-  Inzage (AVG)). `details` bevat het aantal scans in het bestand en de
-  naam van de Organisatie, zonder persoonsgegevens van de Respondent.
-
-Een overgeslagen scan bij een samenvoeging of bulkverplaatsing wordt als
-onderdeel van `details` gelogd en niet als aparte actie.
-
-**Assessment verwijderd.** Het verwijderen van een Assessment is een
-gebeurtenis (`assessment.verwijderd`). `details` bevat de naam en het kort
-label van het Assessment, het aantal Categorieën, Bouwblokken en Vragen dat
-meeging, en de namen van de benchmarks waaruit het is gehaald. Er zijn
-geen scans of persoonsgegevens bij betrokken.
-
-**Gewichtswijziging.** Een wijziging van `Bouwblok.gewicht` is een
-gebeurtenis (`bouwblok.gewichtGewijzigd`), omdat die terugwerkend de
-scores van alle scans van dat Assessment verandert. `details` bevat de
-naam en het volgnummer van het bouwblok, de naam van het Assessment, het
-oude en het nieuwe gewicht en het aantal scans dat daardoor anders
-doorrekent.
-
-**Benchmark.** De acties rond een benchmark (deel 3) loggen elk een
-gebeurtenis, zonder persoonsgegevens uit scans.
-
-- `benchmark.aangemaakt`, `benchmark.gewijzigd` en `benchmark.verwijderd`.
-  `details` bevat de naam van de benchmark en de namen van de Assessments
-  en organisaties zoals ze op dat moment waren.
-- `lead.toegangGewijzigd` (gebouwd op 14 oktober 2026). `details` bevat de
-  organisatie, de weergave (resultaten, antwoorden of benchmark), de Meting of
-  de benchmark en of het vinkje aan of uit is gezet, zonder naam of
-  e-mailadres van de Lead. De gebeurtenissen `benchmark.toegewezen` en
-  `benchmark.toewijzingIngetrokken` blijven geldig voor wat al is gelogd.
-- `korteNaam.gewijzigd` (gebouwd op 15 oktober 2026). `details` bevat het
-  veld en de originele waarde, en niet de nieuwe korte naam, zoals bij
-  `algemeneTekst.gewijzigd`.
-- `organisatie.antwoordenNamenGewijzigd` (voorstel). `details` bevat de naam
-  van de organisatie en de nieuwe stand van de schakelaar.
-- `organisatie.benchmarkVlagGewijzigd`. `details` bevat de naam van de
-  organisatie en de nieuwe stand van de vlag.
-- `ronde.aangemaakt` en `ronde.hernoemd` (gebouwd, vervallen op 14 oktober 2026
-  met de ronde). Wat al is gelogd, blijft staan.
-- `meting.meetdatumGewijzigd` (gebouwd). `details` bevat het label van de
-  Meting en de oude en de nieuwe meetdatum.
-- `meting.samengesteldAangemaakt`, `meting.samengesteldGewijzigd` en
-  `meting.samengesteldVerwijderd` (gebouwd). `details` bevat het label en de
-  labels van de onderliggende Metingen zoals ze op dat moment waren.
-- `organisatie.hernoemd`. `details` bevat de oude en de nieuwe naam van de
-  organisatie. Alleen `Organisatie.naam` verandert, het `id` en alle
-  koppelingen blijven gelijk.
-- `onderdeel.aangemaakt`, `onderdeel.hernoemd` en `onderdeel.verwijderd`
-  (gebouwd op 19 oktober 2026). `details` bevat de naam van de Organisatie
-  en de naam van het Onderdeel. Bij hernoemen staan de oude en de nieuwe naam
-  erin, bij verwijderen het aantal KPI-waarden dat meeging.
-- `kpi.waardenGewijzigd` (gebouwd op 19 oktober 2026). Eén gebeurtenis per plek
-  die bij één keer Opslaan in "KPI's invullen" wijzigde, met één `groepId` voor
-  de hele keer. `details` bevat de naam van de Organisatie, de plek (de naam van
-  het Onderdeel of "Algemeen") en het aantal ingevulde, gewijzigde en gewiste
-  waarden.
-- `contactpersoon.toegevoegd`, `contactpersoon.gewijzigd` en
-  `contactpersoon.verwijderd` (gebouwd op 20 oktober 2026). `details` bevat
-  alleen de Organisatie en bij `toegevoegd` of er een LinkedIn-profiel is, en
-  bij `gewijzigd` welke velden zijn gewijzigd (`["functie"]`), nooit de naam,
-  de functie, het adres of de notitie. `entiteitNaam` is leeg, zoals bij
-  `respondent.bewerkt`.
-- `nieuwsartikel.toegevoegd`, `nieuwsartikel.gewijzigd` en
-  `nieuwsartikel.verwijderd` (gebouwd op 20 oktober 2026, vervallen voor nieuwe
-  gebeurtenissen sinds het Dossier is gebouwd op 21 oktober 2026; bestaande
-  regels blijven leesbaar).
-- `dossier.itemToegevoegd`, `dossier.itemGewijzigd` en
-  `dossier.itemVerwijderd` (gebouwd op 21 oktober 2026, `entiteitType` is `dossieritem`). `details` bevat de
-  Organisatie, de soort, de titel en bij `itemGewijzigd` de namen van de
-  gewijzigde velden. Bij een Case staat ook de naam van de Organisatie in de
-  Case erin.
-- `dossier.zichtbaarGemaakt` en `dossier.verborgen` (voorheen `dossier.geopend` en
-  `dossier.gesloten`; gebouwd op 21 oktober 2026 onder de oude namen, hernoemd op 21 oktober 2026, de hernoeming is nog niet gebouwd):
-  `zichtbaar` is aan of uit gezet. `details` bevat de Organisatie en het
-  aantal zichtbare items.
-- `dossier.instellingGewijzigd` (voorstel van 21 oktober 2026): `naamVoorLead` of
-  een `radarBronnen` is gewijzigd. `details` bevat de Organisatie, het veld, bij
-  een scorebron het Assessment en de Meting (of "automatisch"), en de oude en
-  nieuwe waarde.
-- `organisatie.caseVlagGewijzigd` (gebouwd op 21 oktober 2026):
-  `caseToegestaan` is gewijzigd. `details` bevat de Organisatie en de nieuwe
-  waarde.
-- `kpiDefinitie.aangemaakt`, `kpiDefinitie.gewijzigd`, `kpiDefinitie.verwijderd`,
-  `kpiDefinitie.volgordeGewijzigd`, `kanaal.aangemaakt`, `kanaal.hernoemd`,
-  `kanaal.verwijderd` en `kanaal.volgordeGewijzigd` (gebouwd op 19 oktober 2026). `details` bevat de naam en
-  bij `kpiDefinitie.gewijzigd` de oude en de nieuwe waarde van elk gewijzigd
-  veld. Bij `kanaal.verwijderd` en `kpiDefinitie.verwijderd` staat het aantal waarden en Organisaties dat
-  meeging.
-
-**Bewaartermijn.** De bewaartermijn van ingevulde scans
-(`bewaarTermijnDagen`, zie Bewaartermijn ingevulde scans hierboven)
-geldt ook voor `AuditEvent`, gerekend vanaf `tijdstip`. Een afwijkende
-termijn volgt alleen als daar later een eigen spec voor komt. Net als bij
-scans is er geen automatische verwijdering: Na de termijn krijgt de Admin
-een melding en blijven de gebeurtenissen bestaan tot de Admin ze bewust
-opruimt. Dat opruimen is zelf een gebeurtenis (`auditlog.opgeruimd`, met
-periode en aantal).
-
----
-
-### 5. Rechtenmatrix
-
-Een streepje betekent geen toegang.
-
-| Permissie | Admin | Consultant | Lead | Respondent |
-|---|---|---|---|---|
-| `gebruikers.beheren` | alle | - | - | - |
-| `account.bewerken` (eigen naam en wachtwoord) | zelf | zelf | - | - |
-| `rollen.toekennen` | alle | - | - | - |
-| `content.beheren` (ook de definitie van organisatievelden, KPI's en kanalen) | alle | - | - | - |
-| `organisaties.aanmaken` | alle | ja | - | - |
-| `organisaties.toewijzen` (aan een Consultant) | alle | - | - | - |
-| `organisaties.bewerken` (incl. kenmerken, KPI-waarden en Onderdelen) | alle | eigen | te bevestigen | - |
-| `contactpersonen.bewerken` (Contactpersonen aanmaken, wijzigen en verwijderen; een Consultant ziet ze wel; vooralsnog alleen Admin, later waarschijnlijk eigen voor een Consultant) | alle | - | - | - |
-| `dossier.bewerken` (Dossieritems aanmaken, wijzigen en verwijderen, Zichtbaar voor Lead, de naam en de scorebron van het Dossier; gebouwd op 21 oktober 2026, de naam en de scorebron nog niet gebouwd, `dossier.md`) | alle | eigen | - | - |
-| `dossier.inzien` (gebouwd op 21 oktober 2026) | alle | eigen | alleen openstaande items van de eigen Organisatie | - |
-| `organisaties.verwijderen` | alle | eigen | - | - |
-| `metingen.plannen` (ook een nieuw Onderdeel aanmaken in het formulier) | alle | eigen | - | - |
-| `respondenten.uitnodigen` | alle | eigen | aangevinkte Metingen (Uitnodigen) | - |
-| `respondenten.leadToekennen` (het Leads-venster en de Lead-rol) | alle | - | - | - |
-| `respondenten.verwijderen` | alle | eigen | - | - |
-| `scans.verwijderen` | alle | eigen | - | - |
-| `scan.invullen` | - | - | zelf | zelf |
-| `resultaten.inzien` | alle | eigen | aangevinkte Metingen (Resultaten) | zelf |
-| `spreiding.inzien` (weergave B, voorstel) | alle | eigen | aangevinkte Metingen (Spreiding) | - |
-| `antwoorden.inzien` (weergave G, voorstel) | alle | eigen | aangevinkte Metingen (Antwoorden) | - |
-| `export.uitvoeren` | alle | eigen | zelf, of aangevinkte Metingen (Exporteren) | zelf |
-| `benchmark.beheren` | alle | - | - | - |
-| `benchmark.inzien` | alle | - | aangevinkte benchmarks | - |
-| `verkennen.inzien` (gebouwd, 15 oktober 2026) | alle | - | - | - |
-
-Een Lead die zelf invult, doet dat met het bereik `zelf`, net als elke
-respondent.
-
-**Wat een Lead met een vinkje mag.** Elke weergave is een eigen vinkje per
-Meting: Resultaten (`resultaten.inzien`), Spreiding (`spreiding.inzien`),
-Antwoorden (`antwoorden.inzien`), Uitnodigen (`respondenten.uitnodigen`) en
-Exporteren (`export.uitvoeren`). De beperkingen blijven: Geen bulk-export,
-niets van andere organisaties, geen Lead-rollen toekennen
-(`respondenten.leadToekennen`) en geen beheerrechten. Antwoorden toont namen
-of is anoniem volgens `Organisatie.antwoordenMetNamen`. De Consultant heeft geen recht op het
-Leads-venster, omdat die alleen voor een Admin is.
-
-**`export.uitvoeren`, bereik van een Lead/Respondent**: Bewust smaller dan
-`resultaten.inzien` hierboven. Een Respondent en een Lead kunnen alleen
-exporteren wat ze ook al zelf op hun eigen scherm zien: een Respondent zijn
-eigen ingevulde scan (resultatenpagina, bereik `zelf`), een Lead daarnaast
-ook de Metingen waarvoor hij Exporteren heeft (`LeadToegang`), dus
-niet elke Meting die hij toevallig kan *inzien* via een andere weg. Geen
-bulk-export en geen toegang tot exports van andere organisaties/Metingen,
-ook niet "te bevestigen": dat was hier eerder nog open, nu vastgelegd. Voor
-Admin en Consultant blijft dit ongewijzigd: bereik `alle`/`eigen`, zoals de
-rest van deze matrix, inclusief de bulk-acties in `beheerpagina.md` punt 5 en 7.
-
-`content.beheren` is Admin-only: Assessment-types en Content
-(bouwblokken, vragen, categorieën) zitten in beheer onder de link
-"Assessments", die een Consultant niet ziet (`beheerpagina.md`, Wat
-beheerbaar is). Een Consultant beheert alleen zijn eigen organisaties,
-metingen en respondenten, niet de scaninhoud zelf.
-
----
-
-`benchmark.beheren` is Admin-only, zoals `content.beheren`. Een benchmark
-rekent over organisaties die een Consultant niet beheert, dus het bereik
-`eigen` past er niet bij. Een Consultant heeft er vooralsnog geen toegang
-toe. `benchmark.inzien` geldt voor een Lead alleen voor de benchmarks die een
-Admin voor hem heeft aangevinkt (deel 3 en `benchmark.md`). Het prototype kent
-`benchmark.inzien` nog niet als aparte regel in `lib/rechten.ts`: Daar loopt de
-toegang van de Lead via de toewijzing en `leadMetingIds`, net als bij
-`export.uitvoeren`, tot de overgang naar `LeadToegang`. De regel in de matrix is
-het doel voor de rolrechten die met de database komen.
-
-`verkennen.inzien` (gebouwd, 15 oktober 2026) is Admin-only, om dezelfde reden
-als `benchmark.beheren`: Verkennen rekent over alle Organisaties van een
-Assessment en laat de namen zien. Een Consultant en een Lead hebben er geen
-toegang toe (`visualisatie-verkennen.md`).
-
----
-
-### 6. Open punten
-
-1. Eén gedeelde Rol-tabel (zoals hier) of aparte tabellen voor beheer en
-   organisatie.
-2. De cellen "te bevestigen" in de rechtenmatrix.
-3. Bestaand auth-framework of zelf bouwen (keuze voor de bouwer).
-
----
-
-## Deel 3: Benchmark (gebouwd en voorstel)
-
-**Status.** Het niveau tussen organisaties is gebouwd (PR 61). De niveaus binnen
-een organisatie en binnen een Meting zijn voorstel en staan hieronder als
-zodanig aangegeven. Een benchmark zet de
+Een benchmark zet de
 scores van een zelf gekozen groep naast elkaar. Het gedrag staat in `benchmark.md`, de
 schermen in `beheerpagina.md`, punt 14. Hier staan de records, de
 uitbreiding op Organisatie en de instellingen.
@@ -1741,20 +1091,16 @@ Benchmark {
   naam: string                      // vrije tekst, bepaalt de Admin
   assessmentIds: string[]           // één of meer
   leden: BenchmarkLid[]             // leeg bij soort "verkenning", de leden volgen uit de filters
-  meldingen: { tekst: string, op: datetime }[]
-                                    // gebouwd: schermmeldingen, zie hieronder
+  meldingen: { tekst: string, op: datetime }[] // schermmeldingen, zie hieronder
   niveau?: "organisaties" | "metingen" | "scans"
-                                    // voorstel, ontbreekt = "organisaties"
-  lezing?: "ontwikkeling" | "naastElkaar"
-                                    // gebouwd op 14 oktober 2026, alleen bij niveau "metingen"; ontbreekt het veld, dan volgt ze uit de leden (zie hieronder)
-  soort?: "vasteGroep" | "verkenning"
-                                    // gebouwd op 17 oktober 2026, alleen bij niveau "organisaties"; ontbreekt = "vasteGroep"
+                                    // ontbreekt = "organisaties"
+  lezing?: "ontwikkeling" | "naastElkaar" // alleen bij niveau "metingen"; ontbreekt het veld, dan volgt ze uit de leden (zie hieronder)
+  soort?: "vasteGroep" | "verkenning" // alleen bij niveau "organisaties"; ontbreekt = "vasteGroep"
   eenheid?: "organisaties" | "onderdelen"
                                     // alleen bij soort "verkenning"
   filters?: { kenmerk: string, waarden: string[] }[]
                                     // alleen bij soort "verkenning", minstens één; kenmerk is een veld uit de organisatievelden
-  meetperiode?: { van: date, totEnMet: date }
-                                    // gebouwd op 19 oktober 2026, alleen bij soort "verkenning"; ontbreekt = per lid telt de meest recente Meting
+  meetperiode?: { van: date, totEnMet: date } // alleen bij soort "verkenning"; ontbreekt = per lid telt de meest recente Meting
   aangemaaktOp: datetime
   aangemaaktDoor: string            // Gebruiker
 }
@@ -1766,24 +1112,23 @@ BenchmarkLid {
 }
 ```
 
-`BenchmarkToewijzing` (gebouwd op 13 oktober 2026) is op 14 oktober 2026
-vervallen. Een view voor een Lead is een `LeadToegang` met `weergave:
-"benchmark"` (deel 2). Bestaande toewijzingen worden daarbij overgezet
-(`beheerpagina.md`, punt 6a, Overgang).
+`BenchmarkToewijzing` bestaat niet
+meer. Een view voor een Lead is een `LeadToegang` met `weergave:
+"benchmark"` (`datamodel-rollen.md`, Audit).
 
 Op niveau "organisaties" heeft een organisatie per benchmark per Assessment
 hoogstens één lid. Het sectorfilter bij het samenstellen wordt niet
 opgeslagen.
 
-**`meldingen`** (gebouwd) is wel opgeslagen, maar geen inhoud van de
+**`meldingen`** is wel opgeslagen, maar geen inhoud van de
 benchmark. Het zijn korte teksten voor de beheerweergave, bijvoorbeeld "{naam}
-is uit de benchmark gehaald: de Meting is verwijderd". Ze ontstaan als een lid
+is uit de benchmark gehaald: De Meting is verwijderd". Ze ontstaan als een lid
 automatisch wegvalt (zie Verwijderen en datakoppelingen). Een Admin klikt ze
 weg, en een wijziging van de samenstelling wist ze. Ze bevatten alleen namen
 van organisaties, geen scores of persoonsgegevens, en ze blijven alleen
 bestaan zolang de benchmark bestaat.
 
-**`niveau`** (voorstel) bepaalt wat een lid is, zie `benchmark.md`.
+**`niveau`** bepaalt wat een lid is, zie `benchmark.md`.
 
 - `organisaties`: Een lid is een organisatie met een Meting per Assessment.
   Dit is de waarde als het veld ontbreekt, dus bestaande benchmarks hoeven
@@ -1791,13 +1136,11 @@ bestaan zolang de benchmark bestaat.
 - `metingen`: Alle leden hebben dezelfde `organisatieId`. Per Assessment zijn
   er meerdere leden, elk met een andere Meting.
 - `scans`: Eén lid, de Meting waarin de scans worden vergeleken. De scans
-  zelf zijn geen leden, want ze volgen uit de Meting. Voorstel van 14 oktober
-  2026: Deze waarde vervalt, want een view op een scan wordt niet meer aan een
-  Lead gegeven (`benchmark.md`, View voor een Lead). Niveau 3 blijft een
+  zelf zijn geen leden, want ze volgen uit de Meting. Een view op een scan wordt
+  niet aan een Lead gegeven (`benchmark.md`, View voor een Lead). Niveau 3 is een
   weergave voor de Admin.
 
-**`soort`, `eenheid`, `filters` en `meetperiode`** (`soort`, `eenheid` en `filters` gebouwd op 17 oktober 2026, `meetperiode` gebouwd op 19 oktober 2026, `benchmark.md`,
-Opgeslagen verkenning). Een benchmark met `soort: "verkenning"` slaat geen
+**`soort`, `eenheid`, `filters` en `meetperiode`** (`benchmark.md`, Opgeslagen verkenning). Een benchmark met `soort: "verkenning"` slaat geen
 leden op. De leden worden bij elk gebruik berekend uit `filters`, met de
 poolregels van Verkennen. Bij `eenheid: "organisaties"` is een lid een
 Organisatie, bij `onderdelen` een onderdeel. `assessmentIds` heeft bij een
@@ -1810,7 +1153,7 @@ samengestelde Meting. Een periode is geen filter en telt niet mee voor de eis va
 een getalkenmerk uit Verkennen worden niet opgeslagen. Voldoet een Organisatie
 niet meer aan de filters, dan vervalt het vinkje van haar Leads (`LeadToegang`).
 
-**`lezing`** (gebouwd op 14 oktober 2026) zegt hoe de leden van een benchmark
+**`lezing`** zegt hoe de leden van een benchmark
 op niveau `metingen` gelezen worden (`benchmark.md`, Niveau 2, Lezing). Bij
 niveau `organisaties` en `scans` ontbreekt ze.
 
@@ -1822,14 +1165,13 @@ niveau `organisaties` en `scans` ontbreekt ze.
 
 De Admin kan de lezing achteraf wijzigen. De controles lopen dan opnieuw.
 Een benchmark die van vóór de lezing is en het veld niet heeft, krijgt haar
-lezing uit de leden volgens het voorstel van de app: Hetzelfde onderdeel en
+lezing uit de leden als volgt: Hetzelfde onderdeel en
 verschillende meetdata geven `ontwikkeling`, in elk ander geval `naastElkaar`.
 De opgeslagen waarde wint altijd.
 
 ### Uitbreiding op Organisatie
 
-`Organisatie` krijgt `antwoordenMetNamen` (boolean, standaard false, gebouwd
-op 14 oktober 2026). Staat hij aan, dan ziet een Lead bij Antwoorden de namen
+`Organisatie` krijgt `antwoordenMetNamen` (boolean, standaard false). Staat hij aan, dan ziet een Lead bij Antwoorden de namen
 van de respondenten, en anders R1 tot en met Rn (`beheerpagina.md`, punt 6a).
 Een Admin zet hem na afstemming met de opdrachtgever. De intake en het
 toestemmingsvakje veranderen er niet door.
@@ -1839,8 +1181,7 @@ Admin zet de vlag nadat dit met de organisatie is afgesproken. Alleen
 organisaties met de vlag kunnen in een benchmark worden opgenomen. Zie
 `benchmark.md`, Toestemming en privacy.
 
-`Organisatie` krijgt ook `caseToegestaan` (boolean, standaard false, voorstel van
-20 oktober 2026, gebouwd op 21 oktober 2026): De Afspraak "Mag als case gebruikt worden". Een Admin zet de
+`Organisatie` krijgt ook `caseToegestaan` (boolean, standaard false): De Afspraak "Mag als case gebruikt worden". Een Admin zet de
 vlag nadat dit met de organisatie is afgesproken. Alleen met de vlag kan een
 Case bij een andere Organisatie naar haar verwijzen en voor een Lead zichtbaar
 zijn. Bestaande Organisaties beginnen met false. Zie `dossier.md`.
@@ -1849,16 +1190,15 @@ zijn. Bestaande Organisaties beginnen met false. Zie `dossier.md`.
 
 Globale instellingen, door een Admin te bepalen in beheer
 (`beheerpagina.md`, punt 10, Drempels en termijnen). `benchmarkMinOrganisaties` (startwaarde 5,
-niveau 1) en `benchmarkMinScans` (startwaarde 3) zijn gebouwd. Voorstel: Per
+niveau 1) en `benchmarkMinScans` (startwaarde 3) Per
 niveau een eigen drempel voor het aanvinken van een view voor een Lead,
 `benchmarkMinRespondenten`
 (startwaarde 5, het minimale aantal afgeronde scans in een Meting voor
 Spreiding, voor anonieme Antwoorden en voor de lijn van laagste tot hoogste score bij een Lead).
-Gebouwd op 15 oktober 2026 voor Verkennen: `verkennenMinGroep` (3), `verkennenMinVergelijking` (5),
+Voor Verkennen: `verkennenMinGroep` (3), `verkennenMinVergelijking` (5),
 `verkennenMinPool` (6), `verkennenMaxGroepen` (12) en `verkennenMinIngevuldPct` (40),
-alle gehele getallen van minstens 1, het percentage tot en met 100 (`visualisatie-verkennen.md`, Drempels). `verkennenWaarschuwingGroep` is hernoemd naar `verkennenMinVergelijking`: Een opgeslagen waarde onder de oude naam wordt bij het lezen overgenomen. De startwaarden zijn de norm vanuit het ontwerp. Gebouwd op 15 oktober 2026: Het percentage mag 0 zijn (geen ondergrens), dus voor het percentage geldt 0 tot en met 100.
-Gebouwd op 17 oktober 2026: `benchmarkMinOrganisaties` geldt ook voor een opgeslagen verkenning en telt daar altijd Organisaties, ook bij de eenheid Onderdelen. Er komt geen nieuwe instelling bij.
-Gebouwd op 14 oktober 2026: `benchmarkMaxDagenTussenMetingen` (startwaarde 90),
+alle gehele getallen van minstens 1. Het percentage mag 0 zijn en loopt tot en met 100 (`visualisatie-verkennen.md`, Drempels). `benchmarkMinOrganisaties` geldt ook voor een opgeslagen verkenning en telt daar altijd Organisaties, ook bij de eenheid Onderdelen.
+`benchmarkMaxDagenTussenMetingen` (startwaarde 90),
 het aantal dagen waarboven een vergelijking met de lezing Naast elkaar een
 waarschuwing geeft. De
 betekenis staat in `benchmark.md`, Drempels en View voor een Lead.

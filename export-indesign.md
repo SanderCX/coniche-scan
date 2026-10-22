@@ -3,7 +3,7 @@
 Levert de inhoud van één
 ingevulde scan (scores, top 3, contentsectie) los aan als XML plus
 losse chart-afbeeldingen, zodat een designer die in een handmatig
-opgemaakt InDesign-document kan verwerken — zoals het bredere
+opgemaakt InDesign-document kan verwerken, zoals het bredere
 adviesrapport waar de scanresultaten en de visie/2030-content nu al
 onderdeel van uitmaken. Complementair aan de bestaande PDF-export
 (`export-pdf-visual-volwassenheidsscan.md`): Die levert een
@@ -12,7 +12,7 @@ dezelfde inhoud in onderdelen, voor een sjabloon dat niet door de app
 wordt bepaald.
 
 **Bekende beperking**: Automatisch plaatsen van de SVG's via de
-XML-`href`'s bleek in de praktijk niet te werken — het Structuur-paneel
+XML-`href`'s bleek in de praktijk niet te werken, het Structuur-paneel
 laat de elementen na importeren wel labelen, maar het Koppelingen-paneel
 (Venster > Koppelingen) toont daarna geen daadwerkelijke link naar de
 SVG-bestanden. De structuur en `href`-syntax in dit document zijn
@@ -25,17 +25,17 @@ handmatig plaatsen (File > Place) per SVG.
 Derde optie in dezelfde Exporteren-dropdown als nu (resultatenpagina
 en `beheerpagina.md` punt 7, Ingevulde scans): Naast "Als PDF"
 en "Als CSV" komt **"Voor InDesign (XML)"**. Beschikbaar bij precies
-één scan, net als PDF — geen bulk-variant, zie "Wat nog niet kan"
+één scan, net als PDF, geen bulk-variant, zie "Wat nog niet kan"
 hieronder.
 
-**Toegang** (`datamodel.md` deel 2, Rechtenmatrix, `export.uitvoeren`):
+**Toegang** (`datamodel-rollen.md`, Rechtenmatrix, `export.uitvoeren`):
 Admin en Consultant hebben deze optie overal waar de Exporteren-dropdown
-al staat (bereik `alle`/`eigen`, zoals de rest van beheer) — dat dekt
+al staat (bereik `alle`/`eigen`, zoals de rest van beheer), dat dekt
 zowel de resultatenpagina als `beheerpagina.md` punt 7. Een Respondent of
 Lead ziet "Voor InDesign (XML)" alléén op de resultatenpagina van zijn
 eigen ingevulde scan (bereik `zelf`); een Lead ziet 'm daarnaast ook op de
 resultatenpagina van een Meting waarvoor hij Lead is, zodra die pagina
-zelf export krijgt — nu nog niet het geval, zie `beheerpagina.md` punt 4,
+zelf export krijgt, nu nog niet het geval, zie `beheerpagina.md` punt 4,
 "Organisatie-resultaten", "Nog niet gedekt". Geen van beide rollen krijgt
 'm ergens anders (geen toegang tot andermans scan, geen toegang tot een
 Meting waar hij geen Lead voor is), en geen bulk-InDesign-export voor een
@@ -56,28 +56,28 @@ met daarin:
 herkent alleen het gereserveerde attribuut `href` op een leeg,
 getagd element als instructie om een afbeelding automatisch te
 plaatsen bij XML-import. Elk ander attribuut (ook een logische naam
-als `bestand`) wordt genegeerd: het kader blijft dan stil leeg, geen
+als `bestand`) wordt genegeerd: Het kader blijft dan stil leeg, geen
 foutmelding. Dit geldt voor alle vijf elementen in `<charts>`
 hieronder.
 
 **Waarde van `href` heeft altijd de `file:///`-prefix nodig**, ook
 bij een relatief pad binnen dezelfde map (altijd het geval in deze
-export, alles zit los in één ZIP): `href="file:///./grafiek.svg"`
-— de `./` is nodig om InDesign te dwingen dat relatief te lezen
+export, alles zit los in één ZIP): `href="file:///./grafiek.svg"`,
+de `./` is nodig om InDesign te dwingen dat relatief te lezen
 vanaf de map van de XML, in plaats van als root-pad.
-Zonder die prefix — ook een op zich geldige relatieve bestandsnaam —
+Zonder die prefix, ook een op zich geldige relatieve bestandsnaam,
 herkent InDesign de waarde niet als beeldpad en blijft het kader
 stil leeg.
 
 **Bij het importeren (File > Import XML) moeten deze opties aan
 staan**, anders wordt de link niet gelegd of de content niet
 ververst:
-- **Create Link** (koppeling aanmaken) — zonder deze optie wordt de
+- **Create Link** (koppeling aanmaken), zonder deze optie wordt de
   afbeelding niet gelinkt.
 - **Delete elements, frames and content that do not match imported
-  XML** — zorgt dat een eerdere/lege placeholder-status wordt
+  XML**, zorgt dat een eerdere/lege placeholder-status wordt
   overschreven in plaats van genegeerd.
-- **Do not import contents of whitespace-only elements** — voorkomt
+- **Do not import contents of whitespace-only elements**, voorkomt
   rommelige lege tekstknopen tussen elementen.
 
 Geen nieuwe contentbron: Dezelfde velden als de PDF-export
@@ -166,7 +166,7 @@ Geen nieuwe contentbron: Dezelfde velden als de PDF-export
 </scanExport>
 ```
 
-**Gebouwd op 19 oktober 2026 (KPI's en kanalen).** De
+De
 elementen `contactenCall` tot en met `contactenWhatsapp` en `kpiAht` tot en met
 `kpiFtr` blijven bestaan, zodat het sjabloon blijft werken. Ze komen uit de
 `KpiWaarde`'s bij Algemeen (`datamodel.md`, KPI's en kanalen, Gevolgen voor
@@ -183,11 +183,11 @@ sjabloon hoeft te raken. Hier moet elk kenmerk een eigen, taggable
 tekstkader in InDesign kunnen vullen, dus elk kenmerk krijgt zijn
 eigen elementnaam. Ontbreekt een waarde (organisatie heeft dit
 kenmerk niet ingevuld), dan is de waarde `"n.v.t."`, geen leeg
-element — zelfde reden als bij de CSV: Een leeg element is in
+element, zelfde reden als bij de CSV: Een leeg element is in
 InDesign niet te onderscheiden van "nog niet getagd".
 
 **Kwetsbaarheid van deze aanpak**: Zodra organisatievelden zelf
-beheerbaar worden (`beheerpagina.md`, "Nog te bouwen") en de
+beheerbaar worden (`beheerpagina.md`, "") en de
 lijst dus kan wijzigen, moeten deze elementnamen en het sjabloon
 gelijk opgaan. Geen nieuw risico t.o.v. de rest van deze spec (zie
 "Eigenaarschap van de tagnamen" onderaan), maar hier weegt het zwaarder
@@ -210,12 +210,12 @@ dit element tagt, moet die tag loslaten.
 **`top3Sterktes`/`top3Verbeterkansen` als SVG, geen tekstelementen**
 (toelichting): Elke lijst is één afbeelding (rangnummer, naam, score-badge in de
 kleur uit `stylesheet.md`'s score-schaal), net als de radar en het
-staafdiagram — geen drie losse `<item>`-tekstkaders om per stuk te
-taggen. Reden: de opmaak (rangcirkel, gekleurde scorebadge) is vast
+staafdiagram, geen drie losse `<item>`-tekstkaders om per stuk te
+taggen. Reden: De opmaak (rangcirkel, gekleurde scorebadge) is vast
 vormgegeven en hergebruikt dezelfde renderlogica als het
 staafdiagram; als tekstelementen zou dat drie tekstkaders én een los
 gekleurd vormkader per item vergen, met evenveel losse tags als een
-hele grafiek. Zelfde afweging als bij de charts: één taggable
+hele grafiek. Zelfde afweging als bij de charts: Één taggable
 beeldkader per lijst, inhoud vast bepaald door de export.
 
 **`groepsScores`, attribuut `type`**: Volgt exact dezelfde regel als
@@ -223,7 +223,7 @@ beeldkader per lijst, inhoud vast bepaald door de export.
 categorielaag (Klantcontact Volwassenheid, 5 categorieën), dan is
 `type="categorie"` en is elke `<groep>` een categorie-gemiddelde.
 Ontbreekt die laag (AI-volwassenheid, 8 domeinen plat), dan is
-`type="bouwblok"` en is elke `<groep>` een los bouwblok/domein — geen
+`type="bouwblok"` en is elke `<groep>` een los bouwblok/domein, geen
 kunstmatige categorie ertussen, zelfde uitgangspunt als elders
 ("Maak geen kunstmatige categorieën met elk één bouwblok",
 `datamodel.md`).
@@ -238,7 +238,7 @@ van de XML én van het sjabloon.
 
 **`contentSectie`**: Hergebruikt `Assessment.pdfContentSecties`
 (`titel` en `bron`, zie `export-pdf-visual-volwassenheidsscan.md`,
-Slotsectie per scan-type) — dus bij Klantcontact Volwassenheid de
+Slotsectie per scan-type), dus bij Klantcontact Volwassenheid de
 visie (`visie-coniche.md` deel 1), bij AI-volwassenheid het
 2030-duidingsstuk (`content-2030.md`). Ontbreekt `pdfContentSecties`
 voor het gekozen Assessment, dan blijft dit element weg uit de XML
@@ -272,7 +272,7 @@ De tagnamen hierboven zijn het contract tussen export en sjabloon: Wie
 het InDesign-sjabloon opbouwt, tagt de tekst- en beeldkaders met
 precies deze namen (via de Structure-functie, XML-import). Een
 afwijkende tagnaam levert geen foutmelding op, alleen een kader dat
-bij import stil leeg blijft — dat is de belangrijkste valkuil bij
+bij import stil leeg blijft, dat is de belangrijkste valkuil bij
 XML-import in InDesign, dus deze XML-structuur is de bron van waarheid
 voor het taggen, niet andersom.
 
@@ -286,7 +286,7 @@ voor het taggen, niet andersom.
   "Export van één scan, geen aggregatie").
 - **Geen aggregatie over meerdere respondenten binnen een Meting.** De
   aggregatieweergave zelf bestaat wel (`beheerpagina.md`,
-  Organisatie-resultaten, en zie de Lead-rol in `datamodel.md` deel 2),
+  Organisatie-resultaten, en zie de Lead-rol in `datamodel-rollen.md`),
   een InDesign-export ervan nog niet. Deze XML-structuur is er wel naar
   toe te groeien: Een aggregaat zou dezelfde
   `groepsScores`/`top3Sterktes`/`top3Verbeterkansen`-vorm krijgen, één
@@ -299,8 +299,7 @@ voor het taggen, niet andersom.
   (`<b>`/`<i>`), geen platte tekst. Zie hierboven.
 - **Geen Contactpersonen en geen Dossier**: Ze zijn geen scandata en een
   Contactpersoon is een persoon buiten de app (`datamodel.md`, Contactpersoon,
-  Privacy). Ze gaan niet mee in de XML (besloten op 20 oktober 2026, het Dossier
-  sinds `dossier.md`, Exports).
+  Privacy). Ze gaan niet mee in de XML (het Dossier sinds `dossier.md`, Exports).
 - **Eigenaarschap van de tagnamen**: Joost tagt en beheert het
   InDesign-sjabloon zelf, deze spec is en blijft daarbij de bron van
   waarheid voor de tagnamen (geen apart afstemmingsrisico tussen twee

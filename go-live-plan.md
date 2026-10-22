@@ -48,15 +48,15 @@ verandert.
   dat alles in `backlog.md` onder Functioneel na de livegang komt
   (aggregatie, AI-managementsamenvatting, Zorg-variant, Adoptiescan,
   landingspagina als leadgenerator, Lezen/Presenteren-toggle, calls to
-  action bij bouwstenen, responsive). Bevestigen of er iets uit moet
+  action bij bouwblokken, responsive). Bevestigen of er iets uit moet
   dat de oude tool wel kon en waar klanten op rekenen.
 - [ ] **Toegang voor respondenten bij livegang (Joost en Sander).** Alleen
   de korte persoonlijke link (nu gebouwd), of meteen met e-mailverificatie
-  zoals `datamodel.md` deel 2 beschrijft.
+  zoals `datamodel-rollen.md` beschrijft.
   De resultaten bevatten bedrijfsgevoelige scores, en een link kan
   doorgestuurd worden. Dat pleit voor verificatie vanaf dag 1.
 - [ ] **Rollen en inlog bij livegang (Joost en Sander).** Volledige rollen
-  en 2FA (`datamodel.md` deel 2) of eerst een tussenvorm met alleen Admin
+  en 2FA (`datamodel-rollen.md`) of eerst een tussenvorm met alleen Admin
   en een beperkt aantal beheeraccounts. Vaststellen dat 2FA voor beheer
   verplicht is voordat er echte klantdata in staat (aanvulling).
 - [ ] **Open punten deel 2 beantwoorden (Joost).** De cellen "te
@@ -188,7 +188,7 @@ verandert.
 - [ ] Knop "Kopieer link" laten staan als terugvaloptie voor beheer
   (`beheerpagina.md`, punt 6).
 - [ ] Het scherm Toegang echt laten werken en de tekst laten kloppen met
-  wat er gebeurt (`CLAUDE.md`, scherm 4a).
+  wat er gebeurt (`schermen.md`, Toegang).
 
 ## Fase 4: Functionaliteit afmaken en opruimen
 
@@ -207,7 +207,7 @@ verandert.
   punt 8 en `import-scans.md`). Zie fase 6.
 - [ ] Weging van bouwblokken bouwen (`datamodel.md`, Bouwblok en
   Scoreberekening): `Bouwblok.gewicht` in de gedeelde scorefunctie
-  (gewogen categoriescore en overall), de wegingskaart bij de intake met
+  (gewogen categoriescore en totaalscore), de wegingskaart bij de intake met
   de tekst per Assessment, de factor naast bouwblokken met een gewicht
   ongelijk aan 1 (flow, sidebar, resultaten, PDF), het veld "Weging" en
   de wegingstekst in Content-beheer (`beheerpagina.md`, punt 2), het
@@ -251,14 +251,14 @@ verandert.
   eerste versie is gebouwd; die verhuist naar het Respondent-overzicht.
 - [ ] Openstaande aanpassingen op de eerste versie afhandelen, inclusief
   navigatie op de resultatenpagina.
-- [ ] Open contentvragen beantwoorden: De cutoffs voor Basis op Orde,
+- [ ] Open contentvragen beantwoorden: De cutoffs voor Basis op orde,
   Uitbouwen en Sterk punt (nu een aanname), de kleurcodes per categorie,
   en of Rol/Functie verplicht of optioneel is, nu het een keuzelijst wordt (`backlog.md`,
   `CLAUDE.md` sectie 5).
-- [ ] Status van de contentbestanden nalopen. Bouwsteenbeschrijvingen
+- [ ] Status van de contentbestanden nalopen. Bouwblokbeschrijvingen
   staan volgens `CLAUDE.md` nog op concept, en de bestaande tekst blijft
   staan zolang dat zo is (`inhoudelijk-fundament.md`).
-- [ ] Contentsecties Visie, Bouwstenen, AI en 2030 op de Assessment-pagina's nalezen op
+- [ ] Contentsecties Visie, Bouwblokken, AI en 2030 op de Assessment-pagina's nalezen op
   actualiteit en onderling kloppen (`content-2030.md`, `visie-*.md`).
 - [ ] Focus- en foutstaten in formulieren afmaken (`CLAUDE.md` sectie 5,
   `stylesheet.md`), en foutmeldingen die een gebruiker daadwerkelijk kan
@@ -276,7 +276,7 @@ verandert.
     demodata uit de productiebuild halen (aanvulling)
 - [ ] Eenvoudige foutregistratie en beschikbaarheidsbewaking instellen,
   met een melding naar Sander en Joost (aanvulling).
-- [ ] Voorbeeld-output (scherm 3) op vaste demodata laten staan en
+- [ ] Voorbeeld-output op vaste demodata laten staan en
   controleren dat die geen echte klantdata bevat.
 
 ## Fase 5: Oude omgeving, inventarisatie en export
@@ -307,8 +307,7 @@ Kan nu al starten.
   (`import-scans.md`, Beslist).
 - [ ] Toestemming (`consent_given`) vastleggen. De scans zijn door
   Coniche-collega's samen met de klant ingevuld, dus toestemming geldt
-  als gegeven voor alle rijen die worden overgenomen (besluit Joost, 30
-  september 2026). Het veld wordt bewust niet geïmporteerd
+  als gegeven voor alle rijen die worden overgenomen (besluit Joost). Het veld wordt bewust niet geïmporteerd
   (`import-scans.md`). Wel de kolommen `consent_given` en
   `consent_timestamp` meenemen in het archief, en een korte controle
   doen of ze inderdaad overal op waar staan (aanvulling).
@@ -389,7 +388,7 @@ Vraagt een werkende database en de importfunctie uit fase 4.
 - [ ] Controle na import: Aantal organisaties, respondenten, metingen en
   scans tegen de controlegetallen uit fase 5, en de berekende score tegen
   de oude `overall_score`. Bij Klantcontact en AI kan alleen de afronding
-  een verschil van 0,1 geven. Bij de Zorgscan hoort de nieuwe overall af
+  een verschil van 0,1 geven. Bij de Zorgscan hoort de nieuwe totaalscore af
   te wijken, omdat de oude tool de weging niet toepaste (`import-scans.md`,
   `weight`): Vergelijk daar met de ongewogen berekening.
   Steekproef van een paar scans volledig doorlopen in de resultatenpagina.
@@ -411,7 +410,9 @@ Kan parallel aan de bouw. De doorlooptijd hangt van anderen af.
 - [ ] Placeholders invullen: Statutaire naam, adres, KvK-nummer,
   privacycontact, hostingplek en EU-regio.
 - [ ] Toestemmingstekst op de intake en de privacypagina inhoudelijk
-  gelijk houden (`privacy-pagina.md`, sectie 4).
+  gelijk houden (`privacy-pagina.md`, sectie 4). Ook de toestemmingstekst
+  voor de benchmark (`benchmark.md`, Toestemming en privacy) moet op de
+  privacypagina staan.
 - [ ] Verwerkersovereenkomst tussen Coniche en de klantorganisaties, omdat
   Coniche verwerkt namens de klant (`privacy-pagina.md`, Open punten).
   Nagaan bij welke bestaande klanten die al is afgesloten.

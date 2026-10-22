@@ -25,8 +25,8 @@ staafdiagram per domein, en de sortering volgt de score
 
 Acht domeinen, **overal precies 2 per pagina**, gescheiden door de
 oranje middenlijn (zie `export-pdf-visual-volwassenheidsscan.md`).
-Omdat een AI-domein 5 vragen heeft (bouwsteen: 4) en langere uitleg,
-gebruikt deze scan de compacte variant (`.bouwsteen-pagina.compact`):
+Omdat een AI-domein 5 vragen heeft (bouwblok: 4) en langere uitleg,
+gebruikt deze scan de compacte variant (`.bouwblok-pagina.compact`):
 
 | | Normaal | Compact |
 |---|---|---|
@@ -41,10 +41,10 @@ boven de titel is oranje in plaats van de categoriekleur: De AI-scan
 heeft geen categorielaag en dus geen categoriekleur om te tonen
 (`datamodel.md`, `Assessment.categorieen` is hier `null`). Kop per
 domein: "AI-DOMEIN {N}", verder dezelfde opbouw (naam + score-badge,
-centrale vraag, uitleg, vragentabel, opmerking) als een bouwsteen in
+centrale vraag, uitleg, vragentabel, opmerking) als een bouwblok in
 `export-pdf-visual-volwassenheidsscan.md`.
 
-## Pagina 6 t/m 9: Slotsectie — Klantcontact richting 2030 (stijl van `/klantcontact-2030`)
+## Pagina 6 t/m 9: Slotsectie: Klantcontact richting 2030 (stijl van `/klantcontact-2030`)
 
 Vier pagina's, handmatig verdeeld (`.pdf-pagina`, elk met een eigen
 paginabreuk en 14mm bovenruimte) zodat geen kaart of kop midden op een
@@ -72,7 +72,7 @@ De kop "Geen vast eindbeeld" staat er bewust niet in: Die is ook op
 
 `data/klantcontact-2030-content.ts` (ook de vaste tussenzinnen),
 `data/ai-domeinen-content.ts` (uitleg per domein), `data/ai-scan-
-assessment.ts` (vragen, schaal, en de scan-brede PDF-instellingen — zie
+assessment.ts` (vragen, schaal, en de scan-brede PDF-instellingen, zie
 de naamverschil-opmerking in `export-pdf-visual-volwassenheidsscan.md`,
 Bron van de tekst).
 

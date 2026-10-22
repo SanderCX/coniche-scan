@@ -1,16 +1,16 @@
 # Coniche Scan: Visualisaties van de Quickscan Ziekenhuis
 
-**Status.** Voorstel van 15 oktober 2026. Joost heeft de vijf weergaven als richting aangenomen. Gebouwd op 15 oktober 2026, met de keuzes onder Gebouwd. Dit bestand beschrijft wat getoond wordt en hoe het berekend wordt voor de Klantcontact Quickscan – Ziekenhuis (`content-ziekenhuis-quickscan.md`). Het vult `visualisatie-scores.md` aan en vervangt het niet: De weergaven daar rekenen met scores op de schaal van 1 tot 5, de Quickscan rekent met punten en percentages (`datamodel.md`, Scoreberekening). De precieze opmaak volgt `stylesheet.md`. Waar dit bestand daar iets aan toevoegt, staat dat onder Nieuwe stijlwaarden.
+Dit bestand beschrijft wat getoond wordt en hoe het berekend wordt voor de Klantcontact Quickscan – Ziekenhuis (`content-ziekenhuis-quickscan.md`). Het vult `visualisatie-scores.md` aan en vervangt het niet: De weergaven daar rekenen met scores op de schaal van 1 tot 5, de Quickscan rekent met punten en percentages (`datamodel.md`, Scoreberekening). De precieze opmaak volgt `stylesheet.md`. Waar dit bestand daar iets aan toevoegt, staat dat onder Stijlwaarden.
 
-**Visueel referentieontwerp.** Het canvas "Quickscan Ziekenhuis – voorstellen voor visualisaties" (vijf borden, voorbeeldgegevens van een fictief ziekenhuis) is een ontwerpschets en geen code. Waar schets en tekst verschillen, geldt de tekst. Het canvas is privé en moet door Joost gedeeld worden voordat Sander het kan openen.
+**Visueel referentieontwerp.** Het canvas "Quickscan Ziekenhuis – voorstellen voor visualisaties" (vijf borden, voorbeeldgegevens van een fictief ziekenhuis) is een ontwerpschets en geen code. Waar schets en tekst verschillen, geldt de tekst.
 
 ## Welke weergave waar
 
 | Weergave | Vraag | Plek | Wie ziet het |
 |---|---|---|---|
-| 1. Per afdeling | Wat is mijn resultaat per afdeling? | Resultatenscherm (scherm 6), standaardweergave | Respondent, en de eigen scan in beheer |
+| 1. Per afdeling | Wat is mijn resultaat per afdeling? | Resultatenpagina, standaardweergave | Respondent, en de eigen scan in beheer |
 | 2. Overzicht | Waar scoor ik hoog en laag, over alle afdelingen heen? | Zelfde scherm, tweede stand van een schakelaar | Respondent, en de eigen scan in beheer |
-| 3. Gemiddelde en spreiding | Wat is het gemiddelde van de groep en zijn de respondenten het eens? | Resultatenpagina van een Meting | Admin, Consultant, Lead met vinkje |
+| 3. Spreiding | Wat is het gemiddelde van de groep en zijn de respondenten het eens? | Resultatenpagina van een Meting | Admin, Consultant, Lead met vinkje |
 | 4. Antwoorden per vraag | Wie antwoordde wat, per vraag? | Resultatenpagina van een Meting | Admin, Consultant, Lead met vinkje |
 | 5. Benchmark | Waar zitten we boven of onder de groep? | De view per organisatie (`benchmark.md`, Niveau 1) | Admin, Lead met vinkje |
 
@@ -20,7 +20,7 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 
 **Percentages.** Een bouwblok, afdeling of totaal toont punten, maximum en percentage, bijvoorbeeld "9/15 (60%)". Het percentage is afgerond op hele procenten, half-away-from-zero. Klasse en kleur volgen de afgeronde waarde. Berekening en weging: `datamodel.md`, Scoreberekening.
 
-**Klassekleuren.** Goed op orde (vanaf 80%) is `--stat-green`, Gemiddeld inzicht (50 tot en met 79%) is `--stat-amber` en Ontwikkelruimte (onder 50%) is `--stat-red`. Voor de totaalscore gelden de namen Sterk ontwikkeld, Gemiddeld ontwikkeld en Aanzienlijke ontwikkelruimte, in dezelfde kleuren (`CLAUDE.md`, sectie 1). Deze weergaven gebruiken dus de drie klassekleuren en niet de vijf scorekleuren.
+**Klassekleuren.** Goed op orde (vanaf 80%) is `--stat-green`, Gemiddeld inzicht (50 tot en met 79%) is `--stat-amber` en Ontwikkelruimte (onder 50%) is `--stat-red`. Voor de totaalscore gelden de namen Sterk ontwikkeld, Gemiddeld ontwikkeld en Aanzienlijke ontwikkelruimte, in dezelfde kleuren (`CLAUDE.md`, Scoringslogica). Deze weergaven gebruiken dus de drie klassekleuren en niet de vijf scorekleuren.
 
 **Antwoordkleuren.** Ja is `--stat-green`, Nee is `--stat-red` en Weet ik niet is grijs (`#d4d1ca`). Weet ik niet telt als Nee voor de score, maar staat nooit in de kleur van Nee.
 
@@ -40,19 +40,19 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 
 ## 1. Per afdeling
 
-**Plek.** Het resultatenscherm van de Respondent (`CLAUDE.md`, scherm 6) en dezelfde weergave voor een scan in beheer. Dit is de opbouw die al in `content-ziekenhuis-quickscan.md`, Resultaten, staat: Totaalkaart, een kaart per afdeling, Sterkste afdeling en Meeste ontwikkelruimte, en de legenda. Hier staat alleen wat het canvas daaraan toevoegt.
+**Plek.** De Resultatenpagina van de Respondent (`schermen.md`) en dezelfde weergave voor een scan in beheer. Dit is de opbouw die al in `content-ziekenhuis-quickscan.md`, Resultaten, staat: Totaalkaart, een kaart per afdeling, Sterkste afdeling en Meeste ontwikkelruimte, en de legenda. Hier staat alleen wat het canvas daaraan toevoegt.
 
 **Aanscherpingen.**
 
 - De totaalkaart noemt de afdelingen die niet meetellen bij naam ("Vragen over Patiëntenservice zijn niet beantwoord. De afdeling telt niet mee in het totaal").
-- De ring in de totaalkaart is de `.score-ring` van `stylesheet.md` (Resultaten): Een boog die voor `percentage / 100` gevuld is, in de klassekleur van het totaal, met het percentage in de ring en de klassenaam als chip eronder. Ze is dezelfde als op Mijn metingen (besloten op 19 oktober 2026).
+- De ring in de totaalkaart is de `.score-ring` van `stylesheet.md` (Resultaten): Een boog die voor `percentage / 100` gevuld is, in de klassekleur van het totaal, met het percentage in de ring en de klassenaam als chip eronder. Ze is dezelfde als op Mijn metingen.
 - De kaart "Niet van toepassing" zegt dat de antwoorden bewaard blijven als de respondent de keuze later wijzigt.
 - De legenda toont per klasse de grens in procenten en de punten per afdeling (12 tot en met 15, 8 tot en met 11, 0 tot en met 7 van 15).
 - De chips "Grootste aandachtspunt" en "Relatief sterkste basis" staan onder elkaar, rood en groen omrand, met de `aandachtZin` erboven.
 
 ## 2. Overzicht
 
-**Plek.** Hetzelfde scherm als weergave 1, als tweede stand van een schakelaar (`stylesheet.md`, Weergave-schakelaar, een pilvormige groep) met de pillen Per afdeling en Overzicht. Per afdeling is de standaard. De keuze staat in de adresbalk (`?weergave=overzicht`). Dit wijkt af van `visualisatie-scores.md`, Navigatie, waar de respondent op scherm 6 geen schakelaar ziet: Voor de Quickscan is de schakelaar er wel, omdat beide standen het eigen resultaat tonen.
+**Plek.** Hetzelfde scherm als weergave 1, als tweede stand van een schakelaar (`stylesheet.md`, Weergave-schakelaar, een pilvormige groep) met de pillen Per afdeling en Overzicht. Per afdeling is de standaard. De keuze staat in de adresbalk (`?weergave=overzicht`). Dit wijkt af van `visualisatie-scores.md`, Navigatie, waar de respondent op de Resultatenpagina geen schakelaar ziet: Voor de Quickscan is de schakelaar er wel, omdat beide standen het eigen resultaat tonen.
 
 **Opbouw.** Drie kaarten onder elkaar.
 
@@ -62,13 +62,13 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 
 **Bouwblokken met weinig vragen.** Ze staan in de matrix en de lijst, maar tellen niet mee voor "Relatief sterkste basis" (minstens 3 vragen), in lijn met de chipregels.
 
-## 3. Gemiddelde en spreiding
+## 3. Spreiding
 
-**Plek.** De resultatenpagina van een Meting, als knop "Gemiddelde en spreiding" in de bestaande schakelaar (`visualisatie-scores.md`, Navigatie). Voor een Meting van de Quickscan vervangen deze weergave en Antwoorden de knoppen Per bouwblok en Spreiding. Overzicht blijft de huidige pagina van de Meting, met in elke kaart het gemiddelde van de Meting in plaats van de score van één scan. Voor Admin, Consultant en een Lead met het vinkje Spreiding (`beheerpagina.md`, punt 6a).
+**Plek.** De resultatenpagina van een Meting, als knop "Spreiding" in de bestaande schakelaar (`visualisatie-scores.md`, Navigatie). Voor een Meting van de Quickscan vervangen deze weergave en Antwoorden de knoppen Per bouwblok en Spreiding. Overzicht blijft de huidige pagina van de Meting, met in elke kaart het gemiddelde van de Meting in plaats van de score van één scan. Voor Admin, Consultant en een Lead met het vinkje Spreiding (`beheerpagina.md`, punt 6a).
 
 **Data.** Per afdeling tellen alleen de afgeronde scans waarin de afdeling relevant is. Per scan en bouwblok is de score het aantal Ja gedeeld door het aantal vragen. Het gemiddelde van een bouwblok is het gemiddelde van die scores over de relevante scans. Het gemiddelde van een afdeling komt op dezelfde manier uit de afdelingsscores (punten gedeeld door 15). Het totaal van de Meting is alle punten van alle relevante afdelingen gedeeld door alle mogelijke punten (open punt 2).
 
-**Totaalkaart in plaats van tegels (voorstel van 20 oktober 2026, gebouwd op 20 oktober 2026).** De twee tegels Afgeronde scans en Totaal van de Meting vervallen. In deze weergave staat dezelfde Totaalkaart als in de andere weergaven van de Meting (`stylesheet.md`, Resultaatkop): Links de ring van 128px met het gemiddelde van de Meting als percentage ("58%") en het label "TOTAALSCORE", rechts de klassechip en de feiten. De afgeronde scans staan in de feiten ("Gemiddelde van 3 afgeronde scans" en "van 3 uitgenodigd"). Zo heeft de Quickscan in elke weergave van een Meting dezelfde ring, en ziet Gemiddelde en spreiding er niet anders uit dan Overzicht. Sterkste afdeling en Meeste ontwikkelruimte zijn geen tegels meer (voorstel van 19 oktober 2026, gebouwd op 19 oktober 2026): Ze staan als twee kolommen met rijen, zoals Top 3 bij de andere scans (`content-ziekenhuis-quickscan.md`, Resultaten, punt 3), elk met het gemiddelde, onder de afdelingskaarten. De Resultaatkop (`stylesheet.md`) staat bovenaan met het gemiddelde van de Meting in de ring.
+**Totaalkaart in plaats van tegels.** De twee tegels Afgeronde scans en Totaal van de Meting vervallen. In deze weergave staat dezelfde Totaalkaart als in de andere weergaven van de Meting (`stylesheet.md`, Resultaatkop): Links de ring van 128px met het gemiddelde van de Meting als percentage ("58%") en het label "TOTAALSCORE", rechts de klassechip en de feiten. De afgeronde scans staan in de feiten ("Gemiddelde van 3 afgeronde scans" en "van 3 uitgenodigd"). Zo heeft de Quickscan in elke weergave van een Meting dezelfde ring, en ziet Gemiddelde en spreiding er niet anders uit dan Overzicht. Sterkste afdeling en Meeste ontwikkelruimte zijn geen tegels meer: Ze staan als twee kolommen met rijen, zoals Top 3 bij de andere scans (`content-ziekenhuis-quickscan.md`, Resultaten, punt 3), elk met het gemiddelde, onder de afdelingskaarten. De Resultaatkop (`stylesheet.md`) staat bovenaan met het gemiddelde van de Meting in de ring.
 
 **Opbouw per afdeling.** Een kaart met de naam, "Relevant voor x van y respondenten", het gemiddelde van de afdeling en de klasse. Bij een afdeling die voor een deel van de respondenten niet van toepassing is, staat erbij hoeveel dat er zijn. Daaronder een rij per dimensie met:
 
@@ -77,18 +77,17 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 - Een verticale streep van 2px in `--ink-m` op het gemiddelde.
 - Rechts het gemiddelde als percentage en het spreidingslabel.
 
-**Ruimte en lagen** (voorstel van 19 oktober 2026, gebouwd op 19 oktober 2026, na een schermafbeelding van de gebouwde weergave). Op de gebouwde kaart staan de kolommen te krap: Labels breken af over twee regels, het label "Te weinig antwoorden" steekt buiten de kaart en de bollen en de streep op het gemiddelde lopen door elkaar. De regels hieronder maken de kaart ruim genoeg, voor elke afdeling en elke Meting.
+**Ruimte en lagen.** Labels breken niet af over twee regels, het label "Te weinig antwoorden" steekt niet buiten de kaart en de bollen en de streep op het gemiddelde lopen niet door elkaar. De regels hieronder maken de kaart ruim genoeg, voor elke afdeling en elke Meting.
 
 - **Kolommen.** Elke rij heeft vier kolommen met een vaste breedte, naast een spoor dat de rest van de ruimte krijgt: Label 280px, spoor (minimaal 360px), gemiddelde 64px en spreidingslabel 176px, met 24px tussen de kolommen. De kaart heeft 24px padding aan alle kanten, en niets in de rij steekt buiten die padding. De kolomkoppen (de drie klassen boven het spoor, "Gemiddelde" boven de waarde) staan in dezelfde kolommen en op één regel.
 - **Label op één regel.** De naam van de dimensie staat in `--fs-14` en het aantal vragen erachter in `--fs-12`, in `--ink-s` ("Processen en techniek · 10 vragen"), met `white-space: nowrap`. Past het niet, dan wordt het afgekapt met een tooltip met de volledige naam, zoals bij Balken. Bij een bouwblok met minder dan 3 vragen staat het aantal alleen in het spreidingslabel en niet ook achter de naam, zodat "1 vraag" niet twee keer staat.
 - **Labels op één regel.** Het gemiddelde ("63%") en het spreidingslabel (Eensgezind, Wisselend, Verdeeld, "Te weinig antwoorden", "1 vraag" en "2 vragen") hebben `white-space: nowrap`. Het gemiddelde staat rechts uitgelijnd in `--fs-16`, gewicht 700, en het label links uitgelijnd in zijn kolom.
 - **Rijhoogte.** Elke rij is minstens 48px hoog, met het spoor (12px) in het midden, zodat een bol van 24px 12px lucht boven en onder heeft en bollen van naastgelegen rijen elkaar niet raken. Tussen twee rijen staat geen lijn.
-- **Lagen in het spoor.** Van onder naar boven: de drie banden, de stippellijnen op 50% en 80%, de streep op het gemiddelde en de bollen. De stippellijnen lopen alleen over de hoogte van het spoor. De streep is 32px hoog, gecentreerd op het spoor, en staat achter de bollen, zodat een bol de streep afdekt en de streep er boven en onder uitsteekt. Zo is altijd te zien waar het gemiddelde ligt, ook onder een bol.
+- **Lagen in het spoor.** Van onder naar boven: De drie banden, de stippellijnen op 50% en 80%, de streep op het gemiddelde en de bollen. De stippellijnen lopen alleen over de hoogte van het spoor. De streep is 32px hoog, gecentreerd op het spoor, en staat achter de bollen, zodat een bol de streep afdekt en de streep er boven en onder uitsteekt. Zo is altijd te zien waar het gemiddelde ligt, ook onder een bol.
 - **Bollen aan de rand.** Een bol op 0% of op 100% blijft helemaal binnen het spoor: Het midden van de bol staat minstens op de halve breedte van de bol (12px, of 7px bij één respondent) van de rand. De bol kan dus niet worden afgekapt. De streep op het gemiddelde blijft eveneens minstens 1px van de rand.
-- **Zo gebouwd.** `DimensieRij` in `components/quickscan/QuickscanGemiddeldeSpreiding.tsx` en `.qv-rij--spreiding` in `app/styles/visualisatie.css`: Kolommen van 280, minstens 360, 64 en 176 px met 24 px ertussen, rijen van 48 px (gemeten in de browser), spoor van 12 px, een streep van 32 px (`z-index` 1) achter de bollen (`z-index` 2), en bollen en streep die met `clamp()` binnen het spoor blijven. Bij minder dan 3 vragen staat het aantal alleen in het spreidingslabel. Op een kaart smaller dan ongeveer 1000 px scrolt de kaart horizontaal, omdat het spoor minstens 360 px krijgt. De namen van de banden boven het spoor passen pas bij een spoor van ongeveer 450 px of meer.
 - **Bollen die overlappen.** Bollen met bijna dezelfde score (minder dan 24px uit elkaar) liggen over elkaar. Het getal in de bol staat dan op de bovenste. Is het onderscheid gering, dan is de totale spreiding ook gering en zegt het label Eensgezind het al.
 
-**Spreidingslabel.** Op basis van de standaardafwijking (steekproef, n − 1) van de percentages in de relevante scans, in procentpunten. Voorstel: Onder 14 is Eensgezind, van 14 tot 20 is Wisselend en vanaf 20 is Verdeeld. Dit zijn de grenzen van `visualisatie-scores.md` (0,55 en 0,8 op een schaal van vier) omgerekend. Verdeeld is het enige label met een volle vulling. Een bouwblok met minder dan 3 vragen krijgt geen label maar "1 vraag" of "2 vragen" (gestreepte rand), omdat de uitkomsten dan te grof zijn. Bij minder dan 3 relevante scans voor de afdeling staat er "Te weinig antwoorden".
+**Spreidingslabel.** Op basis van de standaardafwijking (steekproef, n − 1) van de percentages in de relevante scans, in procentpunten. Onder 14 is Eensgezind, van 14 tot 20 is Wisselend en vanaf 20 is Verdeeld. Dit zijn de grenzen van `visualisatie-scores.md` (0,55 en 0,8 op een schaal van vier) omgerekend, als startwaarden die een Admin kan instellen. Verdeeld is het enige label met een volle vulling. Een bouwblok met minder dan 3 vragen krijgt geen label maar "1 vraag" of "2 vragen" (gestreepte rand), omdat de uitkomsten dan te grof zijn. Bij minder dan 3 relevante scans voor de afdeling staat er "Te weinig antwoorden".
 
 **Sortering.** Standaard in de volgorde van het model. De schakelaar "Sorteer op spreiding" uit `visualisatie-scores.md` werkt ook hier.
 
@@ -101,7 +100,7 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 **Opbouw van Verdeling.**
 
 - Boven de kaart een keuze van de afdeling, als losse keuzepillen (`stylesheet.md`, Keuzepil en pilvormige groep), omdat de afdelingen uit de content komen en hun aantal en lengte wisselen. De gekozen pil is massief oranje, de andere zijn wit met grijze rand. Tussen de pillen staat 8px en tot de tegels eronder 24px. Een afdeling zonder relevante scans is uitgeschakeld.
-- Tegels: Respondenten (die de afdeling relevant vonden), Alle antwoorden (Ja, Nee en Weet niet als percentages, met een gestapelde balk), Minst vaak Ja (bouwblok, vraagnummer en aantal) en Vaakst Weet ik niet.
+- Tegels: Respondenten (die de afdeling relevant vonden), Alle antwoorden (Ja, Nee en Weet ik niet als percentages, met een gestapelde balk), Minst vaak Ja (bouwblok, vraagnummer en aantal) en Vaakst Weet ik niet.
 - Een legenda met Ja, Nee en Weet ik niet, en de opmerking dat de getallen in de balken aantallen respondenten zijn.
 - Per dimensie een kopregel (naam, aantal vragen, gemiddeld percentage) en daaronder een rij per vraag.
 - Een vraagrij heeft het vraagnummer, de volledige vraagtekst zoals de respondent die zag, een gestapelde balk en rechts "x% Ja". De balk is Ja, Nee en Weet ik niet naast elkaar, elk met het aantal erin en met een breedte naar verhouding. Een antwoord dat niemand gaf, ontbreekt. De kleur van "x% Ja" volgt de klasse van het afgeronde percentage.
@@ -113,7 +112,7 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 
 ## 5. Benchmark
 
-**Kop (voorstel van 20 oktober 2026, gebouwd op 20 oktober 2026).** Bovenaan staat dezelfde Resultaatkop en Totaalkaart als bij de schaalscans (`stylesheet.md`, Resultaatkop, Benchmark): Eyebrow "Benchmark", de naam van het Assessment als titel, de subregel, en een kaart met de ring van 128px met het percentage van de organisatie X en het feit "Rest van de groep: 61%". Daaronder de weergave.
+**Kop.** Bovenaan staat dezelfde Resultaatkop en Totaalkaart als bij de schaalscans (`stylesheet.md`, Resultaatkop, Benchmark): Eyebrow "Benchmark", de naam van het Assessment als titel, de subregel, en een kaart met de ring van 128px met het percentage van de organisatie X en het feit "Rest van de groep: 61%". Daaronder de weergave.
 
 **Plek.** De view per organisatie (`benchmark.md`, Niveau 1, View per organisatie), voor een Admin en voor een Lead met het vinkje. Het is weergave D uit `visualisatie-scores.md`, in percentages en zonder klassebanden. Radar en staafdiagram per categorie bestaan voor de Quickscan niet, dus deze weergave is de enige plek voor de vergelijking.
 
@@ -143,9 +142,9 @@ De volgorde is de volgorde van het verhaal: Eerst het eigen resultaat (1 en 2), 
 
 De weergaven C (ontwikkeling tussen Metingen), E (matrix) en H (Metingen naast elkaar) uit `visualisatie-scores.md` gelden ook voor de Quickscan, in percentages en met de klassekleuren van dit bestand. De rijen zijn dan de dimensies, gegroepeerd per afdeling, met een rij Totaal. Er is geen eigen schets voor gemaakt.
 
-## Nieuwe stijlwaarden
+## Stijlwaarden
 
-Voorstel, op te nemen in `stylesheet.md` zodra ze zijn bevestigd:
+Waarden die voor deze weergaven gelden. `stylesheet.md` blijft leidend voor tokens en maten.
 
 | Gebruik | Waarde |
 |---|---|
@@ -155,59 +154,20 @@ Voorstel, op te nemen in `stylesheet.md` zodra ze zijn bevestigd:
 | Matrixcel | `#c3e6d2`, `#fde9c8`, `#f7c6c1` (zelfde tekstkleuren als hierboven) |
 | Matrixcel zonder dimensie of n.v.t. | Gearceerd `#faf9f7` en `#f2f0eb`, rand `1px dashed #d4d1ca` |
 | Weet ik niet | `#d4d1ca`, tekst `--ink` |
-| Bol in Gemiddelde en spreiding | `rgba(93, 106, 120, .82)`, witte rand, 24px (14px bij één respondent) |
+| Bol in Spreiding | `rgba(93, 106, 120, .82)`, witte rand, 24px (14px bij één respondent) |
 | Benchmark, band minimum tot maximum | `#ebf1fb` |
 | Benchmark, band eerste tot derde kwartiel | `#b9cde8` |
 | Benchmark, groepsgemiddelde | `#225ba0` |
 | Benchmark, bol van X | `--or` met witte rand |
-| Positielabel | Zoals in `visualisatie-scores.md`, Nieuwe stijlwaarden |
+| Positielabel | Zoals in `visualisatie-scores.md`, Stijlwaarden |
 
 ## Open punten
 
 - De grenzen van het spreidingslabel in procentpunten (14 en 20), en of de ondergrens van 3 vragen voor het label klopt.
 - Het totaal van een Meting met afdelingen die niet voor iedereen relevant zijn: Alle punten gedeeld door alle mogelijke punten (hier gekozen) of het gemiddelde van de totalen per scan. Hetzelfde geldt voor de benchmark. Zie ook `backlog.md`, Quickscan Ziekenhuis, gemiddelde en benchmark met n.v.t. afdelingen.
-- Of de respondent op scherm 6 de schakelaar tussen Per afdeling en Overzicht krijgt (hier voorgesteld), of dat Overzicht alleen in beheer staat.
+
 - De drempel "Onbekend bij x van y" (40% en minstens drie).
 - Of de stand Per respondent in Antwoorden nodig is, naast het archiefexport per scan (`backlog.md`).
-- Of een Admin in Gemiddelde en spreiding een naam bij een bol kan zien (open punt in `visualisatie-scores.md`).
+- Of een Admin in Spreiding een naam bij een bol kan zien (open punt in `visualisatie-scores.md`).
 - Het minimum en maximum in de benchmark van één organisatie (zie D).
 - Export van deze weergaven naar PDF, CSV en InDesign (PDF-spec volgt later).
-
-## Gebouwd
-
-Gebouwd op 15 oktober 2026. De berekeningen staan in `lib/quickscan-groep.ts` (met tests in `lib/quickscan-groep.test.ts`), de
-weergaven in `components/quickscan/` en `components/QuickscanResultaten.tsx`.
-
-**Plekken**
-
-- 1 en 2: `QuickscanResultaten` met de schakelaar Per afdeling en Overzicht (`?weergave=overzicht`), op het resultaatscherm van de
-  respondent, de voorbeeld-output en de scan in beheer. "Positie in de Meting" (weergave B op niveau 3) is er voor dit type niet.
-- 3 en 4: `MetingWeergaven` op de resultatenpagina van een Meting, in beheer en voor een Lead. De schakelaar heeft Overzicht
-  (het gemiddelde van de Meting in dezelfde kaarten), "Gemiddelde en spreiding" en Antwoorden. Per bouwblok vervalt. De knop
-  Spreiding in het Leads-venster opent weergave 3.
-- 5: De view per organisatie van een benchmark tussen organisaties (`BenchmarkOrganisatieView`), voor een Admin en een Lead. In
-  de lijst van de benchmark staat per organisatie het totaal met de klasse.
-
-**Keuzes waar de spec open liet** (de open punten hierboven, met de gebouwde waarde)
-
-- De grenzen van het spreidingslabel staan als constante: 14 en 20 procentpunten, minstens 3 vragen en minstens 3 relevante scans
-  (`QS_SPREIDING_GRENZEN`).
-- Het totaal van een Meting is alle punten gedeeld door alle mogelijke punten van de relevante afdelingen, over alle scans. In de
-  kaart van de Meting staat bij het totaal geen aantal punten, omdat het maximum per scan verschilt als een afdeling niet
-  voor iedereen relevant is. Hetzelfde geldt voor de benchmark: Elk lid telt even zwaar met zijn totaal.
-- De respondent krijgt op scherm 6 de schakelaar Per afdeling en Overzicht.
-- "Onbekend bij x van y" staat vanaf 40% Weet ik niet en minstens drie respondenten (`QS_ONBEKEND_AANDEEL`, `QS_ONBEKEND_MIN`).
-- De stand Per respondent bij Antwoorden is gebouwd: Cellen J, N of ? met de namen en initialen van weergave G, voor een Lead
-  zonder namen R1 tot en met Rn.
-- Een Admin ziet in Gemiddelde en spreiding geen naam bij een bol (geen tooltip, niet aanklikbaar).
-- Het minimum en het maximum in de benchmark staan er zoals in de spec. Het risico dat één organisatie herleidbaar is, geldt
-  zoals bij weergave D (`visualisatie-scores.md`, Open punten).
-- Bij gelijkstand tonen de tegels "Minst vaak Ja" en "Vaakst Weet ik niet" de eerste vraag in de volgorde van het model.
-- De groep voor een rij in de benchmark telt alleen de leden met een afgeronde scan. Is de groep (X inbegrepen) kleiner dan
-  `benchmarkMinOrganisaties`, dan staat bij die rij "Te weinig ziekenhuizen" en geen band.
-
-**Nog niet gebouwd**
-
-- De weergaven C, E en H voor dit type (vergelijking tussen Metingen in percentages) en de samengestelde Meting.
-- De benchmark binnen een organisatie en binnen een Meting voor dit type.
-- Export van deze weergaven naar PDF, CSV en InDesign.

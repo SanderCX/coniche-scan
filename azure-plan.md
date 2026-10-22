@@ -9,7 +9,7 @@ Het vult `go-live-plan.md` aan met de Azure-specifieke stappen. Waar een punt
 daar al staat, verwijst dit document ernaar (fase 0 t/m 11). De
 checklist daar blijft leidend voor volgorde en go/no-go.
 
-## Aan de slag: eerste stappen
+## Aan de slag: Eerste stappen
 
 De code staat in Azure Repos (`werkend2040/coniche`). De volgorde hieronder
 gaat over wat nu kan en waar we op wachten. De technische volgorde van de
@@ -58,7 +58,7 @@ migratie staat verderop onder "Volgorde".
   Voorstel: Azure SQL Database. Bij een VM zijn patches en back-ups eigen werk.
   Welke database definitief wordt, staat nog open met IT (`backlog.md`).
 - [ ] **Hosting van de app:** App Service (Linux, Node) of Container Apps /
-  App Service met een container. Voorstel: een container, vanwege de
+  App Service met een container. Voorstel: Een container, vanwege de
   PDF-export (zie punt 2).
 - [ ] **Regio:** West Europe (Amsterdam) voor alle onderdelen
   (`go-live-plan.md`, fase 0).
@@ -111,7 +111,7 @@ migratie staat verderop onder "Volgorde".
 ### Beveiliging
 
 - [ ] **Beheerlogin:** wachtwoord-hashing, sessies met cookies, 2FA (TOTP),
-  herstelcodes en lockout (`datamodel.md` deel 2).
+  herstelcodes en lockout (`datamodel-rollen.md`).
 - [ ] **Autorisatie op de server:** Per rol en per record. Nu zijn de
   API-routes open en bepaalt de browser wat mag.
 - [ ] **Respondenten:** E-mailverificatie met een code, een ToegangsSessie van
@@ -205,10 +205,10 @@ migratie staat verderop onder "Volgorde".
 3. Databasemigratie, nieuw schema en API per entiteit (punt 2).
 4. Login, rechten en e-mail (punt 2).
 5. Domein en WAF (punt 4).
-6. Acceptatie: testen, pentest en review (punt 7).
+6. Acceptatie: Testen, pentest en review (punt 7).
 7. Dataoverdracht en livegang (punt 5).
 
-De grootste klus zijn stap 3 en 4: de app is nu browser-first en moet naar een
+De grootste klus zijn stap 3 en 4: De app is nu browser-first en moet naar een
 echte server met database, inlog en autorisatie. De Azure-inrichting zelf is
 overzichtelijk.
 

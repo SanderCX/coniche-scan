@@ -1,6 +1,6 @@
 # Klantcontact richting 2030
 
-**Plaats in de app (besloten door Joost op 21 oktober 2026):** Dit stuk staat als sectie "Klantcontact richting 2030" op de Assessment-pagina van de AI-scan (`CLAUDE.md`, sectie 3, scherm 2), met de vijf ontwerpkeuzes als kaarten en "Lees het hele stuk" voor de rest. Het is geen losse pagina en geen link in de header meer. **Zo gebouwd (21 oktober 2026)**: `components/assessment/Content2030Sectie.tsx`. De korte zin op een kaart is de eerste zin van de tekst, de pillen zijn de overige onderdelen van het stuk (alleen ter oriëntatie) en "Lees het hele stuk" klapt het volledige stuk uit, zoals het op de oude pagina stond.
+**Plaats in de app:** Dit stuk staat als sectie "Klantcontact richting 2030" op de Assessment-pagina van de AI-scan (`schermen.md`, Assessment-pagina), met de vijf ontwerpkeuzes als kaarten en "Lees het hele stuk" voor de rest. Het is geen losse pagina en geen link in de header. De korte zin op een kaart is de eerste zin van de tekst, de pillen zijn de overige onderdelen van het stuk (alleen ter oriëntatie) en "Lees het hele stuk" klapt het volledige stuk uit.
 
 Waar klantcontact naartoe gaat richting 2030 ligt niet vast. Organisaties
 bewegen niet dezelfde kant op: De ene zet vooral in op verdere
@@ -249,10 +249,10 @@ invalshoeken:
 
 ## De relatie met deze scan
 
-Deze scan meet waar de eigen organisatie nu staat op de bouwstenen van
+Deze scan meet waar de eigen organisatie nu staat op de bouwblokken van
 klantcontact (`visie-coniche.md`). Dit stuk beschrijft waar de markt als
 geheel naartoe beweegt. Dat zijn twee verschillende vragen: Een lage
-score op een bouwsteen zegt iets over de eigen inrichting, niet
+score op een bouwblok zegt iets over de eigen inrichting, niet
 automatisch iets over de marktontwikkeling hierboven, en andersom. Beide
 samen geven wel een vollediger beeld: Wat een organisatie nu al goed
 geregeld heeft, en wat er op haar afkomt.

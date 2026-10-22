@@ -1,13 +1,12 @@
 # Coniche-visie op goed klantcontact
 
-**Plaats in de app (besloten door Joost op 21 oktober 2026):** Deel 1 staat als sectie "Visie" en deel 2 als sectie "De 15 bouwblokken" op de Assessment-pagina van Klantcontact Volwassenheid en Zorg (`CLAUDE.md`, sectie 3, scherm 2). Het zijn geen losse pagina's en geen links in de header meer. Voor de Zorgscan volgen later zorgspecifieke teksten (`backlog.md`).
+**Plaats in de app:** Deel 1 staat als sectie "Visie" en deel 2 als sectie "De 15 bouwblokken" op de Assessment-pagina van Klantcontact Volwassenheid en Zorg (`schermen.md`, Assessment-pagina). Het zijn geen losse pagina's en geen links in de header meer. Voor de Zorgscan volgen later zorgspecifieke teksten (`backlog.md`).
 
-**Status: Concept.** Herschreven versie van
-`coniche-visie-goed-klantcontact.md`. Deel 1 beschrijft de visie, deel 2
-de vijftien bouwstenen. De bouwsteenbeschrijvingen zijn afgestemd op de
+**Status: Concept.** Deel 1 beschrijft de visie, deel 2
+de vijftien bouwblokken. De bouwblokbeschrijvingen zijn afgestemd op de
 vragen in de scan: Elke vraag heeft hier een onderbouwing, en de centrale
-vraag per bouwsteen is de vraag die de scanvragen samen beantwoorden. Hoe
-visie, bouwstenen en scan samenhangen, staat in `inhoudelijk-fundament.md`.
+vraag per bouwblok is de vraag die de scanvragen samen beantwoorden. Hoe
+visie, bouwblokken en scan samenhangen, staat in `inhoudelijk-fundament.md`.
 
 ---
 
@@ -30,7 +29,7 @@ structureel geregeld heeft. Denk aan afspraken die ook gelden als een
 bepaalde collega afwezig is, of een overleg dat op vaste momenten
 plaatsvindt en tot besluiten leidt.
 
-Coniche heeft de Bouwstenen van Klantcontact ontwikkeld om dat geheel in
+Coniche heeft de Bouwblokken van Klantcontact ontwikkeld om dat geheel in
 kaart te brengen. Het model beschrijft vijftien onderdelen die samen
 bepalen hoe goed klantcontact functioneert. Met de scan wordt per
 onderdeel zichtbaar hoe ver een organisatie is, als basis om gericht te
@@ -63,7 +62,7 @@ verhaal. Medewerkers werken binnen processen, processen draaien op
 systemen, en systemen worden gekozen op basis van strategie en doelen.
 Als daar iets schuift, merkt de klant dat, hoe goed de medewerker ook is.
 
-Kwaliteit is in dit model daarom geen losse bouwsteen. Het komt op
+Kwaliteit is in dit model daarom geen losse bouwblok. Het komt op
 meerdere plekken terug. In de scan zit het expliciet bij Performance
 Management (een vast kwaliteitsproces), Kennismanagement (actuele en
 vindbare kennis), Leren uit Klantcontact (verbeteringen die aantoonbaar
@@ -83,19 +82,19 @@ en doen. Er ligt een plan, maar niemand is eigenaar van de uitvoering, of
 achteraf kijkt niemand of het effect had.
 
 De cyclus komt terug in de scan, in de schaal en in de opbouw van de
-vragen per bouwsteen. Hoe precies, staat in `inhoudelijk-fundament.md`.
+vragen per bouwblok. Hoe precies, staat in `inhoudelijk-fundament.md`.
 
 ---
 
-# Deel 2: De Bouwstenen van Klantcontact
+# Deel 2: De Bouwblokken van Klantcontact
 
-De bouwstenen beschrijven de voorwaarden voor goed klantcontact: Hoe een
+De bouwblokken beschrijven de voorwaarden voor goed klantcontact: Hoe een
 organisatie is ingericht om het mogelijk te maken. De uitkomsten, zoals
 klanttevredenheid, afhandeltijd en servicelevel, zijn daar het gevolg
 van. Die worden in de app apart vastgelegd bij de organisatiekenmerken.
 
-Er zijn vijftien bouwstenen, verdeeld over vijf groepen. Per bouwsteen
-staat hieronder wat de bouwsteen inhoudt en welke centrale vraag de
+Er zijn vijftien bouwblokken, verdeeld over vijf groepen. Per bouwblok
+staat hieronder wat de bouwblok inhoudt en welke centrale vraag de
 scanvragen samen beantwoorden.
 
 ## Overkoepelend
@@ -169,7 +168,7 @@ en achteraf wordt gekeken of ze het beoogde effect hadden. Een
 verbetering is pas af als ze zichtbaar terugkomt in de kennisbank, een
 training of een aangepast proces.
 
-Van alle bouwstenen volgt deze de verbetercyclus het meest letterlijk.
+Van alle bouwblokken volgt deze de verbetercyclus het meest letterlijk.
 
 **Centrale vraag:** Leiden signalen uit klantcontact aantoonbaar tot
 verbeteringen in de organisatie?
@@ -334,7 +333,7 @@ gaat, en doet ze daar aantoonbaar iets mee?
 
 ### 14. Leiderschap
 
-Leidinggevenden bepalen in hoge mate hoe goed de andere bouwstenen in de
+Leidinggevenden bepalen in hoge mate hoe goed de andere bouwblokken in de
 praktijk werken. In klantcontact ligt dat voor een groot deel bij de
 teamleads.
 
@@ -356,8 +355,8 @@ verbonden met de rest van de organisatie?
 ### 15. Cultuur
 
 Cultuur is zichtbaar in gedrag, vooral op momenten dat geen procedure
-het antwoord geeft. Daar sluit deze bouwsteen aan op de beslisregels uit
-de klantcontactstrategie (bouwsteen 2).
+het antwoord geeft. Daar sluit deze bouwblok aan op de beslisregels uit
+de klantcontactstrategie (bouwblok 2).
 
 Een organisatie heeft haar gedragsprincipes expliciet benoemd, zoals
 klantgerichtheid, eigenaarschap en samenwerking, en die komen terug in
@@ -374,11 +373,11 @@ gemaakt, en wordt het in de praktijk ondersteund?
 
 # Tot slot
 
-De bouwstenen zijn een hulpmiddel om te verbeteren. Een hoge score is
+De bouwblokken zijn een hulpmiddel om te verbeteren. Een hoge score is
 daarom geen doel op zich. Wat telt, is of een organisatie beter in staat
 raakt om klanten goed te helpen en haar eigen doelen te halen.
 
-De scan laat zien waar een organisatie staat en welke bouwstenen de
+De scan laat zien waar een organisatie staat en welke bouwblokken de
 meeste aandacht vragen. Het vervolg bestaat uit kiezen welke
 verbeteringen voorrang krijgen en die doorvoeren, met de verbetercyclus
 als leidraad.

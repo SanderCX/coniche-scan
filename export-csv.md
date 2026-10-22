@@ -2,12 +2,12 @@
 
 Legt de kolommen van de "Als CSV"-optie in de Exporteren-dropdown
 volledig vast (resultatenpagina, één scan, en `beheerpagina.md`
-punt 5 en 7, Meting-overzicht en Resultaten, één of meerdere scans — zelfde kolomstructuur
+punt 5 en 7, Meting-overzicht en Resultaten, één of meerdere scans, zelfde kolomstructuur
 in beide gevallen, alleen het aantal rijen verschilt). Vergelijkbaar
 van opzet met de CSV die we importeren (`import-scans.md`),
 maar dan met onze eigen velden, correct volgens `datamodel.md`, en
 vollediger: Waar de import bewust een deel van de oude kolommen
-weglaat, geldt die terughoudendheid hier niet — dit is de laatste stap
+weglaat, geldt die terughoudendheid hier niet, dit is de laatste stap
 in de keten (niets leest een CSV-export terug in de app), dus geen
 risico op een tweede, afwijkende bron van waarheid.
 
@@ -18,10 +18,10 @@ Bestaande "Als CSV"-optie in de Exporteren-dropdown: Resultatenpagina
 Resultaten (één of meerdere geselecteerde scans). Zelfde exportfunctie, zelfde kolommen,
 of het nu 1 of N rijen oplevert.
 
-## Grain: één rij per ingevulde scan
+## Grain: Één rij per ingevulde scan
 
 Zelfde niveau als de import: Eén `ScanInvulling` is één rij. Geen
-aggregatie over meerdere respondenten binnen een `Meting` — de
+aggregatie over meerdere respondenten binnen een `Meting`, de
 aggregatieweergave zelf bestaat wel (`beheerpagina.md`,
 Organisatie-resultaten), maar een CSV-export daarvan nog niet, net als
 bij de PDF- en InDesign-export.
@@ -42,25 +42,23 @@ organisatie, dan is "Exporteren" uitgeschakeld, met het Info-icoon
 
 ### Basisgegevens
 
-De kolom `onderdeel` is gebouwd op 13 oktober 2026 en de kolom
-`meting_meetdatum` is gebouwd op 14 oktober 2026 (`datamodel.md`, Meting).
-De kolom `ronde` van 13 oktober 2026 vervalt met de ronde. Ze staan direct na
-`meting_label`. De import leest kolommen op hun kopnaam, zodat een bestand zonder
-deze kolommen, of met een oude kolom `ronde`, blijft werken (`import-scans.md`,
-Meetdatum en onderdeel).
+De kolommen `onderdeel` en `meting_meetdatum` (`datamodel.md`, Meting) staan
+direct na `meting_label`. De import leest kolommen op hun kopnaam, zodat een
+bestand zonder deze kolommen, of met een oude kolom `ronde`, blijft werken
+(`import-scans.md`, Meetdatum en onderdeel).
 
 | Kolom | Bron | Toelichting |
 |---|---|---|
 | `organisatie_naam` | `Organisatie.naam` | |
 | `meting_label` | `Meting.label` | bijv. "Nulmeting 2026" |
 | `meting_meetdatum` | `Meting.meetdatum` | ISO-datum, bijv. "2026-10-14", leeg bij een Meting zonder meetdatum |
-| `onderdeel` | `Meting.onderdeel` (sinds 19 oktober 2026 de naam van het Onderdeel) | bijv. "Team A", of "Hele organisatie" |
+| `onderdeel` | `Meting.onderdeel` (de naam van het Onderdeel) | bijv. "Team A", of "Hele organisatie" |
 | `assessment_naam` | `Assessment.naam` | bijv. "Klantcontact Volwassenheid" |
 | `respondent_naam` | `Respondent.naam` | leeg zolang de intake niet is gestart |
 | `respondent_email` | `Respondent.email` | |
 | `respondent_functie` | `Respondent.functie` | |
 | `respondent_team` | `Respondent.team` | |
-| `scan_notitie` | `ScanInvulling.notitie` | gebouwd op 13 oktober 2026: De notitie van déze scan, niet de notities van de Respondent (`datamodel.md`, Notitie op de scan) |
+| `scan_notitie` | `ScanInvulling.notitie` | De notitie van déze scan, niet de notities van de Respondent (`datamodel.md`, Notitie op de scan) |
 | `status` | `ScanInvulling.status` | `"uitgenodigd"` / `"bezig"` / `"afgerond"` |
 | `aangemaakt_op` | `ScanInvulling.aangemaaktOp` | bij een geïmporteerde scan het importmoment |
 | `uitgenodigd_op` | `ScanInvulling.uitgenodigdOp` | |
@@ -101,11 +99,11 @@ een oudere CSV-export kan afwijken van de actuele score.
 |---|---|
 | `organisatie_kenmerken` | JSON-kolom, letterlijk `Organisatie.kenmerken` (`{ [veldId]: waarde }`, `datamodel.md`) |
 
-**Gebouwd op 19 oktober 2026.** De KPI's en de contacten per kanaal staan niet meer in `Organisatie.kenmerken` maar als `KpiWaarde` (`datamodel.md`, KPI's en kanalen). Voorstel: Een tweede JSON-kolom `organisatie_kpis` met een lijst van onderdeel (de naam, leeg bij Algemeen), kanaal (de naam, leeg bij Algemeen), KPI en waarde. De kolom `onderdeel` blijft de naam van het Onderdeel, en "Hele organisatie" bij een Meting zonder Onderdeel. Een export van vóór deze wijziging heeft de KPI's nog in `organisatie_kenmerken` (`import-scans.md`).
+De KPI's en de contacten per kanaal staan niet meer in `Organisatie.kenmerken` maar als `KpiWaarde` (`datamodel.md`, KPI's en kanalen). Een tweede JSON-kolom `organisatie_kpis` met een lijst van onderdeel (de naam, leeg bij Algemeen), kanaal (de naam, leeg bij Algemeen), KPI en waarde. De kolom `onderdeel` blijft de naam van het Onderdeel, en "Hele organisatie" bij een Meting zonder Onderdeel. Een export van vóór deze wijziging heeft de KPI's nog in `organisatie_kenmerken` (`import-scans.md`).
 
 **Bewust één JSON-kolom, geen kolom per veld** (dus geen aparte
 `sector`, `subsector`, `nps`, etc.). Organisatievelden zijn nu vaste
-data, maar staan in `beheerpagina.md` onder "Nog te bouwen": Zodra
+data, maar worden in `beheerpagina.md` (Organisatievelden) nog niet beheerd. Zodra
 die zelf beheerbaar worden, kan de set velden wijzigen zonder dat de
 app opnieuw gebouwd hoeft te worden. Een vaste kolom per huidig veld
 zou deze spec (en elke CSV die er al van bestaat) bij zo'n wijziging
@@ -135,7 +133,7 @@ Elk item in `antwoorden`:
 Zelfde soort vorm als de kolom die we importeren
 (`import-scans.md`, `answers`), met dezelfde reden: `vraagTekst`
 en `schaalLabel` erbij, niet alleen `vraagId` en `score`, zodat de CSV
-ook leesbaar is voor wie het datamodel niet kent — een consultant die
+ook leesbaar is voor wie het datamodel niet kent, een consultant die
 'm in Excel opent, niet alleen Sander of de import-tool later.
 
 ## Inzage (AVG)
@@ -176,7 +174,7 @@ deze afwijkingen:
 
 ## CSV-formaat
 
-- **Scheidingsteken: puntkomma, niet komma.** Excel-NL (het gangbare
+- **Scheidingsteken: Puntkomma, niet komma.** Excel-NL (het gangbare
   gebruik hier) gebruikt de komma als decimaalteken en verwacht
   standaard een puntkomma-gescheiden CSV; met een komma-CSV opent
   Excel-NL alles in één kolom. Decimalen in `overall_score` en de
@@ -191,7 +189,7 @@ deze afwijkingen:
 
 ## Spanningsmeter (nog niet gespecificeerd)
 
-Voor de Spanningsmeter (antwoordType `spanning`) is er nog geen CSV. De export heeft geen overall score en geen groepsscores per bouwblok, maar per veld een score en een spanning. Zie `backlog.md`, Spanningsmeter. Tot dat besloten is, staat "Als CSV" niet in de Exporteren-dropdown voor dit type.
+Voor de Spanningsmeter (antwoordType `spanning`) is er nog geen CSV. De export heeft geen totaalscore en geen groepsscores per bouwblok, maar per veld een score en een spanning. Zie `backlog.md`, Spanningsmeter. Tot dat besloten is, staat "Als CSV" niet in de Exporteren-dropdown voor dit type.
 
 ## Beslist
 
@@ -200,8 +198,7 @@ Voor de Spanningsmeter (antwoordType `spanning`) is er nog geen CSV. De export h
   `groepsScores` niet apart.
 - **Geen Contactpersonen en geen Dossier**: Ze zijn geen scandata en een
   Contactpersoon is een persoon buiten de app (`datamodel.md`, Contactpersoon,
-  Privacy). Ze staan niet in de CSV (besloten op 20 oktober 2026, het Dossier
-  sinds `dossier.md`, Exports).
+  Privacy). Ze staan niet in de CSV (het Dossier sinds `dossier.md`, Exports).
 - **Bulk-export alleen binnen één organisatie**, in verband met
   datavermenging. Op het globale overzicht werkt dat ook zonder filter,
   zolang de selectie bij één organisatie hoort. Zie hierboven.
