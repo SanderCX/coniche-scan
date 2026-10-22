@@ -94,7 +94,7 @@ Vervangen door Kaart met cirkel, Quickscan hieronder. Onderstaande beschrijving 
 - Rechts één rij per afdeling, in de volgorde van het Assessment. Elke rij heeft naam, balk van 6 px en rechts "<punten>/<maximum> · <percentage>". Een afdeling die in deze scan niet is ingevuld, wordt weggelaten.
 - Balkkleur per afdeling volgt de statuskleuren van de Quickscan (`visualisatie-quickscan.md`): Groen vanaf 80%, oranje van 50 tot 80%, rood onder 50%. De kleur van het totaal volgt de klasse.
 
-Voor een nieuw Assessment geldt: Heeft het categorieën, dan de eerste vorm. Heeft het afdelingen, dan de tweede. Heeft het geen van beide, dan alleen het totaal met klassenpil.
+Voor een nieuw Assessment geldt: Heeft het categorieën, dan de eerste vorm. Heeft het afdelingen, dan de tweede. Heeft het domeinen zonder categorieën (de AI-scan), dan het paneel met domeinrijen (Kaart met cirkel, AI-scan). Heeft het niets van dit alles, dan alleen het totaal met klassenpil.
 
 ## Teaser van de hele meting (Lead)
 
@@ -133,7 +133,7 @@ De eerste knop in het linkerblok is de hoofdactie van de eigen scan. In het rech
 
 ## Kaart met cirkel (voorstel van 19 oktober 2026, gebouwd op 19 oktober 2026)
 
-Ontworpen in "Coniche Scan Mijn metingen", borden "Kaart met cirkel, voorstel (19 oktober)" (Volwassenheidsscan) en "Quickscan met cirkel, voorstel (19 oktober)" (Quickscan), gebouwd op 19 oktober 2026 (zie Zo gebouwd hieronder). Dit geldt voor alle Assessments met categorieën of afdelingen en vervangt voor hen de teaser "Jouw overall score" en de twee blokken naast elkaar uit Kaart: Lead en respondent. Hieronder staat eerst de kaart voor Assessments met categorieën, daarna de afwijkingen voor Assessments met afdelingen (Quickscan). Twee blokken van 500 px met een cirkel erbij passen niet naast elkaar, en Jij en Groep op één spoor laten het verschil per categorie direct zien.
+Ontworpen in "Coniche Scan Mijn metingen", borden "Kaart met cirkel, voorstel (19 oktober)" (Volwassenheidsscan) en "Quickscan met cirkel, voorstel (19 oktober)" (Quickscan), gebouwd op 19 oktober 2026 (zie Zo gebouwd hieronder). Dit geldt voor alle Assessments met categorieën, afdelingen of domeinen en vervangt voor hen de teaser "Jouw overall score" en de twee blokken naast elkaar uit Kaart: Lead en respondent. Hieronder staat eerst de kaart voor Assessments met categorieën, daarna de afwijkingen voor Assessments met afdelingen (Quickscan) en voor Assessments met domeinen zonder categorieën (de AI-scan). Twee blokken van 500 px met een cirkel erbij passen niet naast elkaar, en Jij en Groep op één spoor laten het verschil per categorie direct zien.
 
 - **Breedte.** Elke kaart met een paneel is op volle breedte van de pagina, dus ook de kaart van een Lead zonder eigen scan en de kaart van een Lead die ook respondent is. Alle kaarten met een paneel zijn zo even breed en staan onder elkaar. Het paneel heeft minstens ongeveer 720 px nodig (zijblok 200 px, tussenruimte 40 px, rijen minstens 420 px en padding 64 px). In een halve kolom breken de responsregel, de datum en de as ("1" en "5") af. Zie het scherm van 19 oktober 2026, waar de smalle Lead-kaart naast een brede kaart stond.
 - **Paneel.** Onder de kop een paneel met achtergrond `--bg-warm`, rand `--border`, hoekstraal 10 px en padding 28 px 32 px. Links staat een zijblok van 200 px, rechts staan de rijen, met 40 px ertussen. Onder 720 px komt het zijblok boven de rijen.
@@ -151,6 +151,7 @@ Ontworpen in "Coniche Scan Mijn metingen", borden "Kaart met cirkel, voorstel (1
 - **Respons (alleen Lead).** Onderin het paneel, onder een lijn van 1 px `--border` en met 16 px ruimte. Een regel in 14 px `--ink-m`, "<n> van <m> respondenten afgerond". Rechts staat de chip "Compleet" (groen) als iedereen klaar is, met links ervan de datum van de laatst afgeronde scan in 14 px `--ink-s`, bijvoorbeeld "14 oktober 2026". Is niet iedereen klaar, dan staat rechts "Bijgewerkt <datum> · <percentage>" in 14 px `--ink-s`, met dezelfde datum. Daaronder een balk van 4 px met spoor `--border` en vulling `#b3b0a8`. De balk is niet oranje, want oranje is voor acties en categorieën. Het aantal respondenten en de datum staan er ook onder de drempel (Respons hierboven).
 - **Onder de drempel van `benchmarkMinRespondenten`.** Het paneel toont alleen de eigen balken en een regel "Resultaten van de groep volgen bij minstens <n> afgeronde scans" met de teller "<k> van <n>". Er is geen groepskolom, geen stip, geen lijn, geen groepsregel en geen legenda (Voorwaarden).
 - **Knoppen.** Onder het paneel, volgens Knoppen hierboven (40 px hoog, bij meer dan één knop 232 px breed, naast elkaar op één rij): Lead met eigen scan "Bekijk jouw resultaten" en "Resultaten hele meting" (hoofdacties) en "Respondenten uitnodigen" (nevenactie), een respondent alleen "Bekijk jouw resultaten".
+- **Over deze scan.** Op elke Meting-kaart van een Respondent staat naast "Bekijk jouw resultaten" de link "Over deze scan" naar de Assessment-pagina, in dezelfde stijl als de knoppen maar als tekstlink (`--or`, 14 px, gewicht 700). De linktekst hangt af van het type: "Over deze scan: visie en bouwblokken" bij de Volwassenheidsscan en de Zorgscan, "Over deze scan: AI-domeinen en 2030" bij de AI-scan en "Over deze scan: spanningsvelden en visie" bij de Spanningsmeter. Bij de Quickscan staat de link er niet. Een Lead die geen Respondent is, ziet hem niet. Zie `CLAUDE.md`, scherm 5.
 - **Geen chip Tussenstand of Eindstand.** In deze kaart vervalt die chip. Compleet of het percentage in de responsregel zegt al of de meting klaar is, en de datum staat daarnaast.
 - **Zelfde ring op het resultatenscherm.** De cirkel is de `.score-ring` van `stylesheet.md` (Resultaten) en wordt ook gebruikt in de totaalkaart van het resultatenscherm, voor de Volwassenheidsscan en de Quickscan. Daar vervangt ze de oude classificatiecirkel. Voor de Quickscan staat de opbouw in `content-ziekenhuis-quickscan.md`, Resultaten. De totaalkaart van de Volwassenheidsscan is nog niet opnieuw getekend en krijgt alleen de nieuwe ring, met de rest van de kaart zoals nu (Open punten).
 - **Typografie.** Vier groottes (12, 14, 18 en 36 px) en twee gewichten (400 en 700), met 800 alleen voor het getal in de cirkel. De labels "Jouw overall score" en "Gemiddelde score · <n> scans" vervallen, omdat de cirkel en de kolomkoppen hetzelfde zeggen.
@@ -170,13 +171,25 @@ Dezelfde kaart, in percentages en met klassekleuren. Alles hierboven geldt, beha
 - **Lijn.** Van de laagste tot de hoogste afdelingsscore van een afgeronde scan. Zijn die gelijk, dan alleen een stip.
 - **Kolomkop.** Het label boven de rijen is "Per afdeling".
 - **Respons, datum, knoppen, drempel.** Identiek aan de kaart hierboven.
-- **Zonder categorieën of afdelingen** (de AI-scan) staat alleen het totaal met de klassenchip, zonder cirkel en rijen.
+- **Zonder categorieën, afdelingen en domeinen** staat alleen het totaal met de klassenchip, zonder cirkel en rijen.
+
+### AI-scan (en andere Assessments met domeinen zonder categorieën)
+
+Besloten door Joost op 22 oktober 2026 (voorstel, nog te bouwen). Eerder stond de AI-scan op de teaser met alleen het totaal en de klassenchip; daardoor zag de kaart er anders uit dan die van de Volwassenheidsscan. Nu is het dezelfde kaart met cirkel, met rijen per AI-domein. Alles hierboven geldt, behalve de volgende punten.
+
+- **Paneel, cirkel, chip, Groep, stip, respons en knoppen.** Identiek aan de Volwassenheidsscan: Zijblok van 200 px, ring van 156 px met het totaal (schaal 1 tot 5, vulling `(score − 1) / 4`), klassenchip van 24 px in de celkleur van de afgeronde score (bijvoorbeeld "Basis op Orde" in `#fbe1e1` met tekst `#a32426`), de regel "Groep, <n> scans" en de stip van het groepsgemiddelde op de ring, de responsregel en de knoppen van 232 px.
+- **Rijen.** Eén rij per AI-domein, 40 px hoog, in de vaste volgorde 1 tot en met 8 (niet gesorteerd op score, zoals rond de radar). Links een nummerbolletje van 22 px in de domeinkleur (`stylesheet.md`, Domeinkleuren) met het nummer in 12 px, gewicht 700, wit; bij de domeinen 5, 6 en 8 in `--ink`. Daarnaast de domeinnaam in 14 px `--ink-m`, 190 px breed. Past een naam niet op één regel ("Performance, monitoring en kwaliteit"), dan loopt hij door op een tweede regel (regelhoogte 18 px) en blijft de rij 40 px. Daarna het spoor van 1 tot 5 en rechts de kolommen Jij en, bij een Lead, Groep van 44 px. Dit is dezelfde opbouw als de zes velden van de Spanningsmeter.
+- **Jij en Groep.** Zoals bij de Volwassenheidsscan, met de domeinkleur in plaats van de categoriekleur: Jij is een balk van 8 px, Groep een stip van 14 px met een witte rand van 2 px op het gemiddelde en een lijn van 2 px (`#b3b0a8`) van de laagste tot de hoogste score van een afgeronde scan in dat domein.
+- **Kolomkop.** Het label boven de rijen is "Per domein" (het meervoud van `Assessment.bouwblokLabel` in kleine letters, zoals in "Scores per domein" op het resultatenscherm). Er zijn geen categorielabels, want de AI-scan heeft geen categorielaag.
+- **Breedte.** Het paneel heeft minstens ongeveer 780 px nodig (zijblok 200 px, tussenruimte 40 px, nummerbolletje en naam 220 px, spoor minstens 160 px, twee getalkolommen 88 px en padding 64 px). De kaart is op volle breedte, zoals alle kaarten met een paneel.
+- **Tekstalternatief.** Per rij bijvoorbeeld "Domein 3, Use-cases en automatisering, jouw score 2,0, gemiddelde 3,4, laagste 2,0, hoogste 4,2". De cirkel heeft "Totaalscore 2,4, Basis op Orde".
+- **Lead zonder eigen scan, respondent zonder Resultaten en onder de drempel.** Zoals bij de Volwassenheidsscan.
 
 ### Zo gebouwd (19 oktober 2026)
 
 `CirkelPaneel` (`components/mijn-metingen/CirkelPaneel.tsx`) en de opmaak in `app/styles/mijn-metingen.css`, met de gegevens in `lib/mijn-metingen.ts` (`Teaser.ring`, en bij de Quickscan de lijn van laagste tot hoogste percentage per afdeling).
 
-- **Wanneer het paneel er staat.** Bij een afgeronde eigen scan, bij een Lead met Resultaten en genoeg afgeronde scans, en bij beide, voor een Assessment met categorieën of afdelingen. Een Assessment zonder categorieën (de AI-scan) houdt de teaser met alleen het totaal en de klassenpil. Een Lead die ook invult maar zijn eigen scan nog niet heeft afgerond, houdt de twee blokken Jouw scan en Hele meting.
+- **Wanneer het paneel er staat.** Bij een afgeronde eigen scan, bij een Lead met Resultaten en genoeg afgeronde scans, en bij beide, voor een Assessment met categorieën of afdelingen. Een Assessment zonder categorieën, afdelingen en domeinen houdt de teaser met alleen het totaal en de klassenpil. De AI-scan krijgt het paneel met domeinrijen vanaf 22 oktober 2026 (AI-scan hierboven, nog te bouwen); tot die tijd staat hij nog op de teaser met alleen het totaal. Een Lead die ook invult maar zijn eigen scan nog niet heeft afgerond, houdt de twee blokken Jouw scan en Hele meting.
 - **Lead zonder eigen scan.** Het paneel toont de groep: De cirkel is het gemiddelde van de Meting, onder de chip staat "Groep, n scans", en de rijen hebben alleen stip, lijn en de kolom Groep. Er is dan geen stip op de cirkel en geen legenda, want er is niets om mee te vergelijken. De spec beschrijft deze stand niet.
 - **Onder de drempel.** Een Lead die ook invult krijgt het paneel met de eigen balken en onder de rijen de regel "Resultaten van de groep volgen bij minstens n afgeronde scans (k van n)". Een Lead zonder eigen scan houdt het blok "Resultaten volgen bij minstens n afgeronde scans" met de teller.
 - **Knoppen.** De hoofdknop van de eigen scan staat in dezelfde rij als "Resultaten hele meting" en "Respondenten uitnodigen", elk 232 px bij meer dan één knop.
@@ -273,7 +286,7 @@ Gebouwd op 15 oktober 2026. De pagina is `app/s/[code]/page.tsx`, de kaarten sta
   Meting zijn afgerond en anders "Tussenstand". Een samengestelde Meting heeft de chip "Gemiddelde".
 - **Quickscan-teaser voor een Lead.** Dezelfde regels als bij de eigen scan, met het gemiddelde van de Meting
   (`quickscanMeting`) en alleen percentages in de rijen.
-- **Zonder categorieën of afdelingen** (de AI-scan) staat alleen het totaal met de klassenpil.
+- **Zonder categorieën, afdelingen en domeinen** staat alleen het totaal met de klassenpil. De AI-scan was hier de eerste uitzondering; zie AI-scan onder Kaart met cirkel voor de nieuwe vorm.
 - **"Respondenten uitnodigen"** opent onder de knoppen het invoerveld voor een e-mailadres.
 - **Benchmarkkaart.** Titel is `Benchmark.naam`. De regel noemt het aantal organisaties alleen bij `benchmarkMinOrganisaties`. Bij
   niveau 2 staat "Vergelijking van Metingen".

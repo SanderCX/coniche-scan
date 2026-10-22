@@ -410,8 +410,8 @@ standaardteksten zoals ze nu in de app staan):
 | `info.auditLog` | Audit-log, naast de paginatitel | Wie (of het Systeem) wat deed, wanneer en op welk record. Alleen-lezen. Geen persoonsgegevens uit scans. |
 | `info.algemeneTekstenPagina` | Algemene teksten, naast de paginatitel | Teksten los van één Assessment-type. Wijzigingen zijn direct zichtbaar, geen aparte publicatiestap. |
 | `info.algemeneTekstenInfoIconen` | Algemene teksten, naast de kop Info-iconen | Alle toelichtingen achter een Info-icoon, met de plek en de actuele tekst. Aanpassen kan op de plek zelf, met het potlood in het open Info-icoon. |
-| `info.contentToelichting` | Content, veld Toelichting van een bouwblok | Lopende tekst in de Toelichtingsmodal bij dit bouwblok. Een lege regel scheidt de alinea's. Laat je het veld leeg, dan ontbreekt dit onderdeel in de modal. |
-| `info.contentBouwblokLabel` | Content, veld Bouwblok-label | De kleine kop boven de titel in de Toelichtingsmodal, bijvoorbeeld "Bouwsteen" of "AI-domein", gevolgd door het nummer. |
+| `info.contentToelichting` | Content, veld Toelichting van een bouwblok | Lopende tekst in de Toelichtingsmodal en in de kop van dit bouwblok in de doorloopflow. Een lege regel scheidt de alinea's. Laat je het veld leeg, dan ontbreekt dit onderdeel in de modal en in de kop. |
+| `info.contentBouwblokLabel` | Content, veld Bouwblok-label | De kleine kop boven de titel in de Toelichtingsmodal en in de doorloopflow, bijvoorbeeld "Bouwsteen" of "AI-domein", gevolgd door het nummer. |
 | `info.conflictOplossen` | Conflict oplossen, naast de titel van de modal | Een Respondent heeft per Meting één scan. Hang één van de twee scans aan een andere Respondent. Alleen die scan gaat mee, de oorspronkelijke Respondent blijft bestaan met de andere scan. |
 | `info.dataIntegriteit` | Instellingen, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
 | `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
@@ -649,7 +649,7 @@ verplaatsen, omhangen en verwijderen (`datamodel.md`, Audit), met in
 Aanmaken en bewerken van een `Assessment` (`datamodel.md`): Naam, kort
 label (voor de PDF-footer, bijv. "Volwassenheidsscan"), subtitel,
 beschrijving, doelgroep, geschatte duur, het bouwblok-label (de eyebrow
-in de Toelichtingsmodal, standaard "Bouwsteen", bij de AI-scan
+in de Toelichtingsmodal en de doorloopflow, standaard "Bouwsteen", bij de AI-scan
 "AI-domein"), de vijf schaallabels, en de
 slotsectie voor de PDF-export (`pdfContentSecties`, zie
   `export-pdf-visual-volwassenheidsscan.md`, Slotsectie per scan-type):

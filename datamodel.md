@@ -44,7 +44,7 @@ Assessment {
   relevantieVraag: string | null    // alleen als een Categorie optioneel is: de Ja/Nee-vraag bovenaan die categorie, zie Optionele categorieën
   pdfContentSecties: { titel: string, bron: ContentBron } | null // zie export-pdf-visual-volwassenheidsscan.md
   afgeleidVanAssessmentId: string | null // zie Sector-varianten hieronder
-  bouwblokLabel: string             // eyebrow in de Toelichtingsmodal; standaard "Bouwsteen" (Klantcontact, Zorg), "AI-domein" bij de AI-scan
+  bouwblokLabel: string             // eyebrow in de Toelichtingsmodal en in de kop van het bouwblok in de doorloopflow; standaard "Bouwsteen" (Klantcontact, Zorg), "AI-domein" bij de AI-scan
   bouwblokEenheidEnkelvoud: string  // enkelvoud van de eenheid in lopende tekst, bijv. "bouwsteen" of "domein"
   bouwblokEenheidMeervoud: string   // meervoud, bijv. "bouwstenen" of "domeinen"
   wegingTitel: string | null        // kop van de wegingskaart, zie Bouwblok.gewicht; leeg = standaardtitel
@@ -123,7 +123,7 @@ Bouwblok {
   volgnummer: number                // 1 t/m 15, volgens de nummering in visie-coniche.md
   naam: string
   omschrijving: string              // de vraagzin onder de titel
-  toelichting: string | null        // lopende tekst in de Toelichtingsmodal, zie stylesheet.md; leeg = dat onderdeel ontbreekt
+  toelichting: string | null        // lopende tekst in de Toelichtingsmodal en direct in de kop van het bouwblok in de doorloopflow, zie stylesheet.md; leeg = dat onderdeel ontbreekt
   centraleVraag: string | null      // blok "CENTRALE VRAAG" in dezelfde modal, bron: visie-coniche.md deel 2 / visie-ai-klantcontact.md; leeg = het blok ontbreekt
   tags: string[]                    // variabel aantal
   korteNaam: string | null          // alleen bij antwoordType "spanning": naam voor rijen en tooltips waar de volledige naam te lang is ("Verhaal", "Regie", ...); leeg = de volledige naam

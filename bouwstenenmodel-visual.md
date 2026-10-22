@@ -14,10 +14,10 @@ beschrijving en de centrale vraag.
 ## Hergebruik van bestaande content, geen nieuwe
 
 De modal die opent bij een klik, is de Toelichtingsmodal (`stylesheet.md`,
-"Modal en Toelichtingsmodal"), dezelfde als bij de toelichting-icoontjes
-("i") per bouwblok in de doorloopflow (CLAUDE.md sectie 3).
-Beide triggers, het i-icoontje in de doorloopflow en een klik op een
-blok in dit overzicht, openen dezelfde modal met dezelfde content
+"Modal en Toelichtingsmodal"), dezelfde modal die tot 22 oktober 2026 ook bij het i-icoontje in de
+doorloopflow hoorde. De doorloopflow toont die content nu direct in de
+kop van het bouwblok (CLAUDE.md sectie 3). Een klik op een
+blok in dit overzicht opent de modal met dezelfde content
 (`Bouwblok.toelichting` en `Bouwblok.centraleVraag`). Geen nieuwe
 overlay bouwen, geen content dupliceren.
 
@@ -243,8 +243,9 @@ gebouwd.
 
 **Definitief: Modal-overlay, niet een inline paneel.** Klikken op een
 bouwsteen-blok opent de Toelichtingsmodal (`stylesheet.md`, "Modal en
-Toelichtingsmodal"), dezelfde overlay als bij de toelichting bij een
-bouwblok in de doorloopflow. Eén functie, één opmaak. Geen tweede
+Toelichtingsmodal"), één overlay voor alle plekken waar de toelichting in een
+modal staat (de doorloopflow toont de toelichting sinds 22 oktober 2026
+direct in de kop). Eén functie, één opmaak. Geen tweede
 modalfunctie en geen inline stijlen bouwen.
 
 **Afwijking om te corrigeren**: De eerste bouwpoging toont de inhoud in
@@ -274,8 +275,8 @@ nodig.
 
 ## Open punten
 
-- `Bouwblok.omschrijving` is nu de korte vraagzin die in de doorloopflow
-  onder de bouwblok-titel staat (bijv. "Wat zijn de belangrijkste korte
+- `Bouwblok.omschrijving` was de korte vraagzin die in de doorloopflow
+  onder de bouwblok-titel stond (sinds 22 oktober 2026 staan daar de centrale vraag en de toelichting) (bijv. "Wat zijn de belangrijkste korte
   en langere termijn strategische organisatiedoelen en -plannen"). De
   langere beschrijving uit `visie-coniche.md` staat nu in
   `Bouwblok.toelichting`. Voor dit scherm is de toelichting de juiste
