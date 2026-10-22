@@ -346,6 +346,8 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
 | Wisselend vanaf (Quickscan) | `spreidingWisselendQuickscan` | 14 | Standaardafwijking van de percentages, in procentpunten, vanaf waar het label Wisselend is. |
 | Verdeeld vanaf (Quickscan) | `spreidingVerdeeldQuickscan` | 20 | Standaardafwijking in procentpunten vanaf waar het label Verdeeld is. |
 
+**Schakelaar Testknop** (`testknopAan`, boolean, standaard uit). Een schakelaar onder Drempels en termijnen, met de kop "Testknop in de vragenlijst" en de hint "Toont een knop waarmee je een vragenlijst automatisch invult, om te testen. Zet hem uit in productie." Staat hij aan, dan ziet een ingelogde Admin of Consultant bovenaan de vragenlijst het vlak "TESTKNOP (tijdelijk)" met de keuzelijst Gemiddelde score (2, 3 of 4) en de knop "Vul alle vragen automatisch in". Een Respondent of Lead ziet het vlak nooit, ook niet als de schakelaar aan staat. Alleen een Admin mag de schakelaar zetten. Wijzigen wordt gelogd in het audit-log.
+
 **Formulier Verkennen** (`visualisatie-verkennen.md`, Drempels). Een eigen formulier onder Drempels en termijnen, naast de formulieren Bewaartermijn en Benchmark, met de kop Verkennen en een Info-icoon (`info.verkennenInstellingen`). Het bevat de grenzen die bepalen wanneer Verkennen een groep, een vergelijking of een groepering toestaat. Het formulier heeft vijf velden: `verkennenMinGroep`, `verkennenMinVergelijking`, `verkennenMinPool`, `verkennenMinIngevuldPct` en een vijfde grens (`visualisatie-verkennen.md`, Drempels), met het Info-icoon `info.verkennenInstellingen`. De startwaarden 3, 5, 6, 12 en 40 zijn de norm vanuit het ontwerp en blijven de beginstand. Een Admin kan elke waarde in de praktijk aanpassen.
 
 | Veld | Instelling | Startwaarde | Wat het doet |
@@ -449,7 +451,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.contactpersonen` | Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen | Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze. |
 | `info.dossier` (vervangt `info.nieuwsartikelen`) | Organisatie-detail, kaart Dossier, naast de titel | Cases, benchmarks, nieuws, events en blogs die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier zichtbaar is én het item op Zichtbaar voor Lead staat. Een case kan alleen zichtbaar worden als de organisatie in de case dat heeft toegestaan. |
 | `info.caseVlag` | Organisatie-detail, bij het vinkje "Mag als case gebruikt worden" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads. |
-| `info.kpiBlok` | Organisatie-detail, blok KPI's, naast de titel | Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet. |
+| `info.kpiBlok` | Organisatie-detail, organisatiepaneel, naast het label KPI's | Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet. |
 | `info.kpiPlek` | Modal KPI's invullen, naast het label Plek | Kies voor welk deel van de organisatie je invult. Algemeen is de hele organisatie. |
 | `info.kpiKanalen` | Modal KPI's invullen, naast het label Kanalen uitsplitsen | Kies alleen de kanalen waarvoor je cijfers hebt. De kolom Algemeen blijft altijd staan. |
 | `info.kpiDefinities` | Organisatievelden, tab KPI's en kanalen, naast de titel KPI's | Per KPI bepaal je of hij per onderdeel en per kanaal ingevuld mag worden. Algemeen is altijd mogelijk. |
@@ -811,7 +813,8 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
 
 - **Kaart KPI's.** Titel met een Info-icoon (`info.kpiDefinities`) en rechts de
   knop "+ KPI toevoegen" (`.btn-or .btn-compact`). Daaronder een tabel met de
-  kolommen Naam (invoerveld), Eenheid (invoerveld), Per onderdeel (vinkje), Per
+  kolommen Naam (invoerveld), Eenheid (invoerveld), Schaal van en Schaal tot (twee
+  invoervelden voor `schaalMin` en `schaalMax`, leeg betekent geen ring in het blok KPI's), Per onderdeel (vinkje), Per
   kanaal (vinkje) en Korte naam (invoerveld, met de naam als placeholder). De
   rijen staan in de volgorde van aanmaken.
 - **Vinkjes.** Een vinkje staat uitgeschakeld zolang er waarden op dat niveau
@@ -971,13 +974,13 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   filter Organisatie al ingesteld op deze organisatie (in de URL, zoals de
   andere filters). Zijn het er 5 of minder, dan is er geen link. Er komt
   geen link naar de lijst over alle organisaties heen.
-  **Eén kaart per sectie**: Het organisatiepaneel, het Dossier, de KPI's, de
+  **Eén kaart per sectie**: Het organisatiepaneel, het Dossier, de
   Metingen, de Respondenten en de Leads staan elk op een eigen witte kaart
   (`stylesheet.md`, Sectiekaart), in die volgorde. De kop van een kaart heeft
   links de titel en rechts de actie van die sectie.
-- **Organisatiepaneel** (design: Design-artifact "Organisatiescherm: visuele varianten", bord C; de organisatievelden heten in het datamodel nog Kenmerken): De witte kaart bovenaan het organisatie-detail, boven de kaarten Dossier, KPI's, Metingen, Respondenten en Leads. Ze toont de waarden van de organisatievelden (`datamodel.md`, Organisatievelden) visueel, laat bewerken op dezelfde plek en bevat verderop in dezelfde kaart Toegang, Afspraken en Contactpersonen. Welke blokken de Lead in het Dossier ziet, stelt een Consultant of Admin in bij Bewerken (zie Zichtbaar voor de Lead hieronder en `dossier.md`, Profiel van de Organisatie).
+- **Organisatiepaneel** (design: Design-artifact "Organisatiescherm: visuele varianten", bord C; de organisatievelden heten in het datamodel nog Kenmerken): De witte kaart bovenaan het organisatie-detail, boven de kaarten Dossier, Metingen, Respondenten en Leads. Ze toont de waarden van de organisatievelden (`datamodel.md`, Organisatievelden) en de KPI's visueel, laat bewerken op dezelfde plek en bevat verderop in dezelfde kaart Toegang, Afspraken en Contactpersonen. Welke blokken de Lead in het Dossier ziet, stelt een Consultant of Admin in bij Bewerken (zie Zichtbaar voor de Lead hieronder en `dossier.md`, Profiel van de Organisatie).
   - **Kaart**: Zoals Kaarten in `stylesheet.md` (wit, `1px solid var(--border)`, `border-radius: 10px`), met padding 24px en 24px tussen de onderdelen.
-  - **Kop**: Links een vierkant van 56px met de beginletter van de organisatie (radius 14px, achtergrond `--or-faint`, letter 28px, gewicht 800, `--or`). Daarnaast de naam (24px, gewicht 800) en eronder de pillen Sector en Subsector (12px, gewicht 700, radius 12px, padding 4px 10px). Sector heeft `--bl-faint` met tekst `--bl`, Subsector `--bg-mid` met tekst `--ink-m`. Ze tonen de korte naam, met de originele naam in de tooltip (zie Korte namen in kaart en formulier). Een pil zonder waarde valt weg. Rechts staat de knop "Bewerken" (`.btn-outline .btn-compact`, vraagt `organisaties.bewerken`). Een Lead of Respondent ziet dit paneel niet.
+  - **Kop**: Links een vierkant van 56px met de beginletter van de organisatie (radius 14px, achtergrond `--or-faint`, letter 28px, gewicht 800, `--or`). Daarnaast de naam (24px, gewicht 800) en eronder de pillen Sector en Subsector (12px, gewicht 700, radius 12px, padding 4px 10px). Sector heeft `--bl-faint` met tekst `--bl`, Subsector `--bg-mid` met tekst `--ink-m`. Ze tonen de korte naam, met de originele naam in de tooltip (zie Korte namen in kaart en formulier). Een pil zonder waarde valt weg. Rechts staat de knop "Bewerken" (`.btn-outline .btn-compact`, met een pijltje ▾ erachter, vraagt `organisaties.bewerken`) die een menu opent, zoals het menu van "Exporteren" (`stylesheet.md`). De opties zijn "Kenmerken" (opent de modal Kenmerken bewerken, hieronder), "KPI's invullen" (opent de modal KPI's invullen) en "Onderdelen" (opent de modal Onderdelen). Alle drie vragen `organisaties.bewerken`. Een Lead of Respondent ziet dit paneel niet.
   - **Regel onder de naam**: In het design staat de regel "Aangemaakt door: … · Ook toegewezen aan: …" niet meer onder de naam, omdat Toegang dit toont. Een Consultant ziet de kaart Toegang niet en houdt de regel daarom (12px, `--ink-s`, onder de pillen), als alleen-lezen tekst.
   - **Cijferrij**: Onder de kop, tussen twee lijnen van 1px `--border`, vier kolommen met een lijn van 1px `--border` ertussen en 24px padding links van elke kolom behalve de eerste. Elke kolom heeft een getal (32px, gewicht 800) en eronder een toelichting (14px, `--ink-m`):
     - **Klanten**: Het totaal aantal klanten, vanaf een miljoen als "2,4 mln", daaronder met het aandeel B2C: "klanten, 92% B2C".
@@ -989,7 +992,14 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     - **Ingezet**: Gekleurd. De cirkel heeft de kleur van het kanaal, de pil de lichte variant daarvan met een rand in dezelfde tint, de naam staat in gewicht 700 en daarachter het aantal contacten per jaar in 14px `--ink-m` ("850k").
     - **Niet ingezet**: Lichtgrijs, zodat het kanaal zichtbaar blijft zonder op te vallen. Achtergrond `--bg-warm`, rand `#efede8`, cirkel `#efede8` met icoon `#a9a69e`, naam in gewicht 600 en `#8f8c84`, zonder aantal.
     - **Kleur per kanaal** (`stylesheet.md`, Kanaalkleuren): Het icoon en de kleur horen bij het kanaal, maar de kleur is nooit het enige verschil, want de naam staat er altijd bij.
-  - **Techstack**: Onder de kanalen het label Techstack (zelfde opmaak als Kanalen) en zes tegels in één rij, een per categorie. Een tegel is `--bg-warm`, heeft radius 8px en padding 10px 12px, en toont de categorie (12px, `--ink-m`) en de oplossing (14px, gewicht 700, korte naam als die er is). Wie de oplossing ondersteunt, het deploymentmodel en de cloudleverancier staan niet in het paneel, alleen in het formulier. Dat is bewust: Op dit scherm is wie ondersteunt veel minder belangrijk dan welke oplossing er staat.
+  - **KPI's** (design: bord F, G en H in het Design-artifact "Organisatiescherm: visuele varianten"): Onder de Kanalen het label KPI's (zelfde opmaak als Kanalen) met een Info-icoon (`info.kpiBlok`) en daaronder een rij ringen. De opmaak van de ringen, het kiezen van een kanaal via de kanaalpillen en de drie toestanden bij een gekozen kanaal staan in `dossier.md`, KPI-ringen, en gelden hier ook. Het blok staat altijd in het paneel, ook als de schakelaar KPI's voor de Lead uit staat. Die bepaalt alleen wat de Lead ziet. Dit verschilt van wat de Lead ziet:
+    - **Onderdeel kiezen.** Heeft de Organisatie Onderdelen, dan staat rechts op de regel van het label een keuzelijst (32px hoog) met "Hele organisatie" en daarna de Onderdelen op alfabet. Hele organisatie staat gekozen bij het openen. De ringen tonen de waarden (`KpiWaarde`) van de gekozen plek. De keuze van het Onderdeel en die van het kanaal blijven staan als je de andere wijzigt, maar worden niet bewaard. De kop is "KPI'S · {Onderdeel} · {KANAAL}", waarbij een deel dat niet gekozen is wegvalt. Zonder Onderdelen is er geen keuzelijst. "KPI's invullen" opent met de gekozen plek.
+    - **Niets valt weg.** Een KPI zonder waarde blijft staan, ook zonder gekozen kanaal. De ring is dan uitgegrijsd met "Niet ingevuld", zodat zichtbaar is wat nog ontbreekt.
+    - **Niet van toepassing.** Bij een gekozen Onderdeel staat een KPI zonder `perOnderdeel` uitgegrijsd met de regel "n.v.t." in plaats van "Niet ingevuld".
+    - **Stip en kanalen.** De stip toont Algemeen bij Algemeen van de gekozen plek. Een kanaalpil is klikbaar als het kanaal bij die plek ingezet is (Contacten per jaar groter dan 0 bij die plek).
+    - **Zonder schaal.** Een KPI zonder `schaalMin` en `schaalMax` heeft geen ring. De waarden staan wel in "KPI's invullen".
+    - **Geen eigen knoppen.** Het blok heeft geen knoppen. Invullen en het beheren van Onderdelen staan onder Bewerken.
+  - **Techstack**: Onder de KPI's het label Techstack (zelfde opmaak als Kanalen) en zes tegels in één rij, een per categorie. Een tegel is `--bg-warm`, heeft radius 8px en padding 10px 12px, en toont de categorie (12px, `--ink-m`) en de oplossing (14px, gewicht 700, korte naam als die er is). Wie de oplossing ondersteunt, het deploymentmodel en de cloudleverancier staan niet in het paneel, alleen in het formulier. Dat is bewust: Op dit scherm is wie ondersteunt veel minder belangrijk dan welke oplossing er staat.
   - **Overige velden**: Adoptie mijnomgeving/app, Klantcontact management & support en IT DevOps-medewerkers staan niet in het design van bord C. Ze staan als kleine regel onder de Techstack, als label (12px, `--ink-s`) boven een waarde (14px, gewicht 600), in een rij die afbreekt. Dit onderdeel moet nog in het design worden gezet.
   - **Onder de lijn**: Onder de Techstack staat een lijn van 1px `--border` en daaronder twee vlakken van gelijke breedte met 24px ertussen: links Toegang en rechts Afspraken (beide alleen voor een Admin, zie hierboven). Een vlak heeft `--bg-warm`, `1px solid #efede8`, radius 10px en padding 16px 20px. Voor een Consultant staat hier niets, en Contactpersonen staan direct onder de Techstack.
   - **Contactpersonen**: Onderaan het paneel, onder Toegang en Afspraken (zie hieronder).
@@ -1006,7 +1016,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     er in plaats van de cijferrij, de Techstack en de overige velden de tekst "Er zijn nog geen kenmerken ingevuld."
     in `--ink-s` (14px), met "Bewerken" rechtsboven zoals altijd. De kanalen
     blijven staan als ze er zijn.
-  - **Bewerken** (volgt de regel Bewerken in `stylesheet.md`): "Bewerken" opent een modal (`.modal-box--breed`, titel
+  - **Bewerken** (volgt de regel Bewerken in `stylesheet.md`): De optie "Kenmerken" van "Bewerken" opent een modal (`.modal-box--breed`, titel
     "Kenmerken bewerken" met de naam van de Organisatie eronder) met de velden
     van `datamodel.md`, Organisatievelden, in een raster van twee kolommen. Het
     zijn er te veel om in de kaart zelf te bewerken, en een formulier in de kaart
@@ -1016,11 +1026,10 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     Annuleren en het kruisje gooien de wijzigingen weg. Terwijl de modal open
     staat, geldt het Bewerkslot (`datamodel.md`, Bewerkslot). Een veld dat van een
     ander veld afhangt (Subsector bij Sector) volgt de regels uit het datamodel.
-  - **Zichtbaar voor de Lead**: Onderin de modal Kenmerken bewerken, onder het formulier en boven de knoppen, staat een groep met de kop "Zichtbaar voor de Lead" (14px, gewicht 700, met Info-icoon `info.profielLead`) en vier schakelaars onder elkaar, elk met een label: Cijfers (klanten, FTE klantcontact, contacten per jaar en digitalisering), Kanalen, Techstack en Overige velden. Ze horen bij `Organisatie.dossier.toonProfiel` (`datamodel.md`, Dossieritem) en staan standaard uit. De groep is alleen zichtbaar voor wie `dossier.bewerken` heeft. Staat het Dossier niet zichtbaar voor de Lead (`Organisatie.dossier.zichtbaar` uit), dan zijn de schakelaars wel te zetten, met onder de groep de hint "De Lead ziet dit pas als het Dossier zichtbaar is gemaakt." Opslaan schrijft ze samen met de velden. Toegang, Afspraken en Contactpersonen hebben geen schakelaar, want de Lead ziet ze nooit. Een wijziging wordt gelogd als `dossier.profielGewijzigd`.
-  - **Wat het paneel niet bevat**: De KPI's staan in de kaart eronder
-    (hieronder). Het paneel toont alleen Contacten per jaar (Algemeen en per
-    kanaal) uit die KPI's, als leesweergave. De Meting, het benchmarkvinkje en de
-    Leads hebben eigen kaarten.
+  - **Zichtbaar voor de Lead**: Onderin de modal Kenmerken bewerken, onder het formulier en boven de knoppen, staat een groep met de kop "Zichtbaar voor de Lead" (14px, gewicht 700, met Info-icoon `info.profielLead`) en vijf schakelaars onder elkaar, elk met een label: Cijfers (klanten, FTE klantcontact, contacten per jaar en digitalisering), Kanalen, Techstack, Overige velden en KPI's (de KPI's van de hele organisatie als ringen, zonder Onderdelen). Ze horen bij `Organisatie.dossier.toonProfiel` (`datamodel.md`, Dossieritem) en staan standaard uit. De groep is alleen zichtbaar voor wie `dossier.bewerken` heeft. Staat het Dossier niet zichtbaar voor de Lead (`Organisatie.dossier.zichtbaar` uit), dan zijn de schakelaars wel te zetten, met onder de groep de hint "De Lead ziet dit pas als het Dossier zichtbaar is gemaakt." Opslaan schrijft ze samen met de velden. Toegang, Afspraken en Contactpersonen hebben geen schakelaar, want de Lead ziet ze nooit. Een wijziging wordt gelogd als `dossier.profielGewijzigd`.
+  - **Wat het paneel niet bevat**: De Meting, het benchmarkvinkje en de
+    Leads hebben eigen kaarten. De cijferrij toont van de KPI's alleen Contacten
+    per jaar (Algemeen), de andere KPI's staan in het blok KPI's.
   - **Contactpersonen** (op verzoek van Sander; Nieuws is op verhuisd naar de kaart Dossier, zie hieronder): Onderaan het organisatiepaneel, onder Toegang en Afspraken,
     gescheiden door een lijn van 1px `--border` en 24px ruimte, staat de lijst
     Contactpersonen met een kop van 16px, gewicht 700, een Info-icoon
@@ -1072,59 +1081,9 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     origineel. Bewaard wordt altijd het origineel (`Organisatie.kenmerken`), dus
     een korte naam wijzigen verandert geen gegevens. De exports, de import en de
     PDF houden het origineel (`datamodel.md`, Korte namen).
-- **KPI's** (ontworpen; design in `Claude outputs/kpi-design/`, bord 1 en 2, de kolommen in bord 6): Een eigen kaart onder de
-  Kenmerken. De KPI's en de contacten per kanaal staan niet meer bij de
-  Kenmerken (`datamodel.md`, KPI's en kanalen). De Kenmerken zelf zijn in het
-  design een compacte lijst met "Bewerken", uitgeschreven in het punt Kenmerken
-  hierboven. De spec van de Kenmerken verandert alleen doordat de KPI's eruit zijn.
-  - **Kop**: De titel KPI's met een Info-icoon (`info.kpiBlok`). Rechts "+
-    Onderdeel toevoegen" (`.btn-or .btn-compact`) en "KPI's invullen"
-    (`.btn-outline .btn-compact`). Beide vragen `organisaties.bewerken`. "+
-    Onderdeel toevoegen" opent een basismodal met het veld Naam, "Annuleren" en
-    "Opslaan". Die modal staat niet in het design.
-  - **Tabel**: In de eerste kolom de KPI's in de volgorde van de definities.
-    Daarna de kolom Algemeen en dan de Onderdelen op alfabet. Algemeen heeft
-    `--bg-warm` als achtergrond. De tabel staat in een vak met `overflow-x:
-    auto`, met de eerste kolom vast (`position: sticky; left: 0`) zodra de
-    tabel breder is dan het vak.
-  - **Kolomkop** (design bord 1 en 6, volgt `stylesheet.md`, Kolomkop en rijkop): Elke kolom met cijfers is 96px breed
-    (`--kolom-b`), ook Algemeen, en de eerste kolom is 240px. Op de eerste regel
-    staat de naam in 14px, gewicht 700, rechts uitgelijnd, op één regel en met
-    een afkapping (`…`) als hij niet past. Een korte naam bestaat hier niet
-    (korte namen staan niet in het organisatie-detail), dus de volledige naam
-    wordt afgekapt. Op de tweede regel staat "n van m" in 12px, gewicht 400, in
-    `--ink-s`, zonder het woord "ingevuld". Daarin is n het aantal KPI's met een
-    waarde bij het kanaal Algemeen voor die plek, en m het aantal KPI's dat op
-    die plek mag (bij Algemeen alle KPI's, bij een Onderdeel de KPI's met
-    `perOnderdeel`). De tooltip (`title`) noemt de volledige naam, "n van m
-    KPI's ingevuld" en bij een Onderdeel "Klik om te bewerken" (de regel Bewerken in `stylesheet.md`). De
-    tabel heeft vaste kolommen (`table-layout: fixed`, 240px en 96px) en elke rij
-    is 48px hoog (gemeten in de browser), een kanaalrij 40px.
-    - **Onderdeel wijzigen**: De kop van een Onderdeel is zelf een knop (hover
-      `--bg-mid`, zichtbare focusring) die een basismodal opent met de naam,
-      "Verwijderen" (`.btn-danger`, uitgeschakeld zolang er Metingen zijn, met
-      de reden), "Annuleren" en "Opslaan". Er staat geen potlood in de kop. De
-      kop van Algemeen is geen knop. Die modal staat niet in het design.
-    - **Fout, geen variant**: Een kop op twee regels, een kolom die breder is
-      dan 96px, een kolom waarvan de breedte van de naam afhangt en een eenheid
-      op een tweede regel onder de KPI-naam.
-  - **KPI-naam en eenheid**: De eenheid staat achter de naam op dezelfde regel,
-    bijvoorbeeld "AHT (s)" en "SLA (%)", zodat elke rij 48px hoog is. Een
-    kanaalrij is 40px hoog.
-  - **Cel**: De waarde, rechts uitgelijnd, met tabelcijfers. Een lege cel is
-    een streepje in grijs. Mag de KPI niet op die plek (`perOnderdeel` uit),
-    dan staat er "n.v.t." in grijs.
-  - **Kanalen per KPI**: Een KPI met `perKanaal` en minstens één kanaalwaarde in
-    de tabel heeft voor de naam een chevron en achter de naam "n kanalen" in
-    12px grijs, met n het aantal kanalen met minstens één waarde. Een klik
-    klapt de KPI open: Per kanaal met minstens één waarde een rij, in de
-    volgorde van de kanalenlijst, met een streepje bij lege cellen. Een KPI
-    zonder kanaalwaarden heeft geen chevron. Standaard staat elke KPI dicht en
-    de stand wordt niet bewaard.
-  - **Zonder Onderdelen**: Dan toont de tabel alleen de kolom Algemeen, met
-    eronder de regel "Er zijn nog geen onderdelen. De waarden gelden voor de
-    hele organisatie en voor alle kanalen samen."
-- **KPI's invullen** (ontworpen; design bord 3): Een modal in plaats van een zijpaneel, omdat de specs alleen
+- **KPI's** (ontworpen): De KPI's hebben geen eigen kaart en geen tabel met een kolom per Onderdeel meer. Ze staan als ringen in het organisatiepaneel (`beheerpagina.md`, Organisatiepaneel, KPI's). "KPI's invullen" en het beheren van Onderdelen staan onder "Bewerken" (Organisatiepaneel, Kop). De oude kaart met de tabel, de kolomkop met "n van m" en de chevron per KPI vervallen.
+- **Onderdelen** (modal, niet in het design): Opent via Bewerken, optie "Onderdelen", en vervangt "+ Onderdeel toevoegen" en het wijzigen via de kolomkop. `.modal-box` (maximaal 560px) met de titel "Onderdelen" als `h2` van 18px, de naam van de Organisatie eronder in 14px en een kruisje. Daaronder een rij per Onderdeel op alfabet, links met een tekstveld met de naam (`.field`) en rechts "Verwijderen" (`.btn-danger .btn-compact`, uitgeschakeld zolang er Metingen aan het Onderdeel hangen, met de reden in een tooltip). Onder de rijen staat een rij met een leeg tekstveld (placeholder "Naam van een nieuw onderdeel") en "+ Toevoegen" (`.btn-or .btn-compact`). Zonder Onderdelen staat er alleen die rij, met erboven de regel "Er zijn nog geen onderdelen. De KPI's gelden voor de hele organisatie en voor alle kanalen samen." Onderin staan "Annuleren" en "Opslaan" zoals bij KPI's invullen. De naamregels staan in `datamodel.md`, Onderdeel (verplicht, uniek binnen de Organisatie, "Hele organisatie" is gereserveerd). Verwijderen vraagt een bevestiging die het aantal KPI-waarden noemt (`datamodel.md`, Verwijderen en datakoppelingen). Openen neemt het Bewerkslot en Opslaan logt `onderdeel.aangemaakt`, `onderdeel.hernoemd` en `onderdeel.verwijderd`.
+- **KPI's invullen** (ontworpen; design bord 3): Opent via "Bewerken", optie "KPI's invullen", met de plek die in het blok KPI's gekozen is. Een modal in plaats van een zijpaneel, omdat de specs alleen
   de modal kennen voor een formulier met "Annuleren" en "Opslaan" (zoals de modal
   Korte namen). `.modal-box--breed` (maximaal 720px), met `max-height: 88vh` en
   scrollen binnen de modal.

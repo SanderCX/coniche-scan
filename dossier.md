@@ -34,6 +34,7 @@ Organisatie.dossier {
     kanalen: boolean                // standaard false
     techstack: boolean              // standaard false
     overig: boolean                 // standaard false
+    kpis: boolean                   // standaard false, de KPI's van de hele Organisatie als ringen
   }
   radarBronnen: RadarBron[]         // hoogstens één per Assessment met een radar, leeg of ontbrekend = overal automatisch
   gewijzigdOp: datetime | null      // laatste wijziging in wat een Lead ziet
@@ -123,12 +124,29 @@ Dit wordt aan de serverkant bepaald, bij elke keer laden. Het prototype bepaalt 
 
 Naast de items kan de Lead bovenaan het Dossier een compact profiel van zijn eigen Organisatie zien, opgebouwd uit de blokken van het organisatiepaneel (`beheerpagina.md`, Organisatiepaneel). Een Consultant of Admin met `dossier.bewerken` kiest per blok of de Lead het ziet, met de schakelaars Zichtbaar voor de Lead in het venster Kenmerken bewerken (`beheerpagina.md`, Zichtbaar voor de Lead).
 
-- **Blokken.** Cijfers (klanten, FTE klantcontact, contacten per jaar, digitalisering), Kanalen, Techstack en Overige velden. Elk blok heeft een eigen schakelaar in `Organisatie.dossier.toonProfiel`, standaard uit.
+- **Blokken.** Cijfers (klanten, FTE klantcontact, contacten per jaar, digitalisering), Kanalen, Techstack, Overige velden en KPI's. Elk blok heeft een eigen schakelaar in `Organisatie.dossier.toonProfiel`, standaard uit.
 - **Voorwaarde.** Een blok is alleen zichtbaar als `Organisatie.dossier.zichtbaar` aan staat. Staat het Dossier uit, dan ziet de Lead niets, ook niet als de schakelaars aan staan.
-- **Nooit zichtbaar.** Toegang, Afspraken en Contactpersonen. Ze gaan over de relatie tussen Coniche en de Organisatie en staan niet in het profiel dat de Lead ziet.
+- **Nooit zichtbaar.** Toegang, Afspraken, Contactpersonen en de KPI-waarden van Onderdelen. Ze gaan over de relatie tussen Coniche en de Organisatie en staan niet in het profiel dat de Lead ziet.
 - **Alleen de eigen Organisatie.** De Lead ziet nooit het profiel van een andere Organisatie.
 - **Waarden.** Wat de Lead ziet, zijn dezelfde waarden als in het organisatiepaneel. Een wijziging daar is dus direct zichtbaar voor de Lead zodra het blok aan staat. Bij de Techstack staat alleen de oplossing, zoals in het paneel.
 - **Zichtbaarheid wijzigen.** Een wijziging van een schakelaar telt als wijziging in wat een Lead ziet en zet `gewijzigdOp`.
+
+### KPI-ringen
+
+Ontwerp: borden F, G en H in het Design-artifact "Organisatiescherm: visuele varianten". In het Profiel van de Organisatie staat onder de Kanalen het blok KPI's, als `toonProfiel.kpis` aan staat. Het toont de KPI's van de hele Organisatie (`onderdeelId: null`, `datamodel.md`, KPI's en kanalen) als ringen. Onderdelen zijn voor de Lead niet zichtbaar.
+
+- **Kop.** Het label "KPI'S" (12px, hoofdletters, gewicht 700, letterafstand .08em, `--ink-s`, zoals het label "Kanalen"), met 16px ruimte onder het label.
+- **Welke KPI's.** Elke KPI met een `schaalMin` en `schaalMax`, in de volgorde van `KpiDefinitie.volgorde`. In de startset zijn dat AHT, NPS, CSAT, SLA en FTR. Contacten per jaar staat in de cijferrij en heeft geen ring.
+- **Ring.** Dezelfde ring als de `.score-ring` (`stylesheet.md`), maar 132px met een lijn van 12px. Het spoor is `#efede8` en de vulling heeft afgeronde uiteinden, begint bovenaan en loopt met de klok mee. De vulling is (waarde − `schaalMin`) gedeeld door (`schaalMax` − `schaalMin`), begrensd tot 0 en 1. In het midden staat de waarde (26px, gewicht 800, `--ink`) met de eenheid erbij ("440 s", "92%") en bij een positieve NPS een plusteken ("+34"). Onder de ring staat de naam van de KPI (14px, gewicht 700) en daaronder een regel van 12px in `--ink-s`. De ringen staan links uitgelijnd naast elkaar met 64px ertussen.
+- **Zonder gekozen kanaal.** Elke ring toont Algemeen bij Algemeen (`kanaalId: null`) in `--or`. Er staat geen stip en de regel onder de naam is leeg.
+- **Kanaal kiezen.** Staat het blok Kanalen ook aan, dan zijn de ingezette kanalen knoppen (`aria-pressed`). Een klik kiest het kanaal, en de pil krijgt een rand van 1px en een ring van 2px in de kanaalkleur. Een klik op een ander kanaal verplaatst de keuze, en een klik op het gekozen kanaal wist hem. Kanalen die niet ingezet zijn, zijn niet klikbaar. Staat het blok Kanalen uit, dan is er geen keuze en tonen de ringen alleen Algemeen. Bij een gekozen kanaal staat de kop als "KPI'S · {KANAAL}" en staat rechts op dezelfde regel een legenda met het stipje en de tekst "Algemeen (alle kanalen)".
+- **Drie toestanden bij een gekozen kanaal.** Per ring geldt:
+  1. **Waarde bij het kanaal bekend.** De ring heeft de kanaalkleur (`stylesheet.md`, Kanaalkleuren) en toont de waarde van het kanaal. Is Algemeen bij Algemeen ook bekend, dan staat op de ring een stip op de plek van die waarde (straal 7px, wit, rand van 3px in `--ink`) en staat onder de naam "Algemeen {waarde}".
+  2. **Alleen Algemeen bekend.** Dat is zo bij een KPI zonder `perKanaal` en bij een KPI zonder waarde bij dit kanaal. De ring is oranje, toont Algemeen en heeft geen stip. De regel onder de naam is leeg.
+  3. **Geen van beide bekend.** De ring is uitgegrijsd: alleen het spoor, een streepje in het midden (`#c9c6be`), de naam in `#a9a69e` en daaronder de regel "Niet ingevuld" in `#a9a69e`. De ring blijft op zijn plek staan, zodat de rij niet verspringt.
+- **KPI zonder enige waarde.** Een KPI waarvoor bij de hele Organisatie niets is ingevuld, dus geen Algemeen en geen enkele kanaalwaarde, valt voor de Lead weg. Zijn alle KPI's zo leeg, dan valt het hele blok weg. De uitgegrijsde toestand hierboven komt alleen voor bij een gekozen kanaal.
+- **Waarden.** Dezelfde `KpiWaarde` als in beheer, waar hetzelfde blok in het organisatiepaneel staat (`beheerpagina.md`, Organisatiepaneel, KPI's). Een wijziging bij "KPI's invullen" is direct zichtbaar voor de Lead zodra het blok aan staat.
+- **Toegankelijkheid.** Elke ring is een afbeelding met een `aria-label` zoals "NPS +41, Algemeen +34". Is een ring uitgegrijsd, dan luidt het label "CSAT niet ingevuld". De kanaalkeuze is met Tab bereikbaar en de kleur is niet de enige drager, want het gekozen kanaal staat ook in de kop.
 
 ### Verwijderen en datakoppelingen
 
@@ -187,7 +205,7 @@ Ontwerp: `Dossier-beheer-B` (het eerste ontwerp, Bord 1 en `Dossier-beheer`, ver
   - **Nieuws.** Krant, tegel `--bl-faint`, icoon en label `--bl`.
   - **Event.** Kalender, tegel `#e7f6ef`, icoon en label `--gr`. Een verlopen Event heeft een grijze tegel (`--bg-warm`) met icoon en label in `--ink-s`, zoals de datumtegel bij de Lead.
   - **Blog.** Pen op een blad, tegel `#fff6e0`, icoon en label `#7a5600`.
-  - **Benchmark.** Staafdiagram (drie staven), tegel `#efeaf2`, icoon en label `--pu`. Nieuws is al blauw, dus Benchmark heeft geen blauw, ook al is de benchmarkkaart op Mijn metingen blauw (zie Open punten).
+  - **Benchmark.** Staafdiagram (drie staven), tegel `#efeaf2`, icoon en label `--pu`. Het icoon is hetzelfde staafdiagram als bij "Benchmarks" op de pagina van de Lead (punt 7) en op de benchmarkkaart, met dezelfde gevulde staven, alleen in de kleur van de soort. Een eigen of dunner getekend icoon is een fout. Nieuws is al blauw, dus Benchmark heeft geen blauw, ook al is de benchmarkkaart op Mijn metingen blauw (zie Open punten).
 - **Statusbadge.** In de kleuren van de bestaande statuschips: "Zichtbaar voor Lead" (groen), "Intern" (grijs), "Verlopen" (grijs, alleen bij een Event waarvan de datum voorbij is) en "Toestemming ontbreekt" (oranje, voor elke Case waarvan de Organisatie `caseToegestaan` uit heeft, ook als het item op Intern staat). "Kies een organisatie" (oranje) bij een Case zonder `caseOrganisatieId`. Bij een Benchmark komen "Geen toegang voor Lead" (oranje, `zichtbaarVoorLead` staat aan maar geen enkele Lead van de Organisatie heeft het vinkje voor de benchmark) en "Kies een benchmark" (oranje, de benchmark bestaat niet meer) erbij.
 - **Leeg.** "Er staan nog geen items in het Dossier."
 
@@ -226,7 +244,7 @@ Ontwerp: Bord 5. Een pagina van de Lead bij de persoonlijke link. De nav is die 
 Van boven naar beneden:
 
 1. **Kop.** Achtergrond `--or-faint` met concentrische cirkels in `--or-mid` rechts. Er is geen paars in de kop (de kop lijkt anders te veel op een andere Coniche-site). Eyebrow "Dossier" (`--or`, donkerder variant `#c2570c` voor tekst), titel {naam voor de Lead} (32px), een zin ("Je consultant heeft cases en nieuws verzameld die passen bij jullie situatie, met bij elk item uitleg waarom. Bij elk item staat de bouwsteen waar het over gaat."), twee chips ("Gedeeld door je consultant", de datum van `zichtbaarSinds`) en rechts een tegel per soort dat items heeft, met het aantal (Cases, Benchmarks, Nieuwsberichten, Events, Blogs). Een verlopen Event telt niet mee.
-1a. **Profiel van de Organisatie.** Alleen als minstens één blok van `toonProfiel` aan staat. Een kaart (witte achtergrond, 1px `--border`, 10px radius, padding 24px) direct onder de kop, zonder knoppen en zonder Bewerken. Bovenin links de beginletter in een vierkant van 56px (`--or-faint`, letter 28px, `--or`), daarnaast de naam van de Organisatie (24px, gewicht 800) met de pillen Sector en Subsector. Daaronder alleen de blokken die aan staan, met dezelfde opmaak als in het organisatiepaneel: de cijferrij, de Kanalen (ingezet gekleurd, niet ingezet lichtgrijs), de Techstack en de overige velden. Staat er alleen een blok zonder gegevens aan, dan valt dat blok weg, en zijn alle blokken leeg, dan valt de hele kaart weg.
+1a. **Profiel van de Organisatie.** Alleen als minstens één blok van `toonProfiel` aan staat. Een kaart (witte achtergrond, 1px `--border`, 10px radius, padding 24px) direct onder de kop, zonder knoppen en zonder Bewerken. Bovenin links de beginletter in een vierkant van 56px (`--or-faint`, letter 28px, `--or`), daarnaast de naam van de Organisatie (24px, gewicht 800) met de pillen Sector en Subsector. Daaronder alleen de blokken die aan staan, met dezelfde opmaak als in het organisatiepaneel: de cijferrij, de Kanalen (ingezet gekleurd, niet ingezet lichtgrijs), de Techstack, de overige velden en onder de Kanalen het blok KPI's (`dossier.md`, KPI-ringen). Staat er alleen een blok zonder gegevens aan, dan valt dat blok weg, en zijn alle blokken leeg, dan valt de hele kaart weg.
 2. **Waar dit dossier over gaat.** Een kaart (10px radius, `--bg-warm`, padding 32px) met links de radar en rechts de verdeling (zie Verdeling rechts van de radar). Alleen aanwezig als minstens één zichtbaar item bouwstenen heeft. Hebben items bouwstenen in twee Assessments, dan staat boven de radar een pil-groep met de namen van die Assessments en toont de kaart er één tegelijk, met bij elke pil het aantal items. Bij maar één Assessment staat die pil-groep er niet. De eerste keer staat het Assessment met de meeste zichtbare items open. Een filter op een bouwsteen van het andere Assessment zet de pil om. Eerdere events tellen hier mee, ook als ze nog dichtgeklapt zijn. Zie Radar met filter.
 3. **Filterbalk.** Alleen als er een filter staat: Een balk in `--or-faint` met de bouwsteen (cirkel met nummer, naam, "n items in dit dossier") en rechts de knop "Alle items tonen ×" (`.btn-outline`, 32px hoog).
 4. **Soortfilter.** Een rij pillen: Alles, Cases, Benchmarks, Nieuws, Events, Blogs, elk met het aantal items dat nu in de lijst past (een verlopen Event telt niet mee, het filter op een bouwsteen telt wel mee). Eén pil is tegelijk gekozen, standaard Alles. De pil van de gekozen soort is oranje gevuld. Het soortfilter en het filter op een bouwsteen werken samen.
@@ -284,7 +302,7 @@ Nieuwe gebeurtenissen (`datamodel.md`, Audit), in plaats van `nieuwsartikel.*`:
 
 - `dossier.itemToegevoegd`, `dossier.itemGewijzigd` en `dossier.itemVerwijderd`. `details` bevat de Organisatie, de soort (nieuws, case, event, blog of benchmark), de titel (bij een Benchmark de naam van de benchmark), en bij `itemGewijzigd` de namen van de gewijzigde velden. Bij een Case staat ook de naam van de Organisatie in de case erin (de log is alleen voor een Admin).
 - `dossier.zichtbaarGemaakt` en `dossier.verborgen` (voorheen `dossier.geopend` en `dossier.gesloten`): `zichtbaar` is aan of uit gezet, met de Organisatie en het aantal zichtbare items. Gaat het Dossier uit omdat een gekozen Meting niet meer zichtbaar is voor de Lead, dan staat daar ook de reden en de Meting bij.
-- `dossier.profielGewijzigd`: Een schakelaar van `toonProfiel` is gewijzigd. `details` bevat de Organisatie, het blok (cijfers, kanalen, techstack of overig) en de nieuwe waarde.
+- `dossier.profielGewijzigd`: Een schakelaar van `toonProfiel` is gewijzigd. `details` bevat de Organisatie, het blok (cijfers, kanalen, techstack, overig of kpis) en de nieuwe waarde.
 - `dossier.instellingGewijzigd`: `naamVoorLead` of een `radarBronnen` is gewijzigd. `details` bevat de Organisatie, het veld, bij een scorebron het Assessment en de Meting (of "automatisch"), en de oude en nieuwe waarde.
 - `organisatie.caseVlagGewijzigd`: `caseToegestaan` is gewijzigd, met de Organisatie en de nieuwe waarde.
 

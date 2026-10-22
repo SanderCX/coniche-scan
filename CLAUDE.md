@@ -118,7 +118,7 @@ Wat gebouwd is, per onderdeel. De spec van het onderdeel beschrijft hoe het moet
 | Aggregatie over meerdere respondenten | Deels gebouwd | `visualisatie-scores.md` | Het gemiddelde per Meting is gebouwd; afwijking en spreiding zijn ontworpen |
 | Dossier | Gebouwd | `dossier.md` | Niet in exports en import |
 | Contactpersonen | Gebouwd | `datamodel.md`, `beheerpagina.md` | Alleen een Admin wijzigt ze |
-| KPI's per plek en kanaal | Gebouwd | `datamodel.md`, `beheerpagina.md` | Het design staat in `Claude outputs/kpi-design/` |
+| KPI's per plek en kanaal | Gebouwd, spec gewijzigd | `datamodel.md`, `beheerpagina.md`, `dossier.md` | Invoer en definities zijn gebouwd. De weergave verandert: ringen in het organisatiepaneel in plaats van de tabel, zie `backlog.md` (KPI-ringen en KPI's in beheer) |
 | Mijn metingen | Gebouwd | `visualisatie-mijn-metingen.md` | Inclusief de kaart met cirkel |
 | Opmaak (lettergroottes, pil, scorekleur, balklijst, resultaatkop, radar en staafdiagram) | Gebouwd | `stylesheet.md` | De PDF-export valt er niet onder |
 | Help | Gebouwd | `help.md` | De inhoud wacht op beoordeling door Joost |

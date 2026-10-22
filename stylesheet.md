@@ -724,7 +724,7 @@ potlood, nooit "Wijzigen". Dat geldt ook voor titels en menu-items.
 ### Doorloopflow
 
 - **Layout**: Sidebar 300px, hoofdgedeelte flexibel. Het logo staat
-  alleen in de nav, niet in de sidebar. In het hoofdgedeelte is de kop van een bouwsteen maximaal 800px breed (inclusief de accentbalk en de 28px ruimte erachter). Het instructievlak, de vragen met hun antwoorden, het opmerkingenveld en de knoppen onderaan zijn maximaal 664px breed (ontwerp `Vragenlijst-breedte`, variant B). Op een smaller scherm krimpt alles mee met de ruimte naast de sidebar, en de kop blijft dan het breedst.
+  alleen in de nav, niet in de sidebar. In het hoofdgedeelte is de kop van een bouwsteen maximaal 800px breed (inclusief de accentbalk en de 28px ruimte erachter). Het instructievlak is even breed als de kop (maximaal 800px, vanaf de linkerrand van de accentbalk), zodat de lichtgrijze opmerking even breed is als de tekst erboven. De vragen met hun antwoorden, het opmerkingenveld en de knoppen onderaan zijn maximaal 664px breed (ontwerp `Vragenlijst-breedte`, variant B). Op een smaller scherm krimpt alles mee met de ruimte naast de sidebar, en de kop blijft dan het breedst.
 - **Sidebar** (ontwerp `Vragenlijst-sidebar-doorlopend`): Bovenaan de naam van de respondent en de voortgangsbalk met de regel "100% – 60 van 60 vragen". Daaronder per categorie een kopje en de bouwstenen. Het kopje is 12px, hoofdletters, gewicht 800, letterafstand .08em, in de categoriekleur (via `--accent`). Bij Fundament staat het kopje in geel (`#ffc043`, zie Categoriekleuren). Status per bouwsteen: Leeg (niet begonnen), gevuld in categoriekleur (bezig), `--stat-green` (afgerond, ongeacht categorie).
   - **Actieve bouwsteen.** Een vlak in `#e7e4dc` met 6px radius, de naam in gewicht 700 en `--ink`.
   - **Lijn langs de actieve categorie.** Naast de categorie waarin de lezer staat loopt een lijn van 3px breed met afgeronde uiteinden in de categoriekleur, 14px links van de bouwstenen (in de marge van de sidebar). De lijn begint direct onder het kopje en loopt tot en met de onderkant van de laatste bouwsteen van die categorie, met 3px marge onderaan. Alleen de actieve categorie heeft de lijn en de actieve bouwsteen heeft zelf geen streepje, want het grijze vlak wijst dat aan. Bij Fundament is de lijn geel.
@@ -737,7 +737,7 @@ potlood, nooit "Wijzigen". Dat geldt ook voor titels en menu-items.
   - **Spanningsmeter.** De sidebar heeft zes velden met nummerbolletje in de veldkleur en rechts de status; het actieve veld krijgt het streepje in de veldkleur. De veldkop is die uit `visualisatie-spanningsmeter.md`, Doorloopflow.
 - **Geen i-icoon en geen tags.** Het i-icoon naast de titel en de `.toelichting-link` vervallen, want de toelichting staat in de kop. `Bouwsteen.omschrijving` en de tags staan niet meer in de doorloopflow (ze blijven in de data en in de beheerpagina).
 - **Instructievlak**: Vlak in `var(--bg-mid)` met de vaste
-  instructietekst.
+  instructietekst, even breed als de kop van de bouwsteen erboven (zie Doorloopflow).
 - **Radiobuttons**: Rand en gevulde stip in categoriekleur (`--accent`).
 - **Scans zonder categorie-laag** (bijv. de AI-Volwassenheidsscan): Overal
   waar hierboven `--accent` staat, valt dat terug op `--or` zodra er geen
@@ -814,7 +814,7 @@ Elke scan die zijn bouwstenen, domeinen of velden in groepen verdeelt, geeft elk
 | Veldkleuren | Spanningsmeter | 6 velden | Hieronder |
 | Geen groepskleur | Quickscan | Afdelingen | `--or`, met de lijn en het kopje van de actieve afdeling |
 
-**Domeinkleuren (AI-scan)**: Acht kleuren in de volgorde van de domeinen, zo dat buren op de radar zo veel mogelijk verschillen. 1 `--or` (`#ff671f`), 2 `--bl` (`#225ba0`), 3 `--gr` (`#197f4e`), 4 `--pu` (`#392944`), 5 `--ye` (`#ffc043`), 6 turquoise `#1f9aa0`, 7 framboos `#d1467f`, 8 lavendel `#8a7bb8`. Tekst in of op een domeinkleur is wit, behalve bij 5, 6 en 8 waar het `--ink` is (zoals bij Fundament). Een stip of cirkel in een lichte domeinkleur krijgt de witte rand die alle stippen hebben. Een nieuwe scan met meer dan acht groepen vraagt om een eigen besluit.
+**Domeinkleuren (AI-scan)**: Acht kleuren in de volgorde van de domeinen, zo dat buren op de radar zo veel mogelijk verschillen. 1 `--or` (`#ff671f`), 2 `--bl` (`#225ba0`), 3 `--gr` (`#197f4e`), 4 `--pu` (`#392944`), 5 `--ye` (`#ffc043`), 6 turquoise `#1f9aa0`, 7 framboos `#d1467f`, 8 lavendel `#8a7bb8`. Tekst in of op een domeinkleur is wit, ook bij turquoise (6) en lavendel (8). Alleen bij het gele domein 5 is het `--ink` (zoals bij Fundament). Een stip of cirkel in een lichte domeinkleur krijgt de witte rand die alle stippen hebben. Een nieuwe scan met meer dan acht groepen vraagt om een eigen besluit.
 
 **Veldkleuren (Spanningsmeter)**: Zes kleuren in de volgorde van de spanningsvelden: 1 `--or` (`#ff671f`), 2 `--bl` (`#225ba0`), 3 `--gr` (`#197f4e`), 4 turquoise `#1f9aa0`, 5 `--pu` (`#392944`), 6 `--ye` (`#ffc043`). Tekst in of op een veldkleur is wit, behalve bij 6 waar het `--ink` is (zoals bij Fundament). Een stip of cirkel in geel krijgt de witte rand die alle stippen hebben. Een veldkleur is een vulling of accent en nooit de kleur van een score.
 

@@ -264,7 +264,7 @@ verandert.
   `stylesheet.md`), en foutmeldingen die een gebruiker daadwerkelijk kan
   zien bij een netwerkfout of verlopen sessie (aanvulling).
 - [ ] **Opruimen voor productie** (`backlog.md`, Voor productie):
-  - [ ] Testknop (vragenlijst automatisch invullen) verwijderen
+  - [ ] Testknop (vragenlijst automatisch invullen) uitzetten in Instellingen (`testknopAan`, standaard uit)
   - [ ] Seed-data met testorganisatie en testrespondent verwijderen
   - [ ] De dev-autologin in beheer (`devAutoLogin`) en de seed-accounts met
     bekende wachtwoorden verwijderen (aanvulling)
@@ -502,7 +502,7 @@ bereikbaar blijft, zodat terugvallen kan.
   zodat de laatste export compleet is.
 - [ ] Laatste export uit de oude omgeving en vergelijken met de eerdere
   exports en controlegetallen.
-- [ ] Productie schoon controleren: Geen testdata, geen testknop, juiste
+- [ ] Productie schoon controleren: Geen testdata, testknop uit, juiste
   omgevingsvariabelen, juiste afzender, echte Admin-accounts met 2FA.
 - [ ] Import uitvoeren en controle na import (fase 6).
 - [ ] Domein omzetten en HTTPS controleren.

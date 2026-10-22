@@ -34,7 +34,7 @@ De modal gebruikt de toelichting (`Bouwsteen.toelichting`), niet de omschrijving
 ## Gedeeld: Opbouw
 
 - **Stage.** Drie kolommen in de container van de pagina (1096px bij een venster van 1240px): Links 280px, midden 536px, rechts 280px, verticaal gecentreerd. In het midden staat de radar (536 bij 536px).
-- **Radar.** Eén taartpunt per element, met de klok mee vanaf boven, straal 190px, gevuld met de kleur van het element op 22% dekking en een witte rand van 1,5px. Ringen bij score 2, 3, 4 en 5 (wit op 70%, 37,5px per stap, score 5 op straal 150px). Een veelhoek in `--or` met voorbeeldscores, zonder getallen, zodat het een radar lijkt. Dit zijn geen echte scores.
+- **Radar.** Eén taartpunt per element, met de klok mee vanaf boven, straal 190px, gevuld met de kleur van het element op 22% dekking en een witte rand van 1,5px. Ringen bij score 2, 3, 4 en 5 (wit op 70%, 37,5px per stap, score 5 op straal 150px). Een veelhoek in `--or` met vaste voorbeeldscores, zonder getallen, zodat het een radar lijkt. De veelhoek heeft een lijn van 2px en een vulling van 18% (`stylesheet.md`, Vlak), en elk hoekpunt ligt op straal (score − 1) × 37,5px, op de hoek van het midden van de taartpunt. De scores per variant staan hieronder en worden niet afgerond, gemiddeld of door de build bedacht. Een veelhoek die dicht bij het midden blijft of bijna een cirkel is, is een fout. Dit zijn geen echte scores.
 - **Nummer.** Buiten elke taartpunt, op straal 226px, staat het nummer in een cirkel van 26px in de kleur van het element.
 - **Rijen.** De elementen staan als rijen links en rechts van de radar (klasse `.pl`).
 - **Kaart met de centrale vraag.** Boven de stage, gecentreerd, hoogstens 720px breed, 96px hoog, `--bg-mid`, 1px rand, 10px radius, padding 16px 24px. Zonder hover staat er een label en een uitnodigende zin, bij hover staat er "n · Naam" (label, 12px, hoofdletters) met de centrale vraag (18px, regelhoogte 26px).
@@ -77,9 +77,10 @@ Het kleine label is `Assessment.bouwsteenLabel` ("Bouwsteen" of "AI-domein", aan
 ## Variant: AI-domeinen
 
 - **Radar.** Acht taartpunten van 45° die bij −22,5° beginnen, zodat domein 1 boven staat en de rest met de klok mee loopt. Straal van de taartpunten 190px, nummercirkels van 26px op straal 226px.
+- **Voorbeeldscores.** Domein 1 tot en met 8: 2,8 / 2,4 / 2,0 / 2,0 / 2,4 / 3,6 / 2,2 / 2,2. Dit zijn dezelfde cijfers als in de films (`help.md`, Films), zodat de radar en de films hetzelfde beeld tonen. Domein 6 steekt het verst uit.
 - **Rijen.** Rechts domein 1 tot en met 4, links domein 5 tot en met 8. Er zijn geen groepskoppen, want er is geen categorielaag.
 - **Kaartlabel zonder hover.** "Beweeg over een domein of een nummer in de radar om de centrale vraag te zien."
-- **Kleur.** Elk domein heeft zijn eigen kleur, palet B uit `stylesheet.md` (Groepskleuren, Domeinkleuren). Tekst in of op een domeinkleur is wit, behalve bij domein 5, 6 en 8 waar het `--ink` is. Het label "AI-domein 5", "AI-domein 6" en "AI-domein 8" in de modal staat in `--ink-m` in plaats van in de domeinkleur, anders is het contrast te laag. De accentbalk van de centrale vraag in de modal blijft wel in de domeinkleur.
+- **Kleur.** Elk domein heeft zijn eigen kleur, palet B uit `stylesheet.md` (Groepskleuren, Domeinkleuren). Tekst in of op een domeinkleur is wit, behalve bij domein 5 (geel) waar het `--ink` is. Het label "AI-domein 5", "AI-domein 6" en "AI-domein 8" in de modal staat in `--ink-m` in plaats van in de domeinkleur, anders is het contrast te laag. De accentbalk van de centrale vraag in de modal blijft wel in de domeinkleur.
 - **Film.** De sectie "Wat krijg ik" op de AI-pagina toont dezelfde twee films als bij Volwassenheid, met acht domeinen. De eerste film noemt "een staaf per domein" in plaats van "per categorie". De tweede film is de AI-variant van de Dossier-film (`Film-Dossier-AI`): Een radar met 8 taartpunten, waarin alleen de domeinen met items in het Dossier gevuld en klikbaar zijn. Een klik filtert de lijst op dat domein. De tekst spreekt van "domein", niet van "bouwsteen".
 
 ## Koppeling met het Dossier

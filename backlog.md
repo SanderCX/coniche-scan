@@ -49,7 +49,8 @@ Bewust nog niet opgepakt. Geen prioritering.
   aflopende bewaartermijnen, een vastgelegde procedure voor verlengen en
   verwijderen, en back-upretentie afgestemd op het dataretentiebeleid.
 - **Testknop** (vragenlijst automatisch invullen): Alleen tonen aan
-  ingelogde beheerders, en voor productie verwijderen. De keuze "Gemiddelde
+  ingelogde beheerders, en alleen als de instelling `testknopAan` aan staat
+  (`beheerpagina.md`, Schakelaar Testknop), standaard uit. De keuze "Gemiddelde
   score" is een keuzelijst (combobox) met de waarden 2, 3 en 4, geen half
   invulveld. De werking van de knop blijft zoals nu.
 - **Testdata**: Seed-data met een testorganisatie en testrespondent
@@ -696,3 +697,14 @@ Plekken waar de code nog moet worden aangepast aan de spec.
 - Open: De velden Adoptie mijnomgeving/app, Klantcontact management & support en IT DevOps-medewerkers staan nog niet in het design van het organisatiepaneel.
 - Profiel voor de Lead in het Dossier: veld `Organisatie.dossier.toonProfiel` (vier schakelaars), de groep Zichtbaar voor de Lead in het venster Kenmerken bewerken, de profielkaart bij de Lead (`dossier.md`, Profiel van de Organisatie), `info.profielLead` en het audit-event `dossier.profielGewijzigd`. Design: bord D en E in het Design-artifact "Organisatiescherm: visuele varianten".
 - Het staafdiagram per categorie is overal een staand kolomdiagram (`stylesheet.md`, Staafdiagram per categorie). De build toont op het resultaatscherm bij een smalle kaart nog een liggend diagram. Haal de liggende variant weg en laat de kolommen op een smalle kaart meeschalen, met alleen nummers onder de balk onder 88px per kolom.
+- De klassenaam onder de ring (bijvoorbeeld "Gemiddeld ontwikkeld") staat in de build linksuitgelijnd en op twee regels. Volgens `stylesheet.md` (Score-ring) staat hij gecentreerd onder de ring en op één regel. Pas de build aan.
+- Het instructievlak in de vragenlijst is even breed als de kop (800px), niet 664px (`stylesheet.md`, Doorloopflow).
+- Testknop: Voeg de instelling `testknopAan` toe aan Instellingen en toon het vlak alleen als hij aan staat.
+- Kop op Kies jouw assessment: De tekst zonder selectie is "Actionable advies voor het verbeteren van je klantcontact" (`schermen.md`).
+- Nummercirkels bij de AI-scan en de Spanningsmeter hebben een wit nummer, behalve bij het gele domein of veld (`stylesheet.md`, Domeinkleuren en Veldkleuren). De build toont nu een donker nummer bij turquoise en lavendel.
+- De radars van de AI-scan en de Spanningsmeter (Assessment-pagina, films) zijn in de build vlakker dan die van Volwassenheid en Zorg. Breng ze op hetzelfde niveau: Dezelfde dikte van de lijn, vulling en stippen als de radar van Volwassenheid, en de voorbeeldscores uit de spec. AI-scan: 2,8 / 2,4 / 2,0 / 2,0 / 2,4 / 3,6 / 2,2 / 2,2 (`visual-bouwstenen-en-domeinen.md`, Voorbeeldscores). Spanningsmeter: 3,8 / 2,6 / 2,2 / 3,4 / 2,4 / 4,0 (`visualisatie-spanningsmeter.md`). Hoekpunt op straal (score − 1) × 37,5px. De build toont nu een bijna ronde, lage veelhoek, dat is een fout.
+- De films van de AI-scan tonen de antwoordopties onder elkaar, zoals in de echte vragenlijst (`help.md`, Films). Nu staan ze naast elkaar. Bij de Spanningsmeter blijven de ronde knoppen naast elkaar, ook in de film.
+- Het Benchmark-icoon in de Dossier-rij (`dossier.md`, Soortkleur en icoon) is een ander staafdiagram dan bij "Benchmarks" op de pagina van de Lead. Gebruik hetzelfde icoon met gevulde staven, alleen in `--pu` op `#efeaf2`.
+- KPI-ringen in het Profiel voor de Lead (`dossier.md`, KPI-ringen): Vijfde schakelaar `Organisatie.dossier.toonProfiel.kpis` (`datamodel.md`, Dossieritem) en in Kenmerken bewerken, nieuwe velden `schaalMin` en `schaalMax` bij `KpiDefinitie` met startwaarden en invoer in het formulier voor de KPI-definitie, het blok KPI's met ringen onder de Kanalen, kanaalkeuze via de ingezette kanaalpillen, drie toestanden per ring (kanaal, alleen Algemeen, niet ingevuld) en het weglaten van lege KPI's voor de Lead. Design: bord F, G en H in het Design-artifact "Organisatiescherm: visuele varianten".
+- KPI's in beheer (`beheerpagina.md`, Organisatiepaneel, KPI's): De kaart KPI's met de tabel vervalt. Het blok KPI's met ringen komt onder de Kanalen in het organisatiepaneel, met een keuzelijst voor het Onderdeel. De knop "Bewerken" wordt een menu met Kenmerken, KPI's invullen en Onderdelen. Nieuw is de modal Onderdelen (namen wijzigen, verwijderen en toevoegen) die de kolomkop-modals en "+ Onderdeel toevoegen" vervangt. Design: bord C, F, G en H.
+- KPI CES (Customer Effort Score) in de startset (`datamodel.md`, KPI's en kanalen): Schaal 1 tot 7, per Onderdeel en per kanaal. In de tab KPI's en kanalen komen de kolommen Schaal van en Schaal tot (`beheerpagina.md`). CES staat niet in het InDesign-sjabloon en krijgt daar geen element zolang het sjabloon er niet om vraagt.
