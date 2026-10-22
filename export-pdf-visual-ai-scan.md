@@ -25,8 +25,8 @@ staafdiagram per domein, en de sortering volgt de score
 
 Acht domeinen, **overal precies 2 per pagina**, gescheiden door de
 oranje middenlijn (zie `export-pdf-visual-volwassenheidsscan.md`).
-Omdat een AI-domein 5 vragen heeft (bouwblok: 4) en langere uitleg,
-gebruikt deze scan de compacte variant (`.bouwblok-pagina.compact`):
+Omdat een AI-domein 5 vragen heeft (bouwsteen: 4) en langere uitleg,
+gebruikt deze scan de compacte variant (`.bouwsteen-pagina.compact`):
 
 | | Normaal | Compact |
 |---|---|---|
@@ -35,13 +35,13 @@ gebruikt deze scan de compacte variant (`.bouwblok-pagina.compact`):
 | Tabelcel | 7,8pt, padding 2px | 7,8pt, padding 2px |
 | Ruimte rond middenlijn | 3mm onder / 4mm boven | 2mm onder / 3mm boven |
 
-De compacte variant wordt automatisch gekozen als een bouwblok meer dan
+De compacte variant wordt automatisch gekozen als een bouwsteen meer dan
 4 vragen heeft. Het eyebrow
 boven de titel is oranje in plaats van de categoriekleur: De AI-scan
 heeft geen categorielaag en dus geen categoriekleur om te tonen
 (`datamodel.md`, `Assessment.categorieen` is hier `null`). Kop per
 domein: "AI-DOMEIN {N}", verder dezelfde opbouw (naam + score-badge,
-centrale vraag, uitleg, vragentabel, opmerking) als een bouwblok in
+centrale vraag, uitleg, vragentabel, opmerking) als een bouwsteen in
 `export-pdf-visual-volwassenheidsscan.md`.
 
 ## Pagina 6 t/m 9: Slotsectie: Klantcontact richting 2030 (stijl van `/klantcontact-2030`)

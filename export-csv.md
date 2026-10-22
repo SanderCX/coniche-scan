@@ -74,22 +74,22 @@ blijven deze kolommen leeg (geen score op een onvolledige invulling).
 
 | Kolom | Toelichting |
 |---|---|
-| `overall_score` | Gewogen gemiddelde van alle antwoorden, van 5, uit de gedeelde scoreberekening (`datamodel.md`, Scoreberekening, inclusief `Bouwblok.gewicht`); zelfde functie als resultatenpagina, PDF- en InDesign-export |
-| `groepsScores` | JSON-kolom, zelfde vorm als `export-indesign.md`, `<groepsScores>`: `{"type": "categorie" of "bouwblok", "groepen": [{"naam": ..., "score": ..., "bouwblokken": [{"nummer": ..., "naam": ..., "score": ..., "gewicht": ...}, ...]}, ...]}`. Zelfde regel: `type="categorie"` bij een scan mét categorielaag (Klantcontact Volwassenheid), `type="bouwblok"` zonder (AI-volwassenheid). Bij `type="categorie"` heeft elke groep een lijst `bouwblokken` met het gewicht per bouwblok; bij `type="bouwblok"` is de groep zelf een bouwblok en heeft hij direct `nummer` en `gewicht` (geen `bouwblokken`-lijst). Het gewicht staat er altijd, ook bij 1: Dit is machinedata, geen weergave |
+| `overall_score` | Gewogen gemiddelde van alle antwoorden, van 5, uit de gedeelde scoreberekening (`datamodel.md`, Scoreberekening, inclusief `Bouwsteen.gewicht`); zelfde functie als resultatenpagina, PDF- en InDesign-export |
+| `groepsScores` | JSON-kolom, zelfde vorm als `export-indesign.md`, `<groepsScores>`: `{"type": "categorie" of "bouwsteen", "groepen": [{"naam": ..., "score": ..., "bouwstenen": [{"nummer": ..., "naam": ..., "score": ..., "gewicht": ...}, ...]}, ...]}`. Zelfde regel: `type="categorie"` bij een scan mét categorielaag (Klantcontact Volwassenheid), `type="bouwsteen"` zonder (AI-volwassenheid). Bij `type="categorie"` heeft elke groep een lijst `bouwstenen` met het gewicht per bouwsteen; bij `type="bouwsteen"` is de groep zelf een bouwsteen en heeft hij direct `nummer` en `gewicht` (geen `bouwstenen`-lijst). Het gewicht staat er altijd, ook bij 1: Dit is machinedata, geen weergave |
 
 **Geen aparte top-3-kolommen.** Sterktes en verbeterkansen zijn triviaal
 af te leiden door `groepsScores` te sorteren; een aparte, dubbele
 representatie voegt niets toe en kan uit de pas gaan lopen met de
 brondata.
 
-**Geen aparte `gewicht`-kolom.** `Bouwblok.gewicht` (`datamodel.md`) is
+**Geen aparte `gewicht`-kolom.** `Bouwsteen.gewicht` (`datamodel.md`) is
 een content-eigenschap van het Assessment, geen gegeven van déze ene
 scan, en voor elke rij met hetzelfde Assessment identiek. Het gewicht
-staat daarom per bouwblok in `groepsScores`. Daarmee is `overall_score`
+staat daarom per bouwsteen in `groepsScores`. Daarmee is `overall_score`
 na te rekenen uit alleen de export: `Σ(gewicht × score van het
-bouwblok) / Σ gewicht` geeft de overall zolang alle bouwblokken evenveel
+bouwsteen) / Σ gewicht` geeft de overall zolang alle bouwstenen evenveel
 vragen hebben (nu altijd 4 bij Klantcontact, 5 bij AI), met als
-afwijking de afronding van de bouwblokscores. Een eventueel gewicht
+afwijking de afronding van de bouwsteenscores. Een eventueel gewicht
 wordt na een wijziging in één keer doorgerekend (`datamodel.md`), dus
 een oudere CSV-export kan afwijken van de actuele score.
 
@@ -115,14 +115,14 @@ velden er op dat moment bestaan.
 | Kolom | Toelichting |
 |---|---|
 | `antwoorden` | JSON-kolom, array van antwoord-items, zie hieronder |
-| `opmerkingen_per_bouwblok` | JSON-kolom, `{ [bouwblokId]: tekst }`, alleen bouwblokken met een ingevulde opmerking |
+| `opmerkingen_per_bouwsteen` | JSON-kolom, `{ [bouwsteenId]: tekst }`, alleen bouwstenen met een ingevulde opmerking |
 
 Elk item in `antwoorden`:
 
 ```json
 {
-  "bouwblokId": "organisatiestrategie",
-  "bouwblokNaam": "Organisatiestrategie",
+  "bouwsteenId": "organisatiestrategie",
+  "bouwsteenNaam": "Organisatiestrategie",
   "vraagId": "...",
   "vraagTekst": "Is er een actueel strategiedocument (max. 2 jaar oud) waarin missie/visie/kernwaarden én 3–7 strategische doelen staan?",
   "score": 5,
@@ -189,7 +189,7 @@ deze afwijkingen:
 
 ## Spanningsmeter (nog niet gespecificeerd)
 
-Voor de Spanningsmeter (antwoordType `spanning`) is er nog geen CSV. De export heeft geen totaalscore en geen groepsscores per bouwblok, maar per veld een score en een spanning. Zie `backlog.md`, Spanningsmeter. Tot dat besloten is, staat "Als CSV" niet in de Exporteren-dropdown voor dit type.
+Voor de Spanningsmeter (antwoordType `spanning`) is er nog geen CSV. De export heeft geen totaalscore en geen groepsscores per bouwsteen, maar per veld een score en een spanning. Zie `backlog.md`, Spanningsmeter. Tot dat besloten is, staat "Als CSV" niet in de Exporteren-dropdown voor dit type.
 
 ## Beslist
 

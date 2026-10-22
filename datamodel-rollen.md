@@ -43,7 +43,7 @@ Een `LeadToegang` is uniek per combinatie van Respondent, weergave en Meting of
 benchmark.
 
 - **Resultaten**: De resultatenpagina van de Meting, met Overzicht, Per
-  bouwblok en de vergelijking met een eerdere Meting waarvoor de Lead ook
+  bouwsteen en de vergelijking met een eerdere Meting waarvoor de Lead ook
   Resultaten heeft. Een `LeadToegang` mag naar een samengestelde Meting
   verwijzen. De Lead ziet dan alleen het gemiddelde.
 - **Spreiding**: Weergave B van die Meting, zonder ring
@@ -407,14 +407,14 @@ onderdeel van `details` gelogd en niet als aparte actie.
 
 **Assessment verwijderd.** Het verwijderen van een Assessment is een
 gebeurtenis (`assessment.verwijderd`). `details` bevat de naam en het kort
-label van het Assessment, het aantal Categorieën, Bouwblokken en Vragen dat
+label van het Assessment, het aantal Categorieën, Bouwstenen en Vragen dat
 meeging, en de namen van de benchmarks waaruit het is gehaald. Er zijn
 geen scans of persoonsgegevens bij betrokken.
 
-**Gewichtswijziging.** Een wijziging van `Bouwblok.gewicht` is een
-gebeurtenis (`bouwblok.gewichtGewijzigd`), omdat die terugwerkend de
+**Gewichtswijziging.** Een wijziging van `Bouwsteen.gewicht` is een
+gebeurtenis (`bouwsteen.gewichtGewijzigd`), omdat die terugwerkend de
 scores van alle scans van dat Assessment verandert. `details` bevat de
-naam en het volgnummer van het bouwblok, de naam van het Assessment, het
+naam en het volgnummer van de bouwsteen, de naam van het Assessment, het
 oude en het nieuwe gewicht en het aantal scans dat daardoor anders
 doorrekent.
 
@@ -550,7 +550,7 @@ Admin en Consultant blijft dit ongewijzigd: Bereik `alle`/`eigen`, zoals de
 rest van deze matrix, inclusief de bulk-acties in `beheerpagina.md` punt 5 en 7.
 
 `content.beheren` is Admin-only: Assessment-types en Content
-(bouwblokken, vragen, categorieën) zitten in beheer onder de link
+(bouwstenen, vragen, categorieën) zitten in beheer onder de link
 "Assessments", die een Consultant niet ziet (`beheerpagina.md`, Wat
 beheerbaar is). Een Consultant beheert alleen zijn eigen organisaties,
 metingen en respondenten, niet de scaninhoud zelf.

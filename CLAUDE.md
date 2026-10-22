@@ -23,7 +23,7 @@ De specificatie van de Coniche Scan-app. Dit bestand bevat de uitgangspunten, de
 | `content-klantcontact-volwassenheid.md` | Vragen en tags van de Klantcontact Volwassenheidsscan |
 | `content-zorgscan.md` | Vragen van de Zorgscan, sector-variant van de Klantcontact Volwassenheidsscan |
 | `content-ai-scan.md` | Vragen van de AI-volwassenheidsscan |
-| `content-ziekenhuis-quickscan.md` | Afdelingen (categorieën), dimensies (bouwblokken), vragen en resultaatopbouw van de Klantcontact Quickscan – Ziekenhuis (Ja / Nee / Weet ik niet) |
+| `content-ziekenhuis-quickscan.md` | Afdelingen (categorieën), dimensies (bouwstenen), vragen en resultaatopbouw van de Klantcontact Quickscan – Ziekenhuis (Ja / Nee / Weet ik niet) |
 | `content-spanningsmeter.md` | Vragen, ijkpunten, open voorbeeldvragen en achtergrondvragen van de Spanningsmeter (zes spanningsvelden, 30 gescoorde vragen), met de rekenregels en een validatieplan |
 | `content-respondentrol.md` | De vaste lijst bij het veld Rol / functie van de Respondent |
 | `content-techstack.md` | De vaste lijsten bij de organisatievelden Techstack, oplossingen en ondersteunende partijen |
@@ -32,11 +32,11 @@ De specificatie van de Coniche Scan-app. Dit bestand bevat de uitgangspunten, de
 
 | Bestand | Inhoud |
 |---|---|
-| `visie-coniche.md` | Visie op goed klantcontact en de vijftien bouwblokken |
-| `inhoudelijk-fundament.md` | Hoe visie, bouwblokken en scan samenhangen, met status per onderdeel |
+| `visie-coniche.md` | Visie op goed klantcontact en de vijftien bouwstenen |
+| `inhoudelijk-fundament.md` | Hoe visie, bouwstenen en scan samenhangen, met status per onderdeel |
 | `visie-ai-klantcontact.md` | Visie op AI in klantcontact, per domein van de AI-volwassenheidsscan |
 | `content-2030.md` | Duidingsstuk "Klantcontact richting 2030", los van de scanresultaten; sectie op de Assessment-pagina van de AI-scan |
-| `visual-bouwblokken-en-domeinen.md` | Het interactieve overzicht van de 15 bouwblokken (Volwassenheid en Zorg) en de 8 AI-domeinen (AI), een sectie op de Assessment-pagina |
+| `visual-bouwstenen-en-domeinen.md` | Het interactieve overzicht van de 15 bouwstenen (Volwassenheid en Zorg) en de 8 AI-domeinen (AI), een sectie op de Assessment-pagina |
 | `privacy-pagina.md` | De privacypagina |
 | `help.md` | De helppagina in de app: Een regel Help in het menu, uitleg per rol met illustratie, als Markdown-bestanden in `help/` |
 
@@ -50,7 +50,7 @@ De specificatie van de Coniche Scan-app. Dit bestand bevat de uitgangspunten, de
 | `visualisatie-mijn-metingen.md` | Opmaak van Mijn metingen voor Respondent en Lead: Kaarten, statussen, teaser van de uitkomst, respons, benchmarkkaart |
 | `visualisatie-verkennen.md` | Admin-scherm Verkennen onder Resultaten: Filteren, groeperen en vergelijken van alle Organisaties van één Assessment, met vier weergaven |
 | `benchmark.md` | Benchmark op drie niveaus: Tussen organisaties (geaggregeerd en anoniem, met een view per organisatie voor een Lead), binnen een organisatie tussen Metingen, en binnen een Meting |
-| `dossier.md` | Het Dossier van een Organisatie: Nieuws, Cases, Events en Blogs die een Consultant samenstelt en openzet voor de Lead, met koppeling aan bouwblokken, de radar met filter en de verdeling (Basis op orde, Uitbouwen, Sterk punt) met de rail "In dit dossier", de Afspraak "Mag als case gebruikt worden" en de rechten |
+| `dossier.md` | Het Dossier van een Organisatie: Nieuws, Cases, Events en Blogs die een Consultant samenstelt en openzet voor de Lead, met koppeling aan bouwstenen, de radar met filter en de verdeling (Basis op orde, Uitbouwen, Sterk punt) met de rail "In dit dossier", de Afspraak "Mag als case gebruikt worden" en de rechten |
 
 **Export en import**
 
@@ -83,7 +83,7 @@ De specificatie van de Coniche Scan-app. Dit bestand bevat de uitgangspunten, de
 ## Uitgangspunten
 
 - Bouw de flow generiek over data heen, niet met hardcoded schermen per
-  bouwblok. Bouwblokken, vragen, schaallabels en organisatievelden zijn
+  bouwsteen. Bouwstenen, vragen, schaallabels en organisatievelden zijn
   data. Een nieuw scan-type of veld vraagt dan een beheerscherm dat die
   data bewerkt, geen nieuwe flow.
 - De app hoeft voorlopig niet responsive te zijn. Ontwerp en test voor
@@ -123,7 +123,7 @@ Wat gebouwd is, per onderdeel. De spec van het onderdeel beschrijft hoe het moet
 | Opmaak (lettergroottes, pil, scorekleur, balklijst, resultaatkop, radar en staafdiagram) | Gebouwd | `stylesheet.md` | De PDF-export valt er niet onder |
 | Help | Gebouwd | `help.md` | De inhoud wacht op beoordeling door Joost |
 | Quickscan Ziekenhuis | Deels gebouwd | `content-ziekenhuis-quickscan.md`, `visualisatie-quickscan.md` | Doorloopflow, resultaat en visualisaties zijn gebouwd; PDF, CSV, InDesign, import, vergelijking tussen Metingen en benchmark binnen een organisatie of Meting volgen (`backlog.md`) |
-| Spanningsmeter | Deels gebouwd | `content-spanningsmeter.md`, `visualisatie-spanningsmeter.md` | Open: De validatie van de vragen en de verificatie van de teksten |
+| Spanningsmeter | Ontworpen, niet gebouwd | `content-spanningsmeter.md`, `visualisatie-spanningsmeter.md` | Open: De validatie van de vragen en de verificatie van de teksten |
 | AI-managementsamenvatting | Uitgesteld | `backlog.md` | |
 | Adoptiescan | Niet gestart | | |
 
@@ -139,8 +139,8 @@ In de interface en in alle specs gelden deze termen. In de code heten sommige ty
 | **Respondent** | De persoon die een scan invult | Lid |
 | **Ingevulde scan** | Eén invulling door één Respondent binnen één Meting | |
 | **Onderdeel** | Een deel van een Organisatie met een eigen naam en eigen KPI-waarden | Afdeling, rolgroep |
-| **Bouwblok** | Een van de 15 bouwblokken van de Klantcontact Volwassenheidsscan | Bouwsteen |
-| **Spanningsveld** | Een van de zes velden van de Spanningsmeter. In de code een bouwblok; in de interface nooit "bouwblok" | |
+| **Bouwsteen** | Een van de 15 bouwstenen van de Klantcontact Volwassenheidsscan | Bouwblok |
+| **Spanningsveld** | Een van de zes velden van de Spanningsmeter. In de code een bouwsteen; in de interface nooit "bouwsteen" | |
 
 ## Assessments en functies
 
@@ -149,9 +149,9 @@ Wat elk Assessment kent. Een lege cel is niet gespecificeerd.
 | | Klantcontact Volwassenheid | Zorg | AI-volwassenheid | Quickscan Ziekenhuis | Spanningsmeter |
 |---|---|---|---|---|---|
 | Antwoordtype | Schaal 1 tot 5 | Schaal 1 tot 5 | Schaal 1 tot 5 | Ja / Nee / Weet ik niet | Spanning (1 tot 5, en 0 voor "Kan ik niet beoordelen") |
-| Opbouw | 15 bouwblokken in 5 categorieën | 15 bouwblokken in 5 categorieën | 8 domeinen, geen categorielaag | 4 afdelingen met 10 dimensies | 6 spanningsvelden, geen categorielaag |
+| Opbouw | 15 bouwstenen in 5 categorieën | 15 bouwstenen in 5 categorieën | 8 domeinen, geen categorielaag | 4 afdelingen met 10 dimensies | 6 spanningsvelden, geen categorielaag |
 | Vragen | 60 | 60 | 40 | 60 | 30 gescoord, 6 open |
-| Gewichten per bouwblok | Nee | Ja (bouwblok 4, 10 en 11 op 2) | Nee | Nee | Nee |
+| Gewichten per bouwsteen | Nee | Ja (bouwsteen 4, 10 en 11 op 2) | Nee | Nee | Nee |
 | Totaalscore | Ja | Ja | Ja | Ja, in procenten | Nee: Een profiel van zes veldscores |
 | Radar en staafdiagram per categorie | Ja | Ja | Radar; kolomdiagram per domein | Nee | Radar; tabel Score per veld |
 | Per afdeling of veld | | | | Ja | Ja |
@@ -165,8 +165,8 @@ Wat elk Assessment kent. Een lege cel is niet gespecificeerd.
 
 ## Scoringslogica
 
-Elk bouwblok heeft een gewicht `g` (standaard 1, zie `datamodel.md`,
-`Bouwblok.gewicht`). Alleen de Zorgscan heeft nu bouwblokken met een
+Elke bouwsteen heeft een gewicht `g` (standaard 1, zie `datamodel.md`,
+`Bouwsteen.gewicht`). Alleen de Zorgscan heeft nu bouwstenen met een
 ander gewicht (4, 10 en 11 op 2). Volledige uitwerking en rekenvoorbeeld
 staan in `datamodel.md`, Scoreberekening.
 
@@ -174,19 +174,19 @@ Deze sectie beschrijft het antwoordType `"schaal"` (1–5). Een Assessment
 met antwoordType `"ja-nee-weetniet"` (de Quickscan) rekent in punten en
 procenten: Zie `datamodel.md`, Scoreberekening, en de classificatie voor
 dat type hieronder. De categoriescore is daar geen gemiddelde van de
-bouwblokpercentages, maar het aantal Ja van de hele categorie gedeeld
+bouwsteenpercentages, maar het aantal Ja van de hele categorie gedeeld
 door het aantal vragen.
 
-- **Bouwblokscore**: Gemiddelde van de vragen binnen het bouwblok,
+- **Bouwsteenscore**: Gemiddelde van de vragen binnen de bouwsteen,
   ongewogen, afgerond op 1 decimaal.
-- **Categoriescore**: Gewogen gemiddelde van de bouwblokscores binnen de
+- **Categoriescore**: Gewogen gemiddelde van de bouwsteenscores binnen de
   categorie (`Σ(g × score) / Σ g`), afgerond op 1 decimaal.
-- **Totaalscore**: `Σ(g × som antwoorden per bouwblok) / Σ(g × aantal
-  vragen per bouwblok)`. Bij gewicht 1 overal is dat de som van alle
+- **Totaalscore**: `Σ(g × som antwoorden per bouwsteen) / Σ(g × aantal
+  vragen per bouwsteen)`. Bij gewicht 1 overal is dat de som van alle
   antwoorden gedeeld door 60. Dit is niet het gemiddelde van de
-  categoriescores: Categorieën hebben een ongelijk aantal bouwblokken (2,
+  categoriescores: Categorieën hebben een ongelijk aantal bouwstenen (2,
   4, 4, 4, 1) en zouden anders ongelijk meewegen. De totaalscore komt uit de
-  ruwe antwoorden en niet uit afgeronde bouwblokscores.
+  ruwe antwoorden en niet uit afgeronde bouwsteenscores.
 - **Afronding**: Half-away-from-zero (zoals JS `toFixed(1)`), alleen op
   getoonde waarden.
 - **Voortgang**: Beantwoorde vragen gedeeld door het totaal aantal vragen
@@ -203,12 +203,12 @@ door het aantal vragen.
   te gaan."
 - "Sterk punt" (vanaf 3,5): "Hier is de organisatie al heel goed in.
   Benut dit optimaal en bouw het verder uit, ook ter ondersteuning van
-  zwakkere bouwblokken."
+  zwakkere bouwstenen."
 
 ### Classificatie bij Ja / Nee / Weet ik niet (Quickscan)
 
 Drie klassen, bepaald op het afgeronde percentage (hele procenten). Ze
-gelden voor een afdeling (categorie), een dimensie (bouwblok) en de
+gelden voor een afdeling (categorie), een dimensie (bouwsteen) en de
 totaalscore. Er zijn geen
 uitlegzinnen per klasse.
 
@@ -237,7 +237,7 @@ en nooit de volle kleur.
 
 ### Top 3
 
-De bouwblokken gesorteerd op score: De hoogste 3 zijn de sterktes, de
+De bouwstenen gesorteerd op score: De hoogste 3 zijn de sterktes, de
 laagste 3 de verbeterkansen.
 
 ## Kleuren per categorie
@@ -251,13 +251,13 @@ staan uitsluitend in `stylesheet.md`.
 
 ## Content per Assessment
 
-- **Klantcontact Volwassenheid**: `content-klantcontact-volwassenheid.md` (15 bouwblokken, 5 categorieën, 60 vragen)
+- **Klantcontact Volwassenheid**: `content-klantcontact-volwassenheid.md` (15 bouwstenen, 5 categorieën, 60 vragen)
 - **AI-volwassenheid in Klantcontact**: `content-ai-scan.md` (8 domeinen, geen categorielaag, 40 vragen)
-- **Klantcontact Volwassenheid – Zorg (Zorgscan)**: `content-zorgscan.md` (dezelfde 15 bouwblokken, 5 categorieën en 60 vragen als de Klantcontact Volwassenheidsscan; sector-variant met vraagteksten herschreven naar patiënt- en cliëntcontact, `afgeleidVanAssessmentId: "klantcontact-volwassenheid"`, zie `datamodel.md`, Sector-varianten). Bouwblok-omschrijving, -toelichting en -tags zijn nog niet sector-vertaald, zie het open punt bovenaan `content-zorgscan.md`.
-- **Klantcontact Quickscan – Ziekenhuis**: `content-ziekenhuis-quickscan.md` (4 categorieën die de afdelingen zijn, 10 bouwblokken die de dimensies zijn, 60 vragen met Ja / Nee / Weet ik niet, standalone Assessment)
+- **Klantcontact Volwassenheid – Zorg (Zorgscan)**: `content-zorgscan.md` (dezelfde 15 bouwstenen, 5 categorieën en 60 vragen als de Klantcontact Volwassenheidsscan; sector-variant met vraagteksten herschreven naar patiënt- en cliëntcontact, `afgeleidVanAssessmentId: "klantcontact-volwassenheid"`, zie `datamodel.md`, Sector-varianten). Bouwsteen-omschrijving, -toelichting en -tags zijn nog niet sector-vertaald, zie het open punt bovenaan `content-zorgscan.md`.
+- **Klantcontact Quickscan – Ziekenhuis**: `content-ziekenhuis-quickscan.md` (4 categorieën die de afdelingen zijn, 10 bouwstenen die de dimensies zijn, 60 vragen met Ja / Nee / Weet ik niet, standalone Assessment)
 - **Spanningsmeter**: `content-spanningsmeter.md` (6 spanningsvelden, geen categorielaag, 30 gescoorde vragen plus 6 open voorbeeldvragen, antwoordType `spanning`)
 
-Elk contentbestand volgt dezelfde structuur: Per categorie de bouwblokken met naam, omschrijving, tags en vragen.
+Elk contentbestand volgt dezelfde structuur: Per categorie de bouwstenen met naam, omschrijving, tags en vragen.
 
 ## Open punten
 

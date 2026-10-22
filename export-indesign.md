@@ -138,7 +138,7 @@ Geen nieuwe contentbron: Dezelfde velden als de PDF-export
   <overallScore waarde="3.8" van="5" />
   <voortgang beantwoord="60" totaal="60" />
 
-  <!-- type="categorie" of type="bouwblok", zie toelichting hieronder -->
+  <!-- type="categorie" of type="bouwsteen", zie toelichting hieronder -->
   <groepsScores type="categorie">
     <groep naam="Strategie" score="3.8" />
     <groep naam="Organisatie" score="3.8" />
@@ -223,17 +223,17 @@ beeldkader per lijst, inhoud vast bepaald door de export.
 categorielaag (Klantcontact Volwassenheid, 5 categorieën), dan is
 `type="categorie"` en is elke `<groep>` een categorie-gemiddelde.
 Ontbreekt die laag (AI-volwassenheid, 8 domeinen plat), dan is
-`type="bouwblok"` en is elke `<groep>` een los bouwblok/domein, geen
+`type="bouwsteen"` en is elke `<groep>` een los bouwsteen/domein, geen
 kunstmatige categorie ertussen, zelfde uitgangspunt als elders
-("Maak geen kunstmatige categorieën met elk één bouwblok",
+("Maak geen kunstmatige categorieën met elk één bouwsteen",
 `datamodel.md`).
 
 **Weging**: `overallScore` en de scores in `groepsScores` komen uit de
 gedeelde, gewogen scorefunctie (`datamodel.md`, Scoreberekening). In
-deze XML staat bewust nog geen gewicht per bouwblok: De `groep` is bij
+deze XML staat bewust nog geen gewicht per bouwsteen: De `groep` is bij
 Klantcontact een categorie, en het sjabloon heeft vaste elementen die
 hier niet voor zijn ingericht. Dat is een open punt voor Joost (zie
-Open): Een factor bij de bouwblokken in InDesign vraagt een uitbreiding
+Open): Een factor bij de bouwstenen in InDesign vraagt een uitbreiding
 van de XML én van het sjabloon.
 
 **`contentSectie`**: Hergebruikt `Assessment.pdfContentSecties`
@@ -312,7 +312,7 @@ voor het taggen, niet andersom.
 
 ## Open
 
-- **Factor per bouwblok in InDesign**: Of de XML het gewicht per
-  bouwblok moet meegeven (bijvoorbeeld als genest element onder de
+- **Factor per bouwsteen in InDesign**: Of de XML het gewicht per
+  bouwsteen moet meegeven (bijvoorbeeld als genest element onder de
   categorie-`groep`), en of het sjabloon een plek krijgt voor de factor.
   Beslissing van Joost, zie Weging hierboven.

@@ -1,9 +1,9 @@
 # Content: Klantcontact Volwassenheidsscan
 
 Vragen en tags voor het `Assessment`-object "Klantcontact
-Volwassenheid": 15 bouwblokken, 5 categorieën, 60 vragen op de 1–5-schaal
+Volwassenheid": 15 bouwstenen, 5 categorieën, 60 vragen op de 1–5-schaal
 uit `datamodel.md`. Nummering volgens `visie-coniche.md`. De
-beschrijving en centrale vraag per bouwblok staan in `visie-coniche.md`
+beschrijving en centrale vraag per bouwsteen staan in `visie-coniche.md`
 deel 2.
 
 ### Overkoepelend (oranje)

@@ -6,8 +6,8 @@ Bron is het document "Digitale Spanningsmeter – vragenset" van Martijn (13 pag
 
 ## Opzet
 
-- **Assessment**: Spanningsmeter, standalone Assessment zonder `afgeleidVanAssessmentId`. Er is geen categorielaag, de 6 spanningsvelden zijn de `Bouwblok`ken en hangen direct aan het Assessment (`datamodel.md`, Assessment).
-- **Eenheid**: Een bouwblok heet hier een **spanningsveld** (`bouwblokLabel` "Spanningsveld", enkelvoud "spanningsveld", meervoud "spanningsvelden"). In de interface en in alle specs voor dit Assessment staat "veld" of "spanningsveld", niet "bouwblok" en niet "domein".
+- **Assessment**: Spanningsmeter, standalone Assessment zonder `afgeleidVanAssessmentId`. Er is geen categorielaag, de 6 spanningsvelden zijn de `Bouwsteen`en en hangen direct aan het Assessment (`datamodel.md`, Assessment).
+- **Eenheid**: Een bouwsteen heet hier een **spanningsveld** (`bouwsteenLabel` "Spanningsveld", enkelvoud "spanningsveld", meervoud "spanningsvelden"). In de interface en in alle specs voor dit Assessment staat "veld" of "spanningsveld", niet "bouwsteen" en niet "domein".
 - **Icoon**: Sleutel `gauge`, een halve meter met een wijzer (`stylesheet.md`, Assessment-icoon).
 - **Antwoordtype**: `"spanning"` (nieuw, `datamodel.md`, Antwoordtype): Een schaal van 1 tot en met 5 met als extra antwoord 0, "Kan ik niet beoordelen".
 - **Vragen**: 30 gescoorde vragen, 5 per veld, en per veld 1 open vraag (zie Open vraag). Een gescoorde vraag heeft een invalshoek, de vraag zelf en een toelichting "Waar je op let".
@@ -33,7 +33,7 @@ De schaal is geen volwassenheidsschaal met de labels "Niet aanwezig" tot "Geopti
 
 ## Ijkpunt per veld
 
-Bij elk veld staat de Spanningsmeter uit het boek, met de vijf niveaus voor dat veld. Die helpt deelnemers hun score te plaatsen. In de doorloopflow staan de vijf ijkpunten bovenaan het veld, onder de instructie (`schermen.md`, Doorloopflow). Ze zijn gegevens van het veld (`Bouwblok.ijkpunten`, `datamodel.md`), niet van de vraag.
+Bij elk veld staat de Spanningsmeter uit het boek, met de vijf niveaus voor dat veld. Die helpt deelnemers hun score te plaatsen. In de doorloopflow staan de vijf ijkpunten bovenaan het veld, onder de instructie (`schermen.md`, Doorloopflow). Ze zijn gegevens van het veld (`Bouwsteen.ijkpunten`, `datamodel.md`), niet van de vraag.
 
 ## Open vraag per veld
 
@@ -43,7 +43,7 @@ Na de vijf vragen van elk veld vraagt de tool om één concreet voorbeeld dat de
 
 - Staat standaard aan, is niet verplicht en wordt niet gescoord.
 - De ID's zijn VL6, GR6, MG6, DA6, PR6 en TE6.
-- Een antwoord staat in `ScanInvulling.opmerkingenPerBouwblok` (`datamodel.md`), omdat het veld per bouwblok al bestaat. Bij dit Assessment heet het veld in de doorloopflow niet "Opmerkingen" maar zoals hierboven.
+- Een antwoord staat in `ScanInvulling.opmerkingenPerBouwsteen` (`datamodel.md`), omdat het veld per bouwsteen al bestaat. Bij dit Assessment heet het veld in de doorloopflow niet "Opmerkingen" maar zoals hierboven.
 - Tegenvoorbeelden komen in de workshop aan bod en niet in de tool.
 
 ## Achtergrondvragen
@@ -233,7 +233,7 @@ Basis: UTAUT (Venkatesh e.a., 2003), Brynjolfsson, Rock & Syverson (2021), Desig
 
 - **Doorloopflow** (`schermen.md`, Doorloopflow): Per veld de `omschrijving`, de vijf ijkpunten, de vijf vragen met de invalshoek erboven, de toelichting "Waar je op let" achter een Info-knop bij elke vraag, en daaronder de open vraag.
 - **Toelichting "Waar je op let"** stuurt niet naar een score. De tekst is een gegeven van de vraag (`Vraag.aandachtspunt`, `datamodel.md`) en door een Admin te bewerken (`beheerpagina.md`).
-- **Toelichtingsmodal** bij een klik op een veld in de radar op de Assessment-pagina (`visualisatie-spanningsmeter.md`, `stylesheet.md`, Toelichtingsmodal): De `omschrijving`, de ijkpunten en de basis (de literatuur). In de doorloopflow staat die inhoud direct in de veldkop, zonder modal. Een centrale vraag is er niet voor dit Assessment (`Bouwblok.centraleVraag` is leeg).
+- **Toelichtingsmodal** bij een klik op een veld in de radar op de Assessment-pagina (`visualisatie-spanningsmeter.md`, `stylesheet.md`, Toelichtingsmodal): De `omschrijving`, de ijkpunten en de basis (de literatuur). In de doorloopflow staat die inhoud direct in de veldkop, zonder modal. Een centrale vraag is er niet voor dit Assessment (`Bouwsteen.centraleVraag` is leeg).
 - **Gearchiveerde vragen**: Zie `datamodel.md`, Content bewerken. Het aantal vragen per veld mag veranderen, de berekening neemt `n` per veld (`datamodel.md`, Scoreberekening).
 
 ## Validatie

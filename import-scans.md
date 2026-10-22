@@ -9,7 +9,7 @@ beheer"):
   tool, zodat historische klantdata niet verloren gaat. Gebaseerd op
   twee daadwerkelijke exports van dezelfde klant: Één Klantcontact
   Volwassenheidsscan en één AI-volwassenheidsscan (`<organisatie-
-  slug>`), beide met exact dezelfde bouwblokken/domeinen en
+  slug>`), beide met exact dezelfde bouwstenen/domeinen en
   vraagteksten als de huidige content. **Tijdelijk**: Verdwijnt zodra
   de historische migratie voltooid is, zie `backlog.md`.
 - **"Coniche Scan (eigen export)"**: Onze eigen "Als CSV"-export
@@ -104,10 +104,10 @@ Kolommen, gegroepeerd naar wat ermee gebeurt:
 | `completed_at` | `ScanInvulling.afgerondOp` |
 | `status` | `ScanInvulling.status`: Altijd `"completed"` → `"afgerond"`. De export uit de oude tool is handmatig en gebeurt alleen voor scans die Coniche wil behouden, dus altijd afgerond; de tool importeert geen andere statuswaarde en meldt het als er onverwacht een andere waarde in een rij staat |
 | `answers` (JSON) | `ScanInvulling.antwoorden`, per vraag (mapping hieronder) |
-| `answers[].blockComment` | `ScanInvulling.opmerkingenPerBouwblok`, één per bouwblok (dedupliceren, zie hieronder) |
+| `answers[].blockComment` | `ScanInvulling.opmerkingenPerBouwsteen`, één per bouwsteen (dedupliceren, zie hieronder) |
 
 `answers` is een platte lijst van 60 (Klantcontact) of 40 (AI-scan)
-losse vraag-items, geen geneste structuur per bouwblok. Velden per
+losse vraag-items, geen geneste structuur per bouwsteen. Velden per
 item, uit de daadwerkelijke CSV's:
 
 ```json
@@ -127,7 +127,7 @@ item, uit de daadwerkelijke CSV's:
 - **Groeperen vóór matchen**: De tool groepeert deze platte lijst eerst
   op `buildingBlockId` (volgorde van eerste voorkomen), vóórdat de
   matchingregels hieronder worden toegepast. Dat geeft de blokken
-  waarop "Assessment- en bouwblok-matching" verderop matcht; de
+  waarop "Assessment- en bouwsteen-matching" verderop matcht; de
   blok-telling (punt 1 daar) controleert tegen het **aantal groepen**,
   niet tegen `answers.length`.
 - **Scoreveld is `answerScore`**, niet `score`. `answerLabel` bevat
@@ -135,18 +135,18 @@ item, uit de daadwerkelijke CSV's:
   apart geïmporteerd: `ScanInvulling.antwoorden` slaat alleen het
   cijfer op, de labeltekst volgt al uit `datamodel.md` (SchaalLabel).
 - **`weight`**: Niet per antwoord geïmporteerd. Dit hoort inhoudelijk
-  bij de bouwblok-definitie (`Bouwblok.gewicht`, zie `datamodel.md`),
+  bij de bouwsteen-definitie (`Bouwsteen.gewicht`, zie `datamodel.md`),
   niet bij de losse invulling, en al helemaal niet bij de losse vraag, ook al staat
   het in de CSV op elk vraag-item: Gecontroleerd over beide bestanden
   is deze waarde overal `1`, ook binnen elk blok, dus niets wijst
   erop dat er ooit per vraag gevarieerd werd. Bij beide huidige CSV's
   staat dit overal op `1`, gelijk aan de standaardwaarde, dus geen
   actie nodig. Wijkt dit in een toekomstige import af van het huidige
-  `Bouwblok.gewicht`, dan is dat een contentvraagstuk voor dat moment,
+  `Bouwsteen.gewicht`, dan is dat een contentvraagstuk voor dat moment,
   geen uitbreiding van deze import.
 
   **Zorgscan**: Ook in de oude exports van de Zorgscan staat `weight`
-  overal op 1, terwijl de Zorgscan in de nieuwe tool gewogen is (bouwblok
+  overal op 1, terwijl de Zorgscan in de nieuwe tool gewogen is (bouwsteen
   4, 10 en 11 op 2, zie `content-zorgscan.md`). De oude tool paste de
   weging dus nooit toe. Geïmporteerde Zorgscans worden met de nieuwe
   weging berekend, zoals alle scans van dat Assessment. Hun totaalscore wijkt
@@ -292,7 +292,7 @@ binnen een organisatie uniek is.
 
 **Meting.** Zie "Meting" hieronder.
 
-## Assessment- en bouwblok-matching
+## Assessment- en bouwsteen-matching
 
 **Het Assessment-type wordt per rij automatisch bepaald**, niet vooraf
 door de beheerder gekozen. Aanvankelijk koos de beheerder dit expliciet,
@@ -306,14 +306,14 @@ stap zonder een risico weg te nemen.
 
 De tool bepaalt het type in twee stappen. **Eerste stap**: De
 (gegroepeerde, zie hieronder) bloknamen uit de CSV vergelijken met de
-bouwblokken/domeinen van elk Assessment-type. Is er precies één type
+bouwstenen/domeinen van elk Assessment-type. Is er precies één type
 waarvan zowel het aantal als alle namen exact overeenkomen, dan is dat
 het gedetecteerde type.
 
 **Tweede stap, nodig sinds sector-varianten bestaan** (`datamodel.md`,
-Sector-varianten): Een sector-variant kopieert de bouwblok-namen van zijn
+Sector-varianten): Een sector-variant kopieert de bouwsteen-namen van zijn
 template één-op-één, de Zorgscan heeft bijvoorbeeld exact dezelfde 15
-bouwblok-namen als de Klantcontact Volwassenheidsscan, alleen de
+bouwsteen-namen als de Klantcontact Volwassenheidsscan, alleen de
 vraagteksten wijken af. De eerste stap levert dan meerdere kandidaten op
 in plaats van precies één. In dat geval beslissen de **vraagteksten**, met
 een matchpercentage in plaats van alles-of-niets (dit voorkwam eerder dat
@@ -346,8 +346,8 @@ wijzigingen toe (spelling, woordvolgorde, een enkele herschreven vraag)
 zonder de garantie los te laten: Nog steeds altijd een expliciete
 goedkeuring per rij, nooit automatisch en nooit voor alle rijen tegelijk.
 Geldt alléén voor deze vraagtekst-tiebreak in stap 2, stap 1
-(bouwblok-namen en -aantal) blijft 100% exact, geen tolerantie: Wijkt
-een bouwblok af, dan blijft dat gewoon "niet importeren en melden".
+(bouwsteen-namen en -aantal) blijft 100% exact, geen tolerantie: Wijkt
+een bouwsteen af, dan blijft dat gewoon "niet importeren en melden".
 
 Blijft het na beide stappen onbepaald (geen enkele volledige match in
 stap 1, of geen kandidaat op of boven de 95%-drempel in stap 2, of
@@ -363,16 +363,16 @@ Na die detectie valideert de tool per rij:
    AI-volwassenheid), al gegarandeerd door de detectiestap hierboven,
    maar blijft hier ook expliciet gecontroleerd.
 2. Elk blok wordt gematcht op **naam** (`buildingBlockName` in de CSV
-   tegen `Bouwblok.naam`), niet op het CSV-eigen `buildingBlockId`
+   tegen `Bouwsteen.naam`), niet op het CSV-eigen `buildingBlockId`
    (dat is een oude, eigen slug en komt niet noodzakelijk overeen met
-   het huidige `Bouwblok.id`). Bij twee kandidaten met verschillende
-   `Bouwblok.id` maar toevallig dezelfde naam: Handmatig oplossen, de
+   het huidige `Bouwsteen.id`). Bij twee kandidaten met verschillende
+   `Bouwsteen.id` maar toevallig dezelfde naam: Handmatig oplossen, de
    tool importeert die rij niet automatisch.
 3. Binnen een blok worden de vragen **op volgorde** gematcht (eerste
    vraag in de CSV op `Vraag.volgnummer` 1, enzovoort), niet op
    `questionId`: Ook dat is een oude, eigen sleutel. Komt het aantal
    vragen in een blok niet overeen met het aantal in het huidige
-   `Bouwblok.vragen`, dan slaat de tool die rij over met een duidelijke
+   `Bouwsteen.vragen`, dan slaat de tool die rij over met een duidelijke
    melding, in plaats van een deel van de antwoorden te importeren.
 
 **De huidige `Vraag`-tekst is altijd leidend voor wat er daadwerkelijk
@@ -385,12 +385,12 @@ uiteindelijke koppeling, dat was al zo, en blijft zo.
 Bij twijfel geldt: **Niet importeren en melden**, boven een deel
 importeren dat er correct uitziet maar het niet is.
 
-## Opmerkingen per bouwblok
+## Opmerkingen per bouwsteen
 
 `blockComment` staat in de CSV op elke vraag binnen een blok, met
 dezelfde tekst herhaald (het is een opmerking per blok, geen opmerking
 per vraag). De tool neemt die tekst één keer over in
-`ScanInvulling.opmerkingenPerBouwblok`. Staan er binnen één blok
+`ScanInvulling.opmerkingenPerBouwsteen`. Staan er binnen één blok
 verschillende, tegenstrijdige `blockComment`-waarden (zou niet moeten
 voorkomen, maar de tool checkt het), dan importeert de tool die rij
 niet en meldt het, in plaats van er zelf één van te kiezen.
@@ -514,7 +514,7 @@ hoort.
    een niet te bepalen Assessment-type) worden gemarkeerd en apart
    afgehandeld, ze blokkeren niet de import van de overige rijen in het
    bestand. **Bij een 95%+-vraagtekstmatch** (Assessment- en
-   bouwblok-matching, stap 2): Het percentage en de afwijkende vraag/vragen
+   bouwsteen-matching, stap 2): Het percentage en de afwijkende vraag/vragen
    staan er ook bij, zodat de beheerder ziet wat hij goedkeurt.
 6. **Goedkeuren en importeren, op één plek.** Importeren gebeurt alleen
    met de ene knop onder de lijst, "N rijen importeren". Daarmee geeft de
@@ -578,13 +578,13 @@ formaat hierboven:
   UTF-8-BOM bevatten, beide precies zoals `export-csv.md` ze zelf
   schrijft.
 - **Geen naam-/volgorde-matching nodig**: `antwoorden` bevat al onze
-  eigen `bouwblokId` en `vraagId` (het is immers onze eigen data), dus
+  eigen `bouwsteenId` en `vraagId` (het is immers onze eigen data), dus
   de import matcht daar rechtstreeks op. Bestaat een `vraagId` niet meer
   in de huidige content (bijv. na een contentwijziging), dan wordt die
   rij overgeslagen met een duidelijke melding, dezelfde "niet
   importeren en melden"-regel als het oude formaat.
 - **Assessment-type wordt gematcht op `assessment_naam`** (exacte
-  naam), niet gedetecteerd uit de bouwblokken: Onze eigen export
+  naam), niet gedetecteerd uit de bouwstenen: Onze eigen export
   vermeldt de naam al expliciet, geen detectiestap nodig.
 - **Alle drie de statussen worden geïmporteerd** (`uitgenodigd`,
   `bezig`, `afgerond`), niet alleen afgeronde scans: Dit is geen

@@ -16,7 +16,7 @@ De schermen van de Coniche Scan-app aan de respondent- en leadkant, met de navig
 
 ## Globale layout
 
-Eén gedeelde navigatiebalk en footer op elk scherm, als één component, vormgegeven volgens `stylesheet.md`. Alle schermen gebruiken de tokens uit `stylesheet.md`. De nav bevat geen links naar content (Visie, Bouwblokken, AI, 2030): Die staat op de Assessment-pagina, bij het Assessment waar ze bij hoort.
+Eén gedeelde navigatiebalk en footer op elk scherm, als één component, vormgegeven volgens `stylesheet.md`. Alle schermen gebruiken de tokens uit `stylesheet.md`. De nav bevat geen links naar content (Visie, Bouwstenen, AI, 2030): Die staat op de Assessment-pagina, bij het Assessment waar ze bij hoort.
 
 De nav heeft een vast deel links (het logo) en een contextueel deel rechts (`.nav-right`) met acties voor het scherm waar je bent. De volgorde binnen `.nav-right` is overal gelijk:
 
@@ -57,8 +57,8 @@ Het eerste scherm van de publieke kant. Eén cirkel is verdeeld in vijf gelijke 
 - **Detailpaneel**: Van boven naar beneden: De titel van het Assessment (24px, regelhoogte 28px, gewicht 800), de samenvattende zin (16px, regelhoogte 26px, `--ink-m`), de drie punten met grijs lijnicoon (14px, regelhoogte 20px, iconen 20px, `--ink-s`, zelfde stijl als op de Assessment-pagina), 12px ertussen, en de knop "Bekijk dit assessment" (48px hoog, `--or`, 10px afronding, 28px padding) op 24px eronder, die naar de Assessment-pagina gaat. Alleen de knop is klikbaar.  De titel is de volledige naam van het Assessment ("Klantcontact Volwassenheid – Zorg"), het label op de cirkel is de korte naam.
 - **Smal scherm**: Onder 768px staat de cirkel bovenaan op de volle breedte (hij schaalt mee) en het detailpaneel eronder. Bij het kiezen van een deel scrolt de pagina naar het paneel.
 - **Teksten in het detailpaneel**: De samenvattende zin en de drie punten zijn per Assessment concreet en komen niet in elke kaart hetzelfde terug. Het eerste punt noemt het aantal vragen en de invultijd, het tweede de opbouw van het Assessment en het derde wat je in het resultaat terugziet. De aantallen komen waar het kan uit het Assessment.
-  - **Klantcontact Volwassenheid**: "Breng in kaart hoe volwassen jouw klantcontactorganisatie is." Punten: "60 vragen, ±30 minuten" (klok), "15 bouwblokken in 5 categorieën" (lagen), "Concrete stappen op basis van je scores" (vlag).
-  - **Klantcontact Volwassenheid – Zorg**: "Breng in kaart hoe volwassen het patiënt- of cliëntcontact van jouw zorg- of welzijnsorganisatie is." Punten: "60 vragen, ±30 minuten", "15 bouwblokken in 5 categorieën", "Scores gewogen voor de zorg, met concrete stappen".
+  - **Klantcontact Volwassenheid**: "Breng in kaart hoe volwassen jouw klantcontactorganisatie is." Punten: "60 vragen, ±30 minuten" (klok), "15 bouwstenen in 5 categorieën" (lagen), "Concrete stappen op basis van je scores" (vlag).
+  - **Klantcontact Volwassenheid – Zorg**: "Breng in kaart hoe volwassen het patiënt- of cliëntcontact van jouw zorg- of welzijnsorganisatie is." Punten: "60 vragen, ±30 minuten", "15 bouwstenen in 5 categorieën", "Scores gewogen voor de zorg, met concrete stappen".
   - **AI-Volwassenheid in Klantcontact**: "Zie hoe ver jouw organisatie is met AI in klantcontact." Punten: "40 vragen, ±20 minuten", "8 AI-domeinen", "Concrete stappen per domein".
   - **Klantcontact Quickscan – Ziekenhuis**: "Zie snel waar jouw ziekenhuis staat in klantcontact." Punten: "60 vragen, ±15 minuten", "10 dimensies", "Gemiddelde en spreiding per afdeling" (staafjes).
   - **Spanningsmeter**: "Zie waar de spanning zit tussen verhaal, regie, gedrag, data, processen en technologie." Punten: "30 vragen, ±10 tot 15 minuten", "6 spanningsvelden", "Je eigen Spanningsprofiel, daarna de groep naast elkaar".
@@ -70,20 +70,20 @@ Het publieke scherm per Assessment: Wat het Assessment is, de content die erbij 
 
 **Kop.** Een compacte kop van één regel: Het Assessment-icoon in een witte cirkel van 56px (schaduw `0 4px 16px rgba(28,28,26,.08)`, icoon 28px, lijndikte 1,8, `--or`) en op 20px ernaast de titel (48px, regelhoogte 56px, gewicht 800), links uitgelijnd met de container, met 56px ruimte erboven en 40px eronder (`stylesheet.md`, Kop van de Assessment-pagina en sectie-inleiding). Er staan geen eyebrow, geen uitlegzin, geen rij kenmerken en geen knop "Start assessment" in de kop. De knop staat in de sub-nav en in de sectie Praktisch, voor alle Assessments.
 
-- **Opbouw van boven naar beneden**: De kop (zie hierboven), de sticky sub-nav, de inhoudssectie van het Assessment (bij Volwassenheid en Zorg "De 15 bouwblokken", bij de AI-scan "AI in klantcontact", bij de Spanningsmeter "De 6 spanningsvelden", bij de Quickscan "De 4 afdelingen"), "Praktisch", "Wat krijg ik", de sectie met de visie (bij Volwassenheid, Zorg en de Spanningsmeter "Visie", bij de AI-scan "Klantcontact richting 2030") en de footer. De hoofd-nav blijft bovenaan staan en de sub-nav zit eronder. Secties wisselen af tussen wit en `--bg-warm`, beginnend met wit.
-- **Sticky sub-nav**: Een balk van 64px hoog met een boven- en onderrand, direct onder de hoofd-nav (`position: sticky; top: var(--nav-h)`), met links één omlijnde capsule met de pillen (pil 34px hoog, 14px, gewicht 700, de actieve pil gevuld met `--or` en witte tekst, `stylesheet.md`, Sub-nav) en rechts de uitgeschakelde knop "Start assessment". Een klik op een pil scrolt zacht naar de sectie, met ruimte erboven voor de balken (`scroll-margin-top`). Als sectie geldt de laatste sectie waarvan de bovenkant minder dan 90px onder de balk staat. De pillen werken ook als gewone ankerlinks (`#bouwblokken`, `#ai`, `#velden`, `#afdelingen`, `#praktisch`, `#wat`, `#visie`, `#2030`). Staat in het systeem verminderde beweging aan, dan scrolt de pagina niet zacht.
+- **Opbouw van boven naar beneden**: De kop (zie hierboven), de sticky sub-nav, de inhoudssectie van het Assessment (bij Volwassenheid en Zorg "De 15 bouwstenen", bij de AI-scan "AI in klantcontact", bij de Spanningsmeter "De 6 spanningsvelden", bij de Quickscan "De 4 afdelingen"), "Praktisch", "Wat krijg ik", de sectie met de visie (bij Volwassenheid, Zorg en de Spanningsmeter "Visie", bij de AI-scan "Klantcontact richting 2030") en de footer. De hoofd-nav blijft bovenaan staan en de sub-nav zit eronder. Secties wisselen af tussen wit en `--bg-warm`, beginnend met wit.
+- **Sticky sub-nav**: Een balk van 64px hoog met een boven- en onderrand, direct onder de hoofd-nav (`position: sticky; top: var(--nav-h)`), met links één omlijnde capsule met de pillen (pil 34px hoog, 14px, gewicht 700, de actieve pil gevuld met `--or` en witte tekst, `stylesheet.md`, Sub-nav) en rechts de uitgeschakelde knop "Start assessment". Een klik op een pil scrolt zacht naar de sectie, met ruimte erboven voor de balken (`scroll-margin-top`). Als sectie geldt de laatste sectie waarvan de bovenkant minder dan 90px onder de balk staat. De pillen werken ook als gewone ankerlinks (`#bouwstenen`, `#ai`, `#velden`, `#afdelingen`, `#praktisch`, `#wat`, `#visie`, `#2030`). Staat in het systeem verminderde beweging aan, dan scrolt de pagina niet zacht.
 - **Secties per Assessment**:
-  - Klantcontact Volwassenheid en Zorg: "De 15 bouwblokken", "Praktisch", "Wat krijg ik", "Visie". De Zorgscan gebruikt dezelfde teksten (zorgspecifieke teksten staan in `backlog.md`).
+  - Klantcontact Volwassenheid en Zorg: "De 15 bouwstenen", "Praktisch", "Wat krijg ik", "Visie". De Zorgscan gebruikt dezelfde teksten (zorgspecifieke teksten staan in `backlog.md`).
   - AI-volwassenheid: "AI in klantcontact", "Praktisch", "Wat krijg ik", "Klantcontact richting 2030".
   - Spanningsmeter (ontwerp `Landing` in het Design-artifact): "De 6 spanningsvelden", "Praktisch", "Wat krijg ik", "Visie". De uitwerking staat in `visualisatie-spanningsmeter.md`, Landingspagina en film Wat krijg ik.
-  - Quickscan Ziekenhuis (ontwerp `Herontwerp-Quickscan` in het Design-artifact): Dezelfde kop en opbouw als de andere Assessments: De compacte kop met het icoon `cross` en de titel "Klantcontact Quickscan – Ziekenhuis", de sticky sub-nav met "De 4 afdelingen" (`#afdelingen`), "Praktisch", "Wat krijg ik" en "Visie", en de secties in die volgorde. **De 4 afdelingen** (voor de Quickscan, in de plaats van de bouwblokken): De kop "Vier afdelingen die samen het klantcontact van het ziekenhuis bepalen", een inleiding ("Je beantwoordt 60 vragen met Ja, Nee of Weet ik niet, 15 per afdeling. Daarna zie je per afdeling waar de basis op orde is en waar ontwikkelruimte zit.") en vier kaarten naast elkaar, één per afdeling: Een nummercirkel (oranje rand) met de naam, de definitie uit `content-ziekenhuis-quickscan.md` (De 4 afdelingen, in een zin zonder "X =") en onderaan de vragen per dimensie (Organisatie, Processen en techniek, Mensen; alleen de dimensies die de afdeling heeft, samen 15). Eronder een regel dat een afdeling die niet relevant is, wordt overgeslagen. Er is geen radar of spin, want de Quickscan toont percentages en bogen. De kaarten zijn niet klikbaar. **Praktisch**: Zoals bij de andere Assessments, met "±15 minuten" en "Direct resultaat" ("score per afdeling"). **Wat krijg ik**: Alleen de film Wat krijg ik van de Quickscan (`Film-Quickscan`), zonder de film Het dossier, want de Quickscan heeft geen bouwblokken met een radar. **Visie**: Dezelfde sectie als bij Volwassenheid.
+  - Quickscan Ziekenhuis (ontwerp `Herontwerp-Quickscan` in het Design-artifact): Dezelfde kop en opbouw als de andere Assessments: De compacte kop met het icoon `cross` en de titel "Klantcontact Quickscan – Ziekenhuis", de sticky sub-nav met "De 4 afdelingen" (`#afdelingen`), "Praktisch", "Wat krijg ik" en "Visie", en de secties in die volgorde. **De 4 afdelingen** (voor de Quickscan, in de plaats van de bouwstenen): De kop "Vier afdelingen die samen het klantcontact van het ziekenhuis bepalen", een inleiding ("Je beantwoordt 60 vragen met Ja, Nee of Weet ik niet, 15 per afdeling. Daarna zie je per afdeling waar de basis op orde is en waar ontwikkelruimte zit.") en vier kaarten naast elkaar, één per afdeling: Een nummercirkel (oranje rand) met de naam, de definitie uit `content-ziekenhuis-quickscan.md` (De 4 afdelingen, in een zin zonder "X =") en onderaan de vragen per dimensie (Organisatie, Processen en techniek, Mensen; alleen de dimensies die de afdeling heeft, samen 15). Eronder een regel dat een afdeling die niet relevant is, wordt overgeslagen. Er is geen radar of spin, want de Quickscan toont percentages en bogen. De kaarten zijn niet klikbaar. **Praktisch**: Zoals bij de andere Assessments, met "±15 minuten" en "Direct resultaat" ("score per afdeling"). **Wat krijg ik**: Alleen de film Wat krijg ik van de Quickscan (`Film-Quickscan`), zonder de film Het dossier, want de Quickscan heeft geen bouwstenen met een radar. **Visie**: Dezelfde sectie als bij Volwassenheid.
 - **Visie** (bron `visie-coniche.md`, deel 1): Een sectiekop met een korte inleiding en drie kaarten naast elkaar (Beloften waarmaken, Kwaliteit zit in het geheel, Van meten naar verbeteren), elk met een korte tekst en "Lees verder". "Lees verder" klapt de volledige tekst op dezelfde pagina uit; er is geen aparte pagina.
-- **De 15 bouwblokken** (bron `visie-coniche.md`, deel 2, component `visual-bouwblokken-en-domeinen.md`): De interactieve visual staat hier als sectie, vijf kolommen (de categorieën) met de bouwblokken als pillen met een nummercirkel in de categoriekleur. Een klik opent de Toelichtingsmodal zoals nu.
-- **AI in klantcontact** (bron `visie-ai-klantcontact.md`, component `visual-bouwblokken-en-domeinen.md`): De acht domeinen als radar met acht taartpunten en rijen in de domeinkleur (`stylesheet.md`, Groepskleuren). Een klik opent de Toelichtingsmodal.
+- **De 15 bouwstenen** (bron `visie-coniche.md`, deel 2, component `visual-bouwstenen-en-domeinen.md`): De interactieve visual staat hier als sectie: Een radar met vijftien taartpunten en de bouwstenen als rijen, gegroepeerd per categorie (`visual-bouwstenen-en-domeinen.md`). Een klik opent de Toelichtingsmodal.
+- **AI in klantcontact** (bron `visie-ai-klantcontact.md`, component `visual-bouwstenen-en-domeinen.md`): De acht domeinen als radar met acht taartpunten en rijen in de domeinkleur (`stylesheet.md`, Groepskleuren). Een klik opent de Toelichtingsmodal.
 - **Klantcontact richting 2030** (bron `content-2030.md`): De vijf ontwerpkeuzes als vijf kaarten naast elkaar (nummer, titel, één zin), daaronder pillen met de overige onderdelen van het stuk en "Lees het hele stuk", dat het volledige stuk op dezelfde pagina uitklapt.
 - **Wat krijg ik**: Kop "Zo ziet je resultaat eruit" met een inleidende zin die bij het type past. Daaronder de film Wat krijg ik van het type (`help.md`, Films, met de knop "Bekijk de voorbeeld-output") en daaronder de film "Het dossier, de radar voor de Lead" (`help.md`, Films, ontwerp `Film-Dossier`), zonder knop. Beide staan in een kaart met drie stapkaarten.
 - **Praktisch**: Sectiekop "Wat je kunt verwachten" met als inleiding "Bedoeld voor ..." (de doelgroep van het Assessment), de drie kaarten van Praktische informatie (invultijd, direct resultaat, privacy) en daaronder de uitgeschakelde knop "Start assessment" met het Info-icoon en de regel "Toegang loopt via een persoonlijke link van Coniche. Heb je die niet, neem dan contact op."
-- **Routes**: De losse pagina's `/visie`, `/bouwblokken`, `/ai-scan` en de 2030-pagina vervallen. Een oud adres stuurt door naar de Assessment-pagina waar de content nu staat (Visie en Bouwblokken naar Klantcontact Volwassenheid, AI en 2030 naar de AI-scan).
+- **Routes**: De losse pagina's `/visie`, `/bouwstenen`, `/bouwblokken`, `/ai-scan` en de 2030-pagina vervallen. Een oud adres stuurt door naar de Assessment-pagina waar de content nu staat (Visie en Bouwstenen naar Klantcontact Volwassenheid, AI en 2030 naar de AI-scan).
 - **Bereikbaarheid**: Een bezoeker zonder sessie komt hier via Kies jouw assessment, met alleen "Inloggen" in de nav. Een gebruiker met een persoonlijke link komt hier via "Over deze scan" op de Meting-kaart op Mijn metingen; de nav toont dan "← Terug naar Mijn metingen" en "Mijn gegevens" en het logo gaat naar Mijn metingen.- **Iconen**: De drie kaarten van Praktisch hebben grijze lijniconen (`--ink-s`, op het raster van de Assessment-iconen).
 
 
@@ -107,7 +107,7 @@ staat bovenaan dezelfde kop:
 - De nav toont hier alleen "Inloggen" (Globale
   layout, punt 5). "← Terug" staat in de kop en niet ook in de nav.
 Onder die kop staat bij de Spanningsmeter de weergave Groep van het resultaat met demodata (`visualisatie-spanningsmeter.md`, Resultaat). Bij de Klantcontact Volwassenheidsscan, de
-AI-volwassenheidsscan en de Zorgscan de weergave Per bouwblok
+AI-volwassenheidsscan en de Zorgscan de weergave Per bouwsteen
 van een Meting met zes demo-respondenten (`visualisatie-scores.md`, A), met
 de uitleg dat de tool bij meerdere respondenten van dezelfde Meting en
 organisatie ook het gemiddelde en de afwijking daarop toont.
@@ -158,7 +158,7 @@ is, ziet geen intake, geen vragenlijst en geen lijst met eigen scans. Heeft
 een Lead niets aan staan en geen scans, dan staat er een korte melding dat
 er nog niets voor hem klaarstaat (`beheerpagina.md`, punt 6a).
 
-**Over deze scan.** De content (Visie, Bouwblokken, AI en 2030) staat op de Assessment-pagina en niet in de nav. Op elke Meting-kaart van een Respondent staat een link "Over deze scan" naar de Assessment-pagina van het Assessment van die Meting, met de persoonlijke code (`?code=`). De linktekst hangt af van het type: "Over deze scan: Visie en bouwblokken" bij Klantcontact Volwassenheid en Zorg, "Over deze scan: AI-domeinen en 2030" bij de AI-scan. Bij de Quickscan staat de link er niet zolang daar geen extra content is. De link staat naast "Bekijk resultaten" (zelfde stijl, `--or`, 14px, gewicht 700). Een Lead die geen Respondent is en alleen een benchmark heeft, ziet de link niet.
+**Over deze scan.** De content (Visie, Bouwstenen, AI en 2030) staat op de Assessment-pagina en niet in de nav. Op elke Meting-kaart van een Respondent staat een link "Over deze scan" naar de Assessment-pagina van het Assessment van die Meting, met de persoonlijke code (`?code=`). De linktekst hangt af van het type: "Over deze scan: Visie en bouwstenen" bij Klantcontact Volwassenheid en Zorg, "Over deze scan: AI-domeinen en 2030" bij de AI-scan. Bij de Quickscan staat de link er niet zolang daar geen extra content is. De link staat naast "Bekijk resultaten" (zelfde stijl, `--or`, 14px, gewicht 700). Een Lead die geen Respondent is en alleen een benchmark heeft, ziet de link niet.
 
 ## Intake
 
@@ -170,18 +170,18 @@ opgeslagen, geen nieuw datamodel-veld. De tekst van het vakje bevat ook de toest
 
 **Bij de Spanningsmeter** heeft de intake geen extra velden. Een deel van een organisatie is een Onderdeel (geen afdeling en geen rolgroep). Op Mijn metingen heet de link "Over deze scan: Spanningsvelden en visie".
 
-**Wegingskaart**: Heeft het Assessment minstens één bouwblok met een
+**Wegingskaart**: Heeft het Assessment minstens één bouwsteen met een
 gewicht ongelijk aan 1, dan staat bovenaan de intake (boven het
 formulier) een kaart (`stylesheet.md`, Wegingskaart) met een
 weegschaalicoon, met:
 `Assessment.wegingTitel`, `Assessment.wegingToelichting` en daaronder
-een chip per bouwblok met gewicht ongelijk aan 1, bijvoorbeeld
+een chip per bouwsteen met gewicht ongelijk aan 1, bijvoorbeeld
 "Kanaalmanagement (2×)". De chips staan op volgorde van het
-bouwblok-nummer. Zijn titel of toelichting leeg, dan geldt de
+bouwsteen-nummer. Zijn titel of toelichting leeg, dan geldt de
 standaardtitel "Gewogen scoring" en de standaardtekst "Binnen dit
-assessment wegen niet alle bouwblokken even zwaar mee in de
-totaalscore. De volgende bouwblokken tellen extra mee:". Heeft geen
-enkel bouwblok een afwijkend gewicht, dan verschijnt de kaart niet.
+assessment wegen niet alle bouwstenen even zwaar mee in de
+totaalscore. De volgende bouwstenen tellen extra mee:". Heeft geen
+enkele bouwsteen een afwijkend gewicht, dan verschijnt de kaart niet.
 Gewicht 1 is de normale situatie en wordt nergens getoond. De tekst
 is per Assessment aanpasbaar in beheer (`beheerpagina.md`).
 
@@ -223,16 +223,16 @@ Positie in `.nav-right`: Punt 5 van de navigatieregel (Globale layout), helemaal
 ## Doorloopflow
 
 Sidebar met naam respondent, voortgang, categorieën
-met genummerde bouwblokken, actief bouwblok gemarkeerd met een lijn langs de actieve categorie en drie
+met genummerde bouwstenen, actief bouwsteen gemarkeerd met een lijn langs de actieve categorie en drie
 statussen. De sidebar blijft staan als de inhoud rechts scrolt (zie
-`stylesheet.md`). Per bouwblok: Een kop met een accentbalk in de
+`stylesheet.md`). Per bouwsteen: Een kop met een accentbalk in de
 categoriekleur met de eyebrow, de titel, de centrale vraag en de
 toelichting, direct zichtbaar (er is geen i-icoon en geen modal meer, en de omschrijving en de tags staan niet meer in de doorloopflow, `stylesheet.md`, Doorloopflow), de instructieregel "Beantwoord op basis van
 wat aantoonbaar geregeld is (documenten, ritmes, tooling,
 afspraken).", de vragen met 5-puntsschaal en één opmerkingenveld per
-bouwblok. Heeft een bouwblok een gewicht ongelijk aan 1, dan staat
+bouwsteen. Heeft een bouwsteen een gewicht ongelijk aan 1, dan staat
 naast de titel een kleine chip met de factor ("2×") en in de sidebar
-achter het bouwblok dezelfde marker. Bij gewicht 1 staat er niets. Op het laatste bouwblok wordt "Volgende" de knop "Bekijk
+achter de bouwsteen dezelfde marker. Bij gewicht 1 staat er niets. Op de laatste bouwsteen wordt "Volgende" de knop "Bekijk
 resultaten".
 
 **Bij de Spanningsmeter** (antwoordType `spanning`) heeft de doorloopflow zes velden zonder categorieën. Per vraag staan vijf ronde knoppen 1 tot en met 5 met de niveaunaam eronder en een aparte pil "0 · Kan ik niet beoordelen"; boven de vragen staan de vijf ijkpunten van het veld, bij elke vraag een Info-knop "Waar je op let", en onder de vragen een open voorbeeldvraag die niet verplicht is en geen score krijgt. De voortgang telt de 30 gescoorde vragen (`visualisatie-spanningsmeter.md`, Doorloopflow).
@@ -241,8 +241,8 @@ resultaten".
 knoppen, "Ja", "Nee" en "Weet ik niet", in plaats van de 5-puntsschaal.
 De instructieregel komt uit `Assessment.instructieregel`. De sidebar
 werkt zoals bij de andere scans: De afdelingen zijn de categorieën, met
-daaronder de genummerde bouwblokken (de dimensies) en per bouwblok het
-aantal beantwoorde vragen. Een bouwblok kan maar één vraag hebben
+daaronder de genummerde bouwstenen (de dimensies) en per bouwsteen het
+aantal beantwoorde vragen. Een bouwsteen kan maar één vraag hebben
 (Mensen bij de poliklinieken). Eén persoon vult de hele scan in. Elke
 afdeling begint met haar definitie en de vraag of ze relevant is voor
 de situatie van de respondent (Ja of Nee). Bij Nee worden haar vragen
@@ -250,7 +250,7 @@ overgeslagen en telt ze niet mee in de score (`datamodel.md`,
 Antwoordtype, Optionele categorieën, en
 `content-ziekenhuis-quickscan.md`, Doorloop per afdeling).
 
-**Bron voor de toelichting.** De bouwblokbeschrijvingen in `visie-coniche.md` deel 2. Zolang die op `concept` staan (zie `inhoudelijk-fundament.md`), blijft de huidige tekst in de app staan.
+**Bron voor de toelichting.** De bouwsteenbeschrijvingen in `visie-coniche.md` deel 2. Zolang die op `concept` staan (zie `inhoudelijk-fundament.md`), blijft de huidige tekst in de app staan.
 
 **Eén persoon tegelijk per scan.** Een scan die iemand invult, is
 voor anderen vergrendeld (`datamodel.md`, Bewerkslot). Opent een tweede
@@ -262,14 +262,14 @@ zodra het slot vrij is.
 uiterst links (met een pijl naar rechts, niet links: Dit is een
 voorwaartse actie, geen terug-actie. Alleen zichtbaar zodra deze
 ScanInvulling `"afgerond"` is, gaat rechtstreeks naar de Resultatenpagina zonder
-opnieuw door de bouwblokken te hoeven klikken). Is deze actie
+opnieuw door de bouwstenen te hoeven klikken). Is deze actie
 zichtbaar, dan volgt een scheidingslijn, dan "← Terug naar Mijn metingen";
 is de invulling nog niet afgerond, dan staat er alleen "← Terug naar Mijn
 metingen", zonder scheidingslijn.
 
 ## Resultatenpagina
 
-Het resultaat van één ingevulde scan. Bovenaan de Resultaatkop met eyebrow, titel, subregel en totaalkaart (`stylesheet.md`, Resultaatkop, voor elke scan dezelfde). De totaalscore staat daarin in de ring (`.score-ring`, `stylesheet.md`, Resultaten), met de voortgang. Daaronder staan de radar van alle bouwblokken en het staafdiagram per categorie naast elkaar, in twee kaarten. De radar heeft genummerde knooppunten met de namen in een tooltip. Het staafdiagram staat in de categoriekleuren, zonder getallen in de balken, met de klassegrenzen als stippellijn (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm). Verder staan er de top 3 sterktes, de top 3 verbeterkansen en de legenda.
+Het resultaat van één ingevulde scan. Bovenaan de Resultaatkop met eyebrow, titel, subregel en totaalkaart (`stylesheet.md`, Resultaatkop, voor elke scan dezelfde). De totaalscore staat daarin in de ring (`.score-ring`, `stylesheet.md`, Resultaten), met de voortgang. Daaronder staan de radar van alle bouwstenen en het staafdiagram per categorie naast elkaar, in twee kaarten. De radar heeft genummerde knooppunten met de namen in een tooltip. Het staafdiagram staat in de categoriekleuren, zonder getallen in de balken, met de klassegrenzen als stippellijn (`stylesheet.md`, Radar en staafdiagram op het resultaatscherm). Verder staan er de top 3 sterktes, de top 3 verbeterkansen en de legenda.
 
 **Bij AI-volwassenheid** (geen categorielaag, `content-ai-scan.md`)
 vervalt het staafdiagram per categorie: In plaats daarvan "Scores per
@@ -281,7 +281,7 @@ domein", een staand kolomdiagram met een kolom per domein in volgorde 1 tot en m
 **Bij Ja / Nee / Weet ik niet (Quickscan)** heeft het scherm een eigen
 opbouw: Een totaalkaart (met de ring, `content-ziekenhuis-quickscan.md`,
 Resultaten), een kaart per afdeling (categorie) met
-verdieping op de bouwblokken (dimensies), "Sterkste afdeling" en
+verdieping op de bouwstenen (dimensies), "Sterkste afdeling" en
 "Meeste ontwikkelruimte", en de legenda van de drie klassen. Radar,
 staafdiagram per categorie en top 3 vervallen. Een afdeling die niet
 van toepassing is staat er grijs en doorgestreept, en doet niet mee in
@@ -295,12 +295,12 @@ resultatenpagina van een Meting heeft voor dit type de weergaven Overzicht
 heeft weergave 5. Een samengestelde Meting, een
 benchmark binnen een organisatie of een Meting en Exporteren bestaan voor dit type niet.
 
-**Weging in de resultaten**: Een bouwblok met een gewicht ongelijk
+**Weging in de resultaten**: Een bouwsteen met een gewicht ongelijk
 aan 1 toont zijn factor ("2×") bij de naam, in de tooltip van de radar en in de
-lijst per bouwblok, en in de top 3 als het daarin staat. De getoonde
-bouwblokscore zelf blijft ongewogen. Categoriescore en totaalscore zijn
+lijst per bouwsteen, en in de top 3 als het daarin staat. De getoonde
+bouwsteenscore zelf blijft ongewogen. Categoriescore en totaalscore zijn
 gewogen (zie Scoringslogica). Geen factor bij gewicht 1. Dezelfde
-markering komt terug in de PDF en staat als `gewicht` per bouwblok in
+markering komt terug in de PDF en staat als `gewicht` per bouwsteen in
 de JSON-kolom `groepsScores` van de CSV (`export-csv.md`). De
 InDesign-export krijgt alleen de gewogen scores
 (`export-indesign.md`, Weging).
@@ -320,7 +320,7 @@ dan "← Terug naar Mijn metingen". Eén gedeelde exportfunctie, zie
 - De tekst "Wat is goed klantcontact?" uit `visie-coniche.md` deel 1 staat in het ontwerp niet apart in de sectie Visie.
 - Welke teksten bij de Zorgscan komen op de Assessment-pagina.
 - De film "De radar in je resultaten" staat niet op de Assessment-pagina's, alleen Wat krijg ik en Het dossier.
-- Of de teksten van Visie, Bouwblokken, AI en 2030 beheerbaar blijven zoals in `beheerpagina.md`, punt 11.
+- Of de teksten van Visie, Bouwstenen, AI en 2030 beheerbaar blijven zoals in `beheerpagina.md`, punt 11.
 - De teksten van de Visie en van de velden van de Spanningsmeter moeten nog geverifieerd worden (`visualisatie-spanningsmeter.md`).
 - Rol/functie bij de Respondent in de Intake: Vrij tekstveld of vaste lijst.
 - Focus- en error-states in formulieren (`stylesheet.md`).

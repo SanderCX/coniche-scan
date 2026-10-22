@@ -798,6 +798,6 @@ Beide specs zijn samengevoegd in `visual-bouwblokken-en-domeinen.md`. De volgend
 
 Op 15 oktober 2026 stonden de eerste twee velden al in de app (`verkennenMinGroep` en `verkennenWaarschuwingGroep`, met `info.verkennenDrempels`), door Joost op 2 en 2 gezet om te proberen. De spec maakt er vijf van, hernoemt `verkennenWaarschuwingGroep` naar `verkennenMinVergelijking` en vervangt het Info-icoon door `info.verkennenInstellingen`. De rij `info.verkennenDrempels` vervalt.
 
-## 22 oktober 2026: Het label Bouwblok
+### Hernoeming van bouwblok naar bouwsteen (22 oktober 2026)
 
-`Assessment.bouwblokLabel` heet standaard "Bouwblok" (voorheen "Bouwsteen", `datamodel.md`, Assessment; `CLAUDE.md`, Terminologie). Gebouwd: De seed van de Klantcontact Volwassenheidsscan en de Zorgscan, de standaard bij een nieuw Assessment (`lib/assessment-store.ts`) en de omzetting van opgeslagen kopieën met het oude label (`verrijkAssessment`, `lib/assessment-migratie.ts`: Alleen exact "Bouwsteen" wordt "Bouwblok", een eigen label blijft staan). De eyebrow in de doorloopflow, de Toelichtingsmodal en de PDF toont daardoor "BOUWBLOK {n}". `contentSoort` (`lib/landing.ts`) herkent Volwassenheid en Zorg niet meer aan het label maar aan het id `klantcontact-volwassenheid` of `afgeleidVanAssessmentId`, zodat een Admin het label kan aanpassen zonder de Assessment-pagina te breken.
+In alle specs is "bouwblok" vervangen door "bouwsteen" (en "bouwblokken" door "bouwstenen"), ook in het datamodel en de veldnamen. De bestandsnaam `visual-bouwblokken-en-domeinen.md` is `visual-bouwstenen-en-domeinen.md` geworden. De oude naam staat in dit archief ongewijzigd, omdat hij de toestand van dat moment beschrijft.

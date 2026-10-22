@@ -337,6 +337,15 @@ Klein, groeit later mee. Waarden die een Admin hier instelt:
   laagste tot hoogste score aan te zetten (`visualisatie-scores.md`,
   onderdeel A).
 
+**Formulier Spreiding** (`visualisatie-scores.md`, Spreidingslabel, en `visualisatie-quickscan.md`, Spreidingslabel). Een eigen formulier onder Drempels en termijnen, met de kop Spreiding en een Info-icoon (`info.spreidingGrenzen`). Het bevat de grenzen waarop het spreidingslabel Eensgezind, Wisselend of Verdeeld kiest. De waarden zijn getallen met een komma, groter dan 0, en de grens voor Verdeeld ligt boven die voor Wisselend.
+
+| Veld | Instelling | Startwaarde | Wat het doet |
+|---|---|---|---|
+| Wisselend vanaf (schaalscans) | `spreidingWisselend` | 0,55 | Standaardafwijking van de bouwsteenscores vanaf waar het label Wisselend is. |
+| Verdeeld vanaf (schaalscans) | `spreidingVerdeeld` | 0,8 | Standaardafwijking vanaf waar het label Verdeeld is. |
+| Wisselend vanaf (Quickscan) | `spreidingWisselendQuickscan` | 14 | Standaardafwijking van de percentages, in procentpunten, vanaf waar het label Wisselend is. |
+| Verdeeld vanaf (Quickscan) | `spreidingVerdeeldQuickscan` | 20 | Standaardafwijking in procentpunten vanaf waar het label Verdeeld is. |
+
 **Formulier Verkennen** (`visualisatie-verkennen.md`, Drempels). Een eigen formulier onder Drempels en termijnen, naast de formulieren Bewaartermijn en Benchmark, met de kop Verkennen en een Info-icoon (`info.verkennenInstellingen`). Het bevat de grenzen die bepalen wanneer Verkennen een groep, een vergelijking of een groepering toestaat. Het formulier heeft vijf velden: `verkennenMinGroep`, `verkennenMinVergelijking`, `verkennenMinPool`, `verkennenMinIngevuldPct` en een vijfde grens (`visualisatie-verkennen.md`, Drempels), met het Info-icoon `info.verkennenInstellingen`. De startwaarden 3, 5, 6, 12 en 40 zijn de norm vanuit het ontwerp en blijven de beginstand. Een Admin kan elke waarde in de praktijk aanpassen.
 
 | Veld | Instelling | Startwaarde | Wat het doet |
@@ -401,8 +410,8 @@ standaardteksten zoals ze nu in de app staan):
 | `info.auditLog` | Audit-log, naast de paginatitel | Wie (of het Systeem) wat deed, wanneer en op welk record. Alleen-lezen. Geen persoonsgegevens uit scans. |
 | `info.algemeneTekstenPagina` | Algemene teksten, naast de paginatitel | Teksten los van één Assessment-type. Wijzigingen zijn direct zichtbaar, geen aparte publicatiestap. |
 | `info.algemeneTekstenInfoIconen` | Algemene teksten, naast de kop Info-iconen | Alle toelichtingen achter een Info-icoon, met de plek en de actuele tekst. Aanpassen kan op de plek zelf, met het potlood in het open Info-icoon. |
-| `info.contentToelichting` | Content, veld Toelichting van een bouwblok | Lopende tekst in de Toelichtingsmodal op de Assessment-pagina en in de kop van dit bouwblok in de doorloopflow. Een lege regel scheidt de alinea's. Laat je het veld leeg, dan ontbreekt dit onderdeel in de modal en in de kop. |
-| `info.contentBouwblokLabel` | Content, veld Bouwblok-label | De kleine kop boven de titel in de Toelichtingsmodal en in de doorloopflow, bijvoorbeeld "Bouwblok" of "AI-domein", gevolgd door het nummer. |
+| `info.contentToelichting` | Content, veld Toelichting van een bouwsteen | Lopende tekst in de Toelichtingsmodal op de Assessment-pagina en in de kop van deze bouwsteen in de doorloopflow. Een lege regel scheidt de alinea's. Laat je het veld leeg, dan ontbreekt dit onderdeel in de modal en in de kop. |
+| `info.contentBouwsteenLabel` | Content, veld Bouwsteen-label | De kleine kop boven de titel in de Toelichtingsmodal en in de doorloopflow, bijvoorbeeld "Bouwsteen" of "AI-domein", gevolgd door het nummer. |
 | `info.conflictOplossen` | Conflict oplossen, naast de titel van de modal | Een Respondent heeft per Meting één scan. Hang één van de twee scans aan een andere Respondent. Alleen die scan gaat mee, de oorspronkelijke Respondent blijft bestaan met de andere scan. |
 | `info.dataIntegriteit` | Instellingen, Data-integriteit, naast "Controleer nu" | Controleert of er, bijvoorbeeld na een verwijderactie, nog ingevulde scans zijn die naar een niet-bestaande Respondent verwijzen. |
 | `info.startAssessment` | Assessment-landingspagina, achter de uitgeschakelde knop "Start assessment" | Toegang tot een assessment loopt via een persoonlijke uitnodiging. |
@@ -428,6 +437,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.benchmarkAanmakenScans` | Benchmark binnen een Meting aanmaken of wijzigen, achter de uitgeschakelde knop | Een benchmark binnen een Meting heeft een naam nodig, een organisatie, een Assessment en een Meting. Een Meting is alleen te kiezen met genoeg afgeronde scans. |
 | `info.exportEenScan` | Meting-overzicht en de lijsten onder Resultaten, achter de uitgeschakelde opties "Als PDF" en "Voor InDesign (XML)" | Beschikbaar bij precies één scan. |
 | `info.korteNaamOrganisatie` | Organisatie aanmaken en bewerken, naast het veld Korte naam | Een korte naam staat in de kolomkoppen van matrices en heatmaps, bijvoorbeeld "Rabobank" in plaats van de volledige naam. Laat je het veld leeg, dan geldt de naam zelf. De volledige naam staat in de tooltip. |
+| `info.spreidingGrenzen` | Instellingen, Drempels en termijnen, formulier Spreiding | Grenzen voor het spreidingslabel. Onder de eerste grens is de groep Eensgezind, tussen de twee grenzen Wisselend en vanaf de tweede grens Verdeeld. Voor schaalscans gaat het om de standaardafwijking van de scores, voor de Quickscan om procentpunten. |
 | `info.verkennenInstellingen` | Instellingen, Drempels en termijnen, formulier Verkennen | Grenzen voor Verkennen. Een groep onder het minimum is gestreept en krijgt geen cijfers. Bij een kleinere focus of rest staat een waarschuwing. In een kleinere pool kun je niet groeperen. Een kenmerk met meer waarden dan het maximum of een lagere invulling dan het minimum kan niet groeperen. |
 | `info.verkennenKenmerken` | Verkennen, kaart Kenmerken, naast de titel | Zet hier een kenmerk neer om op te filteren en om op te groeperen. Een kenmerk zonder gekozen waarde filtert niets. Filteren op bereik bij getallen volgt later. |
 | `info.verkennenGroeperen` | Verkennen, naast het label Groeperen op | Kies een kenmerk om de Organisaties in groepen te verdelen. Daarna kies je de groep waarop je inzoomt (de focusgroep). Die wordt vergeleken met alle andere Organisaties. Is er nog geen kenmerk, dan staat er: Er is nog geen kenmerk om op te groeperen. Voeg bij Kenmerken een kenmerk toe, dan kun je de Organisaties erop in groepen verdelen. |
@@ -436,7 +446,7 @@ standaardteksten zoals ze nu in de app staan):
 | `info.verkennenOpslaan` | Verkennen, naast de knop Opslaan als benchmark | Je slaat de filters op en niet de uitkomst. De groep volgt de filters: Komt er een Organisatie bij die erbij past, dan telt die mee. Daarna wijs je de benchmark toe aan een Lead van een Organisatie die erin zit, in het Leads-venster van die Organisatie. |
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
 | `info.contactpersonen` | Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen | Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze. |
-| `info.dossier` (vervangt `info.nieuwsartikelen`) | Organisatie-detail, kaart Dossier, naast de titel | Cases en nieuws die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier zichtbaar is én het item op Zichtbaar voor Lead staat. Een case kan alleen zichtbaar worden als de organisatie in de case dat heeft toegestaan. |
+| `info.dossier` (vervangt `info.nieuwsartikelen`) | Organisatie-detail, kaart Dossier, naast de titel | Cases, benchmarks, nieuws, events en blogs die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier zichtbaar is én het item op Zichtbaar voor Lead staat. Een case kan alleen zichtbaar worden als de organisatie in de case dat heeft toegestaan. |
 | `info.caseVlag` | Organisatie-detail, bij het vinkje "Mag als case gebruikt worden" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads. |
 | `info.kpiBlok` | Organisatie-detail, blok KPI's, naast de titel | Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet. |
 | `info.kpiPlek` | Modal KPI's invullen, naast het label Plek | Kies voor welk deel van de organisatie je invult. Algemeen is de hele organisatie. |
@@ -449,24 +459,24 @@ Elk nieuw Info-icoon krijgt hier een regel en een regel in
 `data/info-teksten.ts`. Een standaardtekst bevat geen verwijzing naar een
 document of andere bouwerstekst.
 
-#### 11. Content-pagina's (Visie, Bouwblokken, AI, 2030)
+#### 11. Content-pagina's (Visie, Bouwstenen, AI, 2030)
 
-De content van Visie, Bouwblokken, AI en 2030 staat als secties op de Assessment-pagina (`schermen.md`, Assessment-pagina). Dit onderdeel maakt ze bewerkbaar vanuit beheer, net als Algemene teksten hierboven:
+De content van Visie, Bouwstenen, AI en 2030 staat als secties op de Assessment-pagina (`schermen.md`, Assessment-pagina). Dit onderdeel maakt ze bewerkbaar vanuit beheer, net als Algemene teksten hierboven:
 
 - **Visie** (`visie-coniche.md` deel 1) en **2030**
   (`content-2030.md`): Secties met tekst (de Visie met drie kaarten, de 2030 met vijf kaarten en een uitklapbaar stuk). Eén
   tekstveld per pagina, zelfde soort component als Algemene teksten.
-- **Bouwblokken**: De 15 bouwblokken uit `visie-coniche.md` /
-  `visual-bouwblokken-en-domeinen.md`. Titel en omschrijving per bouwblok
+- **Bouwstenen**: De 15 bouwstenen uit `visie-coniche.md` /
+  `visual-bouwstenen-en-domeinen.md`. Titel en omschrijving per bouwsteen
   bewerkbaar. De interactieve visual zelf (indeling, volgorde,
   interactie) niet, dat blijft vast, alleen de tekstinhoud erin wordt
   beheerbaar.
 - **AI**: De 8 AI-domeinen uit `visie-ai-klantcontact.md` /
-  `visual-bouwblokken-en-domeinen.md`. Titel en modal-tekst per domein
-  bewerkbaar, de visual zelf niet, zelfde uitgangspunt als Bouwblokken.
+  `visual-bouwstenen-en-domeinen.md`. Titel en modal-tekst per domein
+  bewerkbaar, de visual zelf niet, zelfde uitgangspunt als Bouwstenen.
 
 **Nog open**: Het onderliggende datamodel hiervoor (records per
-bouwblok/domein, versiebeheer, of het archiveren i.p.v. verwijderen
+bouwsteen/domein, versiebeheer, of het archiveren i.p.v. verwijderen
 zoals bij Content per Assessment) is nog niet uitgewerkt, dit
 beschrijft alleen wélke content beheerbaar wordt, niet de
 implementatie ervan. Zie Open punten onderaan dit document.
@@ -634,8 +644,8 @@ verplaatsen, omhangen en verwijderen (`datamodel.md`, Audit), met in
 
 Aanmaken en bewerken van een `Assessment` (`datamodel.md`): Naam, kort
 label (voor de PDF-footer, bijv. "Volwassenheidsscan"), subtitel,
-beschrijving, doelgroep, geschatte duur, het bouwblok-label (de eyebrow
-in de Toelichtingsmodal en de doorloopflow, standaard "Bouwblok", bij de AI-scan
+beschrijving, doelgroep, geschatte duur, de bouwsteen-label (de eyebrow
+in de Toelichtingsmodal en de doorloopflow, standaard "Bouwsteen", bij de AI-scan
 "AI-domein"), de vijf schaallabels, en de
 slotsectie voor de PDF-export (`pdfContentSecties`, zie
   `export-pdf-visual-volwassenheidsscan.md`, Slotsectie per scan-type):
@@ -646,11 +656,11 @@ tekstveld.
 Sector-varianten): Naast "Nieuw Assessment aanmaken" (leeg) een tweede
 actie, "Aanmaken vanuit bestaand Assessment". Kies een bestaand
 Assessment als template; de actie kopieert al zijn Categorieën,
-Bouwblokken en Vragen naar nieuwe content-records onder het nieuwe
+Bouwstenen en Vragen naar nieuwe content-records onder het nieuwe
 Assessment (`afgeleidVanAssessmentId` wijst terug naar het template,
 puur ter herkomst). Daarna bewerk je de kopie als een gewoon
 Assessment: Naam/kortLabel aanpassen (bijv. "Zorgscan"), en per
-Bouwblok/Vraag de tekst, en per Bouwblok het gewicht (zie Content).
+Bouwsteen/Vraag de tekst, en per Bouwsteen het gewicht (zie Content).
 Het gewicht en de wegingstekst (`Assessment.wegingTitel` en
 `wegingToelichting`) worden bij het kopiëren meegenomen. Geen
 lopende koppeling met het template: Een latere wijziging daarop werkt
@@ -700,7 +710,7 @@ datakoppelingen.
 - **Bevestiging**: Een modal met de titel "Assessment verwijderen?" en de
   tekst "Weet je zeker dat je {naam} wilt verwijderen? Dit kan niet ongedaan
   worden gemaakt." Daaronder wat er verdwijnt: Het Assessment met zijn
-  Categorieën, Bouwblokken en Vragen (met aantallen), de benchmarks waaruit
+  Categorieën, Bouwstenen en Vragen (met aantallen), de benchmarks waaruit
   het wordt gehaald, en de Assessments die ervan zijn afgeleid (die houden
   hun inhoud, alleen de regel "Afgeleid van" vervalt). Knoppen
   "Annuleren" en een destructieve "Verwijderen".
@@ -715,25 +725,25 @@ datakoppelingen.
 
 #### 2. Content
 
-Per Assessment: Categorieën met kleur en volgorde, bouwblokken (naam,
-omschrijving, toelichting, centrale vraag, tags) en de vragen per bouwblok. Content waar
+Per Assessment: Categorieën met kleur en volgorde, bouwstenen (naam,
+omschrijving, toelichting, centrale vraag, tags) en de vragen per bouwsteen. Content waar
 al antwoorden aan hangen wordt gearchiveerd, niet verwijderd
 (`datamodel.md`, Content bewerken).
 
-**Weging per bouwblok.** Bij elk bouwblok een veld "Weging" (getal groter
-dan 0, ook decimalen zoals 1,5, standaard 1; `Bouwblok.gewicht`,
-`datamodel.md`). Bouwblokken met een weging ongelijk aan 1 krijgen in de
+**Weging per bouwsteen.** Bij elke bouwsteen een veld "Weging" (getal groter
+dan 0, ook decimalen zoals 1,5, standaard 1; `Bouwsteen.gewicht`,
+`datamodel.md`). Bouwstenen met een weging ongelijk aan 1 krijgen in de
 lijst een chip met de factor ("2×"), bij weging 1 staat er niets. Het
-veld heeft het nummer en de naam van het bouwblok erbij, zodat duidelijk
+veld heeft het nummer en de naam van de bouwsteen erbij, zodat duidelijk
 is welk blok het betreft. Een gewicht wijzigen kan altijd, ook als er al
 ingevulde scans zijn: Alle scores worden berekend en niet opgeslagen,
 dus de wijziging werkt direct door in alle scans van dat Assessment (en
 in de Organisatie-resultaten, PDF en exports). Opslaan vraagt daarom een
-bevestiging die noemt om welk bouwblok het gaat, het oude en nieuwe
+bevestiging die noemt om welke bouwsteen het gaat, het oude en nieuwe
 gewicht en het aantal ingevulde scans dat anders gaat rekenen. De
-wijziging wordt gelogd (`bouwblok.gewichtGewijzigd`, zie Audit-log).
+wijziging wordt gelogd (`bouwsteen.gewichtGewijzigd`, zie Audit-log).
 Meerdere gewichten tegelijk wijzigen kan in één opslagactie, met één
-bevestiging en één logregel per bouwblok. Rechten: Als overige
+bevestiging en één logregel per bouwsteen. Rechten: Als overige
 Content-beheer.
 
 **Wegingstekst per Assessment.** Twee velden bij het Assessment: "Titel
@@ -742,7 +752,7 @@ wegingskaart" en "Tekst wegingskaart" (`wegingTitel`,
 scan (`schermen.md`, Intake, Wegingskaart). De velden mogen leeg blijven:
 Dan geldt de standaardtekst. Bij een Assessment zonder afwijkende
 gewichten verschijnt de kaart niet, ook als de velden gevuld zijn. De
-bouwblokken en hun factor onder de tekst komen uit de gewichten zelf en
+bouwstenen en hun factor onder de tekst komen uit de gewichten zelf en
 hoeven niet in de tekst te staan.
 
 Teksten die niet aan één Assessment hangen (zoals de introtekst op
@@ -1176,7 +1186,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   resultatenscherm van één scan (`schermen.md`, Resultatenpagina:
   classificatiecirkel, radar, staafdiagram per categorie, top 3, legenda),
   alleen met de gemiddelde scores van de Meting in plaats van die van
-  één respondent. De weging uit `Bouwblok.gewicht` werkt hier hetzelfde
+  één respondent. De weging uit `Bouwsteen.gewicht` werkt hier hetzelfde
   door: De uitkomst is het gemiddelde van de antwoorden van alle
   afgeronde scans, door dezelfde scorefunctie gewogen, wat gelijk is aan
   het gemiddelde van de scores per respondent. Zichtbaar zodra er minstens
@@ -1186,12 +1196,12 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
 
   **Weergaven.** Boven de
   inhoud staat een weergave-schakelaar (`stylesheet.md`, Weergave-schakelaar)
-  met Overzicht, Per bouwblok en Spreiding, en voor een Admin en Consultant ook Antwoorden (de antwoorden per vraag en per respondent). Overzicht is de standaard en de
+  met Overzicht, Per bouwsteen en Spreiding, en voor een Admin en Consultant ook Antwoorden (de antwoorden per vraag en per respondent). Overzicht is de standaard en de
   opbouw hierboven, die ongewijzigd blijft. Rechts van de schakelaar staat de
   knop "Vergelijking", actief als de Meting in een vergelijking tussen Metingen zit
   (punt 14). De weergaven, de knop en de
   adresbalkparameters staan in `visualisatie-scores.md`, Navigatie. Een Lead
-  ziet Overzicht en Per bouwblok, de vergelijking als hij de benchmark aangevinkt
+  ziet Overzicht en Per bouwsteen, de vergelijking als hij de benchmark aangevinkt
   heeft en Resultaten op de Metingen daarin, en Spreiding en Antwoorden als die vinkjes in
   het Leads-venster aan staan (punt 6a).
 
@@ -1486,11 +1496,11 @@ daarom staat ze niet op de pagina zelf maar in een eigen venster.
 **Wat elke kolom geeft.**
 
 - **Resultaten (per Meting)**: De resultatenpagina van de Meting, met
-  Overzicht, Per bouwblok en de knop "Vergelijking"
+  Overzicht, Per bouwsteen en de knop "Vergelijking"
   (`visualisatie-scores.md`, Navigatie). De vergelijking is er alleen als de Lead
   de benchmark heeft aangevinkt en Resultaten heeft op de Metingen daarin.
 - **Spreiding (per Meting)**: Weergave B zonder ring (`visualisatie-scores.md`,
-  onderdeel B), een stip per scan per bouwblok met de spreiding. De stippen
+  onderdeel B), een stip per scan per bouwsteen met de spreiding. De stippen
   hebben geen naam en geen tooltip. Het is een extra weergave op de
   resultatenpagina van die Meting.
 - **Uitnodigen (per Meting)**: Respondenten voor deze Meting uitnodigen,
@@ -2186,8 +2196,8 @@ niveau 2 en 3 anders is, staat onder Niveau 2 en 3 aan het eind van dit punt.
   organisatie het aantal afgeronde scans. De Admin ziet hier de namen van
   de organisaties, ook van de organisaties die in een Assessment
   ontbreken (`benchmark.md`, Weergave voor de Admin). Onder de gemiddelden
-  staat per Assessment de matrix "Per bouwblok en per organisatie", met de
-  bouwblokken als rijen en de organisaties als kolommen (`benchmark.md`,
+  staat per Assessment de matrix "Per bouwsteen en per organisatie", met de
+  bouwstenen als rijen en de organisaties als kolommen (`benchmark.md`,
   Weergave voor de Admin, en `visualisatie-scores.md`, onderdeel E). Is een lid
   automatisch weggevallen, dan staat boven het detail een melding
   (`Benchmark.meldingen`) die de Admin kan wegklikken. Onder de cijfers
@@ -2318,7 +2328,7 @@ doet, niet een beheeractie (`backlog.md`).
 
 ## Open punten
 
-- Of bouwblokken en vragen herbruikbaar moeten zijn tussen
+- Of bouwstenen en vragen herbruikbaar moeten zijn tussen
   assessment-types.
 - Organisatiekenmerken worden in de praktijk soms samen met medewerkers
   van de klant ingevuld. Het huidige model kent die toegang niet
@@ -2330,5 +2340,5 @@ doet, niet een beheeractie (`backlog.md`).
   scherm binnen die drie onderdelen ontbreekt nog, de schermen staan
   alleen hier, per onderdeel, niet als samenhangende flow.
 - Het datamodel achter onderdeel 11, Content-pagina's (Visie,
-  Bouwblokken, AI, 2030): Welke records, versiebeheer, archiveren i.p.v.
+  Bouwstenen, AI, 2030): Welke records, versiebeheer, archiveren i.p.v.
   verwijderen zoals bij Content per Assessment.

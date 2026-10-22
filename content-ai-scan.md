@@ -3,13 +3,13 @@
 Vragen voor het `Assessment`-object "AI-Volwassenheid in Klantcontact": 8
 domeinen, 40 vragen (5 per domein), op dezelfde 1–5-schaal als de
 Klantcontact Volwassenheidsscan. Beschrijving en centrale vraag per
-domein (`Bouwblok.toelichting` en `Bouwblok.centraleVraag`,
+domein (`Bouwsteen.toelichting` en `Bouwsteen.centraleVraag`,
 `datamodel.md`): `visie-ai-klantcontact.md`.
 
 ## Verschillen met de Klantcontact Volwassenheidsscan
 
 - **Geen categorieën**: De 8 domeinen staan plat onder elkaar in de
-  sidebar. In de UI heten bouwblokken hier "domeinen". Zie
+  sidebar. In de UI heten bouwstenen hier "domeinen". Zie
   `datamodel.md` (`categorieen` is optioneel).
 - **Geen tags**: Geen van de domeinen heeft een tags-rij.
 - **Scores gesorteerd**: "Scores per Domein" op het resultatenscherm is
@@ -19,7 +19,7 @@ domein (`Bouwblok.toelichting` en `Bouwblok.centraleVraag`,
 
 - Naam: "AI-Volwassenheid in Klantcontact"
 - Subtitel: "±20 minuten. Helder inzicht. Direct vervolgstappen."
-- Bouwblok-label (`Assessment.bouwblokLabel`): "AI-domein". De eyebrow in
+- Bouwsteen-label (`Assessment.bouwsteenLabel`): "AI-domein". De eyebrow in
   de Toelichtingsmodal wordt daarmee "AI-DOMEIN 2" (zonder categorienaam,
   want er zijn geen categorieën).
 - Beschrijving: "Deze assessment geeft inzicht in hoe volwassen jouw
@@ -116,14 +116,14 @@ domein (`Bouwblok.toelichting` en `Bouwblok.centraleVraag`,
    hoog-risico interacties.
 
 **7. Operating model en schaalbaarheid**
-> Delivery model, lifecycle management, schaling en bouwblokken
+> Delivery model, lifecycle management, schaling en bouwstenen
 1. We hebben een herhaalbaar delivery model voor AI (van idee → pilot →
    productie → optimalisatie).
 2. AI-producten hebben lifecycle management (roadmap, budget, ownership,
    onderhoud).
 3. We schalen succesvolle AI-oplossingen organisatie breed (niet team- of
    kanaalgebonden).
-4. We werken met standaard bouwblokken (RAG/kennis, MCP/datakoppeling,
+4. We werken met standaard bouwstenen (RAG/kennis, MCP/datakoppeling,
    analytics, orchestration, guardrails).
 5. We evalueren leveranciers/technologie op basis van vaste criteria
    (kwaliteit, kosten, risico, lock-in).

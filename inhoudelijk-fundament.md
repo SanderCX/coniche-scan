@@ -5,7 +5,7 @@
 Dit document beschrijft het inhoudelijke fundament onder de app en houdt
 bij hoe ver elk onderdeel is uitgewerkt.
 
-## Opbouw: Visie, bouwblokken, scan
+## Opbouw: Visie, bouwstenen, scan
 
 Het fundament bestaat uit drie lagen die op elkaar steunen.
 
@@ -13,44 +13,44 @@ Het fundament bestaat uit drie lagen die op elkaar steunen.
    klantcontact, waarom kwaliteit uit het geheel voortkomt, en de
    verbetercyclus Meten → Begrijpen → Besluiten → Doen → Leren. Deze laag
    verandert zelden.
-2. **Bouwblokken** (`visie-coniche.md`, deel 2). Vijftien bouwblokken in
-   vijf groepen, per bouwblok een beschrijving en een centrale vraag.
+2. **Bouwstenen** (`visie-coniche.md`, deel 2). Vijftien bouwstenen in
+   vijf groepen, per bouwsteen een beschrijving en een centrale vraag.
    Dit is de brug tussen de visie en de scan.
 3. **Scan** (`content-klantcontact-volwassenheid.md`). De vier vragen per
-   bouwblok en de schaal van 1 tot 5. Wat de app daadwerkelijk meet.
+   bouwsteen en de schaal van 1 tot 5. Wat de app daadwerkelijk meet.
 
 **De onderbouwing loopt van de scan omhoog.** De vragen zijn leidend. Elke
-bouwblokbeschrijving onderbouwt de vier vragen van die bouwblok, en de
+bouwsteenbeschrijving onderbouwt de vier vragen van die bouwsteen, en de
 centrale vraag is de vraag die ze samen beantwoorden. De visie onderbouwt
-op haar beurt de bouwblokken. Wijzigt er een scanvraag, dan wordt de
-beschrijving van die bouwblok gecontroleerd en zo nodig aangepast.
+op haar beurt de bouwstenen. Wijzigt er een scanvraag, dan wordt de
+beschrijving van die bouwsteen gecontroleerd en zo nodig aangepast.
 
-De tags per bouwblok (in het contentbestand) komen uit de kernwoorden
+De tags per bouwsteen (in het contentbestand) komen uit de kernwoorden
 van het oorspronkelijke Bouwstenenmodel. Voor beschrijvingen en centrale
 vragen is `visie-coniche.md` de enige bron.
 
 ## Spanningsmeter
 
-De Spanningsmeter heeft geen eigen laag van visie en bouwblokken in dit fundament. Haar inhoud komt uit het boek "Onder Spanning" (Franssen, 2026) en de opzet van Martijn (`content-spanningsmeter.md`). Status per onderdeel: De zes spanningsvelden en de ijkpunten zijn opgesteld (concept), de vragen zijn nog niet gevalideerd (`content-spanningsmeter.md`, Validatie), en de visietekst op de Assessment-pagina is een voorstel. De scan meet verschillen tussen velden en kent geen totaalscore.
+De Spanningsmeter heeft geen eigen laag van visie en bouwstenen in dit fundament. Haar inhoud komt uit het boek "Onder Spanning" (Franssen, 2026) en de opzet van Martijn (`content-spanningsmeter.md`). Status per onderdeel: De zes spanningsvelden en de ijkpunten zijn opgesteld (concept), de vragen zijn nog niet gevalideerd (`content-spanningsmeter.md`, Validatie), en de visietekst op de Assessment-pagina is een voorstel. De scan meet verschillen tussen velden en kent geen totaalscore.
 
 ### Welke laag geldt voor welke scan
 
 Dit fundament beschrijft de Klantcontact Volwassenheidsscan. De andere scans delen er een deel van.
 
-| Scan | Visie | Bouwblokken | Vragen |
+| Scan | Visie | Bouwstenen | Vragen |
 |---|---|---|---|
 | Klantcontact Volwassenheid | `visie-coniche.md` | 15, in 5 categorieën | `content-klantcontact-volwassenheid.md` |
-| Zorg | Dezelfde als Volwassenheid | Dezelfde 15, met bouwblok 4, 10 en 11 dubbel gewogen | `content-zorgscan.md` |
+| Zorg | Dezelfde als Volwassenheid | Dezelfde 15, met bouwsteen 4, 10 en 11 dubbel gewogen | `content-zorgscan.md` |
 | AI-volwassenheid | `visie-ai-klantcontact.md` | 8 AI-domeinen, geen categorieën | `content-ai-scan.md` |
 | Quickscan Ziekenhuis | Eigen opzet | Dimensies per afdeling | `content-ziekenhuis-quickscan.md` |
 | Spanningsmeter | Het boek "Onder Spanning" | 6 spanningsvelden | `content-spanningsmeter.md` |
 
 ## Werkafspraken
 
-- **De vragen zijn leidend.** Visie en bouwblokbeschrijvingen worden
+- **De vragen zijn leidend.** Visie en bouwsteenbeschrijvingen worden
   aangepast zodat ze de vragen onderbouwen. De vragen zelf veranderen hier
   niet.
-- Per bouwblok leggen we vast: De beschrijving en centrale vraag (in
+- Per bouwsteen leggen we vast: De beschrijving en centrale vraag (in
   `visie-coniche.md`), welke stap van de verbetercyclus elke vraag raakt
   (in dit document), en de status.
 - Status per onderdeel: `open`, `concept` of `akkoord`.
@@ -71,7 +71,7 @@ De scan meet wat in een organisatie aantoonbaar geregeld is. Elke vraag
 gaat over iets dat je kunt laten zien: Een document, een vast overleg,
 een werkend systeem, een afspraak die in de praktijk wordt nageleefd.
 Wat mensen vinden of van plan zijn, telt niet mee. Daarom staat bij elk
-bouwblok de instructie "Beantwoord op basis van wat aantoonbaar geregeld
+bouwsteen de instructie "Beantwoord op basis van wat aantoonbaar geregeld
 is (documenten, ritmes, tooling, afspraken)."
 
 Dit sluit aan op het uitgangspunt van de visie: De kwaliteit van
@@ -108,7 +108,7 @@ De cyclus komt op twee manieren terug in de scan.
 op basis daarvan wordt bijgesteld. Een organisatie die hoog scoort, heeft
 de cyclus voor dat onderdeel op orde.
 
-**In de vragen per bouwblok.** Elke vraag is in sectie 3 gekoppeld aan
+**In de vragen per bouwsteen.** Elke vraag is in sectie 3 gekoppeld aan
 een stap. Naast de vijf stappen van de cyclus gebruiken we daarbij
 **Basis**: De vraag toetst of iets is vastgelegd of ingericht (een
 document, een structuur, een systeem). Dat is de voorwaarde waar de
@@ -133,8 +133,8 @@ open punten).
 
 ### Wat de scan niet laat zien
 
-De scan scoort elke bouwblok los en middelt daarna. De samenhang tussen
-bouwblokken is uit de scores niet af te lezen, die komt naar voren in de
+De scan scoort elke bouwsteen los en middelt daarna. De samenhang tussen
+bouwstenen is uit de scores niet af te lezen, die komt naar voren in de
 duiding van de resultaten met een consultant.
 
 ### Open punten bij deze sectie
@@ -146,8 +146,8 @@ duiding van de resultaten met een consultant.
 - De uitleg per schaalniveau: Opnemen als hulptekst in de app?
 
 Opgelost: Kwaliteit als lens. `visie-coniche.md` benoemt nu concreet bij
-welke bouwblokken kwaliteit in de vragen terugkomt, in plaats van te
-stellen dat het op iedere bouwblok van toepassing is.
+welke bouwstenen kwaliteit in de vragen terugkomt, in plaats van te
+stellen dat het op iedere bouwsteen van toepassing is.
 
 ---
 
@@ -160,18 +160,18 @@ omgenummerd; beide zijn geverifieerd consistent.
 
 ---
 
-## 3. Per bouwblok
+## 3. Per bouwsteen
 
 Beschrijving en centrale vraag staan in `visie-coniche.md`. Hier per
-bouwblok wat er is aangepast ten opzichte van de oorspronkelijke visie,
-en welke stap elke scanvraag raakt. Alle bouwblokken staan op `concept`.
+bouwsteen wat er is aangepast ten opzichte van de oorspronkelijke visie,
+en welke stap elke scanvraag raakt. Alle bouwstenen staan op `concept`.
 
 ### Overkoepelend
 
 #### 1. Organisatiestrategie
 **Status: Concept.**
 - Aangepast: Centrale vraag gaat nu over de strategie zelf (de oude vraag
-  hoorde bij bouwblok 2). Skills- en capaciteitsplan toegevoegd.
+  hoorde bij bouwsteen 2). Skills- en capaciteitsplan toegevoegd.
 - Vraag 1 (strategiedocument): Basis
 - Vraag 2 (meetbare doelen met eigenaar): Meten
 - Vraag 3 (vast ritme, besluiten vastgelegd): Besluiten
@@ -305,7 +305,7 @@ en welke stap elke scanvraag raakt. Alle bouwblokken staan op `concept`.
 #### 15. Cultuur
 **Status: Concept.**
 - Aangepast: Psychologische veiligheid en de brug naar de beslisregels
-  van bouwblok 2 toegevoegd. Centrale vraag herschreven.
+  van bouwsteen 2 toegevoegd. Centrale vraag herschreven.
 - Vraag 1 (gedragsprincipes in onboarding en coaching): Basis
 - Vraag 2 (leren van fouten): Leren
 - Vraag 3 (successen erkend): Doen
@@ -313,11 +313,11 @@ en welke stap elke scanvraag raakt. Alle bouwblokken staan op `concept`.
 
 ---
 
-## 4. Overlap tussen bouwblokken
+## 4. Overlap tussen bouwstenen
 
 **Status: Concept.**
 
-Op een paar plekken raken vragen uit verschillende bouwblokken hetzelfde
+Op een paar plekken raken vragen uit verschillende bouwstenen hetzelfde
 onderwerp. De beschrijvingen in `visie-coniche.md` geven elk een eigen
 perspectief:
 
@@ -338,10 +338,10 @@ perspectief:
 
 ## 5. Relatie met de app (later uit te werken)
 
-- De bouwblokbeschrijvingen uit `visie-coniche.md` worden de tekst voor
-  het veld `toelichting` (de modal op de Assessment-pagina en de kop van het bouwblok in de doorloopflow). Tot ze `akkoord` zijn,
+- De bouwsteenbeschrijvingen uit `visie-coniche.md` worden de tekst voor
+  het veld `toelichting` (de modal op de Assessment-pagina en de kop van de bouwsteen in de doorloopflow). Tot ze `akkoord` zijn,
   blijft de huidige tekst in de app staan.
-- De centrale vraag heeft een plek in het datamodel: `Bouwblok.centraleVraag`
+- De centrale vraag heeft een plek in het datamodel: `Bouwsteen.centraleVraag`
   (`datamodel.md`). Al gebouwd en in gebruik in de toelichting-overlay,
   zie het label "CENTRALE VRAAG" onder de titel.
 - De uitleg per schaalniveau (sectie 1) als hulptekst bij de vragen.

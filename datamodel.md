@@ -31,7 +31,7 @@ Assessment {
   icoon: string                     // sleutel in ASSESSMENT_ICONS (eigen SVG's, nu target, sparkle, heart, cross en gauge, zie stylesheet.md, Assessment-icoon); valt terug op een letterlijke emoji als er geen SVG bij de sleutel is
   geschatteDuur: string             // bijv. "±30 minuten"
   categorieen: Categorie[] | null   // optioneel, zie hieronder
-  bouwblokken: Bouwblok[] | null    // gebruikt als categorieen ontbreken
+  bouwstenen: Bouwsteen[] | null    // gebruikt als categorieen ontbreken
   scoresPerGroepGesorteerd: boolean // sorteert de lijst Scores per groep op waarde; de AI-scan toont Scores per domein in volgorde 1 tot en met 8 (stylesheet.md, Domeinen), dus voor de kaart naast de radar niet gebruikt
   schaal: SchaalLabel[5] | null     // per Assessment, zie hieronder; null bij antwoordType "ja-nee-weetniet"
   antwoordType: "schaal" | "ja-nee-weetniet" | "spanning" // standaard "schaal" (1–5), zie Antwoordtype
@@ -39,21 +39,21 @@ Assessment {
   relevantieVraag: string | null    // alleen als een Categorie optioneel is: de Ja/Nee-vraag bovenaan die categorie, zie Optionele categorieën
   pdfContentSecties: { titel: string, bron: ContentBron } | null // zie export-pdf-visual-volwassenheidsscan.md
   afgeleidVanAssessmentId: string | null // zie Sector-varianten hieronder
-  bouwblokLabel: string             // eyebrow in de Toelichtingsmodal en in de kop van het bouwblok in de doorloopflow; standaard "Bouwblok" (Klantcontact, Zorg), "AI-domein" bij de AI-scan
-  bouwblokEenheidEnkelvoud: string  // enkelvoud van de eenheid in lopende tekst, bijv. "bouwblok" of "domein"
-  bouwblokEenheidMeervoud: string   // meervoud, bijv. "bouwblokken" of "domeinen"
-  wegingTitel: string | null        // kop van de wegingskaart, zie Bouwblok.gewicht; leeg = standaardtitel
+  bouwsteenLabel: string             // eyebrow in de Toelichtingsmodal en in de kop van de bouwsteen in de doorloopflow; standaard "Bouwsteen" (Klantcontact, Zorg), "AI-domein" bij de AI-scan
+  bouwsteenEenheidEnkelvoud: string  // enkelvoud van de eenheid in lopende tekst, bijv. "bouwsteen" of "domein"
+  bouwsteenEenheidMeervoud: string   // meervoud, bijv. "bouwstenen" of "domeinen"
+  wegingTitel: string | null        // kop van de wegingskaart, zie Bouwsteen.gewicht; leeg = standaardtitel
   wegingToelichting: string | null  // tekst van de wegingskaart, per Assessment aanpasbaar; leeg = standaardtekst
-  openVraag: string | null          // alleen bij antwoordType "spanning": tekst van de open vraag onder elk bouwblok, in plaats van het opmerkingenveld; leeg = het gewone opmerkingenveld, zie content-spanningsmeter.md
+  openVraag: string | null          // alleen bij antwoordType "spanning": tekst van de open vraag onder elke bouwsteen, in plaats van het opmerkingenveld; leeg = het gewone opmerkingenveld, zie content-spanningsmeter.md
 }
 ```
 
 Niet elk scan-type heeft een categorie-laag. De Klantcontact
-Volwassenheidsscan groepeert 15 bouwblokken in 5 categorieën, de
+Volwassenheidsscan groepeert 15 bouwstenen in 5 categorieën, de
 AI-volwassenheidsscan heeft 8 domeinen plat onder elkaar. Als
-`categorieen` leeg is, tonen sidebar en resultatenpagina de bouwblokken
+`categorieen` leeg is, tonen sidebar en resultatenpagina de bouwstenen
 direct, zonder categoriekop. Maak geen kunstmatige categorieën met elk
-één bouwblok.
+één bouwsteen.
 
 ### Sector-varianten
 
@@ -77,10 +77,10 @@ template verwijderd, dan wordt het veld `null` en verdwijnt de regel
 
 **Aanmaken = kopiëren, geen levende overerving.** Bij het aanmaken van
 een sector-variant vanuit een template kopieert die actie alle
-Categorieën, Bouwblokken en Vragen naar nieuwe, losse content-records
+Categorieën, Bouwstenen en Vragen naar nieuwe, losse content-records
 onder het nieuwe Assessment (nieuwe id's). Daarna zijn het gewone,
 onafhankelijke content-records: Wijzig je een vraagtekst of een
-`Bouwblok.gewicht` op de sector-variant, dan raakt dat alleen die
+`Bouwsteen.gewicht` op de sector-variant, dan raakt dat alleen die
 variant. Een latere correctie op het template werkt dus
 niet automatisch door in bestaande sector-varianten, bewuste keuze,
 om dezelfde reden als "Content bewerken" hieronder: Een sector-scan
@@ -91,8 +91,8 @@ variant apart worden doorgevoerd.
 
 Wat er bij het kopiëren verandert, komt met het aanmaken van de eerste
 sector-variant zelf aan bod (nog niet uitgewerkt): In elk geval de
-vraagteksten en de gewichten per bouwblok, mogelijk ook
-bouwbloktoelichtingen. De structuur (aantal bouwblokken, categorieën,
+vraagteksten en de gewichten per bouwsteen, mogelijk ook
+bouwsteentoelichtingen. De structuur (aantal bouwstenen, categorieën,
 volgorde) blijft ongewijzigd overnemen, tenzij expliciet aangepast.
 
 ### Categorie
@@ -106,58 +106,58 @@ Categorie {
   optioneel: boolean                // standaard false; true = de respondent kan aangeven dat deze categorie niet van toepassing is, zie Optionele categorieën
   volgorde: number
   gearchiveerd: boolean             // standaard false, zie Content bewerken
-  bouwblokken: Bouwblok[]
+  bouwstenen: Bouwsteen[]
 }
 ```
 
-### Bouwblok
+### Bouwsteen
 
 ```
-Bouwblok {
+Bouwsteen {
   id: string
   volgnummer: number                // 1 t/m 15, volgens de nummering in visie-coniche.md
   naam: string
   omschrijving: string              // de vraagzin onder de titel
-  toelichting: string | null        // lopende tekst in de Toelichtingsmodal en direct in de kop van het bouwblok in de doorloopflow, zie stylesheet.md; leeg = dat onderdeel ontbreekt
+  toelichting: string | null        // lopende tekst in de Toelichtingsmodal en direct in de kop van de bouwsteen in de doorloopflow, zie stylesheet.md; leeg = dat onderdeel ontbreekt
   centraleVraag: string | null      // blok "CENTRALE VRAAG" in dezelfde modal, bron: visie-coniche.md deel 2 / visie-ai-klantcontact.md; leeg = het blok ontbreekt
   tags: string[]                    // variabel aantal
   korteNaam: string | null          // alleen bij antwoordType "spanning": naam voor rijen en tooltips waar de volledige naam te lang is ("Verhaal", "Regie", ...); leeg = de volledige naam
   ijkpunten: string[] | null        // alleen bij antwoordType "spanning": vijf teksten, één per niveau 1 tot en met 5, het ijkpunt uit het boek voor dit veld; leeg = geen ijkpunt
   gewicht: number                   // standaard 1, zie toelichting hieronder
   gearchiveerd: boolean             // standaard false, zie Content bewerken
-  aandachtZin: string | null        // alleen bij antwoordType "ja-nee-weetniet": zin onder de categoriekaart als dit bouwblok het grootste aandachtspunt is, zie content-ziekenhuis-quickscan.md
+  aandachtZin: string | null        // alleen bij antwoordType "ja-nee-weetniet": zin onder de categoriekaart als deze bouwsteen het grootste aandachtspunt is, zie content-ziekenhuis-quickscan.md
   vragen: Vraag[]                   // nu steeds 4 (AI-scan: 5, Spanningsmeter: 5, Quickscan: 1 tot en met 12), niet hardcoded aannemen
 }
 ```
 
-**`gewicht`** (alleen op `Bouwblok`, niet op `Categorie` en niet op
-`Vraag`): Bepaalt hoe zwaar een bouwblok meetelt in de scores. Standaard
+**`gewicht`** (alleen op `Bouwsteen`, niet op `Categorie` en niet op
+`Vraag`): Bepaalt hoe zwaar een bouwsteen meetelt in de scores. Standaard
 `1`. Een getal groter dan 0, ook decimalen (bijv. `1,5`). Het gewicht
-hangt aan het bouwblok en dus aan het bouwstenenmodel, inclusief de
+hangt aan de bouwsteen en dus aan het bouwstenenmodel, inclusief de
 categorie waarin het blok zit. Bij een Assessment zonder categorielaag
 (AI-volwassenheid) werkt het hetzelfde.
 
 Het gewicht werkt door in de categoriescore en in de totaalscore, niet
-in de bouwblokscore zelf (zie Scoreberekening). Een gewicht ongelijk aan
+in de bouwsteenscore zelf (zie Scoreberekening). Een gewicht ongelijk aan
 1 is bewust zichtbaar voor de respondent: Zie `schermen.md`, Intake
-(Wegingskaart) en `stylesheet.md` (factor per bouwblok). Een gewicht van 1 wordt nergens
+(Wegingskaart) en `stylesheet.md` (factor per bouwsteen). Een gewicht van 1 wordt nergens
 getoond, dat is de normale situatie.
 
 Bij Klantcontact Volwassenheid en AI-volwassenheid staat het overal op
-`1`. Bij de Zorgscan hebben drie bouwblokken gewicht `2`: 4 (Leren uit
+`1`. Bij de Zorgscan hebben drie bouwstenen gewicht `2`: 4 (Leren uit
 Klantcontact), 10 (Kanaalmanagement) en 11 (Performance Management), zie
-`content-zorgscan.md`. De bouwblok-nummers zijn de `volgnummer`s uit
+`content-zorgscan.md`. De bouwsteen-nummers zijn de `volgnummer`s uit
 `visie-coniche.md`.
 
-Bij de Quickscan is een bouwblok een dimensie binnen een afdeling. Een
+Bij de Quickscan is een bouwsteen een dimensie binnen een afdeling. Een
 afdeling zwaarder laten wegen betekent daar hetzelfde gewicht op al haar
-bouwblokken (`content-ziekenhuis-quickscan.md`).
+bouwstenen (`content-ziekenhuis-quickscan.md`).
 
 **Wijzigen kan altijd**, ook als er al ingevulde scans zijn. Scores
 worden nooit opgeslagen maar altijd berekend uit `antwoorden` en het
 actuele gewicht, dus een wijziging werkt in één keer door in alle
 scans van dat Assessment: Resultatenpagina, PDF, InDesign, CSV en de
-Organisatie-resultaten per Meting. Dat is een bewuste verantwoordelijkheid van Coniche. De wijziging wordt gelogd (`bouwblok.gewichtGewijzigd`,
+Organisatie-resultaten per Meting. Dat is een bewuste verantwoordelijkheid van Coniche. De wijziging wordt gelogd (`bouwsteen.gewichtGewijzigd`,
 zie Audit).
 
 ### Vraag
@@ -165,7 +165,7 @@ zie Audit).
 ```
 Vraag {
   id: string
-  volgnummer: number                // binnen het bouwblok
+  volgnummer: number                // binnen de bouwsteen
   tekst: string
   invalshoek: string | null         // alleen bij antwoordType "spanning": korte naam van de invalshoek, boven de vraag ("Noodzaak", "Prioriteren & stoppen"); leeg = niets tonen
   aandachtspunt: string | null      // alleen bij antwoordType "spanning": de toelichting "Waar je op let" achter een Info-knop bij de vraag; leeg = geen Info-knop
@@ -212,7 +212,7 @@ vragen.
   van 1 tot en met 5 volgens `Assessment.schaal`, met als extra waarde `0`
   voor "Kan ik niet beoordelen". Een 0 is een geldig antwoord (de vraag telt
   als beantwoord), maar telt niet mee in de score. Er is geen totaalscore: De
-  uitkomst is een score per bouwblok (hier een spanningsveld), een niveau en de
+  uitkomst is een score per bouwsteen (hier een spanningsveld), een niveau en de
   spanning tussen de velden (Scoreberekening). Spanningsmeter
   (`content-spanningsmeter.md`).
 
@@ -222,20 +222,20 @@ beoordelen mee.
 
 **Structuur van de Spanningsmeter.** Dit Assessment gebruikt de bestaande
 lagen en voegt er geen toe. Er is geen categorielaag (`categorieen` is leeg),
-de 6 spanningsvelden zijn `Bouwblok`ken direct onder het Assessment, en de 5
-gescoorde vragen per veld zijn `Vraag`en. De volgorde van de bouwblokken is de
+de 6 spanningsvelden zijn `Bouwsteen`en direct onder het Assessment, en de 5
+gescoorde vragen per veld zijn `Vraag`en. De volgorde van de bouwstenen is de
 bouwlogica en telt mee in de berekening (Scoreberekening, Spanning). Wat per
-bouwblok en per vraag extra is (ijkpunten, invalshoek, "Waar je op let", de
-open vraag) staat in de velden hieronder en bij Bouwblok en Vraag. `gewicht`
+bouwsteen en per vraag extra is (ijkpunten, invalshoek, "Waar je op let", de
+open vraag) staat in de velden hieronder en bij Bouwsteen en Vraag. `gewicht`
 is bij dit antwoordType niet in gebruik en de wegingskaart verschijnt niet.
 
 **Structuur van de Quickscan.** Dit Assessment gebruikt de bestaande
 lagen en voegt er geen toe. De 4 afdelingen zijn `Categorie`s, de
-dimensies (Organisatie, Processen en techniek, Mensen) zijn `Bouwblok`ken
-onder een afdeling, en de vragen hangen aan die bouwblokken. Een
+dimensies (Organisatie, Processen en techniek, Mensen) zijn `Bouwsteen`en
+onder een afdeling, en de vragen hangen aan die bouwstenen. Een
 dimensie die in een afdeling geen vragen heeft, bestaat daar niet als
-bouwblok. Dezelfde dimensienaam komt daardoor in meerdere afdelingen
-terug als aparte bouwblokken.
+bouwsteen. Dezelfde dimensienaam komt daardoor in meerdere afdelingen
+terug als aparte bouwstenen.
 
 **Optionele categorieën.** Een Categorie met `optioneel: true` begint in
 de doorloopflow met de vraag uit `Assessment.relevantieVraag`, met Ja en
@@ -243,7 +243,7 @@ Nee als antwoord, onder de `omschrijving` van de categorie. Het antwoord
 staat in `ScanInvulling.relevantie`.
 
 - Ja: De categorie is van toepassing en haar vragen worden gesteld.
-- Nee: De categorie is niet van toepassing. Haar bouwblokken en vragen
+- Nee: De categorie is niet van toepassing. Haar bouwstenen en vragen
   worden overgeslagen en ze doet in geen enkele score mee
   (Scoreberekening). Antwoorden die er al stonden blijven bewaard en
   tellen weer mee als de respondent terugkeert naar Ja.
@@ -340,12 +340,12 @@ RadarBron {
 
 Dossieritem {
   id: string
-  soort: "nieuws" | "case" | "event" | "blog"   // staat vast na het aanmaken
-  titel: string                     // verplicht, getrimd, maximaal 200 tekens
+  soort: "nieuws" | "case" | "event" | "blog" | "benchmark"   // staat vast na het aanmaken
+  titel: string                     // verplicht, getrimd, maximaal 200 tekens; bij een Benchmark leeg, de titel is de naam van de benchmark
   toelichting: string               // maximaal 400 tekens, mag leeg zijn
   zichtbaarVoorLead: boolean        // standaard false
-  bouwblokIds: string[]             // Bouwblok.id van de Klantcontact Volwassenheidsscan en de AI-scan, mag leeg zijn
-  url: string                       // Nieuws en Blog: verplicht. Case en Event: optioneel. Altijd http of https
+  bouwsteenIds: string[]             // Bouwsteen.id van de Klantcontact Volwassenheidsscan en de AI-scan, mag leeg zijn
+  url: string                       // Nieuws en Blog: verplicht. Case en Event: optioneel. Benchmark: geen. Altijd http of https
   aangemaaktOp: datetime
   gewijzigdOp: datetime
   bron: string                      // alleen Nieuws en Blog, maximaal 80 tekens
@@ -357,11 +357,12 @@ Dossieritem {
   caseOrganisatieId: string | null  // alleen Case: de Organisatie waar de case over gaat
   omvang: string                    // alleen Case, maximaal 40 tekens
   totResultaat: string              // alleen Case, maximaal 40 tekens
+  benchmarkId: string | null        // alleen Benchmark: Benchmark.id, de Organisatie is lid van die benchmark, verplicht bij opslaan
 }
 ```
 
 - **Event verlopen** is afgeleid uit `datum` of `einddatum` (`dossier.md`, Regels), er is geen veld voor.
-- **Een Lead ziet een item** als `Organisatie.dossier.zichtbaar` aan staat, `zichtbaarVoorLead` aan staat en, bij een Case, `Organisatie.caseToegestaan` van `caseOrganisatieId` aan staat. De naam van de Organisatie in de Case gaat nooit naar de Lead.
+- **Een Lead ziet een item** als `Organisatie.dossier.zichtbaar` aan staat, `zichtbaarVoorLead` aan staat en, bij een Case, `Organisatie.caseToegestaan` van `caseOrganisatieId` aan staat. De naam van de Organisatie in de Case gaat nooit naar de Lead. Bij een Benchmark komt daar bij dat de Lead het vinkje heeft (`LeadToegang` met `weergave: "benchmark"`) en de Organisatie nog in de benchmark zit (`dossier.md`, Wat de Lead ziet).
 - **Naam en scorebron.** `naamVoorLead` is de titel van het Dossier bij de Lead. `radarBronnen` bepaalt per Assessment welke Meting de scores in de radar en de verdeling levert: `metingId` leeg is automatisch (de meest recente Meting waarvan de Lead de Resultaten mag inzien), anders een vaste Meting die de Lead mag inzien. Wie `dossier.bewerken` heeft, mag beide wijzigen. De regels staan in `dossier.md` (Welke scores).
 - **`OrganisatieLid.dossierGezienOp`** (datetime of null) bepaalt of de kaart Dossier bij een Lead de tag "Nieuw" krijgt.
 
@@ -494,7 +495,7 @@ ScanInvulling {
   laatstOpgeslagenOp: datetime | null // voor "Laatst opgeslagen" op Mijn metingen (`visualisatie-mijn-metingen.md`); gezet bij elk opslaan van een antwoord
   antwoorden: { [vraagId: string]: number | string }   // 1-5, of "ja" | "nee" | "weet-niet" bij antwoordType "ja-nee-weetniet", of 0-5 bij antwoordType "spanning" (0 = kan ik niet beoordelen)
   relevantie: { [categorieId: string]: boolean }       // alleen bij optionele categorieën: true = van toepassing, false = niet van toepassing, ontbreekt = nog niet beantwoord
-  opmerkingenPerBouwblok: { [bouwblokId: string]: string }   // bij antwoordType "spanning": het antwoord op de open vraag (Assessment.openVraag) per bouwblok
+  opmerkingenPerBouwsteen: { [bouwsteenId: string]: string }   // bij antwoordType "spanning": het antwoord op de open vraag (Assessment.openVraag) per bouwsteen
   notitie: string | null // zie hieronder
   bewaarVerlengdTot: datetime | null        // zie Bewaartermijn ingevulde scans
 }
@@ -559,18 +560,18 @@ gedrag moet zijn.
 ### Scoreberekening
 
 Eén gedeelde functie berekent de totaalscore en de score per
-categorie/bouwblok uit `antwoorden` en `Bouwblok.gewicht`. Alle scores
+categorie/bouwsteen uit `antwoorden` en `Bouwsteen.gewicht`. Alle scores
 worden berekend en nooit opgeslagen. Met `g` het gewicht van een
-bouwblok en `n` het aantal vragen in dat blok:
+bouwsteen en `n` het aantal vragen in dat blok:
 
-- **Bouwblokscore** = som van de antwoorden in het blok gedeeld door `n`.
+- **Bouwsteenscore** = som van de antwoorden in het blok gedeeld door `n`.
   Ongewogen.
-- **Categoriescore** = `Σ(g × bouwblokscore) / Σ g` over de bouwblokken
+- **Categoriescore** = `Σ(g × bouwsteenscore) / Σ g` over de bouwstenen
   in die categorie. Een blok met gewicht 2 telt dus dubbel mee.
 - **Totaalscore** = `Σ(g × som antwoorden per blok) / Σ(g × n)` over alle
-  bouwblokken. Bij gewicht `1` overal is dat de som van alle antwoorden
+  bouwstenen. Bij gewicht `1` overal is dat de som van alle antwoorden
   gedeeld door het aantal vragen (60 bij Klantcontact). De totaalscore komt
-  uit de ruwe antwoorden en niet uit afgeronde bouwblokscores.
+  uit de ruwe antwoorden en niet uit afgeronde bouwsteenscores.
 - **Afronding** alleen op getoonde waarden: 1 decimaal, half-away-from-
   zero (`toFixed(1)`). Classificatie en kleur volgen de afgeronde
   waarde.
@@ -582,16 +583,16 @@ de test van de scorefunctie.
 
 **Antwoordtype `"ja-nee-weetniet"` (Quickscan).** Hier is de score een
 aantal punten en een percentage, geen gemiddelde van 1 tot 5. Met `p` het
-aantal Ja in een bouwblok, `n` het aantal vragen in dat blok en `g` het
+aantal Ja in een bouwsteen, `n` het aantal vragen in dat blok en `g` het
 gewicht:
 
-- **Bouwblokscore** = `p` punten van `n`, als percentage `p / n`.
+- **Bouwsteenscore** = `p` punten van `n`, als percentage `p / n`.
   Ongewogen. Bij de Quickscan is dit de score van een dimensie binnen een
   afdeling.
-- **Categoriescore** = `Σ(g × p) / Σ(g × n)` over de bouwblokken in die
+- **Categoriescore** = `Σ(g × p) / Σ(g × n)` over de bouwstenen in die
   categorie, als percentage. Dit wijkt af van het gemiddelde van de
-  bouwblokpercentages dat bij de schaal geldt, want dat laat een bouwblok
-  van 1 vraag even zwaar tellen als een bouwblok van 10. Poliklinieken
+  bouwsteenpercentages dat bij de schaal geldt, want dat laat een bouwsteen
+  van 1 vraag even zwaar tellen als een bouwsteen van 10. Poliklinieken
   scoren op Organisatie 2 van 4, Processen en techniek 2 van 10 en Mensen
   1 van 1: De afdeling staat op 5 van 15 (33%), het gemiddelde van de drie
   percentages zou 57% zijn.
@@ -599,13 +600,13 @@ gewicht:
   zijn `Σ(g × p)` van `Σ(g × n)`. Bij gewicht 1 overal is dat het aantal
   Ja gedeeld door het aantal vragen (60 bij de Quickscan). Net als bij de
   schaal komt de totaalscore uit de ruwe antwoorden en niet uit afgeronde
-  bouwblokpercentages.
-- **Niet van toepassing.** Bouwblokken van een categorie met `relevantie`
+  bouwsteenpercentages.
+- **Niet van toepassing.** Bouwstenen van een categorie met `relevantie`
   op `false` doen niet mee. Totaalscore en punten gaan dan over de overige
   categorieën, bijvoorbeeld 14 van 15 punten (93%) als alleen
   Patiëntenservice van toepassing is en daar 14 vragen met Ja zijn
   beantwoord. De categorie zelf krijgt geen score en geen klasse.
-- **Tellingen** per bouwblok: Het aantal Ja, Nee en Weet ik niet, uit
+- **Tellingen** per bouwsteen: Het aantal Ja, Nee en Weet ik niet, uit
   `antwoorden`.
 - **Afronding**: Alleen op getoonde waarden, hele procenten,
   half-away-from-zero. Klasse en kleur volgen het afgeronde percentage
@@ -613,7 +614,7 @@ gewicht:
 
 Rekenvoorbeeld Quickscan (de fictieve proefscan uit de PDF): De vier
 afdelingen scoren 5, 3, 5 en 4 punten van 15, samen 17 van 60, dus 28%
-(28,3 afgerond). Krijgen de bouwblokken van de tweede afdeling gewicht 2, dan is het
+(28,3 afgerond). Krijgen de bouwstenen van de tweede afdeling gewicht 2, dan is het
 `Σ(g × p)` 5 + 6 + 5 + 4 = 20 en `Σ(g × n)` 15 + 30 + 15 + 15 = 75, dus
 27% (26,7 afgerond). Dit voorbeeld hoort in de test van de scorefunctie.
 
@@ -622,7 +623,7 @@ berekening. PDF, CSV, InDesign, import, het gemiddelde over meerdere
 Respondenten, spreiding en benchmark zijn er nog niet voor uitgewerkt
 (`backlog.md`).
 
-**Antwoordtype `"spanning"` (Spanningsmeter).** Hier is er geen bouwblok-gemiddelde dat in een
+**Antwoordtype `"spanning"` (Spanningsmeter).** Hier is er geen bouwsteen-gemiddelde dat in een
 totaalscore uitkomt. De uitkomst is een score per spanningsveld, een niveau en
 de spanning tussen de velden. Met `a` een antwoord van 1 tot en met 5, een
 vraag met antwoord `0` of zonder antwoord is niet beoordeeld:
@@ -639,7 +640,7 @@ vraag met antwoord `0` of zonder antwoord is niet beoordeeld:
   (`stylesheet.md`, Scorekleuren).
 - **Spanning** per veld, behalve het eerste: `score(veld) − min(score van alle
   voorgaande velden)`, over de voorgaande velden die een score hebben. De
-  volgorde is die van `Bouwblok.volgnummer`: Verhaal, Regie, Gedrag, Data,
+  volgorde is die van `Bouwsteen.volgnummer`: Verhaal, Regie, Gedrag, Data,
   Processen, Technologie. Positief betekent dat het veld voorloopt op zijn
   fundament, negatief dat het achterblijft bij het laagste veld daarvoor. Het
   eerste veld heeft geen spanning, evenmin een veld zonder voorgaand veld met
@@ -703,7 +704,7 @@ scan (niveau 3).
 - Per lid wordt eerst het gemiddelde antwoord per vraag genomen over de
   afgeronde scans, en daarna het gemiddelde van die waarden over de leden.
 - Op die gemiddelden werkt dezelfde scorefunctie als hierboven, met
-  `Bouwblok.gewicht`. Omdat de berekening lineair is, geeft dit hetzelfde
+  `Bouwsteen.gewicht`. Omdat de berekening lineair is, geeft dit hetzelfde
   als het gemiddelde van de scores van de leden. Er komt dus geen
   tweede rekenmethode bij.
 - De leden horen bij hetzelfde Assessment. Een lid zonder afgeronde scan
@@ -777,7 +778,7 @@ verwijst wat niet meer bestaat.
   (en zo nodig de Organisaties), en kan het Assessment daarna verwijderen.
   Zonder Metingen bestaan er geen scans, antwoorden of benchmarkleden van
   dit Assessment, dus er verdwijnt alleen de definitie: Het Assessment, zijn
-  Categorieën, Bouwblokken, Vragen en Schaallabels, ook de gearchiveerde.
+  Categorieën, Bouwstenen, Vragen en Schaallabels, ook de gearchiveerde.
   Dit kan niet ongedaan worden gemaakt, en de bevestiging zegt dat.
 
 Verwijzingen naar een verwijderd Assessment worden opgeruimd. Bij een ander
@@ -808,9 +809,9 @@ records, dan verdwijnt ook de verwijzing.
 
 ### Content bewerken
 
-Een vraag of bouwblok waar al antwoorden aan hangen, wordt niet
+Een vraag of bouwsteen waar al antwoorden aan hangen, wordt niet
 verwijderd maar gearchiveerd (`gearchiveerd: true` op Categorie,
-Bouwblok of Vraag). Anders verdwijnen scores uit eerdere invullingen.
+Bouwsteen of Vraag). Anders verdwijnen scores uit eerdere invullingen.
 Nieuwe invullingen krijgen gearchiveerde content niet meer te zien.
 Scores en exports van bestaande invullingen rekenen nog wel met die
 content. In beheer is gearchiveerde content terug te zetten met
@@ -819,7 +820,7 @@ content. In beheer is gearchiveerde content terug te zetten met
 ### Algemene teksten
 
 Losse stukken tekst in de app die niet bij één Assessment horen (dus
-geen `Bouwblok`/`Vraag`/`Categorie`), en die anders hardcoded in de
+geen `Bouwsteen`/`Vraag`/`Categorie`), en die anders hardcoded in de
 code zouden staan. Generiek in plaats van een apart veld per tekst, zodat
 er telkens gewoon een rij bijkomt in plaats van een nieuw datamodel-veld:
 
@@ -1195,6 +1196,7 @@ niveau een eigen drempel voor het aanvinken van een view voor een Lead,
 `benchmarkMinRespondenten`
 (startwaarde 5, het minimale aantal afgeronde scans in een Meting voor
 Spreiding, voor anonieme Antwoorden en voor de lijn van laagste tot hoogste score bij een Lead).
+Voor het spreidingslabel: `spreidingWisselend` (0,55) en `spreidingVerdeeld` (0,8) voor schaalscans, `spreidingWisselendQuickscan` (14) en `spreidingVerdeeldQuickscan` (20) voor de Quickscan, positieve getallen waarbij de tweede grens boven de eerste ligt (`beheerpagina.md`, formulier Spreiding).
 Voor Verkennen: `verkennenMinGroep` (3), `verkennenMinVergelijking` (5),
 `verkennenMinPool` (6), `verkennenMaxGroepen` (12) en `verkennenMinIngevuldPct` (40),
 alle gehele getallen van minstens 1. Het percentage mag 0 zijn en loopt tot en met 100 (`visualisatie-verkennen.md`, Drempels). `benchmarkMinOrganisaties` geldt ook voor een opgeslagen verkenning en telt daar altijd Organisaties, ook bij de eenheid Onderdelen.

@@ -44,7 +44,7 @@ ook de grondslag:
 invullen):
 - E-mailadres (bij uitnodigen)
 - Naam, functie, team, notities (bij de intake, optioneel)
-- Antwoorden op de scanvragen (1-5) en opmerkingen per bouwblok
+- Antwoorden op de scanvragen (1-5) en opmerkingen per bouwsteen
 - Technische gegevens die nodig zijn om de link te laten werken (de
   toegangscode zelf, zie `datamodel.md`, Toegangscode)
 

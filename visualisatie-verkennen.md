@@ -57,7 +57,7 @@ De pool is per Assessment. Scores van verschillende Assessments worden niet door
 - In de pool zitten Organisaties met `benchmarkToegestaan` die een Meting van het gekozen Assessment hebben met minstens `benchmarkMinScans` afgeronde scans.
 - Per Organisatie telt de Meting die volgens de Meetperiode telt en aan die eis voldoet (Meetperiode). Bij de eenheid Organisaties mag dat een samengestelde Meting zijn (`benchmark.md`, Welke Meting telt waar). Bij de eenheid Onderdelen nooit.
 - De Admin ziet de namen van de Organisaties.
-- De Zorgscan en de Klantcontact Volwassenheidsscan hebben dezelfde 15 bouwblokken, maar zijn aparte Assessments en dus aparte pools. De Zorgscan weegt bouwblok 4, 10 en 11 dubbel. Binnen een pool speelt dat niet, omdat bouwblokscores ongewogen zijn en de totaalscore scoring van het Assessment volgt (`CLAUDE.md`, Scoringslogica).
+- De Zorgscan en de Klantcontact Volwassenheidsscan hebben dezelfde 15 bouwstenen, maar zijn aparte Assessments en dus aparte pools. De Zorgscan weegt bouwsteen 4, 10 en 11 dubbel. Binnen een pool speelt dat niet, omdat bouwsteenscores ongewogen zijn en de totaalscore scoring van het Assessment volgt (`CLAUDE.md`, Scoringslogica).
 
 **Teller.** Onderaan de kaart Kenmerken staat "X van Y Organisaties in de pool". Y is het aantal Organisaties dat voor het Assessment in aanmerking komt, X het aantal na de filters. Eronder staat een balk, en een regel met hoeveel Organisaties niet beschikbaar zijn omdat ze geen toestemming hebben gegeven voor benchmark. Dit volgt het patroon van de redenen onder de lijst bij het samenstellen van een benchmark.
 
@@ -152,13 +152,13 @@ Groeperen verdeelt de pool (na de filters) in groepen. Eén groep is de focus. D
 
 ## Weergaven
 
-Vier weergaven (met groepering, zie Zonder groepering voor de pool zonder), gekozen met de weergave-schakelaar boven de resultaten, een pilvormige groep (`stylesheet.md`, Keuzepil en pilvormige groep). Het visual design toont ze als tabs met een onderstreping, maar de pilvormige groep geldt, net als op elke andere resultatenpagina. De rijen zijn de bouwblokken, gegroepeerd per categorie met de categoriekleur (`stylesheet.md`, Categoriekleuren). Bij een Assessment zonder categorielaag (de AI-scan) zijn de rijen de domeinen, zonder kopregels.
+Vier weergaven (met groepering, zie Zonder groepering voor de pool zonder), gekozen met de weergave-schakelaar boven de resultaten, een pilvormige groep (`stylesheet.md`, Keuzepil en pilvormige groep). Het visual design toont ze als tabs met een onderstreping, maar de pilvormige groep geldt, net als op elke andere resultatenpagina. De rijen zijn de bouwstenen, gegroepeerd per categorie met de categoriekleur (`stylesheet.md`, Categoriekleuren). Bij een Assessment zonder categorielaag (de AI-scan) zijn de rijen de domeinen, zonder kopregels.
 
 ### 1. Groep tegenover de rest
 
-Per bouwblok een rij met een schaal van 1 tot 5. Elke Organisatie in de pool is een stip: De focus oranje en iets groter, de rest grijs. Een staande streep markeert het gemiddelde van de focus (oranje) en van de rest (donkergrijs), met een lijn ertussen. Aan de rechterkant staan het gemiddelde van de focus, het gemiddelde van de rest en het verschil als staafje met een getal. Een verschil boven 0 is blauw (`--bl`) en onder 0 donkeroranje (`--dal`). Achter elke rij staan de drie banden van de klassen in de lichte klassekleuren (`stylesheet.md`, Drie niveaus van scorekleur), zoals in `visualisatie-scores.md`, onderdeel A. Hover op een stip toont de naam van de Organisatie en de score.
+Per bouwsteen een rij met een schaal van 1 tot 5. Elke Organisatie in de pool is een stip: De focus oranje en iets groter, de rest grijs. Een staande streep markeert het gemiddelde van de focus (oranje) en van de rest (donkergrijs), met een lijn ertussen. Aan de rechterkant staan het gemiddelde van de focus, het gemiddelde van de rest en het verschil als staafje met een getal. Een verschil boven 0 is blauw (`--bl`) en onder 0 donkeroranje (`--dal`). Achter elke rij staan de drie banden van de klassen in de lichte klassekleuren (`stylesheet.md`, Drie niveaus van scorekleur), zoals in `visualisatie-scores.md`, onderdeel A. Hover op een stip toont de naam van de Organisatie en de score.
 
-Boven de rijen staan vier kaarten: Het gemiddelde van de focus (totaalscore), het gemiddelde van de rest, de grootste plus en de grootste min per bouwblok.
+Boven de rijen staan vier kaarten: Het gemiddelde van de focus (totaalscore), het gemiddelde van de rest, de grootste plus en de grootste min per bouwsteen.
 
 ### 2. Spreiding binnen de groep
 
@@ -166,17 +166,17 @@ Dezelfde rijen, maar alleen de stippen van de focus. Daarachter staan het bereik
 
 ### 3. Alle groepen naast elkaar
 
-Een heatmap met de bouwblokken als rijen en de groepen als kolommen. De eerste kolom toont de hele pool met het gemiddelde in de celtinten (`stylesheet.md`, Drie niveaus van scorekleur) en niet in de volle scorekleuren. De andere kolommen tonen per groep het verschil met het gemiddelde van de hele pool, blauw (`--bl`) voor boven en donkeroranje (`--dal`) voor onder, met een dekking die meegroeit tot maximaal 35% bij een verschil van 1,0 of meer. Elke kolom is 96px breed. De kolomkop is de korte naam van de groep op één regel, met "n = 11" in een tweede regel van 12px, en de volledige naam in een tooltip (`stylesheet.md`, Kolomkop en rijkop). Een kop wordt niet hoger of breder voor een lange naam. Een groep met minder dan `verkennenMinGroep` Organisaties is grijs met "n<3" (het getal volgt de instelling). Hover toont het gemiddelde van de groep en dat van de pool. Een klik op een kolomkop maakt die groep de focus en opent weergave 1.
+Een heatmap met de bouwstenen als rijen en de groepen als kolommen. De eerste kolom toont de hele pool met het gemiddelde in de celtinten (`stylesheet.md`, Drie niveaus van scorekleur) en niet in de volle scorekleuren. De andere kolommen tonen per groep het verschil met het gemiddelde van de hele pool, blauw (`--bl`) voor boven en donkeroranje (`--dal`) voor onder, met een dekking die meegroeit tot maximaal 35% bij een verschil van 1,0 of meer. Elke kolom is 96px breed. De kolomkop is de korte naam van de groep op één regel, met "n = 11" in een tweede regel van 12px, en de volledige naam in een tooltip (`stylesheet.md`, Kolomkop en rijkop). Een kop wordt niet hoger of breder voor een lange naam. Een groep met minder dan `verkennenMinGroep` Organisaties is grijs met "n<3" (het getal volgt de instelling). Hover toont het gemiddelde van de groep en dat van de pool. Een klik op een kolomkop maakt die groep de focus en opent weergave 1.
 
 ### 4. Verband met een kenmerk
 
-Een spreidingsdiagram van 780 bij 380 pixels. Horizontaal staat een numeriek organisatieveld (nu AHT, FTR of NPS), verticaal de totaalscore of de score van één bouwblok. De focus is oranje, de rest grijs. Een rechte lijn (kleinste kwadraten) laat de richting zien. Naast het diagram staan de correlatiecoëfficiënt r, het aantal Organisaties en een woord bij de sterkte (onder 0,2 nauwelijks, onder 0,4 zwak, onder 0,6 matig, daarboven sterk, met de richting erbij). Bij minder dan `verkennenMinGroep` Organisaties met een waarde staat er "Te weinig data". Onder de coëfficiënt staat een korte zin dat scores zelfrapportage zijn en dat sector en kanaalmix meespelen, zodat een verband geen oorzaak is. Achter het diagram staan horizontale banden op de totaalscore (onder 2,5, 2,5 tot 3,5 en vanaf 3,5) in de lichte klassekleuren.
+Een spreidingsdiagram van 780 bij 380 pixels. Horizontaal staat een numeriek organisatieveld (nu AHT, FTR of NPS), verticaal de totaalscore of de score van één bouwsteen. De focus is oranje, de rest grijs. Een rechte lijn (kleinste kwadraten) laat de richting zien. Naast het diagram staan de correlatiecoëfficiënt r, het aantal Organisaties en een woord bij de sterkte (onder 0,2 nauwelijks, onder 0,4 zwak, onder 0,6 matig, daarboven sterk, met de richting erbij). Bij minder dan `verkennenMinGroep` Organisaties met een waarde staat er "Te weinig data". Onder de coëfficiënt staat een korte zin dat scores zelfrapportage zijn en dat sector en kanaalmix meespelen, zodat een verband geen oorzaak is. Achter het diagram staan horizontale banden op de totaalscore (onder 2,5, 2,5 tot 3,5 en vanaf 3,5) in de lichte klassekleuren.
 
 ### Zonder groepering
 
 Is er geen groepering, omdat er nog geen kenmerk is of er geen meer kan, dan is de hele pool de focus en is er geen rest. Alle weergaven blijven werken. De pool is dan nog niet gefilterd of heeft alleen filters.
 
-- **1. Groep tegenover de rest.** Alle stippen zijn oranje, met één streep op het gemiddelde van de pool. De kolommen Rest en Verschil vervallen. De vier kaarten zijn het gemiddelde van de pool (totaalscore), het aantal Organisaties, het hoogste bouwblok en het laagste bouwblok.
+- **1. Groep tegenover de rest.** Alle stippen zijn oranje, met één streep op het gemiddelde van de pool. De kolommen Rest en Verschil vervallen. De vier kaarten zijn het gemiddelde van de pool (totaalscore), het aantal Organisaties, de hoogste bouwsteen en de laagste bouwsteen.
 - **2. Spreiding binnen de groep.** Alleen de pool. De grijze achtergrondbalk van de rest vervalt.
 - **3. Alle groepen naast elkaar.** Alleen de kolom Hele pool, met de hint "Kies een kenmerk om groepen naast elkaar te zetten".
 - **4. Verband met een kenmerk.** Alle stippen oranje, de lijn en r over de hele pool.
@@ -187,7 +187,7 @@ Bij weergave 1 en 2 kan de Admin kiezen tussen de volgorde van het model (met ko
 
 ## Rekenregels
 
-- Per Organisatie telt de bouwblokscore van haar Meting (`CLAUDE.md`, Scoringslogica).
+- Per Organisatie telt de bouwsteenscore van haar Meting (`CLAUDE.md`, Scoringslogica).
 - Het gemiddelde van een groep is het gemiddelde van de scores van haar Organisaties, dus elke Organisatie telt even zwaar. Het aantal scans binnen een Meting speelt geen rol.
 - De totaalscore van een Organisatie volgt de Totaalscore van het Assessment (met weging waar die geldt). Het gemiddelde van een groep is het gemiddelde van die totaalscores.
 - Het verschil is het gemiddelde van de focus min dat van de rest, op één decimaal. Het teken is een plus of een min (−), en bij een verschil van minder dan 0,05 staat er geen teken.
