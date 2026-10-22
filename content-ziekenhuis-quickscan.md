@@ -3,7 +3,7 @@
 Vragen en resultaatopbouw voor het `Assessment`-object "Klantcontact
 Quickscan – Ziekenhuis" (`id: "quickscan-ziekenhuis"`, `kortLabel:
 "Quickscan Ziekenhuis"`): 4 categorieën (de afdelingen), daaronder 10
-bouwblokken (de dimensies, per afdeling 2 of 3) en 60 vragen, 15 per
+bouwstenen (de dimensies, per afdeling 2 of 3) en 60 vragen, 15 per
 afdeling. Elke vraag wordt beantwoord met Ja, Nee of Weet ik niet.
 Standalone Assessment (`afgeleidVanAssessmentId: null`), dus geen
 sector-variant van de Zorgscan. Het antwoordtype en de score in punten
@@ -21,7 +21,7 @@ en geen antwoorden en is niet gebruikt.
 ## Afspraken over de inhoud
 
 - **Indeling over de dimensies.** De indeling uit de PDF is juist.
-  Receptie / Centrale en Patiëntenservice hebben dus geen bouwblok
+  Receptie / Centrale en Patiëntenservice hebben dus geen bouwsteen
   Mensen, en Poliklinieken heeft er één met 1 vraag. De eerste
   schermafbeelding uit de oude tool, met Mensen-vragen bij elke afdeling,
   geldt niet.
@@ -41,14 +41,14 @@ en geen antwoorden en is niet gebruikt.
 
 1. **Minimaal 3 vragen voor "Relatief sterkste basis".** In de oude tool
    telde een dimensie met 2 vragen (Mensen, 2/2) wel mee als sterkste
-   basis. Deze spec vraagt er minstens 3, zodat een bouwblok met één of
+   basis. Deze spec vraagt er minstens 3, zodat een bouwsteen met één of
    twee vragen niet vanzelf 100% scoort en de chip bepaalt. Het
    minimum is één waarde in de code.
 2. **Radar, top 3 en staafdiagram per categorie vervallen** voor dit
    Assessment. Een radar met 4 assen zegt weinig, en de oude tool
    toonde in plaats daarvan "Sterkste onderdeel" en "Meeste
    ontwikkelruimte". Nog te bevestigen.
-3. **Namen van bouwblokken komen vier keer terug.** "Organisatie" staat bij
+3. **Namen van bouwstenen komen vier keer terug.** "Organisatie" staat bij
    elke afdeling. In de wegingskaart en bij de factor ("2×") is dan niet
    te zien om welke afdeling het gaat. Mogelijke oplossing: Bij dit Assessment
    tonen die plekken "Afdeling · Dimensie", bijvoorbeeld "Poliklinieken ·
@@ -64,20 +64,20 @@ en geen antwoorden en is niet gebruikt.
 
 ## Verschillen met de Klantcontact Volwassenheidsscan
 
-- **Categorie is een afdeling, bouwblok is een dimensie.** De 4
+- **Categorie is een afdeling, bouwsteen is een dimensie.** De 4
   afdelingen zijn de categorieën. Daaronder staan per afdeling 2 of 3
-  bouwblokken: Organisatie, Processen en techniek en Mensen. De vragen
-  staan in die bouwblokken, dus in de volgorde van de PDF gegroepeerd per
+  bouwstenen: Organisatie, Processen en techniek en Mensen. De vragen
+  staan in die bouwstenen, dus in de volgorde van de PDF gegroepeerd per
   dimensie.
 - **Geen 1–5-schaal.** Elke vraag heeft de antwoorden Ja, Nee en Weet ik
   niet. De score loopt in punten en procenten (`datamodel.md`,
   Scoreberekening).
 - **Afdelingsscore uit de punten.** De categoriescore is het aantal Ja
   van de hele afdeling gedeeld door het aantal vragen (15). Het is dus
-  geen gemiddelde van de bouwblokpercentages, anders telt het bouwblok
+  geen gemiddelde van de bouwsteenpercentages, anders telt de bouwsteen
   Mensen van de poliklinieken (1 vraag) even zwaar als Processen en
   techniek (10 vragen).
-- **Geen tags, geen toelichting.** De bouwblokken hebben geen tags, geen
+- **Geen tags, geen toelichting.** De bouwstenen hebben geen tags, geen
   `toelichting` en geen `centraleVraag`. Zijn alle drie leeg, dan heeft
   de Toelichtingsmodal niets te tonen en verschijnt het icoon naast de
   titel niet. Sander controleert dat de bestaande regel "leeg = dat
@@ -88,10 +88,10 @@ en geen antwoorden en is niet gebruikt.
   worden de vragen van die afdeling overgeslagen en telt ze niet mee in
   de score. Alle vier de afdelingen zijn daarvoor `optioneel`
   (`datamodel.md`, Antwoordtype, Optionele categorieën).
-- **Weging kan.** `Bouwblok.gewicht` werkt zoals bij de Zorgscan en
+- **Weging kan.** `Bouwsteen.gewicht` werkt zoals bij de Zorgscan en
   staat nu overal op 1. Een afdeling zwaarder laten wegen betekent hetzelfde
-  gewicht op al haar bouwblokken. De wegingskaart verschijnt pas als een
-  bouwblok een ander gewicht krijgt (`schermen.md`, Intake).
+  gewicht op al haar bouwstenen. De wegingskaart verschijnt pas als een
+  bouwsteen een ander gewicht krijgt (`schermen.md`, Intake).
 - **Eigen resultatenscherm**, zie Resultaten hieronder.
 - **Buiten scope voor nu**: PDF-export, CSV-export, InDesign-export,
   import, managementsamenvatting, spreiding, benchmark en de matrix over
@@ -107,16 +107,16 @@ en geen antwoorden en is niet gebruikt.
 - `relevantieVraag`: "Is deze afdeling relevant voor uw situatie?" (in de
   oude tool "Is dit organisatieonderdeel relevant voor uw situatie?")
 - `categorieen`: De 4 afdelingen, elk met `optioneel: true` en een
-  `omschrijving` (de definitie, zie De 4 afdelingen), `bouwblokken`:
+  `omschrijving` (de definitie, zie De 4 afdelingen), `bouwstenen`:
   `null`. `Categorie.kleur`
   is voor alle vier de oranje van de AI-volwassenheidsscan, want de
   afdelingen hebben geen eigen betekenis in kleur. De resultaten gebruiken
   de klassekleuren, geen categoriekleur.
-- `Bouwblok.volgnummer` loopt door over de afdelingen, 1 tot en met 10.
+- `Bouwsteen.volgnummer` loopt door over de afdelingen, 1 tot en met 10.
 - `scoresPerGroepGesorteerd`: `false`; de afdelingen staan in de volgorde
   van de lijst hieronder.
-- `bouwblokLabel`: "Dimensie", `bouwblokEenheidEnkelvoud`: "dimensie",
-  `bouwblokEenheidMeervoud`: "dimensies".
+- `bouwsteenLabel`: "Dimensie", `bouwsteenEenheidEnkelvoud`: "dimensie",
+  `bouwsteenEenheidMeervoud`: "dimensies".
 - Subtitel (voorstel): "±15 minuten. Snel inzicht in waar het ziekenhuis
   staat."
 - Beschrijving (voorstel): "Deze quickscan geeft inzicht in hoe goed
@@ -140,10 +140,10 @@ en geen antwoorden en is niet gebruikt.
 
 ## Dimensies en de aandachtZin
 
-De drie dimensies komen als bouwblok terug in elke afdeling waar ze
-vragen hebben. De `aandachtZin` staat op `Bouwblok.aandachtZin` en is
-voor alle bouwblokken met dezelfde naam gelijk. Het is de zin die onder
-de afdelingskaart staat als dit bouwblok het grootste aandachtspunt van
+De drie dimensies komen als bouwsteen terug in elke afdeling waar ze
+vragen hebben. De `aandachtZin` staat op `Bouwsteen.aandachtZin` en is
+voor alle bouwstenen met dezelfde naam gelijk. Het is de zin die onder
+de afdelingskaart staat als deze bouwsteen het grootste aandachtspunt van
 de afdeling is.
 
 1. **Organisatie**: "Binnen deze afdeling lijkt de organisatorische
@@ -155,7 +155,7 @@ de afdeling is.
    deze afdeling lijkt de grootste ontwikkelruimte te zitten bij de
    mensen, in kennis, bevoegdheden en de belasting door telefonie."
 
-De zinnen zijn per bouwblok aan te passen in beheer. De oude tool sprak
+De zinnen zijn per bouwsteen aan te passen in beheer. De oude tool sprak
 van "onderdeel" in plaats van "afdeling"; die woorden zijn hier aan de
 tekst van deze spec aangepast.
 
@@ -173,13 +173,13 @@ Elke afdeling begint in de doorloopflow met twee kaarten boven de vragen
    `Assessment.relevantieVraag` in 18px, gewicht 700, en daaronder de keuzes
    Ja en Nee als pillen van 40px hoog (gekozen massief `--or`).
 
-Daarna volgt per bouwblok (dimensie) een kop met alleen de balk, de eyebrow
+Daarna volgt per bouwsteen (dimensie) een kop met alleen de balk, de eyebrow
 "{AFDELING} · DIMENSIE {n}" en de naam, zonder centrale vraag en toelichting,
 want die zijn bij dit Assessment leeg. De antwoorden Ja, Nee en Weet ik niet
 staan per vraag als drie pillen van 40px hoog onder de vraag (18px,
 gewicht 700), met de gekozen pil massief `--or`.
 
-Pas na Ja volgen de bouwblokken van de afdeling. Bij Nee gaat
+Pas na Ja volgen de bouwstenen van de afdeling. Bij Nee gaat
 "Volgende" naar de volgende afdeling. In de sidebar staat een afdeling
 die niet van toepassing is grijs (`#b3b0a8`) met "· N.V.T." achter het kopje en
 doorgestreepte namen van de dimensies (ontwerp `Vragenlijst-Quickscan`). De Respondent
@@ -218,9 +218,9 @@ Classificatie. Van boven naar beneden:
      voortgangsbalk in klassekleur.
    - De tellingen "Ja: 10", "Nee: 3", "Weet ik niet: 2", in de kleuren
      groen, rood en grijs.
-   - Het blok "Verdieping op dimensies": Per bouwblok van de afdeling de
-     naam, een balk in de klassekleur van dat bouwblok en "x/y (z%)", in
-     de volgorde van de bouwblokken.
+   - Het blok "Verdieping op dimensies": Per bouwsteen van de afdeling de
+     naam, een balk in de klassekleur van die bouwsteen en "x/y (z%)", in
+     de volgorde van de bouwstenen.
    - Onder de balken de `aandachtZin` (14px, `--ink-s`) en, in plaats van twee
      omrande chips, twee gewone regels van 12px in `--ink-m` met een stip van
      8px ervoor (rood bij "Grootste aandachtspunt", groen bij "Relatief sterkste
@@ -251,27 +251,27 @@ Classificatie. Van boven naar beneden:
 
 De radar, het staafdiagram per categorie, de top 3 en "Scores per
 Domein" vervallen voor dit Assessment (open punt 2). Ter vervanging
-komt er een tweede stand Overzicht met alle afdelingen en bouwblokken
+komt er een tweede stand Overzicht met alle afdelingen en bouwstenen
 in één blik. Die en de weergaven voor de groep, de antwoorden per
 vraag en de benchmark staan in `visualisatie-quickscan.md`.
 
-### Regels voor de bouwblokken per afdeling
+### Regels voor de bouwstenen per afdeling
 
-- **Bouwblokscore.** Aantal Ja gedeeld door het aantal vragen van het
-  bouwblok, getoond als "x/y (z%)". Het percentage is afgerond op hele
+- **Bouwsteenscore.** Aantal Ja gedeeld door het aantal vragen van het
+  bouwsteen, getoond als "x/y (z%)". Het percentage is afgerond op hele
   procenten, half-away-from-zero. Klasse en kleur volgen de afgeronde
   waarde, dus 50% is Gemiddeld inzicht (oranje) en 80% is Goed op orde
   (groen).
 - **Chips.** Er komen alleen chips en een `aandachtZin` als de afdeling
-  minstens 2 bouwblokken heeft. Vergelijken gebeurt op de exacte
+  minstens 2 bouwstenen heeft. Vergelijken gebeurt op de exacte
   verhouding, niet op het afgeronde percentage.
-  - "Grootste aandachtspunt: {bouwblok}." hoort bij het bouwblok met de
-    laagste score, rood omrand. De `aandachtZin` van dat bouwblok staat
+  - "Grootste aandachtspunt: {bouwsteen}." hoort bij de bouwsteen met de
+    laagste score, rood omrand. De `aandachtZin` van die bouwsteen staat
     erboven.
-  - "Relatief sterkste basis: {bouwblok}." hoort bij het bouwblok met de
-    hoogste score onder de bouwblokken met minstens 3 vragen, groen
+  - "Relatief sterkste basis: {bouwsteen}." hoort bij de bouwsteen met de
+    hoogste score onder de bouwstenen met minstens 3 vragen, groen
     omrand.
-  - Delen twee of meer bouwblokken de laagste score, dan komt er geen
+  - Delen twee of meer bouwstenen de laagste score, dan komt er geen
     aandachtspunt en geen `aandachtZin`. Delen ze de hoogste, dan komt
     er geen sterkste basis.
   - De chips verschijnen ook als de afdeling zelf Goed op orde is.
@@ -280,8 +280,8 @@ vraag en de benchmark staan in `visualisatie-quickscan.md`.
 
 De vraagteksten zijn letterlijk uit de PDF overgenomen, inclusief
 "terugbel-lijsten" bij vraag 10 van de poliklinieken. Achter elk
-bouwblok staan de nummers van de vragen in de PDF, zodat de indeling na
-te lopen is. Binnen een bouwblok blijft de volgorde van de
+bouwsteen staan de nummers van de vragen in de PDF, zodat de indeling na
+te lopen is. Binnen een bouwsteen blijft de volgorde van de
 PDF.
 
 ### 1. Poliklinieken

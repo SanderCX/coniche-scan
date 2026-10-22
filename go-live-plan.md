@@ -48,7 +48,7 @@ verandert.
   dat alles in `backlog.md` onder Functioneel na de livegang komt
   (aggregatie, AI-managementsamenvatting, Zorg-variant, Adoptiescan,
   landingspagina als leadgenerator, Lezen/Presenteren-toggle, calls to
-  action bij bouwblokken, responsive). Bevestigen of er iets uit moet
+  action bij bouwstenen, responsive). Bevestigen of er iets uit moet
   dat de oude tool wel kon en waar klanten op rekenen.
 - [ ] **Toegang voor respondenten bij livegang (Joost en Sander).** Alleen
   de korte persoonlijke link (nu gebouwd), of meteen met e-mailverificatie
@@ -94,12 +94,12 @@ verandert.
   tijdelijke opslag vervalt. Het doel is Azure SQL Database
   (`azure-plan.md`).
 - [ ] Schema opzetten vanuit `datamodel.md` deel 1: Assessment, Categorie,
-  Bouwblok, Vraag, Organisatie, Respondent, Meting, ScanInvulling,
+  Bouwsteen, Vraag, Organisatie, Respondent, Meting, ScanInvulling,
   Toegangscode, organisatievelden.
 - [ ] Antwoorden als losse records of als lijst per ingevulde scan
   vastleggen. De backlog noemt losse records handig voor export en
   aggregatie, en het schema is later duur om om te zetten.
-- [ ] Content (assessments, bouwblokken, vragen, schaallabels) van
+- [ ] Content (assessments, bouwstenen, vragen, schaallabels) van
   hardcoded data naar de database verplaatsen, met archiveren in plaats
   van verwijderen zodra er antwoorden aan hangen (`datamodel.md`, Content
   bewerken).
@@ -205,19 +205,19 @@ verandert.
   release wordt aangepast.
 - [ ] Importfunctie voor historische scans (`beheerpagina.md`,
   punt 8 en `import-scans.md`). Zie fase 6.
-- [ ] Weging van bouwblokken bouwen (`datamodel.md`, Bouwblok en
-  Scoreberekening): `Bouwblok.gewicht` in de gedeelde scorefunctie
+- [ ] Weging van bouwstenen bouwen (`datamodel.md`, Bouwsteen en
+  Scoreberekening): `Bouwsteen.gewicht` in de gedeelde scorefunctie
   (gewogen categoriescore en totaalscore), de wegingskaart bij de intake met
-  de tekst per Assessment, de factor naast bouwblokken met een gewicht
+  de tekst per Assessment, de factor naast bouwstenen met een gewicht
   ongelijk aan 1 (flow, sidebar, resultaten, PDF), het veld "Weging" en
   de wegingstekst in Content-beheer (`beheerpagina.md`, punt 2), het
-  audit-event `bouwblok.gewichtGewijzigd` en `gewicht` per bouwblok in de
+  audit-event `bouwsteen.gewichtGewijzigd` en `gewicht` per bouwsteen in de
   CSV (`export-csv.md`). `Categorie.gewicht` uit het schema halen.
-  Zorgscan: Bouwblok 4, 10 en 11 op gewicht 2 zetten
+  Zorgscan: Bouwsteen 4, 10 en 11 op gewicht 2 zetten
   (`content-zorgscan.md`).
 - [ ] Wegingstekst en factor in de PDF-specs opnemen
   (`export-pdf-visual-*.md`, nu niet bijgewerkt), en beslissen of de
-  InDesign-XML het gewicht per bouwblok meekrijgt (`export-indesign.md`,
+  InDesign-XML het gewicht per bouwsteen meekrijgt (`export-indesign.md`,
   Open).
 - [ ] Respondentenlijst met overzicht (modal) bouwen (`beheerpagina.md`,
   punt 6b): Alle acties op een Respondent staan daar, het
@@ -255,10 +255,10 @@ verandert.
   Uitbouwen en Sterk punt (nu een aanname), de kleurcodes per categorie,
   en of Rol/Functie verplicht of optioneel is, nu het een keuzelijst wordt (`backlog.md`,
   `CLAUDE.md` sectie 5).
-- [ ] Status van de contentbestanden nalopen. Bouwblokbeschrijvingen
+- [ ] Status van de contentbestanden nalopen. Bouwsteenbeschrijvingen
   staan volgens `CLAUDE.md` nog op concept, en de bestaande tekst blijft
   staan zolang dat zo is (`inhoudelijk-fundament.md`).
-- [ ] Contentsecties Visie, Bouwblokken, AI en 2030 op de Assessment-pagina's nalezen op
+- [ ] Contentsecties Visie, Bouwstenen, AI en 2030 op de Assessment-pagina's nalezen op
   actualiteit en onderling kloppen (`content-2030.md`, `visie-*.md`).
 - [ ] Focus- en foutstaten in formulieren afmaken (`CLAUDE.md` sectie 5,
   `stylesheet.md`), en foutmeldingen die een gebruiker daadwerkelijk kan
@@ -450,7 +450,7 @@ Kan parallel aan de bouw. De doorlooptijd hangt van anderen af.
   intake, invullen, resultaten, export, verwijderen.
 - [ ] Beide scan-types doorlopen, met en zonder categorielaag.
 - [ ] Scorefunctie testen met vaste invoer: Een invulling met som 172 over
-  60 vragen geeft ongewogen 2,87 en bij de Zorgscan-weging (bouwblok 4,
+  60 vragen geeft ongewogen 2,87 en bij de Zorgscan-weging (bouwsteen 4,
   10 en 11 op 2) 2,99, afgerond 3,0 (`datamodel.md`, Scoreberekening).
   Daarnaast een gewicht van 1,5 en een wijziging van het gewicht op een
   Assessment met ingevulde scans, waarbij alle scores in één keer

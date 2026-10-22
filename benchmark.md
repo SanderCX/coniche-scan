@@ -12,7 +12,7 @@ Een benchmark zet de scores van een zelf gekozen groep naast elkaar. Een Admin s
 | 2. Binnen een organisatie, tussen Metingen | Twee of meer Metingen van één organisatie, bijvoorbeeld voor en na een verbetertraject of twee onderdelen | Een Meting |
 | 3. Binnen een Meting | De scans in één Meting | Een afgeronde scan |
 
-Een benchmark kan één of meer Assessments omvatten, bijvoorbeeld de Klantcontact Volwassenheidsscan en de AI-volwassenheidsscan. De resultaten van elk Assessment staan in een eigen sectie. Scores van verschillende Assessments worden niet samengevoegd, omdat de bouwblokken verschillen.
+Een benchmark kan één of meer Assessments omvatten, bijvoorbeeld de Klantcontact Volwassenheidsscan en de AI-volwassenheidsscan. De resultaten van elk Assessment staan in een eigen sectie. Scores van verschillende Assessments worden niet samengevoegd, omdat de bouwstenen verschillen.
 
 Scores worden berekend en nooit opgeslagen (`datamodel.md`, Scoreberekening). Dat geldt voor alle niveaus.
 
@@ -37,9 +37,9 @@ Deze regels gelden op alle niveaus.
 Elk lid telt even zwaar mee, ongeacht het aantal respondenten daaronder. Bij vijf leden telt elk lid voor een vijfde. Per lid:
 
 - Het gemiddelde antwoord per vraag over de afgeronde scans van dat lid.
-- De gedeelde scorefunctie op die gemiddelden, met `Bouwblok.gewicht`, geeft de bouwblokscore, categoriescore en totaalscore van het lid.
+- De gedeelde scorefunctie op die gemiddelden, met `Bouwsteen.gewicht`, geeft de bouwsteenscore, categoriescore en totaalscore van het lid.
 
-De benchmark is het gemiddelde over de leden van dat Assessment, per vraag, bouwblok, categorie en totaalscore. De berekening is lineair, dus dit komt uit op hetzelfde als het gemiddelde van de scores van de leden. Er komt geen tweede rekenmethode bij (`datamodel.md`, Scoreberekening). Gearchiveerde content rekent mee zoals bij de andere weergaven (`datamodel.md`, Content bewerken). Een lid zonder afgeronde scan telt niet mee.
+De benchmark is het gemiddelde over de leden van dat Assessment, per vraag, bouwsteen, categorie en totaalscore. De berekening is lineair, dus dit komt uit op hetzelfde als het gemiddelde van de scores van de leden. Er komt geen tweede rekenmethode bij (`datamodel.md`, Scoreberekening). Gearchiveerde content rekent mee zoals bij de andere weergaven (`datamodel.md`, Content bewerken). Een lid zonder afgeronde scan telt niet mee.
 
 De cijfers worden live berekend (`lib/benchmark.ts`). De samenstelling staat vast, dus de lijst met leden verandert alleen als de Admin hem wijzigt. De cijfers bewegen mee als er nog scans binnenkomen, als een scan wordt verwijderd of als een gewicht verandert. Een gewichtswijziging werkt voor alle leden tegelijk door.
 
@@ -78,12 +78,12 @@ Boven elke Assessment-sectie staat "X van Y organisaties". Y is het aantal organ
 
 ### Weergave voor de Admin
 
-Per Assessment een sectie met de gemiddelden van de groep, per vraag, per bouwblok, per categorie en totaalscore. De Admin ziet de namen van de organisaties. De resultaatcomponenten van het resultatenscherm (`schermen.md`, Resultatenpagina) worden hergebruikt waar dat kan. Elke sectie is een zelfstandig onderdeel, zodat een latere PDF per Assessment een eigen deel kan krijgen.
+Per Assessment een sectie met de gemiddelden van de groep, per vraag, per bouwsteen, per categorie en totaalscore. De Admin ziet de namen van de organisaties. De resultaatcomponenten van het resultatenscherm (`schermen.md`, Resultatenpagina) worden hergebruikt waar dat kan. Elke sectie is een zelfstandig onderdeel, zodat een latere PDF per Assessment een eigen deel kan krijgen.
 
-Per Assessment komt onder de gemiddelden van de groep ook de matrix die niveau 2 heeft (Niveau 2, Weergave). De bouwblokken zijn de rijen en de organisaties de kolommen, zodat de Admin in één blik ziet welke organisatie op welk bouwblok afwijkt. De opbouw staat in `visualisatie-scores.md`, onderdeel E.
+Per Assessment komt onder de gemiddelden van de groep ook de matrix die niveau 2 heeft (Niveau 2, Weergave). De bouwstenen zijn de rijen en de organisaties de kolommen, zodat de Admin in één blik ziet welke organisatie op welke bouwsteen afwijkt. De opbouw staat in `visualisatie-scores.md`, onderdeel E.
 
 - **Kolommen.** Eén kolom per lid van het Assessment. De kop toont de organisatienaam, met daaronder het label van de Meting en het aantal afgeronde scans. Organisaties die bij dat Assessment ontbreken, staan niet als kolom in de matrix. Ze staan al bij de teller.
-- **Cijfers.** Het gemiddelde van de rij is het groepsgemiddelde van het bouwblok, want elk lid telt even zwaar mee (Gedeelde regels). De matrix leest dus uit dezelfde berekening als de rest van de sectie en heeft geen eigen rekenregel.
+- **Cijfers.** Het gemiddelde van de rij is het groepsgemiddelde van de bouwsteen, want elk lid telt even zwaar mee (Gedeelde regels). De matrix leest dus uit dezelfde berekening als de rest van de sectie en heeft geen eigen rekenregel.
 - **Alleen voor de Admin.** De kolomkoppen tonen de namen van de organisaties. Een Lead ziet deze matrix nooit en houdt alleen zijn view per organisatie (View per organisatie).
 - **Bij veel organisaties.** De matrix scrolt horizontaal met een vaste eerste kolom.
 
@@ -97,10 +97,10 @@ Opbouw van de view:
 - Een radar met twee reeksen, X en de rest van de groep.
 - Het staafdiagram per categorie, met het groepsgemiddelde als tweede, neutraal gekleurde balk naast die van X. De tweede balk komt in plaats van een markering, want hij leest beter.
 - De radar en het staafdiagram naast elkaar lichten elkaar op, in beide richtingen en met beide reeksen, en scrollen niet (`stylesheet.md`, Radar en staafdiagram op elke plek, zonder scroll). Dat geldt ook voor de view van een lid bij niveau 1 en voor het detail van een benchmark.
-- Het verschil per bouwblok (X min de rest, op één decimaal).
+- Het verschil per bouwsteen (X min de rest, op één decimaal).
 - Onder de view de tekst "Vergelijkgroep van n organisaties, samengesteld door Coniche", met de peildatum.
 
-De range van de groep (laagste tot hoogste score) komt als band in de view, zonder namen, samen met de middelste helft van de groep en een label voor de positie. Het verschil per bouwblok (hierboven) gaat op in die weergave. De uitwerking staat in `visualisatie-scores.md`, onderdeel D. Open: Of de band een eigen drempel krijgt.
+De range van de groep (laagste tot hoogste score) komt als band in de view, zonder namen, samen met de middelste helft van de groep en een label voor de positie. Het verschil per bouwsteen (hierboven) gaat op in die weergave. De uitwerking staat in `visualisatie-scores.md`, onderdeel D. Open: Of de band een eigen drempel krijgt.
 
 De view toont nooit de namen van andere organisaties. De Admin bekijkt de view eerst zelf.
 
@@ -208,7 +208,7 @@ Een vergelijking van twee of meer Metingen van één organisatie. De vraag die e
 - **Leden.** Een lid is een Meting (`BenchmarkLid`, met overal dezelfde `organisatieId`). In tegenstelling tot niveau 1 mag een organisatie meerdere leden per Assessment hebben.
 - **Berekening.** Zie Gedeelde regels. Elke Meting telt even zwaar mee, ongeacht het aantal respondenten. Er is geen groepsgemiddelde over de gekozen Metingen, want een gemiddelde over twee momenten zegt weinig. Elke Meting toont haar eigen scores.
 - **Teller.** "N Metingen". Er is geen Y, want de Admin kiest de Metingen zelf.
-- **Weergave.** Bij Ontwikkeling over tijd en twee Metingen weergave C, met een holle ring op de oudere Meting, een gevulde stip op de nieuwere en het verschil per bouwblok. Bij Naast elkaar en twee Metingen weergave H, met twee verschillende symbolen en het verschil zonder richting. Daaronder een matrix met de bouwblokken als rijen en de Metingen als kolommen, in de volgorde van de lezing, met bij Ontwikkeling een kolom Verschil en bij Naast elkaar een kolom Hoogste, per bouwblok, per categorie en voor de totaalscore. De opbouw staat in `visualisatie-scores.md`, onderdeel C, H en E. Binnen één organisatie is anonimiteit geen probleem voor de Admin, dus de namen van de Metingen staan erbij.
+- **Weergave.** Bij Ontwikkeling over tijd en twee Metingen weergave C, met een holle ring op de oudere Meting, een gevulde stip op de nieuwere en het verschil per bouwsteen. Bij Naast elkaar en twee Metingen weergave H, met twee verschillende symbolen en het verschil zonder richting. Daaronder een matrix met de bouwstenen als rijen en de Metingen als kolommen, in de volgorde van de lezing, met bij Ontwikkeling een kolom Verschil en bij Naast elkaar een kolom Hoogste, per bouwsteen, per categorie en voor de totaalscore. De opbouw staat in `visualisatie-scores.md`, onderdeel C, H en E. Binnen één organisatie is anonimiteit geen probleem voor de Admin, dus de namen van de Metingen staan erbij.
 - **Vorige Meting.** Er is geen automatische "vorige Meting". De Admin kiest welke twee Metingen samen een vergelijking vormen.
 - **Op de resultatenpagina.** Zit een Meting in een benchmark binnen een organisatie, dan staat op haar resultatenpagina een knop "Vergelijking" die die benchmark opent. Zit ze in meer dan één, dan opent een keuzelijst met de naam van de benchmark en de lezing erbij. Zit ze in geen enkele, dan is de knop uitgeschakeld, met een Info-icoon (`info.vergelijkMetingen`) die zegt dat een Admin eerst een vergelijking moet aanmaken.
 - **View voor een Lead.** Een Admin geeft een Lead via het Leads-venster het vinkje voor de benchmark (zie View voor een Lead).
@@ -223,7 +223,7 @@ De vraag is hoe een scan scoort ten opzichte van alle andere scans in dezelfde M
 - **Ondergrens.** Bij weinig scans is de vergelijking te herleiden naar personen. Daarom geldt een eigen instelling voor niveau 3, `benchmarkMinRespondenten` (startwaarde 5): Het minimale aantal afgeronde scans in de Meting, inclusief de scan van de view. Een Admin past hem aan in Instellingen. Te bevestigen.
 - **Wie ziet het.** De Admin, die de namen van de Respondenten al ziet. Een Lead krijgt de spreiding als kolom Spreiding en de antwoorden via Antwoorden, beide zonder koppeling aan één scan (zie View voor een Lead).
 - **Opslag.** Omdat de view niet meer aan een Lead wordt toegewezen, is er geen `Benchmark` met niveau "scans" nodig. Niveau 3 is een weergave op de resultatenpagina; wie wat ziet, staat onder Rechten per niveau.
-- **Weergave.** Per bouwblok een stip per scan, een streep op het gemiddelde van de andere scans, een ring op de scan van de view en een label voor de spreiding (Eensgezind, Wisselend, Verdeeld). Zie `visualisatie-scores.md`, onderdeel B.
+- **Weergave.** Per bouwsteen een stip per scan, een streep op het gemiddelde van de andere scans, een ring op de scan van de view en een label voor de spreiding (Eensgezind, Wisselend, Verdeeld). Zie `visualisatie-scores.md`, onderdeel B.
 
 ## Rechten per niveau
 
@@ -242,6 +242,7 @@ Eén Leads-venster per organisatie bepaalt wat een Lead ziet (`beheerpagina.md`,
 - **Niveau 2.** De Lead ziet de vergelijking met de Metingen die lid zijn van de benchmark en waarvoor hij Resultaten heeft, en niet meer dan dat. Heeft hij Resultaten op minder dan twee van de leden, dan is er niets te vergelijken en is de cel in de tabel grijs. Bij twee leden moet hij dus beide hebben.
 - **Niveau 3.** De spreiding binnen een Meting krijgt een Lead als kolom Spreiding in het Leads-venster, zonder ring (`visualisatie-scores.md`, onderdeel B). Positie in de Meting, de ring op één scan, blijft voor de Admin. Een Lead die de antwoorden mag zien, krijgt ze via Antwoorden (`visualisatie-scores.md`, onderdeel G).
 - **Geen scan nodig.** Een Lead kan een view krijgen zonder zelf een scan te hebben.
+- **Vanuit het Dossier.** Een Consultant kan een benchmark waarin de Organisatie zit als item in het Dossier zetten (`dossier.md`, Soort Benchmark). De Lead ziet dat item alleen met het vinkje voor die benchmark en komt via de knop op dezelfde view als vanaf Mijn metingen. Het item geeft zelf geen toegang. Verdwijnt het vinkje, dan verdwijnt het item bij die Lead.
 - **Samengestelde Meting.** Resultaten op een samengestelde Meting is altijd een bewuste keuze van de Admin. Toegang erft niet mee. Een Lead op een onderliggende Meting krijgt de samengestelde Meting niet, en andersom. Hij ziet alleen het gemiddelde. Er zijn geen Respondenten om uit te nodigen, en export van een samengestelde Meting is nog niet gedekt.
 - **Geen namen van andere leden.** De Lead ziet nooit de namen van andere leden. Op niveau 2 staan dus geen namen van andere Metingen in zijn view, ook al ziet de Admin ze wel.
 - **Drempels.** Elk niveau heeft een eigen instelling, door een Admin aan te passen in Instellingen. Niveau 1: `benchmarkMinOrganisaties` (startwaarde 5). Niveau 2: Geen eigen drempel meer. Het minimum is twee Metingen, en `benchmarkMinScans` geldt per Meting. Bij de lezing Naast elkaar geeft `benchmarkMaxDagenTussenMetingen` een waarschuwing, en geen drempel. Voldoet de groep niet, dan is de cel in de tabel grijs. De Admin ziet de benchmark altijd, ook onder de drempel.
@@ -272,6 +273,6 @@ De gebeurtenissen staan in `datamodel.md`, Audit, onder Benchmark. Wat een verwi
 - Niveau 1: Of de band en de kwartielen van de groep een eigen drempel krijgen.
 - Opgeslagen verkenning: Of een Consultant later een verkenning mag opslaan, en of een Meetperiode die meeschuift (de laatste twaalf maanden) nodig is.
 - Niveau 1: Of de matrix bij heel veel organisaties een andere weergave nodig heeft dan horizontaal scrollen.
-- Niveau 2: Hoe de weergave eruitziet bij meer dan twee Metingen, bijvoorbeeld een lijn per bouwblok over de meetdata. De eerste versie vergelijkt twee.
+- Niveau 2: Hoe de weergave eruitziet bij meer dan twee Metingen, bijvoorbeeld een lijn per bouwsteen over de meetdata. De eerste versie vergelijkt twee.
 - Samengestelde Meting: Wat er gebeurt als er één onderliggende Meting overblijft, en de aanvulling in `datamodel.md`, Verwijderen en datakoppelingen.
 - Niveau 1: Of het sectorfilter bij het samenstellen van een benchmark de korte namen gebruikt (`visualisatie-verkennen.md`, Korte namen).

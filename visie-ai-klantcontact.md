@@ -1,6 +1,6 @@
 # Visie: AI-volwassenheid in klantcontact
 
-**Plaats in de app:** De domeinteksten staan in de Toelichtingsmodal van de sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan (`visual-bouwblokken-en-domeinen.md`).
+**Plaats in de app:** De domeinteksten staan in de Toelichtingsmodal van de sectie "AI in klantcontact" op de Assessment-pagina van de AI-scan (`visual-bouwstenen-en-domeinen.md`).
 
 **Status: Concept.** Beschrijving en centrale vraag per domein van de
 AI-Volwassenheidsscan (`content-ai-scan.md`), naar het patroon van
@@ -127,7 +127,7 @@ verbeteren.
 Daarvoor zijn processen nodig voor selectie, ontwikkeling, implementatie,
 onderhoud en evaluatie. Ook moeten eigenaarschap, budgetten en
 verantwoordelijkheden helder zijn ingericht.
-Een volwassen organisatie werkt daarbij met herbruikbare bouwblokken
+Een volwassen organisatie werkt daarbij met herbruikbare bouwstenen
 (zoals kennisontsluiting, datakoppelingen, analyse en waarborgen) in
 plaats van elke AI-oplossing opnieuw uit te vinden, en beoordeelt
 leveranciers en technologie op vaste criteria zoals kwaliteit, kosten,
@@ -138,7 +138,7 @@ succesvolle toepassingen opgeschaald kunnen worden zonder afhankelijk te
 zijn van individuen of losse projecten.
 
 **Centrale vraag:** Kan de organisatie AI duurzaam ontwikkelen, beheren
-en opschalen, met herbruikbare bouwblokken en bewust gekozen
+en opschalen, met herbruikbare bouwstenen en bewust gekozen
 leveranciers?
 
 ### 8. Klant- en kanaalervaring

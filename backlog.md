@@ -68,10 +68,10 @@ Bewust nog niet opgepakt. Geen prioritering.
 
 ## Functioneel
 
-- **Zorgspecifieke teksten voor Visie en Bouwblokken**: De
+- **Zorgspecifieke teksten voor Visie en Bouwstenen**: De
   Zorgscan gebruikt op de Assessment-pagina voorlopig dezelfde secties als
   Klantcontact Volwassenheid (`schermen.md`, Assessment-pagina). Later krijgen
-  Visie en Bouwblokken voor Zorg eigen teksten.
+  Visie en Bouwstenen voor Zorg eigen teksten.
 - **Content voor de Quickscan Ziekenhuis op de Assessment-pagina**: Nu geen sub-nav en geen extra content. Nog te bepalen wat er komt.
 
 - **Conflict oplossen bij omhangen naar een andere Meting**
@@ -109,7 +109,7 @@ Bewust nog niet opgepakt. Geen prioritering.
   `benchmark.md`, Niveau 2, `visualisatie-scores.md`, onderdeel C, E, H,
   `datamodel.md`, Meting en `beheerpagina.md`, punt 5 en 14. Nog niet
   ontworpen: De weergave bij drie of meer Metingen, bijvoorbeeld een lijn per
-  bouwblok over de meetdata.
+  bouwsteen over de meetdata.
 - **KPI's, peildatum en ontwikkeling in de tijd**: Een
   KPI-waarde heeft in het voorstel geen peildatum, zodat het model niet
   explodeert in waarden maal kanalen maal tijd (`datamodel.md`, KPI's en
@@ -200,7 +200,7 @@ Bewust nog niet opgepakt. Geen prioritering.
   tonen (`inhoudelijk-fundament.md` sectie 1).
 - **Planning bij een meting**: Open vanaf, sluit op, status.
 - **Content presenteerbaar maken (toggle Lezen/Presenteren)**: Elke
-  contentsectie op de Assessment-pagina (Visie, Bouwblokken, AI-scan, 2030, dus
+  contentsectie op de Assessment-pagina (Visie, Bouwstenen, AI-scan, 2030, dus
   `visie-coniche.md`, `visie-ai-klantcontact.md`, `content-2030.md`)
   krijgt naast de leesweergave een presenteerweergave: Schermvullend,
   stap voor stap, bedoeld voor sales en consultants om het
@@ -217,24 +217,24 @@ Bewust nog niet opgepakt. Geen prioritering.
     aparte afweging, niet automatisch hetzelfde ding.
   Eerste stap: Een proof-of-concept op één of twee onderwerpen, niet in
   één keer alle vier.
-- **Kleine calls to action bij de bouwblokken-content**: Op de
-  secties Bouwblokken en AI op de Assessment-pagina en/of in de modal van de
+- **Kleine calls to action bij de bouwstenen-content**: Op de
+  secties Bouwstenen en AI op de Assessment-pagina en/of in de modal van de
   bouwstenenmodel-visual/ai-domeinenmodel-visual (nog te bepalen welke,
   zie ook de open plek-vraag in die bestanden). Drie soorten links, per
-  bouwblok of domein:
-  - Naar andere content over die bouwblok (blogs, whitepapers).
-  - Naar opleidingen/trainingen over de bouwblokken in het algemeen of
-    over die ene bouwblok specifiek.
-  - Naar een visie- of inspiratiesessie bij Coniche, over de bouwblokken
-    in het algemeen of over die ene bouwblok specifiek.
+  bouwsteen of domein:
+  - Naar andere content over die bouwsteen (blogs, whitepapers).
+  - Naar opleidingen/trainingen over de bouwstenen in het algemeen of
+    over die ene bouwsteen specifiek.
+  - Naar een visie- of inspiratiesessie bij Coniche, over de bouwstenen
+    in het algemeen of over die ene bouwsteen specifiek.
   - Structurele verwijzing vanuit scanresultaten naar concreet
     Coniche-aanbod (modules/producten) dat bij een lage score op die
-    bouwblok past, niet alleen losse contentlinks maar een brug naar
+    bouwsteen past, niet alleen losse contentlinks maar een brug naar
     wat Coniche daadwerkelijk aanbiedt.
   Vormgeving nog open: Een apart paneeltje naast de tekst, een sectie
   onderaan de modal, of iets anders. Vraagt ook een plek in het
-  datamodel om deze links per bouwblok te kunnen vastleggen (nu nog
-  geen veld hiervoor op `Bouwblok`, zie `datamodel.md`).
+  datamodel om deze links per bouwsteen te kunnen vastleggen (nu nog
+  geen veld hiervoor op `Bouwsteen`, zie `datamodel.md`).
 
 ### Quickscan Ziekenhuis (antwoordType Ja / Nee / Weet ik niet)
 
@@ -275,7 +275,7 @@ nog niet opgepakt:
   uitging van een score "van 5" en dus niet bij deze scoring past. Niet
   overnemen; zie de bestaande backlog-regel over de AI-samenvatting.
 - **Wegen per afdeling in één handeling**: Nu moet het gewicht op alle
-  bouwblokken van een afdeling worden gezet. Een beheerhulp of een
+  bouwstenen van een afdeling worden gezet. Een beheerhulp of een
   gewicht op de categorie kan later.
 - **Rework van de scan zelf.** De scan lijkt snel in elkaar gezet. De
   spec legt hem vast zoals hij is. Punten die bij het uitwerken
@@ -325,9 +325,9 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
 - **Content-pagina's** beheerbaar maken (punt 11) en **Organisatievelden**
   zelf beheerbaar met de tab Organisatievelden (punt 3).
 - **Paginering** van de lijsten Respondenten en Metingen en de scanlijst in het Meting-overzicht.
-- **Spec en code gelijktrekken**: `Assessment.bouwblokLabel` in de spec
-  tegenover `bouwblokEenheidEnkelvoud`/`Meervoud` in de code, en
-  `Bouwblok.centraleVraag` als echt veld tegenover de lookup-tabellen.
+- **Spec en code gelijktrekken**: `Assessment.bouwsteenLabel` in de spec
+  tegenover `bouwsteenEenheidEnkelvoud`/`Meervoud` in de code, en
+  `Bouwsteen.centraleVraag` als echt veld tegenover de lookup-tabellen.
 - **Import**: Twee uploads van dezelfde organisatie geven twee Metingen met
   dezelfde naam ("Legacy-import 2026"). Bedenk een onderscheidend label.
 - **Opsplitsen** van de Import-pagina (590 regels).
@@ -357,8 +357,8 @@ deployment, beveiliging en stabiliteit. Een deel is al opgepakt, zie
   iemand hem gebruikt, zoals bij Techstack (`lib/kenmerken-opties.ts`).
 - **Toelichting-veld in het contentbeheer werkt niet bij de bestaande
   Assessments**: Bij Klantcontact, AI en Zorg gebruikt de toelichting een losse
-  lookup-tabel (`data/bouwblokken-content.ts`, `data/ai-domeinen-content.ts`) en
-  niet het veld `Bouwblok.toelichting`. Alleen bij een zelf aangemaakt bouwblok
+  lookup-tabel (`data/bouwstenen-content.ts`, `data/ai-domeinen-content.ts`) en
+  niet het veld `Bouwsteen.toelichting`. Alleen bij een zelf aangemaakt bouwsteen
   heeft het veld effect. Open: Het scherm laten waarschuwen als het veld wordt
   genegeerd, of de lookup-tabellen vervangen door het veld.
 - **Instellingen in het Accountmenu**: De hoofdlink "Applicatie" vervalt
@@ -433,7 +433,7 @@ klanten alleen na deze vier punten.
 Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De rest van de changelog is gebouwd en staat in de specs.
 
 **Besloten, nog te bouwen of te verwerken**
-- **Zorgscan-gewichten**: Bouwblok 4, 10 en 11 staan op 2, de spec is leidend
+- **Zorgscan-gewichten**: Bouwsteen 4, 10 en 11 staan op 2, de spec is leidend
   (`CLAUDE.md`, Scoringslogica). De seed staat op 2. Nog te controleren: De
   opgeslagen data in de database en in bestaande browsers.
 - **Fout: Omgehangen scans verschijnen in de data-integriteitscontrole**
@@ -543,11 +543,11 @@ Wat uit Sanders changelog nog niet gebouwd is of nog moet worden afgestemd. De r
   pagina's bevatten checklistkaarten, een verbetercyclus van vijf stappen,
   genummerde kaarten en iconen. Per tekstblok verliest niets, één tekstveld
   volgt de spec letterlijk maar maakt de pagina's plat. Nog geen keuze.
-- **Content-pagina's, velden (Bouwblokken en AI)**: Naam, omschrijving en
+- **Content-pagina's, velden (Bouwstenen en AI)**: Naam, omschrijving en
   centrale vraag bewerkbaar, de visual zelf vast. Open: Is er één bron met de
-  velden `Bouwblok.toelichting` en `Bouwblok.centraleVraag` van het Assessment
+  velden `Bouwsteen.toelichting` en `Bouwsteen.centraleVraag` van het Assessment
   (een aanpassing in Content wijzigt dan ook de publieke pagina), of mogen ze
-  uit elkaar lopen. Nu gebruiken de secties Bouwblokken en AI op de Assessment-pagina nog hun eigen
+  uit elkaar lopen. Nu gebruiken de secties Bouwstenen en AI op de Assessment-pagina nog hun eigen
   statische content.
 - **Content-pagina's, opslag**: Voorstel is zoals bij Algemene teksten: Een
   gewijzigde tekst gaat voor op de standaardtekst, met "Standaardtekst
@@ -648,7 +648,7 @@ Ontworpen en gespecificeerd (`content-spanningsmeter.md`, `visualisatie-spanning
 
 - **Validatie van de vragen**: De vier stappen uit `content-spanningsmeter.md`, Validatie. Zolang die niet gedaan zijn, kan het resultaat een label "pilot" krijgen.
 - **Import**: Het importbestand van de opzet (Excel of CSV) inlezen (`import-scans.md`).
-- **PDF, CSV en InDesign**: Eigen exportspecs. De CSV heeft voor dit type per veld een score en een spanning in plaats van groepsscores per bouwblok (`export-csv.md`).
+- **PDF, CSV en InDesign**: Eigen exportspecs. De CSV heeft voor dit type per veld een score en een spanning in plaats van groepsscores per bouwsteen (`export-csv.md`).
 - **Verdeling per veld**: Het aantal scans per niveau, zoals de bron vraagt, naast laagste en hoogste score.
 - **Benchmark, Verkennen en vergelijking tussen Metingen**: Nog niet voor dit type (`benchmark.md`, `visualisatie-verkennen.md`).
 - **Dossier en film**: Het Dossier en de film "Het dossier" voor dit type.
@@ -687,4 +687,5 @@ Plekken waar de code nog moet worden aangepast aan de spec.
 - `Meting.onderdeel` bestaat niet als veld (`datamodel.md`, Meting). Haal resterende verwijzingen in de code weg.
 - Kaart "Lead met een eigen scan die nog niet is afgerond" gebruikt het paneel Lead zonder eigen scan (`visualisatie-mijn-metingen.md`). De build toont nu twee blokken.
 - De Spreidingslabel-drempels (`visualisatie-scores.md`, `visualisatie-quickscan.md`) zijn Admin-instelbare startwaarden. Voeg ze toe aan Instellingen (`beheerpagina.md`) en het datamodel.
-- De sectie "AI in klantcontact" is een radar met acht taartpunten (`visual-bouwblokken-en-domeinen.md`). De build toont nog een raster van vier kolommen.
+- De sectie "AI in klantcontact" is een radar met acht taartpunten (`visual-bouwstenen-en-domeinen.md`). De build toont nog een raster van vier kolommen.
+- Hernoem bouwblok naar bouwsteen in code en database: de entiteit `Bouwblok` wordt `Bouwsteen`, `Assessment.bouwblokLabel` wordt `bouwsteenLabel`, `bouwblokIds` wordt `bouwsteenIds`, de routes `/bouwblokken` en `/bouwstenen` blijven als redirect naar de Assessment-pagina, `info.contentBouwblokLabel` wordt `info.contentBouwsteenLabel`, `components/assessment/BouwblokkenSectie.tsx` wordt `BouwstenenSectie.tsx`. Zie ook de lijst met veldnamen in `datamodel.md`. De database heeft hiervoor een migratie nodig.

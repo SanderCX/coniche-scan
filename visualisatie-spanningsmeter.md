@@ -8,9 +8,9 @@ Het beeld in de cirkel, de iconen, de kleuren en de volgorde van de delen staan 
 
 - **Geen totaalscore.** De Spanningsmeter meet het verschil tussen velden. Waar één getal staat (de ring), is dat het Gemiddeld niveau en een weergave, afgerond op een van de vijf niveaus volgens de grenzen van De vijf niveaus hieronder. Het is geen score en wordt nergens als resultaat van de meter gepresenteerd (`datamodel.md`, Scoreberekening).
 - **Eerst je eigen profiel.** Een respondent ziet na het invullen direct zijn eigen profiel. Het beeld van de groep komt daarna en is er alleen als een Admin het aanzet (`beheerpagina.md`, punt 6a) en de drempel is gehaald.
-- **Dezelfde bouwblokken als de andere scans.** Resultaatkop, Totaalkaart met `.score-ring`, de pilvormige groep, de balklijst, de kaart met cirkel op Mijn metingen en de Toelichtingsmodal zijn dezelfde componenten (`stylesheet.md`). Wat hier anders is, staat hieronder.
+- **Dezelfde bouwstenen als de andere scans.** Resultaatkop, Totaalkaart met `.score-ring`, de pilvormige groep, de balklijst, de kaart met cirkel op Mijn metingen en de Toelichtingsmodal zijn dezelfde componenten (`stylesheet.md`). Wat hier anders is, staat hieronder.
 - **Anonimiteit.** Een groepsweergave toont nooit een antwoord of profiel van één persoon (Anonimiteit).
-- **Tekst.** Een veld heet "veld" of "spanningsveld", nooit "bouwblok". Getallen hebben een decimale komma en een min-teken is `−`, geen koppelteken.
+- **Tekst.** Een veld heet "veld" of "spanningsveld", nooit "bouwsteen". Getallen hebben een decimale komma en een min-teken is `−`, geen koppelteken.
 
 ## Veldkleuren
 
@@ -104,7 +104,7 @@ Twee kaarten naast elkaar op één rij (24px ertussen): Links "Spanningsprofiel"
 
 ### Voorbeelden uit de groep (alleen groep)
 
-Een kaart "Voorbeelden uit de groep" met twee kaartjes naast elkaar (achtergrond `--bg-warm`, 8px radius, padding 16px 20px): Een label (12px, hoofdletters, `--ink-s`) met het veld, zoals "Mensen & gedrag", en de tekst (14px, `--ink`). Het zijn antwoorden op de open vraag (`ScanInvulling.opmerkingenPerBouwblok`), zonder naam, zonder afdeling en zonder score, bij het veld waar ze bij horen. Onder de kaarten staat "Voorbeelden zijn anoniem en staan bij het veld waar ze bij horen. Ze krijgen geen score." Voorbeelden zijn alleen zichtbaar voor een Lead met een zichtbare groep (boven `benchmarkMinRespondenten`), anoniem.
+Een kaart "Voorbeelden uit de groep" met twee kaartjes naast elkaar (achtergrond `--bg-warm`, 8px radius, padding 16px 20px): Een label (12px, hoofdletters, `--ink-s`) met het veld, zoals "Mensen & gedrag", en de tekst (14px, `--ink`). Het zijn antwoorden op de open vraag (`ScanInvulling.opmerkingenPerBouwsteen`), zonder naam, zonder afdeling en zonder score, bij het veld waar ze bij horen. Onder de kaarten staat "Voorbeelden zijn anoniem en staan bij het veld waar ze bij horen. Ze krijgen geen score." Voorbeelden zijn alleen zichtbaar voor een Lead met een zichtbare groep (boven `benchmarkMinRespondenten`), anoniem.
 
 ### De vijf niveaus
 
@@ -120,7 +120,7 @@ Een kaart met de kop "De vijf niveaus" en vijf kolommen: Een rondje van 22px in 
 
 Ontwerp: Bord Landing. De pagina volgt `schermen.md`, Assessment-pagina: De kop (icoon `gauge` in een witte cirkel van 56px en de titel in 48px), de sticky sub-nav en de secties, in deze volgorde: "De 6 spanningsvelden", "Praktisch", "Wat krijg ik" en "Visie", met achtergronden die wisselen beginnend met wit.
 
-- **De 6 spanningsvelden.** Kop "De 6 spanningsvelden", een inleiding ("Elk veld heeft vijf vragen met een eigen schaal van 1 tot 5. Klik op een veld voor de uitleg.") en daaronder een interactieve radar met zes taartpunten, analoog aan de radar van de AI-scan (`visual-bouwblokken-en-domeinen.md`) en van Volwassenheid (`visual-bouwblokken-en-domeinen.md`). De velden staan als rijen naast de radar, niet als zes kaarten.
+- **De 6 spanningsvelden.** Kop "De 6 spanningsvelden", een inleiding ("Elk veld heeft vijf vragen met een eigen schaal van 1 tot 5. Klik op een veld voor de uitleg.") en daaronder een interactieve radar met zes taartpunten, analoog aan de radar van de AI-scan (`visual-bouwstenen-en-domeinen.md`) en van Volwassenheid (`visual-bouwstenen-en-domeinen.md`). De velden staan als rijen naast de radar, niet als zes kaarten.
   - **Structuur.** Twee kolommen van 320px en 536px met 40px ertussen, gecentreerd. Links alle zes de velden onder elkaar als rijen, van 1 tot en met 6, zonder groepskoppen (er is geen categorielaag). Rechts de radar van 536px, met daarboven de kaart voor de omschrijving (96px hoog). De radar heeft 6 taartpunten van 60° die bij −30° beginnen, zodat veld 1 boven staat en de rest met de klok mee loopt. Straal van de taartpunten 190px, nummercirkels van 26px op straal 226px, ringen bij 2, 3, 4 en 5 (37,5px per stap), taartpunten op 22% vulling met een witte rand van 1,5px.
   - **Kleur.** Elk veld in zijn eigen veldkleur (`content-spanningsmeter.md`). Tekst op een veldkleur is wit, behalve waar de kleur te licht is (geel): Daar `--ink`.
   - **Voorbeeldpolygoon.** De scores uit het tekstalternatief (3,8 / 2,6 / 2,2 / 3,4 / 2,4 / 4,0), als voorbeelddata en zonder claim.

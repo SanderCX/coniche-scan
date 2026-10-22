@@ -249,10 +249,10 @@ invalshoeken:
 
 ## De relatie met deze scan
 
-Deze scan meet waar de eigen organisatie nu staat op de bouwblokken van
+Deze scan meet waar de eigen organisatie nu staat op de bouwstenen van
 klantcontact (`visie-coniche.md`). Dit stuk beschrijft waar de markt als
 geheel naartoe beweegt. Dat zijn twee verschillende vragen: Een lage
-score op een bouwblok zegt iets over de eigen inrichting, niet
+score op een bouwsteen zegt iets over de eigen inrichting, niet
 automatisch iets over de marktontwikkeling hierboven, en andersom. Beide
 samen geven wel een vollediger beeld: Wat een organisatie nu al goed
 geregeld heeft, en wat er op haar afkomt.
