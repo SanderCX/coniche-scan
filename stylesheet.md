@@ -637,6 +637,24 @@ Witte of `var(--bg-warm)` achtergrond, `1px solid var(--border)`,
 Elke klikbare kaart (`a.card`, `.assessment-card`, `.admin-row`) krijgt
 bij hover een lichte lift (`translateY(-2px)`) en een zachte schaduw.
 
+**Sectiekaart.** Elke sectie van een beheerpagina met een lijst of een formulier
+(bijvoorbeeld de secties van het organisatie-detail) staat op een witte kaart
+(`#fff`, `1px solid var(--border)`, `border-radius: 10px`, padding 24px, 20px
+tussen kop en inhoud). De kop heeft links de titel (18px, gewicht 700) en
+rechts de actie van de sectie op één regel. Een tabel in een sectiekaart heeft
+koppen in 12px, gewicht 700, hoofdletters, letterafstand .08em en `#6b6a63`,
+met 1px `--border` onder de kop en 1px `#efede8` tussen de rijen. Een sectie
+staat dus niet los op de pagina-achtergrond. De kaarten staan 24px uit elkaar.
+
+**Kanaalkleuren.** Een Kanaal heeft een vaste kleur en een icoon: Call `--or`
+(telefoon), Voicebot `--pu` (microfoon), Livechat `--bl` (tekstballon),
+Chatbot `#0e7c86` (robot), E-mail `--ye` (envelop, icoon in `--ink`) en
+Whatsapp `--gr` (berichtbel). De lichte variant voor een pil is de kleur op
+ongeveer 10% op wit, met een rand op ongeveer 25%. Een Kanaal dat niet is
+ingezet is lichtgrijs (`--bg-warm`, rand `#efede8`, cirkel `#efede8`, icoon
+`#a9a69e`, naam `#8f8c84`). Onderling zijn de kleuren niet alleen op tint te
+onderscheiden: De naam staat er altijd bij.
+
 ### Formulieren
 
 `.field` geldt voor tekst-, e-mail-, wachtwoord- en getalvelden (in
@@ -706,9 +724,9 @@ potlood, nooit "Wijzigen". Dat geldt ook voor titels en menu-items.
 ### Doorloopflow
 
 - **Layout**: Sidebar 300px, hoofdgedeelte flexibel. Het logo staat
-  alleen in de nav, niet in de sidebar. In het hoofdgedeelte is de kop van een bouwsteen maximaal 880px breed (inclusief de accentbalk en de 28px ruimte erachter). Het instructievlak, de vragen met hun antwoorden, het opmerkingenveld en de knoppen onderaan zijn maximaal 664px breed. Op een smaller scherm krimpt alles mee met de ruimte naast de sidebar, en de kop blijft dan het breedst.
+  alleen in de nav, niet in de sidebar. In het hoofdgedeelte is de kop van een bouwsteen maximaal 800px breed (inclusief de accentbalk en de 28px ruimte erachter). Het instructievlak, de vragen met hun antwoorden, het opmerkingenveld en de knoppen onderaan zijn maximaal 664px breed (ontwerp `Vragenlijst-breedte`, variant B). Op een smaller scherm krimpt alles mee met de ruimte naast de sidebar, en de kop blijft dan het breedst.
 - **Sidebar** (ontwerp `Vragenlijst-sidebar-doorlopend`): Bovenaan de naam van de respondent en de voortgangsbalk met de regel "100% – 60 van 60 vragen". Daaronder per categorie een kopje en de bouwstenen. Het kopje is 12px, hoofdletters, gewicht 800, letterafstand .08em, in de categoriekleur (via `--accent`). Bij Fundament staat het kopje in geel (`#ffc043`, zie Categoriekleuren). Status per bouwsteen: Leeg (niet begonnen), gevuld in categoriekleur (bezig), `--stat-green` (afgerond, ongeacht categorie).
-  - **Actief bouwsteen.** Een vlak in `#e7e4dc` met 6px radius, de naam in gewicht 700 en `--ink`.
+  - **Actieve bouwsteen.** Een vlak in `#e7e4dc` met 6px radius, de naam in gewicht 700 en `--ink`.
   - **Lijn langs de actieve categorie.** Naast de categorie waarin de lezer staat loopt een lijn van 3px breed met afgeronde uiteinden in de categoriekleur, 14px links van de bouwstenen (in de marge van de sidebar). De lijn begint direct onder het kopje en loopt tot en met de onderkant van de laatste bouwsteen van die categorie, met 3px marge onderaan. Alleen de actieve categorie heeft de lijn en de actieve bouwsteen heeft zelf geen streepje, want het grijze vlak wijst dat aan. Bij Fundament is de lijn geel.
   - **Zonder categorie-laag** (de AI-scan en de Spanningsmeter): Er is geen groep, dus de actieve bouwsteen krijgt zelf een streepje van 3px in `--or` (bij de Spanningsmeter in de veldkleur), 14px links van het vlak, met 3px marge boven en onder de rij. Bij de Quickscan zijn de afdelingen de categorieën en loopt de lijn langs de afdeling.
 - **Bouwsteen-kop** (ontwerp `Vragenlijst-toelichting`): Een verticale accentbalk van 4px in de categoriekleur met 28px ruimte erachter, over de hele kop, die stopt onder de toelichting en niet doorloopt langs de vragen. De kop is maximaal 880px breed, dus de tekst erin maximaal 848px. Van boven naar beneden staan de eyebrow "{CATEGORIE} · BOUWSTEEN {n}" (12px, hoofdletters, gewicht 700, letterafstand .14em, in de categoriekleur), de titel (32px, gewicht 800, bij een gewicht ongelijk aan 1 met de chip met de factor), het label "CENTRALE VRAAG" (12px, hoofdletters, gewicht 700, `--ink-s`) met de centrale vraag (18px, regelhoogte 28px, gewicht 700, over de volle tekstbreedte van de kop), en de toelichting (16px, regelhoogte 26px, `--ink-m`, niet breder dan 760px, 16px tussen de alinea's). Dit zijn `Bouwsteen.centraleVraag` en `Bouwsteen.toelichting`, dezelfde inhoud als in de Toelichtingsmodal. Een domein van de AI-scan heeft geen categorie: De eyebrow is dan "AI-DOMEIN {n}" (`Assessment.bouwsteenLabel`), en de accentkleur is `--or`.

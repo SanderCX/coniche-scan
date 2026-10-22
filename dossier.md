@@ -144,7 +144,7 @@ Voor de Quickscan en de Spanningsmeter is het Dossier nog niet uitgewerkt (zie O
 | `dossier.bewerken` (items aanmaken, wijzigen en verwijderen, Zichtbaar voor Lead, de naam en de scorebron van het Dossier) | alle | eigen | - | - |
 | `dossier.inzien` | alle | eigen | alleen wat zichtbaar is (zie Wat de Lead ziet), van de eigen Organisatie | - |
 
-- **De Afspraak blijft bij een Admin.** `caseToegestaan` zet alleen een Admin, in de kaart Afspraken, net als de andere twee. Een Consultant ziet de kaart Afspraken niet. In het formulier van een Case staat voor een Consultant daarom bij ontbrekende toestemming de tekst "Vraag een Admin om 'Mag als case gebruikt worden' aan te zetten", en voor een Admin de knop "Naar Afspraken". Het ontwerp toont de knop voor beide rollen.
+- **De Afspraak blijft bij een Admin.** `caseToegestaan` zet alleen een Admin, in het vlak Afspraken, net als de andere twee. Een Consultant ziet het vlak Afspraken niet. In het formulier van een Case staat voor een Consultant daarom bij ontbrekende toestemming de tekst "Vraag een Admin om 'Mag als case gebruikt worden' aan te zetten", en voor een Admin de knop "Naar Afspraken". Het ontwerp toont de knop voor beide rollen.
 - **Bewerkslot.** Het Bewerkslot van de Organisatie geldt voor het hele Dossier, zoals bij de Kenmerken.
 - **Contactpersonen.** `contactpersonen.bewerken` blijft zoals het is (alleen een Admin). Het gaat nu alleen nog over Contactpersonen.
 - **Benchmark kiezen en toegang.** Wie `dossier.bewerken` heeft, kiest de benchmark, maar het vinkje voor de Lead blijft bij een Admin (`benchmark.md`). Is er geen Lead met toegang, dan staat in het formulier voor een Admin de knop "Naar Leads" (het Leads-venster van de Organisatie, `beheerpagina.md`, punt 6a). Het ontwerp toont de knop voor beide rollen, zoals bij de Case. Een Consultant ziet er dezelfde tekst bij, met erachter "Vraag een Admin om de Lead toegang te geven."
@@ -154,7 +154,7 @@ Voor de Quickscan en de Spanningsmeter is het Dossier nog niet uitgewerkt (zie O
 
 Ontwerp: `Dossier-beheer-B` (het eerste ontwerp, Bord 1 en `Dossier-beheer`, vervalt). De pagina volgt het stylesheet strak: Epilogue, alleen de maten 12, 14, 18 en 32px, gewichten 400, 600, 700 en 800, standaardknoppen van 40px, de standaard pil-groep en badges. De kaart staat onder de Kenmerken en onder de rij Toegang en Afspraken (als die er is), en boven de kaart KPI's. Contactpersonen blijft in de kaart Kenmerken staan, ongewijzigd. De lijst Nieuws in die kaart vervalt.
 
-- **Kop.** De eyebrow met de naam van de Organisatie (12px, hoofdletters, `--or`) en de titel "Dossier" (32px, gewicht 800). Daaronder het paneel Instellingen voor de Lead, daarna de filterrij en de items.
+- **Kop.** De titel "Dossier" (32px, gewicht 800), zonder eyebrow met de naam van de Organisatie erboven, want de pagina is al die van de Organisatie. Daaronder het paneel Instellingen voor de Lead, daarna de filterrij en de items.
 - **Paneel "Instellingen voor de Lead".** Een witte kaart (rand 1px `--border`, 10px radius) met een kop (18px, gewicht 800, met Info-icoon `info.dossier`) en drie rijen. Links staat het label (12px, hoofdletters, gewicht 700, `--ink-s`, 200px breed), rechts de waarde (14px) met eronder een hint (12px, `--ink-s`) en uiterst rechts een potloodknop (40×40px, rand 1px `--border-d`, oranje icoon).
   - **Zichtbaar voor Lead.** Een schakelaar (40×24px, oranje als aan) met "Aan" of "Uit" (gewicht 700) en de hint "De Lead ziet het dossier en de items die zichtbaar zijn gemaakt. Uit: alleen jij en je collega-Consultants zien het." Standaard uit. Aanzetten vraagt een bevestiging: "Het Dossier wordt zichtbaar voor de Leads van {Organisatie}. Ze zien {n} items." Bij n gelijk aan 0 staat daar "Er staan nog geen items op Zichtbaar voor Lead." Uitzetten kan zonder bevestiging.
   - **Naam voor de Lead.** De naam (gewicht 700) met de badge "Standaard" zolang er geen eigen naam is, en de hint "Titel van het dossier voor de Lead. Leeg laten geeft "Dossier {Organisatie}"." Het potlood opent de modal "Naam voor de Lead" (560px breed, titel 18px) met een invoerveld, de hint "Leeg laten geeft "Dossier {Organisatie}" (de naam van de Organisatie). De naam komt alleen in het Dossier voor." en de knoppen Annuleren en Opslaan.
@@ -203,6 +203,8 @@ Ontwerp: Bord 6 (de gekozen optie A). Bord 7 laat de afgewezen optie zien, met l
 ## Dossier lezen (Lead)
 
 Ontwerp: Bord 5. Een pagina van de Lead bij de persoonlijke link. De nav is die van de Lead, met "← Terug naar Mijn metingen". Opent de Lead de pagina, dan wordt `dossierGezienOp` gezet.
+
+**Tabbladtitel.** Volgens de regel in `stylesheet.md` (Tabbladtitel) is dat de naam van het Dossier gevolgd door " | Coniche Scan", dus `{naamVoorLead} | Coniche Scan`, of "Dossier {Organisatie} | Coniche Scan" zolang er geen eigen naam is. Alleen "Coniche Scan" is fout.
 
 Van boven naar beneden:
 

@@ -875,7 +875,7 @@ KorteNaam {
 - Een veldnaam heeft zijn korte naam in `VeldDefinitie.korteNaam`. `KorteNaam` is er voor waarden.
 - Een lege of ontbrekende korte naam betekent het origineel.
 - De rij hoort bij de combinatie van veld en waarde. Bij een waarde via "Anders…" ontstaat de rij pas zodra een Admin een korte naam invult. Verdwijnt de waarde uit de lijst en uit alle Organisaties, dan kan de rij weg (Data-integriteit, `beheerpagina.md`, punt 13).
-- De korte naam staat in Verkennen, in het organisatie-detail (de kaart Kenmerken en de keuzelijsten Sector en Subsector in het formulier, met het origineel in de tooltip) en in andere schermen waar ruimte krap is. Hij staat niet in de exports, de import en de PDF, want daar blijft het origineel staan.
+- De korte naam staat in Verkennen, in het organisatie-detail (het organisatiepaneel en de keuzelijsten Sector en Subsector in het formulier, met het origineel in de tooltip) en in andere schermen waar ruimte krap is. Hij staat niet in de exports, de import en de PDF, want daar blijft het origineel staan.
 - Wijzigen vraagt `content.beheren` (alleen Admin) en wordt gelogd (zie Audit).
 - **Opslag.** De korte namen staan niet op de definities (`organisatie-velden.ts` is vaste data) maar bij de
   instellingen: `Instellingen.korteNamen = { velden: { [veldId]: string }, waarden: KorteNaam[] }`, met het veld-id als pad
@@ -1028,9 +1028,10 @@ KpiWaarde {
   kanalen). Een leeg veld is onbekend en telt niet als "niet ingezet".
 - **Startset KPI's**, aanpasbaar door een Admin: Contacten per jaar (aantal, per
   Onderdeel, per kanaal), AHT (s, per Onderdeel, per kanaal), NPS (geen eenheid,
-  per Onderdeel, niet per kanaal), CSAT (geen eenheid, per Onderdeel, per
+  per Onderdeel, per kanaal), CSAT (geen eenheid, per Onderdeel, per
   kanaal), SLA (%, per Onderdeel, per kanaal) en FTR (%, per Onderdeel, per
   kanaal).
+- **NPS per kanaal.** Het kanaal waar het contact plaatsvond, bepaalt waar de uitvraag vandaan komt, en de uitkomst wordt onder dat kanaal gerapporteerd. Algemeen is het gemiddelde cijfer en een kanaalcijfer is de NPS van alleen dat kanaal. Beide kunnen naast elkaar bestaan en Algemeen wordt niet uit de kanalen berekend (zie Algemeen is een gewone waarde).
 - **Korte naam.** Een KPI heeft een korte naam zoals een organisatieveld. Hij
   staat in `Instellingen.korteNamen.velden` onder het pad `kpis.<id>`, dus een
   bestaande korte naam van `kpis.aht` blijft werken. Wijzigen wordt gelogd als
