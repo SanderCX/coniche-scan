@@ -289,8 +289,8 @@ Onderdeel {
 
 - **Hele organisatie is geen Onderdeel.** Het is de vaste standaard. Een Meting zonder onderdeel heeft `onderdeelId: null`, en een KPI-waarde met `onderdeelId: null` geldt voor de hele organisatie. De naam "Hele organisatie" is gereserveerd, ook in andere hoofdletters.
 - **Naam.** Verplicht en getrimd, zoals de naam van een Organisatie. Uniek binnen de Organisatie, zonder verschil tussen hoofdletters en kleine letters. Komt een ingetypte naam hoofdletterongevoelig overeen met een bestaand Onderdeel, dan geldt dat Onderdeel met zijn eigen spelling (zoals bij "Anders…", zie Organisatievelden).
-- **Aanmaken** kan op twee plekken die dezelfde lijst gebruiken: In het KPI-blok van het organisatie-detail ("+ Onderdeel toevoegen") en in elk formulier met een veld Onderdeel (`beheerpagina.md`, punt 5, Het veld Onderdeel). Een Onderdeel mag bestaan zonder Meting en zonder KPI-waarden.
-- **Hernoemen** verandert de naam op één plek. De kolomkop bij de KPI's, de Metingen en de naam van elke Meting volgen. Een Meting met `labelHandmatig` houdt haar eigen naam.
+- **Aanmaken** kan op twee plekken die dezelfde lijst gebruiken: In het venster Onderdelen onder Bewerken in het organisatie-detail en in elk formulier met een veld Onderdeel (`beheerpagina.md`, punt 5, Het veld Onderdeel). Een Onderdeel mag bestaan zonder Meting en zonder KPI-waarden.
+- **Hernoemen** verandert de naam op één plek. De keuzelijst bij de KPI's, de Metingen en de naam van elke Meting volgen. Een Meting met `labelHandmatig` houdt haar eigen naam.
 - **Verwijderen** kan alleen als er geen Meting aan hangt. De KPI-waarden van het Onderdeel verdwijnen mee, en de bevestiging noemt hoeveel (Verwijderen en datakoppelingen).
 - **Recht.** `organisaties.bewerken`. Aanmaken kan ook met `metingen.plannen`, omdat een Consultant bij het plannen van een Meting een nieuw team moet kunnen noemen.
 - **`Meting.onderdeel` bestaat niet.** De naam van het Onderdeel komt uit het Onderdeel via `onderdeelId`; een tweede veld voor dezelfde informatie kan na een hernoeming uit de pas lopen. Hernoemen van een Onderdeel werkt de naam van de Metingen bij, behalve bij `labelHandmatig`.
@@ -333,6 +333,7 @@ Organisatie.dossier {
     kanalen: boolean                // standaard false
     techstack: boolean              // standaard false
     overig: boolean                 // standaard false
+    kpis: boolean                   // standaard false, de KPI's van de hele Organisatie als ringen
   }
   radarBronnen: RadarBron[]         // hoogstens één per Assessment met een radar, leeg = overal automatisch
   gewijzigdOp: datetime | null      // laatste wijziging in wat een Lead ziet
@@ -370,7 +371,7 @@ Dossieritem {
 - **Event verlopen** is afgeleid uit `datum` of `einddatum` (`dossier.md`, Regels), er is geen veld voor.
 - **Een Lead ziet een item** als `Organisatie.dossier.zichtbaar` aan staat, `zichtbaarVoorLead` aan staat en, bij een Case, `Organisatie.caseToegestaan` van `caseOrganisatieId` aan staat. De naam van de Organisatie in de Case gaat nooit naar de Lead. Bij een Benchmark komt daar bij dat de Lead het vinkje heeft (`LeadToegang` met `weergave: "benchmark"`) en de Organisatie nog in de benchmark zit (`dossier.md`, Wat de Lead ziet).
 - **Naam en scorebron.** `naamVoorLead` is de titel van het Dossier bij de Lead. `radarBronnen` bepaalt per Assessment welke Meting de scores in de radar en de verdeling levert: `metingId` leeg is automatisch (de meest recente Meting waarvan de Lead de Resultaten mag inzien), anders een vaste Meting die de Lead mag inzien. Wie `dossier.bewerken` heeft, mag beide wijzigen. De regels staan in `dossier.md` (Welke scores).
-- **Profiel voor de Lead.** `toonProfiel` bepaalt welke blokken van het organisatiepaneel (`beheerpagina.md`, Organisatiepaneel) de Lead bovenaan het Dossier ziet: `cijfers` (klanten, FTE klantcontact, contacten per jaar en digitalisering), `kanalen`, `techstack` en `overig` (Adoptie mijnomgeving/app, Klantcontact management & support en IT DevOps-medewerkers). Alle vier staan standaard uit. Een blok is alleen zichtbaar als `Organisatie.dossier.zichtbaar` ook aan staat. Toegang, Afspraken en Contactpersonen zijn nooit zichtbaar voor de Lead. Wie `dossier.bewerken` heeft, mag `toonProfiel` wijzigen. De regels staan in `dossier.md` (Wat de Lead ziet, Profiel).
+- **Profiel voor de Lead.** `toonProfiel` bepaalt welke blokken van het organisatiepaneel (`beheerpagina.md`, Organisatiepaneel) de Lead bovenaan het Dossier ziet: `cijfers` (klanten, FTE klantcontact, contacten per jaar en digitalisering), `kanalen`, `techstack`, `overig` (Adoptie mijnomgeving/app, Klantcontact management & support en IT DevOps-medewerkers) en `kpis` (de KPI's van de hele Organisatie als ringen). Alle vijf staan standaard uit. Een blok is alleen zichtbaar als `Organisatie.dossier.zichtbaar` ook aan staat. Toegang, Afspraken en Contactpersonen zijn nooit zichtbaar voor de Lead. Wie `dossier.bewerken` heeft, mag `toonProfiel` wijzigen. De regels staan in `dossier.md` (Wat de Lead ziet, Profiel).
 - **`OrganisatieLid.dossierGezienOp`** (datetime of null) bepaalt of de kaart Dossier bij een Lead de tag "Nieuw" krijgt.
 
 
@@ -973,7 +974,7 @@ heeft daarvoor het element `techstackWfm`, en het element
   IT DevOps. Een bestaande waarde zonder groep wordt bij het laden `{ aantal }`)
 - IT DevOps-medewerkers (getal, met percentage gericht op Digital)
 
-**KPI's.** De KPI's zijn geen organisatievelden. Ze staan hieronder bij KPI's en kanalen: AHT, NPS, CSAT, SLA en FTR (veld-id `kpis.aht` enzovoort).
+**KPI's.** De KPI's zijn geen organisatievelden. Ze staan hieronder bij KPI's en kanalen: AHT, NPS, CSAT, SLA, FTR en CES (veld-id `kpis.aht` enzovoort).
 Verkennen gebruikt ze als filter, als groepering (AHT met een
 drempel) en als as in het spreidingsdiagram (`visualisatie-verkennen.md`,
 KPI's als kenmerk).
@@ -997,6 +998,8 @@ KpiDefinitie {
   eenheid: string | null            // bijv. "s", "%" of "aantal"
   perOnderdeel: boolean             // mag een waarde per Onderdeel hebben
   perKanaal: boolean                // mag een waarde per kanaal hebben
+  schaalMin: number | null          // ondergrens van de ring bij de Lead, null = geen ring
+  schaalMax: number | null          // bovengrens van de ring bij de Lead, null = geen ring
   volgorde: number
 }
 
@@ -1033,11 +1036,12 @@ KpiWaarde {
   Whatsapp, in deze volgorde. Een kanaal telt als ingezet bij een waarde boven 0
   voor de KPI Contacten per jaar (`visualisatie-verkennen.md`, Ingezette
   kanalen). Een leeg veld is onbekend en telt niet als "niet ingezet".
+- **Schaal.** `schaalMin` en `schaalMax` bepalen hoe ver de ring van de KPI gevuld is in het blok KPI's van het Profiel voor de Lead (`dossier.md`, KPI-ringen). Een KPI zonder schaal krijgt geen ring. Startwaarden: AHT 0 tot 600 (s), NPS -100 tot 100, CSAT 1 tot 10, SLA 0 tot 100 (%), FTR 0 tot 100 (%) en CES 1 tot 7. Contacten per jaar heeft geen schaal, want die staat in de cijferrij. Een Admin past ze aan bij de KPI-definitie, en `schaalMin` moet kleiner zijn dan `schaalMax`.
 - **Startset KPI's**, aanpasbaar door een Admin: Contacten per jaar (aantal, per
   Onderdeel, per kanaal), AHT (s, per Onderdeel, per kanaal), NPS (geen eenheid,
   per Onderdeel, per kanaal), CSAT (geen eenheid, per Onderdeel, per
-  kanaal), SLA (%, per Onderdeel, per kanaal) en FTR (%, per Onderdeel, per
-  kanaal).
+  kanaal), SLA (%, per Onderdeel, per kanaal), FTR (%, per Onderdeel, per
+  kanaal) en CES (Customer Effort Score, geen eenheid, per Onderdeel, per kanaal).
 - **NPS per kanaal.** Het kanaal waar het contact plaatsvond, bepaalt waar de uitvraag vandaan komt, en de uitkomst wordt onder dat kanaal gerapporteerd. Algemeen is het gemiddelde cijfer en een kanaalcijfer is de NPS van alleen dat kanaal. Beide kunnen naast elkaar bestaan en Algemeen wordt niet uit de kanalen berekend (zie Algemeen is een gewone waarde).
 - **Korte naam.** Een KPI heeft een korte naam zoals een organisatieveld. Hij
   staat in `Instellingen.korteNamen.velden` onder het pad `kpis.<id>`, dus een
@@ -1065,7 +1069,7 @@ KpiWaarde {
   werken. De elementen `contactenCall` tot en met `contactenWhatsapp` krijgen de
   waarde van de KPI Contacten per jaar bij dat kanaal, bij Algemeen. Een kanaal
   dat een Admin toevoegt, krijgt geen element zolang het sjabloon er niet om
-  vraagt. Waarden per Onderdeel volgen als het sjabloon ze vraagt.
+  vraagt. Hetzelfde geldt voor een KPI die niet in het sjabloon staat, zoals CES. Waarden per Onderdeel volgen als het sjabloon ze vraagt.
 - `benchmark.md` en `visualisatie-scores.md`: Waar ze het onderdeel van een
   Meting tonen of vergelijken, is dat de naam van het Onderdeel. Er verandert
   niets aan de regels.
@@ -1205,6 +1209,7 @@ niveau een eigen drempel voor het aanvinken van een view voor een Lead,
 (startwaarde 5, het minimale aantal afgeronde scans in een Meting voor
 Spreiding, voor anonieme Antwoorden en voor de lijn van laagste tot hoogste score bij een Lead).
 Voor het spreidingslabel: `spreidingWisselend` (0,55) en `spreidingVerdeeld` (0,8) voor schaalscans, `spreidingWisselendQuickscan` (14) en `spreidingVerdeeldQuickscan` (20) voor de Quickscan, positieve getallen waarbij de tweede grens boven de eerste ligt (`beheerpagina.md`, formulier Spreiding).
+Voor de testknop in de vragenlijst: `testknopAan` (boolean, standaard false, `beheerpagina.md`, Schakelaar Testknop).
 Voor Verkennen: `verkennenMinGroep` (3), `verkennenMinVergelijking` (5),
 `verkennenMinPool` (6), `verkennenMaxGroepen` (12) en `verkennenMinIngevuldPct` (40),
 alle gehele getallen van minstens 1. Het percentage mag 0 zijn en loopt tot en met 100 (`visualisatie-verkennen.md`, Drempels). `benchmarkMinOrganisaties` geldt ook voor een opgeslagen verkenning en telt daar altijd Organisaties, ook bij de eenheid Onderdelen.

@@ -470,7 +470,7 @@ gebeurtenis, zonder persoonsgegevens uit scans.
 - `dossier.zichtbaarGemaakt` en `dossier.verborgen` (voorheen `dossier.geopend` en `dossier.gesloten`; hernoemd op):
   `zichtbaar` is aan of uit gezet. `details` bevat de Organisatie en het
   aantal zichtbare items.
-- `dossier.profielGewijzigd`: Een schakelaar van `toonProfiel` is gewijzigd. `details` bevat de Organisatie, het blok (cijfers, kanalen, techstack of overig) en de nieuwe waarde.
+- `dossier.profielGewijzigd`: Een schakelaar van `toonProfiel` is gewijzigd. `details` bevat de Organisatie, het blok (cijfers, kanalen, techstack, overig of kpis) en de nieuwe waarde.
 - `dossier.instellingGewijzigd`: `naamVoorLead` of
   een `radarBronnen` is gewijzigd. `details` bevat de Organisatie, het veld, bij
   een scorebron het Assessment en de Meting (of "automatisch"), en de oude en
