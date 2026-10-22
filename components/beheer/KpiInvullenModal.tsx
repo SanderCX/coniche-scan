@@ -19,7 +19,7 @@ const sleutel = (onderdeelId: string | null, kanaalId: string | null, kpiId: str
  * weet: Een lege cel is geen waarde, 0 is een geldige waarde. Wisselen van plek behoudt wat is ingevuld. Eén "Opslaan" bewaart de
  * wijzigingen van alle plekken, "Annuleren" gooit ze allemaal weg.
  */
-export function KpiInvullenModal({ organisatie, onSluit }: { organisatie: Organisatie; onSluit: () => void }) {
+export function KpiInvullenModal({ organisatie, onSluit, beginOnderdeelId = null }: { organisatie: Organisatie; onSluit: () => void; /** De plek waarmee de modal opent: Het gekozen Onderdeel in het organisatiepaneel, `null` is Algemeen. */ beginOnderdeelId?: string | null }) {
   const { kpiDefinities, kanalen } = useInstellingen();
   const kpis = [...kpiDefinities].sort((a, b) => a.volgorde - b.volgorde);
   const kanalenOpVolgorde = [...kanalen].sort((a, b) => a.volgorde - b.volgorde);
@@ -27,7 +27,7 @@ export function KpiInvullenModal({ organisatie, onSluit }: { organisatie: Organi
 
   // Het concept: Per cel de ingetypte tekst, alleen voor cellen die de gebruiker aanraakte.
   const [concept, setConcept] = useState<Record<string, string>>({});
-  const [plek, setPlek] = useState<string>(ALGEMEEN);
+  const [plek, setPlek] = useState<string>(beginOnderdeelId && onderdelen.some((o) => o.id === beginOnderdeelId) ? beginOnderdeelId : ALGEMEEN);
   // De gekozen kanaalkolommen per plek. Een kanaal met een waarde bij die plek staat gekozen bij het openen.
   const [gekozenKanalen, setGekozenKanalen] = useState<Record<string, string[]>>({});
   const [fout, setFout] = useState<string | null>(null);

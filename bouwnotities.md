@@ -830,3 +830,11 @@ In de interface heet het overal Bouwsteen (besloten door Sander op 22 oktober 20
 - **Tabbladtitel**: Een pagina kan zijn eigen naam zetten (`lib/pagina-titel.ts`); de Dossierpagina gebruikt de naam voor de Lead.
 - **Doorloopflow**: De kop is maximaal 800px breed, de rest 664px.
 
+## 22 oktober 2026: KPI-ringen en Onderdelen in het organisatiepaneel
+
+- **KPI-ringen** (`lib/kpi-ringen.ts`, `components/organisatie/ProfielBlokken.tsx`): Eén ring en één blok voor het paneel en voor de Lead. De invoer van de ringen (`KpiRingInvoer`) bevat alleen de gekozen plek, zodat een Lead niet meer krijgt dan hij mag zien. De kaart KPI's met de tabel is weg; `KpiInvullenModal` blijft.
+- **Schaal**: `KpiDefinitie.schaalMin` en `schaalMax`; opgeslagen definities zonder schaal krijgen de startwaarden en de KPI CES wordt eenmalig toegevoegd.
+- **Bewerken**: Een menu (`DropdownKnop`) met Kenmerken, KPI's invullen en Onderdelen. De modal Onderdelen (`OnderdelenModal.tsx`) vervangt de modals voor één Onderdeel.
+- **Testknop**: `testknopAan` in de instellingen (standaard uit); het vak in de vragenlijst staat alleen aan voor een ingelogde Admin of Consultant.
+- **Kleur van nummers**: `tekstOpKleur` geeft alleen op geel `--ink`. Tekst of een dunne lijn in de kleur zelf (`lijnKleur`) blijft bij turkoois, lavendel en geel `--ink`.
+

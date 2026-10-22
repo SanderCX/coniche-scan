@@ -118,9 +118,9 @@ describe("de domeinkleuren", () => {
     expect(domeinKleur(8)).toBe("lavendel");
     expect(domeinKleur(9)).toBe("oranje");
   });
-  it("zet donkere tekst op geel, turkoois en lavendel en witte tekst op de rest", () => {
-    for (const k of ["antraciet", "turkoois", "lavendel"]) expect(tekstOpKleur(CATEGORIE_COLORS[k].hex)).toBe("var(--ink)");
-    for (const k of ["oranje", "blauw", "groen", "paars", "framboos"]) expect(tekstOpKleur(CATEGORIE_COLORS[k].hex)).toBe("#fff");
+  it("zet donkere tekst alleen op geel en witte tekst op de rest, ook op turkoois en lavendel", () => {
+    expect(tekstOpKleur(CATEGORIE_COLORS.antraciet.hex)).toBe("var(--ink)");
+    for (const k of ["oranje", "blauw", "groen", "paars", "framboos", "turkoois", "lavendel"]) expect(tekstOpKleur(CATEGORIE_COLORS[k].hex)).toBe("#fff");
   });
 });
 

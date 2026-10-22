@@ -19,7 +19,8 @@ De waarden gelden voor de hele omgeving. Een wijziging werkt door vanaf het volg
 3. **Benchmark.** Het minimum aantal Organisaties in een groep (beginwaarde 5), het minimum aantal scans per Meting (3) en het aantal dagen waarboven een vergelijking Naast elkaar een waarschuwing geeft (90).
 4. **Voor een Lead.** Het minimum aantal afgeronde scans voor Spreiding, anonieme Antwoorden en de lijn van de laagste tot de hoogste score (5).
 5. **Spreiding.** Vier grenzen voor het label bij de spreiding: Vanaf welke standaardafwijking het label Wisselend is en vanaf welke Verdeeld, voor de schaalscans (beginwaarden 0,55 en 0,8) en voor de Quickscan in procentpunten (14 en 20). Je typt een getal met een komma. De grens voor Verdeeld moet boven die voor Wisselend liggen.
-6. **Verkennen.** Vijf grenzen voor groepen, vergelijkingen, de pool, het aantal waarden per kenmerk en hoe vaak een kenmerk ingevuld moet zijn.
+6. **Testknop in de vragenlijst.** Een schakelaar, standaard uit. Staat hij aan, dan ziet een ingelogde Admin of Consultant bovenaan een vragenlijst een knop om de vragenlijst automatisch in te vullen, om te testen. Een Respondent of Lead ziet de knop nooit. Zet hem uit in productie. Wijzigen staat in de audit-log.
+7. **Verkennen.** Vijf grenzen voor groepen, vergelijkingen, de pool, het aantal waarden per kenmerk en hoe vaak een kenmerk ingevuld moet zijn.
 
 ## Let op
 Een nieuwe grens voor de spreiding geldt direct, voor alle Metingen. Verlaag je een grens, dan kunnen resultaten voor een Lead eerder zichtbaar worden. Ga daar bewust mee om, want een kleine groep maakt individuele antwoorden herleidbaar.

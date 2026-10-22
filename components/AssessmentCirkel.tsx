@@ -133,7 +133,6 @@ export function AssessmentCirkel({ assessments }: { assessments: Assessment[] })
 
   const gekozenAssessment = gekozen !== null ? perPlek[gekozen] : null;
   const inhoud = gekozenAssessment ? tegelInhoud(gekozenAssessment) : null;
-  const aantalWoord = ["Nul", "Eén", "Twee", "Drie", "Vier", "Vijf"][volgorde.length] ?? String(volgorde.length);
 
   return (
     <div className="ac">
@@ -221,7 +220,7 @@ export function AssessmentCirkel({ assessments }: { assessments: Assessment[] })
             </Link>
           </div>
         ) : (
-          <h2 className="ac-leeg">{aantalWoord} assessments in één cirkel. Klik op een deel voor de details.</h2>
+          <h2 className="ac-leeg">Actionable advies voor het verbeteren van je klantcontact</h2>
         )}
       </div>
     </div>

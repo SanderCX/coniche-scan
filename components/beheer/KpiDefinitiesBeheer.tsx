@@ -4,6 +4,7 @@ import { useState } from "react";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { useInstellingen } from "@/lib/instellingen-store";
+import { parseKpiGetal } from "@/lib/kpi";
 import { bewaarKorteNamen, MAX_KORTE_NAAM } from "@/lib/korte-namen";
 import { gevolgenKanaal, gevolgenKpi, hernoemKanaal, maakKanaal, maakKpi, vlagBlokkade, verplaatsKanaal, verplaatsKpi, verwijderKanaal, verwijderKpi, wijzigKpis } from "@/lib/kpi-beheer";
 
@@ -14,6 +15,9 @@ interface Concept {
   perOnderdeel: boolean;
   perKanaal: boolean;
   korteNaam: string;
+  /** De schaal als ingetypte tekst: Leeg is geen ring (`datamodel.md`, KPI's en kanalen, Schaal). */
+  schaalMin: string;
+  schaalMax: string;
 }
 
 function zonder(namen: Record<string, string>, id: string): Record<string, string> {
@@ -35,6 +39,8 @@ export function KpiDefinitiesBeheer() {
     perOnderdeel: k.perOnderdeel,
     perKanaal: k.perKanaal,
     korteNaam: korteNamen.velden[`kpis.${k.id}`] ?? "",
+    schaalMin: k.schaalMin === null ? "" : String(k.schaalMin).replace(".", ","),
+    schaalMax: k.schaalMax === null ? "" : String(k.schaalMax).replace(".", ","),
   }));
   // `null`: Geen wijziging, dan geldt de opgeslagen stand. Nieuwe KPI's staan er alleen in het concept in.
   const [concept, setConcept] = useState<Concept[] | null>(null);
@@ -57,9 +63,17 @@ export function KpiDefinitiesBeheer() {
 
   function opslaan() {
     setFout(null);
-    const wijzigingen: Record<string, { naam: string; eenheid: string | null; perOnderdeel: boolean; perKanaal: boolean }> = {};
+    const wijzigingen: Record<string, { naam: string; eenheid: string | null; perOnderdeel: boolean; perKanaal: boolean; schaalMin: number | null; schaalMax: number | null }> = {};
     const nieuweIds = new Map<number, string>();
     // Eerst de nieuwe KPI's aanmaken, zodat ze een id hebben.
+    // Eerst de schaal controleren, zodat er niets half wordt bewaard: Een getal of leeg, en allebei of geen van beide.
+    const schaal = new Map<number, { min: number | null; max: number | null }>();
+    for (const [i, r] of rijen.entries()) {
+      const min = parseKpiGetal(r.schaalMin);
+      const max = parseKpiGetal(r.schaalMax);
+      if (Number.isNaN(min) || Number.isNaN(max)) return setFout(`${r.naam || "Een KPI"}: Schaal van en Schaal tot zijn een getal, met een komma als decimaalteken.`);
+      schaal.set(i, { min, max });
+    }
     for (const [i, r] of rijen.entries()) {
       if (r.id !== null) continue;
       const m = maakKpi(r.naam);
@@ -68,7 +82,7 @@ export function KpiDefinitiesBeheer() {
     }
     for (const [i, r] of rijen.entries()) {
       const id = r.id ?? nieuweIds.get(i)!;
-      wijzigingen[id] = { naam: r.naam, eenheid: r.eenheid.trim() || null, perOnderdeel: r.perOnderdeel, perKanaal: r.perKanaal };
+      wijzigingen[id] = { naam: r.naam, eenheid: r.eenheid.trim() || null, perOnderdeel: r.perOnderdeel, perKanaal: r.perKanaal, schaalMin: schaal.get(i)!.min, schaalMax: schaal.get(i)!.max };
     }
     const w = wijzigKpis(wijzigingen);
     if (!w.ok) return setFout(w.reden);
@@ -121,7 +135,7 @@ export function KpiDefinitiesBeheer() {
             className="btn btn-or btn-compact"
             onClick={() => {
               setOpgeslagen(false);
-              setConcept([...rijen, { id: null, naam: "", eenheid: "", perOnderdeel: false, perKanaal: false, korteNaam: "" }]);
+              setConcept([...rijen, { id: null, naam: "", eenheid: "", perOnderdeel: false, perKanaal: false, korteNaam: "", schaalMin: "", schaalMax: "" }]);
             }}
           >
             + KPI toevoegen
@@ -133,6 +147,8 @@ export function KpiDefinitiesBeheer() {
               <tr>
                 <th className="kpi-eerste">Naam</th>
                 <th style={{ textAlign: "left" }}>Eenheid</th>
+                <th style={{ textAlign: "left" }}>Schaal van</th>
+                <th style={{ textAlign: "left" }}>Schaal tot</th>
                 <th>Per onderdeel</th>
                 <th>Per kanaal</th>
                 <th style={{ textAlign: "left" }}>Korte naam</th>
@@ -150,6 +166,12 @@ export function KpiDefinitiesBeheer() {
                     </td>
                     <td style={{ textAlign: "left" }}>
                       <input type="text" className="kpi-tekst kpi-tekst--smal" aria-label={`Eenheid van ${r.naam}`} value={r.eenheid} onChange={(e) => wijzig(i, { eenheid: e.target.value })} />
+                    </td>
+                    <td style={{ textAlign: "left" }}>
+                      <input type="text" inputMode="decimal" className="kpi-tekst kpi-tekst--smal" aria-label={`Schaal van van ${r.naam}`} placeholder="–" value={r.schaalMin} onChange={(e) => wijzig(i, { schaalMin: e.target.value })} />
+                    </td>
+                    <td style={{ textAlign: "left" }}>
+                      <input type="text" inputMode="decimal" className="kpi-tekst kpi-tekst--smal" aria-label={`Schaal tot van ${r.naam}`} placeholder="–" value={r.schaalMax} onChange={(e) => wijzig(i, { schaalMax: e.target.value })} />
                     </td>
                     <td>
                       <span className="kpi-vinkje">

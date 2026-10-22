@@ -245,6 +245,33 @@ describe("opslag van waarden en definities", () => {
     expect(audit().find((e) => e.actie === "kanaal.verwijderd")?.details).toMatchObject({ kanaalNaam: "Call", aantalKpiWaarden: 1 });
   });
 
+  it("een schaal is allebei ingevuld of allebei leeg, met Schaal van kleiner dan Schaal tot, en wordt gelogd", () => {
+    expect(beheer.controleerSchaal(null, null)).toBeNull();
+    expect(beheer.controleerSchaal(0, 600)).toBeNull();
+    expect(beheer.controleerSchaal(-100, 100)).toBeNull();
+    expect(beheer.controleerSchaal(0, null)).toMatch(/allebei/);
+    expect(beheer.controleerSchaal(5, 5)).toMatch(/kleiner/);
+    expect(beheer.controleerSchaal(7, 1)).toMatch(/kleiner/);
+    expect(beheer.wijzigKpis({ aht: { naam: "AHT", eenheid: "s", perOnderdeel: true, perKanaal: true, schaalMin: 100, schaalMax: 50 } }).ok).toBe(false);
+    expect(beheer.wijzigKpis({ aht: { naam: "AHT", eenheid: "s", perOnderdeel: true, perKanaal: true, schaalMin: 0, schaalMax: 900 } })).toMatchObject({ ok: true, gewijzigd: 1 });
+    expect(getInstellingen().kpiDefinities.find((k) => k.id === "aht")).toMatchObject({ schaalMin: 0, schaalMax: 900 });
+    expect(audit().find((e) => e.actie === "kpiDefinitie.gewijzigd")?.details).toMatchObject({ wijzigingen: { schaalMax: { oud: 600, nieuw: 900 } } });
+    // Een schaal leegmaken: Geen ring.
+    expect(beheer.wijzigKpis({ aht: { naam: "AHT", eenheid: "s", perOnderdeel: true, perKanaal: true, schaalMin: null, schaalMax: null } }).ok).toBe(true);
+    expect(getInstellingen().kpiDefinities.find((k) => k.id === "aht")).toMatchObject({ schaalMin: null, schaalMax: null });
+  });
+
+  it("opgeslagen definities van vóór de schaal krijgen de startwaarden en, eenmalig, de KPI CES", () => {
+    const oud = STANDAARD_KPIS.filter((k) => k.id !== "ces").map(({ schaalMin: _a, schaalMax: _b, ...rest }) => (void _a, void _b, rest));
+    opslag.set("coniche-scan:instellingen", JSON.stringify({ kpiDefinities: oud }));
+    const defs = getInstellingen().kpiDefinities;
+    expect(defs.find((k) => k.id === "nps")).toMatchObject({ schaalMin: -100, schaalMax: 100 });
+    expect(defs.find((k) => k.id === "ces")).toMatchObject({ schaalMin: 1, schaalMax: 7, perKanaal: true });
+    // Een Admin die CES verwijdert, krijgt hem niet opnieuw.
+    expect(beheer.verwijderKpi("ces").ok).toBe(true);
+    expect(getInstellingen().kpiDefinities.some((k) => k.id === "ces")).toBe(false);
+  });
+
   it("een KPI of kanaal met een bestaande naam (hoofdletterongevoelig) kan niet", () => {
     expect(beheer.maakKpi("aht").ok).toBe(false);
     expect(beheer.maakKanaal("CALL").ok).toBe(false);

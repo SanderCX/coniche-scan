@@ -1,5 +1,33 @@
 # Coniche Scan — Changelog
 
+## 2026-10-22 (37) — Specs van Joost, PR 178: KPI-ringen, Onderdelen onder Bewerken, CES, testknop-instelling en correcties
+
+Op verzoek van Sander ("pull devops", daarna "ja bouw alles maar": A, B en C).
+
+**A. KPI-ringen** (`beheerpagina.md`, Organisatiepaneel, KPI's; `dossier.md`, KPI-ringen; `datamodel.md`):
+- `KpiDefinitie.schaalMin` en `schaalMax` (`lib/types.ts`), startwaarden AHT 0 tot 600, NPS −100 tot 100, CSAT 1 tot 10, SLA en FTR 0 tot 100 en CES 1 tot 7, Contacten per jaar geen schaal. Opgeslagen definities van vóór de schaal krijgen de startwaarden (`vulSchaalAan`) en, eenmalig, de KPI CES (`kpiCesToegevoegd`: Een Admin die CES verwijdert, krijgt hem niet opnieuw). In de tab KPI's en kanalen staan de kolommen Schaal van en Schaal tot, met controle (allebei of geen van beide, van kleiner dan tot) en logging van de wijziging.
+- `lib/kpi-ringen.ts` bepaalt de ringen: Zonder kanaal Algemeen in oranje, bij een gekozen kanaal de drie toestanden (kanaalwaarde in de kanaalkleur met een stip op Algemeen, alleen Algemeen oranje, uitgegrijsd), "n.v.t." bij een gekozen Onderdeel en een KPI die niet per Onderdeel mag, en voor de Lead het weglaten van KPI's zonder enige waarde. `KpiRingFiguur` en `KpiRingenBlok` (`components/organisatie/ProfielBlokken.tsx`) tekenen ze: 132px, lijn 12px, spoor `#efede8`, stip van 7px.
+- Het blok KPI's staat in het organisatiepaneel onder de Kanalen met de keuzelijst Onderdeel en de kanaalpillen als knoppen (`aria-pressed`, klikbaar bij een kanaal dat bij de gekozen plek is ingezet). De kaart KPI's met de tabel, de kolomkop-modals en "+ Onderdeel toevoegen" zijn weg (`KpiBlok.tsx`, `OnderdeelModals.tsx`).
+- "Bewerken" is een menu met Kenmerken, KPI's invullen (opent met de gekozen plek) en Onderdelen. De nieuwe modal Onderdelen (`OnderdelenModal.tsx`) wijzigt en voegt toe met Opslaan en verwijdert met een bevestiging.
+- `Dossier.toonProfiel.kpis` met een vijfde schakelaar in Kenmerken bewerken. `leadProfiel` geeft alleen de KPI's van de hele Organisatie mee (nooit van een Onderdeel) en kanaalwaarden alleen als ook het blok Kanalen aan staat. `LeadProfielKaart` toont ze met dezelfde kanaalkeuze.
+
+**B. Testknop-instelling**: `testknopAan` (standaard uit) in de instellingen, een schakelaar "Testknop in de vragenlijst" onder Drempels en termijnen (alleen een Admin, de wijziging staat in de audit-log) en het vak in de vragenlijst toont alleen als hij aan staat én voor een ingelogde Admin of Consultant.
+
+**C. Correcties**:
+- Instructievlak in de vragenlijst maximaal 800px, even breed als de kop.
+- Tekst zonder selectie op Kies jouw assessment: "Actionable advies voor het verbeteren van je klantcontact".
+- Nummers in cirkels van de AI-scan en de Spanningsmeter zijn wit, behalve bij het gele domein of veld (`tekstOpKleur`; een dunne lijn of tekst in de kleur zelf, `lijnKleur`, blijft `--ink` bij de lichte kleuren).
+- Het Benchmark-icoon is één icoon met gevulde staven (`BenchmarkIcoon`) in de Dossier-rij, op de Lead-pagina en op de benchmarkkaart.
+- De antwoordopties in de film van de AI-scan staan onder elkaar met een radioknop en "n. label".
+
+**Tests**: `lib/kpi-ringen.test.ts`, `lib/kpi.test.ts` (schaal, CES-migratie), `lib/dossier.test.ts` (KPI-ringen voor de Lead), `lib/spreiding-grenzen.test.ts` (testknop), `lib/radar.test.tsx`, `lib/mijn-metingen.test.ts` en `lib/dossier-ai-ui.test.tsx` (witte nummers). Een test van het Dossier ("markeert het Dossier als gezien") faalde soms: Hij bewaarde maar één van de Organisaties, waardoor het opruimen bij het opslaan een nieuwe `gewijzigdOp` zette. De test bewaart ze nu allemaal.
+
+**Help**: `kpis-invullen.md`, `metingen-en-onderdelen.md`, `het-dossier-van-een-organisatie.md`, `het-dossier-lezen.md` en `drempels-en-termijnen.md`.
+
+**Specs bijgewerkt**: Alleen `bouwnotities.md`.
+
+**Afwijkingen en interpretaties**: (1) Het getal in de ring is 24px: De spec zegt 26px, maar die maat staat niet in de letterschaal. (2) In de modal Onderdelen worden wijzigen en toevoegen bewaard met Opslaan, maar verwijderen gebeurt na de bevestiging direct en is niet terug te draaien met Annuleren. (3) De klassenaam onder de ring (Quickscan, Mijn metingen) staat in de build al gecentreerd en op één regel (`white-space: nowrap`): Ik zag het probleem niet en heb daar niets aan veranderd. (4) De radars van de AI-scan en de Spanningsmeter hebben op de Assessment-pagina dezelfde lijn (2px), vulling (18%) en voorbeeldscores als Volwassenheid, met hoekpunten op (score − 1) × 37,5px: Dat klopte al, ik heb niets veranderd. De radars in de films (`MiniRadar`) delen één opbouw voor alle soorten en zijn niet aangepast. (5) Een Onderdeel dat een Admin hernoemt in de modal houdt zijn id, dus zijn KPI-waarden blijven staan. (6) De legenda bij een gekozen kanaal heeft het stipje en de tekst op één regel. (7) CES staat nu ook in een bestaande opslag, een eerdere Admin-keuze om hem niet te hebben kan er niet uit worden afgeleid.
+
 ## 2026-10-22 (36) — Specs van Joost, PR 176: Organisatiepaneel, profiel voor de Lead, staand staafdiagram en kleine punten
 
 Op verzoek van Sander ("pull devops", daarna "ja bouw alles maar": A, B, C en D).

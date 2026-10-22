@@ -78,6 +78,14 @@ describe("de labels volgen de instellingen", () => {
     expect(store.getInstellingen()).toMatchObject(SPREIDING_STANDAARDWAARDEN);
   });
 
+  it("heeft de testknop standaard uit en logt het aanzetten als instellingenwijziging", () => {
+    expect(store.getInstellingen().testknopAan).toBe(false);
+    store.zetInstellingen({ testknopAan: true });
+    expect(store.getInstellingen().testknopAan).toBe(true);
+    const log = JSON.parse(opslag.get("coniche-scan:audit") ?? "[]") as { actie: string; details: { gewijzigd: Record<string, { oud: unknown; nieuw: unknown }> } }[];
+    expect(log.find((e) => e.actie === "instellingen.gewijzigd")?.details.gewijzigd.testknopAan).toEqual({ oud: false, nieuw: true });
+  });
+
   it("past het label aan zodra een Admin de grenzen wijzigt, ook bij een oude opslag zonder de velden", () => {
     opslag.set("coniche-scan:instellingen", JSON.stringify({ benchmarkMinOrganisaties: 5 }));
     expect(visualisatie.spreidingsLabel(0.6)).toBe("Wisselend");

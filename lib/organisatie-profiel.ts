@@ -22,8 +22,8 @@ const procent = (w: unknown): string | null => {
   return t === null ? null : `${t}%`;
 };
 
-/** De vier blokken die een Lead kan zien (`Dossier.toonProfiel`). */
-export const PROFIEL_BLOKKEN = ["cijfers", "kanalen", "techstack", "overig"] as const;
+/** De vijf blokken die een Lead kan zien (`Dossier.toonProfiel`). */
+export const PROFIEL_BLOKKEN = ["cijfers", "kanalen", "techstack", "overig", "kpis"] as const;
 export type ProfielBlok = (typeof PROFIEL_BLOKKEN)[number];
 
 export const PROFIEL_BLOK_LABEL: Record<ProfielBlok, string> = {
@@ -31,6 +31,7 @@ export const PROFIEL_BLOK_LABEL: Record<ProfielBlok, string> = {
   kanalen: "Kanalen",
   techstack: "Techstack",
   overig: "Overige velden",
+  kpis: "KPI's",
 };
 
 /** Een getal in de cijferrij: Vanaf een miljoen "2,4 mln", vanaf duizend "850k" (alleen bij de kanalen), anders met duizendtalpunt. */
@@ -57,6 +58,8 @@ export interface ProfielKanaal {
   ingezet: boolean;
   /** Contacten per jaar, alleen bij een ingezet kanaal ("850k"). */
   aantal: string | null;
+  /** Het kanaal is te kiezen voor de KPI-ringen: Het is ingezet bij de gekozen plek (`profielKanalen` met `plek`). */
+  klikbaar?: boolean;
 }
 
 export interface ProfielTegel {
@@ -114,13 +117,21 @@ export function profielCijfers(organisatie: Pick<Organisatie, "kenmerken" | "kpi
 }
 
 /** De Kanalen in de volgorde van `Kanaal.volgorde`: Ingezet als Contacten per jaar bij dat kanaal boven 0 ligt (`datamodel.md`, KPI's en kanalen). */
-export function profielKanalen(organisatie: Pick<Organisatie, "kpiWaarden">, kanalen: Kanaal[]): ProfielKanaal[] {
+export function profielKanalen(organisatie: Pick<Organisatie, "kpiWaarden">, kanalen: Kanaal[], klikPlek?: { onderdeelId: string | null }): ProfielKanaal[] {
   return [...kanalen]
     .sort((a, b) => a.volgorde - b.volgorde)
     .map((kanaal) => {
       const waarde = kpiWaardeVan(organisatie, KPI_CONTACTEN, { onderdeelId: null, kanaalId: kanaal.id });
       const ingezet = waarde !== null && waarde > 0;
-      return { id: kanaal.id, naam: kanaal.naam, ingezet, aantal: ingezet ? compactGetal(waarde, true) : null };
+      // Of het kanaal te kiezen is: Ingezet bij de gekozen plek (een Onderdeel, of de hele Organisatie).
+      const bijPlek = klikPlek ? kpiWaardeVan(organisatie, KPI_CONTACTEN, { onderdeelId: klikPlek.onderdeelId, kanaalId: kanaal.id }) : null;
+      return {
+        id: kanaal.id,
+        naam: kanaal.naam,
+        ingezet,
+        aantal: ingezet ? compactGetal(waarde, true) : null,
+        ...(klikPlek ? { klikbaar: bijPlek !== null && bijPlek > 0 } : {}),
+      };
     });
 }
 

@@ -23,7 +23,7 @@ import {
   teaserVoorScan,
 } from "@/lib/mijn-metingen";
 import { dagVan } from "@/lib/metingen";
-import { MapIcoon } from "@/components/icons/DossierIcons";
+import { BenchmarkIcoon, MapIcoon } from "@/components/icons/DossierIcons";
 import { LeadDossier, aantalTekst, isNieuwVoorLead, voorproef } from "@/lib/dossier";
 import { overDezeScan } from "@/lib/landing";
 import { Assessment, Organisatie, OrganisatieLid, ScanInvulling, ScanInvullingStatus, ScanUitvoering } from "@/lib/types";
@@ -549,11 +549,7 @@ export function BenchmarkKaart({
     <article className="mm-kaart mm-kaart--vol mm-kaart--benchmark">
       <div className="mm-benchmark">
         <span className="mm-icoon mm-icoon--blauw" aria-hidden="true">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-            <rect x="4" y="12" width="4" height="8" rx="1" fill="currentColor" />
-            <rect x="10" y="6" width="4" height="14" rx="1" fill="currentColor" />
-            <rect x="16" y="9" width="4" height="11" rx="1" fill="currentColor" />
-          </svg>
+          <BenchmarkIcoon width={26} height={26} />
         </span>
         <div className="mm-kop-tekst">
           <span className="mm-label-klein mm-label-klein--blauw">Benchmark</span>

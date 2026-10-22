@@ -63,9 +63,13 @@ export function lijnKleur(hex: string): string {
   return LICHTE_CATEGORIEKLEUREN.has(hex.toLowerCase()) ? "var(--ink)" : hex;
 }
 
-/** Tekstkleur op een vulling in de categoriekleur: Wit, behalve op Fundament (`--ink`). */
+/**
+ * Tekstkleur op een vulling in de categoriekleur of domeinkleur: Wit, ook op turkoois (domein 6) en lavendel (domein 8), behalve op het merkgeel van
+ * Fundament en het gele domein 5 (`--ink`, `stylesheet.md`, Domeinkleuren). Alleen een dunne lijn of tekst in de kleur zelf (`lijnKleur`) blijft bij de
+ * lichte kleuren `--ink`.
+ */
 export function tekstOpKleur(hex: string): string {
-  return LICHTE_CATEGORIEKLEUREN.has(hex.toLowerCase()) ? "var(--ink)" : "#fff";
+  return hex.toLowerCase() === "#ffc043" ? "var(--ink)" : "#fff";
 }
 
 /** Stijlvariabelen voor een categorie: `--accent` (vulling), `--accent-t` (tekst of lijn in de kleur) en `--accent-op` (tekst op de vulling). */

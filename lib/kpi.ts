@@ -19,13 +19,26 @@ export const KPI_CONTACTEN = "contacten";
 
 /** De startset KPI's, aanpasbaar door een Admin. De id's `aht`, `nps`, `csat`, `sla` en `ftr` zijn de oude veld-id's (`kpis.aht`). */
 export const STANDAARD_KPIS: KpiDefinitie[] = [
-  { id: KPI_CONTACTEN, naam: "Contacten per jaar", eenheid: "aantal", perOnderdeel: true, perKanaal: true, volgorde: 1 },
-  { id: "aht", naam: "AHT", eenheid: "s", perOnderdeel: true, perKanaal: true, volgorde: 2 },
-  { id: "nps", naam: "NPS", eenheid: null, perOnderdeel: true, perKanaal: true, volgorde: 3 },
-  { id: "csat", naam: "CSAT", eenheid: null, perOnderdeel: true, perKanaal: true, volgorde: 4 },
-  { id: "sla", naam: "SLA", eenheid: "%", perOnderdeel: true, perKanaal: true, volgorde: 5 },
-  { id: "ftr", naam: "FTR", eenheid: "%", perOnderdeel: true, perKanaal: true, volgorde: 6 },
+  { id: KPI_CONTACTEN, naam: "Contacten per jaar", eenheid: "aantal", perOnderdeel: true, perKanaal: true, volgorde: 1, schaalMin: null, schaalMax: null },
+  { id: "aht", naam: "AHT", eenheid: "s", perOnderdeel: true, perKanaal: true, volgorde: 2, schaalMin: 0, schaalMax: 600 },
+  { id: "nps", naam: "NPS", eenheid: null, perOnderdeel: true, perKanaal: true, volgorde: 3, schaalMin: -100, schaalMax: 100 },
+  { id: "csat", naam: "CSAT", eenheid: null, perOnderdeel: true, perKanaal: true, volgorde: 4, schaalMin: 1, schaalMax: 10 },
+  { id: "sla", naam: "SLA", eenheid: "%", perOnderdeel: true, perKanaal: true, volgorde: 5, schaalMin: 0, schaalMax: 100 },
+  { id: "ftr", naam: "FTR", eenheid: "%", perOnderdeel: true, perKanaal: true, volgorde: 6, schaalMin: 0, schaalMax: 100 },
+  { id: "ces", naam: "CES", eenheid: null, perOnderdeel: true, perKanaal: true, volgorde: 7, schaalMin: 1, schaalMax: 7 },
 ];
+
+/**
+ * Opgeslagen definities van vóór de schaal: Een KPI uit de startset zonder `schaalMin` en `schaalMax` krijgt de startwaarden, elke andere KPI
+ * geen ring (`datamodel.md`, KPI's en kanalen, Schaal). Een Admin die een schaal leeg liet (`null`) houdt dat zo.
+ */
+export function vulSchaalAan(definities: KpiDefinitie[]): KpiDefinitie[] {
+  return definities.map((k) => {
+    if (k.schaalMin !== undefined && k.schaalMax !== undefined) return k;
+    const start = STANDAARD_KPIS.find((s) => s.id === k.id);
+    return { ...k, schaalMin: k.schaalMin ?? start?.schaalMin ?? null, schaalMax: k.schaalMax ?? start?.schaalMax ?? null };
+  });
+}
 
 /** De plek van een waarde: Een Onderdeel (of `null` voor Algemeen) en een kanaal (of `null` voor Algemeen). */
 export interface KpiPlek {

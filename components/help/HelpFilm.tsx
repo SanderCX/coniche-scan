@@ -66,7 +66,29 @@ function Ring({ getal, vul, kleur, klasse, extra }: { getal: string; vul: number
   );
 }
 
+/** De schaallabels van de AI-scan, zoals in de vragenlijst (`data/ai-scan-assessment.ts`). */
+const AI_SCHAAL = ["Niet aanwezig", "Deels / incidenteel", "Aanwezig en meestal toegepast", "Structureel geborgd en gemeten", "Geoptimaliseerd en continu verbeterd"];
+
 function Vraag({ variant }: { variant: FilmVariant }) {
+  if (variant === "domeinen") {
+    // De antwoordopties van de AI-scan staan onder elkaar, zoals in de echte vragenlijst, en nooit naast elkaar (`help.md`, Films, Varianten van Wat krijg ik).
+    return (
+      <div className="film-vraag">
+        <p className="film-vraag-tekst">Er is een actueel overzicht van alle kanalen waarop klanten ons bereiken.</p>
+        <div className="film-schaal film-schaal--onder">
+          {AI_SCHAAL.map((label, i) => (
+            <span key={label} className={`film-keuze film-keuze--rij film-keuze--${i + 1}`}>
+              <span className="film-radio" aria-hidden="true" />
+              <span>
+                <strong>{i + 1}.</strong> {label}
+              </span>
+            </span>
+          ))}
+        </div>
+        <p className="film-vraag-hint">1 is niet aanwezig, 5 is geoptimaliseerd en continu verbeterd</p>
+      </div>
+    );
+  }
   if (variant === "quickscan") {
     return (
       <div className="film-vraag">

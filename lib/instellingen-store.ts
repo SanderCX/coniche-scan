@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { Kanaal, KpiDefinitie, ScanInvulling } from "./types";
-import { STANDAARD_KANALEN, STANDAARD_KPIS } from "./kpi";
+import { STANDAARD_KANALEN, STANDAARD_KPIS, vulSchaalAan } from "./kpi";
 import type { KorteNamen } from "./korte-namen";
 import { SPREIDING_STANDAARDWAARDEN, SpreidingGrenzen } from "./spreiding-grenzen";
 import { haalServerKopieOp, stuurNaarServer } from "./server-sync";
@@ -62,6 +62,10 @@ export interface Instellingen {
   korteNamen: KorteNamen;
   /** De KPI's en op welke plekken ze een waarde mogen hebben (`datamodel.md`, KPI's en kanalen). Beheerd door een Admin. */
   kpiDefinities: KpiDefinitie[];
+  /** Toont de testknop in de vragenlijst voor een ingelogde Admin of Consultant (`beheerpagina.md`, Schakelaar Testknop). Standaard uit. */
+  testknopAan: boolean;
+  /** De KPI CES is aan de opgeslagen lijst toegevoegd (eenmalig): Een Admin die hem verwijdert, krijgt hem niet opnieuw. */
+  kpiCesToegevoegd?: boolean;
   /** De kanalen, één lijst voor het hele platform. Beheerd door een Admin. */
   kanalen: Kanaal[];
 }
@@ -79,6 +83,7 @@ const STANDAARDWAARDEN: Instellingen = {
   verkennenMaxGroepen: 12,
   verkennenMinIngevuldPct: 40,
   ...SPREIDING_STANDAARDWAARDEN,
+  testknopAan: false,
   korteNamen: { velden: {}, waarden: [] },
   kpiDefinities: STANDAARD_KPIS,
   kanalen: STANDAARD_KANALEN,
@@ -119,6 +124,20 @@ if (typeof window !== "undefined") {
   haalServerKopieOp(SERVER_SLEUTEL, KEY, emitChange);
 }
 
+/**
+ * De KPI-definities uit de opslag: Ontbreekt de lijst, dan geldt de startset. Een opgeslagen lijst krijgt de schaal van de startset waar die
+ * ontbreekt en, eenmalig, de KPI CES (`datamodel.md`, KPI's en kanalen, startset).
+ */
+function kpiDefinitiesUitOpslag(rest: Partial<Instellingen>): { kpiDefinities: KpiDefinitie[]; kpiCesToegevoegd: boolean } {
+  if (!Array.isArray(rest.kpiDefinities) || rest.kpiDefinities.length === 0) return { kpiDefinities: STANDAARD_KPIS, kpiCesToegevoegd: true };
+  let lijst = vulSchaalAan(rest.kpiDefinities);
+  if (!rest.kpiCesToegevoegd && !lijst.some((k) => k.id === "ces")) {
+    const ces = STANDAARD_KPIS.find((k) => k.id === "ces")!;
+    lijst = [...lijst, { ...ces, volgorde: Math.max(0, ...lijst.map((k) => k.volgorde)) + 1 }];
+  }
+  return { kpiDefinities: lijst, kpiCesToegevoegd: true };
+}
+
 function parseSnapshot(snapshot: string): Instellingen {
   if (snapshot === SERVER_SENTINEL) return { ...STANDAARDWAARDEN };
   try {
@@ -130,7 +149,7 @@ function parseSnapshot(snapshot: string): Instellingen {
       ...(oud !== undefined && rest.verkennenMinVergelijking === undefined ? { verkennenMinVergelijking: oud } : {}),
       ...rest,
       // Ontbreekt bij instellingen van vóór de KPI's en kanalen: De startset geldt.
-      kpiDefinities: Array.isArray(rest.kpiDefinities) && rest.kpiDefinities.length > 0 ? rest.kpiDefinities : STANDAARD_KPIS,
+      ...kpiDefinitiesUitOpslag(rest),
       kanalen: Array.isArray(rest.kanalen) && rest.kanalen.length > 0 ? rest.kanalen : STANDAARD_KANALEN,
     };
   } catch {

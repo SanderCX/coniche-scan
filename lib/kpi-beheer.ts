@@ -35,6 +35,8 @@ export function maakKpi(naam: string): BeheerResultaat<{ kpi: KpiDefinitie }> {
     perOnderdeel: false,
     perKanaal: false,
     volgorde: Math.max(0, ...kpiDefinities.map((k) => k.volgorde)) + 1,
+    schaalMin: null,
+    schaalMax: null,
   };
   schrijfInstellingen({ kpiDefinities: [...kpiDefinities, kpi] });
   logAudit({ actie: "kpiDefinitie.aangemaakt", entiteitType: "kpiDefinitie", entiteitId: kpi.id, entiteitNaam: kpi.naam, details: { kpiNaam: kpi.naam } });
@@ -46,6 +48,16 @@ export interface KpiWijzigingen {
   eenheid: string | null;
   perOnderdeel: boolean;
   perKanaal: boolean;
+  /** Optioneel: Zonder dit blijft de schaal zoals ze is. `null` is leeg: Geen ring. */
+  schaalMin?: number | null;
+  schaalMax?: number | null;
+}
+
+/** Controleert een schaal: Beide leeg (geen ring) of beide ingevuld met `schaalMin` kleiner dan `schaalMax`. */
+export function controleerSchaal(min: number | null, max: number | null): string | null {
+  if ((min === null) !== (max === null)) return "Vul bij Schaal van en Schaal tot allebei een getal in, of laat ze allebei leeg.";
+  if (min !== null && max !== null && !(min < max)) return "Schaal van moet kleiner zijn dan Schaal tot.";
+  return null;
 }
 
 /** Hoeveel waarden een vlag vasthoudt: Een Admin kan hem niet uitzetten zolang er waarden op dat niveau staan. */
@@ -67,6 +79,10 @@ export function wijzigKpis(wijzigingen: Record<string, KpiWijzigingen>): BeheerR
     const sleutel = naam.toLowerCase();
     if (namen.has(sleutel)) return { ok: false, reden: `Er zijn twee KPI's met de naam "${naam}".` };
     namen.set(sleutel, k.id);
+    if (w) {
+      const fout = controleerSchaal(w.schaalMin !== undefined ? w.schaalMin : k.schaalMin, w.schaalMax !== undefined ? w.schaalMax : k.schaalMax);
+      if (fout) return { ok: false, reden: `${naam}: ${fout}` };
+    }
     if (w && k.perOnderdeel && !w.perOnderdeel && vlagBlokkade(k.id, "onderdeel") > 0) {
       return { ok: false, reden: `${k.naam} heeft waarden per onderdeel: De vlag Per onderdeel kan niet uit.` };
     }
@@ -84,6 +100,10 @@ export function wijzigKpis(wijzigingen: Record<string, KpiWijzigingen>): BeheerR
     if (eenheid !== k.eenheid) velden.eenheid = { oud: k.eenheid, nieuw: eenheid };
     if (w.perOnderdeel !== k.perOnderdeel) velden.perOnderdeel = { oud: k.perOnderdeel, nieuw: w.perOnderdeel };
     if (w.perKanaal !== k.perKanaal) velden.perKanaal = { oud: k.perKanaal, nieuw: w.perKanaal };
+    const schaalMin = w.schaalMin !== undefined ? w.schaalMin : k.schaalMin;
+    const schaalMax = w.schaalMax !== undefined ? w.schaalMax : k.schaalMax;
+    if (schaalMin !== k.schaalMin) velden.schaalMin = { oud: k.schaalMin, nieuw: schaalMin };
+    if (schaalMax !== k.schaalMax) velden.schaalMax = { oud: k.schaalMax, nieuw: schaalMax };
     if (Object.keys(velden).length === 0) return k;
     gewijzigd += 1;
     logAudit({
@@ -93,7 +113,7 @@ export function wijzigKpis(wijzigingen: Record<string, KpiWijzigingen>): BeheerR
       entiteitNaam: w.naam.trim(),
       details: { kpiNaam: k.naam, wijzigingen: velden },
     });
-    return { ...k, naam: w.naam.trim(), eenheid, perOnderdeel: w.perOnderdeel, perKanaal: w.perKanaal };
+    return { ...k, naam: w.naam.trim(), eenheid, perOnderdeel: w.perOnderdeel, perKanaal: w.perKanaal, schaalMin, schaalMax };
   });
   if (gewijzigd > 0) schrijfInstellingen({ kpiDefinities: nieuw });
   return { ok: true, gewijzigd };

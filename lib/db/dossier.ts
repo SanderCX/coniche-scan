@@ -193,7 +193,7 @@ export function zetToonProfiel(organisatieId: string, patch: Partial<ToonProfiel
   const { alles, organisatie } = context(organisatieId);
   if (!organisatie) return { ok: false, reden: "Organisatie niet gevonden." };
   const dossier = dossierVanOrg(organisatie);
-  const huidig = dossier.toonProfiel ?? { cijfers: false, kanalen: false, techstack: false, overig: false };
+  const huidig = dossier.toonProfiel ?? { cijfers: false, kanalen: false, techstack: false, overig: false, kpis: false };
   const gewijzigd = PROFIEL_BLOKKEN.filter((b) => patch[b] !== undefined && patch[b] !== huidig[b]);
   if (gewijzigd.length === 0) return { ok: true };
   const nu = new Date().toISOString();

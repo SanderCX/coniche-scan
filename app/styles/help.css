@@ -155,6 +155,15 @@
   border: 2px solid var(--border-d); background: #fff; color: var(--ink-m);
   font-size: var(--fs-18); font-weight: 700;
 }
+/* De AI-scan: De antwoordopties staan onder elkaar, zoals in de vragenlijst: Een radioknop en "n. label" per rij. */
+.film-schaal--onder { flex-direction: column; gap: 2px; }
+.film-keuze--rij {
+  width: auto; height: 30px; padding: 0 var(--sp-3); gap: var(--sp-3);
+  justify-content: flex-start; border-radius: var(--r); border: 1px solid transparent; background: transparent;
+  font-size: var(--fs-14); font-weight: 400; color: var(--ink-m);
+}
+.film-keuze--rij strong { color: inherit; }
+.film-radio { flex-shrink: 0; box-sizing: border-box; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--or); background: transparent; }
 .film-vraag-hint { margin: 0; font-size: var(--fs-12); color: var(--ink-s); }
 .film-resultaat { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: var(--sp-6); align-items: center; }
 .film-totaal { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
@@ -311,6 +320,9 @@
 @keyframes film-groep { 0%, 66% { opacity: 0; } 72%, 96% { opacity: 1; } 100% { opacity: 0; } }
 .help-film--wat-krijg-ik .film-vraag { animation: film-vraag var(--film-duur) linear infinite; }
 .help-film--wat-krijg-ik .film-keuze--4 { animation: film-keuze-4 var(--film-duur) linear infinite; }
+/* Een antwoordoptie onder elkaar (AI-scan): In rust zonder vlak en zonder rand, gekozen als oranje rij. */
+@keyframes film-keuze-rij-4 { 0%, 14% { background: transparent; border-color: transparent; color: var(--ink-m); } 17%, 30% { background: var(--or); border-color: var(--or); color: #fff; } 100% { background: transparent; border-color: transparent; color: var(--ink-m); } }
+.help-film--wat-krijg-ik .film-keuze--rij.film-keuze--4 { animation-name: film-keuze-rij-4; }
 .help-film--wat-krijg-ik .film-resultaat { animation: film-resultaat var(--film-duur) linear infinite; }
 .help-film--wat-krijg-ik .film-cirkel { animation: film-cirkel var(--film-duur) ease-out infinite; }
 .help-film--wat-krijg-ik .film-groeplijn, .help-film--wat-krijg-ik .film-stip, .help-film--wat-krijg-ik .film-legenda { animation: film-groep var(--film-duur) linear infinite; }

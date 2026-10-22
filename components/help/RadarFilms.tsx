@@ -35,7 +35,7 @@ interface RadarSoort {
   aantal: number;
   scores: number[];
   kleur: (nr: number) => string;
-  /** Tekstkleur op de kleur van het knooppunt: Wit, behalve op de lichte kleuren (Fundament en de domeinen 5, 6 en 8). */
+  /** Tekstkleur op de kleur van het knooppunt: Wit, behalve op het gele Fundament en het gele domein 5. */
   tekst: (nr: number) => string;
 }
 const VOLWASSENHEID: RadarSoort = { aantal: 15, scores: SCORES, kleur: (n) => KLEUREN[categorieVan(n)], tekst: (n) => (n === 15 ? "var(--ink)" : "#fff") };

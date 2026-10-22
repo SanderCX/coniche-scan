@@ -56,11 +56,16 @@ export function BlogIcoon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-/** Een staafdiagram met drie staven voor een Benchmark. */
+/**
+ * Een staafdiagram met drie gevulde staven voor een Benchmark (`dossier.md`, Soortkleur en icoon): Hetzelfde icoon als bij "Benchmarks" op de pagina van de
+ * Lead en op de benchmarkkaart, in de kleur van de tekst. Een eigen of dunner getekend icoon is een fout.
+ */
 export function BenchmarkIcoon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg {...basis} aria-hidden="true" {...props}>
-      <path d="M6 20v-7M12 20V5M18 20v-10M3.5 20h17" />
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <rect x="4" y="12" width="4" height="8" rx="1" fill="currentColor" />
+      <rect x="10" y="6" width="4" height="14" rx="1" fill="currentColor" />
+      <rect x="16" y="9" width="4" height="11" rx="1" fill="currentColor" />
     </svg>
   );
 }

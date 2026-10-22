@@ -821,13 +821,17 @@ select.veld-compact:focus {
 }
 
 /* De hoofdkolom is 896px breed (800px voor de kop van een bouwsteen plus 3rem padding aan elke kant): De kop is maximaal 800px breed, de rest
-   (instructievlak, vragen, opmerkingenveld en knoppen) maximaal 664px (`stylesheet.md`, Doorloopflow). Bij de Spanningsmeter geldt de eigen breedte. */
+   (vragen, opmerkingenveld en knoppen) maximaal 664px en het instructievlak maximaal 800px (`stylesheet.md`, Doorloopflow). Bij de Spanningsmeter geldt de eigen breedte. */
 .flow-main {
   padding: 2.5rem 3rem 4rem;
   max-width: 896px;
 }
-.flow-main:not(.flow-main--spanning) > div > :not(.bouwblok-kop) {
+.flow-main:not(.flow-main--spanning) > div > :not(.bouwblok-kop):not(.instructievlak) {
   max-width: 664px;
+}
+/* Het instructievlak is even breed als de kop (maximaal 800px vanaf de linkerrand van de accentbalk), zodat de lichtgrijze opmerking even breed is als de tekst erboven. */
+.flow-main:not(.flow-main--spanning) > div > .instructievlak {
+  max-width: 800px;
 }
 
 .bouwblok-kop {

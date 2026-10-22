@@ -36,6 +36,7 @@ import {
   zetNieuwsartikelenOm,
 } from "./dossier";
 import { automatischeRadarMeting, dossierRadarMeting, radarBronVan, verlorenRadarBronnen } from "./dossier-radar";
+import { STANDAARD_KPIS } from "./kpi";
 import type { Benchmark, Dossieritem, LeadToegang, Organisatie, OrganisatieLid, ScanUitvoering } from "./types";
 
 const opslag = new Map<string, string>();
@@ -224,7 +225,7 @@ describe("wat de Lead ziet", () => {
   const opgezet = () => {
     const o = org("O", {
       dossier: {
-        zichtbaar: true, zichtbaarSinds: "2026-10-16T08:00:00Z", naamVoorLead: "", radarBronnen: [], toonProfiel: { cijfers: false, kanalen: false, techstack: false, overig: false }, gewijzigdOp: "2026-10-17T08:00:00Z",
+        zichtbaar: true, zichtbaarSinds: "2026-10-16T08:00:00Z", naamVoorLead: "", radarBronnen: [], toonProfiel: { cijfers: false, kanalen: false, techstack: false, overig: false, kpis: false }, gewijzigdOp: "2026-10-17T08:00:00Z",
         items: [
           { ...vul("c1", "case"), zichtbaarVoorLead: true, caseOrganisatieId: "C", bouwblokIds: ["b1", "b2"], omvang: "800 medewerkers" },
           { ...vul("c2", "case"), zichtbaarVoorLead: true, caseOrganisatieId: "Z" },
@@ -281,9 +282,10 @@ describe("wat de Lead ziet", () => {
   });
   it("markeert het Dossier als gezien, een keer", () => {
     const lid = { id: "L", organisatieId: "O", email: "a@b.nl", naam: null, functie: "", team: "", notities: "", toegangscode: "abc", aangemaaktOp: "x" };
-    const [o] = opgezet();
+    // Alle Organisaties moeten bestaan: Een Case naar een Organisatie die er niet is, wordt bij het opslaan opgeruimd en zet dan een nieuwe `gewijzigdOp`.
+    const [o, ...rest] = opgezet();
     o.leden = [lid];
-    zet(o);
+    zet(o, ...rest);
     db.markeerDossierGezien("O", "L");
     const eerste = laad("O").leden[0].dossierGezienOp;
     expect(eerste).toBeTruthy();
@@ -347,7 +349,7 @@ describe("een event verlopen", () => {
   it("heeft de status Verlopen, ook als het op Zichtbaar voor Lead stond, en telt dan nog mee voor de Lead", () => {
     const o = org("O", {
       dossier: {
-        zichtbaar: true, zichtbaarSinds: null, naamVoorLead: "", radarBronnen: [], toonProfiel: { cijfers: false, kanalen: false, techstack: false, overig: false }, gewijzigdOp: null,
+        zichtbaar: true, zichtbaarSinds: null, naamVoorLead: "", radarBronnen: [], toonProfiel: { cijfers: false, kanalen: false, techstack: false, overig: false, kpis: false }, gewijzigdOp: null,
         items: [
           basisItem({ id: "oud", datum: "2026-09-01", zichtbaarVoorLead: true }),
           basisItem({ id: "komt", datum: "2026-12-01", zichtbaarVoorLead: true }),
@@ -380,7 +382,7 @@ describe("wat de Lead ziet bij events en blogs", () => {
   const dossier = () =>
     org("O", {
       dossier: {
-        zichtbaar: true, zichtbaarSinds: "2026-10-16T08:00:00Z", naamVoorLead: "", radarBronnen: [], toonProfiel: { cijfers: false, kanalen: false, techstack: false, overig: false }, gewijzigdOp: null,
+        zichtbaar: true, zichtbaarSinds: "2026-10-16T08:00:00Z", naamVoorLead: "", radarBronnen: [], toonProfiel: { cijfers: false, kanalen: false, techstack: false, overig: false, kpis: false }, gewijzigdOp: null,
         items: [
           basisItem({ id: "e1", soort: "event", datum: "2026-11-12", plaats: "Utrecht", zichtbaarVoorLead: true, bouwblokIds: ["ai1"] }),
           basisItem({ id: "e2", soort: "event", datum: "2026-05-01", zichtbaarVoorLead: true }),
@@ -730,7 +732,7 @@ describe("een Benchmark in het Dossier", () => {
     const o = org("O", {
       leden: [lid("L1", true), lid("L2", true)],
       leadToegang: [bToegang("L1", "b1")],
-      dossier: { zichtbaar: true, zichtbaarSinds: "x", naamVoorLead: "", radarBronnen: [], toonProfiel: { cijfers: false, kanalen: false, techstack: false, overig: false }, gewijzigdOp: "x", items: [bItem({ bouwblokIds: ["b2"] })] },
+      dossier: { zichtbaar: true, zichtbaarSinds: "x", naamVoorLead: "", radarBronnen: [], toonProfiel: { cijfers: false, kanalen: false, techstack: false, overig: false, kpis: false }, gewijzigdOp: "x", items: [bItem({ bouwblokIds: ["b2"] })] },
     });
     const b = bench("b1", "Zorg tegen elkaar");
     const context = (leadId: string) => ({ leadId, benchmarks: [b], assessments: [{ id: "klantcontact-volwassenheid", naam: "Klantcontact Volwassenheid" }], minOrganisaties: 2 });
@@ -751,7 +753,7 @@ describe("een Benchmark in het Dossier", () => {
   });
 
   it("zet de Organisatie van een verwijderde benchmark terug op Kies een benchmark", () => {
-    const o = org("O", { dossier: { zichtbaar: true, zichtbaarSinds: "x", naamVoorLead: "", radarBronnen: [], toonProfiel: { cijfers: false, kanalen: false, techstack: false, overig: false }, gewijzigdOp: "x", items: [bItem(), bItem({ id: "bj", benchmarkId: "b2" })] } });
+    const o = org("O", { dossier: { zichtbaar: true, zichtbaarSinds: "x", naamVoorLead: "", radarBronnen: [], toonProfiel: { cijfers: false, kanalen: false, techstack: false, overig: false, kpis: false }, gewijzigdOp: "x", items: [bItem(), bItem({ id: "bj", benchmarkId: "b2" })] } });
     expect(ruimDossierOp([o], [{ id: "b2" }])).toBe(1);
     expect(o.dossier!.items[0]).toMatchObject({ benchmarkId: null, zichtbaarVoorLead: false });
     expect(o.dossier!.items[1]).toMatchObject({ benchmarkId: "b2", zichtbaarVoorLead: true });
@@ -783,14 +785,14 @@ describe("het profiel van de Organisatie voor de Lead", () => {
     techstack: { "techstack-contact-center": { leverancier: "Genesys" } },
   };
   const kanalen = [{ id: "kanaal-call", naam: "Call", volgorde: 1 }];
-  const metItem = (toon: Partial<{ cijfers: boolean; kanalen: boolean; techstack: boolean; overig: boolean }>) =>
+  const metItem = (toon: Partial<{ cijfers: boolean; kanalen: boolean; techstack: boolean; overig: boolean; kpis: boolean }>) =>
     org("O", {
       kenmerken,
       kpiWaarden: [{ organisatieId: "O", kpiId: "contacten", onderdeelId: null, kanaalId: "kanaal-call", waarde: 850000 }],
       leden: [lid("L1", true)],
       dossier: {
         zichtbaar: true, zichtbaarSinds: "x", naamVoorLead: "", radarBronnen: [], gewijzigdOp: "x",
-        toonProfiel: { cijfers: false, kanalen: false, techstack: false, overig: false, ...toon },
+        toonProfiel: { cijfers: false, kanalen: false, techstack: false, overig: false, kpis: false, ...toon },
         items: [{ ...basisItem({ id: "n", soort: "nieuws", zichtbaarVoorLead: true, url: "https://x.nl", titel: "N" }) }],
       },
     });
@@ -823,6 +825,31 @@ describe("het profiel van de Organisatie voor de Lead", () => {
     expect(leadDossier(leeg, [leeg], undefined, NU, context)!.profiel).toBeNull();
   });
 
+  it("toont de KPI's van de hele Organisatie als ringen, zonder Onderdelen en zonder lege KPI's, en kanaalwaarden alleen met het blok Kanalen", () => {
+    const o = metItem({ kpis: true });
+    o.kpiWaarden = [
+      { organisatieId: "O", kpiId: "nps", onderdeelId: null, kanaalId: null, waarde: 34 },
+      { organisatieId: "O", kpiId: "nps", onderdeelId: null, kanaalId: "kanaal-call", waarde: 41 },
+      { organisatieId: "O", kpiId: "aht", onderdeelId: "od1", kanaalId: null, waarde: 280 },
+    ];
+    const kpiContext = { ...context, kpiDefinities: STANDAARD_KPIS };
+    const p = leadDossier(o, [o], undefined, NU, kpiContext)!.profiel!;
+    expect(p.blokken).toEqual(["kpis"]);
+    // Alleen NPS heeft een waarde bij de hele Organisatie; AHT staat alleen bij een Onderdeel en valt weg. Zonder het blok Kanalen geen kanaalwaarden.
+    expect(p.kpis.map((k) => k.id)).toEqual(["nps"]);
+    expect(p.kpis[0]).toMatchObject({ algemeen: 34, kanalen: {} });
+    expect(JSON.stringify(p)).not.toMatch(/280|od1/);
+    // Met het blok Kanalen erbij zijn de ingezette kanalen te kiezen en staan de kanaalwaarden erin.
+    const metKanalen = metItem({ kpis: true, kanalen: true });
+    metKanalen.kpiWaarden = [...o.kpiWaarden, { organisatieId: "O", kpiId: "contacten", onderdeelId: null, kanaalId: "kanaal-call", waarde: 850000 }];
+    const q = leadDossier(metKanalen, [metKanalen], undefined, NU, kpiContext)!.profiel!;
+    expect(q.kpis[0].kanalen).toEqual({ "kanaal-call": 41 });
+    expect(q.kanalen[0]).toMatchObject({ naam: "Call", klikbaar: true });
+    // Alle KPI's leeg: Het blok en de kaart vallen weg.
+    const leeg = metItem({ kpis: true });
+    expect(leadDossier(leeg, [leeg], undefined, NU, kpiContext)!.profiel).toBeNull();
+  });
+
   it("is er alleen als het Dossier zichtbaar is", () => {
     const o = metItem({ cijfers: true });
     o.dossier!.zichtbaar = false;
@@ -831,16 +858,16 @@ describe("het profiel van de Organisatie voor de Lead", () => {
 
   it("de overgang geeft data van vóór het profiel alles uit", () => {
     const d = zetNieuwsartikelenOm({ dossier: { zichtbaar: true, items: [] } });
-    expect(d.toonProfiel).toEqual({ cijfers: false, kanalen: false, techstack: false, overig: false });
+    expect(d.toonProfiel).toEqual({ cijfers: false, kanalen: false, techstack: false, overig: false, kpis: false });
     const met = zetNieuwsartikelenOm({ dossier: { zichtbaar: true, items: [], toonProfiel: { cijfers: true } } });
-    expect(met.toonProfiel).toEqual({ cijfers: true, kanalen: false, techstack: false, overig: false });
+    expect(met.toonProfiel).toEqual({ cijfers: true, kanalen: false, techstack: false, overig: false, kpis: false });
   });
 
   it("een schakelaar zetten telt als wijziging voor de Lead en wordt per blok gelogd", () => {
     zet(org("O", { dossier: { ...leegDossierVoorTest(), zichtbaar: true } }));
     expect(db.zetToonProfiel("O", { cijfers: true, techstack: true }).ok).toBe(true);
     const o = laad("O");
-    expect(o.dossier!.toonProfiel).toEqual({ cijfers: true, kanalen: false, techstack: true, overig: false });
+    expect(o.dossier!.toonProfiel).toEqual({ cijfers: true, kanalen: false, techstack: true, overig: false, kpis: false });
     expect(o.dossier!.gewijzigdOp).toBeTruthy();
     const events = audit().filter((e) => e.actie === "dossier.profielGewijzigd");
     expect(events.map((e) => e.details?.blok).sort()).toEqual(["cijfers", "techstack"]);
