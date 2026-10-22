@@ -32,7 +32,7 @@ export function WegingBeheer({ assessment }: { assessment: Assessment }) {
 
   return (
     <section className="rounded-2xl border border-gray-200 bg-white p-6">
-      <h2 className="mb-4 text-lg font-semibold text-ink">Weging per bouwblok</h2>
+      <h2 className="mb-4 text-lg font-semibold text-ink">Weging per bouwsteen</h2>
       <div className="space-y-2">
         {rijen.map(({ bouwblok, tekst, ongeldig }) => (
           <div key={bouwblok.id} className="flex items-center gap-3 text-sm">
@@ -42,7 +42,7 @@ export function WegingBeheer({ assessment }: { assessment: Assessment }) {
             <input
               inputMode="decimal"
               value={tekst}
-              aria-label={`Weging bouwblok ${bouwblok.volgnummer} ${bouwblok.naam}`}
+              aria-label={`Weging bouwsteen ${bouwblok.volgnummer} ${bouwblok.naam}`}
               aria-invalid={ongeldig}
               onChange={(e) => setConcept({ ...concept, [bouwblok.id]: e.target.value })}
               className="w-20 rounded-lg border p-2 text-sm"

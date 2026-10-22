@@ -20,7 +20,7 @@ Elke Meting waaraan je meedoet is een kaart met de naam van de scan, een status 
 4. **De knop.** "Start de scan", "Ga verder" of "Bekijk jouw resultaten", afhankelijk van de status.
 
 ## Let op
-Bij de Spanningsmeter toont de ring het gemiddelde niveau van de zes velden, met het woord Niveau eronder, en staat er per veld een rij met Jij en, voor een Lead, Groep. Onder de rijen staat de grootste spanning.
+Bij de Spanningsmeter toont de ring het gemiddelde niveau van de zes velden, met de woorden Gemiddeld niveau eronder, en staat er per veld een rij met Jij en, voor een Lead, Groep. Onder de rijen staat de grootste spanning.
 
 Een Lead die zelf ook invult, ziet bij dezelfde Meting één kaart met twee delen: Jouw scan en Hele meting. Het deel Hele meting is er pas als er genoeg scans zijn afgerond. Zie Resultaten van je Organisatie voor de grens.
 

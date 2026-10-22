@@ -183,11 +183,11 @@ export function BouwblokEditor({
     </details>
     <BevestigModal
       open={archiveren !== null}
-      titel={archiveren?.soort === "vraag" ? "Vraag archiveren" : "Bouwblok archiveren"}
+      titel={archiveren?.soort === "vraag" ? "Vraag archiveren" : "Bouwsteen archiveren"}
       bericht={
         archiveren?.soort === "vraag"
           ? 'Vraag archiveren? Ze verdwijnt uit de doorloopflow voor nieuwe invullingen, maar bestaande antwoorden blijven behouden in de score. Je kunt dit terugzetten via "Gearchiveerd" hieronder.'
-          : `Bouwblok "${bouwblok.naam}" archiveren? Het verdwijnt uit de doorloopflow voor nieuwe invullingen, maar bestaande scores op zijn vragen blijven behouden. Je kunt dit terugzetten via "Gearchiveerd" hieronder.`
+          : `Bouwsteen "${bouwblok.naam}" archiveren? Het verdwijnt uit de doorloopflow voor nieuwe invullingen, maar bestaande scores op zijn vragen blijven behouden. Je kunt dit terugzetten via "Gearchiveerd" hieronder.`
       }
       bevestigLabel="Archiveren"
       onBevestigen={() => {

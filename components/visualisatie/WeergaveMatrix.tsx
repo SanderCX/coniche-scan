@@ -13,7 +13,7 @@ import { Tegels, toon } from "./gedeeld";
  * een kolom Verschil (de nieuwere min de oudere) per bouwblok, per categorie en voor de totaalscore. Alleen voor een Admin: De
  * kolomkoppen tonen de namen. Bij veel kolommen scrolt de matrix horizontaal met een vaste eerste kolom.
  */
-/** De kop boven de rijen: "Bouwblok" en niet "Bouwsteen" (`visualisatie-scores.md`, E). */
+/** De kop boven de rijen: De eenheid van de Assessment, sinds 22 oktober 2026 "Bouwsteen" (`visualisatie-scores.md`, E). */
 function bouwblokKop(assessment: Assessment): string {
   const w = bouwblokWoorden(assessment).enkelvoud;
   return w.charAt(0).toUpperCase() + w.slice(1);

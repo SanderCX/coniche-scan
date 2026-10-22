@@ -142,7 +142,7 @@ function AssessmentLanding({ assessmentId }: { assessmentId: string }) {
           ? "Je krijgt direct je eigen Spanningsprofiel. Daarna leggen we de profielen van de groep naast elkaar. Alle cijfers hieronder zijn voorbeelddata."
           : soort === "ai"
           ? "Na afronding zie je meteen je totaalscore en je score per domein. Hieronder zie je hoe dat eruitziet, met voorbeelddata."
-          : "Na afronding zie je meteen je totaalscore en je score per categorie en per bouwblok. Hieronder zie je hoe dat eruitziet, met voorbeelddata."
+          : "Na afronding zie je meteen je totaalscore en je score per categorie en per bouwsteen. Hieronder zie je hoe dat eruitziet, met voorbeelddata."
       }
       kinderen={
         soort === "spanning" || soort === "quickscan" ? (

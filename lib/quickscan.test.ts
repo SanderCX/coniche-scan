@@ -34,7 +34,7 @@ describe("Quickscan: score", () => {
     expect(r.afdelingen[0].percentage).toBe(33);
   });
 
-  it("met gewicht 2 op de bouwblokken van de tweede afdeling is het 20 van 75, 27%", () => {
+  it("met gewicht 2 op de bouwstenen van de tweede afdeling is het 20 van 75, 27%", () => {
     const gewogen: Assessment = structuredClone(qs);
     for (const b of gewogen.categorieen![1].bouwblokken) b.gewicht = 2;
     const r = quickscanResultaat(gewogen, demoAntwoordenQuickscan, demoRelevantieQuickscan);
@@ -80,7 +80,7 @@ describe("Quickscan: klassen en afronding", () => {
 });
 
 describe("Quickscan: aandachtspunt en sterkste basis", () => {
-  it("geeft het bouwblok met de laagste score en bij gelijkstand geen chip", () => {
+  it("geeft de bouwsteen met de laagste score en bij gelijkstand geen chip", () => {
     const lijn = quickscanResultaat(qs, antwoorden({ "qs-poliklinieken": 4 }), alleRelevant).afdelingen[0];
     // Alleen Organisatie (4 vragen) is volledig Ja: de rest is 0, dus de laagste is niet uniek.
     expect(lijn.aandachtspunt).toBeNull();

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Assessment } from "@/lib/types";
+import { useInstellingen } from "@/lib/instellingen-store";
+import { grensTekst } from "@/lib/spreiding-grenzen";
 import { RijSpreiding, SpreidingWeergave, Vorm, sorteerOpSpreiding, stapelStappen } from "@/lib/visualisatie";
 import { EENHEID_SCAN, EenheidTeksten, Rij, Schaalkop, Tegels, pct, toon, vorigeGroepen } from "./gedeeld";
 
@@ -26,6 +28,7 @@ export function WeergaveSpreiding({
   vormVan?: (id: string) => Vorm | undefined;
 }) {
   const [opSpreiding, setOpSpreiding] = useState(false);
+  const { spreidingWisselend, spreidingVerdeeld } = useInstellingen();
   const metFocus = weergave.aantalOnderGemiddelde !== null;
   const rijen: RijSpreiding[] = opSpreiding ? sorteerOpSpreiding(weergave.rijen) : weergave.rijen;
   // Gesorteerd op spreiding vervalt het groepslabel: Rijen uit verschillende groepen staan door elkaar.
@@ -48,7 +51,7 @@ export function WeergaveSpreiding({
           },
           // Alleen bij een scan-view een vierde tegel (`visualisatie-scores.md`, B, Tegels).
           ...(metFocus
-            ? [{ label: "Onder het gemiddelde", waarde: String(weergave.aantalOnderGemiddelde), sub: "bouwblokken, tegenover de anderen" }]
+            ? [{ label: "Onder het gemiddelde", waarde: String(weergave.aantalOnderGemiddelde), sub: "bouwstenen, tegenover de anderen" }]
             : []),
         ]}
       />
@@ -96,7 +99,7 @@ export function WeergaveSpreiding({
       })}
       <p className="vis-onderschrift">
         {vormVan ? `Elke grijze vorm is één ${eenheid.enkelvoud}` : `Elke grijze stip is één ${eenheid.enkelvoud}`}{metFocus ? `, de oranje ring is ${eenheid.enkelvoud === "afgeronde scan" ? "deze scan" : "deze " + eenheid.enkelvoud}` : ""}. De streep is het gemiddelde
-        {metFocus ? " van de anderen" : ""}. Eensgezind: standaardafwijking onder 0,55, Wisselend tot 0,8, Verdeeld daarboven.
+        {metFocus ? " van de anderen" : ""}. Eensgezind: standaardafwijking onder {grensTekst(spreidingWisselend)}, Wisselend tot {grensTekst(spreidingVerdeeld)}, Verdeeld daarboven.
       </p>
     </div>
   );

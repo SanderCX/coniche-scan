@@ -26,7 +26,7 @@ export interface AuditEvent {
   actorId: string | null;
   /** Naam van de actor zoals die op dat moment was, zodat het overzicht leesbaar blijft. */
   actorNaam: string | null;
-  /** Bijv. "organisatie.verwijderd" of "bouwblok.gewichtGewijzigd". */
+  /** Bijv. "organisatie.verwijderd" of "bouwsteen.gewichtGewijzigd". */
   actie: string;
   entiteitType: string;
   entiteitId: string;

@@ -19,7 +19,7 @@ import { GrafiekActief, ZetActief, staatVan, useGrafiekActief } from "@/lib/graf
  *
  * Met `vergelijking` (een tweede reeks, de rest van de groep in een benchmark, `benchmark.md`) staan er twee balken per categorie: De organisatie in
  * de categoriekleur en de rest van de groep in `#b8b5ad`. Beide lichten samen op, de tooltip toont beide waarden met het verschil, en de klassenamen
- * (Sterk punt, Uitbouwen, Basis op Orde) staan in een kolom rechts van de plot, binnen de kaart. Het diagram scrolt nooit (`stylesheet.md`, Radar en
+ * (Sterk punt, Uitbouwen, Basis op orde) staan in een kolom rechts van de plot, binnen de kaart. Het diagram scrolt nooit (`stylesheet.md`, Radar en
  * staafdiagram op elke plek, zonder scroll): De plot verdeelt de breedte van de kaart en wordt horizontaal als de kaart te smal is.
  */
 export function CategorieStaafdiagram({
@@ -99,7 +99,7 @@ export function CategorieStaafdiagram({
                         </span>
                       </button>
                     </div>
-                    <span className="cat-naam" title={r.nummers ? `${naam} · bouwblok ${r.nummers}` : naam}>
+                    <span className="cat-naam" title={r.nummers ? `${naam} · bouwsteen ${r.nummers}` : naam}>
                       {naam}
                       {r.nummers && <span className="cat-nummers">{r.nummers}</span>}
                     </span>
@@ -128,7 +128,7 @@ export function CategorieStaafdiagram({
                       </span>
                     </button>
                   </div>
-                  <span className="cat-naam" title={r.nummers ? `${naam} · bouwblok ${r.nummers}` : naam}>
+                  <span className="cat-naam" title={r.nummers ? `${naam} · bouwsteen ${r.nummers}` : naam}>
                     {naam}
                     {r.nummers && <span className="cat-nummers">{r.nummers}</span>}
                   </span>
@@ -142,7 +142,7 @@ export function CategorieStaafdiagram({
             {[
               { naam: "Sterk punt", q: 4.25 },
               { naam: "Uitbouwen", q: 3 },
-              { naam: "Basis op Orde", q: 1.75 },
+              { naam: "Basis op orde", q: 1.75 },
             ].map((k) => (
               <span key={k.naam} style={{ bottom: `${plek(k.q)}%` }}>
                 {k.naam}

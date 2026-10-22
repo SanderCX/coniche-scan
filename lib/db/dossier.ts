@@ -4,7 +4,8 @@ import { logAudit } from "../audit-store";
 import { organisatieContext } from "../audit-context";
 import { nieuwId } from "../id";
 import { getAssessment } from "../assessment-store";
-import { DOSSIER_ASSESSMENT_IDS, DossierInvoer, aantalZichtbaarVoorLead, controleerDossieritem, controleerNaamVoorLead, dossierVan, kanOpenZetten, leegDossier } from "../dossier";
+import { getBenchmarksMetLeden } from "../benchmark-leden";
+import { BenchmarkKeuze, DOSSIER_ASSESSMENT_IDS, DossierInvoer, aantalZichtbaarVoorLead, benchmarksVoorDossier, controleerDossieritem, controleerNaamVoorLead, dossierVan, kanOpenZetten, leegDossier } from "../dossier";
 import { metingZichtbaarVoorLead, radarBronVan, verlorenRadarBronnen } from "../dossier-radar";
 import type { Resultaat } from "./meting-plannen";
 
@@ -24,6 +25,22 @@ function dossierVanOrg(organisatie: Organisatie) {
   return organisatie.dossier;
 }
 
+/** De keuze voor een Benchmark-item: Waaruit gekozen kan worden en wat al in het Dossier staat, zonder het item dat bewerkt wordt. */
+function benchmarkKeuze(alles: Organisatie[], organisatie: Organisatie, nietItemId?: string): BenchmarkKeuze {
+  return {
+    kiesbaar: benchmarksVoorDossier(getBenchmarksMetLeden(alles), organisatie.id),
+    alInDossier: dossierVanOrg(organisatie)
+      .items.filter((i) => i.soort === "benchmark" && i.benchmarkId && i.id !== nietItemId)
+      .map((i) => i.benchmarkId as string),
+  };
+}
+
+/** De titel van een item voor de audit-log: Bij een Benchmark de naam van de benchmark (`dossier.md`, Audit). */
+function logTitel(alles: Organisatie[], item: Pick<Dossieritem, "soort" | "titel" | "benchmarkId">): string {
+  if (item.soort !== "benchmark") return item.titel;
+  return getBenchmarksMetLeden(alles).find((b) => b.id === item.benchmarkId)?.naam ?? "";
+}
+
 /** De naam van de Organisatie in een Case, voor de audit-log. */
 function caseNaam(alles: Organisatie[], item: Pick<Dossieritem, "soort" | "caseOrganisatieId">): Record<string, unknown> {
   if (item.soort !== "case") return {};
@@ -34,7 +51,7 @@ function caseNaam(alles: Organisatie[], item: Pick<Dossieritem, "soort" | "caseO
 export function voegDossieritemToe(organisatieId: string, invoer: DossierInvoer): Resultaat<{ item: Dossieritem }> {
   const { alles, organisatie } = context(organisatieId);
   if (!organisatie) return { ok: false, reden: "Organisatie niet gevonden." };
-  const c = controleerDossieritem(invoer, organisatie.id);
+  const c = controleerDossieritem(invoer, organisatie.id, invoer.soort === "benchmark" ? benchmarkKeuze(alles, organisatie) : undefined);
   if (!c.ok) return { ok: false, reden: c.reden };
   if (c.waarde.zichtbaarVoorLead) {
     const reden = kanOpenZetten(c.waarde, alles.find((o) => o.id === c.waarde.caseOrganisatieId));
@@ -51,8 +68,8 @@ export function voegDossieritemToe(organisatieId: string, invoer: DossierInvoer)
     actie: "dossier.itemToegevoegd",
     entiteitType: "dossieritem",
     entiteitId: item.id,
-    entiteitNaam: item.titel,
-    details: { ...organisatieContext(organisatie), soort: item.soort, titel: item.titel, ...caseNaam(alles, item) },
+    entiteitNaam: logTitel(alles, item),
+    details: { ...organisatieContext(organisatie), soort: item.soort, titel: logTitel(alles, item), ...caseNaam(alles, item) },
   });
   return { ok: true, item };
 }
@@ -61,7 +78,7 @@ export function wijzigDossieritem(organisatieId: string, id: string, invoer: Dos
   const { alles, organisatie } = context(organisatieId);
   const bestaand = organisatie?.dossier?.items.find((i) => i.id === id);
   if (!organisatie || !bestaand) return { ok: false, reden: "Item niet gevonden." };
-  const c = controleerDossieritem({ ...invoer, soort: bestaand.soort }, organisatie.id);
+  const c = controleerDossieritem({ ...invoer, soort: bestaand.soort }, organisatie.id, bestaand.soort === "benchmark" ? benchmarkKeuze(alles, organisatie, bestaand.id) : undefined);
   if (!c.ok) return { ok: false, reden: c.reden };
   // Een item dat al open stond, mag bewerkt worden zonder dat de toestemming nu klopt (dan staat de status op "Toestemming ontbreekt").
   // Nieuw openzetten kan alleen met toestemming.
@@ -84,8 +101,8 @@ export function wijzigDossieritem(organisatieId: string, id: string, invoer: Dos
     actie: "dossier.itemGewijzigd",
     entiteitType: "dossieritem",
     entiteitId: bestaand.id,
-    entiteitNaam: bestaand.titel,
-    details: { ...organisatieContext(organisatie), soort: bestaand.soort, titel: bestaand.titel, velden, ...caseNaam(alles, bestaand) },
+    entiteitNaam: logTitel(alles, bestaand),
+    details: { ...organisatieContext(organisatie), soort: bestaand.soort, titel: logTitel(alles, bestaand), velden, ...caseNaam(alles, bestaand) },
   });
   return { ok: true };
 }
@@ -104,8 +121,8 @@ export function verwijderDossieritem(organisatieId: string, id: string): Resulta
     actie: "dossier.itemVerwijderd",
     entiteitType: "dossieritem",
     entiteitId: id,
-    entiteitNaam: bestaand.titel,
-    details: { ...organisatieContext(organisatie), soort: bestaand.soort, titel: bestaand.titel, ...caseNaam(alles, bestaand) },
+    entiteitNaam: logTitel(alles, bestaand),
+    details: { ...organisatieContext(organisatie), soort: bestaand.soort, titel: logTitel(alles, bestaand), ...caseNaam(alles, bestaand) },
   });
   return { ok: true };
 }
@@ -129,7 +146,7 @@ export function zetDossierZichtbaar(organisatieId: string, zichtbaar: boolean): 
     dossier.gewijzigdOp = nu;
   }
   organisatie.gewijzigdOp = nu;
-  const aantal = aantalZichtbaarVoorLead(organisatie, alles);
+  const aantal = aantalZichtbaarVoorLead(organisatie, alles, new Date(), getBenchmarksMetLeden(alles));
   slaAlles(alles);
   logAudit({
     actie: zichtbaar ? "dossier.zichtbaarGemaakt" : "dossier.verborgen",

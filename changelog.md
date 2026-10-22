@@ -1,5 +1,58 @@
 # Coniche Scan — Changelog
 
+## 2026-10-22 (35) — Specs van Joost, PR 174: Namen van bouwsteen in de opslag, Benchmark als Dossier-item, formulier Spreiding
+
+Op verzoek van Sander ("pull devops", daarna "ja bouw alles maar": A, B en C).
+
+**A. Namen in de opslag en exports** (`datamodel.md`, bouwblok is bouwsteen geworden):
+- `lib/opslag-namen.ts` (`stringifyOpslag` en `parseOpslag`) vertaalt aan de rand van de opslag: `bouwblokken` wordt `bouwstenen`, `bouwblokLabel` wordt `bouwsteenLabel`, de eenheden worden `bouwsteenEenheidEnkelvoud` en `bouwsteenEenheidMeervoud`, `bouwblokIds` wordt `bouwsteenIds` en `opmerkingenPerBouwblok` wordt `opmerkingenPerBouwsteen`. In de code blijven de oude namen. Opgeslagen data met de oude namen wordt gewoon gelezen en bij de volgende keer opslaan herschreven. Dit geldt voor de Assessments en de Organisaties (localStorage en de serverkopie).
+- De Info-tekst heet `info.contentBouwsteenLabel` (een opgeslagen tekst onder de oude sleutel gaat mee). Audit: `bouwsteen.gewichtGewijzigd` met `bouwsteenNaam` en `aantalBouwstenen`; oude regels blijven leesbaar. CSV: kolom `opmerkingen_per_bouwsteen`, `groepsScores` met `"bouwsteen"` en `"bouwstenen"`, antwoorden met `bouwsteenId` en `bouwsteenNaam`. InDesign: `type="bouwsteen"`. De import leest de oude en de nieuwe kolom- en sleutelnamen. URL: `?bouwsteen=` (een oude `?bouwblok=` werkt nog).
+
+**B. Benchmark als vijfde Dossier-soort** (`dossier.md`, ontwerp bord 8):
+- `Dossieritem.soort` kent `benchmark` met `benchmarkId`. Geen titel en geen link: de titel is de naam van de benchmark. De keuze is beperkt tot benchmarks waarin de Organisatie zit (ook een Verkenning, niet niveau 3), dezelfde benchmark hoogstens één keer (`controleerDossieritem`, `benchmarksVoorDossier`).
+- Statussen "Geen toegang voor Lead" en "Kies een benchmark" (`itemStatus`). Een verwijderde benchmark zet het item terug op "Kies een benchmark" en niet zichtbaar (`ruimDossierOp`, aangeroepen vanuit `slaAlles`).
+- De Lead ziet een Benchmark alleen met zijn eigen vinkje (`leadDossier` met `LeadContext`). Sectie Benchmarks na de Cases, tegel in de kop, pil in het soortfilter, paarse stip in de voorproef en "1 benchmark" in de aantallen. Knop "Bekijk vergelijking" naar `/s/[code]/benchmark/[id]`.
+- Consultant: pil Benchmarks in het filter, een rij met paarse soorttegel (de tegel met icoon staat nu bij alle soorten), het formulier met keuzelijst, gegevensvlak en het groene of oranje paneel met "Naar Leads" (alleen een Admin). Audit en `info.dossier` volgen de spec.
+
+**C. Formulier Spreiding** (`beheerpagina.md`, `datamodel.md`):
+- Vier instellingen `spreidingWisselend` (0,55), `spreidingVerdeeld` (0,8), `spreidingWisselendQuickscan` (14) en `spreidingVerdeeldQuickscan` (20). Een eigen formulier onder Drempels en termijnen met `info.spreidingGrenzen`, getallen met een komma, groter dan 0, Verdeeld boven Wisselend (`lib/spreiding-grenzen.ts`). `spreidingsLabel` en `spreidingLabelQs` lezen de grenzen uit de instellingen. De onderschriften bij de weergaven tonen de ingestelde grenzen. Een wijziging staat in de audit-log (`instellingen.gewijzigd`).
+
+**Tests**: `lib/opslag-namen.test.ts`, `lib/spreiding-grenzen.test.ts`, `lib/dossier.test.ts` (Benchmark), `lib/csv-export.test.ts`, `lib/import-legacy.test.ts`, `lib/audit-weergave.test.ts`.
+
+**Help**: `het-dossier-van-een-organisatie.md`, `het-dossier-lezen.md` en `drempels-en-termijnen.md`.
+
+**Specs bijgewerkt**: Alleen `bouwnotities.md`. De rest zijn de specs van Joost.
+
+**Afwijkingen en interpretaties**: (1) De foutteksten van het formulier Spreiding staan niet in de spec; ik koos "Vul bij elk veld een getal groter dan 0 in" en "Bij de schaalscans (de Quickscan) moet de grens voor Verdeeld boven die voor Wisselend liggen". (2) De spreidingsgrenzen gelden direct en overal; de spec zegt niets over een peildatum. (3) "Naar Leads" is een knop voor een Admin en tekst voor een Consultant, zoals bij de Case. (4) De status van een Benchmark-item rekent alleen op het vinkje van de Leads van de eigen Organisatie; het vinkje en de drempels (`benchmarkMinOrganisaties`) controleert het Leads-venster, niet het Dossier. (5) Een verwijderde benchmark ruimt de items pas op bij de eerstvolgende schrijfactie op de Organisaties; tot dan staat de status wel al op "Kies een benchmark" en ziet de Lead niets. (6) Op de rij in het beheer stond alleen het soortlabel; de ronde tegel met icoon uit `dossier.md` (Soortkleur en icoon) heb ik meteen voor alle vijf de soorten gebouwd. (7) Onder `benchmarkMinOrganisaties` toont de regel op de Lead-pagina "Vergelijking, {Assessment}" zonder aantal, zoals op de benchmarkkaart.
+
+## 2026-10-22 (34) — Bouwsteen in plaats van Bouwblok in de interface
+
+Op verzoek van Sander: "overal in de interface bouwblokken vervangen voor bouwstenen". Dit draait het label Bouwblok van entry 32 terug en vervangt de interpretatie in entry 33 (alleen de route).
+
+**Gedaan**:
+- Alle zichtbare teksten in `app/`, `components/`, `lib/`, `data/` (info-teksten, seeds) en `help/` zeggen Bouwsteen of bouwstenen (44 bestanden in een eerste ronde, daarna handmatig nagelopen).
+- `bouwblokLabel`, de eenheid (enkelvoud en meervoud) en de seeds zijn "Bouwsteen" en "bouwstenen". `verrijkAssessment` zet opgeslagen "Bouwblok"-waarden om. `bouwblokWoorden` vertaalt niet meer.
+- `heroUitleg` herkent in de beschrijving zowel "bouwblokken" als "bouwstenen".
+- Tests bijgewerkt: `lib/assessment-migratie.test.ts`, `lib/doorloop-ui.test.tsx`, `lib/landing.test.ts`, `lib/film.test.tsx`, `lib/dossier.test.ts`, `lib/visualisatie.test.ts` en andere.
+
+**Specs bijgewerkt**: `bouwnotities.md` (de regel over het label is vervangen). De specs zelf zeggen nog Bouwblok en worden door Joost aangepast (`CLAUDE.md`, Terminologie, en `datamodel.md`, `bouwblokLabel`).
+
+**Afwijkingen en interpretaties**: (1) Identifiers, CSS-klassen, CSV-kolommen (`opmerkingen_per_bouwblok`), het JSON-veld `bouwblokken`, audit-acties en de URL-parameter `?bouwblok=` zijn data en code en blijven. (2) De AI-teksten over "bouwblokken" als technische onderdelen blijven. (3) Een eigen label dat een Admin zelf koos, blijft staan.
+
+## 2026-10-22 (33) — Letterschaal van acht maten, "Basis op orde" en labels
+
+Op verzoek van Sander (na het nalopen van de opgeschoonde specs).
+
+**Gedaan**:
+- **Letterschaal**: De zes extra tokens (`--fs-11`, `13`, `15`, `17`, `26` en `40`) zijn weg en elk gebruik is naar een maat van de schaal omgezet (`assessment-pagina.css`, `components.css`, `help.css`, `tokens.css`, `globals.css`).
+- **"Basis op orde"** met kleine letter overal in de code, de tests en de help.
+- **Teksten**: "Gegevens bekijken/bewerken", "Over deze scan: Visie en bouwblokken" en "Over deze scan: Spanningsvelden en visie", de Quickscan-weergave "Spreiding", en het label "Gemiddeld niveau" op twee regels in de ring van de Spanningsmeter.
+- **Tests**: `lib/spanning-ui.test.tsx` (het ringlabel), bestaande tests bijgewerkt.
+
+**Specs bijgewerkt**: Alleen `bouwnotities.md`. Joost past `schermen.md` (radar in plaats van kolommen), `visual-bouwblokken-en-domeinen.md` (volgorde van de secties), `beheerpagina.md` en het datamodel (spreidingsinstelling van de Quickscan) zelf aan.
+
+**Afwijkingen en interpretaties**: (1) Bij "vervang overal bouwblokken voor bouwstenen" heb ik alleen de route bedoeld: `/bouwstenen` blijft, `/bouwblokken` komt er niet bij. De term in de interface blijft Bouwblok. (2) Waar de spec geen maat noemt (de regel naast "Start assessment" op 15px, de pil in de radar op 13px) koos ik de dichtstbijzijnde maat van de schaal: 14px. (3) De radar in plaats van vijf kolommen was al gebouwd.
+
 ## 2026-10-22 (32) — Specs van Joost, PR 170 en 171: Label Bouwblok in plaats van Bouwsteen
 
 Op verzoek van Sander ("pull devops", daarna "ja bouw maar"). De specs zijn door Joost opgeschoond (`CLAUDE.md` korter, nieuw `schermen.md`, `datamodel-rollen.md`, `bouwnotities.md` en `visual-bouwblokken-en-domeinen.md`); alleen het label raakt code.

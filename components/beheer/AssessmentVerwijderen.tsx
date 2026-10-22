@@ -76,7 +76,7 @@ export function AssessmentVerwijderen({ assessment, naVerwijderen }: { assessmen
             <ul style={{ margin: "0.3rem 0 0", paddingLeft: "1.2rem" }}>
               <li>
                 Het Assessment met {effecten.aantalCategorieen > 0 ? `${effecten.aantalCategorieen} categorieën, ` : ""}
-                {effecten.aantalBouwblokken} bouwblokken en {effecten.aantalVragen} vragen, ook de gearchiveerde.
+                {effecten.aantalBouwblokken} bouwstenen en {effecten.aantalVragen} vragen, ook de gearchiveerde.
               </li>
               {effecten.benchmarkNamen.length > 0 && (
                 <li>

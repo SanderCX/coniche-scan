@@ -11,7 +11,7 @@ import { Assessment } from "@/lib/types";
  */
 export function PraktischSectie({ assessment, aantalVragen, warm }: { assessment: Assessment; aantalVragen: number; warm: boolean }) {
   // De Quickscan toont zijn score per afdeling (`CLAUDE.md`, scherm 2, Praktisch).
-  const eenheid = assessment.antwoordType === "ja-nee-weetniet" ? "afdeling" : assessment.bouwblokLabel === "AI-domein" ? "domein" : "bouwblok";
+  const eenheid = assessment.antwoordType === "ja-nee-weetniet" ? "afdeling" : assessment.bouwblokLabel === "AI-domein" ? "domein" : "bouwsteen";
   const spanning = assessment.antwoordType === "spanning";
   const kaarten = [
     { Icoon: KlokIcoon, titel: "Invultijd", tekst: `${assessment.geschatteDuur}${spanning ? " voor" : ", verdeeld over"} ${aantalVragen} vragen.` },

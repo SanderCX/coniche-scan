@@ -35,13 +35,13 @@ function kop(assessment: Assessment, index = 0, extra: Partial<Parameters<typeof
   );
 }
 
-describe("de kop van een bouwblok in de doorloopflow (22 oktober 2026)", () => {
+describe("de kop van een bouwsteen in de doorloopflow (22 oktober 2026)", () => {
   it("toont de eyebrow, de titel, de centrale vraag en de toelichting direct, zonder i-icoon, omschrijving en tags", () => {
     const b = alleBouwblokkenMetGroep(klantcontactVolwassenheid)[0];
     // De centrale vraag komt in de app uit de bouwsteenteksten bij het laden; hier zetten we hem zelf.
     const html = kop(klantcontactVolwassenheid, 0, {}, { centraleVraag: "Wat is de koers?", toelichting: "Eerste alinea.\n\nTweede alinea." });
     expect(html).toContain("bouwblok-kop-eyebrow");
-    expect(html).toContain(`${b.groepNaam!.toUpperCase()} · BOUWBLOK ${b.bouwblok.volgnummer}`);
+    expect(html).toContain(`${b.groepNaam!.toUpperCase()} · BOUWSTEEN ${b.bouwblok.volgnummer}`);
     expect(html).toContain(`<h2>${b.bouwblok.naam}</h2>`);
     expect(html).toContain("Centrale vraag");
     expect(html).toContain("bouwblok-kop-centrale-vraag");
@@ -80,7 +80,7 @@ describe("de sidebar van de doorloopflow (22 oktober 2026)", () => {
       <Sidebar assessment={assessment} respondent={w} actieveBouwblokId={alleBouwblokkenMetGroep(assessment)[index].bouwblok.id} onSelecteer={noop} />
     );
 
-  it("markeert alleen de actieve categorie met de lijn en het actieve bouwblok met een vlak", () => {
+  it("markeert alleen de actieve categorie met de lijn en de actieve bouwsteen met een vlak", () => {
     const html = sidebar(klantcontactVolwassenheid, 0);
     expect(html.match(/sidebar-categorie--actief/g)).toHaveLength(1);
     expect(html.match(/ actief /g)).toHaveLength(1);
@@ -88,7 +88,7 @@ describe("de sidebar van de doorloopflow (22 oktober 2026)", () => {
     expect(html).toContain("0% – 0 van 60 vragen");
   });
 
-  it("geeft zonder categorielaag (de AI-scan) het actieve bouwblok zelf een streepje", () => {
+  it("geeft zonder categorielaag (de AI-scan) de actieve bouwsteen zelf een streepje", () => {
     const html = sidebar(aiVolwassenheid, 2);
     expect(html).not.toContain("sidebar-categorie--actief");
     expect(html.match(/sidebar-bouwblok--streep/g)).toHaveLength(1);

@@ -113,7 +113,7 @@ export interface Teaser {
    * de volle kleur van de afgeronde score of klasse, en de kleuren van de klassenchip.
    */
   ring: { fractie: number; kleur: string; chipAchtergrond: string; chipTekst: string };
-  /** Alleen bij de Spanningsmeter: Het label onder het getal in de ring ("Niveau" in plaats van "Totaalscore"). */
+  /** Alleen bij de Spanningsmeter: Het label onder het getal in de ring ("Gemiddeld niveau" in plaats van "Totaalscore"). */
   ringLabel?: string;
   /** Alleen bij de Spanningsmeter: Het tekstalternatief van de ring ("Gemiddeld niveau 3,1, Georganiseerd"). */
   ringAlt?: string;
@@ -270,7 +270,7 @@ function spanningTeaser(assessment: Assessment, antwoorden?: Record<string, Antw
     ...(groep ? { aantalScans: groep.scans } : {}),
     rijen,
     ring: { fractie: schaalFractie(gem.score), kleur: `var(--score-${stap})`, chipAchtergrond: `var(--score-${stap}-cel)`, chipTekst: `var(--score-${stap}-cel-tekst)` },
-    ringLabel: "Niveau",
+    ringLabel: "Gemiddeld niveau",
     ringAlt: `Gemiddeld niveau ${KORT(gem.score)}, ${niveau}`,
     rijenLabel: "Per spanningsveld",
     spanningsZin: profiel.grootste ? spanningZin(profiel.grootste) : null,

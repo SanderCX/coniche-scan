@@ -1879,7 +1879,7 @@ a.cn-titel {
 }
 .dos-rij {
   display: grid;
-  grid-template-columns: 80px minmax(0, 1fr) auto 112px;
+  grid-template-columns: 150px minmax(0, 1fr) auto 112px;
   align-items: center;
   gap: var(--sp-6);
   padding: var(--sp-4) var(--sp-6);
@@ -1897,9 +1897,71 @@ a.cn-titel {
 .dos-eyebrow {
   font-size: var(--fs-12);
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--or);
+  color: inherit;
+}
+/* De soort in de eerste kolom: Een ronde tegel van 40px met het icoon en daarnaast het label, in de kleuren van de soort (`dossier.md`, Scherm 1, Soortkleur en icoon). */
+.dos-soort {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  --soort-kleur: var(--or);
+  --soort-tegel: var(--or-faint);
+  color: var(--soort-kleur);
+}
+.dos-soort-tegel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--soort-tegel);
+}
+.dos-soort--nieuws {
+  --soort-kleur: var(--bl);
+  --soort-tegel: var(--bl-faint);
+}
+.dos-soort--event {
+  --soort-kleur: var(--gr);
+  --soort-tegel: #e7f6ef;
+}
+.dos-soort--blog {
+  --soort-kleur: #7a5600;
+  --soort-tegel: #fff6e0;
+}
+.dos-soort--benchmark {
+  --soort-kleur: var(--pu);
+  --soort-tegel: #efeaf2;
+}
+.dos-soort.is-verlopen {
+  --soort-kleur: var(--ink-s);
+  --soort-tegel: var(--bg-warm);
+}
+/* De gegevens van de gekozen benchmark in het formulier: Drie kolommen zonder waarde om in te vullen (`dossier.md`, Scherm 3, Benchmark). */
+.dos-benchmark-gegevens {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-4);
+  margin: var(--sp-3) 0;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+.dos-benchmark-gegevens dt {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-s);
+}
+.dos-benchmark-gegevens dd {
+  margin: 0;
+  font-size: var(--fs-14);
+  color: var(--ink);
 }
 .dos-titel {
   margin: 0;
@@ -1943,7 +2005,9 @@ a.cn-titel {
   margin-bottom: var(--sp-2);
 }
 .dos-status--toestemming-ontbreekt,
-.dos-status--kies-organisatie {
+.dos-status--kies-organisatie,
+.dos-status--geen-toegang,
+.dos-status--kies-benchmark {
   background: var(--stat-amber-faint);
   color: var(--dal);
 }

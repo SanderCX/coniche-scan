@@ -32,19 +32,13 @@
 
   /* Lettergroottes (stylesheet.md, Lettergroottes): Eén schaal van acht maten in even px. Een nieuwe font-size buiten deze
      lijst is een fout, geen variant. */
-  --fs-11: 11px;   /* de nummercirkel in de film van de AI-scan en de tag Nieuw op de Dossierkaart (specs van 20 en 21 oktober 2026) */
   --fs-12: 12px;   /* eyebrow, labels, badges, tabelkoppen, hints, tekst in grafieken, tweede regel van een kolomkop */
-  --fs-13: 13px;   /* chips en pillen in het Dossier en bij de bouwblokken (specs van 21 oktober 2026) */
   --fs-14: 14px;   /* alle interface-tekst: tabellen, formulieren, knoppen, velden, nav, tabs, pillen, meldingen */
-  --fs-15: 15px;   /* de punten op een tegel en de tekst in de Toelichtingsmodal (specs van 21 oktober 2026) */
   --fs-16: 16px;   /* lopende tekst */
-  --fs-17: 17px;   /* de centrale vraag in de kaart boven de radar van de bouwblokken (spec van 21 oktober 2026) */
   --fs-18: 18px;   /* inleidende regel, h3, titel van modals en beheerblokken, h2 in beheer */
   --fs-24: 24px;   /* kop van een bouwblok en van een Assessment-kaart */
-  --fs-26: 26px;   /* de titel in het detailpaneel van de Assessmentcirkel (spec van 21 oktober 2026, PR 166, ter bevestiging door Joost) */
   --fs-32: 32px;   /* paginatitel, h2 op publieke pagina's */
   --fs-36: 36px;   /* getal in de .score-ring */
-  --fs-40: 40px;   /* vervallen voor de ring, nog niet meer in gebruik */
   --fs-48: 48px;   /* h1 op publieke pagina's */
 
   /* Afstanden, raster van 4px (stylesheet.md, Afstanden) */

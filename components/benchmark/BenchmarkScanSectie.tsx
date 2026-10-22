@@ -81,7 +81,7 @@ export function BenchmarkScanSectie({
               groepResultaten={resultaten.groepen}
               vlak={vlak}
               naam="Meting"
-              radarTitel={vlak ? `Per ${woorden.enkelvoud}` : "Per bouwblok"}
+              radarTitel={vlak ? `Per ${woorden.enkelvoud}` : "Per bouwsteen"}
               groepTitel={vlak ? `Scores per ${woorden.enkelvoud}` : "Per categorie"}
             />
           )}

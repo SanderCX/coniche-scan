@@ -43,8 +43,11 @@ export function verrijkAssessment(assessment: Assessment): Assessment {
   const isAi = alleBouwblokken.some((b) => b.id.startsWith("ai"));
   return {
     ...assessment,
-    // Het label heet sinds 22 oktober 2026 "Bouwblok" (`datamodel.md`, Assessment): Opgeslagen kopieën met het oude "Bouwsteen" worden omgezet.
-    bouwblokLabel: !assessment.bouwblokLabel || assessment.bouwblokLabel === "Bouwsteen" ? (isAi ? "AI-domein" : "Bouwblok") : assessment.bouwblokLabel,
+    // In de interface heet het overal Bouwsteen (besloten op 22 oktober 2026, na een korte periode met "Bouwblok"): Opgeslagen kopieën met het label
+    // "Bouwblok" en de eenheid "Bouwblok" of "bouwblokken" worden omgezet. Een eigen label blijft staan.
+    bouwblokLabel: !assessment.bouwblokLabel || assessment.bouwblokLabel === "Bouwblok" ? (isAi ? "AI-domein" : "Bouwsteen") : assessment.bouwblokLabel,
+    bouwblokEenheidEnkelvoud: assessment.bouwblokEenheidEnkelvoud === "Bouwblok" ? "Bouwsteen" : assessment.bouwblokEenheidEnkelvoud,
+    bouwblokEenheidMeervoud: assessment.bouwblokEenheidMeervoud === "bouwblokken" ? "bouwstenen" : assessment.bouwblokEenheidMeervoud,
     wegingTitel: assessment.wegingTitel ?? null,
     wegingToelichting: assessment.wegingToelichting ?? null,
     // De Quickscan had eerst een tijdelijke emoji: Opgeslagen kopieën krijgen het SVG-icoon (`stylesheet.md`, Assessment-icoon).

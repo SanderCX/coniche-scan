@@ -170,6 +170,9 @@
 .mm-vp-stip--case {
   background: var(--or);
 }
+.mm-vp-stip--benchmark {
+  background: var(--pu);
+}
 .mm-vp-stip--nieuws {
   background: var(--bl);
 }

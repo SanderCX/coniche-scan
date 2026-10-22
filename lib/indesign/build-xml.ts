@@ -66,7 +66,7 @@ export function buildIndesignExport(payload: ExportIndesignPayload): IndesignExp
   const bestandsnaamTop3Sterktes = `${orgSlug}-${scanSlug}-top3-sterktes.svg`;
   const bestandsnaamTop3Verbeterkansen = `${orgSlug}-${scanSlug}-top3-verbeterkansen.svg`;
 
-  const groepsScoresXml = `<groepsScores type="${isVlakkeAssessment(assessment) ? "bouwblok" : "categorie"}">${groepResultaten
+  const groepsScoresXml = `<groepsScores type="${isVlakkeAssessment(assessment) ? "bouwsteen" : "categorie"}">${groepResultaten
     .map((g) => `<groep naam="${escapeXml(g.groepNaam)}" score="${g.score !== null ? g.score.toFixed(1) : ""}" />`)
     .join("")}</groepsScores>`;
 

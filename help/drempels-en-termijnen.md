@@ -5,10 +5,10 @@ volgorde: 2
 rollen: [Admin]
 afbeelding: 
 film: 
-bronnen: [beheerpagina.md, datamodel.md, visualisatie-verkennen.md]
-bijgewerkt: 2026-10-21
+bronnen: [beheerpagina.md, datamodel.md, visualisatie-scores.md, visualisatie-verkennen.md]
+bijgewerkt: 2026-10-22
 ---
-Hier stel je de grenzen in die bepalen wanneer iets zichtbaar is, hoe lang gegevens bewaard blijven en wanneer Verkennen een groep toestaat.
+Hier stel je de grenzen in die bepalen wanneer iets zichtbaar is, hoe lang gegevens bewaard blijven, wanneer de spreiding Eensgezind, Wisselend of Verdeeld heet en wanneer Verkennen een groep toestaat.
 
 ## In het kort
 De waarden gelden voor de hele omgeving. Een wijziging werkt door vanaf het volgende scherm. Bij elk veld staat een Info-icoon met uitleg.
@@ -18,10 +18,11 @@ De waarden gelden voor de hele omgeving. Een wijziging werkt door vanaf het volg
 2. **Bewaartermijn en verlengtermijn.** Na de bewaartermijn komt een afgeronde scan op de lijst "Data ouder dan de bewaartermijn". Er wordt niets vanzelf verwijderd. Verlengen stelt de melding uit.
 3. **Benchmark.** Het minimum aantal Organisaties in een groep (beginwaarde 5), het minimum aantal scans per Meting (3) en het aantal dagen waarboven een vergelijking Naast elkaar een waarschuwing geeft (90).
 4. **Voor een Lead.** Het minimum aantal afgeronde scans voor Spreiding, anonieme Antwoorden en de lijn van de laagste tot de hoogste score (5).
-5. **Verkennen.** Vijf grenzen voor groepen, vergelijkingen, de pool, het aantal waarden per kenmerk en hoe vaak een kenmerk ingevuld moet zijn.
+5. **Spreiding.** Vier grenzen voor het label bij de spreiding: Vanaf welke standaardafwijking het label Wisselend is en vanaf welke Verdeeld, voor de schaalscans (beginwaarden 0,55 en 0,8) en voor de Quickscan in procentpunten (14 en 20). Je typt een getal met een komma. De grens voor Verdeeld moet boven die voor Wisselend liggen.
+6. **Verkennen.** Vijf grenzen voor groepen, vergelijkingen, de pool, het aantal waarden per kenmerk en hoe vaak een kenmerk ingevuld moet zijn.
 
 ## Let op
-Verlaag je een grens, dan kunnen resultaten voor een Lead eerder zichtbaar worden. Ga daar bewust mee om, want een kleine groep maakt individuele antwoorden herleidbaar.
+Een nieuwe grens voor de spreiding geldt direct, voor alle Metingen. Verlaag je een grens, dan kunnen resultaten voor een Lead eerder zichtbaar worden. Ga daar bewust mee om, want een kleine groep maakt individuele antwoorden herleidbaar.
 
 ## Zie ook
 - [Verkennen](verkennen)

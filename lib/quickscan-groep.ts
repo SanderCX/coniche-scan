@@ -18,6 +18,8 @@ import {
   quickscanResultaat,
 } from "./quickscan";
 import { gewichtVan } from "./scoring";
+import { SPREIDING_STANDAARD_QUICKSCAN, SpreidingGrenzen, spreidingLabelVoor } from "./spreiding-grenzen";
+import { getSpreidingGrenzen } from "./instellingen-store";
 import { groepStatistiek, GroepStatistiek, PositieLabel } from "./visualisatie";
 
 /** Eén afgeronde scan, zoals de berekeningen hem nodig hebben. */
@@ -36,8 +38,8 @@ export function quickscanScansVan(
     .map((i) => ({ id: i.id, antwoorden: i.antwoorden, relevantie: i.relevantie }));
 }
 
-/** Grenzen van het spreidingslabel in procentpunten (`visualisatie-quickscan.md`, 3, voorstel): Onder 14, 14 tot 20 en vanaf 20. */
-export const QS_SPREIDING_GRENZEN = { wisselend: 14, verdeeld: 20 } as const;
+/** De startwaarden van de grenzen in procentpunten (`visualisatie-quickscan.md`, 3): Onder 14, 14 tot 20 en vanaf 20. Instelbaar door een Admin. */
+export const QS_SPREIDING_GRENZEN = SPREIDING_STANDAARD_QUICKSCAN;
 /** Een bouwblok met minder vragen krijgt geen spreidingslabel: De uitkomsten zijn dan te grof. */
 export const QS_MIN_VRAGEN_SPREIDING = 3;
 /** Minder relevante scans dan dit voor een afdeling geeft "Te weinig antwoorden". */
@@ -48,10 +50,9 @@ export const QS_ONBEKEND_MIN = 3;
 
 export type SpreidingLabelQs = "Eensgezind" | "Wisselend" | "Verdeeld";
 
-export function spreidingLabelQs(sd: number): SpreidingLabelQs {
-  if (sd < QS_SPREIDING_GRENZEN.wisselend) return "Eensgezind";
-  if (sd < QS_SPREIDING_GRENZEN.verdeeld) return "Wisselend";
-  return "Verdeeld";
+/** Het label bij een standaardafwijking in procentpunten, met de grenzen uit de instellingen (`beheerpagina.md`, formulier Spreiding). */
+export function spreidingLabelQs(sd: number, grenzen: SpreidingGrenzen = getSpreidingGrenzen().quickscan): SpreidingLabelQs {
+  return spreidingLabelVoor(sd, grenzen);
 }
 
 /** Standaardafwijking van de steekproef (n − 1), of `null` bij minder dan twee waarden. */

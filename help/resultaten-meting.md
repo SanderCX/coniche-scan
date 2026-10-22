@@ -15,7 +15,7 @@ Klik bij een Meting op "Naar resultaten". Je ziet de totaalscore, de grafieken p
 
 ## Wat je ziet
 1. **Overzicht.** De classificatiecirkel, de radar, het staafdiagram per categorie, de top 3 en de legenda.
-2. **Per bouwblok.** Een rij per bouwblok met een stip op het gemiddelde en een lijn van de laagste tot de hoogste score.
+2. **Per bouwsteen.** Een rij per bouwsteen met een stip op het gemiddelde en een lijn van de laagste tot de hoogste score.
 3. **Spreiding.** Een stip per afgeronde scan, om te zien hoe verdeeld de Respondenten zijn.
 4. **Antwoorden.** De antwoorden per vraag en per Respondent.
 

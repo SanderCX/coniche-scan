@@ -134,8 +134,8 @@
 }
 .ac-leeg {
   margin: 0;
-  font-size: var(--fs-26);
-  line-height: 32px;
+  font-size: var(--fs-24);
+  line-height: 28px;
   font-weight: 800;
   color: var(--ink);
 }
@@ -148,14 +148,14 @@
 }
 .ac-detail h2 {
   margin: 0;
-  font-size: var(--fs-26);
-  line-height: 32px;
+  font-size: var(--fs-24);
+  line-height: 28px;
   font-weight: 800;
 }
 .ac-zin {
   margin: var(--sp-3) 0 var(--sp-4);
-  font-size: var(--fs-17);
-  line-height: 27px;
+  font-size: var(--fs-16);
+  line-height: 26px;
   color: var(--ink-m);
 }
 .ac-punten {
@@ -170,7 +170,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: var(--fs-15);
+  font-size: var(--fs-14);
   line-height: 20px;
   color: var(--ink-m);
 }
@@ -341,7 +341,7 @@
 .ap-start p {
   max-width: 460px;
   margin: 0;
-  font-size: var(--fs-15);
+  font-size: var(--fs-14);
   color: var(--ink-m);
 }
 .ap-label {
@@ -501,7 +501,7 @@
 }
 .br-vraag p {
   margin: 4px 0 0;
-  font-size: var(--fs-17);
+  font-size: var(--fs-18);
   line-height: 26px;
   color: var(--ink);
 }
@@ -617,7 +617,7 @@
 }
 .br-pil-tekst {
   min-width: 0;
-  font-size: var(--fs-13);
+  font-size: var(--fs-14);
   font-weight: 600;
   line-height: 18px;
   color: var(--ink);

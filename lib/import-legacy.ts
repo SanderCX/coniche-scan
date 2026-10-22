@@ -332,12 +332,12 @@ function matchAntwoorden(
   for (const blok of blokken) {
     const kandidaten = bouwblokken.filter((b) => b.naam === blok.buildingBlockName);
     if (kandidaten.length === 0) {
-      return { ok: false, reden: `Bouwblok "${blok.buildingBlockName}" niet gevonden in de huidige content.` };
+      return { ok: false, reden: `Bouwsteen "${blok.buildingBlockName}" niet gevonden in de huidige content.` };
     }
     if (kandidaten.length > 1 || gebruikt.has(kandidaten[0].id)) {
       return {
         ok: false,
-        reden: `Bouwblok "${blok.buildingBlockName}" is niet eenduidig te matchen, handmatig oplossen.`,
+        reden: `Bouwsteen "${blok.buildingBlockName}" is niet eenduidig te matchen, handmatig oplossen.`,
       };
     }
     const bouwblok = kandidaten[0];
@@ -358,7 +358,7 @@ function matchAntwoorden(
     if (opmerkingWaarden.size > 1) {
       return {
         ok: false,
-        reden: `Bouwblok "${bouwblok.naam}" heeft tegenstrijdige opmerkingen binnen hetzelfde blok.`,
+        reden: `Bouwsteen "${bouwblok.naam}" heeft tegenstrijdige opmerkingen binnen hetzelfde blok.`,
       };
     }
     if (opmerkingWaarden.size === 1) opmerkingen[bouwblok.id] = [...opmerkingWaarden][0];
@@ -452,7 +452,7 @@ function detecteerAssessment(groepen: LegacyBlok[], assessments: Assessment[]): 
   if (naamKandidaten.length === 0) {
     return {
       ok: false,
-      reden: `de ${groepen.length} blokken in de CSV komen niet overeen met de bouwblokken/domeinen van een van de scan-types`,
+      reden: `de ${groepen.length} blokken in de CSV komen niet overeen met de bouwstenen/domeinen van een van de scan-types`,
     };
   }
   if (naamKandidaten.length === 1) {
@@ -626,7 +626,9 @@ export interface NieuweExportCsvRow {
   /** Voorstel van 19 oktober 2026 (`export-csv.md`): De KPI's en de contacten per kanaal. Ontbreekt in een export van vóór deze kolom. */
   organisatie_kpis?: string;
   antwoorden: string;
-  opmerkingen_per_bouwblok: string;
+  /** Vanaf 22 oktober 2026 `opmerkingen_per_bouwsteen`; een export van eerder heeft nog `opmerkingen_per_bouwblok`. Eén van de twee is gevuld. */
+  opmerkingen_per_bouwsteen?: string;
+  opmerkingen_per_bouwblok?: string;
 }
 
 const VERPLICHTE_KOLOMMEN_NIEUW: (keyof NieuweExportCsvRow)[] = [
@@ -641,8 +643,11 @@ const VERPLICHTE_KOLOMMEN_NIEUW: (keyof NieuweExportCsvRow)[] = [
 const NIEUWE_EXPORT_STATUSSEN: ScanInvullingStatus[] = ["uitgenodigd", "bezig", "afgerond"];
 
 interface NieuwAntwoordItem {
-  bouwblokId: string;
-  bouwblokNaam: string;
+  /** De namen vanaf 22 oktober 2026; een export van eerder heeft `bouwblokId` en `bouwblokNaam`. */
+  bouwsteenId?: string;
+  bouwsteenNaam?: string;
+  bouwblokId?: string;
+  bouwblokNaam?: string;
   vraagId: string;
   vraagTekst?: string;
   score: number;
@@ -831,7 +836,7 @@ export function valideerNieuweExportRijen(
         status,
         assessmentId: assessment.id,
         assessmentNaam: assessment.naam,
-        probleem: `Vraag "${onbekend.vraagId}" (${onbekend.bouwblokNaam}) bestaat niet meer in de huidige content van "${assessment.naam}".`,
+        probleem: `Vraag "${onbekend.vraagId}" (${onbekend.bouwsteenNaam ?? onbekend.bouwblokNaam ?? ""}) bestaat niet meer in de huidige content van "${assessment.naam}".`,
         antwoorden: {},
         opmerkingenPerBouwblok: {},
       };
@@ -840,9 +845,10 @@ export function valideerNieuweExportRijen(
     const antwoorden = Object.fromEntries(items.map((item) => [item.vraagId, item.score]));
 
     let opmerkingenPerBouwblok: Record<string, string> = {};
-    if (rij.opmerkingen_per_bouwblok) {
+    const opmerkingenTekst = rij.opmerkingen_per_bouwsteen || rij.opmerkingen_per_bouwblok;
+    if (opmerkingenTekst) {
       try {
-        opmerkingenPerBouwblok = JSON.parse(rij.opmerkingen_per_bouwblok);
+        opmerkingenPerBouwblok = JSON.parse(opmerkingenTekst);
       } catch {
         return {
           ...basis,
@@ -850,7 +856,7 @@ export function valideerNieuweExportRijen(
           status,
           assessmentId: assessment.id,
           assessmentNaam: assessment.naam,
-          probleem: "Kolom 'opmerkingen_per_bouwblok' is geen geldige JSON.",
+          probleem: "Kolom 'opmerkingen_per_bouwsteen' is geen geldige JSON.",
           antwoorden: {},
           opmerkingenPerBouwblok: {},
         };

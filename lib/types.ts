@@ -312,13 +312,13 @@ export interface Contactpersoon {
 }
 
 /**
- * Een item in het Dossier van een Organisatie (`datamodel.md`, Dossieritem; `dossier.md`): Nieuws, een Case, een Event of een Blog. De velden
+ * Een item in het Dossier van een Organisatie (`datamodel.md`, Dossieritem; `dossier.md`): Nieuws, een Case, een Event, een Blog of een Benchmark. De velden
  * die bij een soort horen, zijn bij de andere soorten leeg.
  */
 export interface Dossieritem {
   id: string;
   /** Staat vast na het aanmaken. */
-  soort: "nieuws" | "case" | "event" | "blog";
+  soort: "nieuws" | "case" | "event" | "blog" | "benchmark";
   titel: string;
   /** Voor Nieuws de reden waarom het relevant is, voor een Case "Waarom dit voor jullie telt". De Lead leest deze tekst. */
   toelichting: string;
@@ -347,6 +347,8 @@ export interface Dossieritem {
   omvang: string;
   /** Alleen Case: Bijvoorbeeld "6 weken". */
   totResultaat: string;
+  /** Alleen Benchmark: De benchmark waarin de Organisatie zit (`Benchmark.id`), `null` als die is verwijderd of nog niet is gekozen. De titel is dan de naam van de benchmark. */
+  benchmarkId: string | null;
 }
 
 /** Het Dossier van een Organisatie (`datamodel.md`, Dossieritem). */

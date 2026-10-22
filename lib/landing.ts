@@ -9,7 +9,7 @@ import { actieveBouwblokkenMetGroep, actieveVragen } from "./assessment-structuu
  */
 export function heroUitleg(beschrijving: string): string {
   const eerste = beschrijving.trim().split(/(?<=[.!?])\s+(?=[A-ZÀ-Ý])/)[0] ?? "";
-  return eerste.replace(/\s+op \d+ bouwblokken, verdeeld over \d+ pijlers( — van strategie tot cultuur)?/, "");
+  return eerste.replace(/\s+op \d+ bouw(?:blokken|stenen), verdeeld over \d+ pijlers( — van strategie tot cultuur)?/, "");
 }
 
 /**
@@ -64,7 +64,7 @@ export function paginaSecties(assessment: Assessment): PaginaSectie[] {
         ? { id: "velden", label: `De ${actieveBouwblokkenMetGroep(assessment).length} spanningsvelden` }
         : soort === "quickscan"
           ? { id: "afdelingen", label: `De ${(assessment.categorieen ?? []).filter((c) => !c.gearchiveerd).length} afdelingen` }
-          : { id: "bouwblokken", label: "De 15 bouwblokken" };
+          : { id: "bouwblokken", label: "De 15 bouwstenen" };
   const laatste: PaginaSectie = soort === "ai" ? { id: "2030", label: "Klantcontact richting 2030" } : { id: "visie", label: "Visie" };
   return [eerste, { id: "praktisch", label: "Praktisch" }, { id: "wat", label: "Wat krijg ik" }, laatste];
 }
@@ -76,7 +76,7 @@ export function overDezeScan(assessment: Assessment | undefined): { tekst: strin
   // Bij de Quickscan staat de link er niet (`CLAUDE.md`, scherm 5).
   if (!soort || soort === "quickscan") return null;
   return {
-    tekst: soort === "ai" ? "Over deze scan: AI-domeinen en 2030" : soort === "spanning" ? "Over deze scan: spanningsvelden en visie" : "Over deze scan: visie en bouwblokken",
+    tekst: soort === "ai" ? "Over deze scan: AI-domeinen en 2030" : soort === "spanning" ? "Over deze scan: Spanningsvelden en visie" : "Over deze scan: Visie en bouwstenen",
     href: `/${assessment.id}`,
   };
 }
@@ -93,7 +93,7 @@ const TEGELS: Record<string, (n: { vragen: number; duur: string; bouwblokken: nu
     zin: "Breng in kaart hoe volwassen jouw klantcontactorganisatie is.",
     punten: [
       { tekst: `${n.vragen} vragen, ${n.duur}`, icoon: "klok" },
-      { tekst: `${n.bouwblokken} bouwblokken in ${n.categorieen} categorieën`, icoon: "lagen" },
+      { tekst: `${n.bouwblokken} bouwstenen in ${n.categorieen} categorieën`, icoon: "lagen" },
       { tekst: "Concrete stappen op basis van je scores", icoon: "vlag" },
     ],
   }),
@@ -109,7 +109,7 @@ const TEGELS: Record<string, (n: { vragen: number; duur: string; bouwblokken: nu
     zin: "Breng in kaart hoe volwassen het patiënt- of cliëntcontact van jouw zorg- of welzijnsorganisatie is.",
     punten: [
       { tekst: `${n.vragen} vragen, ${n.duur}`, icoon: "klok" },
-      { tekst: `${n.bouwblokken} bouwblokken in ${n.categorieen} categorieën`, icoon: "lagen" },
+      { tekst: `${n.bouwblokken} bouwstenen in ${n.categorieen} categorieën`, icoon: "lagen" },
       { tekst: "Scores gewogen voor de zorg, met concrete stappen", icoon: "vlag" },
     ],
   }),

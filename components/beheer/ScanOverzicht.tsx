@@ -22,7 +22,7 @@ import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { AndereRespondentKoppelenStap, NaarAndereMetingStap, ScanVerplaatsResultaat } from "@/components/beheer/VerplaatsStappen";
 import { STATUS_LABEL, datumTekst, rolTeamTekst } from "@/components/beheer/overzicht-helpers";
 
-const NIVEAU_LABEL = { rood: "Basis op Orde", oranje: "Uitbouwen", groen: "Sterk punt" } as const;
+const NIVEAU_LABEL = { rood: "Basis op orde", oranje: "Uitbouwen", groen: "Sterk punt" } as const;
 
 /**
  * Scan-overzicht (beheerpagina.md punt 7): vervangt de vroegere

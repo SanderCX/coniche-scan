@@ -196,7 +196,7 @@ export function BenchmarkGroepSectie({
                   groepResultaten={resultaten.groepen}
                   vlak={vlak}
                   naam="Groep"
-                  radarTitel={vlak ? `Per ${woorden.enkelvoud}` : "Per bouwblok"}
+                  radarTitel={vlak ? `Per ${woorden.enkelvoud}` : "Per bouwsteen"}
                   groepTitel={vlak ? `Scores per ${woorden.enkelvoud}` : "Per categorie"}
                 />
 

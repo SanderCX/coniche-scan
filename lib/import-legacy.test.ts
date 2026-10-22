@@ -1,3 +1,5 @@
+import { klantcontactVolwassenheid } from "@/data/klantcontact-assessment";
+import { alleBouwblokkenMetGroep } from "./assessment-structuur";
 import { describe, expect, it } from "vitest";
 import { bestandOverslaanReden, detecteerBronFormaat, valideerNieuweExportRijen } from "./import-legacy";
 import type { Assessment } from "./types";
@@ -49,12 +51,46 @@ describe("notitie per scan bij de eigen export", () => {
   const rij = (extra: Record<string, string> = {}) => ({
     organisatie_naam: "Org", meting_label: "Nul", assessment_naam: "Onbekend", respondent_naam: "", respondent_email: "a@x.nl",
     respondent_functie: "", respondent_team: "", status: "afgerond", uitgenodigd_op: "", gestart_op: "", afgerond_op: "",
-    organisatie_kenmerken: "", antwoorden: "[]", opmerkingen_per_bouwblok: "{}", ...extra,
+    organisatie_kenmerken: "", antwoorden: "[]", opmerkingen_per_bouwsteen: "{}", ...extra,
   });
 
   it("leest de kolom scan_notitie als notitie van de scan, en laat hem leeg als de kolom ontbreekt", () => {
     const [met, zonder] = valideerNieuweExportRijen([rij({ scan_notitie: " Jan Jansen " }), rij()], [] as Assessment[]);
     expect(met.scanNotitie).toBe("Jan Jansen");
     expect(zonder.scanNotitie).toBe("");
+  });
+});
+
+describe("de kolom met opmerkingen per bouwsteen (22 oktober 2026)", () => {
+  const assessment = klantcontactVolwassenheid;
+  const bouwblokken = alleBouwblokkenMetGroep(assessment).map((b) => b.bouwblok);
+  const items = (nieuw: boolean) =>
+    JSON.stringify(
+      bouwblokken.flatMap((b) =>
+        b.vragen.map((v) => ({ ...(nieuw ? { bouwsteenId: b.id, bouwsteenNaam: b.naam } : { bouwblokId: b.id, bouwblokNaam: b.naam }), vraagId: v.id, score: 3 }))
+      )
+    );
+  const rij = (extra: Record<string, string>, nieuw = true) => ({
+    organisatie_naam: "Org", meting_label: "Nul", assessment_naam: assessment.naam, respondent_naam: "", respondent_email: "a@x.nl",
+    respondent_functie: "", respondent_team: "", status: "afgerond", uitgenodigd_op: "", gestart_op: "", afgerond_op: "",
+    organisatie_kenmerken: "", antwoorden: items(nieuw), ...extra,
+  });
+  const opm = JSON.stringify({ [bouwblokken[0].id]: "Een opmerking" });
+
+  it("leest zowel opmerkingen_per_bouwsteen als de oude naam opmerkingen_per_bouwblok, met de oude of de nieuwe namen in de antwoorden", () => {
+    const [nieuw, oud] = valideerNieuweExportRijen(
+      [rij({ opmerkingen_per_bouwsteen: opm }), rij({ opmerkingen_per_bouwblok: opm }, false)],
+      [assessment]
+    );
+    expect(nieuw.ok).toBe(true);
+    expect(nieuw.opmerkingenPerBouwblok).toEqual({ [bouwblokken[0].id]: "Een opmerking" });
+    expect(oud.ok).toBe(true);
+    expect(oud.opmerkingenPerBouwblok).toEqual({ [bouwblokken[0].id]: "Een opmerking" });
+  });
+
+  it("meldt een ongeldige JSON met de nieuwe kolomnaam", () => {
+    const [kapot] = valideerNieuweExportRijen([rij({ opmerkingen_per_bouwsteen: "{kapot" })], [assessment]);
+    expect(kapot.ok).toBe(false);
+    expect(kapot.probleem).toContain("opmerkingen_per_bouwsteen");
   });
 });

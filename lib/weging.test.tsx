@@ -17,7 +17,7 @@ const zorgscan: Assessment = {
 };
 
 describe("weging", () => {
-  it("bouwblokken met een afwijkend gewicht worden gevonden: Alleen de Zorgscan-seed heeft er, en wel 4, 10 en 11 op 2", () => {
+  it("bouwstenen met een afwijkend gewicht worden gevonden: Alleen de Zorgscan-seed heeft er, en wel 4, 10 en 11 op 2", () => {
     expect(bouwblokkenMetAfwijkendGewicht(zorgscan).map((b) => [b.volgnummer, b.gewicht])).toEqual([
       [4, 2],
       [10, 2],
@@ -39,7 +39,7 @@ describe("weging", () => {
     expect(gewichtMarkering({ ...b, gewicht: 1 })).toBeNull();
   });
 
-  it("de wegingskaart toont standaardtitel, standaardtekst en een chip per bouwblok, en ontbreekt zonder afwijkend gewicht", () => {
+  it("de wegingskaart toont standaardtitel, standaardtekst en een chip per bouwsteen, en ontbreekt zonder afwijkend gewicht", () => {
     const html = renderToStaticMarkup(<WegingKaart assessment={zorgscan} />);
     expect(html).toContain("Gewogen scoring");
     expect(html).toContain("tellen extra mee");

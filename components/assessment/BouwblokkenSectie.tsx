@@ -89,8 +89,8 @@ export function BouwblokkenSectie({ warm = false }: { warm?: boolean }) {
               </>
             ) : (
               <>
-                <span>De 15 bouwblokken</span>
-                <p className="br-vraag-hint">Beweeg over een bouwblok of een nummer in de radar om de centrale vraag te zien.</p>
+                <span>De 15 bouwstenen</span>
+                <p className="br-vraag-hint">Beweeg over een bouwsteen of een nummer in de radar om de centrale vraag te zien.</p>
               </>
             )}
           </div>
@@ -101,7 +101,7 @@ export function BouwblokkenSectie({ warm = false }: { warm?: boolean }) {
             </div>
             <div className="br-midden">
               <div className="br-radar">
-                <svg viewBox={`0 0 ${MAAT} ${MAAT}`} role="img" aria-label="Radar met de 15 bouwblokken" width="100%" height="100%">
+                <svg viewBox={`0 0 ${MAAT} ${MAAT}`} role="img" aria-label="Radar met de 15 bouwstenen" width="100%" height="100%">
                   {ALLE.map((b) => {
                     const h = hoekVan(b.nummer);
                     const [x1, y1] = punt(TAART_R, h - stap / 2);

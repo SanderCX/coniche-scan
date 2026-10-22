@@ -140,7 +140,7 @@ export const CLASSIFICATIE_SCORES: Record<Classificatie, (1 | 2 | 3 | 4 | 5)[]> 
 
 export const CLASSIFICATIE_INFO: Record<Classificatie, { label: string; omschrijving: string }> = {
   rood: {
-    label: "Basis op Orde",
+    label: "Basis op orde",
     omschrijving:
       "De basis moet op dit punt eerst op orde gemaakt worden om verder te kunnen uitbouwen.",
   },
@@ -152,6 +152,6 @@ export const CLASSIFICATIE_INFO: Record<Classificatie, { label: string; omschrij
   groen: {
     label: "Sterk punt",
     omschrijving:
-      "Hier is de organisatie al heel goed in. Benut dit optimaal en bouw het verder uit, ook ter ondersteuning van zwakkere bouwblokken.",
+      "Hier is de organisatie al heel goed in. Benut dit optimaal en bouw het verder uit, ook ter ondersteuning van zwakkere bouwstenen.",
   },
 };

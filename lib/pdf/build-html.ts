@@ -314,7 +314,7 @@ export function buildResultatenPdfHtml(payload: ExportPdfPayload, logoDataUri: s
      vrije ruimte op de pagina zweven, met een veel grotere en per pagina
      wisselende afstand tot gevolg, op verzoek van Sander teruggedraaid).
      Onbenutte ruimte op een korter paar blijft nu gewoon onderaan de
-     pagina staan. Elk bouwsteen-blok blijft ongesplitst
+     pagina staan. Elke bouwsteen-blok blijft ongesplitst
      (page-break-inside: avoid). */
   .bouwsteen-pagina { display: flex; flex-direction: column; min-height: 245mm; }
   .bouwsteen-pagina + .bouwsteen-pagina { page-break-before: always; }

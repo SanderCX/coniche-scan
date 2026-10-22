@@ -40,7 +40,7 @@
   --text-lg: 18px;
   --text-xl: 24px;
   --text-2xl: 32px;
-  --text-3xl: 40px;
+  --text-3xl: 36px;
   --text-4xl: 48px;
 
   --color-ink: #1c1c1a;
@@ -70,7 +70,7 @@
   --color-pu: #392944;
   --color-fu: #ffc043;
 
-  /* Classificatiekleuren (Basis op Orde/Uitbouwen/Sterk punt) — bewust andere
+  /* Classificatiekleuren (Basis op orde/Uitbouwen/Sterk punt) — bewust andere
      waarden dan de categoriekleuren hierboven, zie stylesheet.md. */
   --color-stat-red: #dc2626;
   --color-stat-red-faint: #fdecec;

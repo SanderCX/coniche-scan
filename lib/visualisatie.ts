@@ -9,6 +9,8 @@
  */
 import { Assessment, BenchmarkLezing, Bouwblok, Classificatie, ScanInvulling } from "./types";
 import { alleBouwblokkenMetGroep } from "./assessment-structuur";
+import { SPREIDING_STANDAARD, SpreidingGrenzen, spreidingLabelVoor } from "./spreiding-grenzen";
+import { getSpreidingGrenzen } from "./instellingen-store";
 import {
   bouwblokScore,
   bouwblokScoreRuw,
@@ -20,20 +22,17 @@ import {
 } from "./scoring";
 
 export const KLASSE_LABEL: Record<Classificatie, string> = {
-  rood: "Basis op Orde",
+  rood: "Basis op orde",
   oranje: "Uitbouwen",
   groen: "Sterk punt",
 };
 
 /**
- * Het woord voor een bouwblok in de weergaven van de resultaten, de benchmark en Verkennen: "bouwblok" waar de Assessment het
- * "bouwsteen" noemt (`visualisatie-scores.md`, J: "Bouwblok" en niet "Bouwsteen"), anders de eigen eenheid van de Assessment
+ * Het woord voor een bouwblok in de weergaven van de resultaten, de benchmark en Verkennen: de eigen eenheid van de Assessment ("bouwsteen" bij Klantcontact en Zorg, sinds 22 oktober 2026 overal Bouwsteen in de interface)
  * (bijvoorbeeld "domein" bij de AI-scan). De respondent ziet in zijn eigen scan het woord van de Assessment.
  */
 export function bouwblokWoorden(assessment: Pick<Assessment, "bouwblokEenheidEnkelvoud" | "bouwblokEenheidMeervoud">): { enkelvoud: string; meervoud: string } {
-  const enkelvoud = assessment.bouwblokEenheidEnkelvoud;
-  if (enkelvoud.toLowerCase() === "bouwsteen") return { enkelvoud: "bouwblok", meervoud: "bouwblokken" };
-  return { enkelvoud: kleineLetter(enkelvoud), meervoud: kleineLetter(assessment.bouwblokEenheidMeervoud) };
+  return { enkelvoud: kleineLetter(assessment.bouwblokEenheidEnkelvoud), meervoud: kleineLetter(assessment.bouwblokEenheidMeervoud) };
 }
 
 /**
@@ -148,13 +147,12 @@ export function eenMeting(assessment: Assessment, invullingen: ScanInvulling[]):
 
 export type SpreidingsLabel = "Eensgezind" | "Wisselend" | "Verdeeld";
 
-/** Eerste inschatting (`visualisatie-scores.md`, Spreidingslabel): De grenzen worden bijgesteld met echte data. */
-export const SPREIDING_GRENZEN = { wisselend: 0.55, verdeeld: 0.8 };
+/** De startwaarden van de grenzen (`visualisatie-scores.md`, Spreidingslabel). De grenzen zelf zijn instelbaar door een Admin (`beheerpagina.md`, formulier Spreiding). */
+export const SPREIDING_GRENZEN = SPREIDING_STANDAARD;
 
-export function spreidingsLabel(sd: number): SpreidingsLabel {
-  if (sd < SPREIDING_GRENZEN.wisselend) return "Eensgezind";
-  if (sd < SPREIDING_GRENZEN.verdeeld) return "Wisselend";
-  return "Verdeeld";
+/** Het label bij een standaardafwijking, met de grenzen uit de instellingen of, bij een aanroep met grenzen, die grenzen. */
+export function spreidingsLabel(sd: number, grenzen: SpreidingGrenzen = getSpreidingGrenzen().schaal): SpreidingsLabel {
+  return spreidingLabelVoor(sd, grenzen);
 }
 
 export interface RijSpreiding {

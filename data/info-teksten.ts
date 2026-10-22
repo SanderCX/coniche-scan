@@ -73,14 +73,14 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
   },
   {
     sleutel: "info.contentToelichting",
-    plek: "Content, veld Toelichting van een bouwblok",
+    plek: "Content, veld Toelichting van een bouwsteen",
     tekst:
-      "Lopende tekst in de Toelichtingsmodal bij dit bouwblok. Een lege regel scheidt de alinea's. Laat je het veld leeg, dan ontbreekt dit onderdeel in de modal.",
+      "Lopende tekst in de Toelichtingsmodal bij deze bouwsteen. Een lege regel scheidt de alinea's. Laat je het veld leeg, dan ontbreekt dit onderdeel in de modal.",
   },
   {
-    sleutel: "info.contentBouwblokLabel",
-    plek: "Content, veld Bouwblok-label",
-    tekst: "De kleine kop boven de titel in de Toelichtingsmodal, bijvoorbeeld \"Bouwblok\" of \"AI-domein\", gevolgd door het nummer.",
+    sleutel: "info.contentBouwsteenLabel",
+    plek: "Content, veld Bouwsteen-label",
+    tekst: "De kleine kop boven de titel in de Toelichtingsmodal, bijvoorbeeld \"Bouwsteen\" of \"AI-domein\", gevolgd door het nummer.",
   },
   {
     sleutel: "info.conflictOplossen",
@@ -151,6 +151,12 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
       "Grenzen voor Verkennen. Een groep onder het minimum is gestreept en krijgt geen cijfers. Bij een kleinere focus of rest staat een waarschuwing. In een kleinere pool kun je niet groeperen. Een kenmerk met meer waarden dan het maximum of een lagere invulling dan het minimum kan niet groeperen.",
   },
   {
+    sleutel: "info.spreidingGrenzen",
+    plek: "Instellingen, Drempels en termijnen, formulier Spreiding",
+    tekst:
+      "De grenzen van het spreidingslabel. Onder de eerste grens is de spreiding Eensgezind, tussen de twee grenzen Wisselend en vanaf de tweede grens Verdeeld. Het is de standaardafwijking van de scores van de scans in een Meting: in scorepunten bij de schaalscans, in procentpunten bij de Quickscan. De grens voor Verdeeld ligt boven die voor Wisselend. Een nieuwe grens geldt direct, voor alle Metingen.",
+  },
+  {
     sleutel: "info.korteNaamOrganisatie",
     plek: "Organisatie aanmaken en bewerken, naast het veld Korte naam",
     tekst:
@@ -178,7 +184,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     sleutel: "info.dossier",
     plek: "Organisatie-detail, kaart Dossier, naast de kop van het paneel Instellingen voor de Lead",
     tekst:
-      "Cases, nieuws, events en blogs die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier zichtbaar is én het item op Zichtbaar voor Lead staat. Een case kan alleen zichtbaar worden als de organisatie in de case dat heeft toegestaan.",
+      "Cases, benchmarks, nieuws, events en blogs die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier zichtbaar is én het item op Zichtbaar voor Lead staat. Een case kan alleen zichtbaar worden als de organisatie in de case dat heeft toegestaan, en een benchmark alleen voor een Lead die toegang heeft tot die benchmark.",
   },
   {
     sleutel: "info.caseVlag",

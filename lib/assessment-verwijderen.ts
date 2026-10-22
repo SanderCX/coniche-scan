@@ -81,7 +81,7 @@ export function verwijderAssessment(assessmentId: string, benchmarks: Benchmark[
       assessmentNaam: assessment.naam,
       kortLabel: assessment.kortLabel,
       aantalCategorieen: effecten.aantalCategorieen,
-      aantalBouwblokken: effecten.aantalBouwblokken,
+      aantalBouwstenen: effecten.aantalBouwblokken,
       aantalVragen: effecten.aantalVragen,
       benchmarkNamen,
     },

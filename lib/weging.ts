@@ -6,7 +6,7 @@ import { gewichtVan } from "./scoring";
 /** Standaardtitel en -tekst van de wegingskaart (`CLAUDE.md`, scherm 4). */
 export const STANDAARD_WEGINGTITEL = "Gewogen scoring";
 export const STANDAARD_WEGINGTEKST =
-  "Binnen dit assessment wegen niet alle bouwblokken even zwaar mee in de totaalscore. De volgende bouwblokken tellen extra mee:";
+  "Binnen dit assessment wegen niet alle bouwstenen even zwaar mee in de totaalscore. De volgende bouwstenen tellen extra mee:";
 
 /** Bouwblokken met een gewicht ongelijk aan 1, op volgorde van het bouwblok-nummer. Gearchiveerde blokken doen niet mee. */
 export function bouwblokkenMetAfwijkendGewicht(assessment: Assessment): Bouwblok[] {

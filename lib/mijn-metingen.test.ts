@@ -200,7 +200,7 @@ describe("teaser van de AI-scan (domeinrijen, 22 oktober 2026)", () => {
     // De domeinen 5, 6 en 8 hebben een donker nummer op een lichte kleur.
     expect([4, 5, 7].map((i) => t.rijen[i].nummer?.tekst)).toEqual(["var(--ink)", "var(--ink)", "var(--ink)"]);
     expect(t.rijenLabel).toBe("Per domein");
-    expect(t.klasseNaam).toBe("Basis op Orde");
+    expect(t.klasseNaam).toBe("Basis op orde");
   });
 
   it("heeft een tekstalternatief per rij met domein, naam en score", () => {

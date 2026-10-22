@@ -12,6 +12,7 @@ import {
   VERDELING_EERST,
   aantallPerSoort,
   aantalZichtbaarVoorLead,
+  benchmarksVoorDossier,
   brancheVan,
   dossierBouwblokkenPerAssessment,
   eventsInVolgorde,
@@ -30,11 +31,12 @@ import {
   leegDossierInvoer,
   nieuwsNieuwsteEerst,
   casesNieuwsteEerst,
+  ruimDossierOp,
   voorproef,
   zetNieuwsartikelenOm,
 } from "./dossier";
 import { automatischeRadarMeting, dossierRadarMeting, radarBronVan, verlorenRadarBronnen } from "./dossier-radar";
-import type { Dossieritem, LeadToegang, Organisatie, OrganisatieLid, ScanUitvoering } from "./types";
+import type { Benchmark, Dossieritem, LeadToegang, Organisatie, OrganisatieLid, ScanUitvoering } from "./types";
 
 const opslag = new Map<string, string>();
 const KEY = "coniche-scan:organisaties";
@@ -112,7 +114,7 @@ describe("openzetten van een case", () => {
 describe("status en volgorde", () => {
   const item = (extra: Partial<Dossieritem>): Dossieritem => ({
     id: "1", soort: "case", titel: "t", toelichting: "", zichtbaarVoorLead: false, bouwblokIds: [], url: "", aangemaaktOp: "2026-10-01T00:00:00Z",
-    gewijzigdOp: "x", bron: "", gepubliceerdOp: "", datum: "", einddatum: "", plaats: "", samenvatting: "s", caseOrganisatieId: "C", omvang: "", totResultaat: "", ...extra,
+    gewijzigdOp: "x", bron: "", gepubliceerdOp: "", datum: "", einddatum: "", plaats: "", samenvatting: "s", caseOrganisatieId: "C", omvang: "", totResultaat: "", benchmarkId: null, ...extra,
   });
   it("kent vier statussen", () => {
     const alle = [org("C", { caseToegestaan: true })];
@@ -235,7 +237,7 @@ describe("wat de Lead ziet", () => {
     return [o, metSector("C"), metSector("Z", false)];
   };
   function vul(id: string, soort: Dossieritem["soort"]): Dossieritem {
-    return { id, soort, titel: `Titel ${id}`, toelichting: "", zichtbaarVoorLead: false, bouwblokIds: [], url: "", aangemaaktOp: "2026-10-01T00:00:00Z", gewijzigdOp: "x", bron: "", gepubliceerdOp: "", datum: "", einddatum: "", plaats: "", samenvatting: "s", caseOrganisatieId: null, omvang: "", totResultaat: "" };
+    return { id, soort, titel: `Titel ${id}`, toelichting: "", zichtbaarVoorLead: false, bouwblokIds: [], url: "", aangemaaktOp: "2026-10-01T00:00:00Z", gewijzigdOp: "x", bron: "", gepubliceerdOp: "", datum: "", einddatum: "", plaats: "", samenvatting: "s", caseOrganisatieId: null, omvang: "", totResultaat: "", benchmarkId: null };
   }
   it("toont alleen wat openstaat, zichtbaar is en bij een case toestemming heeft", () => {
     const alle = opgezet();
@@ -261,7 +263,7 @@ describe("wat de Lead ziet", () => {
     c.kenmerken = {};
     expect(leadDossier(o, [o, c])).toBeNull();
   });
-  it("filtert op bouwblok, telt per bouwblok en maakt de voorproef", () => {
+  it("filtert op bouwsteen, telt per bouwsteen en maakt de voorproef", () => {
     const alle = opgezet();
     const d = leadDossier(alle[0], alle)!;
     expect(filterOpBouwblok(d, "b2").cases).toHaveLength(1);
@@ -297,7 +299,7 @@ const event = (extra = {}) => ({ ...leegDossierInvoer("event"), titel: "Klantcon
 const blog = (extra = {}) => ({ ...leegDossierInvoer("blog"), titel: "Waarom regie telt", url: "coniche.nl/blog/regie", ...extra });
 const basisItem = (extra: Partial<Dossieritem>): Dossieritem => ({
   id: "i", soort: "event", titel: "t", toelichting: "", zichtbaarVoorLead: false, bouwblokIds: [], url: "", aangemaaktOp: "2026-10-01T00:00:00Z",
-  gewijzigdOp: "x", bron: "", gepubliceerdOp: "", datum: "", einddatum: "", plaats: "", samenvatting: "", caseOrganisatieId: null, omvang: "", totResultaat: "", ...extra,
+  gewijzigdOp: "x", bron: "", gepubliceerdOp: "", datum: "", einddatum: "", plaats: "", samenvatting: "", caseOrganisatieId: null, omvang: "", totResultaat: "", benchmarkId: null, ...extra,
 });
 
 describe("controle van een event en een blog", () => {
@@ -370,7 +372,7 @@ describe("volgorde en aantallen met vier soorten", () => {
       basisItem({ id: "oud", soort: "event", datum: "2026-01-01" }),
     ];
     expect(itemsInVolgorde(lijst, NU).map((i) => i.id)).toEqual(["ca", "ne", "ev", "oud", "bl"]);
-    expect(aantallPerSoort(lijst)).toEqual({ alles: 5, cases: 1, nieuws: 1, events: 2, blogs: 1 });
+    expect(aantallPerSoort(lijst)).toEqual({ alles: 5, cases: 1, benchmarks: 0, nieuws: 1, events: 2, blogs: 1 });
   });
 });
 
@@ -395,7 +397,7 @@ describe("wat de Lead ziet bij events en blogs", () => {
     expect(d.blogs.map((b) => b.id)).toEqual(["b1"]);
     expect(d.cases).toEqual([]);
   });
-  it("telt een verlopen event niet mee in de voorproef en de aantallen, wel in het aantal per bouwblok", () => {
+  it("telt een verlopen event niet mee in de voorproef en de aantallen, wel in het aantal per bouwsteen", () => {
     const o = dossier();
     const d = leadDossier(o, [o], undefined, NU)!;
     expect(voorproef(d, 5).titels.map((t) => t.soort)).toEqual(["nieuws", "event", "blog"]);
@@ -405,8 +407,8 @@ describe("wat de Lead ziet bij events en blogs", () => {
     expect(filterOpBouwblok(d, "ai1").blogs.map((b) => b.id)).toEqual(["b1"]);
   });
   it("laat een soort zonder items in de tekst weg en gebruikt het enkelvoud", () => {
-    expect(aantalTekst({ cases: [], nieuws: [], events: [], blogs: [{ id: "b" } as never] })).toBe("1 blog");
-    expect(aantalTekst({ cases: [{ id: "c" } as never, { id: "d" } as never], nieuws: [], events: [{ verlopen: true } as never], blogs: [] })).toBe("2 cases");
+    expect(aantalTekst({ cases: [], benchmarks: [], nieuws: [], events: [], blogs: [{ id: "b" } as never] })).toBe("1 blog");
+    expect(aantalTekst({ cases: [{ id: "c" } as never, { id: "d" } as never], benchmarks: [], nieuws: [], events: [{ verlopen: true } as never], blogs: [] })).toBe("2 cases");
   });
   it("toont het Dossier ook als er alleen een verlopen event is", () => {
     const o = dossier();
@@ -415,8 +417,8 @@ describe("wat de Lead ziet bij events en blogs", () => {
   });
 });
 
-describe("koppeling aan bouwblokken van twee Assessments", () => {
-  it("biedt de bouwblokken van Klantcontact Volwassenheid en de domeinen van de AI-scan, in die volgorde en op nummer", async () => {
+describe("koppeling aan bouwstenen van twee Assessments", () => {
+  it("biedt de bouwstenen van Klantcontact Volwassenheid en de domeinen van de AI-scan, in die volgorde en op nummer", async () => {
     const { assessments } = await import("@/data/assessments");
     const per = dossierBouwblokkenPerAssessment(assessments);
     expect(per.map((p) => p.assessment.id)).toEqual(["klantcontact-volwassenheid", "ai-volwassenheid"]);
@@ -470,14 +472,14 @@ describe("de verdeling over secties in de lijst van de Lead", () => {
     expect(sectieVanScore(3.5)).toBe("sterk");
   });
 
-  it("zet een item in elke sectie waarin een van zijn bouwblokken valt, over beide Assessments heen", () => {
+  it("zet een item in elke sectie waarin een van zijn bouwstenen valt, over beide Assessments heen", () => {
     expect(sectiesVanItem(["b3", "b2"], scores)).toEqual(["uitbouwen", "sterk"]);
     expect(sectiesVanItem(["b3", "b1", "b2"], scores)).toEqual(["basis", "uitbouwen", "sterk"]);
     expect(sectiesVanItem(["b3"], scores)).toEqual(["sterk"]);
     expect(sectiesVanItem(["b1", "b1"], scores)).toEqual(["basis"]);
   });
 
-  it("zet een item zonder bouwblok of zonder score in Algemeen, en een bouwblok zonder score geeft geen sectie", () => {
+  it("zet een item zonder bouwsteen of zonder score in Algemeen, en een bouwsteen zonder score geeft geen sectie", () => {
     expect(sectiesVanItem([], scores)).toEqual(["algemeen"]);
     expect(sectiesVanItem(["b4"], scores)).toEqual(["algemeen"]);
     expect(sectiesVanItem(["onbekend"], scores)).toEqual(["algemeen"]);
@@ -489,14 +491,15 @@ describe("de verdeling over secties in de lijst van de Lead", () => {
       cases: [item("c1", ["b3"]), item("c2", ["b1"])],
       nieuws: [item("n1", [])],
       events: [item("e1", ["b2"], { verlopen: false }), item("e2", ["b2"], { verlopen: true })],
+      benchmarks: [],
       blogs: [],
     } as unknown as Parameters<typeof verdeelOverSecties>[0];
-    const secties = verdeelOverSecties(l, scores, "bouwblok");
+    const secties = verdeelOverSecties(l, scores, "bouwsteen");
     expect(secties.map((x) => x.sectie)).toEqual(["basis", "uitbouwen", "sterk", "algemeen"]);
     expect(secties.map((x) => x.aantal)).toEqual([1, 1, 1, 1]);
-    expect(secties[3].regel).toBe("Niet aan één bouwblok gekoppeld");
+    expect(secties[3].regel).toBe("Niet aan één bouwsteen gekoppeld");
     expect(secties[1].lijsten.events.map((e) => e.id)).toEqual(["e1", "e2"]);
-    expect(verdeelOverSecties({ cases: [], nieuws: [], events: [], blogs: [] }, scores, "domein")).toEqual([]);
+    expect(verdeelOverSecties({ cases: [], benchmarks: [], nieuws: [], events: [], blogs: [] }, scores, "domein")).toEqual([]);
   });
 
   it("telt per soort zonder verlopen events en filtert op soort", () => {
@@ -504,9 +507,10 @@ describe("de verdeling over secties in de lijst van de Lead", () => {
       cases: [item("c1", [])],
       nieuws: [item("n1", []), item("n2", [])],
       events: [item("e1", [], { verlopen: false }), item("e2", [], { verlopen: true })],
+      benchmarks: [],
       blogs: [item("b1", [])],
     } as unknown as Parameters<typeof filterOpSoort>[0];
-    expect(aantallenPerSoortLead(l)).toEqual({ alles: 5, case: 1, nieuws: 2, event: 1, blog: 1 });
+    expect(aantallenPerSoortLead(l)).toEqual({ alles: 5, case: 1, benchmark: 0, nieuws: 2, event: 1, blog: 1 });
     expect(filterOpSoort(l, "alles")).toBe(l);
     const alleenNieuws = filterOpSoort(l, "nieuws");
     expect([alleenNieuws.cases.length, alleenNieuws.nieuws.length, alleenNieuws.events.length, alleenNieuws.blogs.length]).toEqual([0, 2, 0, 0]);
@@ -537,14 +541,15 @@ describe("een item in meerdere secties (22 oktober 2026)", () => {
   ]);
   const item = (id: string, bouwblokIds: string[]) => ({ id, bouwblokIds });
 
-  it("zet een item in elke sectie waarin een bouwblok valt en telt het per sectie", () => {
+  it("zet een item in elke sectie waarin een bouwsteen valt en telt het per sectie", () => {
     const l = {
       cases: [item("c1", ["b1", "b3"])],
       nieuws: [item("n1", ["b1"]), item("n2", ["b2"])],
       events: [],
+      benchmarks: [],
       blogs: [],
     } as unknown as Parameters<typeof verdeelOverSecties>[0];
-    const secties = verdeelOverSecties(l, scores, "bouwblok");
+    const secties = verdeelOverSecties(l, scores, "bouwsteen");
     expect(secties.map((x) => [x.sectie, x.aantal])).toEqual([
       ["basis", 2],
       ["uitbouwen", 1],
@@ -671,5 +676,96 @@ describe("de scorebron van het Dossier", () => {
     const o = laad("O");
     expect(o.dossier!.zichtbaar).toBe(false);
     expect(verlorenRadarBronnen(o)).toMatchObject([{ metingId: "m2", reden: "verwijderd", metingLabel: null }]);
+  });
+});
+
+
+/* ---------- Benchmark als vijfde soort (`dossier.md`, 22 oktober 2026) ---------- */
+
+describe("een Benchmark in het Dossier", () => {
+  const BKEY = "coniche-scan:benchmarks";
+  const bench = (id: string, naam: string, extra: Partial<Benchmark> = {}): Benchmark => ({
+    id, naam, assessmentIds: ["klantcontact-volwassenheid"], leden: [{ organisatieId: "O", assessmentId: "klantcontact-volwassenheid", metingId: "m" }, { organisatieId: "P", assessmentId: "klantcontact-volwassenheid", metingId: "n" }],
+    meldingen: [], aangemaaktOp: "x", aangemaaktDoor: "A", ...extra,
+  });
+  const zetBenchmarks = (...lijst: Benchmark[]) => opslag.set(BKEY, JSON.stringify({ benchmarks: lijst, toewijzingen: [] }));
+  const lid = (id: string, lead: boolean) => ({
+    id, organisatieId: "O", email: `${id}@x.nl`, naam: null, functie: "", team: "", notities: "", toegangscode: id.padEnd(10, "x"), lead,
+  }) as unknown as OrganisatieLid;
+  const bToegang = (respondentId: string, benchmarkId: string): LeadToegang => ({ respondentId, weergave: "benchmark", benchmarkId, toegekendDoor: "A", toegekendOp: "x" });
+  const invoer = (extra = {}) => ({ ...leegDossierInvoer("benchmark"), benchmarkId: "b1", ...extra });
+  const bItem = (extra: Partial<Dossieritem> = {}): Dossieritem => ({
+    id: "bi", soort: "benchmark", titel: "", toelichting: "Waarom relevant", zichtbaarVoorLead: true, bouwblokIds: [], url: "", aangemaaktOp: "2026-10-01T00:00:00Z",
+    gewijzigdOp: "x", bron: "", gepubliceerdOp: "", datum: "", einddatum: "", plaats: "", samenvatting: "", caseOrganisatieId: null, omvang: "", totResultaat: "", benchmarkId: "b1", ...extra,
+  });
+
+  it("vraagt alleen een benchmark: geen titel en geen link", () => {
+    expect(controleerDossieritem(invoer({ benchmarkId: null }), "O")).toEqual({ ok: false, reden: "Kies een benchmark." });
+    const r = controleerDossieritem(invoer({ titel: "eigen titel", url: "https://x.nl", bron: "x" }), "O");
+    expect(r.ok && r.waarde).toMatchObject({ soort: "benchmark", titel: "", url: "", bron: "", benchmarkId: "b1" });
+    expect(controleerDossieritem(invoer({ toelichting: "x".repeat(401) }), "O").ok).toBe(false);
+  });
+
+  it("kiest alleen uit benchmarks waarin de Organisatie zit, en een benchmark hoogstens één keer", () => {
+    const keuze = { kiesbaar: [{ id: "b1" }], alInDossier: ["b2"] };
+    expect(controleerDossieritem(invoer(), "O", keuze).ok).toBe(true);
+    expect(controleerDossieritem(invoer({ benchmarkId: "b9" }), "O", keuze).ok).toBe(false);
+    expect(controleerDossieritem(invoer({ benchmarkId: "b2" }), "O", { kiesbaar: [{ id: "b2" }], alInDossier: ["b2"] })).toEqual({ ok: false, reden: "Deze benchmark staat al in het Dossier." });
+    const lijst = benchmarksVoorDossier([bench("b1", "Zeta"), bench("b2", "Alfa"), bench("b3", "Anders", { leden: [{ organisatieId: "P", assessmentId: "x", metingId: "n" }] }), bench("b4", "Scans", { niveau: "scans" })], "O");
+    expect(lijst.map((b) => b.naam)).toEqual(["Alfa", "Zeta"]);
+  });
+
+  it("kent de statussen Kies een benchmark en Geen toegang voor Lead", () => {
+    const o = org("O", { leden: [lid("L1", true)], leadToegang: [] });
+    const context = (benchmarks: Benchmark[], organisatie = o) => ({ benchmarks, organisatie });
+    expect(itemStatus(bItem({ benchmarkId: null }), [o], NU)).toBe("kies-benchmark");
+    expect(itemStatus(bItem(), [o], NU, context([]))).toBe("kies-benchmark");
+    expect(itemStatus(bItem(), [o], NU, context([bench("b1", "B")]))).toBe("geen-toegang");
+    expect(itemStatus(bItem({ zichtbaarVoorLead: false }), [o], NU, context([bench("b1", "B")]))).toBe("intern");
+    const mét = org("O", { leden: [lid("L1", true)], leadToegang: [bToegang("L1", "b1")] });
+    expect(itemStatus(bItem(), [mét], NU, context([bench("b1", "B")], mét))).toBe("zichtbaar");
+  });
+
+  it("de Lead ziet de benchmark alleen met zijn eigen vinkje, met de naam van de benchmark als titel", () => {
+    const o = org("O", {
+      leden: [lid("L1", true), lid("L2", true)],
+      leadToegang: [bToegang("L1", "b1")],
+      dossier: { zichtbaar: true, zichtbaarSinds: "x", naamVoorLead: "", radarBronnen: [], gewijzigdOp: "x", items: [bItem({ bouwblokIds: ["b2"] })] },
+    });
+    const b = bench("b1", "Zorg tegen elkaar");
+    const context = (leadId: string) => ({ leadId, benchmarks: [b], assessments: [{ id: "klantcontact-volwassenheid", naam: "Klantcontact Volwassenheid" }], minOrganisaties: 2 });
+    const d = leadDossier(o, [o], undefined, NU, context("L1"))!;
+    expect(d.benchmarks).toEqual([
+      { id: "bi", benchmarkId: "b1", titel: "Zorg tegen elkaar", regel: "Vergelijking van 2 organisaties, Klantcontact Volwassenheid", toelichting: "Waarom relevant", bouwblokIds: ["b2"], aangemaaktOp: "2026-10-01T00:00:00Z" },
+    ]);
+    expect(leadDossier(o, [o], undefined, NU, context("L2"))).toBeNull();
+    expect(leadDossier(o, [o], undefined, NU)).toBeNull();
+    expect(leadDossier(o, [o], undefined, NU, { ...context("L1"), benchmarks: [] })).toBeNull();
+    // Onder het minimum staat het aantal organisaties niet in de regel.
+    expect(leadDossier(o, [o], undefined, NU, { ...context("L1"), minOrganisaties: 5 })!.benchmarks[0].regel).toBe("Vergelijking, Klantcontact Volwassenheid");
+    expect(voorproef(d, 5).titels).toEqual([{ soort: "benchmark", titel: "Zorg tegen elkaar" }]);
+    expect(aantalTekst(d)).toBe("1 benchmark");
+    expect(Object.fromEntries(itemsPerBouwblok(d))).toEqual({ b2: 1 });
+    expect(aantallenPerSoortLead(d).benchmark).toBe(1);
+    expect(filterOpBouwblok(d, "b9").benchmarks).toEqual([]);
+  });
+
+  it("zet de Organisatie van een verwijderde benchmark terug op Kies een benchmark", () => {
+    const o = org("O", { dossier: { zichtbaar: true, zichtbaarSinds: "x", naamVoorLead: "", radarBronnen: [], gewijzigdOp: "x", items: [bItem(), bItem({ id: "bj", benchmarkId: "b2" })] } });
+    expect(ruimDossierOp([o], [{ id: "b2" }])).toBe(1);
+    expect(o.dossier!.items[0]).toMatchObject({ benchmarkId: null, zichtbaarVoorLead: false });
+    expect(o.dossier!.items[1]).toMatchObject({ benchmarkId: "b2", zichtbaarVoorLead: true });
+  });
+
+  it("voegt een benchmark toe, logt de naam van de benchmark en weigert een tweede keer dezelfde", () => {
+    zet(org("O", { leden: [lid("L1", true)] }), org("P"));
+    zetBenchmarks(bench("b1", "Zorg tegen elkaar"));
+    const r = db.voegDossieritemToe("O", invoer());
+    expect(r.ok).toBe(true);
+    expect(audit().find((e) => e.actie === "dossier.itemToegevoegd")).toMatchObject({ entiteitNaam: "Zorg tegen elkaar", details: { soort: "benchmark", titel: "Zorg tegen elkaar" } });
+    expect(db.voegDossieritemToe("O", invoer())).toEqual({ ok: false, reden: "Deze benchmark staat al in het Dossier." });
+    // Een benchmark waar de Organisatie niet in zit is niet te kiezen.
+    zetBenchmarks(bench("b1", "Zorg tegen elkaar"), bench("b5", "Zonder O", { leden: [{ organisatieId: "P", assessmentId: "klantcontact-volwassenheid", metingId: "n" }] }));
+    expect(db.voegDossieritemToe("O", invoer({ benchmarkId: "b5" })).ok).toBe(false);
   });
 });

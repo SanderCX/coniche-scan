@@ -5,6 +5,8 @@ import { MetingAfdeling, MetingBouwblok, QuickscanMeting, SpreidingUitkomst } fr
 import { Totaalkaart } from "@/components/Resultaatkop";
 import { KLASSE_CHIP } from "@/lib/mijn-metingen";
 import { KLASSE_NAAM } from "@/lib/quickscan";
+import { useInstellingen } from "@/lib/instellingen-store";
+import { grensTekst } from "@/lib/spreiding-grenzen";
 import { SterksteMeeste } from "./SterksteMeeste";
 import { Hulplijnen, KLASSE_STIJL, KlasseBadge, getal } from "./gedeeld";
 
@@ -40,6 +42,7 @@ export function QuickscanGemiddeldeSpreiding({
   minRespondenten?: number;
 }) {
   const [opSpreiding, setOpSpreiding] = useState(false);
+  const { spreidingWisselendQuickscan, spreidingVerdeeldQuickscan } = useInstellingen();
   if (meting.aantalScans === 0) return <p className="admin-notice">Er zijn nog geen afgeronde scans in deze Meting.</p>;
 
   return (
@@ -73,7 +76,8 @@ export function QuickscanGemiddeldeSpreiding({
       <SterksteMeeste sterkste={meting.sterkste} meeste={meting.meesteOntwikkelruimte} />
       <p className="vis-onderschrift">
         Een grijze bol is het aantal respondenten met die score, een zwarte streep is het gemiddelde. De spreiding is de
-        standaardafwijking in procentpunten: onder 14 eensgezind, van 14 tot 20 wisselend, vanaf 20 verdeeld.
+        standaardafwijking in procentpunten: onder {grensTekst(spreidingWisselendQuickscan)} eensgezind, van {grensTekst(spreidingWisselendQuickscan)} tot{" "}
+        {grensTekst(spreidingVerdeeldQuickscan)} wisselend, vanaf {grensTekst(spreidingVerdeeldQuickscan)} verdeeld.
       </p>
     </div>
   );

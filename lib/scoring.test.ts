@@ -37,7 +37,7 @@ describe("scoring", () => {
     expect(bouwblokScore(b, {})).toBeNull();
   });
 
-  it("categoriescore negeert bouwblokken zonder antwoorden en is null zonder antwoorden", () => {
+  it("categoriescore negeert bouwstenen zonder antwoorden en is null zonder antwoorden", () => {
     const b1 = bouwblok("b1", ["a", "b"]);
     const b2 = bouwblok("b2", ["c", "d"]);
     const b3 = bouwblok("b3", ["e"]);

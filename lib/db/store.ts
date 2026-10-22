@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { parseOpslag, stringifyOpslag } from "../opslag-namen";
 import { Organisatie } from "../types";
 import { normaliseerEmail } from "../email";
 import { demoOrganisatie } from "@/data/demo-organisatie";
@@ -43,7 +44,7 @@ function getSnapshot(): string {
   // overschreven zou worden, vóórdat `haalServerKopieOp` hieronder haar
   // async ophaal-ronde heeft kunnen doen). Pas bij een eerste echte
   // schrijfactie (`slaAlles`) wordt dit zaad alsnog naar de server gestuurd.
-  const seed = JSON.stringify([structuredClone(demoOrganisatie)]);
+  const seed = stringifyOpslag([structuredClone(demoOrganisatie)]);
   window.localStorage.setItem(KEY, seed);
   return seed;
 }
@@ -158,7 +159,7 @@ function normaliseerOrganisatie(invoer: Organisatie): Organisatie {
 function parseSnapshot(snapshot: string): Organisatie[] {
   if (snapshot === SERVER_SENTINEL) return [];
   try {
-    const alles = JSON.parse(snapshot) as Organisatie[];
+    const alles = parseOpslag<Organisatie[]>(snapshot);
     if (!Array.isArray(alles)) return [];
     return alles.map(normaliseerOrganisatie);
   } catch {
@@ -188,7 +189,7 @@ export function slaAlles(alles: Organisatie[]): void {
   const benchmarks = getBenchmarksMetLeden(alles);
   for (const organisatie of alles) ruimLeadToegangOp(organisatie, benchmarks);
   // Een Case bij een andere Organisatie die naar een verwijderde Organisatie verwees, vraagt om een nieuwe keuze (`dossier.md`, Verwijderen en datakoppelingen).
-  ruimDossierOp(alles);
+  ruimDossierOp(alles, benchmarks);
   // Een gekozen Meting voor de radar die niet meer zichtbaar is voor de Lead (de weergave Resultaten staat uit of de Meting is weg): Het Dossier gaat dan uit
   // (`dossier.md`, Welke scores). Eén plek, zodat geen schrijfactie het vergeet.
   const verborgen = verbergDossiersMetVerlorenBron(alles);
@@ -205,7 +206,7 @@ export function slaAlles(alles: Organisatie[]): void {
       },
     });
   }
-  const json = JSON.stringify(alles);
+  const json = stringifyOpslag(alles);
   window.localStorage.setItem(KEY, json);
   emitChange();
   stuurNaarServer(SERVER_SLEUTEL, json);

@@ -42,16 +42,27 @@ describe("audit-weergave", () => {
     expect(tekst).not.toContain("o1");
   });
 
-  it("een gewichtswijziging noemt bouwblok, volgnummer, oud en nieuw gewicht", () => {
+  it("een gewichtswijziging noemt bouwsteen, volgnummer, oud en nieuw gewicht", () => {
     const tekst = detailTekst(
       event({
         actie: "bouwblok.gewichtGewijzigd",
         details: { bouwblokNaam: "Kanaalmanagement", volgnummer: 10, assessmentNaam: "Zorgscan", oudGewicht: 1, nieuwGewicht: 2, aantalScans: 5 },
       })
     );
-    expect(tekst).toContain("Bouwblok: #10 Kanaalmanagement");
+    expect(tekst).toContain("Bouwsteen: #10 Kanaalmanagement");
     expect(tekst).toContain("Oud gewicht: 1");
     expect(tekst).toContain("Nieuw gewicht: 2");
+  });
+
+  it("een gewichtswijziging onder de nieuwe naam toont dezelfde regel", () => {
+    const tekst = detailTekst(
+      event({
+        actie: "bouwsteen.gewichtGewijzigd",
+        details: { bouwsteenNaam: "Kanaalmanagement", volgnummer: 10, assessmentNaam: "Zorgscan", oudGewicht: 1, nieuwGewicht: 2, aantalScans: 5 },
+      })
+    );
+    expect(tekst).toContain("Bouwsteen: #10 Kanaalmanagement");
+    expect(tekst).not.toContain("bouwsteenNaam");
   });
 
   it("een import wordt één groep met aantallen en status", () => {
