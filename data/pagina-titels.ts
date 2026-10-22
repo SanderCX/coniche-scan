@@ -18,6 +18,8 @@ const PAGINA_TITELS: { route: string; titel: string }[] = [
   { route: "/s/[code]", titel: "Mijn metingen" },
   { route: "/s/[code]/resultaten/[scanUitvoeringId]", titel: "Resultaten van de Meting" },
   { route: "/s/[code]/benchmark/[toewijzingId]", titel: "Benchmark" },
+  // De Dossierpagina zet zelf de naam voor de Lead (`lib/pagina-titel.ts`); dit is de terugval zolang het Dossier niet geladen is.
+  { route: "/s/[code]/dossier", titel: "Dossier" },
   { route: "/scan/[respondentId]/intake", titel: "Intake" },
   { route: "/scan/[respondentId]/doorloop", titel: "Vragenlijst" },
   { route: "/scan/[respondentId]/resultaten", titel: "Resultaten" },

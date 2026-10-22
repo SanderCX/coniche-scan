@@ -359,11 +359,21 @@ export interface Dossier {
   zichtbaarSinds: string | null;
   /** De titel van het Dossier bij de Lead, maximaal 80 tekens. Leeg: "Dossier {Organisatie.naam}" (`dossier.md`, Naam en scorebron). */
   naamVoorLead: string;
+  /** Welke blokken van het organisatiepaneel de Lead bovenaan het Dossier ziet (`dossier.md`, Profiel van de Organisatie). Alle vier standaard uit. */
+  toonProfiel: ToonProfiel;
   /** Per Assessment met een radar de Meting die de scores levert. Ontbreekt een Assessment, dan geldt automatisch (de meest recente Meting). */
   radarBronnen: RadarBron[];
   /** De laatste wijziging in wat een Lead ziet. */
   gewijzigdOp: string | null;
   items: Dossieritem[];
+}
+
+/** De blokken van het organisatiepaneel die een Lead mag zien: Cijfers, Kanalen, Techstack en Overige velden. */
+export interface ToonProfiel {
+  cijfers: boolean;
+  kanalen: boolean;
+  techstack: boolean;
+  overig: boolean;
 }
 
 /** Welke Meting de scores in de radar en de verdeling van het Dossier levert (`dossier.md`, Naam en scorebron). */

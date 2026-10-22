@@ -820,3 +820,13 @@ In de interface heet het overal Bouwsteen (besloten door Sander op 22 oktober 20
 - **Benchmark in het Dossier** (`dossier.md`): `Dossieritem.benchmarkId`, status "Geen toegang voor Lead" en "Kies een benchmark", per Lead zichtbaar via zijn vinkje (`LeadContext` in `leadDossier`). De keuzelijst bevat benchmarks waarin de Organisatie zit, niet niveau 3.
 - **Spreiding** (`beheerpagina.md`): De vier grenzen zijn instellingen (`lib/spreiding-grenzen.ts`). `SPREIDING_GRENZEN` en `QS_SPREIDING_GRENZEN` zijn nu de startwaarden. Het formulier staat onder Drempels en termijnen. De regel "constanten blijven staan tot de spec er is" hierboven is daarmee vervallen.
 
+## 22 oktober 2026: Organisatiepaneel en profiel voor de Lead
+
+- **Organisatiepaneel** (`components/beheer/OrganisatiePaneel.tsx`): Eén kaart met de kop, de cijferrij, de Kanalen, de Techstack, de overige velden, Toegang en Afspraken (Admin) en de Contactpersonen. De gegevens komen uit `lib/organisatie-profiel.ts`. De oude kaart Kenmerken en het raster zijn weg; `lib/kenmerken-weergave.ts` blijft voor Verkennen en de PDF.
+- **Sectiekaart**: `.beheer-kaart` is de Sectiekaart (padding 24px, 20px tussen kop en inhoud). De Dossier-, KPI-, Metingen-, Respondenten- en Leads-kaart gebruiken hem, in een kolom met 24px ertussen (`.org-kaarten`).
+- **Kanalen**: De kleur en het icoon staan op de naam van het kanaal (`lib/kanaal-stijl.ts`). Een kanaal dat een Admin toevoegt, krijgt een neutrale kleur.
+- **Profiel voor de Lead**: `Dossier.toonProfiel`; `leadProfiel` (`lib/dossier.ts`) geeft alleen de blokken die aan staan. Zonder zichtbaar item in het Dossier is er geen pagina en dus ook geen profiel.
+- **Staafdiagram per categorie**: Overal staand. Onder 440px kaartbreedte staan alleen de nummers onder de balk.
+- **Tabbladtitel**: Een pagina kan zijn eigen naam zetten (`lib/pagina-titel.ts`); de Dossierpagina gebruikt de naam voor de Lead.
+- **Doorloopflow**: De kop is maximaal 800px breed, de rest 664px.
+

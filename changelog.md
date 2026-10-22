@@ -1,5 +1,25 @@
 # Coniche Scan — Changelog
 
+## 2026-10-22 (36) — Specs van Joost, PR 176: Organisatiepaneel, profiel voor de Lead, staand staafdiagram en kleine punten
+
+Op verzoek van Sander ("pull devops", daarna "ja bouw alles maar": A, B, C en D).
+
+**A. Staafdiagram per categorie altijd staand** (`stylesheet.md`): De liggende variant (onder 640px schermbreedte en onder 560 of 540px kaartbreedte) is uit `charts.css`. Een kolom is minstens 88px breed. Onder 440px kaartbreedte (535px met een tweede reeks, vanwege de klassenamen) staan onder de balk alleen de nummers en staat de naam in de tooltip. Nagemeten bij 1024px: Kolommen van 89px, geen scroll.
+
+**B. Kleine punten**: De kop van een bouwsteen in de doorloopflow is maximaal 800px breed, de rest 664px (`.flow-main` is 896px, de Spanningsmeter houdt zijn eigen breedte). De tabbladtitel van de Dossierpagina is `{naam voor de Lead} | Coniche Scan` (`lib/pagina-titel.ts`, `useEigenPaginaTitel`). De Dossier-kaart heeft geen eyebrow met de organisatienaam meer. NPS is per kanaal in de startset KPI's.
+
+**C. Profiel voor de Lead** (`dossier.md`, Profiel van de Organisatie): `Dossier.toonProfiel` met `cijfers`, `kanalen`, `techstack` en `overig`, standaard uit en bij oude data alles uit. `leadDossier` geeft `profiel` mee met alleen de blokken die aan staan en gegevens hebben (de andere blokken gaan niet naar de Lead). Een kaart direct onder de kop van de Dossierpagina met dezelfde opmaak als het paneel, zonder knoppen. `zetToonProfiel` zet `gewijzigdOp` en logt per blok `dossier.profielGewijzigd`. De schakelaars staan in de modal Kenmerken bewerken onder "Zichtbaar voor de Lead" met `info.profielLead` en de hint bij een Dossier dat niet zichtbaar is. Ze zijn alleen te zien voor wie `dossier.bewerken` heeft.
+
+**D. Organisatiepaneel** (`beheerpagina.md`, Organisatiepaneel; `stylesheet.md`, Sectiekaart en Kanaalkleuren): Eén witte kaart met de kop (beginletter, naam met potlood, pillen Sector en Subsector, Bewerken), de cijferrij, de Kanalen (`lib/kanaal-stijl.ts`, `KanaalIcons.tsx`), de Techstack met alleen de oplossing, de overige velden, onder een lijn Toegang en Afspraken als vlakken (alleen een Admin) en onderaan de Contactpersonen. De opbouw staat in `lib/organisatie-profiel.ts` en de blokken in `components/organisatie/ProfielBlokken.tsx`, ook voor de Lead. Het Dossier, de KPI's, de Metingen, de Respondenten en de Leads staan elk op een eigen Sectiekaart (`.beheer-kaart`). De naam is hernoemen via het potlood (`OrganisatieNaamBewerken`). De oude kaart Kenmerken is weg.
+
+**Tests**: `lib/organisatie-profiel.test.ts`, `lib/dossier.test.ts` (profiel), `lib/radar.test.tsx` (geen liggende variant), `lib/kpi.test.ts` en `lib/verkennen.test.ts` (NPS per kanaal).
+
+**Help**: `het-dossier-van-een-organisatie.md`, `het-dossier-lezen.md`, `contactpersonen.md` en `kpis-invullen.md`.
+
+**Specs bijgewerkt**: Alleen `bouwnotities.md`.
+
+**Afwijkingen en interpretaties**: (1) De beginletter in het vierkant is 24px: De spec zegt 28px, maar die maat staat niet in de letterschaal van acht maten. (2) Een opgeslagen KPI-definitie van NPS blijft zoals ze is (zonder kanaal) tot een Admin het vinkje zet; alleen de startset is gewijzigd. (3) Een Kanaal dat een Admin toevoegt heeft nog geen eigen kleur en icoon en krijgt een neutrale kleur met een tekstballon. (4) De Lead ziet het profiel alleen als er minstens één zichtbaar item in het Dossier staat: `leadDossier` geeft anders `null`, ook als er blokken aan staan. (5) De overige velden en de Techstack staan zoals de spec ze beschrijft; het design van de overige velden is er nog niet. (6) Bij "Overige velden" toont IT DevOps het aantal met "x% Digital" erachter. (7) De regel "Korte naam: …" staat nog naast het potlood bij de naam; de spec noemt hem niet. (8) De spec zegt dat een Consultant de schakelaars ziet: Ze zijn voor iedereen met `dossier.bewerken` (Admin en Consultant met toegang), zoals de rest van het Dossier.
+
 ## 2026-10-22 (35) — Specs van Joost, PR 174: Namen van bouwsteen in de opslag, Benchmark als Dossier-item, formulier Spreiding
 
 Op verzoek van Sander ("pull devops", daarna "ja bouw alles maar": A, B en C).

@@ -123,26 +123,23 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
   const naam = metingNaam(waarde);
 
   return (
-    <>
-      <div className="flex flex-wrap items-center gap-3" style={{ marginTop: "2rem" }}>
+    <section className="beheer-kaart" aria-label="Metingen">
+      <div className="beheer-kaart-kop">
         <span className="titel-rij" style={{ marginBottom: 0 }}>
           <h2 style={{ margin: 0 }}>Metingen</h2>
           <InfoIcoon sleutel="info.metingBegrippen" />
         </span>
-        <button type="button" className="btn btn-outline btn-compact" onClick={() => setGemiddeldeOpen(true)}>
-          Gemiddelde maken
-        </button>
-        {/* Importeren (`beheerpagina.md`, punt 8): Rechts in de kop, alleen voor een Admin. */}
-        {magImporteren(ingelogd) && (
-          <button
-            type="button"
-            className="btn btn-outline btn-compact"
-            style={{ marginLeft: "auto" }}
-            onClick={() => router.push(`/beheer/organisaties/${organisatie.id}/import`)}
-          >
-            Importeren
+        <span className="knoppenrij">
+          <button type="button" className="btn btn-outline btn-compact" onClick={() => setGemiddeldeOpen(true)}>
+            Gemiddelde maken
           </button>
-        )}
+          {/* Importeren (`beheerpagina.md`, punt 8): Rechts in de kop, alleen voor een Admin. */}
+          {magImporteren(ingelogd) && (
+            <button type="button" className="btn btn-outline btn-compact" onClick={() => router.push(`/beheer/organisaties/${organisatie.id}/import`)}>
+              Importeren
+            </button>
+          )}
+        </span>
       </div>
 
       {/* Veldenrij met labels en een knop (`stylesheet.md`, Formulieren): `items-start`, elk veld met zijn label in een eigen
@@ -250,7 +247,7 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
           onKlaar={() => {}}
         />
       )}
-    </>
+    </section>
   );
 }
 

@@ -6,12 +6,12 @@ rollen: [Consultant, Admin]
 afbeelding:
 film:
 bronnen: [beheerpagina.md, datamodel.md]
-bijgewerkt: 2026-10-21
+bijgewerkt: 2026-10-22
 ---
-Bij elke Organisatie staat vast welke mensen relevant zijn, zodat je bij een gesprek of een Meting direct de juiste context hebt. Ze staan op het organisatie-detail, bij de Kenmerken. Een Admin beheert ze. Als Consultant zie je ze bij je eigen Organisaties.
+Bij elke Organisatie staat vast welke mensen relevant zijn, zodat je bij een gesprek of een Meting direct de juiste context hebt. Ze staan op het organisatie-detail, onderaan het organisatiepaneel. Een Admin beheert ze. Als Consultant zie je ze bij je eigen Organisaties.
 
 ## In het kort
-Onder het raster van de Kenmerken staat de lijst Contactpersonen. Een Admin voegt met "+ Toevoegen" een persoon toe en wijzigt of verwijdert hem met "Bewerken". Een Consultant ziet de lijst zonder die knoppen. Nieuwsartikelen horen sinds 21 oktober 2026 bij het Dossier van de Organisatie.
+Onderaan het organisatiepaneel, onder Toegang en Afspraken, staat de lijst Contactpersonen. Een Admin voegt met "+ Toevoegen" een persoon toe en wijzigt of verwijdert hem met "Bewerken". Een Consultant ziet de lijst zonder die knoppen. Nieuwsartikelen horen sinds 21 oktober 2026 bij het Dossier van de Organisatie.
 
 ## Wat je ziet
 1. **Contactpersonen.** Per persoon de naam, de functie en een link naar het LinkedIn-profiel. De link opent in een nieuw tabblad. De lijst staat op alfabet.

@@ -21,7 +21,7 @@ export const KPI_CONTACTEN = "contacten";
 export const STANDAARD_KPIS: KpiDefinitie[] = [
   { id: KPI_CONTACTEN, naam: "Contacten per jaar", eenheid: "aantal", perOnderdeel: true, perKanaal: true, volgorde: 1 },
   { id: "aht", naam: "AHT", eenheid: "s", perOnderdeel: true, perKanaal: true, volgorde: 2 },
-  { id: "nps", naam: "NPS", eenheid: null, perOnderdeel: true, perKanaal: false, volgorde: 3 },
+  { id: "nps", naam: "NPS", eenheid: null, perOnderdeel: true, perKanaal: true, volgorde: 3 },
   { id: "csat", naam: "CSAT", eenheid: null, perOnderdeel: true, perKanaal: true, volgorde: 4 },
   { id: "sla", naam: "SLA", eenheid: "%", perOnderdeel: true, perKanaal: true, volgorde: 5 },
   { id: "ftr", naam: "FTR", eenheid: "%", perOnderdeel: true, perKanaal: true, volgorde: 6 },

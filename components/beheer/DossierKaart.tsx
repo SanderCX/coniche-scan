@@ -79,7 +79,6 @@ export function DossierKaart({ organisatie }: { organisatie: Organisatie }) {
   return (
     <section className="beheer-kaart dos-kaart" aria-label="Dossier">
       <div className="dos-kop">
-        <span className="dos-kop-eyebrow">{organisatie.naam}</span>
         <h2 className="dos-kop-titel">Dossier</h2>
       </div>
 

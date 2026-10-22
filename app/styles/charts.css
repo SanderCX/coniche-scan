@@ -250,241 +250,34 @@
   font-size: var(--fs-12);
   color: var(--ink-s);
 }
-@media (max-width: 640px) {
-  .cat-plot {
-    grid-template-columns: minmax(0, 1fr);
-    padding-top: 0;
-  }
-  .cat-as {
-    display: none;
-  }
-  .cat-raster {
-    top: 0;
-    bottom: 0;
-    height: auto;
-    left: 158px;
-  }
-  .cat-lijn {
-    top: 0;
-    bottom: 0;
-    left: calc(var(--q) * 1%);
-    right: auto;
-    border-top: 0;
-    border-left: 1px solid var(--border);
-  }
-  .cat-lijn--klasse {
-    border-left: 1px dashed #9a978f;
-  }
-  .cat-kolommen {
-    flex-direction: column;
-    gap: var(--sp-3);
-  }
+/* Het staafdiagram per categorie is overal een staand kolomdiagram, ook in een smalle kaart: Er is geen liggende variant (`stylesheet.md`,
+   Staafdiagram per categorie). Een kolom is minstens 88px breed. Wordt hij smaller (een telefoon), dan staan onder de balk alleen de nummers van
+   de bouwstenen en staat de naam in de tooltip, zoals bij het diagram per domein. */
+.cat-item {
+  min-width: 88px;
+}
+@container (max-width: 439px) {
   .cat-item {
-    flex-direction: row;
+    min-width: 0;
   }
   .cat-naam {
-    order: -1;
-    width: 150px;
-    margin: 0 var(--sp-2) 0 0;
-    text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0;
+    white-space: normal;
   }
   .cat-nummers {
-    display: inline;
-  }
-  .cat-nummers::before {
-    content: " · ";
-  }
-  .cat-spoor {
-    flex: 1;
-    width: auto;
-    height: 28px;
-    align-items: center;
-    justify-content: flex-start;
-  }
-  .cat-balk {
-    width: calc(var(--p) * 1%);
-    height: 24px;
-    border-radius: 0 6px 6px 0;
+    font-size: var(--fs-12);
   }
 }
-@media (max-width: 640px) {
-  .cat-chart--dubbel .cat-plot {
-    grid-template-columns: minmax(0, 1fr);
-    max-width: none;
-  }
-  .cat-chart--dubbel .cat-klassen {
-    display: none;
-  }
-  .cat-chart--dubbel .cat-balk--dubbel {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 3px;
-    width: 100%;
-    height: 100%;
-  }
-  .cat-chart--dubbel .cat-staaf {
-    width: calc(var(--p) * 1%);
-    max-width: none;
-    height: 11px;
-    min-height: 0;
-    border-radius: 0 4px 4px 0;
-  }
-  .cat-chart--dubbel .cat-balk--dubbel .grafiek-tooltip {
-    bottom: calc(100% + 4px);
-    left: 0;
-    transform: none;
-  }
-}
-
-/* Hetzelfde in een kaart die smaller is dan de plot (twee kaarten naast elkaar op een smal scherm). */
-@container (max-width: 559px) {
-  .cat-plot {
-    grid-template-columns: minmax(0, 1fr);
-    padding-top: 0;
-  }
-  .cat-as {
-    display: none;
-  }
-  .cat-raster {
-    top: 0;
-    bottom: 0;
-    height: auto;
-    left: 158px;
-  }
-  .cat-lijn {
-    top: 0;
-    bottom: 0;
-    left: calc(var(--q) * 1%);
-    right: auto;
-    border-top: 0;
-    border-left: 1px solid var(--border);
-  }
-  .cat-lijn--klasse {
-    border-left: 1px dashed #9a978f;
-  }
-  .cat-kolommen {
-    flex-direction: column;
-    gap: var(--sp-3);
-  }
-  .cat-item {
-    flex-direction: row;
-  }
-  .cat-naam {
-    order: -1;
-    width: 150px;
-    margin: 0 var(--sp-2) 0 0;
-    text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .cat-nummers {
-    display: inline;
-  }
-  .cat-nummers::before {
-    content: " · ";
-  }
-  .cat-spoor {
-    flex: 1;
-    width: auto;
-    height: 28px;
-    align-items: center;
-    justify-content: flex-start;
-  }
-  .cat-balk {
-    width: calc(var(--p) * 1%);
-    height: 24px;
-    border-radius: 0 6px 6px 0;
-  }
-}
-
-/* Met twee reeksen vraagt de kolom met klassenamen rechts van de plot ruimte: De drempel is de binnenbreedte van de kaart (zonder padding). */
-@container (max-width: 539px) {
-  .cat-chart--dubbel .cat-plot {
-    grid-template-columns: minmax(0, 1fr);
-    padding-top: 0;
-  }
-  .cat-chart--dubbel .cat-as {
-    display: none;
-  }
-  .cat-chart--dubbel .cat-raster {
-    top: 0;
-    bottom: 0;
-    height: auto;
-    left: 158px;
-  }
-  .cat-chart--dubbel .cat-lijn {
-    top: 0;
-    bottom: 0;
-    left: calc(var(--q) * 1%);
-    right: auto;
-    border-top: 0;
-    border-left: 1px solid var(--border);
-  }
-  .cat-chart--dubbel .cat-lijn--klasse {
-    border-left: 1px dashed #9a978f;
-  }
-  .cat-chart--dubbel .cat-kolommen {
-    flex-direction: column;
-    gap: var(--sp-3);
-  }
+@container (max-width: 535px) {
   .cat-chart--dubbel .cat-item {
-    flex-direction: row;
+    min-width: 0;
   }
   .cat-chart--dubbel .cat-naam {
-    order: -1;
-    width: 150px;
-    margin: 0 var(--sp-2) 0 0;
-    text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0;
+    white-space: normal;
   }
   .cat-chart--dubbel .cat-nummers {
-    display: inline;
-  }
-  .cat-chart--dubbel .cat-nummers::before {
-    content: " · ";
-  }
-  .cat-chart--dubbel .cat-spoor {
-    flex: 1;
-    width: auto;
-    height: 28px;
-    align-items: center;
-    justify-content: flex-start;
-  }
-  .cat-chart--dubbel .cat-balk {
-    width: calc(var(--p) * 1%);
-    height: 24px;
-    border-radius: 0 6px 6px 0;
-  }
-  .cat-chart--dubbel .cat-plot {
-    grid-template-columns: minmax(0, 1fr);
-    max-width: none;
-  }
-  .cat-chart--dubbel .cat-klassen {
-    display: none;
-  }
-  .cat-chart--dubbel .cat-balk--dubbel {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 3px;
-    width: 100%;
-    height: 100%;
-  }
-  .cat-chart--dubbel .cat-staaf {
-    width: calc(var(--p) * 1%);
-    max-width: none;
-    height: 11px;
-    min-height: 0;
-    border-radius: 0 4px 4px 0;
-  }
-  .cat-chart--dubbel .cat-balk--dubbel .grafiek-tooltip {
-    bottom: calc(100% + 4px);
-    left: 0;
-    transform: none;
+    font-size: var(--fs-12);
   }
 }
 

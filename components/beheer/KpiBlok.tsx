@@ -36,7 +36,7 @@ export function KpiBlok({ organisatie }: { organisatie: Organisatie }) {
   };
 
   return (
-    <section className="kpi-blok" aria-label="KPI's">
+    <section className="kpi-blok beheer-kaart" aria-label="KPI's">
       <div className="kpi-kop">
         <div className="titel-rij">
           <h2 style={{ margin: 0 }}>KPI&apos;s</h2>
