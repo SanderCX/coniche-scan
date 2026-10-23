@@ -304,7 +304,7 @@
 .op-ringen {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-6) 64px;
+  gap: var(--sp-6) 40px;
   margin-top: var(--sp-1);
 }
 .op-ring {
@@ -312,12 +312,12 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  width: 132px;
+  width: 96px;
 }
 .op-ring-figuur {
   position: relative;
-  width: 132px;
-  height: 132px;
+  width: 96px;
+  height: 96px;
   margin-bottom: var(--sp-2);
 }
 .op-ring-waarde {
@@ -326,7 +326,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--fs-24);
+  font-size: var(--fs-18);
   font-weight: 800;
   line-height: 1;
   padding-top: 0.09em;
@@ -334,7 +334,7 @@
   white-space: nowrap;
 }
 .op-ring-streep {
-  width: 20px;
+  width: 16px;
   height: 3px;
   border-radius: 2px;
   background: #c9c6be;

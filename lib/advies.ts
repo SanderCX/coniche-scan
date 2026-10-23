@@ -17,7 +17,7 @@ import type {
   UseCase,
 } from "./types";
 import { aantalAfgerondInMeting, gemiddeldeAntwoordenVoorMetingMetSamenstelling, isSamengesteld, maandJaar, meetdatumVan, onderdeelEenheden, vergelijkNieuwsteEerst } from "./metingen";
-import { alleBouwblokResultaten, BouwblokResultaat, classificatie, overallScore } from "./scoring";
+import { alleBouwblokResultaten, BouwblokResultaat, classificatie } from "./scoring";
 import { spreiding, eenhedenSpreiding, rond1, spreidingsLabel, SpreidingsLabel } from "./visualisatie";
 import { bouwBenchmarkSecties, bouwOrganisatieView } from "./benchmark";
 import { benchmarkGeldigVoorOrganisatie } from "./lead-toegang";
@@ -74,37 +74,79 @@ export function blokkadeVerwijderenMeting(organisatie: Pick<Organisatie, "advies
   return "Dit is de enige Meting van een adviesverloop. Verwijder eerst dat adviesverloop of koppel er een andere Meting aan.";
 }
 
+export interface OpruimResultaat {
+  /** Adviesverlopen die geen Meting meer over hadden en zijn verdwenen. */
+  verdwenen: Adviesverloop[];
+  /** Adviesverlopen waarvan Metingen van een ander Assessment zijn losgekoppeld omdat de Benchmark er niet meer voor staat. */
+  losgekoppeld: { adviesverloop: Adviesverloop; metingIds: string[] }[];
+}
+
 /**
  * Houdt de adviesverlopen kloppend na elke wijziging (`datamodel.md`, Verwijderen en datakoppelingen), eenmalig in `slaAlles`: Een gekoppelde Meting die
  * er niet meer is valt weg, `startMetingId` en `peilMetingId` die naar haar wezen worden de eerstvolgende gekoppelde Meting, en de `metingId` van een
- * stap wordt `null`. Houdt een adviesverloop geen Meting over (bijvoorbeeld door een samengestelde Meting die vervalt), dan verdwijnt het. Geeft de
- * verdwenen adviesverlopen terug voor het audit-log.
+ * stap wordt `null`. Houdt een adviesverloop geen Meting over (bijvoorbeeld door een samengestelde Meting die vervalt), dan verdwijnt het. Met `benchmarks`
+ * worden ook de Metingen van een ander Assessment losgekoppeld als de gekozen Benchmark er niet meer is, de Organisatie er niet meer in zit of een van de
+ * Assessments er niet meer in zit (`datamodel.md`, Ander Assessment). Geeft terug wat er is verdwenen of losgekoppeld, voor het audit-log.
  */
-export function ruimAdviesverlopenOp(organisatie: Organisatie): Adviesverloop[] {
-  if (!organisatie.adviesverlopen) return [];
-  const bestaand = new Set(organisatie.scanUitvoeringen.map((m) => m.id));
-  const weg: Adviesverloop[] = [];
+export function ruimAdviesverlopenOp(organisatie: Organisatie, benchmarks?: Benchmark[]): OpruimResultaat {
+  const uit: OpruimResultaat = { verdwenen: [], losgekoppeld: [] };
+  if (!organisatie.adviesverlopen) return uit;
+  const bestaand = new Map(organisatie.scanUitvoeringen.map((m) => [m.id, m]));
   const over: Adviesverloop[] = [];
   for (const av of organisatie.adviesverlopen) {
-    const metingen = av.metingen.filter((m) => bestaand.has(m.metingId));
+    let metingen = av.metingen.filter((m) => bestaand.has(m.metingId));
+    let benchmarkId = av.benchmarkId ?? null;
+    const losgemaakt: string[] = [];
+    if (benchmarks && metingen.length > 0) {
+      const assessmentIds = [...new Set(metingen.map((m) => bestaand.get(m.metingId)!.assessmentId))];
+      if (assessmentIds.length > 1) {
+        const bm = benchmarkId ? benchmarks.find((b) => b.id === benchmarkId) : undefined;
+        const geldig = !!bm && benchmarkGeldigVoorOrganisatie(bm, organisatie.id) && assessmentIds.every((id) => bm.assessmentIds.includes(id));
+        if (!geldig) {
+          const primair = bestaand.get(metingen.some((m) => m.metingId === av.startMetingId) ? av.startMetingId : metingen[0].metingId)!.assessmentId;
+          const rest = metingen.filter((m) => bestaand.get(m.metingId)!.assessmentId === primair);
+          losgemaakt.push(...metingen.filter((m) => !rest.includes(m)).map((m) => m.metingId));
+          metingen = rest;
+          benchmarkId = null;
+        }
+      } else {
+        benchmarkId = null;
+      }
+    }
     if (metingen.length === 0) {
-      weg.push(av);
+      uit.verdwenen.push(av);
       continue;
     }
-    const eerstvolgende = [...metingen]
-      .map((m) => organisatie.scanUitvoeringen.find((s) => s.id === m.metingId)!)
-      .sort((a, b) => vergelijkNieuwsteEerst(b, a))[0].id;
-    over.push({
+    const eerstvolgende = [...metingen].map((m) => bestaand.get(m.metingId)!).sort((a, b) => vergelijkNieuwsteEerst(b, a))[0].id;
+    const nieuw: Adviesverloop = {
       ...av,
       metingen,
-      startMetingId: bestaand.has(av.startMetingId) && metingen.some((m) => m.metingId === av.startMetingId) ? av.startMetingId : eerstvolgende,
+      benchmarkId,
+      startMetingId: metingen.some((m) => m.metingId === av.startMetingId) ? av.startMetingId : eerstvolgende,
       peilMetingId: av.peilMetingId === null || metingen.some((m) => m.metingId === av.peilMetingId) ? av.peilMetingId : eerstvolgende,
-      stappen: av.stappen.map((s) => (s.metingId && !bestaand.has(s.metingId) ? { ...s, metingId: null } : s)),
-    });
+      stappen: av.stappen.map((s) => (s.metingId && !metingen.some((m) => m.metingId === s.metingId) ? { ...s, metingId: null } : s)),
+    };
+    if (losgemaakt.length > 0) uit.losgekoppeld.push({ adviesverloop: nieuw, metingIds: losgemaakt });
+    over.push(nieuw);
   }
-  const gewijzigd = weg.length > 0 || over.some((a, i) => JSON.stringify(a) !== JSON.stringify(organisatie.adviesverlopen!.filter((x) => !weg.includes(x))[i]));
-  if (gewijzigd) organisatie.adviesverlopen = over;
-  return weg;
+  organisatie.adviesverlopen = over;
+  return uit;
+}
+
+/** Zet een adviesverloop uit de opslag om naar de huidige vorm: Ontbrekende velden krijgen hun beginwaarde, de vervallen velden gaan weg. */
+export function migreerAdviesverloop(invoer: Adviesverloop): Adviesverloop {
+  const { extraBouwsteenIds: _extra, rolTekst: _rolTekst, ...rest } = invoer as Adviesverloop & { extraBouwsteenIds?: unknown; rolTekst?: unknown };
+  void _extra;
+  void _rolTekst;
+  return {
+    ...rest,
+    benchmarkId: rest.benchmarkId ?? null,
+    shortlistBouwsteenIds: Array.isArray(rest.shortlistBouwsteenIds) ? rest.shortlistBouwsteenIds : null,
+    nvFaseIds: Array.isArray(rest.nvFaseIds) ? rest.nvFaseIds : [],
+    nvUseCaseIds: Array.isArray(rest.nvUseCaseIds) ? rest.nvUseCaseIds : [],
+    metingen: Array.isArray(rest.metingen) ? rest.metingen : [],
+    stappen: Array.isArray(rest.stappen) ? rest.stappen : [],
+  };
 }
 
 /* ---------- Metingen koppelen ---------- */
@@ -114,9 +156,14 @@ export const heeftBouwstenenMetScore = (assessment: Pick<Assessment, "antwoordTy
 
 export const heeftAfgerondeScans = (organisatie: Pick<Organisatie, "scanUitvoeringen">, meting: ScanUitvoering): boolean => aantalAfgerondInMeting(organisatie, meting) > 0;
 
-/** Of er een benchmark is waarin de Organisatie meedoet en beide Assessments zitten (`benchmark.md`, Benchmark per Assessment). */
-export function benchmarkMetBeideAssessments(benchmarks: Benchmark[], organisatieId: string, a: string, b: string): boolean {
-  return benchmarks.some((bm) => benchmarkGeldigVoorOrganisatie(bm, organisatieId) && bm.assessmentIds.includes(a) && bm.assessmentIds.includes(b));
+/**
+ * De Benchmarks waarin de Organisatie meedoet en alle genoemde Assessments zitten (`benchmark.md`, Benchmark per Assessment): De keuze voor een adviesverloop met
+ * Metingen van verschillende Assessments (`datamodel.md`, Ander Assessment). Alleen Benchmarks tussen organisaties tellen.
+ */
+export function geschikteBenchmarks(benchmarks: Benchmark[], organisatieId: string, assessmentIds: string[]): Benchmark[] {
+  return benchmarks.filter(
+    (bm) => (bm.niveau ?? "organisaties") === "organisaties" && benchmarkGeldigVoorOrganisatie(bm, organisatieId) && assessmentIds.every((id) => bm.assessmentIds.includes(id))
+  );
 }
 
 /** De gekoppelde Metingen (die nog bestaan), de oudste eerst. */
@@ -171,8 +218,8 @@ export function koppelRijen(
   benchmarks: Benchmark[],
   startMetingId?: string
 ): KoppelRij[] {
-  const eerste = av ? eersteMeting(organisatie, av) : organisatie.scanUitvoeringen.find((m) => m.id === startMetingId) ?? null;
   const gekoppeldeIds = new Set(av ? av.metingen.map((m) => m.metingId) : startMetingId ? [startMetingId] : []);
+  const gekoppeldeAssessments = [...new Set(organisatie.scanUitvoeringen.filter((m) => gekoppeldeIds.has(m.id)).map((m) => m.assessmentId))];
   return organisatie.scanUitvoeringen
     .filter((m) => (m.onderdeelId ?? null) === onderdeelId)
     .sort((a, b) => vergelijkNieuwsteEerst(a, b))
@@ -191,7 +238,11 @@ export function koppelRijen(
       } else if (!heeftBouwstenenMetScore(assessment)) {
         reden = "Alleen voor scans met een schaal van 1 tot 5";
         vast = true;
-      } else if (eerste && eerste.assessmentId !== meting.assessmentId && !benchmarkMetBeideAssessments(benchmarks, organisatie.id, eerste.assessmentId, meting.assessmentId)) {
+      } else if (
+        gekoppeldeAssessments.length > 0 &&
+        !gekoppeldeAssessments.includes(meting.assessmentId) &&
+        geschikteBenchmarks(benchmarks, organisatie.id, [...gekoppeldeAssessments, meting.assessmentId]).length === 0
+      ) {
         reden = "Geen benchmark met beide Assessments";
         vast = true;
       } else if (gekoppeld && gekoppeldeIds.size <= 1) {
@@ -228,16 +279,33 @@ export function opLaagsteScore(resultaten: BouwblokResultaat[]): (BouwblokResult
 }
 
 /**
- * De shortlist: De `aantal` bouwstenen met de laagste score plus de bouwstenen die de Consultant toevoegde, in de volgorde van de score. De laagste
- * scores worden altijd uit de peilmeting afgeleid en niet opgeslagen (`datamodel.md`, Shortlist).
+ * De shortlist (`datamodel.md`, Shortlist): Standaard (`gekozenIds` is `null`) de `aantal` bouwstenen met de laagste score, bij gelijke score op nummer. Die lijst
+ * wordt altijd uit de scores van de peilmeting afgeleid en niet opgeslagen. Heeft de Consultant zelf gekozen, dan zijn het die bouwstenen in die volgorde;
+ * een bouwsteen zonder score van de peilmeting valt er dan uit. `standaard` is of de bouwsteen bij de laagste scores hoort ("Door jou toegevoegd" als niet).
  */
-export function shortlist(resultaten: BouwblokResultaat[], extraIds: string[], aantal: number): ShortlistRij[] {
+export function shortlist(resultaten: BouwblokResultaat[], gekozenIds: string[] | null, aantal: number): ShortlistRij[] {
   const gerangschikt = opLaagsteScore(resultaten);
   const laagste = new Set(gerangschikt.slice(0, aantal).map((r) => r.bouwblok.id));
-  const extra = new Set(extraIds);
-  return gerangschikt
-    .filter((r) => laagste.has(r.bouwblok.id) || extra.has(r.bouwblok.id))
-    .map((r) => ({ resultaat: r, bouwblok: r.bouwblok, score: r.score, klasse: classificatie(rond1(r.score)), standaard: laagste.has(r.bouwblok.id) }));
+  const rij = (r: BouwblokResultaat & { score: number }): ShortlistRij => ({
+    resultaat: r,
+    bouwblok: r.bouwblok,
+    score: r.score,
+    klasse: classificatie(rond1(r.score)),
+    standaard: laagste.has(r.bouwblok.id),
+  });
+  if (gekozenIds === null) return gerangschikt.slice(0, aantal).map(rij);
+  const perId = new Map(gerangschikt.map((r) => [r.bouwblok.id, r]));
+  return gekozenIds.flatMap((id) => (perId.has(id) ? [rij(perId.get(id)!)] : []));
+}
+
+/** Een bouwsteen een plek omhoog (`-1`) of omlaag (`1`) in een lijst; aan de uiteinden verandert er niets. */
+export function verplaatsInLijst(ids: string[], id: string, richting: -1 | 1): string[] {
+  const i = ids.indexOf(id);
+  const j = i + richting;
+  if (i === -1 || j < 0 || j >= ids.length) return ids;
+  const kopie = [...ids];
+  [kopie[i], kopie[j]] = [kopie[j], kopie[i]];
+  return kopie;
 }
 
 /** "+0,4 sinds de eerste Meting" bij meer gekoppelde Metingen van hetzelfde Assessment: Het verschil tussen de peilmeting en de eerste Meting. */
@@ -326,52 +394,92 @@ export const fasenOpVolgorde = (catalogus: AdviesCatalogus): AdviesFase[] => [..
 /** De use cases die meetellen in de fasestrook (`inStrook`), per fase. */
 export const strookUseCases = (catalogus: AdviesCatalogus, faseId: string): UseCase[] => casesVanFase(catalogus, faseId).filter((u) => u.inStrook);
 
+type StappenEnNv = Pick<Adviesverloop, "stappen"> & Partial<Pick<Adviesverloop, "nvFaseIds" | "nvUseCaseIds">>;
+
+export interface FaseUseCase {
+  useCase: UseCase;
+  /** De stap als de use case gedaan is (voor een bouwsteen of voor de hele Organisatie). */
+  stap: Adviesstap | undefined;
+  /** Niet van toepassing verklaard (en nog geen stap). */
+  nv: boolean;
+}
+
 export interface FaseVoortgang {
   fase: AdviesFase;
   gedaan: number;
+  /** Het aantal use cases in de strook dat meetelt: Zonder de n.v.t. verklaarde. */
   totaal: number;
-  /** Alle stappen van de fase zijn gedaan. */
+  /** Het aantal n.v.t. verklaarde use cases in de strook. */
+  nv: number;
+  /** Alle use cases van de fase zijn n.v.t.: De telling is "n.v.t.". */
+  alleNv: boolean;
+  /** De Consultant heeft de fase overgeslagen: Telt niet mee. */
+  overgeslagen: boolean;
+  /** Alle stappen van de fase die meetellen zijn gedaan. */
   klaar: boolean;
-  /** De eerste fase met een open stap. */
+  /** De eerste fase die niet is overgeslagen en een open stap heeft. */
   huidig: boolean;
   /** De gedane stappen, de nieuwste eerst, elk met zijn use case. */
   stappen: { stap: Adviesstap; useCase: UseCase | undefined }[];
-  /** De volgende use case in de strook zonder stap. */
+  /** Alle use cases in de strook van de fase, in de volgorde van de catalogus, met hun stap of n.v.t. */
+  useCases: FaseUseCase[];
+  /** De volgende use case in de strook die niet n.v.t. is en nog geen stap heeft. */
   volgende: UseCase | null;
 }
 
 /**
  * De voortgang per fase voor de fasestrook (`adviesverloop.md`, De fasestrook): Een use case in de strook telt één keer, hoe vaak hij ook voor een bouwsteen is
- * gedaan. Klaar is een fase waarvan alle use cases in de strook gedaan zijn (een fase zonder use cases in de strook is niet klaar en niet huidig).
- * De huidige fase is de eerste met een open stap (`datamodel.md`, Huidige fase).
+ * gedaan. Klaar is een fase waarvan alle use cases die meetellen gedaan zijn. Een overgeslagen fase en een n.v.t. verklaarde use case tellen niet mee
+ * (`datamodel.md`, Niet van toepassing). De huidige fase is de eerste fase die niet is overgeslagen en nog een open stap heeft (`datamodel.md`, Huidige fase).
  */
-export function faseVoortgang(catalogus: AdviesCatalogus, av: Pick<Adviesverloop, "stappen">): FaseVoortgang[] {
+export function faseVoortgang(catalogus: AdviesCatalogus, av: StappenEnNv): FaseVoortgang[] {
   const gedaanIds = new Set(av.stappen.map((s) => s.useCaseId));
+  const nvFasen = new Set(av.nvFaseIds ?? []);
+  const nvUseCases = new Set(av.nvUseCaseIds ?? []);
   let huidigGezet = false;
   return fasenOpVolgorde(catalogus).map((fase) => {
     const strook = strookUseCases(catalogus, fase.id);
-    const gedaan = strook.filter((u) => gedaanIds.has(u.id)).length;
-    const volgende = strook.find((u) => !gedaanIds.has(u.id)) ?? null;
-    const klaar = strook.length > 0 && gedaan === strook.length;
-    const huidig = !huidigGezet && volgende !== null;
+    const overgeslagen = nvFasen.has(fase.id);
+    const useCases: FaseUseCase[] = strook.map((useCase) => ({
+      useCase,
+      stap: av.stappen.filter((s) => s.useCaseId === useCase.id).sort((a, b) => b.gedaanOp.localeCompare(a.gedaanOp))[0],
+      nv: nvUseCases.has(useCase.id) && !gedaanIds.has(useCase.id),
+    }));
+    const meetellend = useCases.filter((u) => !u.nv);
+    const gedaan = meetellend.filter((u) => u.stap).length;
+    const volgende = meetellend.find((u) => !u.stap)?.useCase ?? null;
+    const klaar = !overgeslagen && meetellend.length > 0 && gedaan === meetellend.length;
+    const huidig = !overgeslagen && !huidigGezet && volgende !== null;
     if (huidig) huidigGezet = true;
     const stappen = av.stappen
       .filter((s) => catalogus.useCases.find((u) => u.id === s.useCaseId)?.faseId === fase.id)
       .sort((a, b) => b.gedaanOp.localeCompare(a.gedaanOp))
       .map((stap) => ({ stap, useCase: catalogus.useCases.find((u) => u.id === stap.useCaseId) }));
-    return { fase, gedaan, totaal: strook.length, klaar, huidig, stappen, volgende };
+    return {
+      fase,
+      gedaan,
+      totaal: meetellend.length,
+      nv: useCases.length - meetellend.length,
+      alleNv: useCases.length > 0 && meetellend.length === 0,
+      overgeslagen,
+      klaar,
+      huidig,
+      stappen,
+      useCases,
+      volgende,
+    };
   });
 }
 
-/** De fase van de regel in lijsten: "Oplossen · 0 van 4". Alle fasen klaar: De laatste fase. Zonder use cases in de strook: `null`. */
-export function faseRegel(catalogus: AdviesCatalogus, av: Pick<Adviesverloop, "stappen">): string | null {
+/** De fase van de regel in lijsten: "Oplossen · 0 van 4". Alle fasen klaar: De laatste fase die meetelt. Zonder use cases in de strook: `null`. */
+export function faseRegel(catalogus: AdviesCatalogus, av: StappenEnNv): string | null {
   const v = faseVoortgang(catalogus, av);
-  const kies = v.find((f) => f.huidig) ?? [...v].reverse().find((f) => f.totaal > 0);
+  const kies = v.find((f) => f.huidig) ?? [...v].reverse().find((f) => f.totaal > 0 && !f.overgeslagen);
   return kies ? `${kies.fase.korteNaam} · ${kies.gedaan} van ${kies.totaal}` : null;
 }
 
 /** Het aantal Adviesstappen dat in de strook meetelt en gedaan is, over alle fasen. */
-export const aantalGedaan = (catalogus: AdviesCatalogus, av: Pick<Adviesverloop, "stappen">): number => faseVoortgang(catalogus, av).reduce((n, f) => n + f.gedaan, 0);
+export const aantalGedaan = (catalogus: AdviesCatalogus, av: StappenEnNv): number => faseVoortgang(catalogus, av).reduce((n, f) => n + f.gedaan, 0);
 
 /** De tekst bij een stap in het paneel: "Prompt gekopieerd · 22 okt 2026" of "Gemarkeerd als gedaan · 22 okt 2026". */
 export function stapTekst(stap: Adviesstap): string {
@@ -394,11 +502,18 @@ export function controleerLink(invoer: string): { ok: true; link: string } | { o
 
 /* ---------- Use cases bij een bouwsteen ---------- */
 
-/** De use cases van de fase voor een bouwsteen: Eerst de use cases die voor die bouwsteen of klasse zijn voorgesteld, daarna de rest (`adviesverloop.md`, Uitwerking per bouwsteen). */
-export function casesVoorBouwsteen(catalogus: AdviesCatalogus, faseId: string, bouwsteenId: string, klasse: Classificatie): UseCase[] {
+/** De use cases van de fase voor een bouwsteen, zonder de n.v.t. verklaarde: Eerst de use cases die voor die bouwsteen of klasse zijn voorgesteld, daarna de rest (`adviesverloop.md`, Uitwerking per bouwsteen). */
+export function casesVoorBouwsteen(
+  catalogus: AdviesCatalogus,
+  faseId: string,
+  bouwsteenId: string,
+  klasse: Classificatie,
+  nvUseCaseIds: string[] = []
+): UseCase[] {
   const code = klasseCodeVan(klasse);
   const voorgesteld = (u: UseCase) => u.bouwsteenIds.includes(bouwsteenId) || u.klassen.includes(code);
-  const lijst = casesVanFase(catalogus, faseId);
+  // Een use case die de Consultant niet van toepassing verklaarde, verschijnt niet (`adviesverloop.md`, Uitwerking per bouwsteen).
+  const lijst = casesVanFase(catalogus, faseId).filter((u) => !nvUseCaseIds.includes(u.id));
   return [...lijst.filter(voorgesteld), ...lijst.filter((u) => !voorgesteld(u))];
 }
 
@@ -417,6 +532,8 @@ export interface ContextInvoer {
   resultaten: BouwblokResultaat[];
   /** De bouwsteen waar het om gaat, of `null`. */
   bouwsteenId: string | null;
+  /** De bouwstenen op de shortlist in de gekozen volgorde: Alleen die komen in het blok, ook als andere bouwstenen laag scoren. */
+  shortlistIds: string[];
   spreiding: Map<string, BouwsteenSpreiding>;
   benchmark: BenchmarkVerschil | null;
   /** De scores van de eerste gekoppelde Meting van hetzelfde Assessment, als die er is en een andere Meting is dan de peilmeting. */
@@ -440,19 +557,16 @@ export function bouwContextblok(i: ContextInvoer): string {
   regels.push(`Organisatie: ${i.organisatie.naam}`);
   regels.push(`Onderdeel: ${i.onderdeelNaam}`);
   regels.push(`Afgeronde scans: ${aantal}`);
-  const kenmerken: string[] = [];
   const sector = (i.organisatie.kenmerken["sector-subsector"] as { sector?: string; subsector?: string } | undefined) ?? {};
-  if (sector.sector) kenmerken.push(`Sector: ${sector.sector}`);
-  if (sector.subsector) kenmerken.push(`Subsector: ${sector.subsector}`);
-  for (const c of profielCijfers(i.organisatie)) kenmerken.push(`${c.waarde} ${c.toelichting}`);
+  if (sector.sector) regels.push(`Sector: ${sector.sector}`);
+  if (sector.subsector) regels.push(`Subsector: ${sector.subsector}`);
+  const kenmerken: string[] = profielCijfers(i.organisatie).map((c) => `${c.waarde} ${c.toelichting}`);
 
   if (aantal < i.minRespondenten) {
     regels.push("");
     regels.push(`Scores: Niet meegenomen. Er zijn minder dan ${i.minRespondenten} afgeronde scans, dus de gegevens van de groep blijven buiten Copilot.`);
   } else {
-    const overall = overallScore(i.assessment, gemiddeldeAntwoordenVoorMetingMetSamenstelling(i.assessment, i.organisatie, i.peil));
-    if (overall !== null) regels.push(`Totaalscore: ${formatScore(overall)} (${klasseNaam(overall)})`);
-    const gerangschikt = i.resultaten.filter((r) => r.score !== null).sort((a, b) => (a.score as number) - (b.score as number) || a.bouwblok.volgnummer - b.bouwblok.volgnummer);
+    const metScore = (id: string) => i.resultaten.find((r) => r.bouwblok.id === id && r.score !== null);
     const regel = (r: BouwblokResultaat): string => {
       const score = r.score as number;
       const delen = [`${r.bouwblok.volgnummer}. ${r.bouwblok.naam}: ${formatScore(score)} (${klasseNaam(score)})`];
@@ -464,23 +578,18 @@ export function bouwContextblok(i: ContextInvoer): string {
       if (i.eerste && eerder !== null && eerder !== undefined) delen.push(`${verschilTekst(rond1(score - eerder))} sinds ${i.eerste.label}`);
       return `- ${delen.join(", ")}`;
     };
-    const focus = i.bouwsteenId ? gerangschikt.find((r) => r.bouwblok.id === i.bouwsteenId) : undefined;
+    // De bouwsteen waar het om gaat, en de andere bouwstenen op de shortlist: Wat niet op de shortlist staat gaat niet naar Copilot (`adviesverloop.md`, Contextblok).
+    const focus = i.bouwsteenId ? metScore(i.bouwsteenId) : undefined;
     if (focus) {
       regels.push("");
       regels.push("Waar het om gaat:");
       regels.push(regel(focus));
     }
-    const basis = gerangschikt.filter((r) => classificatie(rond1(r.score as number)) === "rood" && r.bouwblok.id !== focus?.bouwblok.id);
-    if (basis.length > 0) {
+    const anderen = i.shortlistIds.filter((id) => id !== focus?.bouwblok.id).flatMap((id) => (metScore(id) ? [metScore(id)!] : []));
+    if (anderen.length > 0) {
       regels.push("");
-      regels.push("Basis op orde brengen:");
-      regels.push(...basis.map(regel));
-    }
-    const sterk = gerangschikt.filter((r) => classificatie(rond1(r.score as number)) === "groen" && r.bouwblok.id !== focus?.bouwblok.id);
-    if (sterk.length > 0) {
-      regels.push("");
-      regels.push("Sterke punten:");
-      regels.push(...sterk.map(regel));
+      regels.push(focus ? "Andere bouwstenen op de shortlist:" : "Bouwstenen op de shortlist:");
+      regels.push(...anderen.map(regel));
     }
   }
 
@@ -503,9 +612,12 @@ export function bouwContextblok(i: ContextInvoer): string {
   return regels.join("\n");
 }
 
-/** De tekst die op het klembord komt: De rol, de context en de prompt onder elkaar (`adviesverloop.md`, Prompt klaarzetten, Kopiëren). */
-export function bouwPromptTekst(rolTekst: string, context: string, prompt: string): string {
-  return [rolTekst.trim(), context.trim(), prompt.trim()].filter(Boolean).join("\n\n");
+/**
+ * De tekst die op het klembord komt (`adviesverloop.md`, Prompt klaarzetten, Kopiëren): Eerst "Over mij", dan de tekst van de rol, de context en de prompt onder
+ * elkaar. Lege delen vallen weg.
+ */
+export function bouwPromptTekst(overMij: string, rolTekst: string, context: string, prompt: string): string {
+  return [overMij.trim(), rolTekst.trim(), context.trim(), prompt.trim()].filter(Boolean).join("\n\n");
 }
 
 /** De onderdeelnaam voor in teksten: "Hele organisatie" of de naam van het Onderdeel. */

@@ -8,7 +8,7 @@ import { migreerTechstackOndersteuning } from "@/lib/techstack";
 import { ruimOrganisatieOp } from "@/lib/metingen";
 import { zorgOnderdelenKloppend } from "@/lib/onderdelen";
 import { migreerKpiWaarden } from "@/lib/kpi";
-import { getBenchmarks, haalMetingenUitBenchmarks, legeToewijzingen, wisOmgezetteToewijzingen } from "@/lib/benchmark-store";
+import { bijBenchmarkWijziging, getBenchmarks, haalMetingenUitBenchmarks, legeToewijzingen, wisOmgezetteToewijzingen } from "@/lib/benchmark-store";
 import { getBenchmarksMetLeden } from "@/lib/benchmark-leden";
 import { ruimLeadToegangOp, toegangSleutel, zetLegacyBereikOm } from "@/lib/lead-toegang";
 import { techstackCategorieIdsMetLijst } from "@/data/organisatie-velden";
@@ -17,7 +17,7 @@ import { ruimDossierOp, zetNieuwsartikelenOm } from "@/lib/dossier";
 import { verbergDossiersMetVerlorenBron } from "@/lib/dossier-radar";
 import { logAudit } from "@/lib/audit-store";
 import { organisatieContext } from "@/lib/audit-context";
-import { ruimAdviesverlopenOp } from "@/lib/advies";
+import { migreerAdviesverloop, ruimAdviesverlopenOp } from "@/lib/advies";
 
 const KEY = "coniche-scan:organisaties";
 const SERVER_SLEUTEL = "organisaties";
@@ -145,6 +145,8 @@ function normaliseerOrganisatie(invoer: Organisatie): Organisatie {
     dossier: zetNieuwsartikelenOm(ruw as unknown as Record<string, unknown>),
     // Ontbreekt bij data van vóór de Afspraak: Geen toestemming vastgelegd, dus niet toegestaan.
     caseToegestaan: ruw.caseToegestaan === true,
+    // Een adviesverloop van vóór de eigen shortlist, de n.v.t.-keuzes en de adviescontext krijgt de nieuwe velden (`lib/advies.ts`, `migreerAdviesverloop`).
+    ...(Array.isArray(ruw.adviesverlopen) ? { adviesverlopen: ruw.adviesverlopen.map(migreerAdviesverloop) } : {}),
   };
   delete (organisatie as { nieuwsartikelen?: unknown }).nieuwsartikelen;
   zetLegacyBereikOm(organisatie);
@@ -184,12 +186,13 @@ export function slaAlles(alles: Organisatie[]): void {
     for (const id of r.verwijderdeSamengesteldeIds) verdwenen.push({ metingId: id, organisatieNaam: organisatie.naam });
   }
   if (verdwenen.length > 0) haalMetingenUitBenchmarks(verdwenen);
-  // Een adviesverloop houdt geen verwijzing naar een Meting die er niet meer is, en verdwijnt als er geen Meting overblijft (`datamodel.md`, Verwijderen en datakoppelingen).
-  const verdwenenAdviesverlopen = alles.flatMap((organisatie) => ruimAdviesverlopenOp(organisatie).map((av) => ({ organisatie, av })));
   // De vinkjes van Leads kloppend houden: Een benchmark die er niet meer is of waar de organisatie geen lid meer van is, en
   // alles wat van een verdwenen Meting of Lead was (`datamodel.md`, Verwijderen en datakoppelingen).
   // Bij een opgeslagen verkenning volgen de leden uit de filters: Voldoet een organisatie niet meer, dan vervalt het vinkje van haar Leads.
   const benchmarks = getBenchmarksMetLeden(alles);
+  // Een adviesverloop houdt geen verwijzing naar een Meting die er niet meer is, en verdwijnt als er geen Meting overblijft. Metingen van een ander Assessment
+  // vallen los als de Benchmark ervoor weg is (`datamodel.md`, Verwijderen en datakoppelingen en Ander Assessment).
+  const adviesOpruiming = alles.map((organisatie) => ({ organisatie, ...ruimAdviesverlopenOp(organisatie, benchmarks) }));
   for (const organisatie of alles) ruimLeadToegangOp(organisatie, benchmarks);
   // Een Case bij een andere Organisatie die naar een verwijderde Organisatie verwees, vraagt om een nieuwe keuze (`dossier.md`, Verwijderen en datakoppelingen).
   ruimDossierOp(alles, benchmarks);
@@ -209,20 +212,48 @@ export function slaAlles(alles: Organisatie[]): void {
       },
     });
   }
-  for (const { organisatie, av } of verdwenenAdviesverlopen) {
-    logAudit({
-      actie: "adviesverloop.verwijderd",
-      entiteitType: "adviesverloop",
-      entiteitId: av.id,
-      entiteitNaam: organisatie.naam,
-      details: { ...organisatieContext(organisatie), aantalStappen: av.stappen.length, reden: "geen gekoppelde Meting meer" },
-    });
+  for (const { organisatie, verdwenen: weg, losgekoppeld } of adviesOpruiming) {
+    for (const av of weg) {
+      logAudit({
+        actie: "adviesverloop.verwijderd",
+        entiteitType: "adviesverloop",
+        entiteitId: av.id,
+        entiteitNaam: organisatie.naam,
+        details: { ...organisatieContext(organisatie), aantalStappen: av.stappen.length, reden: "geen gekoppelde Meting meer" },
+      });
+    }
+    for (const { adviesverloop, metingIds } of losgekoppeld) {
+      for (const metingId of metingIds) {
+        logAudit({
+          actie: "adviesverloop.metingGekoppeld",
+          entiteitType: "adviesverloop",
+          entiteitId: adviesverloop.id,
+          entiteitNaam: organisatie.naam,
+          details: { ...organisatieContext(organisatie), actie: "losgekoppeld", reden: "de Benchmark voor de koppeling is er niet meer", metingId },
+        });
+      }
+    }
   }
   const json = stringifyOpslag(alles);
   window.localStorage.setItem(KEY, json);
   emitChange();
   stuurNaarServer(SERVER_SLEUTEL, json);
 }
+
+// Verdwijnt een Benchmark of valt een Assessment of Organisatie eruit, dan vallen de Metingen van een ander Assessment los uit een adviesverloop dat die Benchmark
+// gebruikte (`slaAlles` ruimt dat op). Alleen als er zo'n adviesverloop is, en niet opnieuw terwijl dat zelf de benchmarks bijwerkt.
+let adviesOpruimtBezig = false;
+bijBenchmarkWijziging(() => {
+  if (adviesOpruimtBezig || typeof window === "undefined") return;
+  const alles = laadAlles();
+  if (!alles.some((o) => o.adviesverlopen?.some((a) => a.benchmarkId))) return;
+  adviesOpruimtBezig = true;
+  try {
+    slaAlles(alles);
+  } finally {
+    adviesOpruimtBezig = false;
+  }
+});
 
 export function useOrganisaties(): Organisatie[] {
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);

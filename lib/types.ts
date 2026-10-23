@@ -236,6 +236,8 @@ export interface Gebruiker {
   actief: boolean;
   laatstIngelogdOp: string | null;
   aangemaaktOp: string;
+  /** De adviescontext (`adviesverloop.md`); ontbreekt tot de eerste keer openen, dan gevuld uit de `AdviesRol`-records. Alleen de eigenaar leest hem. */
+  adviesProfiel?: AdviesProfiel;
 }
 
 /**
@@ -722,9 +724,33 @@ export interface AdviesRol {
   /** "consultant", "salesmanager", "teamleider", uitbreidbaar. */
   id: string;
   naam: string;
-  /** De vooringevulde tekst bij "Wie ben jij bij deze klant", maximaal 600 tekens. */
+  /** De beginwaarde van de tekst van de rol in het `AdviesProfiel` van een Consultant (`datamodel.md`, Adviesverloop). */
   standaardTekst: string;
   volgorde: number;
+}
+
+/** Een rol in het `AdviesProfiel` van een Consultant, met zijn eigen tekst. */
+export interface AdviesProfielRol {
+  id: string;
+  /** Vrij, maximaal 60 tekens. */
+  naam: string;
+  /** Wie je bij deze klant bent, maximaal 600 tekens, mag leeg zijn. */
+  tekst: string;
+  /** De `AdviesRol` waarvan de prompts van de use cases worden gebruikt; `null` bij een zelf toegevoegde rol, dan telt de rol Consultant. */
+  adviesRolId: string | null;
+}
+
+/**
+ * De adviescontext van een Admin of Consultant (`adviesverloop.md`, Adviescontext in Mijn account): Persoonlijk, alleen de eigenaar leest en wijzigt hem.
+ * Staat bij de Gebruiker en verdwijnt met hem.
+ */
+export interface AdviesProfiel {
+  /** "Over mij", maximaal 600 tekens, mag leeg zijn. */
+  overMij: string;
+  /** `AdviesProfielRol.id`, de rol die een nieuw adviesverloop voorselecteert. */
+  standaardRolId: string;
+  /** Minstens één. */
+  rollen: AdviesProfielRol[];
 }
 
 export interface UseCasePrompt {
@@ -805,11 +831,16 @@ export interface Adviesverloop {
   peilMetingId: string | null;
   aangemaaktDoor: string;
   aangemaaktOp: string;
-  /** Door de Consultant aan de shortlist toegevoegde bouwstenen. De laagste scores staan er altijd in en worden niet opgeslagen. */
-  extraBouwsteenIds: string[];
+  /** De Benchmark die Metingen van verschillende Assessments verbindt, alleen ingevuld als er Metingen van meer dan één Assessment gekoppeld zijn. */
+  benchmarkId: string | null;
+  /** De door de Consultant gekozen shortlist in de gekozen volgorde; `null` is de standaard (de laagste scores, afgeleid en niet opgeslagen). */
+  shortlistBouwsteenIds: string[] | null;
+  /** Fasen die de Consultant heeft overgeslagen. */
+  nvFaseIds: string[];
+  /** Use cases die de Consultant niet van toepassing heeft verklaard. */
+  nvUseCaseIds: string[];
+  /** De gekozen `AdviesProfielRol` van de Consultant die het adviesverloop bewerkt; de tekst staat in zijn `AdviesProfiel`. */
   rolId: string;
-  /** De tekst bij "Wie ben jij bij deze klant", maximaal 600 tekens. */
-  rolTekst: string;
   metingen: AdviesverloopMeting[];
   stappen: Adviesstap[];
 }

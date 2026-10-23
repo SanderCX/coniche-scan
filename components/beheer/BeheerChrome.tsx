@@ -15,6 +15,7 @@ import { BeheerMeldingBalk } from "@/components/beheer/BeheerMelding";
 import { BeheerOverzichten } from "@/components/beheer/BeheerOverzichten";
 import { ConflictHost } from "@/components/beheer/ConflictHost";
 import { MijnAccountModal } from "@/components/beheer/MijnAccountModal";
+import { MijnAccountTab, useMijnAccountVerzoek } from "@/lib/mijn-account-open";
 
 /**
  * Beheer hergebruikt de publieke nav/footer (zelfde logo, zelfde balk),
@@ -126,6 +127,15 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
   const navActions = useBeheerNavActionsValue();
   const router = useRouter();
   const [accountOpen, setAccountOpen] = useState(false);
+  const [accountTab, setAccountTab] = useState<MijnAccountTab>("gegevens");
+  // Een scherm kan de modal openen op een tab (`lib/mijn-account-open.ts`), bijvoorbeeld "Aanpassen in Mijn account" in het adviesverloop.
+  const verzoek = useMijnAccountVerzoek();
+  const [gezienVerzoek, setGezienVerzoek] = useState(verzoek?.nr ?? 0);
+  if (verzoek && verzoek.nr !== gezienVerzoek) {
+    setGezienVerzoek(verzoek.nr);
+    setAccountTab(verzoek.tab);
+    setAccountOpen(true);
+  }
   const heeftInstellingen = magGebruikersBeheren(gebruiker);
   const inInstellingen = INSTELLINGEN_PADEN.some((p) => pathname.startsWith(p));
   const inHelp = pathname.startsWith("/beheer/help");
@@ -178,7 +188,7 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
                 rechtsUitgelijnd
                 actief={heeftInstellingen && inInstellingen}
                 opties={[
-                  { label: "Mijn account", onClick: () => setAccountOpen(true) },
+                  { label: "Mijn account", onClick: () => { setAccountTab("gegevens"); setAccountOpen(true); } },
                   ...(heeftInstellingen
                     ? [{ label: "Instellingen", onClick: () => router.push("/beheer/gebruikers"), actief: inInstellingen }]
                     : []),
@@ -235,7 +245,11 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
         </div>
       )}
       <BeheerMeldingBalk />
-      {gebruiker && accountOpen && <MijnAccountModal gebruiker={gebruiker} open onSluit={() => setAccountOpen(false)} />}
+      {gebruiker && accountOpen && (
+        <div className="account-boven">
+          <MijnAccountModal key={`${accountTab}-${gezienVerzoek}`} gebruiker={gebruiker} open beginTab={accountTab} onSluit={() => setAccountOpen(false)} />
+        </div>
+      )}
       <main className="flex-1">{children}</main>
       <Suspense fallback={null}>
         <BeheerOverzichten />

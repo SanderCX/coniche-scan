@@ -48,7 +48,7 @@ function adviesLabel(organisatie: Organisatie, metingId: string): string | null 
  * formulier om een Meting te plannen (Assessment-type, Onderdeel en Meetdatum), met "Gemiddelde maken". Op een selectie komen
  * "Meetdatum instellen…" en "Samenbrengen in één Meting…" erbij.
  */
-export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
+export function MetingenSectie({ organisatie, children }: { organisatie: Organisatie; /** De onderdelen Respondenten en Leads, onder de lijst in dezelfde kaart. */ children?: React.ReactNode }) {
   const router = useRouter();
   const ingelogd = useIngelogdeGebruiker();
   const assessments = useAssessments();
@@ -132,7 +132,7 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
   const naam = metingNaam(waarde);
 
   return (
-    <section className="beheer-kaart" aria-label="Metingen">
+    <section className="beheer-kaart org-anker" id="metingen" aria-label="Metingen">
       <div className="beheer-kaart-kop">
         <span className="titel-rij" style={{ marginBottom: 0 }}>
           <h2 style={{ margin: 0 }}>Metingen</h2>
@@ -256,6 +256,7 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
           onKlaar={() => {}}
         />
       )}
+      {children}
     </section>
   );
 }

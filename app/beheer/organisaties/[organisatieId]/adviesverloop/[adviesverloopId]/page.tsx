@@ -57,10 +57,12 @@ export default function AdviesverloopPagina({ params }: { params: Promise<{ orga
   const kanWijzigen = !afgerond;
   const peilDatum = peil ? meetdatumVan(peil) : null;
   const onderdeel = onderdeelNaamVan(organisatie, adviesverloop.onderdeelId);
+  const sector = ((organisatie.kenmerken["sector-subsector"] as { sector?: string } | undefined)?.sector ?? "").trim();
 
   return (
     <>
       <Fasestrook
+        organisatieId={organisatie.id}
         adviesverloop={adviesverloop}
         catalogus={catalogus}
         gekoppeld={data.gekoppeld}
@@ -83,7 +85,8 @@ export default function AdviesverloopPagina({ params }: { params: Promise<{ orga
             <p className="eyebrow">Adviesverloop</p>
             <h1>{organisatie.naam}</h1>
             <p className="adv-sub">
-              {onderdeel} · {data.gekoppeld.length} {data.gekoppeld.length === 1 ? "Meting" : "Metingen"}
+              {onderdeel}
+              {sector ? ` · ${sector}` : ""} · {data.gekoppeld.length} {data.gekoppeld.length === 1 ? "Meting" : "Metingen"}
               {peil ? ` · peil ${data.peilLabel}${peilDatum ? ` ${maandJaar(peilDatum)}` : ""}` : ""}
               {afgerond ? " · afgerond" : ""}
             </p>
@@ -122,7 +125,6 @@ export default function AdviesverloopPagina({ params }: { params: Promise<{ orga
           <UitwerkingScherm
             data={data}
             kanWijzigen={kanWijzigen}
-            onWijzig={() => setScherm("shortlist")}
             onPrompt={(useCase, bouwsteenId) => setPrompt({ useCase, bouwsteenId })}
             onGedaan={(useCase, bouwsteenId) => setGedaan({ useCase, bouwsteenId })}
           />

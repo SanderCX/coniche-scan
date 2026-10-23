@@ -6,12 +6,12 @@ rollen: [Consultant, Admin]
 afbeelding:
 film:
 bronnen: [dossier.md, beheerpagina.md, datamodel.md]
-bijgewerkt: 2026-10-22
+bijgewerkt: 2026-10-23
 ---
 In het Dossier bewaar je bij een Organisatie wat je tijdens een traject tegenkomt: nieuws over de Organisatie, cases uit andere trajecten, een benchmark waar de Organisatie in zit, events en blogs. Een deel daarvan kun je laten zien aan de Lead, met uitleg waarom het bij de Organisatie past.
 
 ## In het kort
-Het Dossier staat op het organisatie-detail, op een eigen kaart onder het organisatiepaneel en boven de KPI's. Je voegt items toe met "+ Toevoegen". Een item is alleen voor jezelf en je collega-consultants, tot je het Dossier zichtbaar maakt voor de Lead én het item op "Zichtbaar voor Lead" zet.
+Het Dossier staat op het organisatie-detail, op een eigen kaart onder Bedrijfsgegevens (en, voor een Admin, onder Permissies) en boven het Adviesverloop. Je voegt items toe met "+ Toevoegen". Een item is alleen voor jezelf en je collega-consultants, tot je het Dossier zichtbaar maakt voor de Lead én het item op "Zichtbaar voor Lead" zet.
 
 ## Wat je ziet
 1. **De kaart Dossier.** Onder de titel Dossier (zonder naam van de Organisatie erboven, want de pagina is al die van de Organisatie) staat het paneel "Instellingen voor de Lead", daaronder het filter Alles, Cases, Benchmarks, Nieuws, Events en Blogs met de knop "+ Toevoegen", en de items in één kaart. Per item staat een rij met de soort, de titel, een regel met de gegevens, een statusbadge en de knop "Bewerken".

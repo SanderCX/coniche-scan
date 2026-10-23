@@ -6,8 +6,6 @@ import { Schakelaar } from "@/components/Schakelaar";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { KenmerkenForm } from "@/components/beheer/KenmerkenForm";
 import { Contactpersonen } from "@/components/beheer/Contactpersonen";
-import { ToegangKaart } from "@/components/beheer/ToegangKaart";
-import { AfsprakenKaart } from "@/components/beheer/AfsprakenKaart";
 import { OrganisatieNaamBewerken } from "@/components/beheer/OrganisatieNaamBewerken";
 import { Cijferrij, KanalenBlok, KpiRingenBlok, OverigBlok, ProfielKop, TechstackBlok } from "@/components/organisatie/ProfielBlokken";
 import { DropdownKnop } from "@/components/DropdownKnop";
@@ -27,8 +25,8 @@ import { Gebruiker, Organisatie, ToonProfiel } from "@/lib/types";
 
 /**
  * Het organisatiepaneel bovenaan het organisatie-detail (`beheerpagina.md`, Organisatiepaneel): Eén witte kaart met de kop (beginletter, naam, pillen
- * Sector en Subsector, "Bewerken"), de cijferrij, de Kanalen, de Techstack en de overige velden, daaronder Toegang en Afspraken (alleen een Admin) en
- * onderaan de Contactpersonen. Het paneel toont alleen wat bekend is. "Bewerken" opent een modal met alle organisatievelden (`stylesheet.md`, Bewerken: Op
+ * Sector en Subsector), de cijferrij, de Kanalen, de Techstack en de overige velden en onderaan de Contactpersonen. De kaart heet Bedrijfsgegevens, met rechts
+ * in de kop "Bewerken". Toegang en Afspraken staan in de kaart Permissies (`PermissiesKaart`, alleen een Admin). Het paneel toont alleen wat bekend is. "Bewerken" opent een modal met alle organisatievelden (`stylesheet.md`, Bewerken: Op
  * de plek of in een modal), met onderin de schakelaars "Zichtbaar voor de Lead" voor wie `dossier.bewerken` heeft. Het Bewerkslot van de Organisatie
  * geldt al zolang de pagina open is (`MetBewerkslot`).
  */
@@ -62,24 +60,25 @@ export function OrganisatiePaneel({
   const leeg = profiel.cijfers.length === 0 && profiel.techstack.length === 0 && profiel.overig.length === 0;
 
   return (
-    <section className="op-paneel" aria-label="Organisatie">
+    <section className="op-paneel org-anker" id="profiel" aria-label="Bedrijfsgegevens">
+      <div className="beheer-kaart-kop">
+        <h2>Bedrijfsgegevens</h2>
+        <DropdownKnop
+          label="Bewerken"
+          rechtsUitgelijnd
+          opties={[
+            { label: "Kenmerken", onClick: () => setModal("kenmerken") },
+            { label: "KPI's invullen", onClick: () => setModal("kpis") },
+            { label: "Onderdelen", onClick: () => setModal("onderdelen") },
+          ]}
+        />
+      </div>
       <ProfielKop
         letter={profiel.letter}
         naam={organisatie.naam}
         sector={profiel.sector}
         subsector={profiel.subsector}
         naamActie={<OrganisatieNaamBewerken organisatieId={organisatie.id} naam={organisatie.naam} korteNaam={organisatie.korteNaam ?? ""} />}
-        acties={
-          <DropdownKnop
-            label="Bewerken"
-            rechtsUitgelijnd
-            opties={[
-              { label: "Kenmerken", onClick: () => setModal("kenmerken") },
-              { label: "KPI's invullen", onClick: () => setModal("kpis") },
-              { label: "Onderdelen", onClick: () => setModal("onderdelen") },
-            ]}
-          />
-        }
         onder={
           // Toegang toont de eigenaar en de toegewezen Consultants aan een Admin; een Consultant ziet dat vlak niet en houdt daarom deze regel.
           !isAdmin && (
@@ -114,13 +113,6 @@ export function OrganisatiePaneel({
       />
       <TechstackBlok tegels={profiel.techstack} />
       <OverigBlok overig={profiel.overig} />
-
-      {isAdmin && (
-        <div className="op-onder">
-          <ToegangKaart organisatie={organisatie} gebruikers={gebruikers} />
-          <AfsprakenKaart organisatie={organisatie} />
-        </div>
-      )}
 
       <Contactpersonen organisatie={organisatie} />
 

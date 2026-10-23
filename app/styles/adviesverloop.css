@@ -506,3 +506,174 @@
   overflow-y: auto;
   padding: var(--sp-8);
 }
+
+/* Overslaan en niet van toepassing (`adviesverloop.md`, Overslaan en niet van toepassing): Grijs, zonder gevulde balk en zonder vinkje. */
+.fase--overgeslagen .fase-naam,
+.fase--overgeslagen .fase-telling {
+  color: var(--ink-s);
+}
+.fase--overgeslagen .fase-cirkel {
+  border-style: dashed;
+  border-color: var(--border-d);
+  color: var(--ink-s);
+}
+.fasepaneel-stappen--lijst {
+  max-height: 240px;
+  overflow-y: auto;
+}
+.fasepaneel-stappen li.fasepaneel-stap {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.fasepaneel-stap-tekst {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.stap-bol {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--border-d);
+  border-radius: 50%;
+  background: #fff;
+}
+.stap-bol--klaar {
+  border-color: var(--or);
+  background: var(--or);
+}
+.stap-bol--nv {
+  border-style: dashed;
+  border-color: var(--ink-s);
+}
+.fasepaneel-stap--nv .fasepaneel-stap-tekst strong {
+  color: var(--ink-s);
+  font-weight: 500;
+  text-decoration: line-through;
+}
+.tekstknop {
+  flex: none;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--or);
+  cursor: pointer;
+}
+.tekstknop:hover:not(:disabled) {
+  text-decoration: underline;
+}
+.tekstknop:disabled {
+  color: var(--ink-s);
+  cursor: not-allowed;
+}
+
+/* De volgorde van de shortlist: Een volgnummer met twee pijltjes (`adviesverloop.md`, Scherm Adviesverloop, Rijen). */
+.adv-volgorde {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 64px;
+}
+.adv-volgnummer {
+  min-width: 1.2rem;
+  font-size: var(--fs-16);
+  font-weight: 700;
+  color: var(--ink-s);
+  text-align: right;
+}
+.adv-pijltjes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.adv-pijltjes button {
+  width: 24px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--border-d);
+  border-radius: 4px;
+  background: #fff;
+  font-family: inherit;
+  font-size: var(--fs-12);
+  line-height: 1;
+  color: var(--ink-m);
+  cursor: pointer;
+}
+.adv-pijltjes button:hover:not(:disabled) {
+  border-color: var(--or);
+  color: var(--ink);
+}
+.adv-pijltjes button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.adv-rolregel {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+  font-size: var(--fs-14);
+}
+
+/* De tab Adviescontext in Mijn account: Elke rol is een blok met zijn velden en acties. */
+.adv-rol-blok {
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+/* Mijn account opent ook boven de modal Prompt klaarzetten ("Aanpassen in Mijn account"). */
+.account-boven .modal-overlay {
+  z-index: 1200;
+}
+
+/* Het organisatie-detail: De sprongnavigatie en de ankers (`beheerpagina.md`, punt 4, Sprongnavigatie). */
+.org-sprongnav-binnen {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+.org-anker {
+  scroll-margin-top: calc(var(--nav-h) + 64px + 16px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.org-sprongnav-binnen) {
+    scroll-behavior: smooth;
+  }
+}
+/* Elke kaart heeft een titel van 24px, gewicht 800 (`beheerpagina.md`, Eén kaart per sectie). */
+.org-kaarten .beheer-kaart-kop h2 {
+  font-size: var(--fs-24);
+  font-weight: 800;
+}
+.org-kaarten .dos-kop-titel {
+  font-size: var(--fs-24);
+  font-weight: 800;
+}
+/* In de kaart Metingen zijn Respondenten en Leads onderdelen met een kopje van 18px, gewicht 700, gescheiden door een lijn van 1px. */
+.org-subsectie {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: var(--sp-6);
+  border-top: 1px solid var(--border);
+}
+.org-subsectie h3 {
+  margin: 0;
+  font-size: var(--fs-18);
+  font-weight: 700;
+}
+.org-subsectie-kop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}

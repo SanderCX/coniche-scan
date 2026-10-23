@@ -48,6 +48,8 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
   const instellingen = useInstellingen();
   const router = useRouter();
   const [verwijderenOpen, setVerwijderenOpen] = useState(false);
+  // Adviesverlopen die deze benchmark gebruiken voor Metingen van een ander Assessment: De bevestiging noemt ze (`datamodel.md`, Ander Assessment).
+  const aantalAdviesverlopen = organisaties.reduce((n, o) => n + (o.adviesverlopen ?? []).filter((a) => a.benchmarkId === benchmarkId).length, 0);
 
   if (!magBenchmarkBeheren(gebruiker)) {
     return (
@@ -199,6 +201,10 @@ export default function BenchmarkDetailPage({ params }: { params: Promise<{ benc
         bericht={`${benchmark.naam} verwijderen? ${
           aantalVinkjes > 0
             ? `${aantalVinkjes} vinkje${aantalVinkjes === 1 ? "" : "s"} van Leads ${aantalVinkjes === 1 ? "gaat" : "gaan"} mee. `
+            : ""
+        }${
+          aantalAdviesverlopen > 0
+            ? `${aantalAdviesverlopen} adviesverloop${aantalAdviesverlopen === 1 ? "" : "pen"} gebruik${aantalAdviesverlopen === 1 ? "t" : "en"} deze benchmark voor Metingen van een ander Assessment: Die Metingen worden daar losgekoppeld. `
             : ""
         }Organisaties, Metingen en scans blijven bestaan. Dit kan niet ongedaan gemaakt worden.`}
         onBevestigen={() => {

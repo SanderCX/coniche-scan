@@ -8,7 +8,7 @@ import { BevestigModal } from "@/components/beheer/BevestigModal";
 import { appNaam } from "@/lib/advies-catalogus-store";
 import { faseVoortgang, stapTekst, casesVoorBouwsteen, verschilTekst } from "@/lib/advies";
 import { CLASSIFICATIE_INFO } from "@/lib/colors";
-import { zetStapTerug } from "@/lib/db";
+import { zetFaseOverslaan, zetStapTerug } from "@/lib/db";
 import { DOSSIER_STATUS_LABEL, dossierVan, itemStatus } from "@/lib/dossier";
 import { formatScore } from "@/lib/format";
 import { classificatie } from "@/lib/scoring";
@@ -16,7 +16,7 @@ import { ringVanScore } from "@/lib/score-ring";
 import { useOrganisaties } from "@/lib/db";
 import { useBenchmarksMetLeden } from "@/lib/use-benchmarks";
 import type { UseCase } from "@/lib/types";
-import { KlasseChip } from "./ShortlistScherm";
+import { KiezenModal, KlasseChip } from "./ShortlistScherm";
 import type { AdviesData } from "./useAdviesData";
 
 const SOORT_LABEL: Record<string, string> = { nieuws: "Nieuws", case: "Case", event: "Event", blog: "Blog", benchmark: "Benchmark" };
@@ -28,19 +28,22 @@ const SOORT_LABEL: Record<string, string> = { nieuws: "Nieuws", case: "Case", ev
 export function UitwerkingScherm({
   data,
   kanWijzigen,
-  onWijzig,
   onPrompt,
   onGedaan,
 }: {
   data: AdviesData;
   kanWijzigen: boolean;
-  onWijzig: () => void;
   onPrompt: (useCase: UseCase, bouwsteenId: string) => void;
   onGedaan: (useCase: UseCase, bouwsteenId: string) => void;
 }) {
   const { shortlist, catalogus, adviesverloop, organisatie } = data;
   const voortgang = faseVoortgang(catalogus, adviesverloop);
-  const huidig = voortgang.find((v) => v.huidig) ?? [...voortgang].reverse().find((v) => v.totaal > 0) ?? voortgang[0];
+  const huidig =
+    voortgang.find((v) => v.huidig) ??
+    [...voortgang].reverse().find((v) => v.totaal > 0 && !v.overgeslagen) ??
+    voortgang.find((v) => !v.overgeslagen) ??
+    voortgang[0];
+  const [kiezen, setKiezen] = useState(false);
   const alle = useOrganisaties();
   const benchmarks = useBenchmarksMetLeden();
   const [terugzetten, setTerugzetten] = useState<{ stapId: string; titel: string } | null>(null);
@@ -55,7 +58,7 @@ export function UitwerkingScherm({
             </button>
           ))}
         </div>
-        <button type="button" className="btn btn-outline btn-compact" onClick={onWijzig}>
+        <button type="button" className="btn btn-outline btn-compact" disabled={!kanWijzigen} onClick={() => setKiezen(true)}>
           Bouwstenen wijzigen
         </button>
       </div>
@@ -66,7 +69,7 @@ export function UitwerkingScherm({
         const bm = data.benchmark?.perBouwsteen.get(r.bouwblok.id);
         const sp = data.spreiding.get(r.bouwblok.id);
         const sinds = data.verschil?.get(r.bouwblok.id);
-        const useCases = huidig ? casesVoorBouwsteen(catalogus, huidig.fase.id, r.bouwblok.id, klasse) : [];
+        const useCases = huidig && !huidig.overgeslagen ? casesVoorBouwsteen(catalogus, huidig.fase.id, r.bouwblok.id, klasse, adviesverloop.nvUseCaseIds) : [];
         const items = dossierVan(organisatie).items.filter((i) => i.bouwblokIds.includes(r.bouwblok.id));
         return (
           <section key={r.bouwblok.id} id={`adv-bs-${r.bouwblok.id}`} className="org-kaarten" style={{ marginTop: 0, scrollMarginTop: "10rem" }}>
@@ -98,7 +101,16 @@ export function UitwerkingScherm({
                   <InfoIcoon sleutel="info.adviesverloopUsecases" />
                 </div>
               </div>
-              {useCases.length === 0 && <p className="text-sm text-ink-s">Deze fase heeft geen use cases.</p>}
+              {huidig?.overgeslagen ? (
+                <div className="adv-regel">
+                  <span className="text-sm text-ink-s">Deze fase is overgeslagen. Er staan geen use cases.</span>
+                  <button type="button" className="btn btn-outline btn-compact" disabled={!kanWijzigen} onClick={() => zetFaseOverslaan(organisatie.id, adviesverloop.id, huidig.fase.id, false)}>
+                    Fase weer meenemen
+                  </button>
+                </div>
+              ) : (
+                useCases.length === 0 && <p className="text-sm text-ink-s">Deze fase heeft geen use cases.</p>
+              )}
               {useCases.map((u) => {
                 const stap = adviesverloop.stappen.find((s) => s.useCaseId === u.id && s.bouwsteenId === r.bouwblok.id);
                 return (
@@ -182,6 +194,8 @@ export function UitwerkingScherm({
         );
       })}
 
+      {shortlist.length === 0 && <p className="admin-notice">Er staat niets op de shortlist. Kies minstens één bouwsteen om te kunnen uitwerken.</p>}
+      {kiezen && <KiezenModal data={data} onSluit={() => setKiezen(false)} />}
       <BevestigModal
         open={terugzetten !== null}
         titel="Stap terugzetten?"

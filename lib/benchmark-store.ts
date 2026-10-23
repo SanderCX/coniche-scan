@@ -62,10 +62,20 @@ function laad(): Opslag {
   return structuredClone(parse(getSnapshot()));
 }
 
+const naWijziging: (() => void)[] = [];
+/**
+ * Roept `fn` aan na elke wijziging van de benchmarks. De opslag van organisaties gebruikt dit om de adviesverlopen kloppend te houden als de Benchmark voor een
+ * koppeling verdwijnt (`datamodel.md`, Ander Assessment): Deze module kan de organisaties niet zelf importeren.
+ */
+export function bijBenchmarkWijziging(fn: () => void): void {
+  naWijziging.push(fn);
+}
+
 function bewaar(opslag: Opslag): void {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(KEY, JSON.stringify(opslag));
   emitChange();
+  for (const fn of naWijziging) fn();
 }
 
 /** Stabiele referentie per snapshot, zodat `useSyncExternalStore` niet bij elke render een nieuw object ziet. */

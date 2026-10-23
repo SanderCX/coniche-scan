@@ -154,12 +154,12 @@ export function OverigBlok({ overig }: { overig: ProfielOverig[] }) {
 }
 
 /**
- * Eén ring van het blok KPI's (`dossier.md`, KPI-ringen): 132px met een lijn van 12px, het spoor `#efede8` en een vulling met afgeronde uiteinden die bovenaan begint
+ * Eén ring van het blok KPI's (`dossier.md`, KPI-ringen): 96px met een lijn van 9px, het spoor `#efede8` en een vulling met afgeronde uiteinden die bovenaan begint
  * en met de klok mee loopt. In het midden de waarde (met de eenheid), onder de ring de naam en een regel. Een uitgegrijsde ring heeft alleen het spoor en een
  * streepje in het midden. Elke ring is een afbeelding met een `aria-label`.
  */
-const RING = 132;
-const LIJN = 12;
+const RING = 96;
+const LIJN = 9;
 const STRAAL = (RING - LIJN) / 2;
 const OMTREK = 2 * Math.PI * STRAAL;
 
@@ -185,7 +185,7 @@ export function KpiRingFiguur({ ring, kleur }: { ring: KpiRing; kleur: string })
               transform={`rotate(-90 ${RING / 2} ${RING / 2})`}
             />
           )}
-          {ring.stip !== null && <circle cx={RING / 2 + STRAAL * Math.cos(hoek)} cy={RING / 2 + STRAAL * Math.sin(hoek)} r={7} fill="#fff" stroke="var(--ink)" strokeWidth={3} />}
+          {ring.stip !== null && <circle cx={RING / 2 + STRAAL * Math.cos(hoek)} cy={RING / 2 + STRAAL * Math.sin(hoek)} r={5} fill="#fff" stroke="var(--ink)" strokeWidth={2} />}
         </svg>
         <span className="op-ring-waarde" aria-hidden="true">
           {grijs ? <span className="op-ring-streep" /> : ring.tekst}

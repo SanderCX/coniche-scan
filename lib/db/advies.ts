@@ -5,9 +5,11 @@ import { organisatieContext } from "../audit-context";
 import { nieuwId } from "../id";
 import { getIngelogdeGebruikerId } from "../admin-auth";
 import { getAssessments } from "../assessment-store";
+import { getGebruikers } from "../gebruikers-store";
+import { profielVan } from "../advies-profiel";
 import { getBenchmarksMetLeden } from "../benchmark-leden";
-import { ROLTEKST_MAX, getAdviesCatalogus } from "../advies-catalogus-store";
-import { LABEL_MAX, adviesverlopenVan, controleerLink, koppelRijen, lopendAdviesverloop, onderdeelNaamVan } from "../advies";
+import { getAdviesCatalogus } from "../advies-catalogus-store";
+import { LABEL_MAX, adviesverlopenVan, controleerLink, geschikteBenchmarks, koppelRijen, lopendAdviesverloop, onderdeelNaamVan } from "../advies";
 import type { Resultaat } from "./meting-plannen";
 
 /**
@@ -60,10 +62,10 @@ export function startAdviesverloop(organisatieId: string, metingId: string, labe
   if (lopendAdviesverloop(organisatie, onderdeelId)) return { ok: false, reden: "Er loopt al een adviesverloop voor dit onderdeel. Koppel de Meting daaraan." };
   const rij = koppelRijen(organisatie, null, onderdeelId, getAssessments(), getBenchmarksMetLeden(alles), metingId).find((r) => r.meting.id === metingId);
   if (rij?.reden && rij.reden !== "Minstens één Meting") return { ok: false, reden: rij.reden };
-  const katalogus = getAdviesCatalogus();
-  const rol = [...katalogus.rollen].sort((a, b) => a.volgorde - b.volgorde)[0];
   const nu = new Date().toISOString();
   const gebruiker = getIngelogdeGebruikerId() ?? "";
+  // De rol is de standaardrol uit de adviescontext van de Consultant (`adviesverloop.md`, Jouw rol bij deze klant).
+  const profiel = profielVan(getGebruikers().find((g) => g.id === gebruiker), getAdviesCatalogus());
   const av: Adviesverloop = {
     id: nieuwId(),
     organisatieId,
@@ -74,9 +76,11 @@ export function startAdviesverloop(organisatieId: string, metingId: string, labe
     peilMetingId: null,
     aangemaaktDoor: gebruiker,
     aangemaaktOp: nu,
-    extraBouwsteenIds: [],
-    rolId: rol?.id ?? "",
-    rolTekst: rol?.standaardTekst ?? "",
+    benchmarkId: null,
+    shortlistBouwsteenIds: null,
+    nvFaseIds: [],
+    nvUseCaseIds: [],
+    rolId: profiel.standaardRolId,
     metingen: [{ adviesverloopId: "", metingId, label: label?.trim().slice(0, LABEL_MAX) || null, gekoppeldOp: nu, gekoppeldDoor: gebruiker }],
     stappen: [],
   };
@@ -89,13 +93,19 @@ export function startAdviesverloop(organisatieId: string, metingId: string, labe
 }
 
 /** De Metingen van het adviesverloop vervangen door een selectie, elk met een eigen label. Er blijft altijd minstens één Meting gekoppeld. */
-export function koppelMetingen(organisatieId: string, adviesverloopId: string, selectie: { metingId: string; label: string }[]): Resultaat {
+export function koppelMetingen(
+  organisatieId: string,
+  adviesverloopId: string,
+  selectie: { metingId: string; label: string }[],
+  benchmarkKeuze?: string | null
+): Resultaat {
   const c = zoek(organisatieId, adviesverloopId);
   if (!c) return GEEN_AV;
   if (c.av.status === "afgerond") return AFGEROND;
   const unieke = new Map(selectie.map((s) => [s.metingId, s.label.trim().slice(0, LABEL_MAX)]));
   if (unieke.size === 0) return { ok: false, reden: "Er blijft minstens één Meting gekoppeld." };
-  const rijen = koppelRijen(c.organisatie, c.av, c.av.onderdeelId, getAssessments(), getBenchmarksMetLeden(c.alles));
+  const benchmarks = getBenchmarksMetLeden(c.alles);
+  const rijen = koppelRijen(c.organisatie, c.av, c.av.onderdeelId, getAssessments(), benchmarks);
   const huidig = new Map(c.av.metingen.map((m) => [m.metingId, m]));
   for (const id of unieke.keys()) {
     if (huidig.has(id)) continue;
@@ -103,6 +113,19 @@ export function koppelMetingen(organisatieId: string, adviesverloopId: string, s
     if (!rij) return { ok: false, reden: "Meting niet gevonden." };
     if (rij.reden) return { ok: false, reden: rij.reden };
   }
+  // Bij Metingen van verschillende Assessments hoort een Benchmark waarin de Organisatie en al die Assessments zitten (`datamodel.md`, Ander Assessment).
+  const assessmentIds = [...new Set(c.organisatie.scanUitvoeringen.filter((m) => unieke.has(m.id)).map((m) => m.assessmentId))];
+  let benchmarkId: string | null = null;
+  if (assessmentIds.length > 1) {
+    const geschikt = geschikteBenchmarks(benchmarks, c.organisatie.id, assessmentIds);
+    if (geschikt.length === 0) return { ok: false, reden: "Geen benchmark met beide Assessments" };
+    const gekozen = [benchmarkKeuze, c.av.benchmarkId].find((id) => id && geschikt.some((b) => b.id === id));
+    if (gekozen) benchmarkId = gekozen;
+    else if (geschikt.length === 1) benchmarkId = geschikt[0].id;
+    else return { ok: false, reden: "Kies een Benchmark voor de koppeling." };
+  }
+  const benchmarkGewijzigd = (c.av.benchmarkId ?? null) !== benchmarkId;
+  c.av.benchmarkId = benchmarkId;
   const nu = new Date().toISOString();
   const gebruiker = getIngelogdeGebruikerId() ?? "";
   const nieuw: AdviesverloopMeting[] = [...unieke].map(([metingId, label]) => {
@@ -119,7 +142,7 @@ export function koppelMetingen(organisatieId: string, adviesverloopId: string, s
   }
   if (c.av.peilMetingId && !unieke.has(c.av.peilMetingId)) c.av.peilMetingId = null;
   for (const s of c.av.stappen) if (s.metingId && !unieke.has(s.metingId)) s.metingId = null;
-  if (toegevoegd.length === 0 && losgemaakt.length === 0 && labelsGewijzigd.length === 0) return { ok: true };
+  if (toegevoegd.length === 0 && losgemaakt.length === 0 && labelsGewijzigd.length === 0 && !benchmarkGewijzigd) return { ok: true };
   opslaan(c);
   for (const m of toegevoegd) audit(c, "adviesverloop.metingGekoppeld", { actie: "gekoppeld", metingLabel: metingContextNaam(c.organisatie, m.metingId), label: m.label });
   for (const m of losgemaakt) audit(c, "adviesverloop.metingGekoppeld", { actie: "losgekoppeld", metingLabel: metingContextNaam(c.organisatie, m.metingId), label: m.label });
@@ -128,10 +151,10 @@ export function koppelMetingen(organisatieId: string, adviesverloopId: string, s
 }
 
 /** Een Meting aan het lopende adviesverloop koppelen, met een optioneel label (de knop Koppelen in het Meting-overzicht). */
-export function koppelMeting(organisatieId: string, adviesverloopId: string, metingId: string, label: string): Resultaat {
+export function koppelMeting(organisatieId: string, adviesverloopId: string, metingId: string, label: string, benchmarkKeuze?: string | null): Resultaat {
   const c = zoek(organisatieId, adviesverloopId);
   if (!c) return GEEN_AV;
-  return koppelMetingen(organisatieId, adviesverloopId, [...c.av.metingen.map((m) => ({ metingId: m.metingId, label: m.label ?? "" })), { metingId, label }]);
+  return koppelMetingen(organisatieId, adviesverloopId, [...c.av.metingen.map((m) => ({ metingId: m.metingId, label: m.label ?? "" })), { metingId, label }], benchmarkKeuze);
 }
 
 /** De peilmeting kiezen: `null` is automatisch de meest recente gekoppelde Meting met afgeronde scans. */
@@ -147,28 +170,80 @@ export function zetPeilMeting(organisatieId: string, adviesverloopId: string, me
   return { ok: true };
 }
 
-/** Een bouwsteen aan de shortlist toevoegen of eruit halen (alleen de toegevoegde; de laagste scores staan er altijd in). */
-export function zetExtraBouwsteen(organisatieId: string, adviesverloopId: string, bouwsteenId: string, aan: boolean, bouwsteenNaam: string, volgnummer: number): Resultaat {
+export interface BouwsteenNaam {
+  nummer: number;
+  naam: string;
+}
+
+/**
+ * De shortlist vastleggen (`adviesverloop.md`, Bouwstenen kiezen): De gekozen bouwstenen in de gekozen volgorde, of `null` voor de standaard (de laagste scores).
+ * `vorige` is de lijst zoals de Consultant hem zag, zodat het log zegt wat er is toegevoegd of weggehaald, of dat alleen de volgorde veranderde.
+ */
+export function zetShortlist(
+  organisatieId: string,
+  adviesverloopId: string,
+  nieuw: string[] | null,
+  vorige: string[],
+  namen: Record<string, BouwsteenNaam>
+): Resultaat {
   const c = zoek(organisatieId, adviesverloopId);
   if (!c) return GEEN_AV;
   if (c.av.status === "afgerond") return AFGEROND;
-  const staat = c.av.extraBouwsteenIds.includes(bouwsteenId);
-  if (staat === aan) return { ok: true };
-  c.av.extraBouwsteenIds = aan ? [...c.av.extraBouwsteenIds, bouwsteenId] : c.av.extraBouwsteenIds.filter((id) => id !== bouwsteenId);
+  const uniek = nieuw === null ? null : [...new Set(nieuw)];
+  if (JSON.stringify(c.av.shortlistBouwsteenIds) === JSON.stringify(uniek)) return { ok: true };
+  c.av.shortlistBouwsteenIds = uniek;
   opslaan(c);
-  audit(c, "adviesverloop.shortlistGewijzigd", { actie: aan ? "toegevoegd" : "verwijderd", bouwsteenNummer: volgnummer, bouwsteenNaam });
+  const nu = uniek ?? [];
+  const naam = (id: string) => ({ bouwsteenNummer: namen[id]?.nummer ?? null, bouwsteenNaam: namen[id]?.naam ?? null });
+  if (uniek === null) {
+    audit(c, "adviesverloop.shortlistGewijzigd", { actie: "hersteld naar de standaard" });
+    return { ok: true };
+  }
+  const toegevoegd = nu.filter((id) => !vorige.includes(id));
+  const weg = vorige.filter((id) => !nu.includes(id));
+  for (const id of toegevoegd) audit(c, "adviesverloop.shortlistGewijzigd", { actie: "toegevoegd", ...naam(id) });
+  for (const id of weg) audit(c, "adviesverloop.shortlistGewijzigd", { actie: "verwijderd", ...naam(id) });
+  if (toegevoegd.length === 0 && weg.length === 0) audit(c, "adviesverloop.shortlistGewijzigd", { actie: "volgorde gewijzigd" });
   return { ok: true };
 }
 
-/** De rol en de tekst bij "Wie ben jij bij deze klant" bewaren bij het adviesverloop. Niet gelogd: Het is geen inhoud van een stap. */
-export function zetRol(organisatieId: string, adviesverloopId: string, rolId: string, rolTekst: string): Resultaat {
+/** De rol kiezen die bij dit adviesverloop hoort: Een `AdviesProfielRol.id` uit de adviescontext van de Consultant. Niet gelogd. */
+export function zetRol(organisatieId: string, adviesverloopId: string, rolId: string): Resultaat {
   const c = zoek(organisatieId, adviesverloopId);
   if (!c) return GEEN_AV;
   if (c.av.status === "afgerond") return AFGEROND;
-  if (!getAdviesCatalogus().rollen.some((r) => r.id === rolId)) return { ok: false, reden: "Rol niet gevonden." };
+  if (c.av.rolId === rolId) return { ok: true };
   c.av.rolId = rolId;
-  c.av.rolTekst = rolTekst.slice(0, ROLTEKST_MAX);
   opslaan(c);
+  return { ok: true };
+}
+
+/** Een fase overslaan of weer meenemen (`adviesverloop.md`, Overslaan en niet van toepassing). */
+export function zetFaseOverslaan(organisatieId: string, adviesverloopId: string, faseId: string, overslaan: boolean): Resultaat {
+  const c = zoek(organisatieId, adviesverloopId);
+  if (!c) return GEEN_AV;
+  if (c.av.status === "afgerond") return AFGEROND;
+  const fase = getAdviesCatalogus().fasen.find((f) => f.id === faseId);
+  if (!fase) return { ok: false, reden: "Fase niet gevonden." };
+  if (c.av.nvFaseIds.includes(faseId) === overslaan) return { ok: true };
+  c.av.nvFaseIds = overslaan ? [...c.av.nvFaseIds, faseId] : c.av.nvFaseIds.filter((id) => id !== faseId);
+  opslaan(c);
+  audit(c, "adviesstap.gedaan", { status: overslaan ? "fase overgeslagen" : "fase weer meegenomen", faseNaam: fase.naam });
+  return { ok: true };
+}
+
+/** Een use case niet van toepassing verklaren of weer meenemen. Met een stap kan dat niet: Zet de stap eerst terug naar open. */
+export function zetUseCaseNv(organisatieId: string, adviesverloopId: string, useCaseId: string, nv: boolean): Resultaat {
+  const c = zoek(organisatieId, adviesverloopId);
+  if (!c) return GEEN_AV;
+  if (c.av.status === "afgerond") return AFGEROND;
+  const useCase = getAdviesCatalogus().useCases.find((u) => u.id === useCaseId);
+  if (!useCase) return { ok: false, reden: "Use case niet gevonden." };
+  if (c.av.nvUseCaseIds.includes(useCaseId) === nv) return { ok: true };
+  if (nv && c.av.stappen.some((s) => s.useCaseId === useCaseId)) return { ok: false, reden: "Deze use case is al gedaan. Zet de stap eerst terug naar open." };
+  c.av.nvUseCaseIds = nv ? [...c.av.nvUseCaseIds, useCaseId] : c.av.nvUseCaseIds.filter((id) => id !== useCaseId);
+  opslaan(c);
+  audit(c, "adviesstap.gedaan", { useCaseCode: useCase.id, useCaseTitel: useCase.titel, status: nv ? "niet van toepassing" : "weer meegenomen" });
   return { ok: true };
 }
 
@@ -200,6 +275,8 @@ export function legStapVast(organisatieId: string, adviesverloopId: string, invo
     ? { ...bestaand, status: invoer.status, metingId: invoer.metingId, link: link.link || bestaand.link, gedaanOp: nu, gedaanDoor: gebruiker }
     : { id: nieuwId(), adviesverloopId: c.av.id, useCaseId: invoer.useCaseId, status: invoer.status, bouwsteenId: invoer.bouwsteenId, metingId: invoer.metingId, link: link.link, gedaanOp: nu, gedaanDoor: gebruiker };
   c.av.stappen = bestaand ? c.av.stappen.map((s) => (s.id === bestaand.id ? stap : s)) : [...c.av.stappen, stap];
+  // Een use case met een stap is niet meer van toepassing-verklaard.
+  c.av.nvUseCaseIds = c.av.nvUseCaseIds.filter((id) => id !== invoer.useCaseId);
   opslaan(c);
   audit(c, "adviesstap.gedaan", { useCaseCode: useCase.id, useCaseTitel: useCase.titel, status: invoer.status === "gedaan" ? "gedaan" : "prompt gekopieerd", metingLabel: metingContextNaam(c.organisatie, invoer.metingId), metLink: !!stap.link });
   return { ok: true, stap };

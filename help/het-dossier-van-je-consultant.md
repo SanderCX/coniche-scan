@@ -6,7 +6,7 @@ rollen: [Lead]
 afbeelding:
 film:
 bronnen: [dossier.md, visualisatie-mijn-metingen.md]
-bijgewerkt: 2026-10-22
+bijgewerkt: 2026-10-23
 ---
 Je consultant kan een Dossier voor je zichtbaar maken: cases van andere organisaties, nieuws, events en blogs die passen bij jullie situatie, met bij elk item uitleg waarom.
 

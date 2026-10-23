@@ -6,10 +6,13 @@ import { useOrganisatie, updateOrganisatie } from "@/lib/db";
 import { OrganisatiePaneel } from "@/components/beheer/OrganisatiePaneel";
 import { DossierKaart } from "@/components/beheer/DossierKaart";
 import { AdviesverloopBlok } from "@/components/beheer/AdviesverloopBlok";
+import { OrganisatieSprongnav } from "@/components/beheer/OrganisatieSprongnav";
+import { PermissiesKaart } from "@/components/beheer/PermissiesKaart";
+import { magAdviesverloop } from "@/lib/rechten";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { RespondentStatusBadge } from "@/components/beheer/overzicht-helpers";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
-import { magOrganisatieToegang, magLeadToekennen } from "@/lib/rechten";
+import { magOrganisatieToegang, magLeadToekennen, magOrganisatieToewijzen } from "@/lib/rechten";
 import { useGebruikers } from "@/lib/gebruikers-store";
 import { useBeheerOverzicht } from "@/lib/beheer-url";
 import { MetBewerkslot } from "@/components/beheer/MetBewerkslot";
@@ -62,63 +65,77 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
     updateOrganisatie(organisatieId, (o) => ({ ...o, kenmerken }));
   }
 
+  // De pillen van de sprongnavigatie: Alleen onderdelen die de gebruiker ziet, met de naam van de titel op de kaart (`beheerpagina.md`, Sprongnavigatie).
+  const pillen = [
+    { id: "profiel", label: "Bedrijfsgegevens" },
+    ...(magOrganisatieToewijzen(ingelogd) ? [{ id: "permissies", label: "Permissies" }] : []),
+    { id: "dossier", label: "Dossier" },
+    ...(magAdviesverloop(ingelogd, organisatie) ? [{ id: "adviesverloop", label: "Adviesverloop" }] : []),
+    { id: "metingen", label: "Metingen" },
+  ];
+
   return (
+    <>
+    <OrganisatieSprongnav pillen={pillen} />
     <div className="admin-main admin-main--breed">
       <Kruimelpad delen={[{ label: "Organisaties", href: "/beheer/organisaties" }, { label: organisatie.naam }]} />
 
       {/* Elke sectie staat op een eigen witte kaart, in deze volgorde (`beheerpagina.md`, Eén kaart per sectie; `stylesheet.md`, Sectiekaart). */}
       <div className="org-kaarten">
         <OrganisatiePaneel organisatie={organisatie} gebruikers={alleGebruikers} onOpslaan={handleKenmerkenOpslaan} />
-        {/* Het adviesverloop (`adviesverloop.md`): Alleen voor wie `adviesverloop.bekijken` heeft. */}
-        <AdviesverloopBlok organisatie={organisatie} />
+        {/* Toegang en Afspraken (`beheerpagina.md`, Kaart Permissies): Alleen voor een Admin. */}
+        <PermissiesKaart organisatie={organisatie} gebruikers={alleGebruikers} />
         {/* Het Dossier (`dossier.md`): Voor een Admin en voor een Consultant met toegang. */}
         <DossierKaart organisatie={organisatie} />
-        <MetingenSectie organisatie={organisatie} />
-
-        <section className="beheer-kaart" aria-label="Respondenten">
-          <div className="beheer-kaart-kop">
-            <h2>Respondenten</h2>
-          </div>
-          {organisatie.leden.length === 0 ? (
-            <p className="admin-notice">Nog geen respondenten. Nodig ze uit vanuit een Meting.</p>
-          ) : (
-            <>
-              <table className="admin-table">
-                <tbody>
-                  {organisatie.leden.slice(0, MAX_RIJEN).map((lid) => {
-                    const invullingen = organisatie.scanUitvoeringen.flatMap((s) =>
-                      s.invullingen.filter((i) => i.organisatieLidId === lid.id),
-                    );
-                    return (
-                      <tr key={lid.id} className="admin-table-rij-klikbaar" onClick={() => open("respondent", lid.id)}>
-                        <td>
-                          {lid.naam || <em className="text-ink-s">{lid.email}</em>}{" "}
-                          {isLead(lid) && <span className="lead-badge">Lead</span>}
-                        </td>
-                        <td>{lid.email}</td>
-                        <td>
-                          <RespondentStatusBadge invullingen={invullingen} />
-                        </td>
-                        <td className="cel-knop">
-                          <button type="button" className="btn btn-outline btn-compact" onClick={() => open("respondent", lid.id)}>
-                            Bekijk
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              {organisatie.leden.length > MAX_RIJEN && (
-                <Link href={`/beheer/respondenten?organisatie=${organisatie.id}`} className="lijst-meer-link">
-                  Alle respondenten van deze organisatie →
-                </Link>
-              )}
-            </>
-          )}
-        </section>
-        {magLeadToekennen(ingelogd) && <LeadsBlok organisatie={organisatie} />}
+        {/* Het adviesverloop (`adviesverloop.md`): Alleen voor wie `adviesverloop.bekijken` heeft. */}
+        <AdviesverloopBlok organisatie={organisatie} />
+        <MetingenSectie organisatie={organisatie}>
+          <section className="org-subsectie" aria-label="Respondenten">
+            <div className="org-subsectie-kop">
+              <h3>Respondenten</h3>
+            </div>
+            {organisatie.leden.length === 0 ? (
+              <p className="admin-notice">Nog geen respondenten. Nodig ze uit vanuit een Meting.</p>
+            ) : (
+              <>
+                <table className="admin-table">
+                  <tbody>
+                    {organisatie.leden.slice(0, MAX_RIJEN).map((lid) => {
+                      const invullingen = organisatie.scanUitvoeringen.flatMap((s) =>
+                        s.invullingen.filter((i) => i.organisatieLidId === lid.id),
+                      );
+                      return (
+                        <tr key={lid.id} className="admin-table-rij-klikbaar" onClick={() => open("respondent", lid.id)}>
+                          <td>
+                            {lid.naam || <em className="text-ink-s">{lid.email}</em>}{" "}
+                            {isLead(lid) && <span className="lead-badge">Lead</span>}
+                          </td>
+                          <td>{lid.email}</td>
+                          <td>
+                            <RespondentStatusBadge invullingen={invullingen} />
+                          </td>
+                          <td className="cel-knop">
+                            <button type="button" className="btn btn-outline btn-compact" onClick={() => open("respondent", lid.id)}>
+                              Bekijk
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                {organisatie.leden.length > MAX_RIJEN && (
+                  <Link href={`/beheer/respondenten?organisatie=${organisatie.id}`} className="lijst-meer-link">
+                    Alle respondenten van deze organisatie →
+                  </Link>
+                )}
+              </>
+            )}
+          </section>
+          {magLeadToekennen(ingelogd) && <LeadsBlok organisatie={organisatie} binnenKaart />}
+        </MetingenSectie>
       </div>
     </div>
+    </>
   );
 }

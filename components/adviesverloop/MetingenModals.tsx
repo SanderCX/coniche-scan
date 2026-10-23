@@ -5,9 +5,10 @@ import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { useAssessments } from "@/lib/assessment-store";
 import { useBenchmarksMetLeden } from "@/lib/use-benchmarks";
 import { koppelMeting, koppelMetingen, startAdviesverloop, zetPeilMeting } from "@/lib/db";
-import { LABEL_MAX, gekoppeldeMetingen, heeftAfgerondeScans, koppelRijen, metingNaamInTraject, peilMeting } from "@/lib/advies";
+import { LABEL_MAX, gekoppeldeMetingen, geschikteBenchmarks, heeftAfgerondeScans, koppelRijen, metingNaamInTraject, peilMeting } from "@/lib/advies";
+import { aantalOrganisatiesInBenchmark } from "@/lib/dossier";
 import { aantalAfgerondInMeting, maandJaar, meetdatumVan, toonMeetdatum } from "@/lib/metingen";
-import type { Adviesverloop, Organisatie, ScanUitvoering } from "@/lib/types";
+import type { Adviesverloop, Benchmark, Organisatie, ScanUitvoering } from "@/lib/types";
 
 /** De suggesties bij het label van een gekoppelde Meting (`adviesverloop.md`, Metingen in het adviesverloop): Een hulp, geen indeling. */
 const LABEL_SUGGESTIES = ["Nulmeting", "Tussenmeting", "Eindmeting"];
@@ -116,12 +117,20 @@ export function KoppelModal({
     return begin;
   });
   const [fout, setFout] = useState<string | null>(null);
+  // Bij Metingen van verschillende Assessments hoort een Benchmark (`adviesverloop.md`, Benchmark kiezen).
+  const [benchmarkKeuze, setBenchmarkKeuze] = useState<string | null>(adviesverloop?.benchmarkId ?? null);
+  const [kiestBenchmark, setKiestBenchmark] = useState(false);
+  const gekozenAssessmentIds = [...new Set(rijen.filter((r) => r.meting.id in gekozen).map((r) => r.meting.assessmentId))];
+  const geschikt = gekozenAssessmentIds.length > 1 ? geschikteBenchmarks(benchmarks, organisatie.id, gekozenAssessmentIds) : [];
+  const keuzeNodig = geschikt.length > 1 && !geschikt.some((b) => b.id === benchmarkKeuze);
 
   const perAssessment = [...new Set(rijen.map((r) => r.meting.assessmentId))].map((id) => ({ id, naam: assessments.find((a) => a.id === id)?.naam ?? id, rijen: rijen.filter((r) => r.meting.assessmentId === id) }));
   const aantalGekozen = Object.keys(gekozen).length;
 
   function opslaan(e: React.FormEvent) {
     e.preventDefault();
+    if (keuzeNodig && !kiestBenchmark) return setKiestBenchmark(true);
+    const keuze = geschikt.some((b) => b.id === benchmarkKeuze) ? benchmarkKeuze : null;
     if (!adviesverloop) {
       const eerste = aangevinkt ?? Object.keys(gekozen)[0];
       if (!eerste) return setFout("Kies een Meting om mee te beginnen.");
@@ -129,7 +138,7 @@ export function KoppelModal({
       if (!r.ok) return setFout(r.reden);
       const rest = Object.entries(gekozen).filter(([id]) => id !== eerste);
       for (const [id, label] of rest) {
-        const k = koppelMeting(organisatie.id, r.adviesverloop.id, id, label);
+        const k = koppelMeting(organisatie.id, r.adviesverloop.id, id, label, keuze);
         if (!k.ok) return setFout(k.reden);
       }
       onGestart?.(r.adviesverloop.id);
@@ -138,7 +147,8 @@ export function KoppelModal({
     const r = koppelMetingen(
       organisatie.id,
       adviesverloop.id,
-      Object.entries(gekozen).map(([metingId, label]) => ({ metingId, label }))
+      Object.entries(gekozen).map(([metingId, label]) => ({ metingId, label })),
+      keuze
     );
     if (!r.ok) return setFout(r.reden);
     onSluit();
@@ -151,6 +161,23 @@ export function KoppelModal({
       else delete volgende[m.id];
       return volgende;
     });
+  }
+
+  if (kiestBenchmark) {
+    return (
+      <BenchmarkModal
+        benchmarks={geschikt}
+        assessmentNaam={(id) => assessments.find((a) => a.id === id)?.naam ?? id}
+        keuze={benchmarkKeuze}
+        onKeuze={setBenchmarkKeuze}
+        fout={fout}
+        onTerug={() => setKiestBenchmark(false)}
+        onOpslaan={(e) => {
+          if (!benchmarkKeuze) return e.preventDefault();
+          opslaan(e);
+        }}
+      />
+    );
   }
 
   return (
@@ -202,6 +229,10 @@ export function KoppelModal({
           </div>
         ))}
         {rijen.length === 0 && <p className="dos-hint">Er zijn geen Metingen voor dit onderdeel.</p>}
+        {geschikt.length === 1 && <p className="dos-hint">Benchmark voor de koppeling: {geschikt[0].naam}</p>}
+        {geschikt.length > 1 && benchmarkKeuze && geschikt.some((b) => b.id === benchmarkKeuze) && (
+          <p className="dos-hint">Benchmark voor de koppeling: {geschikt.find((b) => b.id === benchmarkKeuze)!.naam}</p>
+        )}
         {fout && (
           <p className="overzicht-melding fout" role="alert">
             {fout}
@@ -213,6 +244,68 @@ export function KoppelModal({
           </button>
           <button type="submit" className="btn btn-or btn-compact" disabled={aantalGekozen === 0}>
             {adviesverloop ? "Opslaan" : "Starten"}
+          </button>
+        </div>
+      </form>
+    </OverzichtModal>
+  );
+}
+
+/**
+ * De modal "Benchmark voor de koppeling" (`adviesverloop.md`, Benchmark kiezen): Een keuzerondje per Benchmark met de naam, het aantal leden en de Assessments, met de
+ * Benchmark die al gekozen is voorgeselecteerd. 560px, patroon "Meting voor de radar".
+ */
+function BenchmarkModal({
+  benchmarks,
+  assessmentNaam,
+  keuze,
+  onKeuze,
+  fout,
+  onTerug,
+  onOpslaan,
+}: {
+  benchmarks: Benchmark[];
+  assessmentNaam: (id: string) => string;
+  keuze: string | null;
+  onKeuze: (id: string) => void;
+  fout: string | null;
+  onTerug: () => void;
+  onOpslaan: (e: React.FormEvent) => void;
+}) {
+  return (
+    <OverzichtModal label="Benchmark voor de koppeling" onSluit={onTerug} className="modal-box--instelling">
+      <form onSubmit={onOpslaan}>
+        <div className="overzicht-kop">
+          <h2>Benchmark voor de koppeling</h2>
+          <p>De Organisatie zit in meer dan één Benchmark waarin deze Assessments staan. Kies welke de Metingen verbindt.</p>
+        </div>
+        <div className="dos-keuzes" role="radiogroup" aria-label="Benchmark voor de koppeling">
+          {benchmarks.map((b) => {
+            const n = aantalOrganisatiesInBenchmark(b);
+            return (
+              <label key={b.id} className={`dos-keuze ${keuze === b.id ? "is-gekozen" : ""}`}>
+                <input type="radio" name="adv-benchmark" checked={keuze === b.id} onChange={() => onKeuze(b.id)} />
+                <span>
+                  <strong>{b.naam}</strong>
+                  <span className="dos-hint">
+                    {n} {n === 1 ? "organisatie" : "organisaties"} · {b.assessmentIds.map(assessmentNaam).join(", ")}
+                  </span>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+        {fout && (
+          <p className="overzicht-melding fout" role="alert">
+            {fout}
+          </p>
+        )}
+        <div className="btn-rij">
+          <button type="button" className="btn btn-outline btn-compact" onClick={onTerug}>
+            Terug
+          </button>
+          <button type="submit" className="btn btn-or btn-compact" disabled={!keuze}>
+            Opslaan
           </button>
         </div>
       </form>

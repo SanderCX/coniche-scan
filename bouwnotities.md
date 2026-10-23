@@ -845,3 +845,9 @@ In de interface heet het overal Bouwsteen (besloten door Sander op 22 oktober 20
 - **Regels**: `lib/advies.ts` (zuiver) en `lib/db/advies.ts` (opslag en audit). `ruimAdviesverlopenOp` draait in `slaAlles`.
 - **Schermen**: `components/adviesverloop/` (Fasestrook, ShortlistScherm, UitwerkingScherm, PromptModal, MetingenModals, `useAdviesData`), de pagina onder `/beheer/organisaties/{id}/adviesverloop/{id}`, `AdviesverloopBlok` en `AdviesverloopKaart` in `components/beheer/`, en `AdviescatalogusBeheer` onder `/beheer/adviescatalogus`. Opmaak in `app/styles/adviesverloop.css`.
 - **Niet gebouwd**: De koppeling met Copilot en SharePoint (`copilot-koppeling.md`).
+
+## 23 oktober 2026: Het adviesverloop met eigen shortlist, n.v.t. en adviescontext
+
+- **Opslag**: `Adviesverloop.shortlistBouwsteenIds`, `nvFaseIds`, `nvUseCaseIds` en `benchmarkId` (de vervallen `extraBouwsteenIds` en `rolTekst` worden bij het laden weggehaald, `migreerAdviesverloop`). `Gebruiker.adviesProfiel` bevat de adviescontext (`lib/advies-profiel.ts`).
+- **Opruimen**: `ruimAdviesverlopenOp(organisatie, benchmarks)` geeft de verdwenen en de losgekoppelde Metingen terug voor het audit-log. `bijBenchmarkWijziging` in `lib/benchmark-store.ts` laat `lib/db/store.ts` na een wijziging van de benchmarks opnieuw opruimen.
+- **Schermen**: Fasestrook met n.v.t., ShortlistScherm met pijltjes en `KiezenModal`, de Benchmark-keuze in `MetingenModals`, de tab Adviescontext in `MijnAccountModal` (geopend via `lib/mijn-account-open.ts`), en op het organisatie-detail `OrganisatieSprongnav`, `PermissiesKaart`, `AdviesverloopBlok` met `StartModal` en de kaart Metingen met Respondenten en Leads als onderdelen.

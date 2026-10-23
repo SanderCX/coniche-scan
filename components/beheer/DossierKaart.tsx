@@ -77,7 +77,7 @@ export function DossierKaart({ organisatie }: { organisatie: Organisatie }) {
   const gefilterd = itemsInVolgorde(dossier.items).filter((i) => filter === "alles" || i.soort === filter);
 
   return (
-    <section className="beheer-kaart dos-kaart" aria-label="Dossier">
+    <section className="beheer-kaart dos-kaart org-anker" id="dossier" aria-label="Dossier">
       <div className="dos-kop">
         <h2 className="dos-kop-titel">Dossier</h2>
       </div>

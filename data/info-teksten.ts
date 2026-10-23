@@ -328,6 +328,16 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     tekst: "Beschikbaar bij precies één scan.",
   },
   {
+    sleutel: "info.adviescontextOverMij",
+    plek: "Mijn account, tab Adviescontext, naast Over mij",
+    tekst: "Deze tekst staat vooraan in elke prompt, vóór de rol. Schrijf het zoals je het aan een collega zou vertellen. Noem geen namen van klanten of personen.",
+  },
+  {
+    sleutel: "info.adviescontextRollen",
+    plek: "Mijn account, tab Adviescontext, naast Mijn rollen bij een klant",
+    tekst: "Eenmaal invullen. In een adviesverloop kies je welke rol je bij die klant speelt. De tekst gaat mee in de prompt die je zelf naar Copilot kopieert, en wordt nergens anders gebruikt.",
+  },
+  {
     sleutel: "info.adviesverloopStarten",
     plek: "Meting-overzicht, kaart Adviesverloop, naast de uitgeschakelde knoppen",
     tekst: "Een adviesverloop begint bij een Meting met minstens één afgeronde scan, van een scan met een schaal van 1 tot 5.",
@@ -341,7 +351,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     sleutel: "info.adviesverloopShortlist",
     plek: "Pagina Adviesverloop, kaart Shortlist voor het gesprek, naast de titel",
     tekst:
-      "De shortlist begint met de bouwstenen met de laagste score. Voeg er een toe als je een open deur wilt meenemen: Een bouwsteen die goed scoort, maar waar de klant graag over praat of waar een snelle winst ligt. Houd de lijst kort.",
+      "De shortlist begint met de bouwstenen met de laagste score. Met Bouwstenen kiezen voeg je bouwstenen toe of haal je ze weg, en met de pijltjes bepaal je de volgorde. Voeg ook een open deur toe als je die wilt meenemen: Een bouwsteen die goed scoort, maar waar de klant graag over praat of waar een snelle winst ligt. Houd de lijst kort.",
   },
   {
     sleutel: "info.adviesverloopUsecases",
@@ -351,7 +361,7 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
   {
     sleutel: "info.adviesverloopRol",
     plek: "Prompt klaarzetten, deel Wie ben jij bij deze klant",
-    tekst: "Beschrijf in je eigen woorden wie je bent bij deze klant: Wie je kent, hoe je samenwerkt en wat je kunt doen. Copilot past de aanpak daarop aan.",
+    tekst: "Dit is de tekst van de rol die je hebt gekozen. Pas hem aan voor deze prompt, de tekst in Mijn account verandert niet. Copilot past de aanpak daarop aan.",
   },
   {
     sleutel: "info.adviesverloopContext",

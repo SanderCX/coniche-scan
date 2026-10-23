@@ -6,12 +6,12 @@ rollen: [Admin]
 afbeelding: 
 film: 
 bronnen: [beheerpagina.md, datamodel.md]
-bijgewerkt: 2026-10-19
+bijgewerkt: 2026-10-23
 ---
 Een Lead ziet niets totdat een Admin dat aanzet. Dat doe je in het Leads-venster van de Organisatie.
 
 ## In het kort
-Open de Organisatie en klik bij het blok Leads op "Leads beheren". In de tabel vink je per Lead en per Meting aan welke weergaven hij ziet. Na "Opslaan" geldt het direct.
+Open de Organisatie en klik in de kaart Metingen, bij het onderdeel Leads, op "Leads beheren". In de tabel vink je per Lead en per Meting aan welke weergaven hij ziet. Na "Opslaan" geldt het direct.
 
 ## Wat je ziet
 1. **De rijen.** Eén rij per Lead van deze Organisatie.

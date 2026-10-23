@@ -6,12 +6,12 @@ rollen: [Consultant, Admin]
 afbeelding:
 film:
 bronnen: [beheerpagina.md, datamodel.md]
-bijgewerkt: 2026-10-22
+bijgewerkt: 2026-10-23
 ---
 KPI's zoals de gemiddelde afhandeltijd, de NPS en het aantal contacten per jaar horen bij de Organisatie. Je vult ze in op het organisatie-detail, per plek en eventueel per kanaal. De NPS kun je ook per kanaal invullen: Het kanaal waar het contact plaatsvond, bepaalt waar de uitvraag vandaan komt.
 
 ## In het kort
-Op het organisatie-detail staan de KPI's als ringen in het organisatiepaneel, onder de Kanalen. Elke ring is gevuld volgens de schaal van de KPI. Met "Bewerken" en dan "KPI's invullen" vul je alles in één venster in.
+Op het organisatie-detail staan de KPI's als ringen in de kaart Bedrijfsgegevens, onder de Kanalen. Elke ring is gevuld volgens de schaal van de KPI. Met "Bewerken" en dan "KPI's invullen" vul je alles in één venster in.
 
 ## Wat je ziet
 1. **De ringen.** Per KPI met een schaal een ring met de waarde in het midden, de naam eronder en een regel met toelichting. Zonder waarde is de ring grijs met "Niet ingevuld", of "n.v.t." als de KPI niet per onderdeel mag.

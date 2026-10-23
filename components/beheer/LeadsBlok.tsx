@@ -13,7 +13,7 @@ const MAX_LEADS = 5;
  * beheren". Zonder Leads staat er "Nog geen Leads" met de knop "+ Lead toevoegen", die het venster opent met het formulier al
  * open.
  */
-export function LeadsBlok({ organisatie }: { organisatie: Organisatie }) {
+export function LeadsBlok({ organisatie, binnenKaart = false }: { organisatie: Organisatie; /** Als onderdeel van de kaart Metingen (kopje van 18px) in plaats van een eigen kaart. */ binnenKaart?: boolean }) {
   const { open } = useBeheerOverzicht();
   const leads = organisatie.leden.filter((l) => l.lead === true);
   const samenvatting = (leadId: string) => {
@@ -22,9 +22,9 @@ export function LeadsBlok({ organisatie }: { organisatie: Organisatie }) {
   };
 
   return (
-    <section className="beheer-kaart" aria-label="Leads">
-      <div className="beheer-kaart-kop">
-        <h2>Leads</h2>
+    <section className={binnenKaart ? "org-subsectie" : "beheer-kaart"} aria-label="Leads">
+      <div className={binnenKaart ? "org-subsectie-kop" : "beheer-kaart-kop"}>
+        {binnenKaart ? <h3>Leads</h3> : <h2>Leads</h2>}
         <button
           type="button"
           className="btn btn-outline btn-compact"

@@ -6,6 +6,8 @@ import { useAdviesCatalogus } from "@/lib/advies-catalogus-store";
 import { useOrganisaties } from "@/lib/db";
 import { useInstellingen } from "@/lib/instellingen-store";
 import { useBenchmarksMetLeden } from "@/lib/use-benchmarks";
+import { useIngelogdeGebruiker } from "@/lib/admin-auth";
+import { kiesProfielRol, useAdviesProfiel } from "@/lib/advies-profiel";
 import {
   BenchmarkVerschil,
   BouwsteenSpreiding,
@@ -22,7 +24,7 @@ import {
   verschilSindsEerste,
 } from "@/lib/advies";
 import type { BouwblokResultaat } from "@/lib/scoring";
-import type { AdviesCatalogus, Adviesverloop, Assessment, Organisatie, ScanUitvoering } from "@/lib/types";
+import type { AdviesCatalogus, AdviesProfiel, AdviesProfielRol, Adviesverloop, Assessment, Organisatie, ScanUitvoering } from "@/lib/types";
 
 export interface AdviesData {
   organisatie: Organisatie;
@@ -35,7 +37,10 @@ export interface AdviesData {
   resultaten: BouwblokResultaat[];
   groepen: Map<string, { naam: string; kleur: string | null }>;
   shortlist: ShortlistRij[];
-  /** Alle bouwstenen met een score, van laag naar hoog, voor de modal Bouwsteen toevoegen. */
+  /** De adviescontext van de ingelogde Gebruiker en de rol die bij dit adviesverloop gekozen is (valt terug op de standaardrol). */
+  profiel: AdviesProfiel;
+  rol: AdviesProfielRol;
+  /** Het verschil per bouwsteen met de eerste Meting van hetzelfde Assessment, of `null`. */
   verschil: Map<string, number> | null;
   benchmark: BenchmarkVerschil | null;
   spreiding: Map<string, BouwsteenSpreiding>;
@@ -49,6 +54,7 @@ export function useAdviesData(organisatieId: string, adviesverloopId: string): A
   const catalogus = useAdviesCatalogus();
   const benchmarks = useBenchmarksMetLeden();
   const instellingen = useInstellingen();
+  const profiel = useAdviesProfiel(useIngelogdeGebruiker()?.id);
   const organisatie = organisaties.find((o) => o.id === organisatieId);
   const adviesverloop = organisatie?.adviesverlopen?.find((a) => a.id === adviesverloopId);
   if (!organisatie || !adviesverloop) return null;
@@ -75,7 +81,9 @@ export function useAdviesData(organisatieId: string, adviesverloopId: string): A
     assessment: bruikbaar,
     resultaten,
     groepen,
-    shortlist: shortlist(resultaten, adviesverloop.extraBouwsteenIds, instellingen.shortlistAantal),
+    profiel,
+    rol: kiesProfielRol(profiel, adviesverloop.rolId),
+    shortlist: shortlist(resultaten, adviesverloop.shortlistBouwsteenIds, instellingen.shortlistAantal),
     verschil: bruikbaar ? verschilSindsEerste(bruikbaar, organisatie, adviesverloop) : null,
     benchmark: bruikbaar ? benchmarkVerschil(bruikbaar, resultaten, organisatie, organisaties, assessments, benchmarks, instellingen.benchmarkMinOrganisaties) : null,
     spreiding: peil && bruikbaar ? spreidingPerBouwsteen(bruikbaar, organisatie, peil) : new Map(),

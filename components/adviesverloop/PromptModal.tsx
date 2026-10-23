@@ -4,6 +4,8 @@ import { useState } from "react";
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { OverzichtModal } from "@/components/beheer/OverzichtModal";
 import { ROLTEKST_MAX } from "@/lib/advies-catalogus-store";
+import { promptRolId } from "@/lib/advies-profiel";
+import { openMijnAccount } from "@/lib/mijn-account-open";
 import { bouwContextblok, bouwPromptTekst, onderdeelNaamVan, promptVoorRol } from "@/lib/advies";
 import { kopieerNaarKlembord } from "@/lib/clipboard";
 import { legStapVast, zetRol } from "@/lib/db";
@@ -17,13 +19,12 @@ import type { AdviesData } from "./useAdviesData";
  * van het contextblok wordt niet bewaard; alleen de rol en de tekst bij Wie ben jij blijven bij het adviesverloop staan.
  */
 export function PromptModal({ data, useCase, bouwsteenId, onSluit }: { data: AdviesData; useCase: UseCase; bouwsteenId: string | null; onSluit: () => void }) {
-  const { organisatie, adviesverloop, catalogus, peil, assessment } = data;
+  const { organisatie, adviesverloop, catalogus, peil, assessment, profiel } = data;
   const instellingen = useInstellingen();
-  const rollen = [...catalogus.rollen].sort((a, b) => a.volgorde - b.volgorde);
   const fase = catalogus.fasen.find((f) => f.id === useCase.faseId);
-  const begin = rollen.find((r) => r.id === adviesverloop.rolId) ?? rollen[0];
-  const [rolId, setRolId] = useState(begin?.id ?? "");
-  const [rolTekst, setRolTekst] = useState(adviesverloop.rolTekst || begin?.standaardTekst || "");
+  const [rolId, setRolId] = useState(data.rol.id);
+  const rol = profiel.rollen.find((r) => r.id === rolId) ?? data.rol;
+  const [rolTekst, setRolTekst] = useState(data.rol.tekst);
   const [rolTekstAangepast, setRolTekstAangepast] = useState(false);
   const [context, setContext] = useState(() =>
     peil && assessment
@@ -35,6 +36,7 @@ export function PromptModal({ data, useCase, bouwsteenId, onSluit }: { data: Adv
           peilLabel: data.peilLabel,
           resultaten: data.resultaten,
           bouwsteenId,
+          shortlistIds: data.shortlist.map((r) => r.bouwblok.id),
           spreiding: data.spreiding,
           benchmark: data.benchmark,
           eerste: data.eerste,
@@ -43,23 +45,24 @@ export function PromptModal({ data, useCase, bouwsteenId, onSluit }: { data: Adv
         })
       : ""
   );
-  const [prompt, setPrompt] = useState(promptVoorRol(useCase, begin?.id ?? "").prompt);
+  const [prompt, setPrompt] = useState(promptVoorRol(useCase, promptRolId(data.rol)).prompt);
   const [promptAangepast, setPromptAangepast] = useState(false);
   const [fout, setFout] = useState<string | null>(null);
-  const situatie = promptVoorRol(useCase, rolId).context;
+  const situatie = promptVoorRol(useCase, promptRolId(rol)).context;
 
   function kiesRol(id: string) {
     setRolId(id);
-    const rol = rollen.find((r) => r.id === id);
-    if (rol && !rolTekstAangepast) setRolTekst(rol.standaardTekst);
-    if (!promptAangepast) setPrompt(promptVoorRol(useCase, id).prompt);
+    const nieuw = profiel.rollen.find((r) => r.id === id);
+    if (nieuw && !rolTekstAangepast) setRolTekst(nieuw.tekst);
+    // Een zelf toegevoegde rol gebruikt de prompt van de rol Consultant (`adviesverloop.md`, Welke prompt bij een eigen rol).
+    if (nieuw && !promptAangepast) setPrompt(promptVoorRol(useCase, promptRolId(nieuw)).prompt);
   }
 
   async function kopieer() {
-    const gelukt = await kopieerNaarKlembord(bouwPromptTekst(rolTekst, context, prompt));
+    const gelukt = await kopieerNaarKlembord(bouwPromptTekst(profiel.overMij, rolTekst, context, prompt));
     if (!gelukt) return setFout("Kopiëren naar het klembord lukt niet. Selecteer de tekst zelf en kopieer hem.");
-    const rol = zetRol(organisatie.id, adviesverloop.id, rolId, rolTekst);
-    if (!rol.ok) return setFout(rol.reden);
+    const rolKeuze = zetRol(organisatie.id, adviesverloop.id, rol.id);
+    if (!rolKeuze.ok) return setFout(rolKeuze.reden);
     const stap = legStapVast(organisatie.id, adviesverloop.id, { useCaseId: useCase.id, status: "promptGekopieerd", bouwsteenId, metingId: peil?.id ?? null });
     if (!stap.ok) return setFout(stap.reden);
     onSluit();
@@ -86,12 +89,18 @@ export function PromptModal({ data, useCase, bouwsteenId, onSluit }: { data: Adv
           <InfoIcoon sleutel="info.adviesverloopRol" />
         </h3>
         <div className="pil-groep" role="group" aria-label="Rol">
-          {rollen.map((r) => (
+          {profiel.rollen.map((r) => (
             <button key={r.id} type="button" className={r.id === rolId ? "actief" : ""} aria-pressed={r.id === rolId} onClick={() => kiesRol(r.id)}>
               {r.naam}
             </button>
           ))}
         </div>
+        <p className="adv-sub" style={{ margin: "var(--sp-2) 0 0" }}>
+          {profiel.overMij.trim() ? "Vooraan in de prompt staat eerst jouw tekst bij Over mij, dan de tekst van de rol." : "Je hebt in Mijn account nog niets bij Over mij ingevuld."}{" "}
+          <button type="button" className="tekstknop" onClick={() => openMijnAccount("adviescontext")}>
+            Aanpassen in Mijn account
+          </button>
+        </p>
         <textarea
           aria-label="Wie ben jij bij deze klant"
           rows={5}

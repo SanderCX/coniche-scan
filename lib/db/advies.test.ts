@@ -8,8 +8,10 @@ const opslag = new Map<string, string>();
 const KEY = "coniche-scan:organisaties";
 type Db = typeof import("../db");
 type Catalogus = typeof import("../advies-catalogus-store");
+type Benchmarks = typeof import("../benchmark-store");
 let db: Db;
 let catalogus: Catalogus;
+let benchmarks: Benchmarks;
 
 beforeAll(async () => {
   vi.stubGlobal("window", {
@@ -23,6 +25,7 @@ beforeAll(async () => {
   vi.stubGlobal("fetch", async () => ({ status: 204, text: async () => "" }));
   db = await import("../db");
   catalogus = await import("../advies-catalogus-store");
+  benchmarks = await import("../benchmark-store");
 });
 beforeEach(() => opslag.clear());
 
@@ -59,8 +62,8 @@ describe("een adviesverloop starten", () => {
   it("begint bij een Meting met afgeronde scans, met de eerste rol en zijn tekst", () => {
     zet(org());
     const a = start("m1");
-    expect(a).toMatchObject({ status: "lopend", onderdeelId: null, startMetingId: "m1", peilMetingId: null, extraBouwsteenIds: [], stappen: [], rolId: "consultant" });
-    expect(a.rolTekst).toBe(ADVIES_CATALOGUS_BEGIN.rollen.find((r) => r.id === "consultant")!.standaardTekst);
+    expect(a).toMatchObject({ status: "lopend", onderdeelId: null, startMetingId: "m1", peilMetingId: null, benchmarkId: null, shortlistBouwsteenIds: null, nvFaseIds: [], nvUseCaseIds: [], stappen: [], rolId: "consultant" });
+    expect(a).not.toHaveProperty("rolTekst");
     expect(a.metingen.map((m) => m.metingId)).toEqual(["m1"]);
     expect(laad().adviesverlopen).toHaveLength(1);
     expect(auditLog().at(-1)).toMatchObject({ actie: "adviesverloop.statusGewijzigd", details: { organisatieNaam: "Org O", onderdeelNaam: "Hele organisatie", status: "lopend" } });
@@ -93,7 +96,7 @@ describe("een adviesverloop starten", () => {
   });
 });
 
-describe("Metingen koppelen, de peilmeting en de shortlist", () => {
+describe("Metingen koppelen, de peilmeting, de shortlist en de n.v.t.-keuzes", () => {
   it("koppelt een Meting met een label en logt het", () => {
     zet(org());
     const a = start("m1");
@@ -126,24 +129,135 @@ describe("Metingen koppelen, de peilmeting en de shortlist", () => {
     expect(db.zetPeilMeting("O", a.id, null).ok).toBe(true);
     expect(lopend().peilMetingId).toBeNull();
   });
-  it("voegt een bouwsteen toe aan de shortlist en haalt hem weer weg, met log", () => {
+  it("legt een eigen shortlist vast in de gekozen volgorde en logt wat er veranderde", () => {
     zet(org());
     const a = start("m1");
-    expect(db.zetExtraBouwsteen("O", a.id, "bs-1", true, "Strategie", 1).ok).toBe(true);
-    expect(lopend().extraBouwsteenIds).toEqual(["bs-1"]);
-    db.zetExtraBouwsteen("O", a.id, "bs-1", true, "Strategie", 1);
-    expect(lopend().extraBouwsteenIds).toEqual(["bs-1"]);
-    db.zetExtraBouwsteen("O", a.id, "bs-1", false, "Strategie", 1);
-    expect(lopend().extraBouwsteenIds).toEqual([]);
-    expect(auditLog().filter((e) => e.actie === "adviesverloop.shortlistGewijzigd").map((e) => e.details?.actie)).toEqual(["toegevoegd", "verwijderd"]);
+    const namen = { b1: { nummer: 1, naam: "Strategie" }, b2: { nummer: 2, naam: "Visie" }, b3: { nummer: 3, naam: "Structuur" } };
+    expect(db.zetShortlist("O", a.id, ["b1", "b2"], ["b3"], namen).ok).toBe(true);
+    expect(lopend().shortlistBouwsteenIds).toEqual(["b1", "b2"]);
+    const acties = auditLog().filter((e) => e.actie === "adviesverloop.shortlistGewijzigd").map((e) => [e.details?.actie, e.details?.bouwsteenNummer]);
+    expect(acties).toEqual([["toegevoegd", 1], ["toegevoegd", 2], ["verwijderd", 3]]);
+    db.zetShortlist("O", a.id, ["b2", "b1"], ["b1", "b2"], namen);
+    expect(lopend().shortlistBouwsteenIds).toEqual(["b2", "b1"]);
+    expect(auditLog().at(-1)).toMatchObject({ actie: "adviesverloop.shortlistGewijzigd", details: { actie: "volgorde gewijzigd" } });
+    expect(JSON.stringify(auditLog().at(-1))).not.toContain("bouwsteenNaam\":\"Strategie");
   });
-  it("bewaart de rol en de tekst, maximaal 1000 tekens", () => {
+  it("herstelt de shortlist naar de standaard en laat een lege lijst toe", () => {
     zet(org());
     const a = start("m1");
-    expect(db.zetRol("O", a.id, "salesmanager", "x".repeat(1100)).ok).toBe(true);
-    expect(lopend()).toMatchObject({ rolId: "salesmanager" });
-    expect(lopend().rolTekst).toHaveLength(1000);
-    expect(db.zetRol("O", a.id, "bestaatniet", "tekst").ok).toBe(false);
+    db.zetShortlist("O", a.id, [], ["b1"], {});
+    expect(lopend().shortlistBouwsteenIds).toEqual([]);
+    expect(db.zetShortlist("O", a.id, null, [], {}).ok).toBe(true);
+    expect(lopend().shortlistBouwsteenIds).toBeNull();
+    expect(auditLog().at(-1)).toMatchObject({ details: { actie: "hersteld naar de standaard" } });
+    const aantal = auditLog().length;
+    db.zetShortlist("O", a.id, null, [], {});
+    expect(auditLog()).toHaveLength(aantal);
+  });
+  it("bewaart een bouwsteen niet dubbel in de shortlist", () => {
+    zet(org());
+    const a = start("m1");
+    db.zetShortlist("O", a.id, ["b1", "b1", "b2"], [], {});
+    expect(lopend().shortlistBouwsteenIds).toEqual(["b1", "b2"]);
+  });
+  it("kiest een rol uit de adviescontext zonder de tekst te bewaren, en logt niets", () => {
+    zet(org());
+    const a = start("m1");
+    const aantal = auditLog().length;
+    expect(db.zetRol("O", a.id, "salesmanager").ok).toBe(true);
+    expect(lopend().rolId).toBe("salesmanager");
+    expect(lopend()).not.toHaveProperty("rolTekst");
+    expect(auditLog()).toHaveLength(aantal);
+  });
+  it("slaat een fase over en neemt hem weer mee, met log", () => {
+    zet(org());
+    const a = start("m1");
+    expect(db.zetFaseOverslaan("O", a.id, "2", true).ok).toBe(true);
+    expect(lopend().nvFaseIds).toEqual(["2"]);
+    expect(db.zetFaseOverslaan("O", a.id, "99", true).ok).toBe(false);
+    db.zetFaseOverslaan("O", a.id, "2", true);
+    expect(lopend().nvFaseIds).toEqual(["2"]);
+    expect(db.zetFaseOverslaan("O", a.id, "2", false).ok).toBe(true);
+    expect(lopend().nvFaseIds).toEqual([]);
+    expect(auditLog().filter((e) => e.actie === "adviesstap.gedaan").map((e) => e.details?.status)).toEqual(["fase overgeslagen", "fase weer meegenomen"]);
+  });
+  it("verklaart een use case niet van toepassing, maar niet als er al een stap voor is", () => {
+    zet(org());
+    const a = start("m1");
+    const uc = eerstvolgende();
+    expect(db.zetUseCaseNv("O", a.id, uc.id, true).ok).toBe(true);
+    expect(lopend().nvUseCaseIds).toEqual([uc.id]);
+    expect(db.zetUseCaseNv("O", a.id, uc.id, false).ok).toBe(true);
+    expect(lopend().nvUseCaseIds).toEqual([]);
+    db.legStapVast("O", a.id, { useCaseId: uc.id, status: "gedaan", bouwsteenId: null, metingId: null });
+    expect(db.zetUseCaseNv("O", a.id, uc.id, true)).toEqual({ ok: false, reden: "Deze use case is al gedaan. Zet de stap eerst terug naar open." });
+    expect(db.zetUseCaseNv("O", a.id, "9-99", true).ok).toBe(false);
+  });
+  it("haalt een use case uit de n.v.t.-lijst als er toch een stap voor wordt vastgelegd", () => {
+    zet(org());
+    const a = start("m1");
+    const uc = eerstvolgende();
+    db.zetUseCaseNv("O", a.id, uc.id, true);
+    db.legStapVast("O", a.id, { useCaseId: uc.id, status: "gedaan", bouwsteenId: null, metingId: null });
+    expect(lopend().nvUseCaseIds).toEqual([]);
+  });
+});
+
+describe("Metingen van een ander Assessment en de Benchmark", () => {
+  const twee = () => org({ scanUitvoeringen: [meting("m1", "2026-03-01"), meting("m4", "2026-08-01", { assessmentId: "ai-volwassenheid" })] });
+  const namen = { assessmentNamen: [], organisatieNamen: [] };
+  const maak = (naam: string, assessmentIds = [AID, "ai-volwassenheid"]) =>
+    benchmarks.maakBenchmark({ naam, assessmentIds, aangemaaktDoor: "g", leden: [{ organisatieId: "O", assessmentId: AID, metingId: "m1" }, { organisatieId: "O", assessmentId: "ai-volwassenheid", metingId: "m4" }] }, namen);
+  beforeEach(() => opslag.delete("coniche-scan:benchmarks"));
+
+  it("weigert zo'n Meting zonder Benchmark waarin beide Assessments zitten", () => {
+    zet(twee());
+    const a = start("m1");
+    expect(db.koppelMeting("O", a.id, "m4", "")).toEqual({ ok: false, reden: "Geen benchmark met beide Assessments" });
+  });
+  it("gebruikt de enige geschikte Benchmark zonder te vragen en bewaart hem", () => {
+    zet(twee());
+    const b = maak("Enige");
+    const a = start("m1");
+    expect(db.koppelMeting("O", a.id, "m4", "Eindmeting").ok).toBe(true);
+    expect(lopend().benchmarkId).toBe(b.id);
+    expect(lopend().metingen.map((m) => m.metingId)).toEqual(["m1", "m4"]);
+  });
+  it("vraagt om een keuze bij meer geschikte Benchmarks, en bewaart die keuze", () => {
+    zet(twee());
+    maak("Eerste");
+    const b2 = maak("Tweede");
+    const a = start("m1");
+    expect(db.koppelMeting("O", a.id, "m4", "")).toEqual({ ok: false, reden: "Kies een Benchmark voor de koppeling." });
+    expect(db.koppelMeting("O", a.id, "m4", "", "bestaatniet").ok).toBe(false);
+    expect(db.koppelMeting("O", a.id, "m4", "", b2.id).ok).toBe(true);
+    expect(lopend().benchmarkId).toBe(b2.id);
+  });
+  it("wist de Benchmark als de Meting van het andere Assessment weer losgaat", () => {
+    zet(twee());
+    maak("Enige");
+    const a = start("m1");
+    db.koppelMeting("O", a.id, "m4", "");
+    expect(db.koppelMetingen("O", a.id, [{ metingId: "m1", label: "" }]).ok).toBe(true);
+    expect(lopend().benchmarkId).toBeNull();
+  });
+  it("koppelt de Meting van het andere Assessment los als de Benchmark wordt verwijderd, en logt dat", () => {
+    zet(twee());
+    const b = maak("Enige");
+    const a = start("m1");
+    db.koppelMeting("O", a.id, "m4", "");
+    benchmarks.verwijderBenchmark(b.id, namen);
+    expect(lopend().metingen.map((m) => m.metingId)).toEqual(["m1"]);
+    expect(lopend().benchmarkId).toBeNull();
+    expect(auditLog().some((e) => e.actie === "adviesverloop.metingGekoppeld" && e.details?.actie === "losgekoppeld" && String(e.details?.reden).includes("Benchmark"))).toBe(true);
+  });
+  it("koppelt de Meting los als het Assessment uit de Benchmark gaat", () => {
+    zet(twee());
+    const b = maak("Enige");
+    const a = start("m1");
+    db.koppelMeting("O", a.id, "m4", "");
+    benchmarks.wijzigBenchmark(b.id, { naam: "Enige", assessmentIds: [AID], leden: [{ organisatieId: "O", assessmentId: AID, metingId: "m1" }] }, namen);
+    expect(lopend().metingen.map((m) => m.metingId)).toEqual(["m1"]);
   });
 });
 
@@ -202,9 +316,11 @@ describe("afronden, heropenen en verwijderen", () => {
     expect(lopend().afgerondOp).not.toBeNull();
     expect(db.koppelMeting("O", a.id, "m2", "").ok).toBe(false);
     expect(db.zetPeilMeting("O", a.id, null).ok).toBe(false);
-    expect(db.zetExtraBouwsteen("O", a.id, "bs-1", true, "x", 1).ok).toBe(false);
+    expect(db.zetShortlist("O", a.id, ["b1"], [], {}).ok).toBe(false);
+    expect(db.zetFaseOverslaan("O", a.id, "2", true).ok).toBe(false);
+    expect(db.zetUseCaseNv("O", a.id, eerstvolgende().id, true).ok).toBe(false);
     expect(db.legStapVast("O", a.id, { useCaseId: eerstvolgende().id, status: "gedaan", bouwsteenId: null, metingId: null }).ok).toBe(false);
-    expect(db.zetRol("O", a.id, "consultant", "x").ok).toBe(false);
+    expect(db.zetRol("O", a.id, "salesmanager").ok).toBe(false);
   });
   it("heropent, tenzij er al een ander adviesverloop loopt", () => {
     zet(org());
