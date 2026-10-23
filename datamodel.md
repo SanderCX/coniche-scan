@@ -1100,7 +1100,22 @@ Fase {
 AdviesRol {
   id: string                       // "consultant" | "salesmanager" | "teamleider", uitbreidbaar
   naam: string                     // "Consultant", "Salesmanager", "Teamleider (interim)"
-  standaardTekst: string           // de vooringevulde tekst bij Wie ben jij bij deze klant, maximaal 600 tekens
+  standaardTekst: string           // de beginwaarde van de tekst van de rol in het AdviesProfiel van een nieuwe Consultant, maximaal 600 tekens
+  volgorde: number
+}
+
+AdviesProfiel {
+  gebruikerId: string              // Gebruiker.id, één per Admin of Consultant, bij de eerste keer openen van Mijn account of van een adviesverloop gevuld uit de AdviesRollen
+  overMij: string                  // de tekst "Over mij", maximaal 600 tekens, mag leeg zijn
+  standaardRolId: string           // AdviesProfielRol.id, de rol die een nieuw adviesverloop voorselecteert
+  rollen: AdviesProfielRol[]       // minstens één
+}
+
+AdviesProfielRol {
+  id: string
+  naam: string                     // vrij, maximaal 60 tekens, bijvoorbeeld "Consultant" of "Teamleider (interim)"
+  tekst: string                    // wie je bij deze klant bent, maximaal 600 tekens, mag leeg zijn
+  adviesRolId: string | null       // de AdviesRol waarvan de prompts van de use cases worden gebruikt; null bij een zelf toegevoegde rol, dan telt de prompt van de rol Consultant
   volgorde: number
 }
 
@@ -1130,12 +1145,14 @@ Adviesverloop {
   status: "lopend" | "afgerond"
   afgerondOp: datetime | null
   startMetingId: string            // de Meting waarmee het Adviesverloop is geopend
+  benchmarkId: string | null       // de Benchmark die Metingen van verschillende Assessments verbindt, alleen ingevuld als er Metingen van meer dan één Assessment gekoppeld zijn
   peilMetingId: string | null      // de Meting waarvan de scores de shortlist bepalen, null is de meest recente gekoppelde Meting met afgeronde scans
   aangemaaktDoor: string           // Gebruiker.id
   aangemaaktOp: datetime
-  extraBouwsteenIds: string[]      // door de Consultant aan de shortlist toegevoegd
-  rolId: string                    // gekozen AdviesRol
-  rolTekst: string                 // de tekst bij Wie ben jij bij deze klant, maximaal 600 tekens
+  shortlistBouwsteenIds: string[] | null // de door de Consultant gekozen shortlist, in de gekozen volgorde; null is de standaard (de laagste scores)
+  nvFaseIds: string[]              // fasen die de Consultant heeft overgeslagen
+  nvUseCaseIds: string[]           // use cases die de Consultant niet van toepassing heeft verklaard
+  rolId: string                    // gekozen AdviesProfielRol van de Consultant die het adviesverloop bewerkt, de tekst staat in het AdviesProfiel en niet bij het adviesverloop
 }
 
 AdviesverloopMeting {
@@ -1161,16 +1178,18 @@ Adviesstap {
 
 - **Bereik.** Een Adviesverloop hoort bij een Organisatie en een Onderdeel (of de hele Organisatie), niet bij een Meting. Per Organisatie en Onderdeel is er hoogstens één lopend Adviesverloop. Een afgerond Adviesverloop blijft bestaan en een nieuw traject begint met een nieuw Adviesverloop.
 - **Metingen koppelen.** De Meting waarmee het Adviesverloop wordt geopend is de eerste gekoppelde Meting. Daarna kan de Consultant andere Metingen van dezelfde Organisatie en hetzelfde Onderdeel koppelen en weer loskoppelen, gewone en samengestelde Metingen (een samengestelde Meting telt als afgerond als haar onderliggende Metingen voldoen), zoveel als bij het traject passen, maar er is altijd minstens één gekoppelde Meting: Loskoppelen van de laatste kan niet. Het `label` is een hulpmiddel en geen vaste indeling: Er is geen verplichte nulmeting, tussenmeting of eindmeting, en de app dwingt geen volgorde of aantal af. De volgorde in de tijd volgt de meetdatum van de Meting.
-- **Ander Assessment.** Een Meting van een ander Assessment dan de eerste gekoppelde Meting kan alleen gekoppeld worden als de Organisatie lid is van een benchmark waarin beide Assessments zitten. Scores van verschillende Assessments worden niet gemengd, dus het verschil met de eerste Meting wordt alleen getoond tussen Metingen van hetzelfde Assessment.
+- **Ander Assessment.** Een Meting van een ander Assessment dan de eerste gekoppelde Meting kan alleen gekoppeld worden als de Organisatie lid is van een Benchmark waarin beide Assessments zitten. De Consultant kiest die Benchmark (`benchmarkId`) uit de Benchmarks die aan die eis voldoen; is er maar één, dan wordt die voorgesteld. Verdwijnt de Benchmark, of gaat de Organisatie eruit, dan worden de Metingen van het andere Assessment losgekoppeld en noemt de bevestiging dat. Scores van verschillende Assessments worden niet gemengd, dus het verschil met de eerste Meting wordt alleen getoond tussen Metingen van hetzelfde Assessment.
 - **Peilmeting.** De Meting die de scores levert voor de shortlist en het contextblok. Standaard de meest recente gekoppelde Meting met afgeronde scans (`peilMetingId: null`). De Consultant kan een andere kiezen.
-- **Shortlist.** De bouwstenen op de shortlist zijn de `shortlistAantal` bouwstenen met de laagste score (`Instellingen`, Drempels en termijnen) plus `extraBouwsteenIds`. De eerste groep wordt altijd afgeleid uit de scores van de peilmeting en niet opgeslagen. Een score die verandert, verandert dus de shortlist.
-- **Een stap telt als gedaan** bij de statussen `promptGekopieerd` en `gedaan`. Terugzetten naar open verwijdert de `Adviesstap`.
-- **Huidige fase** is de eerste fase met een `UseCase` met `inStrook` waarvoor nog geen `Adviesstap` bestaat. Dit wordt afgeleid, er is geen veld voor.
+- **Shortlist.** Standaard (`shortlistBouwsteenIds: null`) zijn dat de `shortlistAantal` bouwstenen met de laagste score van de peilmeting (`Instellingen`, Drempels en termijnen), op volgorde van score en bij gelijke score op nummer. Die lijst wordt afgeleid en niet opgeslagen, dus een score die verandert, verandert de shortlist. Kiest de Consultant zelf, dan wordt de lijst met bouwstenen en hun volgorde opgeslagen in `shortlistBouwsteenIds` en volgen latere scorewijzigingen de lijst niet meer. Bouwstenen toevoegen, weghalen en verplaatsen kan vrij, de lijst mag leeg zijn (dan is er niets uit te werken), en "Standaard herstellen" zet het veld terug op null. Bouwstenen die met een nieuwe peilmeting niet meer bestaan, vallen weg.
+- **Niet van toepassing.** De Consultant kan een hele fase overslaan (`nvFaseIds`) en een use case niet van toepassing verklaren (`nvUseCaseIds`). Beide zijn omkeerbaar. Een use case waarvoor al een `Adviesstap` bestaat, kan niet n.v.t. worden verklaard, zet de stap eerst terug naar open. Een fase die is overgeslagen telt niet mee in de huidige fase en in de voortgang; een fase waarvan alle use cases n.v.t. zijn, gedraagt zich net zo.
+- **Een stap telt als gedaan** bij de statussen `promptGekopieerd` en `gedaan`. Terugzetten naar open verwijdert de `Adviesstap`. Use cases in `nvUseCaseIds` tellen niet mee in de totalen.
+- **Huidige fase** is de eerste fase die niet is overgeslagen, met een `UseCase` met `inStrook` die niet n.v.t. is en waarvoor nog geen `Adviesstap` bestaat. Dit wordt afgeleid, er is geen veld voor.
 - **Aanmaken** bij het eerste openen vanaf een Meting met afgeronde scans. Een Meting zonder afgeronde scans kan geen Adviesverloop starten. Bestaat er voor de Organisatie en het Onderdeel al een lopend Adviesverloop, dan stelt de app voor de Meting daaraan te koppelen.
 - **Afronden.** De Consultant zet het Adviesverloop op `afgerond`. Daarna zijn shortlist, stappen en koppelingen alleen nog te lezen, en kan een nieuw Adviesverloop beginnen. Heropenen kan.
 - **Wat niet wordt opgeslagen.** De inhoud van de prompt en het contextblok. Alleen de `Adviesstap` en een eventuele link.
 - **Adviesverloop verwijderen.** Het Adviesverloop met zijn koppelingen en Adviesstappen. De Metingen blijven bestaan. De bevestiging noemt het aantal stappen. Een Admin mag het van alle Organisaties, een Consultant van zijn eigen (zelf aangemaakt of toegewezen).
 - **Content en rechten.** `Fase`, `AdviesRol` en `UseCase` volgen de regels van Content bewerken: Alleen een Admin beheert ze.
+- **Adviescontext per Consultant.** Het `AdviesProfiel` is persoonlijk: Alleen de eigenaar leest en wijzigt het, ook een Admin ziet dat van een ander niet. Het wordt bewerkt in Mijn account, tab Adviescontext (`beheerpagina.md`). Het bevat geen namen van klanten of personen en wordt niet in het audit-log gelegd. De rollen starten als kopie van de `AdviesRol`-records. Een latere wijziging van de `standaardTekst` door een Admin verandert bestaande profielen niet. Verwijdert de Consultant een rol die een adviesverloop gebruikt, dan valt dat adviesverloop terug op de standaardrol. De laatste rol kan niet verwijderd worden. Het profiel verdwijnt met de Gebruiker.
 
 ---
 

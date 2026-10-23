@@ -110,6 +110,7 @@ een andere gebruiker wijzigt, staat bij Gebruikers (punt 9).
   duidelijk is waarmee je inlogt.
 - **Rol**: Alleen-lezen. Een rol wijzigt alleen een Admin, bij een andere
   gebruiker (punt 9).
+- **Tabs**: De modal heeft bovenin de pilgroep Gegevens | Adviescontext (`.pil`, 32px, geselecteerd is massief oranje). Gegevens bevat de velden hierboven. Adviescontext is er voor een Admin en een Consultant en bevat de tekst "Over mij" en de rollen die de Consultant in een adviesverloop kiest. De velden, teksten en regels staan in `adviesverloop.md`, Adviescontext in Mijn account, en de records in `datamodel.md` (`AdviesProfiel`). Een Admin ziet alleen zijn eigen adviescontext. De knoppen Annuleren en Opslaan onderaan gelden voor beide tabs.
 - **Wachtwoord wijzigen**: Klapt in dezelfde modal drie velden open: Huidig
   wachtwoord, Nieuw wachtwoord en Herhaal nieuw wachtwoord. Dit hoort bij de
   echte inlog met gehashte wachtwoorden (`backlog.md`, Fase 2) en komt daarmee.
@@ -451,9 +452,11 @@ standaardteksten zoals ze nu in de app staan):
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
 | `info.contactpersonen` | Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen | Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze. |
 | `info.adviesverloopStappen` | Pagina Adviesverloop, fasestrook, naast de titel van het paneel | De zes fasen van het adviesproces. De scan is het startpunt. Klik op een fase om te zien wat je al gedaan hebt en wat de volgende stap is. |
-| `info.adviesverloopShortlist` | Pagina Adviesverloop, kaart Shortlist voor het gesprek, naast de titel | De shortlist begint met de bouwstenen met de laagste score. Voeg er een toe als je een open deur wilt meenemen: Een bouwsteen die goed scoort, maar waar de klant graag over praat of waar een snelle winst ligt. Houd de lijst kort. |
+| `info.adviesverloopShortlist` | Pagina Adviesverloop, kaart Shortlist voor het gesprek, naast de titel | De shortlist begint met de bouwstenen met de laagste score. Met Bouwstenen kiezen voeg je bouwstenen toe of haal je ze weg, en met de pijltjes bepaal je de volgorde. Voeg ook een open deur toe als je die wilt meenemen: Een bouwsteen die goed scoort, maar waar de klant graag over praat of waar een snelle winst ligt. Houd de lijst kort. |
 | `info.adviesverloopUsecases` | Uitwerking per bouwsteen, kaart van de huidige fase, naast de titel | Bij elke use case zet de app een prompt voor Copilot klaar. De uitkomst van de Meting vormt de context, jij kijkt het na voor je kopieert. |
-| `info.adviesverloopRol` | Prompt klaarzetten, deel Wie ben jij bij deze klant | Beschrijf in je eigen woorden wie je bent bij deze klant: Wie je kent, hoe je samenwerkt en wat je kunt doen. Copilot past de aanpak daarop aan. |
+| `info.adviesverloopRol` | Prompt klaarzetten, deel Wie ben jij bij deze klant | Dit is de tekst van de rol die je hebt gekozen. Pas hem aan voor deze prompt, de tekst in Mijn account verandert niet. Copilot past de aanpak daarop aan. |
+| `info.adviescontextOverMij` | Mijn account, tab Adviescontext, naast Over mij | Deze tekst staat vooraan in elke prompt, vóór de rol. Schrijf het zoals je het aan een collega zou vertellen. Noem geen namen van klanten of personen. |
+| `info.adviescontextRollen` | Mijn account, tab Adviescontext, naast Mijn rollen bij een klant | Eenmaal invullen. In een adviesverloop kies je welke rol je bij die klant speelt. De tekst gaat mee in de prompt die je zelf naar Copilot kopieert, en wordt nergens anders gebruikt. |
 | `info.adviesverloopContext` | Prompt klaarzetten, deel Waar werk je aan | Dit zijn gegevens op groepsniveau uit de Meting. Antwoorden per persoon, namen en groepen die te klein zijn gaan niet mee. Pas aan wat niet klopt. |
 | `info.dossier` (vervangt `info.nieuwsartikelen`) | Organisatie-detail, kaart Dossier, naast de titel | Cases, benchmarks, nieuws, events en blogs die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier zichtbaar is én het item op Zichtbaar voor Lead staat. Een case kan alleen zichtbaar worden als de organisatie in de case dat heeft toegestaan. |
 | `info.caseVlag` | Organisatie-detail, bij het vinkje "Mag als case gebruikt worden" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads. |
@@ -966,14 +969,12 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   `organisatie.hernoemd`, met de oude en de nieuwe naam in `details`
   (`datamodel.md`, Audit). Oudere audit-regels houden de naam zoals die was
   bij het loggen.
-- **Adviesverloop** (`adviesverloop.md`): Een blok onder de Kenmerken, alleen voor wie `adviesverloop.bekijken` heeft. Per Onderdeel met een adviesverloop (of voor de hele Organisatie) één regel met de huidige fase, het aantal gekoppelde Metingen, de status (Lopend of Afgerond) en de knop "Openen". Bij de Metingen in de lijst hieronder staat het label in het traject, als de Meting gekoppeld is.
-- **Detail**: Het organisatiepaneel (Kenmerken altijd bewerkbaar, met Toegang, Afspraken en Contactpersonen), "Aangemaakt door" (zie
-  hierboven), de metingen van deze organisatie met "Bekijk" naar het
-  Meting-overzicht (punt 5), op meetdatum, de nieuwste bovenaan, en de respondenten met hun
+- **Detail**: De sprongnavigatie, de kaart Bedrijfsgegevens (Kenmerken altijd bewerkbaar, met KPI's, Techstack en Contactpersonen), "Aangemaakt door" (zie
+  hierboven), voor een Admin de kaart Permissies (Toegang en Afspraken), het Dossier, de kaart Adviesverloop en de kaart Metingen. Die laatste bevat de metingen van deze organisatie met "Bekijk" naar het
+  Meting-overzicht (punt 5), op meetdatum, de nieuwste bovenaan, daaronder de respondenten met hun
   status, elk met alleen "Bekijk" dat het Respondent-overzicht opent
-  (punt 6b). Voor een Admin staat in de kop van het blok Metingen ook de knop
-  "Importeren" (punt 8), en onder het blok Respondenten een compact blok
-  Leads met de knop "Leads beheren" (punt 6a). De ingevulde scans staan niet op deze pagina: Die
+  (punt 6b), en daaronder de Leads met de knop "Leads beheren" (punt 6a). Voor een Admin staat in de kop van de kaart Metingen ook de knop
+  "Importeren" (punt 8). De ingevulde scans staan niet op deze pagina: Die
   staan per Meting in het Meting-overzicht.
   **Lange lijsten**: Respondenten tonen op de detailpagina maximaal 5 rijen.
   Zijn het er meer, dan staat onder de lijst een link "Alle respondenten van
@@ -981,11 +982,20 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   filter Organisatie al ingesteld op deze organisatie (in de URL, zoals de
   andere filters). Zijn het er 5 of minder, dan is er geen link. Er komt
   geen link naar de lijst over alle organisaties heen.
-  **Eén kaart per sectie**: Het organisatiepaneel, het Dossier, de
-  Metingen, de Respondenten en de Leads staan elk op een eigen witte kaart
-  (`stylesheet.md`, Sectiekaart), in die volgorde. De kop van een kaart heeft
-  links de titel en rechts de actie van die sectie.
-- **Organisatiepaneel** (design: Design-artifact "Organisatiescherm: visuele varianten", bord C; de organisatievelden heten in het datamodel nog Kenmerken): De witte kaart bovenaan het organisatie-detail, boven de kaarten Dossier, Metingen, Respondenten en Leads. Ze toont de waarden van de organisatievelden (`datamodel.md`, Organisatievelden) en de KPI's visueel, laat bewerken op dezelfde plek en bevat verderop in dezelfde kaart Toegang, Afspraken en Contactpersonen. Welke blokken de Lead in het Dossier ziet, stelt een Consultant of Admin in bij Bewerken (zie Zichtbaar voor de Lead hieronder en `dossier.md`, Profiel van de Organisatie).
+  **Eén kaart per sectie**: Bedrijfsgegevens, Permissies, het Dossier, het
+  Adviesverloop en de Metingen (met daarin de Respondenten en de Leads) staan elk op een eigen witte kaart
+  (`stylesheet.md`, Sectiekaart), in die volgorde. Elke kaart heeft links bovenaan een titel van 24px, gewicht 800, met dezelfde naam als de pil in de sprongnavigatie, en rechts de actie van die sectie. De inhoud begint op alle kaarten op dezelfde afstand van de rand (24px). In de kaart Metingen zijn Respondenten en Leads onderdelen met een kopje van 18px, gewicht 700, gescheiden door een lijn van 1px `--border`.
+
+  **Kaart Adviesverloop** (`adviesverloop.md`): Onder het Dossier en boven de Metingen, alleen voor wie `adviesverloop.bekijken` heeft. Per Onderdeel met een adviesverloop (of voor de hele Organisatie) één rij met de naam van het Onderdeel, de status (Lopend of Afgerond), de huidige fase met de voortgang (bijvoorbeeld "Oplossen · 0 van 4"), het aantal gekoppelde Metingen en de knop "Openen". Heeft de Organisatie nog geen adviesverloop, dan staat er één regel "Nog geen adviesverloop" met de knop "Adviesverloop starten", die vraagt welke Meting het begin is (dezelfde keuzemodal als "Meting voor de radar", `dossier.md`). De knop is uitgeschakeld zonder Meting met afgeronde scans, met de reden in een Info-icoon. Bij de Metingen in de lijst hieronder staat het label in het traject, als de Meting gekoppeld is.
+
+  **Sprongnavigatie**: Direct onder de nav staat een balk met pillen waarmee je naar een onderdeel van de pagina springt, zodat je niet door het hele organisatiepaneel hoeft te scrollen.
+  - **Opbouw.** De Sub-nav uit `stylesheet.md` (capsule met pillen, 64px hoog, `position: sticky; top: var(--nav-h)`), zonder knop rechts. Er zijn vijf pillen, in de volgorde van de pagina en met de naam die ook als titel op de kaart staat: Bedrijfsgegevens, Permissies, Dossier, Adviesverloop en Metingen.
+  - **Wat er staat.** Alleen onderdelen die de gebruiker ziet. Permissies staat er alleen voor een Admin en Adviesverloop alleen voor wie `adviesverloop.bekijken` heeft. Bedrijfsgegevens loopt van de kop met de cijferrij tot en met de Contactpersonen. De Respondenten en de Leads zijn onderdeel van de kaart Metingen en hebben geen eigen pil: De pil Metingen blijft actief zolang je daar scrolt.
+  - **Springen.** Een klik scrolt zacht naar het begin van het onderdeel (direct bij `prefers-reduced-motion`), met `scroll-margin-top` gelijk aan de nav, de balk en 16px. Het onderdeel heeft een eigen anker in de URL (`#profiel`, `#permissies`, `#metingen`, enzovoort), zodat een link naar een onderdeel te delen is.
+  - **Actieve pil.** Die volgt de scrollpositie: Het onderdeel dat het dichtst bij de bovenkant van het scherm staat. Onderaan de pagina is de laatste pil actief. De actieve pil is massief oranje, zoals in `stylesheet.md`, Keuzepil en pilvormige groep.
+  - **Toetsenbord en toegankelijkheid.** `nav` met `aria-label="Onderdelen van deze pagina"` en de pillen als links (`a href="#..."`). De actieve pil heeft `aria-current="true"`. Tab loopt langs de pillen en Enter springt.
+  - **Smalle schermen.** De balk scrolt horizontaal en de pillen breken niet af.
+- **Organisatiepaneel** (design: Design-artifact "Organisatiescherm: visuele varianten", bord C; de organisatievelden heten in het datamodel nog Kenmerken): De witte kaart bovenaan het organisatie-detail, boven de kaarten Permissies, Dossier, Adviesverloop en Metingen. Ze heeft de titel Bedrijfsgegevens, toont de waarden van de organisatievelden (`datamodel.md`, Organisatievelden) en de KPI's visueel, laat bewerken op dezelfde plek en bevat verderop in dezelfde kaart de Contactpersonen. Toegang en Afspraken staan op een eigen kaart (Permissies, zie hieronder). Welke blokken de Lead in het Dossier ziet, stelt een Consultant of Admin in bij Bewerken (zie Zichtbaar voor de Lead hieronder en `dossier.md`, Profiel van de Organisatie).
   - **Kaart**: Zoals Kaarten in `stylesheet.md` (wit, `1px solid var(--border)`, `border-radius: 10px`), met padding 24px en 24px tussen de onderdelen.
   - **Kop**: Links een vierkant van 56px met de beginletter van de organisatie (radius 14px, achtergrond `--or-faint`, letter 28px, gewicht 800, `--or`). Daarnaast de naam (24px, gewicht 800) en eronder de pillen Sector en Subsector (12px, gewicht 700, radius 12px, padding 4px 10px). Sector heeft `--bl-faint` met tekst `--bl`, Subsector `--bg-mid` met tekst `--ink-m`. Ze tonen de korte naam, met de originele naam in de tooltip (zie Korte namen in kaart en formulier). Een pil zonder waarde valt weg. Rechts staat de knop "Bewerken" (`.btn-outline .btn-compact`, met een pijltje ▾ erachter, vraagt `organisaties.bewerken`) die een menu opent, zoals het menu van "Exporteren" (`stylesheet.md`). De opties zijn "Kenmerken" (opent de modal Kenmerken bewerken, hieronder), "KPI's invullen" (opent de modal KPI's invullen) en "Onderdelen" (opent de modal Onderdelen). Alle drie vragen `organisaties.bewerken`. Een Lead of Respondent ziet dit paneel niet.
   - **Regel onder de naam**: In het design staat de regel "Aangemaakt door: … · Ook toegewezen aan: …" niet meer onder de naam, omdat Toegang dit toont. Een Consultant ziet de kaart Toegang niet en houdt de regel daarom (12px, `--ink-s`, onder de pillen), als alleen-lezen tekst.
@@ -1008,8 +1018,8 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
     - **Geen eigen knoppen.** Het blok heeft geen knoppen. Invullen en het beheren van Onderdelen staan onder Bewerken.
   - **Techstack**: Onder de KPI's het label Techstack (zelfde opmaak als Kanalen) en zes tegels in één rij, een per categorie. Een tegel is `--bg-warm`, heeft radius 8px en padding 10px 12px, en toont de categorie (12px, `--ink-m`) en de oplossing (14px, gewicht 700, korte naam als die er is). Wie de oplossing ondersteunt, het deploymentmodel en de cloudleverancier staan niet in het paneel, alleen in het formulier. Dat is bewust: Op dit scherm is wie ondersteunt veel minder belangrijk dan welke oplossing er staat.
   - **Overige velden**: Adoptie mijnomgeving/app, Klantcontact management & support en IT DevOps-medewerkers staan niet in het design van bord C. Ze staan als kleine regel onder de Techstack, als label (12px, `--ink-s`) boven een waarde (14px, gewicht 600), in een rij die afbreekt. Dit onderdeel moet nog in het design worden gezet.
-  - **Onder de lijn**: Onder de Techstack staat een lijn van 1px `--border` en daaronder twee vlakken van gelijke breedte met 24px ertussen: links Toegang en rechts Afspraken (beide alleen voor een Admin, zie hierboven). Een vlak heeft `--bg-warm`, `1px solid #efede8`, radius 10px en padding 16px 20px. Voor een Consultant staat hier niets, en Contactpersonen staan direct onder de Techstack.
-  - **Contactpersonen**: Onderaan het paneel, onder Toegang en Afspraken (zie hieronder).
+  - **Contactpersonen**: Onderaan het paneel, onder de Techstack (zie hieronder). Het paneel eindigt daarmee: De Contactpersonen zijn het laatste onderdeel van Bedrijfsgegevens.
+  - **Kaart Permissies** (alleen voor een Admin): Een eigen kaart onder Bedrijfsgegevens, met de titel Permissies en daaronder twee vlakken van gelijke breedte met 24px ertussen: links Toegang en rechts Afspraken (zie hierboven). Een vlak heeft `--bg-warm`, `1px solid #efede8`, radius 10px en padding 16px 20px. Een Consultant ziet de kaart niet.
   - **Opmaak per soort veld**: Getallen met duizendtalpunt en komma als
     decimaalteken (410.000). Een percentage met het procentteken direct achter het
     getal (38%). Bij meer delen staan de delen achter elkaar: "410.000, 15 / 85%"
@@ -1037,7 +1047,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   - **Wat het paneel niet bevat**: De Meting, het benchmarkvinkje en de
     Leads hebben eigen kaarten. De cijferrij toont van de KPI's alleen Contacten
     per jaar (Algemeen), de andere KPI's staan in het blok KPI's.
-  - **Contactpersonen** (op verzoek van Sander; Nieuws is op verhuisd naar de kaart Dossier, zie hieronder): Onderaan het organisatiepaneel, onder Toegang en Afspraken,
+  - **Contactpersonen** (op verzoek van Sander; Nieuws is op verhuisd naar de kaart Dossier, zie hieronder): Onderaan het organisatiepaneel, onder de Techstack,
     gescheiden door een lijn van 1px `--border` en 24px ruimte, staat de lijst
     Contactpersonen met een kop van 16px, gewicht 700, een Info-icoon
     (`info.contactpersonen`) en rechts een knop "+ Toevoegen"
@@ -2253,7 +2263,7 @@ de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat zelf niets op
 
 #### 16. Adviesverloop
 
-Het adviesverloop van een Organisatie, of van een Onderdeel daarvan (`adviesverloop.md`). Een Meting is de aanleiding en de bron van de scores, maar het adviesverloop hoort bij de Organisatie en kan meerdere Metingen omvatten. Het heeft geen eigen hoofdlink en geen eigen tab: Het zit op drie plekken. In de lijst Metingen onder Resultaten (punt 7) als kolom, in het Meting-overzicht (punt 5) als kaart met de fasestrook, en in het organisatie-detail (punt 4) als eigen blok per Onderdeel. De knop "Adviesverloop openen" opent de pagina Adviesverloop met het kruimelpad Organisaties › {Organisatie} › Adviesverloop. De schermen, de regels en het contextblok staan in `adviesverloop.md`.
+Het adviesverloop van een Organisatie, of van een Onderdeel daarvan (`adviesverloop.md`). Een Meting is de aanleiding en de bron van de scores, maar het adviesverloop hoort bij de Organisatie en kan meerdere Metingen omvatten. Het heeft geen eigen hoofdlink en geen eigen tab: Het zit op drie plekken. In de lijst Metingen onder Resultaten (punt 7) als kolom, in het Meting-overzicht (punt 5) als kaart met de fasestrook, en in het organisatie-detail (punt 4) als eigen blok per Onderdeel. De knop "Adviesverloop openen" opent de pagina Adviesverloop met het kruimelpad Organisaties › {Organisatie} › Adviesverloop. De schermen, de regels, de modals voor het kiezen en koppelen van Metingen (hergebruik van de modal "Meting voor de radar", `dossier.md`) en het contextblok staan in `adviesverloop.md`.
 
 Een Admin ziet het adviesverloop van alle Metingen en een Consultant dat van zijn eigen Organisaties (`adviesverloop.bekijken` en `adviesverloop.bewerken`, `datamodel-rollen.md`). Een Lead en een Respondent zien het niet, ook niet via de adresregel. Een adviesverloop starten kan alleen vanaf een Meting met afgeronde scans.
 
@@ -2263,7 +2273,7 @@ Het beheer van de fasen, de use cases, de rollen en de prompts waaruit het advie
 
 - **Fasen**: De zes fasen met naam, korte naam en volgorde. Aanmaken en verwijderen kan niet; hernoemen en de volgorde wel, tenzij er al een Adviesverloop is.
 - **Use cases**: Per fase een lijst. Per use case de code, titel, omschrijving, apps, de keuze of de use case meetelt in de fasestrook, de bouwstenen en klassen waarbij hij wordt voorgesteld en de volgorde. Een use case verwijderen kan alleen als er geen `Adviesstap` naar verwijst. Anders kan hij worden verborgen.
-- **Rollen**: De rollen met naam, volgorde en de standaardtekst bij Wie ben jij bij deze klant.
+- **Rollen**: De rollen met naam, volgorde en de standaardtekst bij Wie ben jij bij deze klant. Dit zijn de beginwaarden: Een Consultant kopieert ze naar zijn eigen adviescontext in Mijn account en past ze daar aan (`adviesverloop.md`, Adviescontext in Mijn account). Een wijziging hier verandert bestaande adviescontext niet.
 - **Prompts**: Per use case en per rol een context en een prompt. Een use case zonder prompt voor een rol is beschikbaar voor die rol met een lege prompt, die de Consultant zelf invult.
 - **Bewerkslot en audit**: Zoals bij Content (punt 2). Elke wijziging komt in het audit-log als `adviescatalogus.gewijzigd`.
 - **Beginwaarden**: De eerste inhoud komt uit de use cases van de Boks-app.
