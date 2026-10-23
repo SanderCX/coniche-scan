@@ -28,6 +28,9 @@ const TYPE_LABEL: Record<string, string> = {
   contactpersoon: "Contactpersoon",
   nieuwsartikel: "Nieuwsartikel",
   dossieritem: "Dossieritem",
+  adviesverloop: "Adviesverloop",
+  adviesstap: "Adviesstap",
+  adviescatalogus: "Adviescatalogus",
 };
 
 /** Het deel van de actie vóór de punt, bijv. "organisatie" bij "organisatie.verwijderd". */
@@ -126,6 +129,12 @@ const DETAIL_LABEL: Record<string, string> = {
   aantal: "Aantal",
   van: "Van",
   tot: "Tot",
+  useCaseCode: "Use case",
+  useCaseTitel: "Titel van de use case",
+  metLink: "Met link",
+  bouwsteenNummer: "Bouwsteen",
+  actie: "Actie",
+  label: "Label",
 };
 
 /** Sleutels die alleen bij uitklappen en in de export staan (ID's), nooit in de leesbare tekst. */

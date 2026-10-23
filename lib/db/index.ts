@@ -13,6 +13,7 @@ export * from "./onderdelen";
 export * from "./kpi";
 export * from "./contactpersonen";
 export * from "./dossier";
+export * from "./advies";
 export * from "./respondenten";
 export * from "./verplaatsen";
 export * from "./samenbrengen";

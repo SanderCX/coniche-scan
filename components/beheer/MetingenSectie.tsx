@@ -34,6 +34,13 @@ import {
 import { InfoIcoon } from "@/components/InfoIcoon";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { magImporteren } from "@/lib/rechten";
+import { adviesverloopVoorMeting, labelVan } from "@/lib/advies";
+
+/** Het label dat een Meting in het adviesverloop heeft ("Nulmeting"), of `null`. */
+function adviesLabel(organisatie: Organisatie, metingId: string): string | null {
+  const av = adviesverloopVoorMeting(organisatie, metingId);
+  return av ? labelVan(av, metingId) : null;
+}
 
 /**
  * De Metingen van een organisatie (`beheerpagina.md`, punt 5, "Lijst Metingen in het organisatie-detail"): Eén lijst op
@@ -103,6 +110,8 @@ export function MetingenSectie({ organisatie }: { organisatie: Organisatie }) {
         <td>
           <strong>{m.label}</strong> <span className="text-ink-s">— {assessmentNaam(m.assessmentId)}</span>{" "}
           {samengesteld && <span className="admin-badge status-uitgenodigd">Gemiddelde</span>}
+          {/* Het label in het traject van het adviesverloop (`beheerpagina.md`, punt 4, Adviesverloop). */}
+          {adviesLabel(organisatie, m.id) && <span className="adv-chip">{adviesLabel(organisatie, m.id)}</span>}
           {onderdeelVan(organisatie, m) !== STANDAARD_ONDERDEEL && <span className="text-ink-s"> · {onderdeelVan(organisatie, m)}</span>}
         </td>
         <td className={datum ? undefined : "text-ink-s"}>{datum ? toonMeetdatum(datum) : DATUM_ONTBREEKT}</td>

@@ -17,6 +17,7 @@ import { ruimDossierOp, zetNieuwsartikelenOm } from "@/lib/dossier";
 import { verbergDossiersMetVerlorenBron } from "@/lib/dossier-radar";
 import { logAudit } from "@/lib/audit-store";
 import { organisatieContext } from "@/lib/audit-context";
+import { ruimAdviesverlopenOp } from "@/lib/advies";
 
 const KEY = "coniche-scan:organisaties";
 const SERVER_SLEUTEL = "organisaties";
@@ -183,6 +184,8 @@ export function slaAlles(alles: Organisatie[]): void {
     for (const id of r.verwijderdeSamengesteldeIds) verdwenen.push({ metingId: id, organisatieNaam: organisatie.naam });
   }
   if (verdwenen.length > 0) haalMetingenUitBenchmarks(verdwenen);
+  // Een adviesverloop houdt geen verwijzing naar een Meting die er niet meer is, en verdwijnt als er geen Meting overblijft (`datamodel.md`, Verwijderen en datakoppelingen).
+  const verdwenenAdviesverlopen = alles.flatMap((organisatie) => ruimAdviesverlopenOp(organisatie).map((av) => ({ organisatie, av })));
   // De vinkjes van Leads kloppend houden: Een benchmark die er niet meer is of waar de organisatie geen lid meer van is, en
   // alles wat van een verdwenen Meting of Lead was (`datamodel.md`, Verwijderen en datakoppelingen).
   // Bij een opgeslagen verkenning volgen de leden uit de filters: Voldoet een organisatie niet meer, dan vervalt het vinkje van haar Leads.
@@ -204,6 +207,15 @@ export function slaAlles(alles: Organisatie[]): void {
         reden: "Meting voor de radar niet meer zichtbaar voor de Lead",
         metingen: verloren.map((v) => ({ assessmentId: v.assessmentId, meting: v.metingLabel ?? "verwijderd" })),
       },
+    });
+  }
+  for (const { organisatie, av } of verdwenenAdviesverlopen) {
+    logAudit({
+      actie: "adviesverloop.verwijderd",
+      entiteitType: "adviesverloop",
+      entiteitId: av.id,
+      entiteitNaam: organisatie.naam,
+      details: { ...organisatieContext(organisatie), aantalStappen: av.stappen.length, reden: "geen gekoppelde Meting meer" },
     });
   }
   const json = stringifyOpslag(alles);

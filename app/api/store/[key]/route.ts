@@ -26,7 +26,7 @@ const MAX_BODY_TEKENS = 5_000_000;
 
 // `gebruikers` staat hier bewust niet in: Die accounts bevatten nog wachtwoorden
 // in leesbare tekst en deze route heeft geen autorisatie (backlog.md).
-const TOEGESTANE_SLEUTELS = new Set(["organisaties", "assessments", "instellingen", "algemene-teksten"]);
+const TOEGESTANE_SLEUTELS = new Set(["organisaties", "assessments", "instellingen", "algemene-teksten", "adviescatalogus"]);
 
 export async function GET(_request: Request, { params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;

@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { DropdownKnop } from "@/components/DropdownKnop";
 import { BeheerNavActionsProvider, useBeheerNavActionsValue } from "@/components/beheer/BeheerNavActions";
 import { logout, useIngelogdeGebruiker } from "@/lib/admin-auth";
-import { magBenchmarkBeheren, magContentBeheren, magGebruikersBeheren, magVerkennen } from "@/lib/rechten";
+import { magAdviescatalogusBeheren, magBenchmarkBeheren, magContentBeheren, magGebruikersBeheren, magVerkennen } from "@/lib/rechten";
 import { VIA_RESULTATEN } from "@/lib/resultaten-nav";
 import { ROL_KLEUR } from "@/lib/colors";
 import { BeheerMeldingBalk } from "@/components/beheer/BeheerMelding";
@@ -60,7 +60,7 @@ type Sectie = "assessments" | "organisaties" | "resultaten";
  * `?via=resultaten` is dat Resultaten, anders Organisaties. De benchmarkpagina's zijn altijd Resultaten.
  */
 function sectieVoor(pathname: string, via: boolean): Sectie {
-  if (pathname.startsWith("/beheer/assessments") || pathname.startsWith("/beheer/content")) return "assessments";
+  if (pathname.startsWith("/beheer/assessments") || pathname.startsWith("/beheer/content") || pathname.startsWith("/beheer/adviescatalogus")) return "assessments";
   if (pathname.startsWith("/beheer/benchmark") || pathname.startsWith("/beheer/verkennen")) return "resultaten";
   if (pathname.startsWith("/beheer/resultaten/metingen")) return "resultaten";
   if (
@@ -86,6 +86,12 @@ const ORGANISATIE_TABS = [
 ];
 /** Alleen een Admin (`content.beheren`): De definitie van de organisatievelden en hun korte namen. */
 const ORGANISATIEVELDEN_TAB = { href: "/beheer/organisatievelden", label: "Organisatievelden" };
+
+/** Tabbalk van Assessments (`beheerpagina.md`, punt 17): Het overzicht van de Assessments en, alleen voor een Admin die dit beheert, de Adviescatalogus. */
+const ASSESSMENTS_TABS = [
+  { href: "/beheer/content", label: "Assessments" },
+  { href: "/beheer/adviescatalogus", label: "Adviescatalogus" },
+];
 
 /** Tabbalk van Resultaten (beheerpagina.md, punt 7): Metingen, voor een Admin aangevuld met Benchmarks. */
 const RESULTATEN_TABS = [{ href: "/beheer/resultaten/metingen", label: "Metingen" }];
@@ -143,6 +149,8 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
   const toonTabs = organisatieTabs.some((t) => pathname === t.href);
   // Met maar één tab, zoals bij een Consultant, toont de pagina geen tabbalk (`beheerpagina.md`, punt 7).
   const toonResultatenTabs = resultatenTabs.length > 1 && resultatenTabs.some((t) => pathname === t.href);
+  // De tabbalk van Assessments staat op de twee lijstpagina's zelf, niet op een Assessment-detail.
+  const toonAssessmentsTabs = magAdviescatalogusBeheren(gebruiker) && ASSESSMENTS_TABS.some((t) => pathname === t.href);
   const toonInstellingenTabs = heeftInstellingen && INSTELLINGEN_TABS.some((t) => pathname === t.href);
 
   return (
@@ -186,6 +194,17 @@ function BeheerChromeInner({ children }: { children: React.ReactNode }) {
         <div className="beheer-tabs">
           <nav className="beheer-tabs-inner" aria-label="Onderdelen van Organisaties">
             {organisatieTabs.map((tab) => (
+              <Link key={tab.href} href={tab.href} className={`beheer-tab ${pathname === tab.href ? "actief" : ""}`}>
+                {tab.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      )}
+      {toonAssessmentsTabs && (
+        <div className="beheer-tabs">
+          <nav className="beheer-tabs-inner" aria-label="Onderdelen van Assessments">
+            {ASSESSMENTS_TABS.map((tab) => (
               <Link key={tab.href} href={tab.href} className={`beheer-tab ${pathname === tab.href ? "actief" : ""}`}>
                 {tab.label}
               </Link>

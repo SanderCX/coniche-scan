@@ -23,6 +23,7 @@ import { MetingWijzigenFormulier } from "@/components/beheer/MetingWijzigenFormu
 import { zetBeheerMelding } from "@/components/beheer/BeheerMelding";
 import { aantalBenchmarksMetMeting } from "@/lib/benchmark-store";
 import { kruimelsVoorMeting, metVia, VIA_RESULTATEN } from "@/lib/resultaten-nav";
+import { AdviesverloopKaart } from "@/components/beheer/AdviesverloopKaart";
 
 /**
  * Meting-overzicht van een samengestelde Meting (`beheerpagina.md`, punt 5, Samengestelde Meting): Dezelfde kop als een gewone
@@ -45,7 +46,12 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
   const scans = aantalAfgerondInMeting(organisatie, meting);
 
   function verwijderd() {
-    verwijderMeting(meting.id);
+    const r = verwijderMeting(meting.id);
+    if (!r.ok) {
+      setVerwijderenOpen(false);
+      zetBeheerMelding({ tekst: r.reden });
+      return;
+    }
     zetBeheerMelding({ tekst: `Samengestelde Meting "${meting.label}" is verwijderd. De onderliggende Metingen zijn niet veranderd.` });
     router.push(`/beheer/organisaties/${organisatie.id}`);
   }
@@ -96,6 +102,8 @@ export function SamengesteldMetingOverzicht({ organisatie, meting }: { organisat
           Verwijderen
         </button>
       </div>
+
+      <AdviesverloopKaart organisatie={organisatie} meting={meting} />
 
       <h2>Samenstelling</h2>
       {onder.length === 0 ? (

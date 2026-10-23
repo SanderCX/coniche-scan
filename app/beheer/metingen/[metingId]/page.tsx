@@ -31,6 +31,7 @@ import { leadsMetToegangTotMeting } from "@/lib/lead-toegang";
 import { STANDAARD_ONDERDEEL, isSamengesteld, onderdeelVan, toonMeetdatum } from "@/lib/metingen";
 import { MetingWijzigenFormulier } from "@/components/beheer/MetingWijzigenFormulier";
 import { SamengesteldMetingOverzicht } from "@/components/beheer/SamengesteldMetingOverzicht";
+import { AdviesverloopKaart } from "@/components/beheer/AdviesverloopKaart";
 
 /**
  * Meting-overzicht (beheerpagina.md punt 5): alles binnen één Meting op
@@ -116,7 +117,12 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
   }
 
   function handleMetingVerwijderd() {
-    verwijderMeting(scanUitvoering.id);
+    const r = verwijderMeting(scanUitvoering.id);
+    if (!r.ok) {
+      setMetingVerwijderenOpen(false);
+      zetBeheerMelding({ tekst: r.reden });
+      return;
+    }
     zetBeheerMelding({ tekst: `Meting "${scanUitvoering.label}" is verwijderd, met alle scans daarbinnen.` });
     router.push(`/beheer/organisaties/${organisatie.id}`);
   }
@@ -227,6 +233,8 @@ export default function MetingOverzichtPage({ params }: { params: Promise<{ meti
           Meting verwijderen
         </button>
       </div>
+
+      <AdviesverloopKaart organisatie={organisatie} meting={scanUitvoering} />
 
       {leads.length > 0 && (
         <p className="text-sm text-ink-m" style={{ marginTop: "0.8rem" }}>

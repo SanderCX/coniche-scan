@@ -1,0 +1,508 @@
+/* Het adviesverloop en de Adviescatalogus (`adviesverloop.md`; `stylesheet.md`): Hergebruikt de Sectiekaart, de ring, de pil en de modal. Hier staat alleen wat daarbovenop komt. */
+
+/* ---------- Adviescatalogus (beheer) ---------- */
+.advcat-lijst {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.advcat-rij {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  min-height: 56px;
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid #efede8;
+}
+.advcat-rij:last-child {
+  border-bottom: none;
+}
+.advcat-rij--verborgen {
+  opacity: 0.6;
+}
+.advcat-nummer,
+.advcat-code {
+  flex: none;
+  min-width: 2.5rem;
+  font-size: var(--fs-14);
+  font-weight: 700;
+  color: var(--ink-s);
+}
+.advcat-tekst {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-14);
+}
+.advcat-afgekapt {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.advcat-acties {
+  display: flex;
+  flex: none;
+  gap: var(--sp-2);
+}
+.advcat-formulier {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: var(--sp-2);
+}
+.advcat-groep {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.advcat-groep legend,
+.advcat-groep summary {
+  font-size: var(--fs-14);
+  font-weight: 700;
+}
+.advcat-groep summary {
+  cursor: pointer;
+}
+.advcat-keuze {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-1) 0;
+  font-size: var(--fs-14);
+}
+.advcat-kop {
+  margin: var(--sp-3) 0 var(--sp-1);
+  font-size: var(--fs-14);
+  font-weight: 700;
+}
+.advcat-schakelrij {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: var(--fs-14);
+}
+
+/* ---------- Fasestrook (`adviesverloop.md`, De fasestrook) ---------- */
+.fasestrook-kader {
+  position: sticky;
+  top: var(--nav-h);
+  z-index: 90;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+}
+.fasestrook {
+  display: flex;
+  align-items: stretch;
+  gap: var(--sp-2);
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: var(--sp-3) 2rem;
+}
+.fasestrook-scan {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 170px;
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--border-d);
+  border-radius: 10px;
+  background: var(--bg);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.fasestrook-scan:hover,
+.fasestrook-scan[aria-expanded="true"] {
+  border-color: var(--or);
+}
+.fasestrook-scan strong {
+  font-size: var(--fs-14);
+}
+.fasestrook-scan span {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.fasestrook-pijl {
+  align-self: center;
+  flex: none;
+  color: var(--ink-s);
+}
+.fase {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+  padding: var(--sp-2) var(--sp-3) calc(var(--sp-2) + 4px);
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.fase:hover,
+.fase[aria-expanded="true"] {
+  background: var(--bg);
+}
+.fase-balk {
+  position: absolute;
+  left: var(--sp-3);
+  right: var(--sp-3);
+  bottom: 4px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+.fase-balk > span {
+  display: block;
+  height: 100%;
+  background: var(--or);
+}
+.fase-cirkel {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-d);
+  border-radius: 50%;
+  background: #fff;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  color: var(--ink-s);
+}
+.fase--huidig .fase-cirkel {
+  border-color: var(--or);
+  color: var(--or);
+}
+.fase--klaar .fase-cirkel {
+  border-color: var(--or);
+  background: var(--or);
+  color: #fff;
+}
+.fase-tekst {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.fase-naam {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--ink);
+}
+.fase--huidig .fase-naam {
+  font-weight: 800;
+}
+.fase-telling {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.fasepaneel {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 2rem var(--sp-4);
+}
+.fasepaneel-inhoud {
+  display: grid;
+  grid-template-columns: 220px 1fr 240px;
+  gap: var(--sp-6);
+  padding: var(--sp-4) var(--sp-6);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.fasepaneel-kop {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+  font-size: var(--fs-16);
+  font-weight: 700;
+}
+.fasepaneel-stappen {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  font-size: var(--fs-14);
+}
+.fasepaneel-stappen li {
+  display: flex;
+  flex-direction: column;
+}
+.fasepaneel-stappen .stap-code {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.fasepaneel-leeg {
+  margin: 0;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.fasepaneel-volgende {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+}
+.fasepaneel-volgende .eyebrow {
+  margin: 0;
+}
+/* De strook in klein formaat (Meting-overzicht): Alleen cirkels en korte namen, zonder uitklappaneel. */
+.fasestrook-klein {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fasestrook-klein li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-14);
+  color: var(--ink-m);
+}
+.fasestrook-klein .fase--huidig {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+/* ---------- Schermen van het adviesverloop ---------- */
+.adv-pagina {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: var(--sp-6) 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+.adv-kop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-6);
+}
+.adv-kop .eyebrow {
+  margin: 0;
+}
+.adv-kop h1 {
+  margin: var(--sp-1) 0 0;
+}
+.adv-sub {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.adv-acties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.adv-rij {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid #efede8;
+}
+.adv-rij:last-child {
+  border-bottom: none;
+}
+.adv-rij-tekst {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.adv-rij-tekst .eyebrow {
+  margin: 0;
+}
+.adv-rij-naam {
+  font-size: var(--fs-18);
+  font-weight: 800;
+  color: var(--ink);
+}
+.adv-rij-feit {
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.adv-voet {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.klasse-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 var(--sp-3);
+  border-radius: 12px;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.adv-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--border-d);
+  border-radius: 12px;
+  background: #fff;
+  font-size: var(--fs-12);
+  color: var(--ink-m);
+}
+.adv-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.adv-usecase-icoon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--or-faint);
+  color: var(--or);
+  font-size: var(--fs-18);
+  font-weight: 800;
+}
+.adv-uitwerking-kop {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+}
+.adv-uitwerking-kop .score-ring-blok {
+  margin: 0;
+  flex: none;
+}
+.adv-uitwerking-tekst {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+.adv-uitwerking-tekst .eyebrow {
+  margin: 0;
+  color: var(--or);
+}
+.adv-uitwerking-tekst h2 {
+  margin: 0;
+  font-size: var(--fs-24);
+}
+.adv-feiten {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--fs-14);
+  color: var(--ink-s);
+}
+.adv-modal-deel {
+  margin: var(--sp-4) 0;
+}
+.adv-modal-deel h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-16);
+}
+.adv-modal-deel textarea {
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--border-d);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--fs-14);
+  resize: vertical;
+}
+.adv-modal-deel .adv-sub {
+  margin: 0 0 var(--sp-2);
+}
+.adv-kaartje {
+  padding: var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.adv-regel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid #efede8;
+  font-size: var(--fs-14);
+}
+.adv-regel:last-child {
+  border-bottom: none;
+}
+.adv-regel-tekst {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.adv-reden {
+  font-size: var(--fs-12);
+  color: var(--ink-s);
+}
+.adv-modalrij {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid #efede8;
+  font-size: var(--fs-14);
+}
+.adv-modalrij label {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex: 1;
+  min-width: 0;
+}
+.adv-modalrij--uit {
+  color: var(--ink-s);
+}
+.adv-modalrij input[type="text"] {
+  flex: 0 0 11rem;
+  height: 32px;
+}
+
+/* De modal Prompt klaarzetten: 760px breed, de inhoud scrolt (`adviesverloop.md`, Prompt klaarzetten). */
+.modal-box--prompt {
+  width: 760px;
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  padding: var(--sp-8);
+}

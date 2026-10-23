@@ -73,6 +73,19 @@ export function magDossierBewerken(
   return magOrganisatieToegang(gebruiker, organisatie);
 }
 
+/**
+ * `adviesverloop.bekijken`, `adviesverloop.bewerken` en `adviesverloop.verwijderen` (`datamodel-rollen.md`, Rechtenmatrix): Alle Organisaties voor een
+ * Admin, de eigen voor een Consultant. Een Lead en een Respondent zien het adviesverloop niet.
+ */
+export function magAdviesverloop(gebruiker: Gebruiker | null, organisatie: Pick<Organisatie, "aangemaaktDoor" | "toegewezenAan">): boolean {
+  return magOrganisatieToegang(gebruiker, organisatie);
+}
+
+/** `adviesverloop.catalogus`: De fasen, use cases, rollen en prompts beheren (`beheerpagina.md`, punt 17). Alleen een Admin. */
+export function magAdviescatalogusBeheren(gebruiker: Gebruiker | null): boolean {
+  return isAdmin(gebruiker);
+}
+
 /** De Afspraak "Mag als case gebruikt worden" (`dossier.md`, Rechten): Blijft bij een Admin, net als de andere twee Afspraken. */
 export function magCaseVlagZetten(gebruiker: Gebruiker | null): boolean {
   return isAdmin(gebruiker);

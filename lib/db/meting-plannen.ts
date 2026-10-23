@@ -1,6 +1,7 @@
 import { Organisatie, ScanUitvoering } from "../types";
 import { nieuwId } from "../id";
 import { zorgVoorOnderdeel } from "../onderdelen";
+import { adviesverloopVoorMeting } from "../advies";
 import { laadAlles, slaAlles } from "./store";
 import { logAudit, nieuweGroepId } from "../audit-store";
 import { metingContext } from "../audit-context";
@@ -110,6 +111,10 @@ export function wijzigMeting(metingId: string, wijziging: MetingWijziging): Resu
   let onderdeel = oud.onderdeel;
   if (wijziging.onderdeel !== undefined) {
     const od = zorgVoorOnderdeel(organisatie, wijziging.onderdeel);
+    // Een gekoppelde Meting hoort bij hetzelfde Onderdeel als het adviesverloop (`adviesverloop.md`, Metingen in het adviesverloop).
+    if ((od?.id ?? null) !== (meting.onderdeelId ?? null) && adviesverloopVoorMeting(organisatie, meting.id)) {
+      return { ok: false, reden: "Deze Meting hoort bij een adviesverloop van een ander onderdeel. Koppel haar eerst los." };
+    }
     meting.onderdeelId = od?.id ?? null;
     onderdeel = od?.naam ?? STANDAARD_ONDERDEEL;
   }

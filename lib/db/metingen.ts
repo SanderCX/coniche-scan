@@ -4,6 +4,8 @@ import { logAudit } from "../audit-store";
 import { metingContext } from "../audit-context";
 import { haalMetingenUitBenchmarks } from "../benchmark-store";
 import { isSamengesteld, samengesteldeMetingenMet } from "../metingen";
+import { blokkadeVerwijderenMeting } from "../advies";
+import type { Resultaat } from "./meting-plannen";
 
 /** Metingen (in de code `ScanUitvoering`): verwijderen en opzoeken. Plannen en wijzigen staan in `meting-plannen.ts`. */
 
@@ -11,13 +13,16 @@ import { isSamengesteld, samengesteldeMetingenMet } from "../metingen";
  * Meting verwijderen (datamodel.md, "Verwijderen en datakoppelingen"): de
  * meting en alle invullingen daarbinnen. Respondenten (en hun
  * toegangscode/andere invullingen) blijven bestaan — alleen deze ene
- * `ScanUitvoering` verdwijnt uit `organisatie.scanUitvoeringen`.
+ * `ScanUitvoering` verdwijnt uit `organisatie.scanUitvoeringen`. Is het de enige gekoppelde Meting van een adviesverloop, dan gebeurt er
+ * niets en staat de reden in het resultaat (`datamodel.md`, Verwijderen en datakoppelingen).
  */
-export function verwijderMeting(scanUitvoeringId: string): void {
+export function verwijderMeting(scanUitvoeringId: string): Resultaat {
   const alles = laadAlles();
   for (const organisatie of alles) {
     const index = organisatie.scanUitvoeringen.findIndex((s) => s.id === scanUitvoeringId);
     if (index === -1) continue;
+    const blokkade = blokkadeVerwijderenMeting(organisatie, scanUitvoeringId);
+    if (blokkade) return { ok: false, reden: blokkade };
     const [meting] = organisatie.scanUitvoeringen.splice(index, 1);
     // Een onderliggende Meting valt uit de samenstelling van een samengestelde Meting. Houdt ze er niets over, dan verdwijnt
     // ze zelf (`slaAlles`): Dat staat ook in het log (`benchmark.md`, Verwijderen van een onderliggende Meting).
@@ -43,8 +48,9 @@ export function verwijderMeting(scanUitvoeringId: string): void {
         details: { ...metingContext(organisatie, s), reden: "onderliggende Meting verwijderd" },
       })),
     ]);
-    return;
+    return { ok: true };
   }
+  return { ok: true };
 }
 
 export interface ScanUitvoeringContext {

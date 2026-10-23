@@ -4,6 +4,7 @@ import { logAudit } from "../audit-store";
 import { organisatieContext } from "../audit-context";
 import { standaardLabel } from "../metingen";
 import { controleerOnderdeelNaam, isHeleOrganisatie, metingenVanOnderdeel, nieuwOnderdeel, sleutelVan } from "../onderdelen";
+import { adviesverloopVanOnderdeel } from "../advies";
 import type { Resultaat } from "./meting-plannen";
 
 /**
@@ -80,7 +81,7 @@ export function verwijderGevolgenOnderdeel(organisatieId: string, onderdeelId: s
 }
 
 /**
- * Een Onderdeel verwijderen: Alleen als er geen Meting aan hangt. De KPI-waarden van het Onderdeel verdwijnen mee, de
+ * Een Onderdeel verwijderen: Alleen als er geen Meting en geen adviesverloop aan hangt. De KPI-waarden van het Onderdeel verdwijnen mee, de
  * bevestiging in het scherm noemt het aantal (`verwijderGevolgenOnderdeel`).
  */
 export function verwijderOnderdeel(organisatieId: string, onderdeelId: string): Resultaat<{ kpiWaarden: number }> {
@@ -92,6 +93,7 @@ export function verwijderOnderdeel(organisatieId: string, onderdeelId: string): 
   if (aantalMetingen > 0) {
     return { ok: false, reden: `Dit onderdeel heeft ${aantalMetingen} ${aantalMetingen === 1 ? "Meting" : "Metingen"}. Verwijder of wijzig die eerst.` };
   }
+  if (adviesverloopVanOnderdeel(organisatie, onderdeel.id)) return { ok: false, reden: "Dit onderdeel heeft een adviesverloop. Verwijder dat eerst." };
   const weg = (organisatie.kpiWaarden ?? []).filter((w) => w.onderdeelId === onderdeel.id).length;
   organisatie.onderdelen = (organisatie.onderdelen ?? []).filter((o) => o.id !== onderdeel.id);
   if (organisatie.kpiWaarden) organisatie.kpiWaarden = organisatie.kpiWaarden.filter((w) => w.onderdeelId !== onderdeel.id);
