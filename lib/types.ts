@@ -400,6 +400,8 @@ export interface Organisatie {
   contactpersonen?: Contactpersoon[];
   /** Het Dossier met Nieuws en Cases (`dossier.md`). Ontbreekt bij data van vóór dit veld, dan is het leeg en dicht. */
   dossier?: Dossier;
+  /** De adviesverlopen van deze Organisatie, hoogstens één lopend per Onderdeel (`adviesverloop.md`). Ontbreekt bij data van vóór dit veld. */
+  adviesverlopen?: Adviesverloop[];
   /**
    * Of deze Organisatie als Case bij een andere Organisatie mag voorkomen (`datamodel.md` deel 3, Uitbreiding op Organisatie, de Afspraak
    * "Mag als case gebruikt worden"). Standaard `false`.
@@ -698,4 +700,116 @@ export interface BenchmarkToewijzing {
   /** `Gebruiker.id` van de Admin. */
   toegewezenDoor: string;
   toegewezenOp: string;
+}
+
+
+/* ---------- Adviesverloop (`adviesverloop.md`, `datamodel.md`, Adviesverloop) ---------- */
+
+/** Een van de zes fasen van het adviesproces. Data die een Admin beheert (`beheerpagina.md`, punt 17). */
+export interface AdviesFase {
+  /** "1" tot en met "6". */
+  id: string;
+  volgorde: number;
+  /** Bijvoorbeeld "Oplossen & Ontwerpen". */
+  naam: string;
+  /** Bijvoorbeeld "Oplossen". */
+  korteNaam: string;
+  omschrijving: string;
+}
+
+/** De positie van de Consultant bij een klant: Consultant, Salesmanager of Teamleider (interim). */
+export interface AdviesRol {
+  /** "consultant", "salesmanager", "teamleider", uitbreidbaar. */
+  id: string;
+  naam: string;
+  /** De vooringevulde tekst bij "Wie ben jij bij deze klant", maximaal 600 tekens. */
+  standaardTekst: string;
+  volgorde: number;
+}
+
+export interface UseCasePrompt {
+  rolId: string;
+  /** De situatie van de rol bij deze use case. */
+  context: string;
+  /** De vraag aan Copilot. */
+  prompt: string;
+}
+
+/** Een taak binnen een fase, met per rol een prompt voor Copilot. */
+export interface UseCase {
+  /** De code, bijvoorbeeld "4-1". */
+  id: string;
+  faseId: string;
+  titel: string;
+  omschrijving: string;
+  /** Appcodes: "copilot", "word", "excel", "ppt", "outlook", "teams", "onenote" of "studio". */
+  apps: string[];
+  /** Telt mee als stap in de fasestrook. */
+  inStrook: boolean;
+  volgorde: number;
+  /** Voorgesteld bij deze bouwstenen (`Bouwsteen.id`), mag leeg zijn. */
+  bouwsteenIds: string[];
+  /** Voorgesteld bij een klasse: "basis", "uitbouwen" of "sterk", mag leeg zijn. */
+  klassen: string[];
+  prompts: UseCasePrompt[];
+  /** Verborgen use cases verschijnen niet bij de Consultant (een use case waar een Adviesstap naar verwijst, kan niet worden verwijderd). */
+  verborgen?: boolean;
+}
+
+export interface AdviesCatalogus {
+  fasen: AdviesFase[];
+  rollen: AdviesRol[];
+  useCases: UseCase[];
+}
+
+export type AdviesstapStatus = "promptGekopieerd" | "gedaan";
+
+/** Een use case die in een adviesverloop is opgepakt. */
+export interface Adviesstap {
+  id: string;
+  adviesverloopId: string;
+  useCaseId: string;
+  status: AdviesstapStatus;
+  /** De bouwsteen waarvoor de stap is gedaan, `null` als de stap niet bij één bouwsteen hoort. */
+  bouwsteenId: string | null;
+  /** Een webadres (http of https) naar het document buiten de app, mag leeg zijn. */
+  link: string;
+  /** De Meting waarvan de scores in het contextblok zaten, `null` als die Meting is verwijderd. */
+  metingId: string | null;
+  gedaanOp: string;
+  /** `Gebruiker.id`. */
+  gedaanDoor: string;
+}
+
+/** Een Meting die bij een adviesverloop hoort (`datamodel.md`, AdviesverloopMeting). Een Meting hoort bij hoogstens één adviesverloop. */
+export interface AdviesverloopMeting {
+  adviesverloopId: string;
+  metingId: string;
+  /** Een vrije aanduiding zoals "Nulmeting", "Tussenmeting" of "Eindmeting", maximaal 40 tekens. */
+  label: string | null;
+  gekoppeldOp: string;
+  gekoppeldDoor: string;
+}
+
+/** Het adviesverloop van een Organisatie of een Onderdeel daarvan, met Metingen als bron van de scores. */
+export interface Adviesverloop {
+  id: string;
+  organisatieId: string;
+  /** `null` is de hele Organisatie. */
+  onderdeelId: string | null;
+  status: "lopend" | "afgerond";
+  afgerondOp: string | null;
+  /** De Meting waarmee het adviesverloop is geopend. */
+  startMetingId: string;
+  /** De Meting waarvan de scores de shortlist bepalen, `null` is de meest recente gekoppelde Meting met afgeronde scans. */
+  peilMetingId: string | null;
+  aangemaaktDoor: string;
+  aangemaaktOp: string;
+  /** Door de Consultant aan de shortlist toegevoegde bouwstenen. De laagste scores staan er altijd in en worden niet opgeslagen. */
+  extraBouwsteenIds: string[];
+  rolId: string;
+  /** De tekst bij "Wie ben jij bij deze klant", maximaal 600 tekens. */
+  rolTekst: string;
+  metingen: AdviesverloopMeting[];
+  stappen: Adviesstap[];
 }

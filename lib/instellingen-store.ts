@@ -62,6 +62,8 @@ export interface Instellingen {
   korteNamen: KorteNamen;
   /** De KPI's en op welke plekken ze een waarde mogen hebben (`datamodel.md`, KPI's en kanalen). Beheerd door een Admin. */
   kpiDefinities: KpiDefinitie[];
+  /** Hoeveel bouwstenen met de laagste score standaard in de shortlist van een adviesverloop staan (`adviesverloop.md`, Standaard). Startwaarde 3. */
+  shortlistAantal: number;
   /** Toont de testknop in de vragenlijst voor een ingelogde Admin of Consultant (`beheerpagina.md`, Schakelaar Testknop). Standaard uit. */
   testknopAan: boolean;
   /** De KPI CES is aan de opgeslagen lijst toegevoegd (eenmalig): Een Admin die hem verwijdert, krijgt hem niet opnieuw. */
@@ -83,6 +85,7 @@ const STANDAARDWAARDEN: Instellingen = {
   verkennenMaxGroepen: 12,
   verkennenMinIngevuldPct: 40,
   ...SPREIDING_STANDAARDWAARDEN,
+  shortlistAantal: 3,
   testknopAan: false,
   korteNamen: { velden: {}, waarden: [] },
   kpiDefinities: STANDAARD_KPIS,

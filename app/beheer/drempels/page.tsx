@@ -83,6 +83,8 @@ export default function DrempelsEnTermijnenPage() {
   const [minRespondentenInput, setMinRespondentenInput] = useState<string | null>(null);
   const [maxDagenInput, setMaxDagenInput] = useState<string | null>(null);
   const [benchmarkOpgeslagen, setBenchmarkOpgeslagen] = useState(false);
+  const [shortlistInput, setShortlistInput] = useState<string | null>(null);
+  const [shortlistOpgeslagen, setShortlistOpgeslagen] = useState(false);
   const [verkennenInput, setVerkennenInput] = useState<Record<string, string>>({});
   const [verkennenOpgeslagen, setVerkennenOpgeslagen] = useState(false);
   const [spreidingInput, setSpreidingInput] = useState<Partial<Record<SpreidingSleutel, string>>>({});
@@ -121,6 +123,19 @@ export default function DrempelsEnTermijnenPage() {
     setMaxDagenInput(null);
     setBenchmarkOpgeslagen(true);
     setTimeout(() => setBenchmarkOpgeslagen(false), 1600);
+  }
+
+  // Het aantal bouwstenen in de shortlist van een adviesverloop (`beheerpagina.md`, punt 10): Een geheel getal van minstens 1.
+  const shortlist = shortlistInput ?? String(instellingen.shortlistAantal);
+  const shortlistGeldig = shortlist.trim() !== "" && Number.isInteger(Number(shortlist)) && Number(shortlist) >= 1;
+
+  function handleShortlistOpslaan(e: React.FormEvent) {
+    e.preventDefault();
+    if (!shortlistGeldig) return;
+    zetInstellingen({ shortlistAantal: Number(shortlist) });
+    setShortlistInput(null);
+    setShortlistOpgeslagen(true);
+    setTimeout(() => setShortlistOpgeslagen(false), 1600);
   }
 
   // De vijf grenzen van Verkennen (`visualisatie-verkennen.md`, Drempels): Gehele getallen van minstens 1, het percentage tot en met 100.
@@ -232,6 +247,20 @@ export default function DrempelsEnTermijnenPage() {
           </button>
           <InfoIcoon naastVeld sleutel="info.benchmarkInstellingen" />
           {benchmarkOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
+        </span>
+      </form>
+
+      <h2 style={{ marginTop: "2rem" }}>Adviesverloop</h2>
+      <form onSubmit={handleShortlistOpslaan} className="flex flex-wrap items-end gap-3">
+        <div className="admin-field" style={{ marginBottom: 0, maxWidth: "16rem", minWidth: 0 }}>
+          <label htmlFor="shortlist-aantal">Bouwstenen in de shortlist</label>
+          <input id="shortlist-aantal" type="number" min={1} step={1} value={shortlist} onChange={(e) => setShortlistInput(e.target.value)} />
+        </div>
+        <span className="knop-met-icoon">
+          <button type="submit" className="btn btn-or btn-compact" disabled={!shortlistGeldig}>
+            Opslaan
+          </button>
+          {shortlistOpgeslagen && <span className="text-sm text-ink-m">Opgeslagen ✓</span>}
         </span>
       </form>
 

@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "adviescatalogus": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/bouw-adviescatalogus.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

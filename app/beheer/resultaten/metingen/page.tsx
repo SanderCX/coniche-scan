@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useOrganisaties } from "@/lib/db";
 import { useAssessments } from "@/lib/assessment-store";
+import { useAdviesCatalogus } from "@/lib/advies-catalogus-store";
+import { adviesverloopVoorMeting, faseRegel } from "@/lib/advies";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
 import { zichtbareOrganisaties } from "@/lib/rechten";
 import { useBulkSelect } from "@/lib/useBulkSelect";
@@ -17,7 +19,7 @@ import { IndeterminateCheckbox } from "@/components/beheer/IndeterminateCheckbox
 import { BulkToolbar } from "@/components/beheer/BulkToolbar";
 import { ScansSamenbrengenModal } from "@/components/beheer/ScansSamenbrengenModal";
 
-type Kolom = "organisatie" | "meting" | "onderdeel" | "assessment" | "meetdatum" | "scans";
+type Kolom = "organisatie" | "meting" | "onderdeel" | "assessment" | "meetdatum" | "scans" | "adviesverloop";
 
 interface Rij {
   metingId: string;
@@ -32,6 +34,8 @@ interface Rij {
   totaal: number;
   /** `JJJJ-MM-DD`, of een lege tekst bij een Meting zonder meetdatum. */
   meetdatum: string;
+  /** De huidige fase en voortgang van het adviesverloop waar de Meting bij hoort ("Oplossen · 0 van 4"), of een lege tekst. */
+  adviesverloop: string;
 }
 
 const KOLOMMEN: { key: Kolom; label: string }[] = [
@@ -41,6 +45,7 @@ const KOLOMMEN: { key: Kolom; label: string }[] = [
   { key: "assessment", label: "Assessment" },
   { key: "meetdatum", label: "Meetdatum" },
   { key: "scans", label: "Afgeronde scans" },
+  { key: "adviesverloop", label: "Adviesverloop" },
 ];
 
 /**
@@ -54,6 +59,7 @@ function MetingenInhoud() {
   const ingelogd = useIngelogdeGebruiker();
   const organisaties = zichtbareOrganisaties(ingelogd, useOrganisaties());
   const assessments = useAssessments();
+  const catalogus = useAdviesCatalogus();
   const { get, set } = useUrlParams();
   const router = useRouter();
 
@@ -82,10 +88,14 @@ function MetingenInhoud() {
             samengesteld,
             afgerond: samengesteld ? 0 : m.invullingen.filter((i) => i.status === "afgerond").length,
             totaal: samengesteld ? 0 : m.invullingen.length,
+            adviesverloop: (() => {
+              const av = adviesverloopVoorMeting(org, m.id);
+              return av ? (faseRegel(catalogus, av) ?? "Geen stappen") : "";
+            })(),
           };
         })
       ),
-    [organisaties, assessments]
+    [organisaties, assessments, catalogus]
   );
 
   const gefilterd = rijen.filter(
@@ -259,6 +269,7 @@ function MetingenInhoud() {
                       <td>{r.assessment}</td>
                       <td className={r.meetdatum === "" ? "text-ink-s" : undefined}>{r.meetdatum === "" ? DATUM_ONTBREEKT : toonMeetdatum(r.meetdatum)}</td>
                       <td>{r.samengesteld ? "" : `${r.afgerond} van ${r.totaal}`}</td>
+                      <td className={r.adviesverloop === "" ? "text-ink-s" : undefined}>{r.adviesverloop}</td>
                       <td className="cel-knop">
                         <Link
                           href={metVia(`/beheer/metingen/${r.metingId}`, true)}

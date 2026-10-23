@@ -838,3 +838,10 @@ In de interface heet het overal Bouwsteen (besloten door Sander op 22 oktober 20
 - **Testknop**: `testknopAan` in de instellingen (standaard uit); het vak in de vragenlijst staat alleen aan voor een ingelogde Admin of Consultant.
 - **Kleur van nummers**: `tekstOpKleur` geeft alleen op geel `--ink`. Tekst of een dunne lijn in de kleur zelf (`lijnKleur`) blijft bij turkoois, lavendel en geel `--ink`.
 
+
+## 23 oktober 2026: Het adviesverloop
+
+- **Opslag**: `Organisatie.adviesverlopen` met de gekoppelde Metingen en de stappen ingebed; de Adviescatalogus (`lib/advies-catalogus-store.ts`) is een eigen store met serversleutel `adviescatalogus` en beginwaarde `data/advies-catalogus.ts`, gegenereerd uit `content-adviesverloop.md` met `npm run adviescatalogus`.
+- **Regels**: `lib/advies.ts` (zuiver) en `lib/db/advies.ts` (opslag en audit). `ruimAdviesverlopenOp` draait in `slaAlles`.
+- **Schermen**: `components/adviesverloop/` (Fasestrook, ShortlistScherm, UitwerkingScherm, PromptModal, MetingenModals, `useAdviesData`), de pagina onder `/beheer/organisaties/{id}/adviesverloop/{id}`, `AdviesverloopBlok` en `AdviesverloopKaart` in `components/beheer/`, en `AdviescatalogusBeheer` onder `/beheer/adviescatalogus`. Opmaak in `app/styles/adviesverloop.css`.
+- **Niet gebouwd**: De koppeling met Copilot en SharePoint (`copilot-koppeling.md`).

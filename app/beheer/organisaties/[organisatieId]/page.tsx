@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useOrganisatie, updateOrganisatie } from "@/lib/db";
 import { OrganisatiePaneel } from "@/components/beheer/OrganisatiePaneel";
 import { DossierKaart } from "@/components/beheer/DossierKaart";
+import { AdviesverloopBlok } from "@/components/beheer/AdviesverloopBlok";
 import { Kruimelpad } from "@/components/beheer/Kruimelpad";
 import { RespondentStatusBadge } from "@/components/beheer/overzicht-helpers";
 import { useIngelogdeGebruiker } from "@/lib/admin-auth";
@@ -68,6 +69,8 @@ function OrganisatieDetailInhoud({ organisatieId }: { organisatieId: string }) {
       {/* Elke sectie staat op een eigen witte kaart, in deze volgorde (`beheerpagina.md`, Eén kaart per sectie; `stylesheet.md`, Sectiekaart). */}
       <div className="org-kaarten">
         <OrganisatiePaneel organisatie={organisatie} gebruikers={alleGebruikers} onOpslaan={handleKenmerkenOpslaan} />
+        {/* Het adviesverloop (`adviesverloop.md`): Alleen voor wie `adviesverloop.bekijken` heeft. */}
+        <AdviesverloopBlok organisatie={organisatie} />
         {/* Het Dossier (`dossier.md`): Voor een Admin en voor een Consultant met toegang. */}
         <DossierKaart organisatie={organisatie} />
         <MetingenSectie organisatie={organisatie} />

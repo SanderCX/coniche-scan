@@ -5,8 +5,8 @@ volgorde: 2
 rollen: [Admin]
 afbeelding: 
 film: 
-bronnen: [beheerpagina.md, datamodel.md, visualisatie-scores.md, visualisatie-verkennen.md]
-bijgewerkt: 2026-10-22
+bronnen: [beheerpagina.md, datamodel.md, visualisatie-scores.md, visualisatie-verkennen.md, adviesverloop.md]
+bijgewerkt: 2026-10-23
 ---
 Hier stel je de grenzen in die bepalen wanneer iets zichtbaar is, hoe lang gegevens bewaard blijven, wanneer de spreiding Eensgezind, Wisselend of Verdeeld heet en wanneer Verkennen een groep toestaat.
 
@@ -21,6 +21,7 @@ De waarden gelden voor de hele omgeving. Een wijziging werkt door vanaf het volg
 5. **Spreiding.** Vier grenzen voor het label bij de spreiding: Vanaf welke standaardafwijking het label Wisselend is en vanaf welke Verdeeld, voor de schaalscans (beginwaarden 0,55 en 0,8) en voor de Quickscan in procentpunten (14 en 20). Je typt een getal met een komma. De grens voor Verdeeld moet boven die voor Wisselend liggen.
 6. **Testknop in de vragenlijst.** Een schakelaar, standaard uit. Staat hij aan, dan ziet een ingelogde Admin of Consultant bovenaan een vragenlijst een knop om de vragenlijst automatisch in te vullen, om te testen. Een Respondent of Lead ziet de knop nooit. Zet hem uit in productie. Wijzigen staat in de audit-log.
 7. **Verkennen.** Vijf grenzen voor groepen, vergelijkingen, de pool, het aantal waarden per kenmerk en hoe vaak een kenmerk ingevuld moet zijn.
+8. **Adviesverloop.** Het aantal bouwstenen met de laagste score dat standaard in de shortlist van een adviesverloop staat (beginwaarde 3).
 
 ## Let op
 Een nieuwe grens voor de spreiding geldt direct, voor alle Metingen. Verlaag je een grens, dan kunnen resultaten voor een Lead eerder zichtbaar worden. Ga daar bewust mee om, want een kleine groep maakt individuele antwoorden herleidbaar.

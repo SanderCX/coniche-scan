@@ -327,6 +327,37 @@ export const INFO_TEKSTEN: InfoTekstDefinitie[] = [
     plek: "Meting-overzicht en de lijsten onder Resultaten, achter de uitgeschakelde opties \"Als PDF\" en \"Voor InDesign (XML)\"",
     tekst: "Beschikbaar bij precies één scan.",
   },
+  {
+    sleutel: "info.adviesverloopStarten",
+    plek: "Meting-overzicht, kaart Adviesverloop, naast de uitgeschakelde knoppen",
+    tekst: "Een adviesverloop begint bij een Meting met minstens één afgeronde scan, van een scan met een schaal van 1 tot 5.",
+  },
+  {
+    sleutel: "info.adviesverloopStappen",
+    plek: "Pagina Adviesverloop, fasestrook, naast de titel van het paneel",
+    tekst: "De zes fasen van het adviesproces. De scan is het startpunt. Klik op een fase om te zien wat je al gedaan hebt en wat de volgende stap is.",
+  },
+  {
+    sleutel: "info.adviesverloopShortlist",
+    plek: "Pagina Adviesverloop, kaart Shortlist voor het gesprek, naast de titel",
+    tekst:
+      "De shortlist begint met de bouwstenen met de laagste score. Voeg er een toe als je een open deur wilt meenemen: Een bouwsteen die goed scoort, maar waar de klant graag over praat of waar een snelle winst ligt. Houd de lijst kort.",
+  },
+  {
+    sleutel: "info.adviesverloopUsecases",
+    plek: "Uitwerking per bouwsteen, kaart van de huidige fase, naast de titel",
+    tekst: "Bij elke use case zet de app een prompt voor Copilot klaar. De uitkomst van de Meting vormt de context, jij kijkt het na voor je kopieert.",
+  },
+  {
+    sleutel: "info.adviesverloopRol",
+    plek: "Prompt klaarzetten, deel Wie ben jij bij deze klant",
+    tekst: "Beschrijf in je eigen woorden wie je bent bij deze klant: Wie je kent, hoe je samenwerkt en wat je kunt doen. Copilot past de aanpak daarop aan.",
+  },
+  {
+    sleutel: "info.adviesverloopContext",
+    plek: "Prompt klaarzetten, deel Waar werk je aan",
+    tekst: "Dit zijn gegevens op groepsniveau uit de Meting. Antwoorden per persoon, namen en groepen die te klein zijn gaan niet mee. Pas aan wat niet klopt.",
+  },
 ];
 
 export function standaardInfoTekst(sleutel: string): string {
