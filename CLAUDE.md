@@ -50,6 +50,8 @@ De specificatie van de Coniche Scan-app. Dit bestand bevat de uitgangspunten, de
 | `visualisatie-mijn-metingen.md` | Opmaak van Mijn metingen voor Respondent en Lead: Kaarten, statussen, teaser van de uitkomst, respons, benchmarkkaart |
 | `visualisatie-verkennen.md` | Admin-scherm Verkennen onder Resultaten: Filteren, groeperen en vergelijken van alle Organisaties van één Assessment, met vier weergaven |
 | `benchmark.md` | Benchmark op drie niveaus: Tussen organisaties (geaggregeerd en anoniem, met een view per organisatie voor een Lead), binnen een organisatie tussen Metingen, en binnen een Meting |
+| `adviesverloop.md` | Het adviesverloop van een Meting voor een Consultant en een Admin: De fasestrook met de scan als startpunt, de shortlist van bouwstenen, de uitwerking per bouwsteen, Prompt klaarzetten voor Copilot en het vastleggen van gedane stappen |
+| `copilot-koppeling.md` | Architectuur en stappenplan voor Copilot en SharePoint: Componenten met wat de specs vastleggen en wat open staat, en de stappen naar een Copilot-agent |
 | `dossier.md` | Het Dossier van een Organisatie: Nieuws, Cases, Events en Blogs die een Consultant samenstelt en openzet voor de Lead, met koppeling aan bouwstenen, de radar met filter en de verdeling (Basis op orde, Uitbouwen, Sterk punt) met de rail "In dit dossier", de Afspraak "Mag als case gebruikt worden" en de rechten |
 
 **Export en import**
@@ -118,12 +120,13 @@ Wat gebouwd is, per onderdeel. De spec van het onderdeel beschrijft hoe het moet
 | Aggregatie over meerdere respondenten | Deels gebouwd | `visualisatie-scores.md` | Het gemiddelde per Meting is gebouwd; afwijking en spreiding zijn ontworpen |
 | Dossier | Gebouwd | `dossier.md` | Niet in exports en import |
 | Contactpersonen | Gebouwd | `datamodel.md`, `beheerpagina.md` | Alleen een Admin wijzigt ze |
-| KPI's per plek en kanaal | Gebouwd, spec gewijzigd | `datamodel.md`, `beheerpagina.md`, `dossier.md` | Invoer en definities zijn gebouwd. De weergave verandert: ringen in het organisatiepaneel in plaats van de tabel, zie `backlog.md` (KPI-ringen en KPI's in beheer) |
+| KPI's per plek en kanaal | Gebouwd | `datamodel.md`, `beheerpagina.md`, `dossier.md` | Ringen in het organisatiepaneel in plaats van de tabel (gebouwd op 22 oktober, zie `bouwnotities.md`) |
 | Mijn metingen | Gebouwd | `visualisatie-mijn-metingen.md` | Inclusief de kaart met cirkel |
 | Opmaak (lettergroottes, pil, scorekleur, balklijst, resultaatkop, radar en staafdiagram) | Gebouwd | `stylesheet.md` | De PDF-export valt er niet onder |
 | Help | Gebouwd | `help.md` | De inhoud wacht op beoordeling door Joost |
 | Quickscan Ziekenhuis | Deels gebouwd | `content-ziekenhuis-quickscan.md`, `visualisatie-quickscan.md` | Doorloopflow, resultaat en visualisaties zijn gebouwd; PDF, CSV, InDesign, import, vergelijking tussen Metingen en benchmark binnen een organisatie of Meting volgen (`backlog.md`) |
 | Spanningsmeter | Ontworpen, niet gebouwd | `content-spanningsmeter.md`, `visualisatie-spanningsmeter.md` | Open: De validatie van de vragen en de verificatie van de teksten |
+| Adviesverloop | Ontworpen, niet gebouwd | `adviesverloop.md`, `copilot-koppeling.md` | Open: Per Meting of per Organisatie, de plek van de catalogus en de minimale groepsgrootte voor het contextblok |
 | AI-managementsamenvatting | Uitgesteld | `backlog.md` | |
 | Adoptiescan | Niet gestart | | |
 
@@ -140,6 +143,8 @@ In de interface en in alle specs gelden deze termen. In de code heten sommige ty
 | **Ingevulde scan** | Eén invulling door één Respondent binnen één Meting | |
 | **Onderdeel** | Een deel van een Organisatie met een eigen naam en eigen KPI-waarden | Afdeling, rolgroep |
 | **Bouwsteen** | Een van de 15 bouwstenen van de Klantcontact Volwassenheidsscan | Bouwblok |
+| **Adviesverloop** | De voortgang van één Meting door de zes fasen van het adviesproces, met een shortlist van bouwstenen en de gedane stappen. Alleen voor een Admin en een Consultant | |
+| **Use case** | Een taak binnen een fase van het adviesverloop, met per rol een prompt voor Copilot | |
 | **Spanningsveld** | Een van de zes velden van de Spanningsmeter. In de code een bouwsteen; in de interface nooit "bouwsteen" | |
 
 ## Assessments en functies

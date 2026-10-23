@@ -762,7 +762,7 @@ verwijst wat niet meer bestaat.
   blijven bestaan.
 - **Respondent**: De respondent, zijn toegangscode en al zijn
   invullingen.
-- **Meting**: De meting en alle invullingen daarbinnen. Respondenten
+- **Meting**: De meting en alle invullingen daarbinnen, en het Adviesverloop van de Meting met zijn Adviesstappen. Respondenten
   en het Onderdeel van de Meting blijven bestaan.
 - **Onderdeel**: Alleen als er geen Meting
   aan hangt. De KPI-waarden van het Onderdeel verdwijnen mee, en de
@@ -772,7 +772,7 @@ verwijst wat niet meer bestaat.
   waarden en het aantal Organisaties.
 - **Organisatie**: Alles wat eronder hangt: Metingen, respondenten,
   toegangscodes, invullingen, antwoorden en opmerkingen, en Onderdelen en KPI-waarden, en
-  Contactpersonen en het Dossier. Het
+  Contactpersonen, het Dossier en de Adviesverlopen. Het
   assessment-type en de content blijven staan.
 - **Organisatie die in een Case voorkomt**:
   De Cases bij andere Organisaties die naar haar verwijzen krijgen
@@ -1082,6 +1082,76 @@ KpiWaarde {
   van 0.
 - Het verwijderen van een KPI-definitie en het hernoemen van een kanaal staan
   niet in het design (`beheerpagina.md`, punt 3, KPI's en kanalen).
+
+---
+
+### Adviesverloop
+
+Het adviesverloop van een Meting (`adviesverloop.md`): De voortgang door de zes fasen, de shortlist en de gedane stappen. De fasen, use cases en rollen zijn data die een Admin beheert (`beheerpagina.md`, punt 17).
+
+```
+Fase {
+  id: string                       // "1" tot en met "6"
+  volgorde: number
+  naam: string                     // bijvoorbeeld "Oplossen & Ontwerpen"
+  korteNaam: string                // bijvoorbeeld "Oplossen"
+}
+
+AdviesRol {
+  id: string                       // "consultant" | "salesmanager" | "teamleider", uitbreidbaar
+  naam: string                     // "Consultant", "Salesmanager", "Teamleider (interim)"
+  standaardTekst: string           // de vooringevulde tekst bij Wie ben jij bij deze klant, maximaal 600 tekens
+  volgorde: number
+}
+
+UseCase {
+  id: string                       // code, bijvoorbeeld "4-1"
+  faseId: string
+  titel: string                    // verplicht, maximaal 120 tekens
+  omschrijving: string             // maximaal 400 tekens
+  apps: string[]                   // "copilot" | "word" | "excel" | "powerpoint"
+  inStrook: boolean                // telt mee als stap in de fasestrook, standaard false
+  volgorde: number
+  bouwsteenIds: string[]           // voorgesteld bij deze bouwstenen, mag leeg zijn
+  klassen: string[]                // voorgesteld bij een klasse: "basis" | "uitbouwen" | "sterk", mag leeg zijn
+  prompts: UseCasePrompt[]         // hoogstens één per rol
+}
+
+UseCasePrompt {
+  rolId: string                    // AdviesRol.id
+  context: string                  // beschrijft de situatie van de rol bij deze use case
+  prompt: string                   // de vraag aan Copilot
+}
+
+Adviesverloop {
+  id: string
+  metingId: string                 // hoogstens één Adviesverloop per Meting
+  aangemaaktDoor: string           // Gebruiker.id
+  aangemaaktOp: datetime
+  extraBouwsteenIds: string[]      // door de Consultant aan de shortlist toegevoegd
+  rolId: string                    // gekozen AdviesRol
+  rolTekst: string                 // de tekst bij Wie ben jij bij deze klant, maximaal 600 tekens
+  vorigAdviesverloopId: string | null  // bij een herhaalmeting
+}
+
+Adviesstap {
+  id: string
+  adviesverloopId: string
+  useCaseId: string
+  status: "promptGekopieerd" | "gedaan"
+  bouwsteenId: string | null       // de bouwsteen waarvoor de stap is gedaan
+  link: string                     // http of https, mag leeg zijn
+  gedaanOp: datetime
+  gedaanDoor: string               // Gebruiker.id
+}
+```
+
+- **Shortlist.** De bouwstenen op de shortlist zijn de `shortlistAantal` bouwstenen met de laagste score (`Instellingen`, Drempels en termijnen) plus `extraBouwsteenIds`. De eerste groep wordt altijd afgeleid uit de scores van de Meting en niet opgeslagen. Een score die verandert, verandert dus de shortlist.
+- **Een stap telt als gedaan** bij de statussen `promptGekopieerd` en `gedaan`. Terugzetten naar open verwijdert de `Adviesstap`.
+- **Huidige fase** is de eerste fase met een `UseCase` met `inStrook` waarvoor nog geen `Adviesstap` bestaat. Dit wordt afgeleid, er is geen veld voor.
+- **Eén Adviesverloop per Meting**, aangemaakt bij het eerste openen. Een Meting zonder afgeronde scans heeft er geen.
+- **Wat niet wordt opgeslagen.** De inhoud van de prompt en het contextblok. Alleen de `Adviesstap` en een eventuele link.
+- **Content en rechten.** `Fase`, `AdviesRol` en `UseCase` volgen de regels van Content bewerken: Alleen een Admin beheert ze.
 
 ---
 

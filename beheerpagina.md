@@ -10,9 +10,9 @@ De nummers (punt 1 tot en met 15) zijn de nummers waarmee andere specs naar een 
 |---|---|
 | Algemeen | Toegang, Vormgeving, Accountmenu, Navigatie in beheer |
 | Instellingen (Admin) | 9 Gebruikers, 10 Drempels en termijnen, 2a Algemene teksten, 11 Content-pagina's, 12 Audit-log, 13 Data-integriteit |
-| Assessments (Admin) | 1 Assessment-types, 2 Content |
+| Assessments (Admin) | 1 Assessment-types, 2 Content, 17 Adviescatalogus |
 | Organisaties | 3 Organisatievelden, 4 Organisaties, 5 Metingen, 6 Respondenten uitnodigen, 6a Leads: Toegang per weergave, 6b Respondenten, 8 Import van historische scans |
-| Resultaten | 7 Resultaten, 14 Benchmarks, 15 Verkennen |
+| Resultaten | 7 Resultaten, 14 Benchmarks, 15 Verkennen, 16 Adviesverloop |
 | Afsluitend | Verwijderen, Ter overweging, Open punten |
 
 ## Toegang
@@ -135,7 +135,7 @@ Er is geen "Terug"-knop in de nav. Wel zijn er de hulpmiddelen hieronder.
   met de onderdelen van de gekozen hoofdlink. Bij Organisaties zijn dat
   Organisaties en Respondenten, voor een Admin aangevuld met
   Organisatievelden. Bij Resultaten zijn dat Metingen en, voor een
-  Admin, Benchmarks en Verkennen (punt 7 en 15). Bij Instellingen zijn
+  Admin, Benchmarks en Verkennen (punt 7 en 15). Bij Assessments komt daar voor een Admin de tab Adviescatalogus bij (punt 17). Bij Instellingen zijn
   dat Gebruikers, Drempels en termijnen, Algemene teksten, Content-pagina's,
   Audit-log en Data-integriteit. De tabbalk is zichtbaar op de
   lijstpagina's, niet op een detailpagina. Metingen en uitnodigen hebben
@@ -230,9 +230,9 @@ onderdelen (2a, 11 en 12). Benchmark is nummer 14.
 | Link | Onderdelen |
 |---|---|
 | **Instellingen** (Admin-only, via het Accountmenu) | 9. Gebruikers, 10. Drempels en termijnen, 2a. Algemene teksten, 11. Content-pagina's, 12. Audit-log, 13. Data-integriteit |
-| **Assessments** (Admin-only) | 1. Assessment-types, 2. Content |
+| **Assessments** (Admin-only) | 1. Assessment-types, 2. Content, 17. Adviescatalogus |
 | **Organisaties** (Admin: Alle, Consultant: Eigen) | 3. Organisatievelden, 4. Organisaties, 5. Metingen, 6. Respondenten uitnodigen, 6a. Leads (toegang per weergave, Admin-only), 6b. Respondenten, 8. Import (knop in het organisatie-detail, alleen voor een Admin) |
-| **Resultaten** (Admin: Alle, Consultant: Eigen) | 7. Resultaten (tab Metingen), 14. Benchmarks (tab, Admin-only) |
+| **Resultaten** (Admin: Alle, Consultant: Eigen) | 7. Resultaten (tab Metingen), 14. Benchmarks (tab, Admin-only), 16. Adviesverloop (kolom in Metingen en kaart in het Meting-overzicht) |
 
 ### Instellingen (Admin-only)
 
@@ -292,6 +292,7 @@ het Accountmenu.
 Heette eerder Instellingen. Die naam is nu van het hoofdonderdeel hierboven.
 Klein, groeit later mee. Waarden die een Admin hier instelt:
 
+- **Aantal bouwstenen in de shortlist** (`shortlistAantal`, `adviesverloop.md`): Hoeveel bouwstenen met de laagste score standaard in de shortlist van een adviesverloop staan, **default 3**. Eén getal voor de hele omgeving.
 - **Sessieduur respondenten/Leads** (`sessieDuurUren`, `datamodel.md`
   deel 2, Toegang voor respondenten): Hoe lang een `ToegangsSessie`
   geldig blijft na een geslaagde verificatie, **default 4 uur**. Eén
@@ -449,6 +450,11 @@ standaardteksten zoals ze nu in de app staan):
 | `info.verkennenOpslaan` | Verkennen, naast de knop Opslaan als benchmark | Je slaat de filters op en niet de uitkomst. De groep volgt de filters: Komt er een Organisatie bij die erbij past, dan telt die mee. Daarna wijs je de benchmark toe aan een Lead van een Organisatie die erin zit, in het Leads-venster van die Organisatie. |
 | `info.korteNamen` | Organisatievelden, tab Korte namen, naast de titel, en in de modal Korte namen in Verkennen | Een korte naam staat op de chips en in de grafieken van Verkennen. De Organisatie houdt de originele waarde, ook in de exports. Laat je het veld leeg, dan geldt het origineel. |
 | `info.contactpersonen` | Organisatie-detail, bij Kenmerken, naast de kop Contactpersonen | Mensen bij de organisatie die voor Coniche relevant zijn, met hun functie en het LinkedIn-profiel. Het zijn geen Respondenten en ze krijgen niets toegestuurd. Een Admin beheert ze, een Consultant met toegang tot deze organisatie ziet ze. |
+| `info.adviesverloopStappen` | Pagina Adviesverloop, fasestrook, naast de titel van het paneel | De zes fasen van het adviesproces. De scan is het startpunt. Klik op een fase om te zien wat je al gedaan hebt en wat de volgende stap is. |
+| `info.adviesverloopShortlist` | Pagina Adviesverloop, kaart Shortlist voor het gesprek, naast de titel | De shortlist begint met de bouwstenen met de laagste score. Voeg er een toe als je een open deur wilt meenemen: Een bouwsteen die goed scoort, maar waar de klant graag over praat of waar een snelle winst ligt. Houd de lijst kort. |
+| `info.adviesverloopUsecases` | Uitwerking per bouwsteen, kaart van de huidige fase, naast de titel | Bij elke use case zet de app een prompt voor Copilot klaar. De uitkomst van de Meting vormt de context, jij kijkt het na voor je kopieert. |
+| `info.adviesverloopRol` | Prompt klaarzetten, deel Wie ben jij bij deze klant | Beschrijf in je eigen woorden wie je bent bij deze klant: Wie je kent, hoe je samenwerkt en wat je kunt doen. Copilot past de aanpak daarop aan. |
+| `info.adviesverloopContext` | Prompt klaarzetten, deel Waar werk je aan | Dit zijn gegevens op groepsniveau uit de Meting. Antwoorden per persoon, namen en groepen die te klein zijn gaan niet mee. Pas aan wat niet klopt. |
 | `info.dossier` (vervangt `info.nieuwsartikelen`) | Organisatie-detail, kaart Dossier, naast de titel | Cases, benchmarks, nieuws, events en blogs die je bij deze organisatie bewaart. Alleen jij en je collega-consultants zien ze. De Lead ziet een item pas als het Dossier zichtbaar is én het item op Zichtbaar voor Lead staat. Een case kan alleen zichtbaar worden als de organisatie in de case dat heeft toegestaan. |
 | `info.caseVlag` | Organisatie-detail, bij het vinkje "Mag als case gebruikt worden" | Zet dit pas aan nadat dit met de organisatie is afgesproken, bijvoorbeeld via contract of mail. Dan mag een consultant deze organisatie als case laten zien aan de lead van een andere organisatie. De lead ziet de branche en de omvang, nooit de naam. Uitzetten haalt de cases met deze organisatie meteen weg bij de leads. |
 | `info.kpiBlok` | Organisatie-detail, organisatiepaneel, naast het label KPI's | Algemeen geldt voor de hele organisatie en voor alle kanalen samen. Vul in wat je weet en splits uit zodra je meer weet. |
@@ -1294,6 +1300,7 @@ alle Metingen, een Consultant die van zijn eigen organisaties.
 - **Kop**: Naam van de Meting met een potlood erachter (Wijzigen, hierboven),
   Assessment, onderdeel, meetdatum, de organisatie (met link terug naar het organisatie-detail) en
   voortgang ("x van y afgerond").
+- **Adviesverloop**: Een kaart onder de kop met de fasestrook in klein formaat (`adviesverloop.md`, De fasestrook) en de knop "Adviesverloop openen". Alleen voor wie `adviesverloop.bekijken` heeft. Zonder afgeronde scans is de knop uitgeschakeld, met de reden in een Info-icoon.
 - **Scans in deze Meting**: Eén rij per Respondent in deze Meting. Kolommen:
   Naam, Rol/Team, Status, Voortgang, Gestart, Aangemaakt
   (`ScanInvulling.aangemaaktOp`, bij een import het importmoment, zodat je
@@ -2020,7 +2027,7 @@ een view een niveau dieper.
 
 - **Metingen**: Eén rij per Meting, op meetdatum, de nieuwste bovenaan.
   Kolommen: Organisatie, Meting (de naam), Onderdeel, Assessment, Meetdatum,
-  Afgeronde scans ("x van y") en "Bekijk". Een Meting zonder meetdatum staat
+  Afgeronde scans ("x van y"), Adviesverloop (de huidige fase en de voortgang, bijvoorbeeld "Oplossen · 0 van 4", leeg als er geen adviesverloop is, punt 16) en "Bekijk". Een Meting zonder meetdatum staat
   onderaan met "Datum ontbreekt". Een samengestelde Meting heeft de badge
   "Gemiddelde". Filters: Organisatie, Assessment en een periode op meetdatum.
   Alle kolommen zijn sorteerbaar. Een klik op de rij opent het Meting-overzicht
@@ -2242,6 +2249,23 @@ de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat zelf niets op
   Alle groepen naast elkaar en Verband met een kenmerk.
 
 ---
+
+#### 16. Adviesverloop
+
+Het adviesverloop van een Meting (`adviesverloop.md`). Het heeft geen eigen hoofdlink en geen eigen tab: Het zit op drie plekken. In de lijst Metingen onder Resultaten (punt 7) als kolom, in het Meting-overzicht (punt 5) als kaart met de fasestrook, en in het organisatie-detail als regel bij elke Meting. De knop "Adviesverloop openen" opent de pagina Adviesverloop met het kruimelpad Organisaties › {Organisatie} › {Meting} › Adviesverloop. De schermen, de regels en het contextblok staan in `adviesverloop.md`.
+
+Een Admin ziet het adviesverloop van alle Metingen en een Consultant dat van zijn eigen Organisaties (`adviesverloop.bekijken` en `adviesverloop.bewerken`, `datamodel-rollen.md`). Een Lead en een Respondent zien het niet, ook niet via de adresregel. Een Meting zonder afgeronde scans heeft geen adviesverloop.
+
+#### 17. Adviescatalogus (Admin-only)
+
+Het beheer van de fasen, de use cases, de rollen en de prompts waaruit het adviesverloop bestaat (`datamodel.md`, Adviesverloop). Een tab onder Assessments, alleen voor een Admin (`adviesverloop.catalogus`). Een Consultant heeft de tab niet en de pagina is voor hem niet bereikbaar, ook niet via de adresregel.
+
+- **Fasen**: De zes fasen met naam, korte naam en volgorde. Aanmaken en verwijderen kan niet; hernoemen en de volgorde wel, tenzij er al een Adviesverloop is.
+- **Use cases**: Per fase een lijst. Per use case de code, titel, omschrijving, apps, de keuze of de use case meetelt in de fasestrook, de bouwstenen en klassen waarbij hij wordt voorgesteld en de volgorde. Een use case verwijderen kan alleen als er geen `Adviesstap` naar verwijst. Anders kan hij worden verborgen.
+- **Rollen**: De rollen met naam, volgorde en de standaardtekst bij Wie ben jij bij deze klant.
+- **Prompts**: Per use case en per rol een context en een prompt. Een use case zonder prompt voor een rol is beschikbaar voor die rol met een lege prompt, die de Consultant zelf invult.
+- **Bewerkslot en audit**: Zoals bij Content (punt 2). Elke wijziging komt in het audit-log als `adviescatalogus.gewijzigd`.
+- **Beginwaarden**: De eerste inhoud komt uit de use cases van de Boks-app.
 
 ## Verwijderen
 
