@@ -966,6 +966,7 @@ Alleen voor een Admin (`content.beheren`). Het design staat in
   `organisatie.hernoemd`, met de oude en de nieuwe naam in `details`
   (`datamodel.md`, Audit). Oudere audit-regels houden de naam zoals die was
   bij het loggen.
+- **Adviesverloop** (`adviesverloop.md`): Een blok onder de Kenmerken, alleen voor wie `adviesverloop.bekijken` heeft. Per Onderdeel met een adviesverloop (of voor de hele Organisatie) één regel met de huidige fase, het aantal gekoppelde Metingen, de status (Lopend of Afgerond) en de knop "Openen". Bij de Metingen in de lijst hieronder staat het label in het traject, als de Meting gekoppeld is.
 - **Detail**: Het organisatiepaneel (Kenmerken altijd bewerkbaar, met Toegang, Afspraken en Contactpersonen), "Aangemaakt door" (zie
   hierboven), de metingen van deze organisatie met "Bekijk" naar het
   Meting-overzicht (punt 5), op meetdatum, de nieuwste bovenaan, en de respondenten met hun
@@ -1300,7 +1301,7 @@ alle Metingen, een Consultant die van zijn eigen organisaties.
 - **Kop**: Naam van de Meting met een potlood erachter (Wijzigen, hierboven),
   Assessment, onderdeel, meetdatum, de organisatie (met link terug naar het organisatie-detail) en
   voortgang ("x van y afgerond").
-- **Adviesverloop**: Een kaart onder de kop met de fasestrook in klein formaat (`adviesverloop.md`, De fasestrook) en de knop "Adviesverloop openen". Alleen voor wie `adviesverloop.bekijken` heeft. Zonder afgeronde scans is de knop uitgeschakeld, met de reden in een Info-icoon.
+- **Adviesverloop**: Een kaart onder de kop. Hoort de Meting bij een adviesverloop, dan staat er de fasestrook in klein formaat (`adviesverloop.md`, De fasestrook), het label van de Meting in het traject en de knop "Adviesverloop openen". Hoort ze er nog niet bij maar loopt er voor deze Organisatie en dit Onderdeel een adviesverloop, dan staat er "Deze Meting hoort nog niet bij het lopende adviesverloop" met de knop "Koppelen" (met een optioneel label). Loopt er geen, dan staat er de knop "Adviesverloop starten". Alleen voor wie `adviesverloop.bekijken` heeft. Zonder afgeronde scans zijn de knoppen uitgeschakeld, met de reden in een Info-icoon.
 - **Scans in deze Meting**: Eén rij per Respondent in deze Meting. Kolommen:
   Naam, Rol/Team, Status, Voortgang, Gestart, Aangemaakt
   (`ScanInvulling.aangemaaktOp`, bij een import het importmoment, zodat je
@@ -2027,7 +2028,7 @@ een view een niveau dieper.
 
 - **Metingen**: Eén rij per Meting, op meetdatum, de nieuwste bovenaan.
   Kolommen: Organisatie, Meting (de naam), Onderdeel, Assessment, Meetdatum,
-  Afgeronde scans ("x van y"), Adviesverloop (de huidige fase en de voortgang, bijvoorbeeld "Oplossen · 0 van 4", leeg als er geen adviesverloop is, punt 16) en "Bekijk". Een Meting zonder meetdatum staat
+  Afgeronde scans ("x van y"), Adviesverloop (de huidige fase en de voortgang van het adviesverloop waar de Meting bij hoort, bijvoorbeeld "Oplossen · 0 van 4", leeg als de Meting nergens bij hoort, punt 16) en "Bekijk". Een Meting zonder meetdatum staat
   onderaan met "Datum ontbreekt". Een samengestelde Meting heeft de badge
   "Gemiddelde". Filters: Organisatie, Assessment en een periode op meetdatum.
   Alle kolommen zijn sorteerbaar. Een klik op de rij opent het Meting-overzicht
@@ -2252,9 +2253,9 @@ de tab niet. Kruimelpad Resultaten › Verkennen. Het scherm slaat zelf niets op
 
 #### 16. Adviesverloop
 
-Het adviesverloop van een Meting (`adviesverloop.md`). Het heeft geen eigen hoofdlink en geen eigen tab: Het zit op drie plekken. In de lijst Metingen onder Resultaten (punt 7) als kolom, in het Meting-overzicht (punt 5) als kaart met de fasestrook, en in het organisatie-detail als regel bij elke Meting. De knop "Adviesverloop openen" opent de pagina Adviesverloop met het kruimelpad Organisaties › {Organisatie} › {Meting} › Adviesverloop. De schermen, de regels en het contextblok staan in `adviesverloop.md`.
+Het adviesverloop van een Organisatie, of van een Onderdeel daarvan (`adviesverloop.md`). Een Meting is de aanleiding en de bron van de scores, maar het adviesverloop hoort bij de Organisatie en kan meerdere Metingen omvatten. Het heeft geen eigen hoofdlink en geen eigen tab: Het zit op drie plekken. In de lijst Metingen onder Resultaten (punt 7) als kolom, in het Meting-overzicht (punt 5) als kaart met de fasestrook, en in het organisatie-detail (punt 4) als eigen blok per Onderdeel. De knop "Adviesverloop openen" opent de pagina Adviesverloop met het kruimelpad Organisaties › {Organisatie} › Adviesverloop. De schermen, de regels en het contextblok staan in `adviesverloop.md`.
 
-Een Admin ziet het adviesverloop van alle Metingen en een Consultant dat van zijn eigen Organisaties (`adviesverloop.bekijken` en `adviesverloop.bewerken`, `datamodel-rollen.md`). Een Lead en een Respondent zien het niet, ook niet via de adresregel. Een Meting zonder afgeronde scans heeft geen adviesverloop.
+Een Admin ziet het adviesverloop van alle Metingen en een Consultant dat van zijn eigen Organisaties (`adviesverloop.bekijken` en `adviesverloop.bewerken`, `datamodel-rollen.md`). Een Lead en een Respondent zien het niet, ook niet via de adresregel. Een adviesverloop starten kan alleen vanaf een Meting met afgeronde scans.
 
 #### 17. Adviescatalogus (Admin-only)
 

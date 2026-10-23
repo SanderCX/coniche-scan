@@ -25,6 +25,7 @@ De specificatie van de Coniche Scan-app. Dit bestand bevat de uitgangspunten, de
 | `content-ai-scan.md` | Vragen van de AI-volwassenheidsscan |
 | `content-ziekenhuis-quickscan.md` | Afdelingen (categorieën), dimensies (bouwstenen), vragen en resultaatopbouw van de Klantcontact Quickscan – Ziekenhuis (Ja / Nee / Weet ik niet) |
 | `content-spanningsmeter.md` | Vragen, ijkpunten, open voorbeeldvragen en achtergrondvragen van de Spanningsmeter (zes spanningsvelden, 30 gescoorde vragen), met de rekenregels en een validatieplan |
+| `content-adviesverloop.md` | Beginwaarden van de Adviescatalogus: De zes fasen, 49 use cases met per rol een context en een prompt voor Copilot, de drie rollen en de uitleg over context |
 | `content-respondentrol.md` | De vaste lijst bij het veld Rol / functie van de Respondent |
 | `content-techstack.md` | De vaste lijsten bij de organisatievelden Techstack, oplossingen en ondersteunende partijen |
 
@@ -50,9 +51,8 @@ De specificatie van de Coniche Scan-app. Dit bestand bevat de uitgangspunten, de
 | `visualisatie-mijn-metingen.md` | Opmaak van Mijn metingen voor Respondent en Lead: Kaarten, statussen, teaser van de uitkomst, respons, benchmarkkaart |
 | `visualisatie-verkennen.md` | Admin-scherm Verkennen onder Resultaten: Filteren, groeperen en vergelijken van alle Organisaties van één Assessment, met vier weergaven |
 | `benchmark.md` | Benchmark op drie niveaus: Tussen organisaties (geaggregeerd en anoniem, met een view per organisatie voor een Lead), binnen een organisatie tussen Metingen, en binnen een Meting |
-| `adviesverloop.md` | Het adviesverloop van een Meting voor een Consultant en een Admin: De fasestrook met de scan als startpunt, de shortlist van bouwstenen, de uitwerking per bouwsteen, Prompt klaarzetten voor Copilot en het vastleggen van gedane stappen |
+| `adviesverloop.md` | Het adviesverloop van een Organisatie of Onderdeel voor een Consultant en een Admin, met Metingen als bron van de scores: De fasestrook met de scan als startpunt, de shortlist van bouwstenen, de uitwerking per bouwsteen, Prompt klaarzetten voor Copilot en het vastleggen van gedane stappen |
 | `copilot-koppeling.md` | Architectuur en stappenplan voor Copilot en SharePoint: Componenten met wat de specs vastleggen en wat open staat, en de stappen naar een Copilot-agent |
-| `content-adviesverloop.md` | Beginwaarde van de Adviescatalogus: De zes fasen, de use cases met per rol een context en een prompt voor Copilot, de drie rollen en de uitleg over context in Copilot |
 | `dossier.md` | Het Dossier van een Organisatie: Nieuws, Cases, Events en Blogs die een Consultant samenstelt en openzet voor de Lead, met koppeling aan bouwstenen, de radar met filter en de verdeling (Basis op orde, Uitbouwen, Sterk punt) met de rail "In dit dossier", de Afspraak "Mag als case gebruikt worden" en de rechten |
 
 **Export en import**
@@ -127,7 +127,7 @@ Wat gebouwd is, per onderdeel. De spec van het onderdeel beschrijft hoe het moet
 | Help | Gebouwd | `help.md` | De inhoud wacht op beoordeling door Joost |
 | Quickscan Ziekenhuis | Deels gebouwd | `content-ziekenhuis-quickscan.md`, `visualisatie-quickscan.md` | Doorloopflow, resultaat en visualisaties zijn gebouwd; PDF, CSV, InDesign, import, vergelijking tussen Metingen en benchmark binnen een organisatie of Meting volgen (`backlog.md`) |
 | Spanningsmeter | Ontworpen, niet gebouwd | `content-spanningsmeter.md`, `visualisatie-spanningsmeter.md` | Open: De validatie van de vragen en de verificatie van de teksten |
-| Adviesverloop | Ontworpen, niet gebouwd | `adviesverloop.md`, `copilot-koppeling.md`, `content-adviesverloop.md` | Open: Per Meting of per Organisatie, de plek van de catalogus en de minimale groepsgrootte voor het contextblok |
+| Adviesverloop | Ontworpen, niet gebouwd | `adviesverloop.md`, `copilot-koppeling.md`, `content-adviesverloop.md` | Open: Of een Meting van een ander Assessment gekoppeld mag worden, de plek van de catalogus en de minimale groepsgrootte voor het contextblok |
 | AI-managementsamenvatting | Uitgesteld | `backlog.md` | |
 | Adoptiescan | Niet gestart | | |
 
@@ -144,7 +144,7 @@ In de interface en in alle specs gelden deze termen. In de code heten sommige ty
 | **Ingevulde scan** | Eén invulling door één Respondent binnen één Meting | |
 | **Onderdeel** | Een deel van een Organisatie met een eigen naam en eigen KPI-waarden | Afdeling, rolgroep |
 | **Bouwsteen** | Een van de 15 bouwstenen van de Klantcontact Volwassenheidsscan | Bouwblok |
-| **Adviesverloop** | De voortgang van één Meting door de zes fasen van het adviesproces, met een shortlist van bouwstenen en de gedane stappen. Alleen voor een Admin en een Consultant | |
+| **Adviesverloop** | De voortgang van een Organisatie of Onderdeel door de zes fasen van het adviesproces, met een of meer gekoppelde Metingen als bron van de scores, met een shortlist van bouwstenen en de gedane stappen. Alleen voor een Admin en een Consultant | |
 | **Use case** | Een taak binnen een fase van het adviesverloop, met per rol een prompt voor Copilot | |
 | **Spanningsveld** | Een van de zes velden van de Spanningsmeter. In de code een bouwsteen; in de interface nooit "bouwsteen" | |
 

@@ -762,9 +762,9 @@ verwijst wat niet meer bestaat.
   blijven bestaan.
 - **Respondent**: De respondent, zijn toegangscode en al zijn
   invullingen.
-- **Meting**: De meting en alle invullingen daarbinnen, en het Adviesverloop van de Meting met zijn Adviesstappen. Respondenten
+- **Meting**: De meting en alle invullingen daarbinnen, en haar koppeling met een Adviesverloop. Het Adviesverloop en zijn Adviesstappen blijven bestaan; `startMetingId` en `peilMetingId` die naar de Meting wijzen worden de eerstvolgende gekoppelde Meting, en de `metingId` van een Adviesstap wordt `null`. Is het de enige gekoppelde Meting, dan kan ze niet worden verwijderd zolang het Adviesverloop bestaat. Respondenten
   en het Onderdeel van de Meting blijven bestaan.
-- **Onderdeel**: Alleen als er geen Meting
+- **Onderdeel**: Alleen als er geen Meting en geen Adviesverloop
   aan hangt. De KPI-waarden van het Onderdeel verdwijnen mee, en de
   bevestiging noemt het aantal.
 - **Kanaal**: Het kanaal met al zijn
@@ -1087,7 +1087,7 @@ KpiWaarde {
 
 ### Adviesverloop
 
-Het adviesverloop van een Meting (`adviesverloop.md`): De voortgang door de zes fasen, de shortlist en de gedane stappen. De fasen, use cases en rollen zijn data die een Admin beheert (`beheerpagina.md`, punt 17).
+Het adviesverloop van een Organisatie, of van een Onderdeel daarvan (`adviesverloop.md`): De voortgang door de zes fasen, de shortlist en de gedane stappen. Een Meting is de aanleiding en de bron van de scores, maar het adviesverloop hoort bij de Organisatie. Er kunnen in de loop van het traject Metingen bijkomen. De fasen, use cases en rollen zijn data die een Admin beheert (`beheerpagina.md`, punt 17).
 
 ```
 Fase {
@@ -1125,13 +1125,25 @@ UseCasePrompt {
 
 Adviesverloop {
   id: string
-  metingId: string                 // hoogstens één Adviesverloop per Meting
+  organisatieId: string
+  onderdeelId: string | null       // null is "Hele organisatie", zoals bij de Meting
+  status: "lopend" | "afgerond"
+  afgerondOp: datetime | null
+  startMetingId: string            // de Meting waarmee het Adviesverloop is geopend
+  peilMetingId: string | null      // de Meting waarvan de scores de shortlist bepalen, null is de meest recente gekoppelde Meting met afgeronde scans
   aangemaaktDoor: string           // Gebruiker.id
   aangemaaktOp: datetime
   extraBouwsteenIds: string[]      // door de Consultant aan de shortlist toegevoegd
   rolId: string                    // gekozen AdviesRol
   rolTekst: string                 // de tekst bij Wie ben jij bij deze klant, maximaal 600 tekens
-  vorigAdviesverloopId: string | null  // bij een herhaalmeting
+}
+
+AdviesverloopMeting {
+  adviesverloopId: string
+  metingId: string                 // een Meting hoort bij hoogstens één Adviesverloop
+  label: string | null             // vrije aanduiding, bijvoorbeeld "Nulmeting", "Tussenmeting" of "Eindmeting", maximaal 40 tekens
+  gekoppeldOp: datetime
+  gekoppeldDoor: string            // Gebruiker.id
 }
 
 Adviesstap {
@@ -1140,17 +1152,24 @@ Adviesstap {
   useCaseId: string
   status: "promptGekopieerd" | "gedaan"
   bouwsteenId: string | null       // de bouwsteen waarvoor de stap is gedaan
+  metingId: string | null          // de Meting waarvan de scores in het contextblok zaten
   link: string                     // http of https, mag leeg zijn
   gedaanOp: datetime
   gedaanDoor: string               // Gebruiker.id
 }
 ```
 
-- **Shortlist.** De bouwstenen op de shortlist zijn de `shortlistAantal` bouwstenen met de laagste score (`Instellingen`, Drempels en termijnen) plus `extraBouwsteenIds`. De eerste groep wordt altijd afgeleid uit de scores van de Meting en niet opgeslagen. Een score die verandert, verandert dus de shortlist.
+- **Bereik.** Een Adviesverloop hoort bij een Organisatie en een Onderdeel (of de hele Organisatie), niet bij een Meting. Per Organisatie en Onderdeel is er hoogstens één lopend Adviesverloop. Een afgerond Adviesverloop blijft bestaan en een nieuw traject begint met een nieuw Adviesverloop.
+- **Metingen koppelen.** De Meting waarmee het Adviesverloop wordt geopend is de eerste gekoppelde Meting. Daarna kan de Consultant andere Metingen van dezelfde Organisatie en hetzelfde Onderdeel koppelen en weer loskoppelen, gewone en samengestelde Metingen (een samengestelde Meting telt als afgerond als haar onderliggende Metingen voldoen), zoveel als bij het traject passen, maar er is altijd minstens één gekoppelde Meting: Loskoppelen van de laatste kan niet. Het `label` is een hulpmiddel en geen vaste indeling: Er is geen verplichte nulmeting, tussenmeting of eindmeting, en de app dwingt geen volgorde of aantal af. De volgorde in de tijd volgt de meetdatum van de Meting.
+- **Ander Assessment.** Een Meting van een ander Assessment dan de eerste gekoppelde Meting kan alleen gekoppeld worden als de Organisatie lid is van een benchmark waarin beide Assessments zitten. Scores van verschillende Assessments worden niet gemengd, dus het verschil met de eerste Meting wordt alleen getoond tussen Metingen van hetzelfde Assessment.
+- **Peilmeting.** De Meting die de scores levert voor de shortlist en het contextblok. Standaard de meest recente gekoppelde Meting met afgeronde scans (`peilMetingId: null`). De Consultant kan een andere kiezen.
+- **Shortlist.** De bouwstenen op de shortlist zijn de `shortlistAantal` bouwstenen met de laagste score (`Instellingen`, Drempels en termijnen) plus `extraBouwsteenIds`. De eerste groep wordt altijd afgeleid uit de scores van de peilmeting en niet opgeslagen. Een score die verandert, verandert dus de shortlist.
 - **Een stap telt als gedaan** bij de statussen `promptGekopieerd` en `gedaan`. Terugzetten naar open verwijdert de `Adviesstap`.
 - **Huidige fase** is de eerste fase met een `UseCase` met `inStrook` waarvoor nog geen `Adviesstap` bestaat. Dit wordt afgeleid, er is geen veld voor.
-- **Eén Adviesverloop per Meting**, aangemaakt bij het eerste openen. Een Meting zonder afgeronde scans heeft er geen.
+- **Aanmaken** bij het eerste openen vanaf een Meting met afgeronde scans. Een Meting zonder afgeronde scans kan geen Adviesverloop starten. Bestaat er voor de Organisatie en het Onderdeel al een lopend Adviesverloop, dan stelt de app voor de Meting daaraan te koppelen.
+- **Afronden.** De Consultant zet het Adviesverloop op `afgerond`. Daarna zijn shortlist, stappen en koppelingen alleen nog te lezen, en kan een nieuw Adviesverloop beginnen. Heropenen kan.
 - **Wat niet wordt opgeslagen.** De inhoud van de prompt en het contextblok. Alleen de `Adviesstap` en een eventuele link.
+- **Adviesverloop verwijderen.** Het Adviesverloop met zijn koppelingen en Adviesstappen. De Metingen blijven bestaan. De bevestiging noemt het aantal stappen. Een Admin mag het van alle Organisaties, een Consultant van zijn eigen (zelf aangemaakt of toegewezen).
 - **Content en rechten.** `Fase`, `AdviesRol` en `UseCase` volgen de regels van Content bewerken: Alleen een Admin beheert ze.
 
 ---
