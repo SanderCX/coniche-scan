@@ -26,6 +26,8 @@ De nav heeft een vast deel links (het logo) en een contextueel deel rechts (`.na
 4. **Scheidingslijn**, alleen als punt 5 iets bevat.
 5. **Identiteitsmenu**, helemaal uiterst rechts, voorbij de exit-actie: Het Accountmenu (`beheerpagina.md`) aan de beheerkant, het Mijn gegevens-menu (zie Mijn gegevens-menu) aan de respondentkant. Op elk scherm zonder ingelogde of herkende gebruiker (Kies jouw assessment, de andere publieke schermen en de Assessment-pagina zonder sessie) staat hier "Inloggen": De uitgelogde variant van hetzelfde slot, zonder dropdown en zonder pijltje. Het slot is dus nooit leeg. Een account- of profielmenu staat altijd als allerlaatste element in de nav, niet ervoor.
 
+**Adviesverloop.** Het adviesverloop is een beheerscherm voor een Admin en een Consultant, geen scherm voor een Respondent of een Lead. Het hangt aan een Meting en staat in `adviesverloop.md`. Er zijn aan de respondentkant geen links naar.
+
 **Geen scheidingslijn zonder inhoud aan beide kanten.** Op Mijn metingen staat bijvoorbeeld alleen het Mijn gegevens-menu, zonder scheidingslijn: Er is op dat scherm geen scherm-specifieke actie (punt 1) en geen exit-actie (punt 3).
 
 **"Terug naar" is niet automatisch de exit-actie.** Op de Resultatenpagina is "Terug naar de scan" een scherm-specifieke actie (punt 1, je blijft binnen dezelfde scan) en "Terug naar Mijn metingen" de exit-actie (punt 3, je verlaat de scan). Beide staan er naast elkaar.
