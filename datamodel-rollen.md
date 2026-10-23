@@ -478,8 +478,11 @@ gebeurtenis, zonder persoonsgegevens uit scans.
 - `organisatie.caseVlagGewijzigd`:
   `caseToegestaan` is gewijzigd. `details` bevat de Organisatie en de nieuwe
   waarde.
-- `adviesstap.gedaan`: Een stap van een adviesverloop is gedaan (prompt gekopieerd of als gedaan gemarkeerd) of teruggezet. `details` bevat de Organisatie, de Meting, de code van de use case en de status. Niet de inhoud van de prompt.
-- `adviesverloop.shortlistGewijzigd`: Een bouwsteen is aan de shortlist toegevoegd of eruit gehaald. `details` bevat de Organisatie, de Meting, het nummer van de bouwsteen en de actie.
+- `adviesstap.gedaan`: Een stap van een adviesverloop is gedaan (prompt gekopieerd of als gedaan gemarkeerd) of teruggezet. `details` bevat de Organisatie, het Onderdeel, de Meting waarvan de scores zijn gebruikt, de code van de use case en de status. Niet de inhoud van de prompt.
+- `adviesverloop.shortlistGewijzigd`: Een bouwsteen is aan de shortlist toegevoegd of eruit gehaald. `details` bevat de Organisatie, het Onderdeel, het nummer van de bouwsteen en de actie.
+- `adviesverloop.verwijderd`: Een adviesverloop is verwijderd. `details` bevat de Organisatie, het Onderdeel en het aantal stappen.
+- `adviesverloop.metingGekoppeld`: Een Meting is aan een adviesverloop gekoppeld of losgekoppeld. `details` bevat de Organisatie, het Onderdeel, de Meting, het label en de actie.
+- `adviesverloop.statusGewijzigd`: Een adviesverloop is gestart, afgerond of heropend. `details` bevat de Organisatie, het Onderdeel en de nieuwe status.
 - `adviescatalogus.gewijzigd`: Een fase, use case, rol of prompt is aangemaakt, gewijzigd, verwijderd of verplaatst. `details` bevat de soort, de naam of code en bij een wijziging de namen van de gewijzigde velden.
 - `kpiDefinitie.aangemaakt`, `kpiDefinitie.gewijzigd`, `kpiDefinitie.verwijderd`,
   `kpiDefinitie.volgordeGewijzigd`, `kanaal.aangemaakt`, `kanaal.hernoemd`,
@@ -529,8 +532,9 @@ Een streepje betekent geen toegang.
 | `benchmark.beheren` | alle | - | - | - |
 | `benchmark.inzien` | alle | - | aangevinkte benchmarks | - |
 | `verkennen.inzien` | alle | - | - | - |
-| `adviesverloop.bekijken` (het adviesverloop van een Meting, `adviesverloop.md`) | alle | eigen | - | - |
-| `adviesverloop.bewerken` (shortlist, rol, stappen en prompts klaarzetten) | alle | eigen | - | - |
+| `adviesverloop.bekijken` (het adviesverloop van een Organisatie of Onderdeel, `adviesverloop.md`) | alle | eigen | - | - |
+| `adviesverloop.bewerken` (shortlist, rol, stappen, Metingen koppelen, afronden en prompts klaarzetten) | alle | eigen | - | - |
+| `adviesverloop.verwijderen` (een adviesverloop met zijn stappen verwijderen) | alle | eigen | - | - |
 | `adviesverloop.catalogus` (fasen, use cases, rollen en prompts beheren) | alle | - | - | - |
 
 Een Lead die zelf invult, doet dat met het bereik `zelf`, net als elke
