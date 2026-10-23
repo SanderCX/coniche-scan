@@ -109,7 +109,7 @@ Gebruiker {
 ```
 
 Een gebruiker wijzigt zijn eigen naam en wachtwoord via "Mijn account"
-(`beheerpagina.md`, Accountmenu), het e-mailadres niet.
+(`beheerpagina.md`, Accountmenu), het e-mailadres niet. Een Admin en een Consultant wijzigen daar ook hun eigen adviescontext (tab Adviescontext, `adviesverloop.md`, Adviescontext in Mijn account): Alleen de eigenaar leest en wijzigt die, ook een Admin ziet die van een ander niet, en de wijzigingen komen niet in het audit-log.
 
 #### 2FA: TOTP via authenticator-app
 
@@ -479,7 +479,7 @@ gebeurtenis, zonder persoonsgegevens uit scans.
   `caseToegestaan` is gewijzigd. `details` bevat de Organisatie en de nieuwe
   waarde.
 - `adviesstap.gedaan`: Een stap van een adviesverloop is gedaan (prompt gekopieerd of als gedaan gemarkeerd) of teruggezet. `details` bevat de Organisatie, het Onderdeel, de Meting waarvan de scores zijn gebruikt, de code van de use case en de status. Niet de inhoud van de prompt.
-- `adviesverloop.shortlistGewijzigd`: Een bouwsteen is aan de shortlist toegevoegd of eruit gehaald. `details` bevat de Organisatie, het Onderdeel, het nummer van de bouwsteen en de actie.
+- `adviesverloop.shortlistGewijzigd`: Een bouwsteen is aan de shortlist toegevoegd of eruit gehaald, of de volgorde is gewijzigd, of de shortlist is hersteld naar de standaard. `details` bevat de Organisatie, het Onderdeel, het nummer van de bouwsteen en de actie.
 - `adviesverloop.verwijderd`: Een adviesverloop is verwijderd. `details` bevat de Organisatie, het Onderdeel en het aantal stappen.
 - `adviesverloop.metingGekoppeld`: Een Meting is aan een adviesverloop gekoppeld of losgekoppeld. `details` bevat de Organisatie, het Onderdeel, de Meting, het label en de actie.
 - `adviesverloop.statusGewijzigd`: Een adviesverloop is gestart, afgerond of heropend. `details` bevat de Organisatie, het Onderdeel en de nieuwe status.
@@ -533,7 +533,7 @@ Een streepje betekent geen toegang.
 | `benchmark.inzien` | alle | - | aangevinkte benchmarks | - |
 | `verkennen.inzien` | alle | - | - | - |
 | `adviesverloop.bekijken` (het adviesverloop van een Organisatie of Onderdeel, `adviesverloop.md`) | alle | eigen | - | - |
-| `adviesverloop.bewerken` (shortlist, rol, stappen, Metingen koppelen, afronden en prompts klaarzetten) | alle | eigen | - | - |
+| `adviesverloop.bewerken` (shortlist kiezen en ordenen, rol kiezen, stappen, fasen en use cases n.v.t. verklaren, Metingen koppelen, afronden en prompts klaarzetten) | alle | eigen | - | - |
 | `adviesverloop.verwijderen` (een adviesverloop met zijn stappen verwijderen) | alle | eigen | - | - |
 | `adviesverloop.catalogus` (fasen, use cases, rollen en prompts beheren) | alle | - | - | - |
 
