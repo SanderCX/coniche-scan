@@ -52,6 +52,7 @@ De specificatie van de Coniche Scan-app. Dit bestand bevat de uitgangspunten, de
 | `benchmark.md` | Benchmark op drie niveaus: Tussen organisaties (geaggregeerd en anoniem, met een view per organisatie voor een Lead), binnen een organisatie tussen Metingen, en binnen een Meting |
 | `adviesverloop.md` | Het adviesverloop van een Meting voor een Consultant en een Admin: De fasestrook met de scan als startpunt, de shortlist van bouwstenen, de uitwerking per bouwsteen, Prompt klaarzetten voor Copilot en het vastleggen van gedane stappen |
 | `copilot-koppeling.md` | Architectuur en stappenplan voor Copilot en SharePoint: Componenten met wat de specs vastleggen en wat open staat, en de stappen naar een Copilot-agent |
+| `content-adviesverloop.md` | Beginwaarde van de Adviescatalogus: De zes fasen, de use cases met per rol een context en een prompt voor Copilot, de drie rollen en de uitleg over context in Copilot |
 | `dossier.md` | Het Dossier van een Organisatie: Nieuws, Cases, Events en Blogs die een Consultant samenstelt en openzet voor de Lead, met koppeling aan bouwstenen, de radar met filter en de verdeling (Basis op orde, Uitbouwen, Sterk punt) met de rail "In dit dossier", de Afspraak "Mag als case gebruikt worden" en de rechten |
 
 **Export en import**
@@ -126,7 +127,7 @@ Wat gebouwd is, per onderdeel. De spec van het onderdeel beschrijft hoe het moet
 | Help | Gebouwd | `help.md` | De inhoud wacht op beoordeling door Joost |
 | Quickscan Ziekenhuis | Deels gebouwd | `content-ziekenhuis-quickscan.md`, `visualisatie-quickscan.md` | Doorloopflow, resultaat en visualisaties zijn gebouwd; PDF, CSV, InDesign, import, vergelijking tussen Metingen en benchmark binnen een organisatie of Meting volgen (`backlog.md`) |
 | Spanningsmeter | Ontworpen, niet gebouwd | `content-spanningsmeter.md`, `visualisatie-spanningsmeter.md` | Open: De validatie van de vragen en de verificatie van de teksten |
-| Adviesverloop | Ontworpen, niet gebouwd | `adviesverloop.md`, `copilot-koppeling.md` | Open: Per Meting of per Organisatie, de plek van de catalogus en de minimale groepsgrootte voor het contextblok |
+| Adviesverloop | Ontworpen, niet gebouwd | `adviesverloop.md`, `copilot-koppeling.md`, `content-adviesverloop.md` | Open: Per Meting of per Organisatie, de plek van de catalogus en de minimale groepsgrootte voor het contextblok |
 | AI-managementsamenvatting | Uitgesteld | `backlog.md` | |
 | Adoptiescan | Niet gestart | | |
 
